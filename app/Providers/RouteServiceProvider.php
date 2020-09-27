@@ -44,9 +44,75 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
 
-        $this->mapWebRoutes();
+        $this->mapAdminRoutes();
 
-        //
+        $this->mapWarhouseOwnerRoutes();
+
+        $this->mapWarhouseManagerRoutes();
+
+        $this->mapWarhouseRoutes();
+
+        $this->mapWebRoutes();
+    }
+
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapAdminRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->domain('admin.'.env('APP_URL'))
+            ->group(base_path('routes/admin.php'));
+    }
+
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWarhouseOwnerRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->domain('owner.'.env('APP_URL'))
+            ->group(base_path('routes/owner.php'));
+    }
+
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWarhouseManagerRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->domain('manager.'.env('APP_URL'))
+            ->group(base_path('routes/manager.php'));
+    }
+
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWarhouseRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->domain('warhouse.'.env('APP_URL'))
+            ->group(base_path('routes/warhouse.php'));
     }
 
     /**
