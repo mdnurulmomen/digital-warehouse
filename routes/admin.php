@@ -16,13 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::name('admin.')->group(function () {
 
     Route::get('/', function () {
-       return view('auth.login'); 
-    })->name('login_page');
+       return view('auth.login', ['url' => 'admin']); 
+    })->name('login');
 
-	Route::post('/', 'LoginController@adminLogin')->name('submit_login');
+	Route::post('/', 'Auth\LoginController@adminLogin')->name('login');
 
-	Route::get('/home', 'HomeController@index')->name('home');
+	Route::get('/home', 'HomeController@adminHome')->name('home');
 
 });
-
-

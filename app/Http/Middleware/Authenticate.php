@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class Authenticate extends Middleware
@@ -15,7 +17,24 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            return route('login');
+
+            $routeName = Route::currentRouteName();
+
+            if (Str::contains($routeName, 'admin.')) {
+                return route('admin.login');
+            }
+            elseif (Str::contains($routeName, 'owner.')) {
+                return route('owner.login');
+            }
+            elseif (Str::contains($routeName, 'warhouse.')) {
+                return route('warhouse.login');
+            }
+            elseif (Str::contains($routeName, 'manager.')) {
+                return route('manager.login');
+            }
+            else
+                return route('login');
+            
         }
     }
 }

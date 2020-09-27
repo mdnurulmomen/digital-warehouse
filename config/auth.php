@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'merchant',
+        'passwords' => 'merchants',
     ],
 
     /*
@@ -28,7 +28,7 @@ return [
     | here which uses session storage and the Eloquent user provider.
     |
     | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
+    | merchants are actually retrieved out of your database or other storage
     | mechanisms used by this application to persist your user's data.
     |
     | Supported: "session", "token"
@@ -36,14 +36,35 @@ return [
     */
 
     'guards' => [
-        'web' => [
+
+        'admin' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'admins',
+        ],
+
+        'manager' => [
+            'driver' => 'session',
+            'provider' => 'managers',
+        ],
+
+        'owner' => [
+            'driver' => 'session',
+            'provider' => 'owners',
+        ],
+
+        'warhouse' => [
+            'driver' => 'session',
+            'provider' => 'warhouses',
+        ],
+
+        'merchant' => [
+            'driver' => 'session',
+            'provider' => 'merchants',
         ],
 
         'api' => [
             'driver' => 'token',
-            'provider' => 'users',
+            'provider' => 'merchants',
             'hash' => false,
         ],
     ],
@@ -54,7 +75,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
+    | merchants are actually retrieved out of your database or other storage
     | mechanisms used by this application to persist your user's data.
     |
     | If you have multiple user tables or models you may configure multiple
@@ -66,9 +87,30 @@ return [
     */
 
     'providers' => [
-        'users' => [
+
+        'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Admin::class,
+        ],
+
+        'managers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Manager::class,
+        ],
+
+        'owners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\WarhouseOwner::class,
+        ],
+
+        'warhouses' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Warhouse::class,
+        ],
+
+        'merchants' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Merchant::class,
         ],
 
         // 'users' => [
@@ -93,8 +135,8 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
+        'merchants' => [
+            'provider' => 'merchants',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
