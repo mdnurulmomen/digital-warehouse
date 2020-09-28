@@ -15,11 +15,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('owner.')->group(function () {
 
-    Route::get('/', function () {
-       return view('auth.login', ['url' => 'owner']); 
-    })->name('login');
+    Route::middleware(['guest:owner'])->group(function () {
+	    
+	    Route::get('/', function () {
+	       return view('auth.login', ['url' => 'owner']); 
+	    })->name('login');
 
-	Route::post('/', 'Auth\LoginController@ownerLogin')->name('login');
+		Route::post('/', 'Auth\LoginController@ownerLogin')->name('login');
+	
+	});
 
 	Route::get('/home', 'HomeController@ownerHome')->name('home');
 
