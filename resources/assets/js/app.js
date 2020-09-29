@@ -23,9 +23,12 @@ Vue.use(VueRouter)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-import App from './views/App'
-import Home from './views/Home'
-import Home2 from './views/Home2'
+
+import AdminSideMenuBar from './views/AdminSideMenuBar'
+
+import Dashboard from './views/Dashboard'
+import Dashboard2 from './views/Dashboard2'
+import Dashboard3 from './views/Dashboard3'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -37,20 +40,25 @@ const router = new VueRouter({
     mode: 'history',
     routes: [
         {
-            path: '/',
+            path: '/dashboard-1',
             name: 'home',
-            component: Home
+            component: Dashboard
         },
         {
-            path: '/2',
-            name: 'home2',
-            component: Home2,
+            path: '/dashboard-2',
+            name: 'dashboar2',
+            component: Dashboard2,
+        },
+        {
+            path: '/dashboard-3',
+            name: 'dashboar3',
+            component: Dashboard3,
         },
     ],
 });
 
 const app = new Vue({
     el: '#app',
-    components : {App},
+    components : {AdminSideMenuBar},
     router
 });

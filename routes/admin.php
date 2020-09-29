@@ -25,6 +25,6 @@ Route::name('admin.')->group(function () {
 
 	});
 
-	Route::get('/home', 'HomeController@adminHome')->name('home');
+	Route::get('/{any}', 'HomeController@adminHome')->name('home');
 
 });
