@@ -27,4 +27,11 @@ Route::name('admin.')->group(function () {
 
 	Route::get('/{any}', 'HomeController@adminHome')->name('home');
 
+	Route::middleware(['auth:admin'])->group(function () {
+		
+		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');
+		Route::put('/payment-settings', 'SettingController@updatePaymentSetting')->name('payment-settings');	
+
+	});
+
 });

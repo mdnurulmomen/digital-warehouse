@@ -29,6 +29,7 @@ import AdminSideMenuBar from './views/AdminSideMenuBar'
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
+import SettingComponent from './views/SettingComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -40,19 +41,24 @@ const router = new VueRouter({
     mode: 'history',
     routes: [
         {
-            path: '/dashboard-1',
+            path: '/home',
             name: 'home',
             component: Dashboard
         },
         {
             path: '/dashboard-2',
-            name: 'dashboar2',
+            name: 'dashboar-2',
             component: Dashboard2,
         },
         {
             path: '/dashboard-3',
-            name: 'dashboar3',
+            name: 'dashboar-3',
             component: Dashboard3,
+        },
+        {
+            path: '/settings',
+            name: 'setting',
+            component: SettingComponent,
         },
     ],
 });
@@ -62,3 +68,8 @@ const app = new Vue({
     components : {AdminSideMenuBar},
     router
 });
+
+// custom scripts
+window.showSetting = () => {
+    router.push({ name: 'setting' });
+}

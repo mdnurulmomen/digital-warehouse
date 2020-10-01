@@ -15,15 +15,18 @@ class CreateApplicationSettingsTable extends Migration
     {
         Schema::create('application_settings', function (Blueprint $table) {
             $table->tinyIncrements('id');
-            $table->unsignedTinyInteger('vat_percentage')->detault(0);
-            $table->unsignedTinyInteger('default_selling_price')->detault(100);
-            $table->unsignedTinyInteger('default_storing_price')->detault(100);
-            $table->unsignedTinyInteger('default_length')->detault(10);
-            $table->unsignedTinyInteger('default_width')->detault(10);
-            $table->unsignedTinyInteger('default_height')->detault(10);
+            $table->unsignedSmallInteger('default_selling_price')->default(100);
+            $table->unsignedSmallInteger('default_storing_price')->default(100);
+            $table->unsignedSmallInteger('default_length')->default(10);
+            $table->unsignedSmallInteger('default_width')->default(10);
+            $table->unsignedSmallInteger('default_height')->default(10);
             $table->unsignedTinyInteger('default_unit_id')->nullable();
-            $table->string('merchant_number', 50)->nullable();
-            $table->string('bank_account_number', 50)->nullable();
+            $table->string('official_bank_name', 50)->default('XXXX Bank');
+            $table->string('official_bank_account_name', 50)->default('Mr/Mrs XXX');
+            $table->string('official_bank_account_number', 50)->default('XXX-XXXXX-XXXXX');
+            $table->string('official_merchant_name', 50)->default('BKash / Rocket / Nogod');
+            $table->string('official_merchant_account_number', 50)->default('XXX-XXXXX-XXXXX');
+            $table->unsignedTinyInteger('vat_percentage')->default(0);
         });
     }
 

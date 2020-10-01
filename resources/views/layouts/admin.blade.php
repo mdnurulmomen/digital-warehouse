@@ -11,6 +11,7 @@
 	<meta name="description" content="Admindek Bootstrap admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
 	<meta name="keywords" content="flat ui, admin Admin , Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
 	<meta name="author" content="colorlib" />
+	<meta name="csrf-token" content={{csrf_token()}}>
 
 	<link rel="icon" href="https://colorlib.com/polygon/admindek/files/assets/images/favicon.ico" type="image/x-icon">
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
@@ -129,7 +130,7 @@
 									</div>
 									<ul class="show-notification profile-notification dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
 										<li>
-											<a href="#!">
+											<a onclick="showSetting()" href="javascript:void(0)">
 												<i class="feather icon-settings"></i> Settings
 											</a>
 										</li>
@@ -149,7 +150,7 @@
 											</a>
 										</li>
 										<li>
-											<a href="auth-sign-in-social.html">
+											<a href="{{ route('logout') }}">
 												<i class="feather icon-log-out"></i> Logout
 											</a>
 										</li>
