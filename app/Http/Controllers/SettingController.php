@@ -55,4 +55,29 @@ class SettingController extends Controller
 
         return $this->showApplicationSetting();
     }
+
+    public function updateWarhouseSetting(Request $request)
+    {
+        $request->validate([
+            'default_selling_price' => 'required|numeric|min:0',
+            'default_storing_price' => 'required|numeric|min:0',
+            'default_length' => 'required|numeric|min:0',
+            'default_width' => 'required|numeric|min:0',
+            'default_height' => 'required|numeric|min:0',
+            // 'default_measure_unit_id' => 'required|exists:measure_units',
+        ]);
+
+        $adminSettings = ApplicationSetting::firstOrCreate([]);
+
+        $adminSettings->default_selling_price = $request->default_selling_price;
+        $adminSettings->default_storing_price = $request->default_storing_price;
+        $adminSettings->default_length = $request->default_length;
+        $adminSettings->default_width = $request->default_width;
+        $adminSettings->default_height = $request->default_height;
+        $adminSettings->default_measure_unit_id = $request->default_measure_unit_id;
+
+        $adminSettings->save();
+
+        return $this->showApplicationSetting();
+    }
 }

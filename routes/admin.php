@@ -32,6 +32,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');
 		Route::put('/payment-settings', 'SettingController@updatePaymentSetting')->name('payment-settings');
 		Route::put('/contact-settings', 'SettingController@updateContactSetting')->name('contact-settings');	
+		Route::put('/warhouse-settings', 'SettingController@updateWarhouseSetting')->name('warhouse-settings');	
 
 	});
 

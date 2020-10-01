@@ -71,14 +71,14 @@
 														<div class="slide"></div>
 													</li>
 													<li class="nav-item">
-														<a class="nav-link" data-toggle="tab" href="#store" role="tab">
-															<span class="sub-title">Store</span>
+														<a class="nav-link" data-toggle="tab" href="#warhouse" role="tab">
+															<span class="sub-title">Warhouse</span>
 														</a>
 														<div class="slide"></div>
 													</li>
 													<li class="nav-item">
 														<a class="nav-link" data-toggle="tab" href="#others" role="tab">
-															<span class="sub-title lead">System</span>
+															<span class="sub-title">System</span>
 														</a>
 														<div class="slide"></div>
 													</li>
@@ -219,7 +219,7 @@
 														              			</label>
 																                <div class="col-sm-8">
 																                  	<div class="input-group mb-0">
-																						<input type="number" class="form-control" v-model="applicationSettings.vat_percentage" 
+																						<input type="number" class="form-control" v-model.number="applicationSettings.vat_percentage" 
 																						min="0" 
 																						max="100" 
 																						step=".1" 
@@ -369,14 +369,14 @@
 														</div>
 													</div>
 
-													<div class="tab-pane fade show fade" id="store">	
+													<div class="tab-pane fade show fade" id="warhouse">	
 														<div class="row">
 															<div  v-show="!loading" class="col-sm-12">
 																<div class="">
 																	
 															      	<form 
 																      	class="form-horizontal" 
-																      	v-on:submit.prevent="updateDeliverySetting"
+																      	v-on:submit.prevent="updateWarhouseSetting"
 															      	>
 															      		<input 
 																      		type="hidden" 
@@ -394,7 +394,7 @@
 																	                  <input 
 																	                  	type="number" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_selling_price" 
+																						v-model.number="applicationSettings.default_selling_price" 
 																						min="0" 
 																						step="1" 
 																						required="true"
@@ -417,7 +417,7 @@
 																	                  <input 
 																	                  	type="number" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_storing_price" 
+																						v-model.number="applicationSettings.default_storing_price" 
 																						min="0" 
 																						step="1" 
 																						required="true"
@@ -434,7 +434,7 @@
 														              	</div>
 
 														              	<div class="form-group row">
-															              	<div class="col-sm-3">
+															              	<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
 																              			Length
@@ -443,7 +443,7 @@
 																	                  <input 
 																	                  	type="number" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_length" 
+																						v-model.number="applicationSettings.default_length" 
 																						min="0" 
 																						step="1" 
 																						required="true"
@@ -457,7 +457,7 @@
 																	                </div>
 															              		</div>
 															              	</div>
-															              	<div class="col-sm-3">
+															              	<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
 																              			Width
@@ -466,7 +466,7 @@
 																	                  <input 
 																	                  	type="number" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_width" 
+																						v-model.number="applicationSettings.default_width" 
 																						min="0" 
 																						step="1" 
 																						required="true"
@@ -480,7 +480,9 @@
 																	                </div>
 															              		</div>
 															              	</div>
-															                <div class="col-sm-3">
+														              	</div>
+														              	<div class="form-group row">
+														              		<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
 																              			Height
@@ -489,7 +491,7 @@
 																	                  <input 
 																	                  	type="number" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_height" 
+																						v-model.number="applicationSettings.default_height" 
 																						min="0" 
 																						step="1" 
 																						required="true"
@@ -503,29 +505,29 @@
 																	                </div>
 															              		</div>
 															              	</div>
-															              	<div class="col-sm-3">
+															              	<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Unit
+																              			Measurement Unit
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
 																	                  	type="number" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_measure_unit" 
+																						v-model.number="applicationSettings.default_measure_unit_id" 
 																						required="true"
 																						placeholder="Default Unit" 		
-																						:class="!errors.applicationSettings.default_measure_unit  ? 'is-valid' : 'is-invalid'"
-																						@keyup="validateFormInput('default_measure_unit')"
+																						:class="!errors.applicationSettings.default_measure_unit_id  ? 'is-valid' : 'is-invalid'"
+																						@keyup="validateFormInput('default_measure_unit_id')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_measure_unit }}
+																				        	{{ errors.applicationSettings.default_measure_unit_id }}
 																				  		</div>
 																	                </div>
 															              		</div>
 															              	</div>
 														              	</div>
-															            
+
 															            <div class="card-footer text-center">
 															            	<div class="col-sm-12">
 																				<span 
@@ -768,16 +770,16 @@
 
 					});
 			},
-			updateDeliverySetting() {
+			updateWarhouseSetting() {
 
-				if (!this.applicationSettings.delivery_charge || !this.applicationSettings.multiple_delivery_charge_percentage) {
+				if (!this.applicationSettings.default_selling_price || !this.applicationSettings.default_storing_price || !this.applicationSettings.default_length || !this.applicationSettings.default_width || !this.applicationSettings.default_height || !this.applicationSettings.default_measure_unit_id) {
 
 					this.submitForm = false;
 					return false;
 				}
 
 				axios
-					.post('/delivery-settings', this.applicationSettings)
+					.put('/warhouse-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
 							toastr.success(response.data.success, "Success");
@@ -1004,35 +1006,93 @@
 
 						break;
 
-					case 'delivery_charge' :
+					case 'default_selling_price' :
 
-						if (!this.applicationSettings.delivery_charge) {
-							this.errors.applicationSettings.delivery_charge = 'Delivery charge is required';
+						if (!this.applicationSettings.default_selling_price) {
+							this.errors.applicationSettings.default_selling_price = 'Selling price is required';
 						}
-						else if (this.applicationSettings.delivery_charge < 0 ) {
-							this.errors.applicationSettings.delivery_charge = 'Value should be positive number';
+						else if (this.applicationSettings.default_selling_price < 0) {
+							this.errors.applicationSettings.default_selling_price = 'Value should be greater than 0';
 						}
-						else {
+						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'delivery_charge');
+							this.$delete(this.errors.applicationSettings, 'default_selling_price');
 						}
 
 						break;
 
-					case 'multiple_delivery_charge_percentage' :
+					case 'default_storing_price' :
 
-						if (!this.applicationSettings.multiple_delivery_charge_percentage) {
-							this.errors.applicationSettings.multiple_delivery_charge_percentage = 'Percentage is required';
+						if (!this.applicationSettings.default_storing_price) {
+							this.errors.applicationSettings.default_storing_price = 'Storing price is required';
 						}
-						else if (this.applicationSettings.multiple_delivery_charge_percentage < 0 ) {
-							this.errors.applicationSettings.multiple_delivery_charge_percentage = 'Value should be positive number';
+						else if (this.applicationSettings.default_storing_price < 0) {
+							this.errors.applicationSettings.default_storing_price = 'Value should be greater than 0';
 						}
-						else {
+						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'multiple_delivery_charge_percentage');
+							this.$delete(this.errors.applicationSettings, 'default_storing_price');
 						}
 
 						break;
+
+					case 'default_length' :
+
+						if (!this.applicationSettings.default_length) {
+							this.errors.applicationSettings.default_length = 'Default length is required';
+						}
+						else if (this.applicationSettings.default_length < 0) {
+							this.errors.applicationSettings.default_length = 'Value should be greater than 0';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.applicationSettings, 'default_length');
+						}
+
+						break;
+
+					case 'default_width' :
+
+						if (!this.applicationSettings.default_width) {
+							this.errors.applicationSettings.default_width = 'Default width is required';
+						}
+						else if (this.applicationSettings.default_width < 0) {
+							this.errors.applicationSettings.default_width = 'Value should be greater than 0';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.applicationSettings, 'default_width');
+						}
+
+						break;
+
+					case 'default_height' :
+
+						if (!this.applicationSettings.default_height) {
+							this.errors.applicationSettings.default_height = 'Default height is required';
+						}
+						else if (this.applicationSettings.default_height < 0) {
+							this.errors.applicationSettings.default_height = 'Value should be greater than 0';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.applicationSettings, 'default_height');
+						}
+
+						break;
+
+					case 'default_measure_unit_id' :
+
+						if (!this.applicationSettings.default_measure_unit_id) {
+							this.errors.applicationSettings.default_measure_unit_id = 'Default unit is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.applicationSettings, 'default_measure_unit_id');
+						}
+
+						break;
+
 				}
 	 
 			},

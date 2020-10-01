@@ -20,7 +20,7 @@ class CreateApplicationSettingsTable extends Migration
             $table->unsignedSmallInteger('default_length')->default(10);
             $table->unsignedSmallInteger('default_width')->default(10);
             $table->unsignedSmallInteger('default_height')->default(10);
-            $table->unsignedTinyInteger('default_unit_id')->nullable();
+            $table->unsignedTinyInteger('default_measure_unit_id')->nullable();
             $table->string('official_bank_name', 50)->default('XXXX Bank');
             $table->string('official_bank_account_name', 50)->default('Mr/Mrs XXX');
             $table->string('official_bank_account_number', 50)->default('XXX-XXXXX-XXXXX');
