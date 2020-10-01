@@ -727,7 +727,7 @@
 				}
 
 				axios
-					.post('/payment-settings', this.applicationSettings)
+					.put('/payment-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
 							toastr.success(response.data.success, "Success");
@@ -751,7 +751,7 @@
 				}
 
 				axios
-					.post('/contact-settings', this.applicationSettings)
+					.put('/contact-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
 							toastr.success(response.data.success, "Success");

@@ -26,6 +26,9 @@ class CreateApplicationSettingsTable extends Migration
             $table->string('official_bank_account_number', 50)->default('XXX-XXXXX-XXXXX');
             $table->string('official_merchant_name', 50)->default('BKash / Rocket / Nogod');
             $table->string('official_merchant_account_number', 50)->default('XXX-XXXXX-XXXXX');
+            $table->string('official_customer_care_number', 50)->default('XXX-XXXXX-XXXXX');
+            $table->string('official_mail_address', 50)->default('XXX@email.com');
+            $table->string('official_contact_address', 250)->default('XXX-XXXXX-XXXXX');
             $table->unsignedTinyInteger('vat_percentage')->default(0);
         });
     }
