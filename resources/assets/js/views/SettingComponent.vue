@@ -23,7 +23,7 @@
 								</router-link>
 							</li>
 							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'setting' }" class="waves-effect waves-dark">
+								<router-link :to="{ name: 'settings' }" class="waves-effect waves-dark">
 									Settings
 								</router-link>
 							</li>
@@ -563,7 +563,7 @@
 																	
 															      	<form 
 																      	class="form-horizontal" 
-																      	v-on:submit.prevent="updateOtherSetting"
+																      	v-on:submit.prevent="updateSystemSetting"
 															      	>	
 															      		<input 
 																      		type="hidden" 
@@ -578,7 +578,7 @@
 														              		<div class="col-sm-4">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.logo || 'uploads/application/logo.png'" 
+															                  		:src="applicationSettings.application_logo || 'uploads/application/application_logo.png'" 
 															                  		alt="Application logo"
 														                  		>
 														                	</div>
@@ -588,7 +588,6 @@
 																                        <input 
 																                        	type="file" 
 																                        	class="custom-file-input" 
-																                        	id="exampleInputFile" 
 																                        	v-on:change="onLogoChange" 
 																                        	accept="image/*"
 																                        >
@@ -607,7 +606,7 @@
 														              		<div class="col-sm-4">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.favicon || 'uploads/application/favicon.png'" 
+															                  		:src="applicationSettings.application_favicon || 'uploads/application/application_favicon.png'" 
 															                  		alt="Application favicon"
 														                  		>
 														                	</div>
@@ -617,7 +616,6 @@
 																                        <input 
 																                        	type="file" 
 																                        	class="custom-file-input" 
-																                        	id="exampleInputFile" 
 																                        	v-on:change="onFaviconChange" 
 																                        	accept="image/*"
 																                        >
@@ -796,18 +794,18 @@
 
 					});
 			},
-			updateOtherSetting() {
+			updateSystemSetting() {
 
 				if (!this.newLogo && !this.newFavicon) {
 					this.submitForm = false;
 					return;
 				}
 
-				this.applicationSettings.logo = this.newLogo;
-				this.applicationSettings.favicon = this.newFavicon;
+				this.applicationSettings.application_logo = this.newLogo;
+				this.applicationSettings.application_favicon = this.newFavicon;
 
 				axios
-					.post('/other-settings', this.applicationSettings)
+					.put('/system-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
 							
@@ -833,7 +831,7 @@
                 // Only process image files.
 		      	if (files.length && files[0].type.match('image.*')) {
 		      		this.submitForm = true;
-                	this.createImage(files[0], 'logo');
+                	this.readImage(files[0], 'logo');
 		      	}
 
 		      	evnt.target.value = '';
@@ -846,23 +844,23 @@
                 // Only process image files.
 		      	if (files.length && files[0].type.match('image.*')) {
 		      		this.submitForm = true;
-                	this.createImage(files[0], 'favicon');
+                	this.readImage(files[0], 'favicon');
 		      	}
 
 		      	evnt.target.value = '';
 
 		      	return;
 			},
-			createImage(file, filename) {
+			readImage(file, filename) {
                 let reader = new FileReader();
 
                 if (filename=='favicon') {
 	                reader.onload = (evnt) => {
-	                    this.newFavicon = this.applicationSettings.favicon = evnt.target.result;
+	                    this.newFavicon = this.applicationSettings.application_favicon = evnt.target.result;
 	                };
                 }else{
                 	reader.onload = (evnt) => {
-	                    this.newLogo = this.applicationSettings.logo = evnt.target.result;
+	                    this.newLogo = this.applicationSettings.application_logo = evnt.target.result;
 	                };
                 }
 

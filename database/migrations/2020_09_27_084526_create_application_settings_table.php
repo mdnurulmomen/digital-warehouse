@@ -29,6 +29,8 @@ class CreateApplicationSettingsTable extends Migration
             $table->string('official_customer_care_number', 50)->default('XXX-XXXXX-XXXXX');
             $table->string('official_mail_address', 50)->default('XXX@email.com');
             $table->string('official_contact_address', 250)->default('XXX-XXXXX-XXXXX');
+            $table->string('application_logo')->default('gudam_logo.png');
+            $table->string('application_favicon')->default('gudam_favicon.png');
             $table->unsignedTinyInteger('vat_percentage')->default(0);
         });
     }

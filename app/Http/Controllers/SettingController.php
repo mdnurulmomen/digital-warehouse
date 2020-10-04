@@ -80,4 +80,16 @@ class SettingController extends Controller
 
         return $this->showApplicationSetting();
     }
+
+    public function updateSystemSetting(Request $request)
+    {
+        $adminSettings = ApplicationSetting::firstOrCreate([]);
+
+        $adminSettings->application_logo = $request->application_logo;
+        $adminSettings->application_favicon = $request->application_favicon;
+
+        $adminSettings->save();
+
+        return $this->showApplicationSetting();
+    }
 }
