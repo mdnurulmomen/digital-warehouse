@@ -10,7 +10,7 @@
 						<i class="feather icon-settings bg-c-blue"></i>
 						<div class="d-inline">
 							<h5>Settings</h5>
-							<span>You will every settings with navigating tabs</span>
+							<span>You will have every settings with navigating tabs</span>
 						</div>
 					</div>
 				</div>
@@ -38,21 +38,14 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<div class="row justify-content-center" v-show="loading">
-							<div class="card p-5">
-								<div class="card-block">
-								  	<div class="overlay dark">
-								    	<i class="fas fa-3x fa-sync-alt fa-spin"></i>
-								  	</div>
-								</div>
-							</div>
-						</div>
+						<loading-component v-show="loading"></loading-component>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
+										  	
 										  	<div class="col-lg-12 col-xl-12">
 
 												<!-- <div class="sub-title">Default</div> -->
