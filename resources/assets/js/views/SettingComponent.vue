@@ -730,14 +730,14 @@
 					.put('/payment-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
-							toastr.success(response.data.success, "Success");
+							this.$toastr.s("Payment settings have been updated", "Success");
 						}
 					})
 					.catch(error => {
 						if (error.response.status == 422) {
 
 							for (var x in error.response.data.errors) {
-								toastr.warning(error.response.data.errors[x], "Warning");
+								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
 					});
@@ -754,7 +754,7 @@
 					.put('/contact-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
-							toastr.success(response.data.success, "Success");
+							this.$toastr.s("Contact settings have been updated", "Success");
 						}
 					})
 					.catch(error => {
@@ -762,7 +762,7 @@
 						if (error.response.status == 422) {
 
 							for (var x in error.response.data.errors) {
-								toastr.warning(error.response.data.errors[x], "Warning");
+								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
 
@@ -780,7 +780,7 @@
 					.put('/warhouse-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
-							toastr.success(response.data.success, "Success");
+							this.$toastr.s("Warhouse settings have been updated", "Success");
 						}
 					})
 					.catch(error => {
@@ -788,7 +788,7 @@
 						if (error.response.status == 422) {
 
 							for (var x in error.response.data.errors) {
-								toastr.warning(error.response.data.errors[x], "Warning");
+								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
 
@@ -810,7 +810,7 @@
 						if (response.status == 200) {
 							
 							this.newLogo = this.newFavicon = null;
-							toastr.success(response.data.success, "Success");
+							this.$toastr.s("System settings have been updated", "Success");
 
 						}
 					})
@@ -819,7 +819,7 @@
 						if (error.response.status == 422) {
 
 							for (var x in error.response.data.errors) {
-								toastr.warning(error.response.data.errors[x], "Warning");
+								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
 

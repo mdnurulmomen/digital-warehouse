@@ -73,3 +73,5 @@ const app = new Vue({
 window.showSetting = () => {
     router.push({ name: 'settings' });
 }
+
+window.toastr = require('vue-toastr');

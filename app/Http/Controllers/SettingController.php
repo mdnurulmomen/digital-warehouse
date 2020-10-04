@@ -9,7 +9,7 @@ class SettingController extends Controller
 {
     public function showApplicationSetting()
     {
-    	return ApplicationSetting::first();
+    	return response(ApplicationSetting::first(), 200);
     }
 
     public function updatePaymentSetting(Request $request)
