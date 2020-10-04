@@ -21,17 +21,17 @@
 								</a>
 								<ul class="pcoded-submenu">
 									<li class="">
-										<router-link to="/dashboard-1" class="waves-effect waves-dark">
+										<router-link :to="{ name: 'home' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dashboard</span>
 										</router-link>
 									</li>
 									<li class="">
-										<router-link to="/dashboard-2" class="waves-effect waves-dark">
+										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dashboard 2</span>
 										</router-link>
 									</li>
 									<li class="">
-										<router-link to="/dashboard-3" class="waves-effect waves-dark">
+										<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dashboard 3</span>
 										</router-link>
 									</li>

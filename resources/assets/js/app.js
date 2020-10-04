@@ -57,7 +57,7 @@ const router = new VueRouter({
         },
         {
             path: '/settings',
-            name: 'setting',
+            name: 'settings',
             component: SettingComponent,
         },
     ],
@@ -71,5 +71,5 @@ const app = new Vue({
 
 // custom scripts
 window.showSetting = () => {
-    router.push({ name: 'setting' });
+    router.push({ name: 'settings' });
 }
