@@ -24,7 +24,10 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^23.0.0",
+        "@ckeditor/ckeditor5-vue": "^1.0.3",
         "vue-axios": "^2.1.5",
-        "vue-router": "^3.4.4"
+        "vue-router": "^3.4.4",
+        "vue-toastr": "^2.1.2"
     }
 }
