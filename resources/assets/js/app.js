@@ -30,6 +30,7 @@ import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
 import SettingComponent from './views/SettingComponent'
+import ProfileComponent from './views/ProfileComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -60,6 +61,11 @@ const router = new VueRouter({
             name: 'settings',
             component: SettingComponent,
         },
+        {
+            path: '/profile',
+            name: 'profile',
+            component: ProfileComponent,
+        },
     ],
 });
 
@@ -72,6 +78,10 @@ const app = new Vue({
 // custom scripts
 window.showSetting = () => {
     router.push({ name: 'settings' });
+}
+
+window.showProfile = () => {
+    router.push({ name: 'profile' });
 }
 
 window.toastr = require('vue-toastr');

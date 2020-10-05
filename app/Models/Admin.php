@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\ProfilePreview;
+use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable
 {
     use Notifiable;
+
+    protected $guarded = ['id'];
 
     /**
      * The attributes that are mass assignable.
@@ -36,4 +41,46 @@ class Admin extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['profilePreview'];
+
+    /**
+     * Set the user's first name.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setProfilePreviewAttribute($encodedImageFile)
+    {
+        if ($encodedImageFile) {
+            
+            $imagePath = 'uploads/admin/';
+
+            if(!File::isDirectory($imagePath)){
+                File::makeDirectory($imagePath, 0777, true, true);
+            }
+
+            $img = Image::make($encodedImageFile)->resize(100, 100);
+            $img->save($imagePath.$this->id.'.jpg');
+
+            $this->profilePreview()->updateOrCreate(
+                ['user_id' => $this->id, 'user_type' => 'App\Models\Admin'],
+                ['preview' => $imagePath.$this->id.'.jpg']
+            );
+
+        }
+    }
+
+    /**
+     * Get the user's image.
+     */
+    public function profilePreview()
+    {
+        return $this->morphOne(ProfilePreview::class, 'user');
+    }
 }

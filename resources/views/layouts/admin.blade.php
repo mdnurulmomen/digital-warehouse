@@ -135,7 +135,7 @@
 											</a>
 										</li>
 										<li>
-											<a href="#">
+											<a onclick="showProfile()" href="javascript:void(0)">
 												<i class="feather icon-user"></i> Profile
 											</a>
 										</li>

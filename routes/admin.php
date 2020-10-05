@@ -33,7 +33,11 @@ Route::name('admin.')->group(function () {
 		Route::put('/payment-settings', 'SettingController@updatePaymentSetting')->name('payment-settings');
 		Route::put('/contact-settings', 'SettingController@updateContactSetting')->name('contact-settings');	
 		Route::put('/warhouse-settings', 'SettingController@updateWarhouseSetting')->name('warhouse-settings');	
-		Route::put('/system-settings', 'SettingController@updateSystemSetting')->name('system-settings');	
+		Route::put('/system-settings', 'SettingController@updateSystemSetting')->name('system-settings');
+
+		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
+		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
+		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');	
 
 	});
 
