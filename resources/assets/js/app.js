@@ -26,7 +26,10 @@ Vue.use(VueRouter)
 Vue.component('tab-component', require('./components/TabComponent.vue').default);
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('loading-component', require('./components/LoadingComponent.vue').default);
+Vue.component('delete-confirmation', require('./components/DeleteConfirmation.vue').default);
+Vue.component('restore-confirmation', require('./components/RestoreConfirmation.vue').default);
 Vue.component('breadcrumb-component', require('./components/BreadcrumbComponent.vue').default);
+Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/searchAndAdditionOption.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);

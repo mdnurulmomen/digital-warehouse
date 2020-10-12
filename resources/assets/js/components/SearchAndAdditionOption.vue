@@ -6,7 +6,7 @@
   		</div>
   		<div class="col-sm-4 was-validated text-center">
   			<input 	type="text" 
-			  		v-model="query" 
+			  		v-model="search" 
 			  		pattern="[^'!#$%^()\x22]+" 
 			  		class="form-control" 
 			  		placeholder="Search"
@@ -44,8 +44,25 @@
 		    },
 		},
 
+		watch : {
+
+			search : function(val){
+				if (val==='') {
+					this.$emit('fetchAllContents');
+				}
+				else {
+					this.$emit('searchData', this.search);
+				}
+			},
+
+		},
+
 		data() {
-			return {};
+			return {
+
+				search : this.query
+
+			};
 		}
 
 	}

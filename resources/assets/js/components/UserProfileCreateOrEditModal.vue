@@ -300,7 +300,7 @@
 	            		this.$emit('updateUser', this.singleUserDetails)
 	            	}
 
-	            	this.newProfilePicture = this.singleUserDetails.profile_preview.preview = null;
+	            	this.newProfilePicture = null;
 
 				}
 

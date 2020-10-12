@@ -1,0 +1,110 @@
+<template>
+	
+	<!-- Modal -->
+	<div class="modal fade" id="user-profile-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">{{ user }} Details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<div class="card">
+						<div class="card-body text-center">	
+							<img class="profile-user-img img-fluid img-circle" 
+								:src="profileToView.profile_preview.preview || ''"
+								alt="Profile Picture" 
+							>
+						</div>
+					</div>
+
+					<div 
+						class="form-row" 
+						v-for="property in propertiesToShow" 
+						:key="property"
+					> 
+					    <div class="form-group col-md-6 text-right">
+							<label class="font-weight-bold">{{ property | capitalize }}</label>
+						</div>
+						<div class="form-group col-md-6 text-left">
+							{{ getPropertyValue(property) }}
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</template>
+
+<script type="text/javascript">
+	
+	export default {
+
+		props : {
+
+			user : {
+				type : String,
+				required : true,
+				default : 'User'
+			},
+			profileToView : {
+				type : Object,
+				required : true,
+				default : {
+					profile_preview : {}
+				}
+			},
+			propertiesToShow : {
+				type : Array,
+				required : true,
+				default : []
+			}
+
+		},
+
+		methods : {
+
+			getPropertyValue(property) {
+
+				if (property.match(/First Name/gi)) {
+					return this.profileToView.first_name;
+				}
+				else if (property.match(/Last Name/gi)) {
+					return this.profileToView.last_name;
+				}
+				else if (property.match(/Username/gi)) {
+					return this.profileToView.user_name;
+				}
+				else if (property.match(/Email/gi)) {
+					return this.profileToView.email;
+				}
+				else if (property.match(/Mobile/gi)) {
+					return this.profileToView.mobile;
+				}
+				else if (property.match(/Registered/gi)) {
+					return this.profileToView.created_at;
+				}
+
+			},
+
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+				value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			}
+		}
+
+	}
+
+</script>

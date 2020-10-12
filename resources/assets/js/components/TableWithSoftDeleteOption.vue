@@ -50,9 +50,9 @@
 								</button>
 
 								<button type="button" 
-										class="btn btn-grd-inverse btn-icon" 
+										class="btn btn-grd-warning btn-icon" 
 										v-show="content.deleted_at" 
-										@click="$emit('openContentUndoForm', content)"
+										@click="$emit('openContentRestoreForm', content)"
 								>
 									<i class="fas fa-undo"></i>
 								</button>
