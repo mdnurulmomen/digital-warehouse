@@ -22,7 +22,14 @@ Vue.use(VueRouter)
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
+// Registering component globally
+Vue.component('tab-component', require('./components/TabComponent.vue').default);
+Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('loading-component', require('./components/LoadingComponent.vue').default);
+Vue.component('breadcrumb-component', require('./components/BreadcrumbComponent.vue').default);
+Vue.component('search-and-addition-option', require('./components/searchAndAdditionOption.vue').default);
+Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
+Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
 
 import AdminSideMenuBar from './views/AdminSideMenuBar'
 
