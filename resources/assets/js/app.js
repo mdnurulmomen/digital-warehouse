@@ -41,6 +41,7 @@ import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
 import SettingComponent from './views/SettingComponent'
 import ProfileComponent from './views/ProfileComponent'
+import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -75,6 +76,11 @@ const router = new VueRouter({
             path: '/profile',
             name: 'profile',
             component: ProfileComponent,
+        },
+        {
+            path: '/warhouse-owners',
+            name: 'owners',
+            component: WarhouseOwnerIndex,
         },
     ],
 });

@@ -52,6 +52,7 @@
 			restorationMessage : {
 				type : String,
 				required : false,
+				default : 'This will restore all related items !',
 			},
 			contentToRestore : {
 				type : Object,

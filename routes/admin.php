@@ -37,7 +37,15 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
 		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
-		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');	
+		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');
+
+		Route::get('/api/owners/{perPage}', 'WarhouseController@showAllOwners')->name('warhouse-owners');
+		Route::post('/owners/{perPage}', 'WarhouseController@storeNewOwner')->name('warhouse-owners');	
+		Route::put('/owners/{owner}/{perPage}', 'WarhouseController@updateOwner')->name('warhouse-owners');	
+		Route::delete('/owners/{owner}/{perPage}', 'WarhouseController@deleteOwner')->name('warhouse-owners');	
+		Route::patch('/owners/{owner}/{perPage}', 'WarhouseController@restoreOwner')->name('warhouse-owners');
+		Route::get('/api/search-owners/{search}/{perPage}', 'WarhouseController@searchAllOwners')->name('search-warhouse-owners');
+
 
 	});
 

@@ -6,9 +6,22 @@
 				<table class="table table-striped table-bordered nowrap text-center">
 					<thead>
 						<tr>
-							<th v-for="columnName in columnNames" :key="columnName">
-								{{ columnName }}
-								<i class="fa fa-sort" aria-hidden="true"></i>
+							<th 
+								v-for="columnName in columnNames" 
+								:key="columnName" 
+							>
+								<a href="javascript:void(0)" @click="changeContentsOrder(columnName)"> 
+									{{ columnName | capitalize }}
+									<span v-if="currentSorting.toUpperCase() === columnName.toUpperCase() && ascending">
+										<i class="fa fa-sort-up" aria-hidden="true"></i>
+									</span>
+									<span v-if="currentSorting.toUpperCase() === columnName.toUpperCase() && descending">
+										<i class="fa fa-sort-down" aria-hidden="true"></i>
+									</span>
+									<span v-if="currentSorting.toUpperCase() !== columnName.toUpperCase()">
+										<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+									</span>
+								</a>
 							</th>
 							<th>
 								Actions
@@ -17,8 +30,8 @@
 					</thead>
 					<tbody>
 
-						<tr v-if="contentsToShow.length" 
-							v-for="content in contentsToShow" 
+						<tr v-if="currentContents.length" 
+							v-for="content in currentContents" 
 							:key="content.id"
 						>
 							<td v-for="columnValue in columnValuesToShow" :key="columnValue">
@@ -60,7 +73,7 @@
 					    
 						</tr>
 						<tr 
-					  		v-show="!contentsToShow.length"
+					  		v-show="!currentContents.length"
 					  	>
 				    		<td :colspan="columnNames.length+1">
 					      		<div class="alert alert-danger" role="alert">
@@ -72,8 +85,11 @@
 					</tbody>
 					<tfoot>
 						<tr>	
-							<th v-for="columnName in columnNames" :key="columnName">
-								{{ columnName }}
+							<th 
+								v-for="columnName in columnNames" 
+								:key="columnName"
+							>
+								{{ columnName | capitalize }}
 							</th>
 							<th>
 								Actions
@@ -149,14 +165,33 @@
 			},
 			pagination: {
 				type: Object,
-				required: true
+				required: true,
+				default: {}
 			},
 		},
 
 		data() {
 	        return {
-	      		contentsPerPage : this.perPage 
+	      		ascending : false,
+	      		descending : false,
+	      		currentSorting : '',
+	      		currentContents : [],
+	      		contentsPerPage : this.perPage,
 	        }
+		},
+
+		watch: {
+			contentsToShow: function (val) {
+				this.currentContents = this.contentsToShow
+			},
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+				value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			}
 		},
 
 		methods : {
@@ -165,24 +200,172 @@
 					return 'No Name';
 				}
 
-				return object.first_name + object.last_name;
+				return object.first_name + ' ' + object.last_name;
 			},
 			getColumnValue(object, columnValue) {
-				if (columnValue=='full_name') {
+				
+				if (columnValue.match(/full_name/gi)) {
 					return this.getFullName(object);
 				}
-				else if (columnValue=='user_name') {
+				else if (columnValue.match(/user_name/gi)) {
 					return object.user_name;
 				}
-				else if (columnValue=='email') {
+				else if (columnValue.match(/email/gi)) {
 					return object.email;
 				}
-				else if (columnValue=='mobile') {
+				else if (columnValue.match(/mobile/gi)) {
 					return object.mobile;
 				}
-				else if (columnValue=='total_warhouses') {
+				else if (columnValue.match(/total_warhouses/gi)) {
 					return object.warhouses.length;
 				}
+
+			},
+			changeContentsOrder(columnName) {
+
+				this.currentSorting = columnName;
+
+				if (columnName.match(/name/gi)) {
+
+					if (this.ascending) {
+
+						this.ascending = false;
+						this.descending = true;
+
+						this.currentContents.hasOwnProperty('name') ? this.descendingAlphabets('name') : this.currentContents.hasOwnProperty('first_name') ? this.descendingAlphabets('first_name') : this.descendingAlphabets('last_name');
+
+					}
+					else if (this.descending) {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.currentContents.hasOwnProperty('name') ? this.ascendingAlphabets('name') : this.currentContents.hasOwnProperty('first_name') ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+
+					}
+					else {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.currentContents.hasOwnProperty('name') ? this.ascendingAlphabets('name') : this.currentContents.hasOwnProperty('first_name') ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+
+					}
+
+				}
+				else if (columnName.match(/username/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('user_name');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('user_name');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('user_name');
+					}
+					
+				}
+				else if (columnName.match(/email/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('email');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('email');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('email');
+					}
+
+				}
+				else if (columnName.match(/mobile/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('mobile');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('mobile');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('mobile');
+					}
+
+				}
+				else if (columnName.match(/#/gi) && columnName.match(/warhouse/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingNumeric('warhouses');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('warhouses');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('warhouses');
+					}
+					
+				}
+				
+			},
+			ascendingAlphabets(columnValue) {
+				this.currentContents.sort(
+			 		function(a, b){
+						var x = a[columnValue].toLowerCase();
+						var y = b[columnValue].toLowerCase();
+						if (x < y) {return -1;}
+						if (x > y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			descendingAlphabets(columnValue) {
+				this.currentContents.sort(
+			 		function(a, b){
+						var x = a[columnValue].toLowerCase();
+						var y = b[columnValue].toLowerCase();
+						if (x > y) {return -1;}
+						if (x < y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			ascendingNumeric(columnValue) {
+				this.currentContents.sort(
+			 		function(a, b){
+						return a[columnValue].length - b[columnValue].length;
+					}
+				);
+			},
+			descendingNumeric(columnValue) {
+				this.currentContents.sort(
+			 		function(a, b){
+						return b[columnValue].length - a[columnValue].length;
+					}
+				);
 			},
 		}
 
