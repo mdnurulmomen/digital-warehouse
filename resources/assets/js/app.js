@@ -11,6 +11,9 @@ window.Vue = require('vue');
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+import { ToggleButton } from 'vue-js-toggle-button'
+Vue.component('ToggleButton', ToggleButton)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -42,6 +45,7 @@ import Dashboard3 from './views/Dashboard3'
 import SettingComponent from './views/SettingComponent'
 import ProfileComponent from './views/ProfileComponent'
 import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
+import ManagerIndex from './views/ManagerIndexComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -81,6 +85,11 @@ const router = new VueRouter({
             path: '/warhouse-owners',
             name: 'owners',
             component: WarhouseOwnerIndex,
+        },
+        {
+            path: '/managers',
+            name: 'managers',
+            component: ManagerIndex,
         },
     ],
 });

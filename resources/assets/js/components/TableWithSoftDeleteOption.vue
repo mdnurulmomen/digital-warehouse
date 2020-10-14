@@ -216,6 +216,9 @@
 				else if (columnValue.match(/mobile/gi)) {
 					return object.mobile;
 				}
+				else if (columnValue.match(/status/gi)) {
+					return object.active ? 'Approved' : 'Pending';
+				}
 				else if (columnValue.match(/total_warhouses/gi)) {
 					return object.warhouses.length;
 				}
@@ -310,22 +313,42 @@
 					}
 
 				}
-				else if (columnName.match(/#/gi) && columnName.match(/warhouse/gi)) {
+				else if (columnName.match(/#/gi) && columnName.match(/warhouses/gi)) {
 					
 					if (this.ascending) {
 						this.ascending = false;
 						this.descending = true;
-						this.descendingNumeric('warhouses');
+						this.descendingArrayLength('warhouses');
 					}
 					else if (this.descending) {
 						this.ascending = true;
 						this.descending = false;
-						this.ascendingNumeric('warhouses');
+						this.ascendingArrayLength('warhouses');
 					}
 					else {
 						this.ascending = true;
 						this.descending = false;
-						this.ascendingNumeric('warhouses');
+						this.ascendingArrayLength('warhouses');
+					}
+					
+				}
+
+				else if (columnName.match(/status/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingNumeric('active');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('active');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('active');
 					}
 					
 				}
@@ -356,11 +379,25 @@
 			ascendingNumeric(columnValue) {
 				this.currentContents.sort(
 			 		function(a, b){
-						return a[columnValue].length - b[columnValue].length;
+						return a.columnValue - b.columnValue;
 					}
 				);
 			},
 			descendingNumeric(columnValue) {
+				this.currentContents.sort(
+			 		function(a, b){
+						return b.columnValue - a.columnValue;
+					}
+				);
+			},
+			ascendingArrayLength(columnValue) {
+				this.currentContents.sort(
+			 		function(a, b){
+						return a[columnValue].length - b[columnValue].length;
+					}
+				);
+			},
+			descendingArrayLength(columnValue) {
 				this.currentContents.sort(
 			 		function(a, b){
 						return b[columnValue].length - a[columnValue].length;

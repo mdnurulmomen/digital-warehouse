@@ -46,6 +46,13 @@ Route::name('admin.')->group(function () {
 		Route::patch('/owners/{owner}/{perPage}', 'WarhouseController@restoreOwner')->name('warhouse-owners');
 		Route::get('/api/search-owners/{search}/{perPage}', 'WarhouseController@searchAllOwners')->name('search-warhouse-owners');
 
+		Route::get('/api/managers/{perPage}', 'ManagerController@showAllManagers')->name('warhouse-managers');
+		Route::post('/managers/{perPage}', 'ManagerController@storeNewManager')->name('warhouse-managers');	
+		Route::put('/managers/{manager}/{perPage}', 'ManagerController@updateManager')->name('warhouse-managers');	
+		Route::delete('/managers/{manager}/{perPage}', 'ManagerController@deleteManager')->name('warhouse-managers');	
+		Route::patch('/managers/{manager}/{perPage}', 'ManagerController@restoreManager')->name('warhouse-managers');
+		Route::get('/api/search-managers/{search}/{perPage}', 'ManagerController@searchAllManagers')->name('search-warhouse-managers');
+
 
 	});
 

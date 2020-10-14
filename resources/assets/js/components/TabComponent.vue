@@ -8,7 +8,7 @@
 				aria-selected="true" 
 				@click="$emit(getMethodName(tabName))"
 			>
-				{{ tabName }}
+				{{ tabName | capitalize }}
 			</a>
 			<div class="slide"></div>
 		</li>
@@ -33,10 +33,23 @@
 
 		},
 
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+				value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			}
+		},
+
 		methods : {
 
 			getMethodName(tabName) {
-				return 'show'+tabName+'Contents';
+				return 'show'+this.getCapitalizedName(tabName)+'Contents';
+			},
+			getCapitalizedName(tabName) {
+				if (!tabName) return '';
+				tabName = tabName.toString();
+				return tabName.charAt(0).toUpperCase() + tabName.slice(1);
 			}
 
 		}

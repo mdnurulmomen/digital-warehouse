@@ -82,26 +82,33 @@
 
 			getPropertyValue(property) {
 
-				if (property.match(/First Name/gi)) {
+				if (property.match(/first Name/gi)) {
 					return this.profileToView.first_name;
 				}
-				else if (property.match(/Last Name/gi)) {
+				else if (property.match(/last Name/gi)) {
 					return this.profileToView.last_name;
 				}
-				else if (property.match(/Username/gi)) {
+				else if (property.match(/username/gi)) {
 					return this.profileToView.user_name;
 				}
-				else if (property.match(/Email/gi)) {
+				else if (property.match(/email/gi)) {
 					return this.profileToView.email;
 				}
-				else if (property.match(/Mobile/gi)) {
+				else if (property.match(/mobile/gi)) {
 					return this.profileToView.mobile;
 				}
-				else if (property.match(/Registered/gi)) {
-					return this.profileToView.created_at;
+				else if (property.match(/status/gi)) {
+					return this.profileToView.active ? 'Approved' : 'Pending';
+				}
+				else if (property.match(/registered/gi)) {
+					return this.profileToView.created_at ? this.getReadableDate(this.profileToView.created_at) : 'No Date';
 				}
 
 			},
+
+			getReadableDate(timestamp) {
+				return new Date(timestamp).toDateString();
+			}
 
 		}
 

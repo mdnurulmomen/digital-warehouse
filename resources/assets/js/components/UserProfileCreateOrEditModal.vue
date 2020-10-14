@@ -50,6 +50,17 @@
 									  	</div>
 									</div>
 								</div>
+								<div class="form-row">
+									<div class="form-group col-md-12 text-right">
+										<toggle-button 
+											v-model="singleUserDetails.active" 
+											:width=100 
+											:sync="true"
+											:color="{checked: 'green', unchecked: 'red'}"
+											:labels="{checked: 'Active', unchecked: 'Pending'}"
+										/>
+									</div>
+								</div>
 					    	</div>
 					  	</div>
 
