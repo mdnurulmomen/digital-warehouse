@@ -46,12 +46,19 @@ Route::name('admin.')->group(function () {
 		Route::patch('/owners/{owner}/{perPage}', 'WarhouseController@restoreOwner')->name('warhouse-owners');
 		Route::get('/api/search-owners/{search}/{perPage}', 'WarhouseController@searchAllOwners')->name('search-warhouse-owners');
 
-		Route::get('/api/managers/{perPage}', 'ManagerController@showAllManagers')->name('warhouse-managers');
-		Route::post('/managers/{perPage}', 'ManagerController@storeNewManager')->name('warhouse-managers');	
-		Route::put('/managers/{manager}/{perPage}', 'ManagerController@updateManager')->name('warhouse-managers');	
-		Route::delete('/managers/{manager}/{perPage}', 'ManagerController@deleteManager')->name('warhouse-managers');	
-		Route::patch('/managers/{manager}/{perPage}', 'ManagerController@restoreManager')->name('warhouse-managers');
-		Route::get('/api/search-managers/{search}/{perPage}', 'ManagerController@searchAllManagers')->name('search-warhouse-managers');
+		Route::get('/api/managers/{perPage}', 'ManagerController@showAllManagers')->name('managers');
+		Route::post('/managers/{perPage}', 'ManagerController@storeNewManager')->name('managers');	
+		Route::put('/managers/{manager}/{perPage}', 'ManagerController@updateManager')->name('managers');	
+		Route::delete('/managers/{manager}/{perPage}', 'ManagerController@deleteManager')->name('managers');	
+		Route::patch('/managers/{manager}/{perPage}', 'ManagerController@restoreManager')->name('managers');
+		Route::get('/api/search-managers/{search}/{perPage}', 'ManagerController@searchAllManagers')->name('search-managers');
+
+		Route::get('/api/merchants/{perPage}', 'MerchantController@showAllMerchants')->name('merchants');
+		Route::post('/merchants/{perPage}', 'MerchantController@storeNewMerchant')->name('merchants');	
+		Route::put('/merchants/{merchant}/{perPage}', 'MerchantController@updateMerchant')->name('merchants');	
+		Route::delete('/merchants/{merchant}/{perPage}', 'MerchantController@deleteMerchant')->name('merchants');
+		Route::patch('/merchants/{merchant}/{perPage}', 'MerchantController@restoreMerchant')->name('merchants');
+		Route::get('/api/search-merchants/{search}/{perPage}', 'MerchantController@searchAllMerchants')->name('search-merchants');
 
 
 	});

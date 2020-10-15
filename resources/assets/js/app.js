@@ -46,6 +46,7 @@ import SettingComponent from './views/SettingComponent'
 import ProfileComponent from './views/ProfileComponent'
 import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
 import ManagerIndex from './views/ManagerIndexComponent'
+import MerchantIndex from './views/MerchantIndexComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -90,6 +91,11 @@ const router = new VueRouter({
             path: '/managers',
             name: 'managers',
             component: ManagerIndex,
+        },
+        {
+            path: '/merchants',
+            name: 'merchants',
+            component: MerchantIndex,
         },
     ],
 });

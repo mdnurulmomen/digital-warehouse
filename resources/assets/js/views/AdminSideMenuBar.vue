@@ -92,6 +92,32 @@
 							<li class="pcoded-hasmenu">
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
+										<i class="feather icon-command"></i>
+									</span>
+									<span class="pcoded-mtext">Merchant</span>
+									<span class="pcoded-badge label label-warning">NEW</span>
+								</a>
+								<ul class="pcoded-submenu">
+									<li class="">
+										<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Merchants</span>
+										</router-link>
+									</li>
+									<li class="">
+										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Dashboard 2</span>
+										</router-link>
+									</li>
+									<li class="">
+										<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Dashboard 3</span>
+										</router-link>
+									</li>
+								</ul>
+							</li>
+							<li class="pcoded-hasmenu">
+								<a href="javascript:void(0)" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
 										<i class="feather icon-sidebar"></i>
 									</span>
 									<span class="pcoded-mtext">Page layouts</span>
