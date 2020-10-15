@@ -3,17 +3,17 @@
 
 	<div class="pcoded-content">
 
-		<breadcrumb-component 
-			:title="'Managers'" 
+		<breadcrumb 
+			:title="'managers'" 
 			:message="'All our warhouse managers'"
-		></breadcrumb-component>			
+		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading-component v-show="loading"></loading-component>
+						<loading v-show="loading"></loading>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">
@@ -24,7 +24,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:callerPage="'Manager'" 
+											  		:callerPage="'manager'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -34,7 +34,7 @@
 											
 											<div class="col-sm-12 col-lg-12">
 
-										  		<tab-component 
+										  		<tab 
 										  			v-show="query === ''" 
 										  			:tabNames="['approved', 'pending', 'trashed']" 
 										  			:currentTab="currentTab" 
@@ -42,7 +42,7 @@
 										  			@showApprovedContents="showApprovedContents" 
 										  			@showPendingContents="showPendingContents" 
 										  			@showTrashedContents="showTrashedContents" 
-										  		></tab-component>
+										  		></tab>
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
@@ -77,7 +77,7 @@
 
 		<user-profile-create-or-edit-modal 
 			:createMode="createMode" 
-			:user="'Manager'" 
+			:user="'manager'" 
 			:singleUserDetails="singleUserDetails" 
 			:csrf="csrf"
 
@@ -104,7 +104,7 @@
 		></restore-confirmation>
 
 		<user-profile-view-modal 
-			:user="'Manager'" 
+			:user="'manager'" 
 			:profileToView="singleUserDetails" 
 			:propertiesToShow="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
 		></user-profile-view-modal>

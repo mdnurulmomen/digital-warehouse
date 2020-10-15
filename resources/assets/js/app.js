@@ -26,12 +26,12 @@ Vue.component('ToggleButton', ToggleButton)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Registering component globally
-Vue.component('tab-component', require('./components/TabComponent.vue').default);
+Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
-Vue.component('loading-component', require('./components/LoadingComponent.vue').default);
+Vue.component('loading', require('./components/LoadingComponent.vue').default);
 Vue.component('delete-confirmation', require('./components/DeleteConfirmation.vue').default);
 Vue.component('restore-confirmation', require('./components/RestoreConfirmation.vue').default);
-Vue.component('breadcrumb-component', require('./components/BreadcrumbComponent.vue').default);
+Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/searchAndAdditionOption.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
@@ -42,8 +42,8 @@ import AdminSideMenuBar from './views/AdminSideMenuBar'
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
-import SettingComponent from './views/SettingComponent'
-import ProfileComponent from './views/ProfileComponent'
+import ApplicationSetting from './views/SettingComponent'
+import Profile from './views/ProfileComponent'
 import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
 import ManagerIndex from './views/ManagerIndexComponent'
 import MerchantIndex from './views/MerchantIndexComponent'
@@ -75,12 +75,12 @@ const router = new VueRouter({
         {
             path: '/settings',
             name: 'settings',
-            component: SettingComponent,
+            component: ApplicationSetting,
         },
         {
             path: '/profile',
             name: 'profile',
-            component: ProfileComponent,
+            component: Profile,
         },
         {
             path: '/warhouse-owners',

@@ -38,7 +38,7 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading-component v-show="loading"></loading-component>
+						<loading v-show="loading"></loading>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">

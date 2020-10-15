@@ -5,7 +5,7 @@
 				<div class="page-header-title">
 					<i class="feather icon-clipboard bg-c-blue"></i>
 					<div class="d-inline">
-						<h5>{{ title }}</h5>
+						<h5>{{ title | capitalize }}</h5>
 						<span>{{ message }}</span>
 					</div>
 				</div>

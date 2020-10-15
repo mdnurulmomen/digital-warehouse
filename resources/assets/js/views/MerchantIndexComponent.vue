@@ -3,17 +3,17 @@
 
 	<div class="pcoded-content">
 
-		<breadcrumb-component 
+		<breadcrumb 
 			:title="'merchants'" 
 			:message="'All our warhouse merchants'"
-		></breadcrumb-component>			
+		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading-component v-show="loading"></loading-component>
+						<loading v-show="loading"></loading>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">
@@ -34,7 +34,7 @@
 											
 											<div class="col-sm-12 col-lg-12">
 
-										  		<tab-component 
+										  		<tab 
 										  			v-show="query === ''" 
 										  			:tabNames="['approved', 'pending', 'trashed']" 
 										  			:currentTab="currentTab" 
@@ -42,7 +42,7 @@
 										  			@showApprovedContents="showApprovedContents" 
 										  			@showPendingContents="showPendingContents" 
 										  			@showTrashedContents="showTrashedContents" 
-										  		></tab-component>
+										  		></tab>
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 

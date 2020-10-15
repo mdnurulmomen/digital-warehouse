@@ -6,7 +6,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel">
-						{{ createMode ? 'Create' : 'Edit' }} {{ user }}
+						{{ createMode ? 'Create' : 'Edit' }} {{ user | capitalize }}
 						<span v-show="!createMode">
 							({{ singleUserDetails.user_name }})
 						</span>
@@ -243,8 +243,6 @@
 			return {
 
 				submitForm : true,
-
-				newProfilePicture : null,
 				
 				errors : {
 					user : {},
@@ -252,6 +250,14 @@
 
 			}
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+				value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			}
 		},
 
 		methods : {
@@ -277,7 +283,7 @@
 
                 let reader = new FileReader();
                 reader.onload = (evnt) => {
-                    this.newProfilePicture = this.singleUserDetails.profile_preview.preview = evnt.target.result;
+                    this.singleUserDetails.profile_preview.preview = evnt.target.result;
                 };
                 reader.readAsDataURL(file);
 
@@ -299,8 +305,6 @@
 				}
 				else {
 
-					this.singleUserDetails.profile_preview.preview = this.newProfilePicture;
-
 	            	if (this.createMode) {
 	            		
 	            		this.$emit('storeUser', this.singleUserDetails);
@@ -310,8 +314,6 @@
 
 	            		this.$emit('updateUser', this.singleUserDetails)
 	            	}
-
-	            	this.newProfilePicture = null;
 
 				}
 

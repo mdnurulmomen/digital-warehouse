@@ -2,7 +2,7 @@
 	
 	<div class="row d-flex align-items-center">										  	
   		<div class="col-sm-3 text-left">	
-				{{ callerPage }} List
+				{{ callerPage | capitalize }} List
   		</div>
   		<div class="col-sm-6 was-validated text-center">
   			<input 	type="text" 
@@ -21,7 +21,7 @@
 	  			@click="$emit('showContentCreateForm')"
   			>
   				<i class="fa fa-plus"></i>
-  				New {{ callerPage }}
+  				New {{ callerPage | capitalize }}
   			</button>
   		</div>
   	</div>
@@ -55,6 +55,14 @@
 				}
 			},
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+				value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			}
 		},
 
 		data() {
