@@ -30,7 +30,7 @@ class ProfileController extends Controller
 		$admin->user_name = $request->user_name;
 		$admin->email = $request->email;
 		$admin->mobile = $request->mobile;
-		$admin->profile_preview = json_decode(json_encode($request->profile_preview))->preview;
+		$admin->profile_preview = $request->profile_preview['preview'] ?? NULL;
 
 		$admin->save();
 

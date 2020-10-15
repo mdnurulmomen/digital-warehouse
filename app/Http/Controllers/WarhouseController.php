@@ -43,13 +43,9 @@ class WarhouseController extends Controller
 
         $newUser->save();
 
-        $newProfilePicture = json_decode(json_encode($request->profile_preview));
-        
-        if ($newProfilePicture->preview) {
-
-            $newUser->profile_preview = $newProfilePicture->preview;
+        if (array_key_exists('preview', $request->profile_preview)) {
+            $newUser->profile_preview = $request->profile_preview['preview'];
             $newUser->save();
-            
         }
 
         return $this->showAllOwners($perPage);
@@ -74,7 +70,7 @@ class WarhouseController extends Controller
         $userToUpdate->user_name = $request->user_name;
         $userToUpdate->email = $request->email;
         $userToUpdate->mobile = $request->mobile;
-        $userToUpdate->profile_preview = json_decode(json_encode($request->profile_preview))->preview;
+        $userToUpdate->profile_preview = $request->profile_preview['preview'] ?? NULL;
         $userToUpdate->active = $request->active;
 
         if ($request->password) {

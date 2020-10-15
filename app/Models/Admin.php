@@ -81,6 +81,6 @@ class Admin extends Authenticatable
      */
     public function profilePreview()
     {
-        return $this->morphOne(ProfilePreview::class, 'user');
+        return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
     }
 }

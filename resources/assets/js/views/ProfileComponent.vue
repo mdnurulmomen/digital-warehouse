@@ -233,8 +233,6 @@
 	        	},
 	        	password : {},
 
-	        	newProfilePicture : null,
-
 	        	errors : {
 	        		user : {},
 	        	},
@@ -288,7 +286,7 @@
 			createImage(file) {
                 let reader = new FileReader();
                 reader.onload = (evnt) => {
-                    this.newProfilePicture = this.user.profile_preview.preview = evnt.target.result;
+                    this.user.profile_preview.preview = evnt.target.result;
                 };
                 reader.readAsDataURL(file);
             },
@@ -301,14 +299,12 @@
 
 				this.loading = true;
 				this.submitForm = true;
-				this.user.profile_preview.preview = this.newProfilePicture;
 
 				axios
 					.put('/profile', this.user)
 					.then(response => {
 						// handle success
 						if (response.status == 200) {
-							this.newProfilePicture = null;
 							this.user = response.data || {};
 							this.$toastr.s("Profile has been updated", "Success");
 						}
