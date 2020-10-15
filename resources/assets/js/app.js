@@ -37,6 +37,9 @@ Vue.component('search-and-addition-option', require('./components/searchAndAddit
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
 
+Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
+Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
+
 import AdminSideMenuBar from './views/AdminSideMenuBar'
 
 import Dashboard from './views/Dashboard'
@@ -47,6 +50,7 @@ import Profile from './views/ProfileComponent'
 import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
 import ManagerIndex from './views/ManagerIndexComponent'
 import MerchantIndex from './views/MerchantIndexComponent'
+import StorageTypeIndex from './views/StorageTypeIndexComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -96,6 +100,11 @@ const router = new VueRouter({
             path: '/merchants',
             name: 'merchants',
             component: MerchantIndex,
+        },
+        {
+            path: '/storage-types',
+            name: 'storage-types',
+            component: StorageTypeIndex,
         },
     ],
 });

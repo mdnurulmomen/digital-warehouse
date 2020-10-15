@@ -30,9 +30,7 @@
 					</thead>
 					<tbody>
 
-						<tr v-if="currentContents.length" 
-							v-for="content in currentContents" 
-							:key="content.id"
+						<tr v-for="content in currentContents" :key="content.id"
 						>
 							<td v-for="columnValue in columnValuesToShow" :key="columnValue">
 								{{ getColumnValue(content, columnValue) }}
@@ -222,6 +220,12 @@
 				else if (columnValue.match(/total_warhouses/gi)) {
 					return object.warhouses.length;
 				}
+				else if (columnValue.match(/name/gi)) {
+					return object.name;
+				}
+				else if (columnValue.match(/code/gi)) {
+					return object.code;
+				}
 
 			},
 			changeContentsOrder(columnName) {
@@ -230,12 +234,15 @@
 
 				if (columnName.match(/name/gi)) {
 
+					const nameExists = (object) => object.hasOwnProperty('name');
+					const firstNameExists = (object) => object.hasOwnProperty('first_name');
+
 					if (this.ascending) {
 
 						this.ascending = false;
 						this.descending = true;
 
-						this.currentContents.hasOwnProperty('name') ? this.descendingAlphabets('name') : this.currentContents.hasOwnProperty('first_name') ? this.descendingAlphabets('first_name') : this.descendingAlphabets('last_name');
+						this.currentContents.some(nameExists) ? this.descendingAlphabets('name') : this.currentContents.some(firstNameExists) ? this.descendingAlphabets('first_name') : this.descendingAlphabets('last_name');
 
 					}
 					else if (this.descending) {
@@ -243,7 +250,7 @@
 						this.ascending = true;
 						this.descending = false;
 
-						this.currentContents.hasOwnProperty('name') ? this.ascendingAlphabets('name') : this.currentContents.hasOwnProperty('first_name') ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+						this.currentContents.some(nameExists) ? this.ascendingAlphabets('name') : this.currentContents.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
 
 					}
 					else {
@@ -251,7 +258,7 @@
 						this.ascending = true;
 						this.descending = false;
 
-						this.currentContents.hasOwnProperty('name') ? this.ascendingAlphabets('name') : this.currentContents.hasOwnProperty('first_name') ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+						this.currentContents.some(nameExists) ? this.ascendingAlphabets('name') : this.currentContents.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
 
 					}
 
@@ -351,6 +358,26 @@
 						this.ascendingNumeric('active');
 					}
 					
+				}
+
+				else if (columnName.match(/code/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('code');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('code');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('code');
+					}
+
 				}
 				
 			},

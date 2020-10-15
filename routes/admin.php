@@ -60,6 +60,13 @@ Route::name('admin.')->group(function () {
 		Route::patch('/merchants/{merchant}/{perPage}', 'MerchantController@restoreMerchant')->name('merchants');
 		Route::get('/api/search-merchants/{search}/{perPage}', 'MerchantController@searchAllMerchants')->name('search-merchants');
 
+		Route::get('/api/storage-types/{perPage}','AssetController@showAllStorageTypes')->name('storage-types');
+		Route::post('/storage-types/{perPage}','AssetController@storeNewStorageType')->name('storage-types');	
+		Route::put('/storage-types/{type}/{perPage}','AssetController@updateStorageType')->name('storage-types');	
+		Route::delete('/storage-types/{type}/{perPage}','AssetController@deleteStorageType')->name('storage-types');	
+		Route::patch('/storage-types/{type}/{perPage}','AssetController@restoreStorageType')->name('storage-types');
+		Route::get('/api/search-storage-types/{search}/{perPage}','AssetController@searchAllStorageTypes')->name('search-storage-types');
+
 
 	});
 
