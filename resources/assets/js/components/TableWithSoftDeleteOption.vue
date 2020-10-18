@@ -195,10 +195,10 @@
 		methods : {
 			getFullName(object) {
 				if (!object.first_name && !object.last_name) {
-					return 'No Name';
+					return 'NA';
 				}
 
-				return object.first_name + ' ' + object.last_name;
+				return object.first_name || '' + ' ' + object.last_name || '';
 			},
 			getColumnValue(object, columnValue) {
 				
@@ -232,7 +232,26 @@
 
 				this.currentSorting = columnName;
 
-				if (columnName.match(/name/gi)) {
+				if (columnName.match(/username/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('user_name');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('user_name');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('user_name');
+					}
+					
+				}
+				else if (columnName.match(/name/gi)) {
 
 					const nameExists = (object) => object.hasOwnProperty('name');
 					const firstNameExists = (object) => object.hasOwnProperty('first_name');
@@ -262,25 +281,6 @@
 
 					}
 
-				}
-				else if (columnName.match(/username/gi)) {
-
-					if (this.ascending) {
-						this.ascending = false;
-						this.descending = true;
-						this.descendingAlphabets('user_name');
-					}
-					else if (this.descending) {
-						this.ascending = true;
-						this.descending = false;
-						this.ascendingAlphabets('user_name');
-					}
-					else {
-						this.ascending = true;
-						this.descending = false;
-						this.ascendingAlphabets('user_name');
-					}
-					
 				}
 				else if (columnName.match(/email/gi)) {
 					
@@ -384,8 +384,8 @@
 			ascendingAlphabets(columnValue) {
 				this.currentContents.sort(
 			 		function(a, b){
-						var x = a[columnValue].toLowerCase();
-						var y = b[columnValue].toLowerCase();
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
 						if (x < y) {return -1;}
 						if (x > y) {return 1;}
 						return 0;
@@ -395,8 +395,8 @@
 			descendingAlphabets(columnValue) {
 				this.currentContents.sort(
 			 		function(a, b){
-						var x = a[columnValue].toLowerCase();
-						var y = b[columnValue].toLowerCase();
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
 						if (x > y) {return -1;}
 						if (x < y) {return 1;}
 						return 0;

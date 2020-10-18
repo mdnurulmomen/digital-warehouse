@@ -88,11 +88,19 @@
 														                <div class="col-sm-12">
 														                  	<div class="input-group">
 															                    <div class="custom-file">
-															                        <input type="file" class="custom-file-input" id="exampleInputFile" @change="onImageChange" accept="image/*">
+															                        <input 
+																                        type="file" 
+																                        class="custom-file-input" 
+																                        @change="onImageChange" 
+																                        accept="image/*"
+															                        >
 															                        <label class="custom-file-label" for="exampleInputFile">
 															                        	Change Picture
 															                        </label>
 															                    </div>
+															                    <div class="invalid-feedback" style="display: block;" v-show="errors.user.profile_preview">
+																		        	{{ errors.user.profile_preview }}
+																		  		</div>
 														                    </div>
 														                </div>
 													            	</div>
@@ -108,7 +116,17 @@
 														              		<div class="row">
 															              		<label for="inputFirstName3" class="col-sm-4 col-form-label text-right">First Name</label>
 																                <div class="col-sm-8">
-																                  <input type="text" class="form-control" v-model="user.first_name" placeholder="First Name">
+																                  	<input 
+																	                  type="text" 
+																	                  class="form-control" 
+																	                  v-model="user.first_name" 
+																	                  placeholder="First Name" 
+																	                  :class="!errors.user.first_name  ? 'is-valid' : 'is-invalid'" 
+																	                  @change="validateFormInput('first_name')"
+																					>
+																					<div class="invalid-feedback">
+																			        	{{ errors.user.first_name }}
+																			  		</div>
 																                </div>
 														              		</div>
 														              	</div>
@@ -116,7 +134,17 @@
 														                	<div class="row">
 															              		<label for="inputLastName3" class="col-sm-4 col-form-label text-right">Last Name</label>
 																                <div class="col-sm-8">
-																                  	<input type="text" class="form-control" v-model="user.last_name" placeholder="Last Name">
+																                  	<input 
+																	                  	type="text" 
+																	                  	class="form-control" 
+																	                  	v-model="user.last_name" 
+																	                  	placeholder="Last Name" 
+																	                  	:class="!errors.user.last_name  ? 'is-valid' : 'is-invalid'" 
+																	                  	@change="validateFormInput('last_name')"
+																                  	>
+																                  	<div class="invalid-feedback">
+																			        	{{ errors.user.last_name }}
+																			  		</div>
 																                </div>
 														                	</div>
 														              	</div>
@@ -126,7 +154,17 @@
 														              		<div class="row">
 															              		<label for="inputEmail3" class="col-sm-4 col-form-label text-right">Email</label>
 																                <div class="col-sm-8">
-																                  <input type="email" class="form-control" v-model="user.email" placeholder="Email" required="true">
+																                  	<input 
+																                  		type="email" 
+																                  		class="form-control" 
+																                  		v-model="user.email" 
+																                  		placeholder="Email" required="true" 
+																                  		:class="!errors.user.email  ? 'is-valid' : 'is-invalid'" 
+														                  				@change="validateFormInput('email')"
+																                  	>
+																                  	<div class="invalid-feedback">
+																			        	{{ errors.user.email }}
+																			  		</div>
 																                </div>
 														              		</div>
 														              	</div>
@@ -134,7 +172,18 @@
 														                	<div class="row">
 														                		<label for="inputMobile3" class="col-sm-4 col-form-label text-right">Mobile</label>
 																                <div class="col-sm-8">
-																                  	<input type="tel" class="form-control" v-model="user.mobile" placeholder="Mobile" required="true">
+																                  	<input 
+																	                  	type="tel" 
+																	                  	class="form-control" 
+																	                  	v-model="user.mobile" 
+																	                  	placeholder="Mobile" 
+																	                  	required="true" 
+																	                  	:class="!errors.user.mobile  ? 'is-valid' : 'is-invalid'" 
+														                  				@change="validateFormInput('mobile')"
+																                  	>
+																                  	<div class="invalid-feedback">
+																			        	{{ errors.user.mobile }}
+																			  		</div>
 																                </div>
 														                	</div>
 														              	</div>
@@ -144,7 +193,18 @@
 														              		<div class="row">
 															              		<label for="inputEmail3" class="col-sm-4 col-form-label text-right">Username</label>
 																                <div class="col-sm-8">
-																                  <input type="text" class="form-control" v-model="user.user_name" placeholder="Unique Username" required="true">
+																                  	<input 
+																	                  	type="text" 
+																	                  	class="form-control" 
+																	                  	v-model="user.user_name" 
+																	                  	placeholder="Unique Username" 
+																	                  	required="true" 
+																	                  	:class="!errors.user.user_name  ? 'is-valid' : 'is-invalid'" 
+													                  					@change="validateFormInput('user_name')"
+																                  	>
+																                  	<div class="invalid-feedback">
+																			        	{{ errors.user.user_name }}
+																			  		</div>
 																                </div>
 														              		</div>
 														              	</div>
@@ -152,10 +212,17 @@
 													            </div>
 													            <!-- /.card-body -->
 													            <div class="card-footer text-center">
-													              	<button type="submit" :disabled="loading" class="btn btn-primary">
-													              		Update Profile
-													              	</button>
-													            </div>
+																	<div class="col-sm-12" v-show="!submitForm">
+																		<span class="text-danger small">
+																	  		Please input required fields
+																	  	</span>
+																	</div>
+																	<div class="col-sm-12">
+																		<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																			Update Profile
+																		</button>
+																	</div>
+																</div>
 													        	<!-- /.card-footer -->
 														    </div>
 														</div>
@@ -173,27 +240,69 @@
 										              	<div class="form-group row">
 										              		<label for="inputPassword3" class="col-sm-3 col-form-label text-right">Current Password</label>
 											                <div class="col-sm-9">
-											                  	<input type="password" class="form-control" id="inputPassword3" v-model="password.current_password" placeholder="Current Password" required="true">
+											                  	<input 
+												                  	type="password" 
+												                  	class="form-control" 
+												                  	v-model="password.current_password" 
+												                  	placeholder="Current Password" 
+												                  	required="true" 
+												                  	:class="!errors.user.current_password  ? 'is-valid' : 'is-invalid'" 
+									                  				@change="validateFormInput('current_password')"
+											                  	>
+											                  	<div class="invalid-feedback">
+														        	{{ errors.user.current_password }}
+														  		</div>
 											                </div>
 										              	</div>
 										              	<div class="form-group row">
 										              		<label for="inputNewPassword3" class="col-sm-3 col-form-label text-right">New Password</label>
 											                <div class="col-sm-9">
-											                  	<input type="password" class="form-control" id="inputNewPassword3" v-model="password.password" placeholder="New Password" required="true">
+											                  	<input 
+												                  	type="password" 
+												                  	class="form-control" 
+												                  	v-model="password.password" 
+												                  	placeholder="New Password" 
+												                  	required="true" 
+												                  	:class="!errors.user.password  ? 'is-valid' : 'is-invalid'" 
+									                  				@change="validateFormInput('password')"
+											                  	>
+											                  	<div class="invalid-feedback">
+														        	{{ errors.user.password }}
+														  		</div>
 											                </div>
 										              	</div>
 										              	<div class="form-group row">
 										              		<label for="inputConfirmPassword3" class="col-sm-3 col-form-label text-right">Confirm Password</label>
 											                <div class="col-sm-9">
-											                  	<input type="password" class="form-control" id="inputConfirmPassword3" v-model="password.password_confirmation" placeholder="Confirm Password" required="true">
+											                  	<input 
+												                  	type="password" 
+												                  	class="form-control" 
+												                  	v-model="password.password_confirmation" 
+												                  	placeholder="Confirm Password" 
+												                  	required="true" 
+												                  	:class="!errors.user.password_confirmation  ? 'is-valid' : 'is-invalid'" 
+									                  				@change="validateFormInput('password_confirmation')"
+											                  	>
+											                  	<div class="invalid-feedback">
+														        	{{ errors.user.password_confirmation }}
+														  		</div>
 											                </div>
 										              	</div>
 
 										            </div>
 										            <!-- /.card-body -->
 										            <div class="card-footer text-center">
-										              	<button type="submit" :disabled="loading" class="btn btn-primary">Update Password</button>
-										            </div>
+														<div class="col-sm-12" v-show="!submitForm">
+															<span class="text-danger small">
+														  		Please input required fields
+														  	</span>
+														</div>
+														<div class="col-sm-12">
+															<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																Update Password
+															</button>
+														</div>
+													</div>
 										        	<!-- /.card-footer -->
 										      	</form>
 
@@ -241,7 +350,9 @@
 
 	        	error : '',
 	        	loading : false,
+
 	        	submitForm : true,
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 	        }
 		},
@@ -254,7 +365,7 @@
 					return 'No Name';
 				}
 
-				return (this.user.first_name +' '+ this.user.last_name);
+				return (this.user.first_name || '' +' '+ this.user.last_name || '');
 			}
 		},
 		methods : {
@@ -281,12 +392,14 @@
             profileUpdation() {
 
 				if (!this.user.email || !this.user.mobile || !this.user.user_name) {
+					
+					this.validateFormInput('user_name');
+					this.validateFormInput('mobile');
+					this.validateFormInput('email');
+
 					this.submitForm = false;
 					return;
 				}
-
-				this.loading = true;
-				// this.submitForm = true;
 
 				axios
 					.put('/profile', this.user)
@@ -304,22 +417,19 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
-					})
-					.then(() => {
-						// always execute
-				    	this.loading = false;
-				  	});
+					});
 			},
 			passwordUpdation() {
 
 				if (!this.password.current_password || !this.password.password || !this.password.password_confirmation) {
 
+					this.validateFormInput('current_password');
+					this.validateFormInput('password');
+					this.validateFormInput('password_confirmation');
+
 					this.submitForm = false;
 					return;
 				}
-
-				this.loading = true;
-				// this.submitForm = true;
 
 				axios
 					.post('/password', this.password)
@@ -342,18 +452,18 @@
 							
 							this.$toastr.e("Wrong Current Password", "Oops");	
 				      	}
-					})
-					.then(() => {
-					    // always executed
-					    this.loading = false;
-				  	});
+					});
 			},
 			onImageChange(evnt){
 				let files = evnt.target.files || evnt.dataTransfer.files;
 
                 // Only process image files.
 		      	if (files.length && files[0].type.match('image.*')) {
+                	this.$delete(this.errors.user, 'profile_preview');
                 	this.createImage(files[0]);
+		      	}
+		      	else {
+		      		this.errors.user.profile_preview = 'Please input only image file';
 		      	}
 
 		      	evnt.target.value = '';
@@ -365,7 +475,127 @@
                     this.user.profile_preview.preview = evnt.target.result;
                 };
                 reader.readAsDataURL(file);
-            }
+            },
+            validateFormInput (formInputName) {
+				
+				this.submitForm = false;
+
+				switch(formInputName) {
+
+					case 'first_name' :
+
+						if (!this.user.first_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.user.first_name = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'first_name');
+						}
+
+						break;
+
+					case 'last_name' :
+
+						if (!this.user.last_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.user.last_name = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'last_name');
+						}
+
+						break;
+
+					case 'user_name' :
+
+						if (!this.user.user_name) {
+							this.errors.user.user_name = 'Username is required';
+						}
+						else if (!this.user.user_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.user.user_name = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'user_name');
+						}
+
+						break;
+
+					case 'mobile' :
+
+						if (!this.user.mobile) {
+							this.errors.user.mobile = 'Mobile is required';
+						}
+						else if (!this.user.mobile.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
+							this.errors.user.mobile = 'Invalid mobile number';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'mobile');
+						}
+
+						break;
+
+					case 'email' :
+
+						if (!this.user.email) {
+							this.errors.user.email = 'Email is required';
+						}
+						else if (!this.user.email.match(/[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/g)) {
+							this.errors.user.email = 'Invalid email address';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'email');
+						}
+
+						break;
+
+					case 'current_password' :
+
+						if (!this.password.current_password) {
+							this.errors.user.current_password = 'Password is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'current_password');
+						}
+
+						break;
+
+					case 'password' :
+
+						if (!this.password.password) {
+							this.errors.user.password = 'Password is required';
+						}
+						else if (this.password.password.length < 8) {
+							this.errors.user.password = 'Minimum length should be 8';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'password');
+						}
+
+						break;
+
+					case 'password_confirmation' :
+
+						if (this.password.password && !this.password.password_confirmation) {
+							this.errors.user.password_confirmation = 'Password is required';
+						}
+						else if (this.password.password && this.password.password !== this.password.password_confirmation) {
+							this.errors.user.password_confirmation = "Password doesn't match";
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.user, 'password_confirmation');
+						}
+
+						break;
+
+				}
+	 
+			},
 		}
   	}
 
