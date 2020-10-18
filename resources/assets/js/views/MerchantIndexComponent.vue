@@ -14,6 +14,8 @@
 					<div class="page-body">
 
 						<loading v-show="loading"></loading>
+
+						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">
@@ -129,6 +131,7 @@
 	        return {
 
 	        	query : '',
+	        	error : '',
     			perPage : 10,
 	        	loading : false,
 	        	currentTab : 'approved',
@@ -161,7 +164,9 @@
 			fetchAllContents() {
 				
 				this.query = '';
+				this.error = '';
 				this.loading = true;
+				this.allFetchedContents = [];
 				
 				axios
 					.get('/api/merchants/' + this.perPage + "?page=" + this.pagination.current_page)
@@ -172,7 +177,7 @@
 						}
 					})
 					.catch(error => {
-						console.log(error);
+						this.error = error.toString();
 						// Request made and server responded
 						if (error.response) {
 							console.log(error.response.data);
@@ -190,7 +195,7 @@
 						}
 
 					})
-					.then(response => {
+					.finally(response => {
 						this.loading = false;
 					});
 
@@ -201,6 +206,8 @@
 					this.query=emitedValue;
 				}
 
+				this.error = '';
+				this.allFetchedContents = [];
 				this.pagination.current_page = 1;
 				
 				axios
@@ -213,7 +220,7 @@
 					this.pagination = response.data.all;
 				})
 				.catch(e => {
-					console.log(e);
+					this.error = e.toString();
 				});
 
 			},

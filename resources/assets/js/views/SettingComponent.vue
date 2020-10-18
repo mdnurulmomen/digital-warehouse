@@ -39,6 +39,8 @@
 					<div class="page-body">
 
 						<loading v-show="loading"></loading>
+
+						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">
@@ -688,6 +690,7 @@
 	        	newLogo : null,
 	        	newFavicon : null,
 
+	        	error : '',
 	        	loading : false,
 
 	        	errors : {
@@ -703,12 +706,36 @@
 		},
 		methods : {
 			fetchSettingData() {
+
+				this.error = '';
 				this.loading = true;
+
 				axios
 					.get('/api/application-settings')
 					.then(response => {
-						this.loading = false;
 						this.applicationSettings = response.data || {};
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response=>{
+						this.loading = false;
 					});
 			},
 			updatePaymentSetting() {

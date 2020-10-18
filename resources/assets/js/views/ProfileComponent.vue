@@ -39,6 +39,8 @@
 					<div class="page-body">
 
 						<loading v-show="loading"></loading>
+
+						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row" v-show="!loading">
 							<div class="col-sm-12">
@@ -237,6 +239,7 @@
 	        		user : {},
 	        	},
 
+	        	error : '',
 	        	loading : false,
 	        	submitForm : true,
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -256,40 +259,25 @@
 		},
 		methods : {
 			fetchUserData() {
+				
+				this.error = '';
 				this.loading = true;
+
 				axios
 					.get('/api/profile')
 					.then(response => {
 						// handle success
 						this.user = response.data || {};
 					})
-					.catch(function (error) {
+					.catch(error => {
 					    // handle error
-					    this.$toastr.w(error.response.data.errors[x], "Warning");
+					    this.error = error.toString();
 					})
-					.then(() => {
+					.finally(() => {
 			    		// always executed
 			    		this.loading = false;
 				  	});
 			},
-			onImageChange(evnt){
-				let files = evnt.target.files || evnt.dataTransfer.files;
-
-                // Only process image files.
-		      	if (files.length && files[0].type.match('image.*')) {
-                	this.createImage(files[0]);
-		      	}
-
-		      	evnt.target.value = '';
-		      	return;
-			},
-			createImage(file) {
-                let reader = new FileReader();
-                reader.onload = (evnt) => {
-                    this.user.profile_preview.preview = evnt.target.result;
-                };
-                reader.readAsDataURL(file);
-            },
             profileUpdation() {
 
 				if (!this.user.email || !this.user.mobile || !this.user.user_name) {
@@ -298,7 +286,7 @@
 				}
 
 				this.loading = true;
-				this.submitForm = true;
+				// this.submitForm = true;
 
 				axios
 					.put('/profile', this.user)
@@ -331,7 +319,7 @@
 				}
 
 				this.loading = true;
-				this.submitForm = true;
+				// this.submitForm = true;
 
 				axios
 					.post('/password', this.password)
@@ -359,7 +347,25 @@
 					    // always executed
 					    this.loading = false;
 				  	});
-			}
+			},
+			onImageChange(evnt){
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	this.createImage(files[0]);
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+			},
+			createImage(file) {
+                let reader = new FileReader();
+                reader.onload = (evnt) => {
+                    this.user.profile_preview.preview = evnt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
 		}
   	}
 

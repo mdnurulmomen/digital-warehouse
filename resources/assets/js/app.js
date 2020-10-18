@@ -40,6 +40,8 @@ Vue.component('user-profile-create-or-edit-modal', require('./components/UserPro
 Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 
+Vue.component('alert', require('./components/AlertComponent.vue').default);
+
 import AdminSideMenuBar from './views/AdminSideMenuBar'
 
 import Dashboard from './views/Dashboard'
