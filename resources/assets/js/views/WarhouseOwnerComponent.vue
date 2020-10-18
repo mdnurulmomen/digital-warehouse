@@ -24,7 +24,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:callerPage="'owner'" 
+											  		:caller-page="'owner'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -36,8 +36,8 @@
 
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tabNames="['approved', 'pending', 'trashed']" 
-										  			:currentTab="currentTab" 
+										  			:tab-names="['approved', 'pending', 'trashed']" 
+										  			:current-tab="currentTab" 
 
 										  			@showApprovedContents="showApprovedContents" 
 										  			@showPendingContents="showPendingContents" 
@@ -46,7 +46,7 @@
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
-										  			:perPage="perPage"  
+										  			:per-page="perPage"  
 										  			:column-names="['name', 'username', 'email', 'mobile', '# warhouses']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'owner_total_warhouses']" 
 										  			:contents-to-show = "contentsToShow" 
@@ -76,9 +76,9 @@
 		</div>
 
 		<user-profile-create-or-edit-modal 
-			:createMode="createMode" 
+			:create-mode="createMode" 
 			:user="'owner'" 
-			:singleUserDetails="singleOwnerDetails" 
+			:single-user-details="singleOwnerDetails" 
 			:csrf="csrf"
 
 			@storeUser="storeUser($event)" 
@@ -87,26 +87,26 @@
 
 		<delete-confirmation 
 			:csrf="csrf" 
-			:submitMethodName="'deleteUser'" 
-			:contentToDelete="singleOwnerDetails"
-			:restorationMessage="'But once you think, you can restore this item !'" 
+			:submit-method-name="'deleteUser'" 
+			:content-to-delete="singleOwnerDetails"
+			:restoration-message="'But once you think, you can restore this item !'" 
 			
 			@deleteUser="deleteUser($event)" 
 		></delete-confirmation>
 
 		<restore-confirmation 
 			:csrf="csrf" 
-			:submitMethodName="'restoreUser'" 
-			:contentToRestore="singleOwnerDetails"
-			:restorationMessage="'This will restore all related items !'" 
+			:submit-method-name="'restoreUser'" 
+			:content-to-restore="singleOwnerDetails"
+			:restoration-message="'This will restore all related items !'" 
 
 			@restoreUser="restoreUser($event)" 
 		></restore-confirmation>
 
 		<user-profile-view-modal 
 			:user="'owner'" 
-			:profileToView="singleOwnerDetails" 
-			:propertiesToShow="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
+			:profile-to-view="singleOwnerDetails" 
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
 		></user-profile-view-modal>
 
 	</div>
@@ -190,7 +190,7 @@
 						}
 
 					})
-					.then(response => {
+					.finally(response => {
 						this.loading = false;
 					});
 

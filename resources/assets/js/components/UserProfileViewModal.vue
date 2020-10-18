@@ -82,11 +82,11 @@
 
 			getPropertyValue(property) {
 
-				if (property.match(/first Name/gi)) {
-					return this.profileToView.first_name;
+				if (property.match(/first name/gi)) {
+					return this.profileToView.first_name || 'NA';
 				}
-				else if (property.match(/last Name/gi)) {
-					return this.profileToView.last_name;
+				else if (property.match(/last name/gi)) {
+					return this.profileToView.last_name || 'NA';
 				}
 				else if (property.match(/username/gi)) {
 					return this.profileToView.user_name;

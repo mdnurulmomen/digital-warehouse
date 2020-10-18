@@ -24,7 +24,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:callerPage="'storage type'" 
+											  		:caller-page="'storage type'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -36,8 +36,8 @@
 
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tabNames="['current', 'trashed']" 
-										  			:currentTab="currentTab" 
+										  			:tab-names="['current', 'trashed']" 
+										  			:current-tab="currentTab" 
 
 										  			@showCurrentContents="showCurrentContents" 
 										  			@showTrashedContents="showTrashedContents" 
@@ -45,7 +45,7 @@
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
-										  			:perPage="perPage"  
+										  			:per-page="perPage"  
 										  			:column-names="['name', 'code']" 
 										  			:column-values-to-show="['name', 'code']" 
 										  			:contents-to-show = "contentsToShow" 
