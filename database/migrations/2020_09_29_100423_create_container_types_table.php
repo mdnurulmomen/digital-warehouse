@@ -17,7 +17,8 @@ class CreateContainerTypesTable extends Migration
         Schema::create('container_types', function (Blueprint $table) {
             $table->smallIncrements('id');
             $table->string('name', 100);
-            $table->string('container_type_code', 100);
+            $table->string('code', 100);
+            $table->softDeletes();
         });
     }
 

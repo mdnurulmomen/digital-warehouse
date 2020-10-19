@@ -53,6 +53,7 @@ import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
 import ManagerIndex from './views/ManagerIndexComponent'
 import MerchantIndex from './views/MerchantIndexComponent'
 import StorageTypeIndex from './views/StorageTypeIndexComponent'
+import ContainerTypeIndex from './views/ContainerTypeIndexComponent'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -107,6 +108,11 @@ const router = new VueRouter({
             path: '/storage-types',
             name: 'storage-types',
             component: StorageTypeIndex,
+        },
+        {
+            path: '/container-types',
+            name: 'container-types',
+            component: ContainerTypeIndex,
         },
     ],
 });

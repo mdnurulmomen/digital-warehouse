@@ -141,6 +141,23 @@
 											</li>
 										</ul>
 									</li>
+									<li class="pcoded-hasmenu">
+										<a href="javascript:void(0)" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Container</span>
+										</a>
+										<ul class="pcoded-submenu">
+											<li class="">
+												<router-link :to="{ name: 'container-types' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Types</span>
+												</router-link>
+											</li>
+											<li class="">
+												<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Dashboard</span>
+												</router-link>
+											</li>
+										</ul>
+									</li>
 									<li class="">
 										<a href="menu-bottom.html" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Bottom Menu</span>
