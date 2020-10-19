@@ -29,8 +29,8 @@ Vue.component('ToggleButton', ToggleButton)
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('loading', require('./components/LoadingComponent.vue').default);
-Vue.component('delete-confirmation', require('./components/DeleteConfirmation.vue').default);
-Vue.component('restore-confirmation', require('./components/RestoreConfirmation.vue').default);
+Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
+Vue.component('restore-confirmation-modal', require('./components/RestoreConfirmationModal.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/searchAndAdditionOption.vue').default);
@@ -49,11 +49,11 @@ import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
 import ApplicationSetting from './views/SettingComponent'
 import Profile from './views/ProfileComponent'
-import WarhouseOwnerIndex from './views/WarhouseOwnerComponent'
-import ManagerIndex from './views/ManagerIndexComponent'
-import MerchantIndex from './views/MerchantIndexComponent'
-import StorageTypeIndex from './views/StorageTypeIndexComponent'
-import ContainerTypeIndex from './views/ContainerTypeIndexComponent'
+import WarhouseOwnerIndex from './views/WarhouseOwnerIndex'
+import ManagerIndex from './views/ManagerIndex'
+import MerchantIndex from './views/MerchantIndex'
+import StorageTypeIndex from './views/StorageTypeIndex'
+import ContainerTypeIndex from './views/ContainerTypeIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

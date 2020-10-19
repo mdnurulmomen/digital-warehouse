@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'managers'" 
-			:message="'All our warhouse managers'"
+			:title="'owners'" 
+			:message="'All our warhouse owners'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'manager'" 
+											  		:caller-page="'owner'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -49,8 +49,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'username', 'email', 'mobile', 'status']" 
-										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'status']" 
+										  			:column-names="['name', 'username', 'email', 'mobile', '# warhouses']" 
+										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'owner_total_warhouses']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 
@@ -79,36 +79,36 @@
 
 		<user-profile-create-or-edit-modal 
 			:create-mode="createMode" 
-			:user="'manager'" 
-			:single-user-details="singleUserDetails" 
+			:user="'owner'" 
+			:single-user-details="singleOwnerDetails" 
 			:csrf="csrf"
 
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
 		></user-profile-create-or-edit-modal>
 
-		<delete-confirmation 
+		<delete-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'deleteUser'" 
-			:content-to-delete="singleUserDetails"
+			:content-to-delete="singleOwnerDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
 			@deleteUser="deleteUser($event)" 
-		></delete-confirmation>
+		></delete-confirmation-modal>
 
-		<restore-confirmation 
+		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreUser'" 
-			:content-to-restore="singleUserDetails"
+			:content-to-restore="singleOwnerDetails"
 			:restoration-message="'This will restore all related items !'" 
-			
+
 			@restoreUser="restoreUser($event)" 
-		></restore-confirmation>
+		></restore-confirmation-modal>
 
 		<user-profile-view-modal 
-			:user="'manager'" 
-			:profile-to-view="singleUserDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
+			:user="'owner'" 
+			:profile-to-view="singleOwnerDetails" 
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
 		></user-profile-view-modal>
 
 	</div>
@@ -119,7 +119,7 @@
 
 	import axios from 'axios';
 
-    let singleUserDetails = {
+    let singleOwnerDetails = {
     	active : false,
     	profile_preview : {}
     };
@@ -145,7 +145,7 @@
 		        	current_page: 1
 		      	},
 
-	        	singleUserDetails : singleUserDetails,
+	        	singleOwnerDetails : singleOwnerDetails,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -169,7 +169,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/managers/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/owners/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -212,7 +212,7 @@
 				
 				axios
 				.get(
-					"/api/search-managers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-owners/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -225,12 +225,12 @@
 
 			},
 			showContentDetails(object) {	
-				this.singleUserDetails = object;
+				this.singleOwnerDetails = object;
 				$('#user-profile-view-modal').modal('show');
 			},
 			showContentCreateForm() {
 				this.createMode = true;
-				this.singleUserDetails = {
+				this.singleOwnerDetails = {
 					active : false,
 					profile_preview : {}
 				};
@@ -238,24 +238,24 @@
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
-				this.singleUserDetails = object;
+				this.singleOwnerDetails = object;
 				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
-				this.singleUserDetails = object;
+				this.singleOwnerDetails = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
 			openContentRestoreForm(object) {	
-				this.singleUserDetails = object;
+				this.singleOwnerDetails = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
-			storeUser(singleUserDetails) {
+			storeUser(singleOwnerDetails) {
 				
 				axios
-					.post('/managers/' + this.perPage, singleUserDetails)
+					.post('/owners/' + this.perPage, singleOwnerDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New manager has been created", "Success");
+							this.$toastr.s("New owner has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#user-createOrEdit-modal').modal('hide');
@@ -270,13 +270,13 @@
 					});
 
 			},
-			updateUser(singleUserDetails) {
+			updateUser(singleOwnerDetails) {
 				
 				axios
-					.put('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
+					.put('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Manager has been updated", "Success");
+							this.$toastr.s("Owner has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#user-createOrEdit-modal').modal('hide');
@@ -291,13 +291,13 @@
 					});
 
 			},
-			deleteUser(singleUserDetails) {
+			deleteUser(singleOwnerDetails) {
 				
 				axios
-					.delete('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
+					.delete('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Manager has been deleted", "Success");
+							this.$toastr.s("Owner has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -312,13 +312,13 @@
 					});
 
 			},
-			restoreUser(singleUserDetails) {
+			restoreUser(singleOwnerDetails) {
 				
 				axios
-					.patch('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
+					.patch('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Manager has been restored", "Success");
+							this.$toastr.s("Owner has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');

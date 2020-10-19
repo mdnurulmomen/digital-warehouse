@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'storage-types'" 
-			:message="'All our warhouse storage-types'"
+			:title="'container-types'" 
+			:message="'All our warhouse container-types'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'storage type'" 
+											  		:caller-page="'container type'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -78,7 +78,7 @@
 
 		<asset-create-or-edit-modal 
 			:create-mode="createMode" 
-			:caller-page="'storage type'" 
+			:caller-page="'container type'" 
 			:single-asset-data="singleAssetData" 
 			:csrf="csrf"
 
@@ -86,26 +86,26 @@
 			@updateAsset="updateAsset($event)" 
 		></asset-create-or-edit-modal>
 
-		<delete-confirmation 
+		<delete-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
 			@deleteAsset="deleteAsset($event)" 
-		></delete-confirmation>
+		></delete-confirmation-modal>
 
-		<restore-confirmation 
+		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
-			:restoration-message="'This will restore all related items !'" 
+			:restoration-message="'This will automatically be added to all related items !'" 
 
 			@restoreAsset="restoreAsset($event)" 
-		></restore-confirmation>
+		></restore-confirmation-modal>
 
 		<asset-view-modal 
-			:caller-page="'storage type'" 
+			:caller-page="'container type'" 
 			:asset-to-view="singleAssetData" 
 			:properties-to-show="['name', 'code']"
 		></asset-view-modal>
@@ -167,7 +167,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/storage-types/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/container-types/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -210,7 +210,7 @@
 				
 				axios
 				.get(
-					"/api/search-storage-types/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-container-types/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -247,10 +247,10 @@
 			storeAsset(singleAssetData) {
 				
 				axios
-					.post('/storage-types/' + this.perPage, singleAssetData)
+					.post('/container-types/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New storage type has been created", "Success");
+							this.$toastr.s("New container type has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#asset-createOrEdit-modal').modal('hide');
@@ -268,10 +268,10 @@
 			updateAsset(singleAssetData) {
 				
 				axios
-					.put('/storage-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.put('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been updated", "Success");
+							this.$toastr.s("Container type has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#asset-createOrEdit-modal').modal('hide');
@@ -289,10 +289,10 @@
 			deleteAsset(singleAssetData) {
 				
 				axios
-					.delete('/storage-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.delete('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been deleted", "Success");
+							this.$toastr.s("Container type has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -310,10 +310,10 @@
 			restoreAsset(singleAssetData) {
 				
 				axios
-					.patch('/storage-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.patch('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been restored", "Success");
+							this.$toastr.s("Container type has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');

@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'merchants'" 
-			:message="'All our warhouse merchants'"
+			:title="'storage-types'" 
+			:message="'All our warhouse storage-types'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'merchant'" 
+											  		:caller-page="'storage type'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -38,19 +38,18 @@
 
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['approved', 'pending', 'trashed']" 
+										  			:tab-names="['current', 'trashed']" 
 										  			:current-tab="currentTab" 
 
-										  			@showApprovedContents="showApprovedContents" 
-										  			@showPendingContents="showPendingContents" 
+										  			@showCurrentContents="showCurrentContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'username', 'email', 'mobile', '# deals']" 
-										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'merchant_total_deals']" 
+										  			:column-names="['name', 'code']" 
+										  			:column-values-to-show="['name', 'code']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 
@@ -77,39 +76,39 @@
 			</div>
 		</div>
 
-		<user-profile-create-or-edit-modal 
+		<asset-create-or-edit-modal 
 			:create-mode="createMode" 
-			:user="'merchant'" 
-			:single-user-details="singleUserDetails" 
+			:caller-page="'storage type'" 
+			:single-asset-data="singleAssetData" 
 			:csrf="csrf"
 
-			@storeUser="storeUser($event)" 
-			@updateUser="updateUser($event)" 
-		></user-profile-create-or-edit-modal>
+			@storeAsset="storeAsset($event)" 
+			@updateAsset="updateAsset($event)" 
+		></asset-create-or-edit-modal>
 
-		<delete-confirmation 
+		<delete-confirmation-modal 
 			:csrf="csrf" 
-			:submit-method-name="'deleteUser'" 
-			:content-to-delete="singleUserDetails"
+			:submit-method-name="'deleteAsset'" 
+			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
-			@deleteUser="deleteUser($event)" 
-		></delete-confirmation>
+			@deleteAsset="deleteAsset($event)" 
+		></delete-confirmation-modal>
 
-		<restore-confirmation 
+		<restore-confirmation-modal 
 			:csrf="csrf" 
-			:submit-method-name="'restoreUser'" 
-			:content-to-restore="singleUserDetails"
+			:submit-method-name="'restoreAsset'" 
+			:content-to-restore="singleAssetData"
 			:restoration-message="'This will restore all related items !'" 
 
-			@restoreUser="restoreUser($event)" 
-		></restore-confirmation>
+			@restoreAsset="restoreAsset($event)" 
+		></restore-confirmation-modal>
 
-		<user-profile-view-modal 
-			:user="'merchant'" 
-			:profile-to-view="singleUserDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
-		></user-profile-view-modal>
+		<asset-view-modal 
+			:caller-page="'storage type'" 
+			:asset-to-view="singleAssetData" 
+			:properties-to-show="['name', 'code']"
+		></asset-view-modal>
 
 	</div>
 
@@ -119,9 +118,8 @@
 
 	import axios from 'axios';
 
-    let singleUserDetails = {
-    	active : false,
-    	profile_preview : {}
+    let singleAssetData = {
+    	
     };
 
 	export default {
@@ -134,7 +132,7 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
-	        	currentTab : 'approved',
+	        	currentTab : 'current',
 
 	        	createMode : true,
 
@@ -145,7 +143,7 @@
 		        	current_page: 1
 		      	},
 
-	        	singleUserDetails : singleUserDetails,
+	        	singleAssetData : singleAssetData,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -169,7 +167,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/merchants/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/storage-types/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -212,7 +210,7 @@
 				
 				axios
 				.get(
-					"/api/search-merchants/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-storage-types/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -225,40 +223,37 @@
 
 			},
 			showContentDetails(object) {	
-				this.singleUserDetails = object;
-				$('#user-profile-view-modal').modal('show');
+				this.singleAssetData = object;
+				$('#asset-view-modal').modal('show');
 			},
 			showContentCreateForm() {
 				this.createMode = true;
-				this.singleUserDetails = {
-					active : false,
-					profile_preview : {}
-				};
-				$('#user-createOrEdit-modal').modal('show');
+				this.singleAssetData = {};
+				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
-				this.singleUserDetails = object;
-				$('#user-createOrEdit-modal').modal('show');
+				this.singleAssetData = object;
+				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
-				this.singleUserDetails = object;
+				this.singleAssetData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
 			openContentRestoreForm(object) {	
-				this.singleUserDetails = object;
+				this.singleAssetData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
-			storeUser(singleUserDetails) {
+			storeAsset(singleAssetData) {
 				
 				axios
-					.post('/merchants/' + this.perPage, singleUserDetails)
+					.post('/storage-types/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New merchant has been created", "Success");
+							this.$toastr.s("New storage type has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#user-createOrEdit-modal').modal('hide');
+							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -270,16 +265,16 @@
 					});
 
 			},
-			updateUser(singleUserDetails) {
+			updateAsset(singleAssetData) {
 				
 				axios
-					.put('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
+					.put('/storage-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("merchant has been updated", "Success");
+							this.$toastr.s("Storage type has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#user-createOrEdit-modal').modal('hide');
+							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -291,13 +286,13 @@
 					});
 
 			},
-			deleteUser(singleUserDetails) {
+			deleteAsset(singleAssetData) {
 				
 				axios
-					.delete('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
+					.delete('/storage-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("merchant has been deleted", "Success");
+							this.$toastr.s("Storage type has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -312,13 +307,13 @@
 					});
 
 			},
-			restoreUser(singleUserDetails) {
+			restoreAsset(singleAssetData) {
 				
 				axios
-					.patch('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
+					.patch('/storage-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("merchant has been restored", "Success");
+							this.$toastr.s("Storage type has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');
@@ -346,13 +341,9 @@
     		},
     		showSelectedTabContents() {
 				
-				if (this.currentTab=='approved') {
-					this.contentsToShow = this.allFetchedContents.approved.data;
-					this.pagination = this.allFetchedContents.approved;
-				}
-				else if (this.currentTab=='pending') {
-					this.contentsToShow = this.allFetchedContents.pending.data;
-					this.pagination = this.allFetchedContents.pending;
+				if (this.currentTab=='current') {
+					this.contentsToShow = this.allFetchedContents.current.data;
+					this.pagination = this.allFetchedContents.current;
 				}
 				else {
 					this.contentsToShow = this.allFetchedContents.trashed.data;
@@ -360,12 +351,8 @@
 				}
 
 			},
-			showApprovedContents() {
-				this.currentTab = 'approved';
-				this.showSelectedTabContents();
-			},
-			showPendingContents() {
-				this.currentTab = 'pending';
+			showCurrentContents() {
+				this.currentTab = 'current';
 				this.showSelectedTabContents();
 			},
 			showTrashedContents() {

@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'container-types'" 
-			:message="'All our warhouse container-types'"
+			:title="'managers'" 
+			:message="'All our warhouse managers'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'container type'" 
+											  		:caller-page="'manager'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -38,18 +38,19 @@
 
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['current', 'trashed']" 
+										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
 
-										  			@showCurrentContents="showCurrentContents" 
+										  			@showApprovedContents="showApprovedContents" 
+										  			@showPendingContents="showPendingContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'code']" 
-										  			:column-values-to-show="['name', 'code']" 
+										  			:column-names="['name', 'username', 'email', 'mobile', 'status']" 
+										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'status']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 
@@ -76,39 +77,39 @@
 			</div>
 		</div>
 
-		<asset-create-or-edit-modal 
+		<user-profile-create-or-edit-modal 
 			:create-mode="createMode" 
-			:caller-page="'container type'" 
-			:single-asset-data="singleAssetData" 
+			:user="'manager'" 
+			:single-user-details="singleUserDetails" 
 			:csrf="csrf"
 
-			@storeAsset="storeAsset($event)" 
-			@updateAsset="updateAsset($event)" 
-		></asset-create-or-edit-modal>
+			@storeUser="storeUser($event)" 
+			@updateUser="updateUser($event)" 
+		></user-profile-create-or-edit-modal>
 
-		<delete-confirmation 
+		<delete-confirmation-modal 
 			:csrf="csrf" 
-			:submit-method-name="'deleteAsset'" 
-			:content-to-delete="singleAssetData"
+			:submit-method-name="'deleteUser'" 
+			:content-to-delete="singleUserDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
-			@deleteAsset="deleteAsset($event)" 
-		></delete-confirmation>
+			@deleteUser="deleteUser($event)" 
+		></delete-confirmation-modal>
 
-		<restore-confirmation 
+		<restore-confirmation-modal 
 			:csrf="csrf" 
-			:submit-method-name="'restoreAsset'" 
-			:content-to-restore="singleAssetData"
-			:restoration-message="'This will automatically be added to all related items !'" 
+			:submit-method-name="'restoreUser'" 
+			:content-to-restore="singleUserDetails"
+			:restoration-message="'This will restore all related items !'" 
+			
+			@restoreUser="restoreUser($event)" 
+		></restore-confirmation-modal>
 
-			@restoreAsset="restoreAsset($event)" 
-		></restore-confirmation>
-
-		<asset-view-modal 
-			:caller-page="'container type'" 
-			:asset-to-view="singleAssetData" 
-			:properties-to-show="['name', 'code']"
-		></asset-view-modal>
+		<user-profile-view-modal 
+			:user="'manager'" 
+			:profile-to-view="singleUserDetails" 
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
+		></user-profile-view-modal>
 
 	</div>
 
@@ -118,8 +119,9 @@
 
 	import axios from 'axios';
 
-    let singleAssetData = {
-    	
+    let singleUserDetails = {
+    	active : false,
+    	profile_preview : {}
     };
 
 	export default {
@@ -132,7 +134,7 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
-	        	currentTab : 'current',
+	        	currentTab : 'approved',
 
 	        	createMode : true,
 
@@ -143,7 +145,7 @@
 		        	current_page: 1
 		      	},
 
-	        	singleAssetData : singleAssetData,
+	        	singleUserDetails : singleUserDetails,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -167,7 +169,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/container-types/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/managers/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -210,7 +212,7 @@
 				
 				axios
 				.get(
-					"/api/search-container-types/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-managers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -223,37 +225,40 @@
 
 			},
 			showContentDetails(object) {	
-				this.singleAssetData = object;
-				$('#asset-view-modal').modal('show');
+				this.singleUserDetails = object;
+				$('#user-profile-view-modal').modal('show');
 			},
 			showContentCreateForm() {
 				this.createMode = true;
-				this.singleAssetData = {};
-				$('#asset-createOrEdit-modal').modal('show');
+				this.singleUserDetails = {
+					active : false,
+					profile_preview : {}
+				};
+				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
-				this.singleAssetData = object;
-				$('#asset-createOrEdit-modal').modal('show');
+				this.singleUserDetails = object;
+				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
-				this.singleAssetData = object;
+				this.singleUserDetails = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
 			openContentRestoreForm(object) {	
-				this.singleAssetData = object;
+				this.singleUserDetails = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
-			storeAsset(singleAssetData) {
+			storeUser(singleUserDetails) {
 				
 				axios
-					.post('/container-types/' + this.perPage, singleAssetData)
+					.post('/managers/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New container type has been created", "Success");
+							this.$toastr.s("New manager has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#asset-createOrEdit-modal').modal('hide');
+							$('#user-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -265,16 +270,16 @@
 					});
 
 			},
-			updateAsset(singleAssetData) {
+			updateUser(singleUserDetails) {
 				
 				axios
-					.put('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.put('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Container type has been updated", "Success");
+							this.$toastr.s("Manager has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#asset-createOrEdit-modal').modal('hide');
+							$('#user-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -286,13 +291,13 @@
 					});
 
 			},
-			deleteAsset(singleAssetData) {
+			deleteUser(singleUserDetails) {
 				
 				axios
-					.delete('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.delete('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Container type has been deleted", "Success");
+							this.$toastr.s("Manager has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -307,13 +312,13 @@
 					});
 
 			},
-			restoreAsset(singleAssetData) {
+			restoreUser(singleUserDetails) {
 				
 				axios
-					.patch('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.patch('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Container type has been restored", "Success");
+							this.$toastr.s("Manager has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');
@@ -341,9 +346,13 @@
     		},
     		showSelectedTabContents() {
 				
-				if (this.currentTab=='current') {
-					this.contentsToShow = this.allFetchedContents.current.data;
-					this.pagination = this.allFetchedContents.current;
+				if (this.currentTab=='approved') {
+					this.contentsToShow = this.allFetchedContents.approved.data;
+					this.pagination = this.allFetchedContents.approved;
+				}
+				else if (this.currentTab=='pending') {
+					this.contentsToShow = this.allFetchedContents.pending.data;
+					this.pagination = this.allFetchedContents.pending;
 				}
 				else {
 					this.contentsToShow = this.allFetchedContents.trashed.data;
@@ -351,8 +360,12 @@
 				}
 
 			},
-			showCurrentContents() {
-				this.currentTab = 'current';
+			showApprovedContents() {
+				this.currentTab = 'approved';
+				this.showSelectedTabContents();
+			},
+			showPendingContents() {
+				this.currentTab = 'pending';
 				this.showSelectedTabContents();
 			},
 			showTrashedContents() {

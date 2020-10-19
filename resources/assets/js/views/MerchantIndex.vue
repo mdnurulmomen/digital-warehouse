@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'owners'" 
-			:message="'All our warhouse owners'"
+			:title="'merchants'" 
+			:message="'All our warhouse merchants'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'owner'" 
+											  		:caller-page="'merchant'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -49,8 +49,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'username', 'email', 'mobile', '# warhouses']" 
-										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'owner_total_warhouses']" 
+										  			:column-names="['name', 'username', 'email', 'mobile', '# deals']" 
+										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'merchant_total_deals']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 
@@ -79,35 +79,35 @@
 
 		<user-profile-create-or-edit-modal 
 			:create-mode="createMode" 
-			:user="'owner'" 
-			:single-user-details="singleOwnerDetails" 
+			:user="'merchant'" 
+			:single-user-details="singleUserDetails" 
 			:csrf="csrf"
 
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
 		></user-profile-create-or-edit-modal>
 
-		<delete-confirmation 
+		<delete-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'deleteUser'" 
-			:content-to-delete="singleOwnerDetails"
+			:content-to-delete="singleUserDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
 			@deleteUser="deleteUser($event)" 
-		></delete-confirmation>
+		></delete-confirmation-modal>
 
-		<restore-confirmation 
+		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreUser'" 
-			:content-to-restore="singleOwnerDetails"
+			:content-to-restore="singleUserDetails"
 			:restoration-message="'This will restore all related items !'" 
 
 			@restoreUser="restoreUser($event)" 
-		></restore-confirmation>
+		></restore-confirmation-modal>
 
 		<user-profile-view-modal 
-			:user="'owner'" 
-			:profile-to-view="singleOwnerDetails" 
+			:user="'merchant'" 
+			:profile-to-view="singleUserDetails" 
 			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
 		></user-profile-view-modal>
 
@@ -119,7 +119,7 @@
 
 	import axios from 'axios';
 
-    let singleOwnerDetails = {
+    let singleUserDetails = {
     	active : false,
     	profile_preview : {}
     };
@@ -145,7 +145,7 @@
 		        	current_page: 1
 		      	},
 
-	        	singleOwnerDetails : singleOwnerDetails,
+	        	singleUserDetails : singleUserDetails,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -169,7 +169,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/owners/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/merchants/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -212,7 +212,7 @@
 				
 				axios
 				.get(
-					"/api/search-owners/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-merchants/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -225,12 +225,12 @@
 
 			},
 			showContentDetails(object) {	
-				this.singleOwnerDetails = object;
+				this.singleUserDetails = object;
 				$('#user-profile-view-modal').modal('show');
 			},
 			showContentCreateForm() {
 				this.createMode = true;
-				this.singleOwnerDetails = {
+				this.singleUserDetails = {
 					active : false,
 					profile_preview : {}
 				};
@@ -238,24 +238,24 @@
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
-				this.singleOwnerDetails = object;
+				this.singleUserDetails = object;
 				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
-				this.singleOwnerDetails = object;
+				this.singleUserDetails = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
 			openContentRestoreForm(object) {	
-				this.singleOwnerDetails = object;
+				this.singleUserDetails = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
-			storeUser(singleOwnerDetails) {
+			storeUser(singleUserDetails) {
 				
 				axios
-					.post('/owners/' + this.perPage, singleOwnerDetails)
+					.post('/merchants/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New owner has been created", "Success");
+							this.$toastr.s("New merchant has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#user-createOrEdit-modal').modal('hide');
@@ -270,13 +270,13 @@
 					});
 
 			},
-			updateUser(singleOwnerDetails) {
+			updateUser(singleUserDetails) {
 				
 				axios
-					.put('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
+					.put('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Owner has been updated", "Success");
+							this.$toastr.s("merchant has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#user-createOrEdit-modal').modal('hide');
@@ -291,13 +291,13 @@
 					});
 
 			},
-			deleteUser(singleOwnerDetails) {
+			deleteUser(singleUserDetails) {
 				
 				axios
-					.delete('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
+					.delete('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Owner has been deleted", "Success");
+							this.$toastr.s("merchant has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -312,13 +312,13 @@
 					});
 
 			},
-			restoreUser(singleOwnerDetails) {
+			restoreUser(singleUserDetails) {
 				
 				axios
-					.patch('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
+					.patch('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Owner has been restored", "Success");
+							this.$toastr.s("merchant has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');
