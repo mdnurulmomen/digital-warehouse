@@ -33,7 +33,7 @@ Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmat
 Vue.component('restore-confirmation-modal', require('./components/RestoreConfirmationModal.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
-Vue.component('search-and-addition-option', require('./components/searchAndAdditionOption.vue').default);
+Vue.component('search-and-addition-option', require('./components/SearchAndAdditionOption.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
 
@@ -53,7 +53,8 @@ import WarhouseOwnerIndex from './views/WarhouseOwnerIndex'
 import ManagerIndex from './views/ManagerIndex'
 import MerchantIndex from './views/MerchantIndex'
 import StorageTypeIndex from './views/StorageTypeIndex'
-import ContainerTypeIndex from './views/ContainerTypeIndex'
+import ContainerIndex from './views/ContainerTypeIndex'
+import WarhouseIndex from './views/WarhouseIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -110,9 +111,14 @@ const router = new VueRouter({
             component: StorageTypeIndex,
         },
         {
-            path: '/container-types',
-            name: 'container-types',
-            component: ContainerTypeIndex,
+            path: '/containers',
+            name: 'containers',
+            component: ContainerIndex,
+        },
+        {
+            path: '/warhouses',
+            name: 'warhouses',
+            component: WarhouseIndex,
         },
     ],
 });

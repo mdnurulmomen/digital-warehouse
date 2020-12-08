@@ -15,9 +15,10 @@ class CreateWarhouseStorageFeaturesTable extends Migration
     {
         Schema::create('warhouse_storage_features', function (Blueprint $table) {
             $table->mediumIncrements('id');
-            $table->string('feature');
-            $table->unsignedTinyInteger('storage_type_id');
-            $table->unsignedSmallInteger('warhouse_id');
+            $table->string('features');
+            // $table->unsignedTinyInteger('storage_type_id');
+            $table->unsignedMediumInteger('warhouse_storage_type_id');
+            // $table->unsignedSmallInteger('warhouse_id');
         });
     }
 

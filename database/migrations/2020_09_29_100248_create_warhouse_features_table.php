@@ -15,7 +15,7 @@ class CreateWarhouseFeaturesTable extends Migration
     {
         Schema::create('warhouse_features', function (Blueprint $table) {
             $table->mediumIncrements('id');
-            $table->string('feature');
+            $table->string('features');
             $table->unsignedSmallInteger('warhouse_id');
         });
     }

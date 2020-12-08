@@ -16,8 +16,9 @@ class CreateWarhouseStoragePreviewsTable extends Migration
         Schema::create('warhouse_storage_previews', function (Blueprint $table) {
             $table->mediumIncrements('id');
             $table->string('preview');
-            $table->unsignedTinyInteger('storage_type_id');
-            $table->unsignedSmallInteger('warhouse_id');
+            // $table->unsignedTinyInteger('storage_type_id');
+            $table->unsignedMediumInteger('warhouse_storage_type_id');
+            // $table->unsignedSmallInteger('warhouse_id');
         });
     }
 

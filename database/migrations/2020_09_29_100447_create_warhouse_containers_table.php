@@ -17,17 +17,21 @@ class CreateWarhouseContainersTable extends Migration
         // should be engaged once full rack / container is selected for one product
         Schema::create('warhouse_containers', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 100);
-            $table->unsignedTinyInteger('container_type_id');  // rack / pallet
-            $table->unsignedTinyInteger('storage_type_id');  // ex. food & beverage/industrial
-            $table->unsignedSmallInteger('length')->default(100);
-            $table->unsignedSmallInteger('depth')->default(100);
-            $table->unsignedSmallInteger('height')->default(100);
-            $table->unsignedSmallInteger('storing_price')->default(0);  // price for storing only
-            $table->unsignedSmallInteger('selling_price')->default(0);  // price for store and sell
-            $table->boolean('has_shelves')->default(0);
-            $table->boolean('engaged')->default(0);
-            $table->unsignedInteger('warhouse_id');
+            $table->unsignedSmallInteger('quantity')->default(100);
+
+            // $table->unsignedSmallInteger('container_storing_price')->default(0);    // price for store only
+            // $table->unsignedSmallInteger('container_selling_price')->default(0);    // price for store and sell 
+
+            // $table->unsignedSmallInteger('shelf_storing_price')->default(0);        // price for store only
+            // $table->unsignedSmallInteger('shelf_selling_price')->default(0);        // price for store and sell 
+
+            // $table->unsignedSmallInteger('unit_storing_price')->default(0);         // price for store only
+            // $table->unsignedSmallInteger('unit_selling_price')->default(0);         // price for store and sell 
+            
+            $table->unsignedSmallInteger('container_id');
+            $table->unsignedSmallInteger('warhouse_id');
+
+            $table->softDeletes();
         });
     }
 

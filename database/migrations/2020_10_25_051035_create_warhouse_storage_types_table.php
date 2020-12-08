@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWarhousePreviewsTable extends Migration
+class CreateWarhouseStorageTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateWarhousePreviewsTable extends Migration
      */
     public function up()
     {
-        Schema::create('warhouse_previews', function (Blueprint $table) {
+        Schema::create('warhouse_storage_types', function (Blueprint $table) {
             $table->mediumIncrements('id');
-            $table->string('preview');
+            $table->unsignedSmallInteger('storage_type_id');
             $table->unsignedSmallInteger('warhouse_id');
+            $table->softDeletes();
         });
     }
 
@@ -27,6 +28,6 @@ class CreateWarhousePreviewsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('warhouse_previews');
+        Schema::dropIfExists('warhouse_storage_types');
     }
 }

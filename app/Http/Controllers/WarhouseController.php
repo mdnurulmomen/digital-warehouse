@@ -2,21 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Warhouse;
 use Illuminate\Http\Request;
 use App\Models\WarhouseOwner;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\Web\WarhouseCollection;
 
 class WarhouseController extends Controller
 {
-    public function showAllOwners($perPage)
+    public function showAllOwners($perPage=false)
     {
-    	return response()->json([
+    	if ($perPage) {
+            
+            return response()->json([
 
-    		'approved' => WarhouseOwner::where('active', 1)->paginate($perPage),
-            'pending' => WarhouseOwner::where('active', 0)->paginate($perPage),
-    		'trashed' => WarhouseOwner::onlyTrashed()->paginate($perPage),
+        		'approved' => WarhouseOwner::where('active', 1)->paginate($perPage),
+                'pending' => WarhouseOwner::where('active', 0)->paginate($perPage),
+        		'trashed' => WarhouseOwner::onlyTrashed()->paginate($perPage),
 
-    	], 200);
+        	], 200);
+
+        }
+
+        return WarhouseOwner::where('active', 1)->get();
     }
 
     public function storeNewOwner(Request $request, $perPage)
@@ -119,4 +127,224 @@ class WarhouseController extends Controller
             'all' => $query->paginate($perPage),    
         ], 200);
     }
+
+    // Warhouse
+    public function showAllWarhouses($perPage)
+    {
+        return [
+
+            'approved' => new WarhouseCollection(Warhouse::where('active', 1)->paginate($perPage)),
+            'pending' => new WarhouseCollection(Warhouse::where('active', 0)->paginate($perPage)),
+            'trashed' => new WarhouseCollection(Warhouse::onlyTrashed()->paginate($perPage)),
+
+        ];
+    
+    /*
+        return response()->json([
+
+            'approved' => Warhouse::with(['owner', 'previews', 'feature', 'storages.storageType', 'storages.previews', 'storages.feature'])->where('active', 1)->paginate($perPage),
+            'pending' => Warhouse::with(['owner', 'previews', 'feature', 'storages.storageType', 'storages.previews', 'storages.feature'])->where('active', 0)->paginate($perPage),
+            'trashed' => Warhouse::onlyTrashed()->with(['owner', 'previews', 'feature', 'storages.storageType', 'storages.previews', 'storages.feature'])->paginate($perPage),
+
+        ], 200);
+    */
+    }
+
+    public function storeNewWarhouse(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'nullable|string|max:100',
+            'code' => 'required|string|max:100|unique:warhouses,code',
+            'user_name' => 'required|string|max:100|unique:warhouses,user_name',
+            'email' => 'required|string|max:100|unique:warhouses,email',
+            'mobile' => 'required|string|max:50|unique:warhouses,mobile',
+            'password' => 'required|string|max:255|confirmed',
+            'warhouse_deal' => 'required|string',
+            'active' => 'boolean',
+            'warhouse_owner_id' => 'required|numeric',
+            'feature.features' => 'required|string',
+            'previews' => 'required|array',
+
+            'storages' => 'required|array',
+            'storages.*.feature.features' => 'required|string',
+            'storages.*.previews' => 'required|array',
+            'storages.*.storage_type' => 'required',
+
+            'containers' => 'required|array',
+            'containers.*.container.id' => 'required|exists:containers,id',
+            'containers.*.quantity' => 'required|integer|min:0',
+            'containers.*.rents' => 'required',
+        ]);
+
+        $newWarhouse = new Warhouse();
+
+        $newWarhouse->name = $request->name;
+        $newWarhouse->code = $request->code;
+        $newWarhouse->user_name = $request->user_name;
+        $newWarhouse->email = $request->email;
+        $newWarhouse->mobile = $request->mobile;
+        $newWarhouse->password = Hash::make($request->password);
+        $newWarhouse->lat = $request->lat ?? 1;
+        $newWarhouse->lng = $request->lng ?? 2;
+        $newWarhouse->warhouse_deal = $request->warhouse_deal;
+        $newWarhouse->active = $request->active ?? false;
+        $newWarhouse->warhouse_owner_id = $request->warhouse_owner_id;
+
+        $newWarhouse->save();
+
+        if ($request->site_map_preview) {
+
+            $newWarhouse->map_preview = $request->site_map_preview;
+            $newWarhouse->save();
+
+        }
+
+        $newWarhouse->feature()->updateOrCreate(
+            [ 'warhouse_id' => $newWarhouse->id ],
+            [ 'features' => $request->feature['features']]
+        );
+
+        if (count($request->previews)) {
+            
+            $newWarhouse->warhouse_previews = $request->previews;
+
+        }
+
+        if (count($request->storages)) {
+            
+            $newWarhouse->warhouse_storages = $request->storages;
+
+        }
+
+        if (count($request->containers)) {
+            
+            $newWarhouse->warhouse_containers = $request->containers;
+
+        }
+
+        return $this->showAllWarhouses($perPage);
+    }
+
+    public function updateWarhouse(Request $request, $warhouse, $perPage)
+    {
+        $warhouseToUpdate = Warhouse::findOrFail($warhouse);
+
+        $request->validate([
+            'name' => 'nullable|string|max:100',
+            'code' => 'required|string|max:100|unique:warhouses,code,'.$warhouseToUpdate->id,
+            'user_name' => 'required|string|max:100|unique:warhouses,user_name,'.$warhouseToUpdate->id,
+            'email' => 'required|string|max:100|unique:warhouses,email,'.$warhouseToUpdate->id,
+            'mobile' => 'required|string|max:50|unique:warhouses,mobile,'.$warhouseToUpdate->id,
+            'password' => 'nullable|string|max:255|confirmed',
+            'warhouse_deal' => 'required|string',
+            'active' => 'boolean',
+            'warhouse_owner_id' => 'required|numeric',
+            'feature.features' => 'required|string',
+            'previews' => 'required|array',
+
+            'storages' => 'required|array',
+            'storages.*.feature.features' => 'required|string',
+            'storages.*.previews' => 'required|array',
+            'storages.*.storage_type' => 'required',
+
+            'containers' => 'required|array',
+            'containers.*.container.id' => 'required|exists:containers,id',
+            'containers.*.quantity' => 'required|numeric',
+            'containers.*.rents' => 'required',
+        ]);
+
+        $warhouseToUpdate->name = $request->name;
+        $warhouseToUpdate->code = $request->code;
+        $warhouseToUpdate->user_name = $request->user_name;
+        $warhouseToUpdate->email = $request->email;
+        $warhouseToUpdate->mobile = $request->mobile;
+
+        if ($request->password) {
+            
+            $warhouseToUpdate->password = Hash::make($request->password);
+        
+        }
+
+        if ($request->site_map_preview) {
+
+            $warhouseToUpdate->map_preview = $request->site_map_preview;
+
+        }
+        
+        $warhouseToUpdate->lat = $request->lat ?? 1;
+        $warhouseToUpdate->lng = $request->lng ?? 2;
+        $warhouseToUpdate->warhouse_deal = $request->warhouse_deal;
+        $warhouseToUpdate->active = $request->active ?? false;
+        $warhouseToUpdate->warhouse_owner_id = $request->warhouse_owner_id;
+
+        $warhouseToUpdate->save();
+
+
+        $warhouseToUpdate->feature()->updateOrCreate(
+            [ 'warhouse_id' => $warhouseToUpdate->id ],
+            [ 'features' => $request->feature['features']]
+        );
+
+        if (count($request->previews)) {
+            
+            $warhouseToUpdate->warhouse_previews = $request->previews;
+
+        }
+
+        if (count($request->storages)) {
+            
+            $warhouseToUpdate->warhouse_storages = $request->storages;
+
+        }
+
+        if (count($request->containers)) {
+            
+            $warhouseToUpdate->warhouse_containers = $request->containers;
+
+        }
+
+        return $this->showAllWarhouses($perPage);
+    }
+
+    public function deleteWarhouse($owner, $perPage)
+    {
+        $warhouseToDelete = Warhouse::findOrFail($owner);
+        // $warhouseToDelete->warhouses()->delete();
+        $warhouseToDelete->delete();
+
+        return $this->showAllWarhouses($perPage);
+    }
+
+    public function restoreWarhouse($owner, $perPage)
+    {
+        $warhouseToRestore = Warhouse::withTrashed()->findOrFail($owner);
+        // $warhouseToRestore->warhouses()->restore();
+        $warhouseToRestore->restore();
+
+        return $this->showAllWarhouses($perPage);
+    }
+
+    public function searchAllWarhouses($search, $perPage)
+    {
+        $columnsToSearch = ['name', 'user_name', 'email', 'mobile', 'warhouse_deal'];
+
+        $query = Warhouse::withTrashed();
+
+        foreach($columnsToSearch as $column){
+            $query->orWhere($column, 'like', "%$search%");
+        }
+
+        $query->orWhereHas('owner', function($q) use ($search){
+            $q->where('first_name', 'like', "%$search%")
+              ->orWhere('last_name', 'like', "%$search%")
+              ->orWhere('user_name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('mobile', 'like', "%$search%");
+        });
+
+        return response()->json([
+            'all' => new WarhouseCollection($query->paginate($perPage)),    
+        ], 200);
+    }
+
 }

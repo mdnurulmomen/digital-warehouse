@@ -39,7 +39,7 @@ Route::name('admin.')->group(function () {
 		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
 		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');
 
-		Route::get('/api/owners/{perPage}', 'WarhouseController@showAllOwners')->name('warhouse-owners');
+		Route::get('/api/owners/{perPage?}', 'WarhouseController@showAllOwners')->name('warhouse-owners');
 		Route::post('/owners/{perPage}', 'WarhouseController@storeNewOwner')->name('warhouse-owners');	
 		Route::put('/owners/{owner}/{perPage}', 'WarhouseController@updateOwner')->name('warhouse-owners');	
 		Route::delete('/owners/{owner}/{perPage}', 'WarhouseController@deleteOwner')->name('warhouse-owners');	
@@ -60,19 +60,26 @@ Route::name('admin.')->group(function () {
 		Route::patch('/merchants/{merchant}/{perPage}', 'MerchantController@restoreMerchant')->name('merchants');
 		Route::get('/api/search-merchants/{search}/{perPage}', 'MerchantController@searchAllMerchants')->name('search-merchants');
 
-		Route::get('/api/storage-types/{perPage}','AssetController@showAllStorageTypes')->name('storage-types');
+		Route::get('/api/storage-types/{perPage?}','AssetController@showAllStorageTypes')->name('storage-types');
 		Route::post('/storage-types/{perPage}','AssetController@storeNewStorageType')->name('storage-types');	
 		Route::put('/storage-types/{type}/{perPage}','AssetController@updateStorageType')->name('storage-types');	
 		Route::delete('/storage-types/{type}/{perPage}','AssetController@deleteStorageType')->name('storage-types');	
 		Route::patch('/storage-types/{type}/{perPage}','AssetController@restoreStorageType')->name('storage-types');
 		Route::get('/api/search-storage-types/{search}/{perPage}','AssetController@searchAllStorageTypes')->name('search-storage-types');
 
-		Route::get('/api/container-types/{perPage}', 'AssetController@showAllContainerTypes')->name('container-types');
-		Route::post('/container-types/{perPage}', 'AssetController@storeNewContainerType')->name('container-types');	
-		Route::put('/container-types/{type}/{perPage}', 'AssetController@updateContainerType')->name('container-types');	
-		Route::delete('/container-types/{type}/{perPage}', 'AssetController@deleteContainerType')->name('container-types');	
-		Route::patch('/container-types/{type}/{perPage}', 'AssetController@restoreContainerType')->name('container-types');
-		Route::get('/api/search-container-types/{search}/{perPage}', 'AssetController@searchAllContainerTypes')->name('search-container-types');
+		Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('containers');
+		Route::post('/containers/{perPage}', 'AssetController@storeNewContainer')->name('containers');	
+		Route::put('/containers/{container}/{perPage}', 'AssetController@updateContainer')->name('containers');	
+		Route::delete('/containers/{container}/{perPage}', 'AssetController@deleteContainer')->name('containers');	
+		Route::patch('/containers/{container}/{perPage}', 'AssetController@restoreContainer')->name('containers');
+		Route::get('/api/search-containers/{search}/{perPage}', 'AssetController@searchAllContainers')->name('search-containers');
+
+		Route::get('/api/warhouses/{perPage}', 'WarhouseController@showAllWarhouses')->name('warhouses');
+		Route::post('/warhouses/{perPage}', 'WarhouseController@storeNewWarhouse')->name('warhouses');	
+		Route::put('/warhouses/{warhouse}/{perPage}', 'WarhouseController@updateWarhouse')->name('warhouses');	
+		Route::delete('/warhouses/{warhouse}/{perPage}', 'WarhouseController@deleteWarhouse')->name('warhouses');	
+		Route::patch('/warhouses/{warhouse}/{perPage}', 'WarhouseController@restoreWarhouse')->name('warhouses');
+		Route::get('/api/search-warhouses/{search}/{perPage}', 'WarhouseController@searchAllWarhouses')->name('search-warhouses');
 
 	});
 

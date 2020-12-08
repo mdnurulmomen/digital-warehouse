@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class WarhousePreview extends Model
+class WarhouseContainerShelfUnitStatus extends Model
 {
     public $timestamps = false;
     protected $guarded = ['id'];

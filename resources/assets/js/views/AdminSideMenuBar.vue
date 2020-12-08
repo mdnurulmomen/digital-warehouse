@@ -52,13 +52,8 @@
 										</router-link>
 									</li>
 									<li class="">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
-										</router-link>
-									</li>
-									<li class="">
-										<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 3</span>
+										<router-link :to="{ name: 'warhouses' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Warhouses</span>
 										</router-link>
 									</li>
 								</ul>
@@ -66,7 +61,7 @@
 							<li class="pcoded-hasmenu">
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-command"></i>
+										<i class="feather icon-user"></i>
 									</span>
 									<span class="pcoded-mtext">Manager</span>
 									<span class="pcoded-badge label label-warning">NEW</span>
@@ -92,7 +87,7 @@
 							<li class="pcoded-hasmenu">
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-command"></i>
+										<i class="feather icon-users"></i>
 									</span>
 									<span class="pcoded-mtext">Merchant</span>
 									<span class="pcoded-badge label label-warning">NEW</span>
@@ -118,7 +113,7 @@
 							<li class="pcoded-hasmenu">
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-sidebar"></i>
+										<i class="feather icon-briefcase"></i>
 									</span>
 									<span class="pcoded-mtext">Assets</span>
 									<span class="pcoded-badge label label-danger">NEW</span>
@@ -147,7 +142,7 @@
 										</a>
 										<ul class="pcoded-submenu">
 											<li class="">
-												<router-link :to="{ name: 'container-types' }" class="waves-effect waves-dark">
+												<router-link :to="{ name: 'containers' }" class="waves-effect waves-dark">
 													<span class="pcoded-mtext">Types</span>
 												</router-link>
 											</li>
@@ -157,11 +152,6 @@
 												</router-link>
 											</li>
 										</ul>
-									</li>
-									<li class="">
-										<a href="menu-bottom.html" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Bottom Menu</span>
-										</a>
 									</li>
 								</ul>
 							</li>

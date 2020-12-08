@@ -15,11 +15,12 @@ class CreateWarhouseContainerShelvesTable extends Migration
     {
         Schema::create('warhouse_container_shelves', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 100);  // warhousName-containerTypePrefix-numberContainer-shelfNumber (auto-generated)
-            $table->unsignedSmallInteger('storing_price')->default(0);
-            $table->unsignedSmallInteger('selling_price')->default(0);
-            $table->boolean('has_units')->default(0);
-            $table->boolean('engaged')->default(0);
+            // warhousName-containerTypePrefix-numberContainer-shelfNumber (auto-generated)
+            // $table->string('name', 100); 
+            // $table->unsignedSmallInteger('storing_price')->default(0);
+            // $table->unsignedSmallInteger('selling_price')->default(0);
+            // $table->boolean('has_units')->default(0);
+            // $table->boolean('engaged')->default(0);
             $table->unsignedInteger('warhouse_container_id');
         });
     }
