@@ -153,6 +153,23 @@
 											</li>
 										</ul>
 									</li>
+									<li class="pcoded-hasmenu">
+										<a href="javascript:void(0)" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Rent Periods</span>
+										</a>
+										<ul class="pcoded-submenu">
+											<li class="">
+												<router-link :to="{ name: 'rent-periods' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Periods</span>
+												</router-link>
+											</li>
+											<li class="">
+												<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Dashboard</span>
+												</router-link>
+											</li>
+										</ul>
+									</li>
 								</ul>
 							</li>
 							<li class="pcoded-hasmenu">

@@ -81,6 +81,13 @@ Route::name('admin.')->group(function () {
 		Route::patch('/warhouses/{warhouse}/{perPage}', 'WarhouseController@restoreWarhouse')->name('warhouses');
 		Route::get('/api/search-warhouses/{search}/{perPage}', 'WarhouseController@searchAllWarhouses')->name('search-warhouses');
 
+		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
+		Route::post('/rent-periods/{perPage}', 'AssetController@storeNewRentPeriod')->name('rent-periods');	
+		Route::put('/rent-periods/{period}/{perPage}', 'AssetController@updateRentPeriod')->name('rent-periods');	
+		Route::delete('/rent-periods/{period}/{perPage}', 'AssetController@deleteRentPeriod')->name('rent-periods');	
+		Route::patch('/rent-periods/{period}/{perPage}', 'AssetController@restoreRentPeriod')->name('rent-periods');
+		Route::get('/api/search-rent-periods/{search}/{perPage}', 'AssetController@searchAllRentPeriods')->name('search-rent-periods'); 
+
 	});
 
 });

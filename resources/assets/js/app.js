@@ -55,6 +55,7 @@ import MerchantIndex from './views/MerchantIndex'
 import StorageTypeIndex from './views/StorageTypeIndex'
 import ContainerIndex from './views/ContainerTypeIndex'
 import WarhouseIndex from './views/WarhouseIndex'
+import RentPeriodIndex from './views/RentPeriodIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -119,6 +120,11 @@ const router = new VueRouter({
             path: '/warhouses',
             name: 'warhouses',
             component: WarhouseIndex,
+        },
+        {
+            path: '/rent-periods',
+            name: 'rent-periods',
+            component: RentPeriodIndex,
         },
     ],
 });
