@@ -69,7 +69,7 @@ class Admin extends Authenticatable
             $img->save($imagePath.$this->id.'.jpg');
 
             $this->profilePreview()->updateOrCreate(
-                ['user_id' => $this->id, 'user_type' => 'App\Models\Admin'],
+                ['user_id' => $this->id, 'user_type' => get_class($this)],
                 ['preview' => $imagePath.$this->id.'.jpg']
             );
 

@@ -120,7 +120,7 @@ class WarhouseController extends Controller
 
         $query->orWhereHas('warhouses', function($q) use ($search){
             $q->where('name', 'like', "%$search%")
-              ->orWhere('warhouse_code', 'like', "%$search%");
+              ->orWhere('code', 'like', "%$search%");
         });
 
         return response()->json([

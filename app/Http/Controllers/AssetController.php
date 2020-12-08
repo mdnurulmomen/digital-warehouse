@@ -237,7 +237,7 @@ class AssetController extends Controller
 
     public function searchAllContainers($search, $perPage)
     {
-        $columnsToSearch = ['name', 'length', 'width', 'height', 'storing_price', 'selling_price'];
+        $columnsToSearch = ['name', 'length', 'width', 'height'];
 
         $query = Container::with(['shelf.unit'])->withTrashed();
 

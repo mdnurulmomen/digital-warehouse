@@ -44,6 +44,13 @@ class Manager extends Authenticatable
     ];
 
     /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['profilePreview', 'warhouse'];
+
+    /**
      * Set the user's first name.
      *
      * @param  string  $value
@@ -69,8 +76,6 @@ class Manager extends Authenticatable
 
         }
     }
-
-    protected $with = ['profilePreview', 'warhouse'];
 
     /**
      * Get the user's image.

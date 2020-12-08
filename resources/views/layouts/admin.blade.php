@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-	<title>Admindek | Admin Template</title>
+	<title>Gudam | Admin Template</title>
 
 	<meta charset="utf-8">
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="description" content="Admindek Bootstrap admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
+	<meta name="description" content="Gudam admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
 	<meta name="keywords" content="flat ui, admin Admin , Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
 	<meta name="author" content="colorlib" />
 	<meta name="csrf-token" content={{csrf_token()}}>
@@ -22,6 +22,7 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('css/font-awesome-n.min.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/widget.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{asset('css/app.css')}}">
 </head>
 
 <body>
@@ -38,7 +39,7 @@
 				<div class="navbar-wrapper">
 					<div class="navbar-logo">
 						<a href="index.html">
-							<img class="img-fluid" src="{{asset('png/logo.png')}}" alt="Theme-Logo" />
+							<img class="img-fluid" src="{{asset('uploads/application/application_logo.png')}}" alt="Theme-Logo" />
 						</a>
 						<a class="mobile-menu" id="mobile-collapse" href="#!">
 							<i class="feather icon-menu icon-toggle-right"></i>

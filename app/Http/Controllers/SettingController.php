@@ -64,7 +64,7 @@ class SettingController extends Controller
             'default_length' => 'required|numeric|min:0',
             'default_width' => 'required|numeric|min:0',
             'default_height' => 'required|numeric|min:0',
-            // 'default_measure_unit_id' => 'required|exists:measure_units',
+            'default_measure_unit_id' => 'string|max:100',
         ]);
 
         $adminSettings = ApplicationSetting::firstOrCreate([]);

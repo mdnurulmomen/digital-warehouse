@@ -111,7 +111,7 @@
 							<input type="hidden" name="_token" :value="csrf">							
 
 				    		<div class="d-flex">
-				    			<transition name="container-branches">
+				    			<transition name="branches">
 						    		<!-- container -->
 					    			<div class="mr-1 p-2 border w-100">
 							    		<div class="form-row">
@@ -239,7 +239,7 @@
 					    			</div>
 					    		</transition>
 					    		
-					    		<transition name="container-branches">
+					    		<transition name="branches">
 					    			<!-- shelf -->
 					    			<div class="mr-1 ml-1 p-2 border 100" v-if="singleAssetData.has_shelve">
 							    		<!-- shelf price -->
@@ -311,7 +311,7 @@
 					    			</div>
 					    		</transition>
 
-					    		<transition name="container-branches">
+					    		<transition name="branches">
 					    			<!-- unit -->
 					    			<div class="ml-1 p-2 border w-100" v-if="singleAssetData.has_shelve && singleAssetData.shelf.has_units">
 							    		<!-- container price -->
@@ -872,8 +872,34 @@
 						}
 
 						break;
+
+					case 'shelf_quantity' :
+
+						if (this.singleAssetData.has_shelve && (!this.singleAssetData.shelf.quantity || this.singleAssetData.shelf.quantity < 1)) {
+							this.errors.container.shelf.quantity = 'Shelf quantity is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container.shelf, 'quantity');
+						}
+
+						break;
+
+					case 'unit_quantity' :
+
+						if (this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.quantity || this.singleAssetData.shelf.unit.quantity < 1)) {
+							this.errors.container.shelf.unit.quantity = 'Unit quantity is required';
+						}
+						else{
+							this.submitForm = true;
+							// this.errors.container.shelf.unit.quantity = null;
+							this.$delete(this.errors.container.shelf.unit, 'quantity');
+						}
+
+						break;
 				
 
+				/*
 					case 'container_storing_price' :						
 
 						if (!this.singleAssetData.storing_price || this.singleAssetData.storing_price < 0) {
@@ -920,21 +946,7 @@
 							this.$delete(this.errors.container.shelf, 'selling_price');
 						}
 
-						break;
-
-					
-					case 'shelf_quantity' :
-
-						if (this.singleAssetData.has_shelve && (!this.singleAssetData.shelf.quantity || this.singleAssetData.shelf.quantity < 1)) {
-							this.errors.container.shelf.quantity = 'Shelf quantity is required';
-						}
-						else{
-							this.submitForm = true;
-							this.$delete(this.errors.container.shelf, 'quantity');
-						}
-
-						break;
-					
+						break;					
 
 					case 'shelf_unit_selling_price' :
 
@@ -959,20 +971,8 @@
 						}
 
 						break;
-
 					
-					case 'unit_quantity' :
-
-						if (this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.quantity || this.singleAssetData.shelf.unit.quantity < 1)) {
-							this.errors.container.shelf.unit.quantity = 'Unit quantity is required';
-						}
-						else{
-							this.submitForm = true;
-							// this.errors.container.shelf.unit.quantity = null;
-							this.$delete(this.errors.container.shelf.unit, 'quantity');
-						}
-
-						break;
+				*/
 					
 
 				}
@@ -985,13 +985,13 @@
 </script>
 
 <style scoped>
-	.container-branches-enter-active {
+	.branches-enter-active {
   		transition: all 1s ease;
 	}
-	.container-branches-leave-active {
+	.branches-leave-active {
   		transition: all 1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 	}
-	.container-branches-enter, .container-branches-leave-to {
+	.branches-enter, .branches-leave-to {
   		transform: translateX(10px);
   		opacity: 0;
 	}

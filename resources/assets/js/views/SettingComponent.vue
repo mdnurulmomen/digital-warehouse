@@ -507,9 +507,9 @@
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
-																	                  	type="number" 
+																	                  	type="text" 
 																						class="form-control" 
-																						v-model.number="applicationSettings.default_measure_unit_id" 
+																						v-model="applicationSettings.default_measure_unit_id" 
 																						required="true"
 																						placeholder="Default Unit" 		
 																						:class="!errors.applicationSettings.default_measure_unit_id  ? 'is-valid' : 'is-invalid'"
