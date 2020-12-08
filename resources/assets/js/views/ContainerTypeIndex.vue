@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'container-types'" 
-			:message="'All our warhouse container-types'"
+			:title="'containers'" 
+			:message="'All our containers'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,10 +26,10 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'container type'" 
+											  		:caller-page="'container'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
+											  		@searchData="searchData" 
 											  		@fetchAllContents="fetchAllContents"
 											  	></search-and-addition-option>
 											</div>
@@ -48,16 +48,16 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'code']" 
-										  			:column-values-to-show="['name', 'code']" 
+										  			:column-names="['name']" 
+										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 
-										  			@showContentDetails="showContentDetails($event)" 
-										  			@openContentEditForm="openContentEditForm($event)" 
-										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@openContentRestoreForm="openContentRestoreForm($event)" 
-										  			@changeNumberContents="changeNumberContents($event)" 
+										  			@showContentDetails="showContentDetails" 
+										  			@openContentEditForm="openContentEditForm" 
+										  			@openContentDeleteForm="openContentDeleteForm" 
+										  			@openContentRestoreForm="openContentRestoreForm" 
+										  			@changeNumberContents="changeNumberContents" 
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
 										  		>	
@@ -75,16 +75,433 @@
 				</div>
 			</div>
 		</div>
-
+	
+	<!-- 
 		<asset-create-or-edit-modal 
 			:create-mode="createMode" 
-			:caller-page="'container type'" 
+			:caller-page="'container'" 
 			:single-asset-data="singleAssetData" 
 			:csrf="csrf"
 
-			@storeAsset="storeAsset($event)" 
-			@updateAsset="updateAsset($event)" 
+			@storeAsset="storeAsset" 
+			@updateAsset="updateAsset" 
 		></asset-create-or-edit-modal>
+ 	-->
+
+ 		<!-- modal-createOrEdit-container -->
+		<div class="modal fade" id="container-createOrEdit-modal">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					
+					<div class="modal-header">
+					  	<h4 class="modal-title">
+					  		{{ createMode ? 'Create' : 'Edit' }} Container
+					  	</h4>
+					  	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					    	<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+			  		<!-- form start -->
+					<form 
+						class="form-horizontal" 
+						v-on:submit.prevent="createMode ? storeContainer() : updateContainer()" 
+					>
+						<div class="modal-body">
+
+							<input type="hidden" name="_token" :value="csrf">							
+
+				    		<div class="d-flex">
+				    			<transition name="container-branches">
+						    		<!-- container -->
+					    			<div class="mr-1 p-2 border w-100">
+							    		<div class="form-row">
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">Name</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleAssetData.name" 
+													placeholder="Name should be unique" 
+													:class="!errors.container.name  ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('name')" 
+													required="true" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.name }}
+										  		</div>
+											</div>
+										</div>
+						    		 
+						    			<!-- container measurement -->
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Cntnr. Length</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.length" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.length ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('container_length')" 
+													required="true" 
+													:readonly="!createMode"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.length }}
+										  		</div>
+							    			</div>
+							    		
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Cntnr. Width</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.width" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.width ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('container_width')" 
+													required="true" 
+													:readonly="!createMode"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.width }}
+										  		</div>
+							    			</div>
+							    		
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Cntnr. Height</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.height" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.height ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('container_height')" 
+													required="true" 
+													:readonly="!createMode"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.height }}
+										  		</div>
+							    			</div>
+							    		</div>
+						    		
+							    		<!-- container price -->
+										<!-- 
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Storing Price</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.storing_price" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.storing_price ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('container_storing_price')" 
+													required="true" 
+												>
+												<div class="invalid-feedback">
+										        	{{ errors.container.storing_price }}
+										  		</div>
+							    			</div>
+
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Default Selling Price (e-commerce fulfillment)</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.selling_price" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.selling_price ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('container_selling_price')" 
+													required="true" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.selling_price }}
+										  		</div>
+							    			</div>
+							    		</div>
+							    		 -->
+						    		
+					    				<!-- container has shelf -->
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group text-center">
+												<toggle-button 
+													v-model="singleAssetData.has_shelve" 
+													:width=150 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'red'}"
+													:labels="{checked: 'Has Shelfs', unchecked: 'No Shelf'}" 
+													:disabled="!createMode"
+												/>
+							    			</div>
+							    		</div>
+						    		
+					    			</div>
+					    		</transition>
+					    		
+					    		<transition name="container-branches">
+					    			<!-- shelf -->
+					    			<div class="mr-1 ml-1 p-2 border 100" v-if="singleAssetData.has_shelve">
+							    		<!-- shelf price -->
+										<!-- 
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Default Storing Price</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.shelf.storing_price" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.shelf.storing_price ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('shelf_storing_price')" 
+													required="true" 
+												>
+												<div class="invalid-feedback">
+										        	{{ errors.container.shelf.storing_price }}
+										  		</div>
+							    			</div>
+							    			<div class="col-sm-12 form-group">	
+							    				<label for="phone">Default Selling Price</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.shelf.selling_price" 
+													placeholder="Lenght of container" 
+													:class="!errors.container.shelf.selling_price ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('shelf_selling_price')" 
+													required="true" 
+												>
+												<div class="invalid-feedback">
+										        	{{ errors.container.shelf.selling_price }}
+										  		</div>
+							    			</div>
+							    		</div>
+							    		 -->
+							    		<!-- quantity of shelf in each container -->
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group">
+							    				<label for="phone">Shelves Quantity</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.shelf.quantity" 
+													placeholder="Quantity of shelves" 
+													:class="!errors.container.shelf.quantity ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('shelf_quantity')" 
+													required="true" 
+													:readonly="!createMode"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.shelf.quantity }}
+										  		</div>
+							    			</div>
+							    		</div>
+							    		<!-- shelf has unit -->
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group text-center">
+							    				<toggle-button 
+													v-model="singleAssetData.shelf.has_units" 
+													:width=150 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'red'}"
+													:labels="{checked: 'Has Units', unchecked: 'No Units'}" 
+													:disabled="!createMode"
+												/>
+							    			</div>
+							    		</div>
+						    			
+					    			</div>
+					    		</transition>
+
+					    		<transition name="container-branches">
+					    			<!-- unit -->
+					    			<div class="ml-1 p-2 border w-100" v-if="singleAssetData.has_shelve && singleAssetData.shelf.has_units">
+							    		<!-- container price -->
+						    			<!-- 
+						    			<div class="col-sm-12 form-group">	
+						    				<label for="phone">Default Storing Price</label>
+											<input type="number" 
+												class="form-control" 
+												v-model.number="singleAssetData.shelf.unit.storing_price" 
+												placeholder="Lenght of container" 
+												:class="!errors.container.shelf.unit.storing_price ? 'is-valid' : 'is-invalid'" 
+												@blur="validateFormInput('shelf_unit_storing_price')" 
+												required="true" 
+											>
+											<div class="invalid-feedback">
+									        	{{ errors.container.shelf.unit.storing_price }}
+									  		</div>
+						    			</div>
+
+						    			<div class="col-sm-12 form-group">	
+						    				<label for="phone">Default Selling Price (including e-commerce fulfillment)</label>
+											<input type="number" 
+												class="form-control" 
+												v-model.number="singleAssetData.shelf.unit.selling_price" 
+												placeholder="Lenght of container" 
+												:class="!errors.container.shelf.unit.selling_price ? 'is-valid' : 'is-invalid'" 
+												@blur="validateFormInput('shelf_unit_selling_price')" 
+												required="true" 
+											>
+
+											<div class="invalid-feedback">
+									        	{{ errors.container.shelf.unit.selling_price }}
+									  		</div>
+						    			</div>
+										-->
+						    			<!-- quantity of unit in each shelf -->
+							    		<div class="form-row">
+							    			<div class="col-sm-12 form-group">
+							    				<label for="phone">Unit Quantity</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleAssetData.shelf.unit.quantity" 
+													placeholder="Quantity of container" 
+													:class="!errors.container.shelf.unit.quantity ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('unit_quantity')" 
+													required="true" 
+													:readonly="!createMode"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.shelf.unit.quantity }}
+										  		</div>
+							    			</div>
+							    		</div>
+								    		
+					    			</div>
+					    		</transition>
+				    		</div>						  	
+						</div>
+
+						<div class="modal-footer flex-column">
+							<div class="col-sm-12 text-right" v-show="!submitForm">
+								<span class="text-danger small">
+							  		Please input required fields
+							  	</span>
+							</div>
+							<div class="col-sm-12">
+								<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+									Close
+								</button>
+								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+									Save
+								</button>
+							</div>
+						</div>
+
+					</form>
+					<!-- form end -->
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+		<!-- /modal-createOrEdit-container -->
+
+ 		<!-- View Modal -->
+		<div class="modal fade" id="container-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							Container Details
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body text-center">	
+								
+						<div class="card">
+							<div class="card-body">
+								<h4 class="card-title">Container</h4>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.name }}</label>
+								</div>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.length }}</label>
+								</div>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Width :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.width }}</label>
+								</div>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.height }}</label>
+								</div>
+								<!-- 
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Default Storing Price :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.storing_price }}</label>
+								</div>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Default Selling Price :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.selling_price }}</label>
+								</div>
+								-->
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Shelf :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										<span :class="[singleAssetData.has_shelve ? 'badge-success' : 'badge-danger', 'badge']">{{ singleAssetData.has_shelve ? 'Available' : 'NA' }}</span>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<!-- shelf -->
+						<div class="card" v-if="singleAssetData.has_shelve">
+							<div class="card-body">
+								<h4 class="card-title">Container Shelf</h4>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Shelves :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.shelf.quantity }}</label>
+								</div>
+								<!-- 
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Shelf Default Selling Price :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.shelf.selling_price }}</label>
+								</div>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Shelf Default Storing Price :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.shelf.storing_price }}</label>
+								</div>
+								 -->
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Units :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										<span :class="[singleAssetData.shelf.has_units ? 'badge-success' : 'badge-danger', 'badge']">{{ singleAssetData.shelf.has_units ? 'Available' : 'NA' }}</span>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<!-- unit -->
+						<div class="card" v-if="singleAssetData.has_shelve && singleAssetData.shelf.has_units">
+							<div class="card-body">
+								<h4 class="card-title">Shelf Unit</h4>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Units :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.shelf.unit.quantity }}</label>
+								</div>
+								<!-- 
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Unit Default Selling Price :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.shelf.unit.selling_price }}</label>
+								</div>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Unit Default Storing Price :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.shelf.unit.storing_price }}</label>
+								</div>
+								 -->
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<delete-confirmation-modal 
 			:csrf="csrf" 
@@ -92,7 +509,7 @@
 			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
-			@deleteAsset="deleteAsset($event)" 
+			@deleteAsset="deleteAsset" 
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
@@ -101,13 +518,13 @@
 			:content-to-restore="singleAssetData"
 			:restoration-message="'This will automatically be added to all related items !'" 
 
-			@restoreAsset="restoreAsset($event)" 
+			@restoreAsset="restoreAsset" 
 		></restore-confirmation-modal>
 
 		<asset-view-modal 
-			:caller-page="'container type'" 
+			:caller-page="'container'" 
 			:asset-to-view="singleAssetData" 
-			:properties-to-show="['name', 'code']"
+			:properties-to-show="['name']"
 		></asset-view-modal>
 
 	</div>
@@ -119,7 +536,9 @@
 	import axios from 'axios';
 
     let singleAssetData = {
-    	
+    	shelf : {
+    		unit : {},
+    	},
     };
 
 	export default {
@@ -145,6 +564,16 @@
 
 	        	singleAssetData : singleAssetData,
 
+	        	errors : {
+	        		container : {
+	        			shelf : {
+	        				unit : {},
+	        			},
+	        		},
+	        	},
+
+	        	submitForm : true,
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -167,7 +596,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/container-types/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/containers/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -210,7 +639,7 @@
 				
 				axios
 				.get(
-					"/api/search-container-types/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-containers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -224,17 +653,43 @@
 			},
 			showContentDetails(object) {	
 				this.singleAssetData = object;
-				$('#asset-view-modal').modal('show');
+				$('#container-view-modal').modal('show');
 			},
 			showContentCreateForm() {
+				this.submitForm = true;
 				this.createMode = true;
-				this.singleAssetData = {};
-				$('#asset-createOrEdit-modal').modal('show');
+				
+				this.singleAssetData = {
+					shelf : {
+						unit : {},
+					},
+				};
+
+				this.errors = {
+					container : {
+						shelf : {
+							unit : {},
+						},
+					},
+				};
+
+				$('#container-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
+				this.submitForm = true;
 				this.createMode = false;
+
 				this.singleAssetData = object;
-				$('#asset-createOrEdit-modal').modal('show');
+				
+				this.errors = {
+					container : {
+						shelf : {
+							unit : {},
+						},
+					},
+				};
+
+				$('#container-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
 				this.singleAssetData = object;
@@ -244,16 +699,16 @@
 				this.singleAssetData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
-			storeAsset(singleAssetData) {
+			storeContainer() {
 				
 				axios
-					.post('/container-types/' + this.perPage, singleAssetData)
+					.post('/containers/' + this.perPage, this.singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New container type has been created", "Success");
+							this.$toastr.s("New container has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#asset-createOrEdit-modal').modal('hide');
+							$('#container-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -265,16 +720,16 @@
 					});
 
 			},
-			updateAsset(singleAssetData) {
+			updateContainer() {
 				
 				axios
-					.put('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.put('/containers/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Container type has been updated", "Success");
+							this.$toastr.s("Container has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#asset-createOrEdit-modal').modal('hide');
+							$('#container-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -289,10 +744,10 @@
 			deleteAsset(singleAssetData) {
 				
 				axios
-					.delete('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.delete('/containers/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Container type has been deleted", "Success");
+							this.$toastr.s("Container has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -310,10 +765,10 @@
 			restoreAsset(singleAssetData) {
 				
 				axios
-					.patch('/container-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.patch('/containers/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Container type has been restored", "Success");
+							this.$toastr.s("Container has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');
@@ -359,8 +814,185 @@
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
 			},
+			validateFormInput (formInputName) {
+				
+				this.submitForm = false;
+
+				switch(formInputName) {
+
+					case 'name' :
+
+						if (!this.singleAssetData.name) {
+							this.errors.container.name = 'Container name is required';
+						}
+						else if (!this.singleAssetData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.container.name = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'name');
+						}
+
+						break;
+
+				
+					case 'container_length' :
+
+						if (!this.singleAssetData.length || this.singleAssetData.length < 0) {
+							this.errors.container.length = 'Container length is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'length');
+						}
+
+						break;
+
+					case 'container_width' :
+
+						if (!this.singleAssetData.width || this.singleAssetData.width < 0) {
+							this.errors.container.width = 'Container width is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'width');
+						}
+
+						break;
+
+
+					case 'container_height' :
+
+						if (!this.singleAssetData.height || this.singleAssetData.height < 0) {
+							this.errors.container.height = 'Container height is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'height');
+						}
+
+						break;
+				
+
+					case 'container_storing_price' :						
+
+						if (!this.singleAssetData.storing_price || this.singleAssetData.storing_price < 0) {
+							this.errors.container.storing_price = 'Storing price is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'storing_price');
+						}
+
+						break;
+
+					case 'container_selling_price' :
+
+						if (!this.singleAssetData.selling_price || this.singleAssetData.selling_price < 0) {
+							this.errors.container.selling_price = 'Selling price is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'selling_price');
+						}
+
+						break;
+
+					case 'shelf_storing_price' :
+
+						if (this.singleAssetData.has_shelve && (!this.singleAssetData.shelf.storing_price || this.singleAssetData.shelf.storing_price < 0)) {
+							this.errors.container.shelf.storing_price = 'Storing price is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container.shelf, 'storing_price');
+						}
+
+						break;
+
+					case 'shelf_selling_price' :
+
+						if (this.singleAssetData.has_shelve && (!this.singleAssetData.shelf.selling_price || this.singleAssetData.shelf.selling_price < 0)) {
+							this.errors.container.shelf.selling_price = 'Selling price is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container.shelf, 'selling_price');
+						}
+
+						break;
+
+					
+					case 'shelf_quantity' :
+
+						if (this.singleAssetData.has_shelve && (!this.singleAssetData.shelf.quantity || this.singleAssetData.shelf.quantity < 1)) {
+							this.errors.container.shelf.quantity = 'Shelf quantity is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container.shelf, 'quantity');
+						}
+
+						break;
+					
+
+					case 'shelf_unit_selling_price' :
+
+						if (this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.selling_price || this.singleAssetData.shelf.unit.selling_price < 0)) {
+							this.errors.container.shelf.unit.selling_price = 'Selling price is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container.shelf.unit, 'selling_price');
+						}
+
+						break;
+
+					case 'shelf_unit_storing_price' :
+
+						if (this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.storing_price || this.singleAssetData.shelf.unit.storing_price < 0)) {
+							this.errors.container.shelf.unit.storing_price = 'Storing price is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container.shelf.unit, 'storing_price');
+						}
+
+						break;
+
+					
+					case 'unit_quantity' :
+
+						if (this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.quantity || this.singleAssetData.shelf.unit.quantity < 1)) {
+							this.errors.container.shelf.unit.quantity = 'Unit quantity is required';
+						}
+						else{
+							this.submitForm = true;
+							// this.errors.container.shelf.unit.quantity = null;
+							this.$delete(this.errors.container.shelf.unit, 'quantity');
+						}
+
+						break;
+					
+
+				}
+	 
+			},
             
 		}
   	}
 
 </script>
+
+<style scoped>
+	.container-branches-enter-active {
+  		transition: all 1s ease;
+	}
+	.container-branches-leave-active {
+  		transition: all 1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	}
+	.container-branches-enter, .container-branches-leave-to {
+  		transform: translateX(10px);
+  		opacity: 0;
+	}
+</style>
