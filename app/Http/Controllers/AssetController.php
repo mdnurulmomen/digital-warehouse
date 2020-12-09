@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Variation;
 use App\Models\Container;
 use App\Models\RentPeriod;
 use App\Models\StorageType;
@@ -411,6 +412,91 @@ class AssetController extends Controller
         $columnsToSearch = ['name'];
 
         $query = VariationType::withTrashed();
+
+        foreach($columnsToSearch as $column){
+            $query->orWhere($column, 'like', "%$search%");
+        }
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
+
+    // Variations
+    public function showAllVariations($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => Variation::paginate($perPage),
+                'trashed' => Variation::onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return Variation::all();
+    }
+
+    public function storeNewVariation(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:variations,name',
+            'variation_type_id' => 'required|numeric|exists:variation_types,id',
+        ]);
+
+        $newAsset = new Variation();
+
+        $newAsset->name = $request->name;
+        $newAsset->variation_type_id = $request->variation_type_id;
+
+        $newAsset->save();
+
+        return $this->showAllVariations($perPage);
+    }
+
+    public function updateVariation(Request $request, $asset, $perPage)
+    {
+        $assetToUpdate = Variation::findOrFail($asset);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:variations,name,'.$assetToUpdate->id,
+            'variation_type_id' => 'required|numeric|exists:variation_types,id',
+        ]);
+
+        $assetToUpdate->name = $request->name;
+        $assetToUpdate->variation_type_id = $request->variation_type_id;
+
+        $assetToUpdate->save();
+
+        return $this->showAllVariations($perPage);
+    }
+
+    public function deleteVariation($asset, $perPage)
+    {
+        $assetToDelete = Variation::findOrFail($asset);
+        // $userToDelete->warhouses()->delete();
+        $assetToDelete->delete();
+
+        return $this->showAllVariations($perPage);
+    }
+
+    public function restoreVariation($asset, $perPage)
+    {
+        $assetToRestore = Variation::withTrashed()->findOrFail($asset);
+        // $userToRestore->warhouses()->restore();
+        $assetToRestore->restore();
+
+        return $this->showAllVariations($perPage);
+    }
+
+    public function searchAllVariations($search, $perPage)
+    {
+        $columnsToSearch = ['name'];
+
+        $query = Variation::withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

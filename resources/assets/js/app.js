@@ -57,6 +57,7 @@ import ContainerIndex from './views/ContainerTypeIndex'
 import WarhouseIndex from './views/WarhouseIndex'
 import RentPeriodIndex from './views/RentPeriodIndex'
 import VariationTypeIndex from './views/VariationTypeIndex'
+import VariationIndex from './views/VariationIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -131,6 +132,11 @@ const router = new VueRouter({
             path: '/variation-types',
             name: 'variation-types',
             component: VariationTypeIndex,
+        },
+        {
+            path: '/variations',
+            name: 'variations',
+            component: VariationIndex,
         },
     ],
 });

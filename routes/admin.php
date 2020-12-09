@@ -88,12 +88,19 @@ Route::name('admin.')->group(function () {
 		Route::patch('/rent-periods/{period}/{perPage}', 'AssetController@restoreRentPeriod')->name('rent-periods');
 		Route::get('/api/search-rent-periods/{search}/{perPage}', 'AssetController@searchAllRentPeriods')->name('search-rent-periods');
 
-		Route::get('/api/variation-types/{perPage}', 'AssetController@showAllVariationTypes')->name('variationTypes');
+		Route::get('/api/variation-types/{perPage?}', 'AssetController@showAllVariationTypes')->name('variationTypes');
 		Route::post('/variation-types/{perPage}', 'AssetController@storeVariationType')->name('variationTypes');	
 		Route::put('/variation-types/{warhouse}/{perPage}', 'AssetController@updateVariationType')->name('variationTypes');	
 		Route::delete('/variation-types/{warhouse}/{perPage}', 'AssetController@deleteVariationType')->name('variationTypes');	
 		Route::patch('/variation-types/{warhouse}/{perPage}', 'AssetController@restoreVariationType')->name('variationTypes');
 		Route::get('/api/search-variation-types/{search}/{perPage}', 'AssetController@searchVariationTypes')->name('search-variationTypes');
+
+		Route::get('/api/variations/{perPage}', 'AssetController@showAllVariations')->name('variations');
+		Route::post('/variations/{perPage}', 'AssetController@storeNewVariation')->name('variations');	
+		Route::put('/variations/{asset}/{perPage}', 'AssetController@updateVariation')->name('variations');	
+		Route::delete('/variations/{asset}/{perPage}', 'AssetController@deleteVariation')->name('variations');	
+		Route::patch('/variations/{asset}/{perPage}', 'AssetController@restoreVariation')->name('variations');
+		Route::get('/api/search-variations/{search}/{perPage}', 'AssetController@searchAllVariations')->name('search-variations');
 
 	});
 

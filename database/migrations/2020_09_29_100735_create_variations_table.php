@@ -15,8 +15,9 @@ class CreateVariationsTable extends Migration
     {
         Schema::create('variations', function (Blueprint $table) {
             $table->smallIncrements('id');
-            $table->string('name', 100);
-            $table->unsignedSmallInteger('variation_type_id');
+            $table->string('name', 100);    // small, medium, long in length type,
+            $table->unsignedSmallInteger('variation_type_id');      // length, color
+            $table->softDeletes();
         });
     }
 
