@@ -16,7 +16,8 @@ class CreateProductCategoriesTable extends Migration
         Schema::create('product_categories', function (Blueprint $table) {
             $table->smallIncrements('id');
             $table->string('name', 100);
-            $table->unsignedSmallInteger('parent_category')->default(0);
+            $table->unsignedSmallInteger('parent_category_id')->nullable();
+            $table->softDeletes();
         });
     }
 
