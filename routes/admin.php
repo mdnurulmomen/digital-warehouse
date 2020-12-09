@@ -86,7 +86,14 @@ Route::name('admin.')->group(function () {
 		Route::put('/rent-periods/{period}/{perPage}', 'AssetController@updateRentPeriod')->name('rent-periods');	
 		Route::delete('/rent-periods/{period}/{perPage}', 'AssetController@deleteRentPeriod')->name('rent-periods');	
 		Route::patch('/rent-periods/{period}/{perPage}', 'AssetController@restoreRentPeriod')->name('rent-periods');
-		Route::get('/api/search-rent-periods/{search}/{perPage}', 'AssetController@searchAllRentPeriods')->name('search-rent-periods'); 
+		Route::get('/api/search-rent-periods/{search}/{perPage}', 'AssetController@searchAllRentPeriods')->name('search-rent-periods');
+
+		Route::get('/api/variation-types/{perPage}', 'AssetController@showAllVariationTypes')->name('variationTypes');
+		Route::post('/variation-types/{perPage}', 'AssetController@storeVariationType')->name('variationTypes');	
+		Route::put('/variation-types/{warhouse}/{perPage}', 'AssetController@updateVariationType')->name('variationTypes');	
+		Route::delete('/variation-types/{warhouse}/{perPage}', 'AssetController@deleteVariationType')->name('variationTypes');	
+		Route::patch('/variation-types/{warhouse}/{perPage}', 'AssetController@restoreVariationType')->name('variationTypes');
+		Route::get('/api/search-variation-types/{search}/{perPage}', 'AssetController@searchVariationTypes')->name('search-variationTypes');
 
 	});
 
