@@ -230,7 +230,7 @@
 								<label class="font-weight-bold">Type</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.variation.name || 'Trashed' }}
+								{{ singleAssetData.variation.name }}
 							</div>
 						</div>
 

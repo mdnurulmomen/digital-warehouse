@@ -16,6 +16,6 @@ class Variation extends Model
 
     public function variation()
     {
-    	return $this->belongsTo(VariationType::class, 'variation_type_id', 'id');
+    	return $this->belongsTo(VariationType::class, 'variation_type_id', 'id')->withTrashed();
     }
 }

@@ -16,6 +16,6 @@ class ProductCategory extends Model
 
     public function category()
     {
-    	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id');
+    	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
     }
 }
