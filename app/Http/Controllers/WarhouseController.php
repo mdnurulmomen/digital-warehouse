@@ -6,6 +6,7 @@ use App\Models\Warhouse;
 use Illuminate\Http\Request;
 use App\Models\WarhouseOwner;
 use Illuminate\Support\Facades\Hash;
+use App\Models\WarhouseContainerStatus;
 use App\Http\Resources\Web\WarhouseCollection;
 
 class WarhouseController extends Controller
@@ -345,6 +346,46 @@ class WarhouseController extends Controller
         return response()->json([
             'all' => new WarhouseCollection($query->paginate($perPage)),    
         ], 200);
+    }
+
+    // warehouse-contaners
+    public function showAllWarhouseContainers($perPage = false) {
+        if ($perPage) {
+            
+        }
+
+        $emptyContainers = WarhouseContainerStatus::where('engaged', 0)->get();
+
+
+        $emptyShelfContainers = WarhouseContainerStatus::whereHas('containerShelfStatuses', function ($query) {
+                                                            $query->where('engaged', 0);
+                                                        })
+                                                        ->with([
+                                                            'containerShelfStatuses' => 
+                                                                function ($query) {
+                                                                    $query->where('engaged', 0);
+                                                                }
+                                                        ])
+                                                        ->get();
+
+        $emptyUnitContainers = WarhouseContainerStatus::whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
+                                                            function ($query) {
+                                                            $query->where('engaged', 0);
+                                                        })
+                                                        ->with([
+                                                            'containerShelfStatuses.containerShelfUnitStatuses' => 
+                                                                function ($query) {
+                                                                    $query->where('engaged', 0);
+                                                                }
+                                                        ])
+                                                        ->get();
+
+        return [
+            'emptyContainers' => $emptyContainers, 
+            'emptyShelfContainers' => $emptyShelfContainers, 
+            'emptyUnitContainers' => $emptyUnitContainers, 
+        ];
+                                
     }
 
 }

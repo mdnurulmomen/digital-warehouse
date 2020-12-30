@@ -16,12 +16,16 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100); // polo t-shirt / fair n lovely
+            $table->string('description')->nullable(); // short description what has been stored (may be hints for identification / bulk products)
             $table->string('sku', 100); // scanned or generated on product-code & merchant code
-            $table->unsignedMediumInteger('price')->default(100); // minimum one if has variations
-            $table->unsignedMediumInteger('available_quantity')->default(100); // default 100 as initial storing default is 100 (quantity including all variations)
-            $table->string('description')->nullable(); // short description what has been stored (may be hints for identification)
+            // $table->unsignedMediumInteger('price')->default(100); // minimum-one if has variations, 0 for bulk items
+            $table->unsignedDecimal('price', $precision = 8, $scale = 2);
+            $table->unsignedMediumInteger('initial_quantity')->default(100); // quantity including all box / variations
+            $table->unsignedMediumInteger('available_quantity')->default(100); // quantity of all box / variations
+            $table->string('quantity_type', 100)->default('box');  // kg / meter / pc's
             $table->boolean('has_variations')->default(0);
-            $table->unsignedSmallInteger('product_category_id'); // stationary / garments
+            $table->unsignedSmallInteger('product_category_id')->nullable()->default(0); // stationary / garments
+            $table->unsignedInteger('merchant_id'); // who's product is this
         });
     }
 

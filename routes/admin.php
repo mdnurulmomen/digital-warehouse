@@ -53,7 +53,7 @@ Route::name('admin.')->group(function () {
 		Route::patch('/managers/{manager}/{perPage}', 'ManagerController@restoreManager')->name('managers');
 		Route::get('/api/search-managers/{search}/{perPage}', 'ManagerController@searchAllManagers')->name('search-managers');
 
-		Route::get('/api/merchants/{perPage}', 'MerchantController@showAllMerchants')->name('merchants');
+		Route::get('/api/merchants/{perPage?}', 'MerchantController@showAllMerchants')->name('merchants');
 		Route::post('/merchants/{perPage}', 'MerchantController@storeNewMerchant')->name('merchants');	
 		Route::put('/merchants/{merchant}/{perPage}', 'MerchantController@updateMerchant')->name('merchants');	
 		Route::delete('/merchants/{merchant}/{perPage}', 'MerchantController@deleteMerchant')->name('merchants');
@@ -108,6 +108,15 @@ Route::name('admin.')->group(function () {
 		Route::delete('/product-categories/{asset}/{perPage}', 'ProductController@deleteProductCategory')->name('product-categories');	
 		Route::patch('/product-categories/{asset}/{perPage}', 'ProductController@restoreProductCategory')->name('product-categories');
 		Route::get('/api/search-product-categories/{search}/{perPage}', 'ProductController@searchProductAllCategories')->name('search-product-categories');
+
+		Route::get('/api/products/{perPage}', 'ProductController@showAllProducts')->name('products');
+		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	
+		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');	
+		// Route::delete('/products/{asset}/{perPage}', 'ProductController@deleteProduct')->name('products');
+		// Route::patch('/products/{asset}/{perPage}', 'ProductController@restoreProduct')->name('products');
+		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
+
+		Route::get('/api/warhouse-containers/{perPage?}', 'WarhouseController@showAllWarhouseContainers')->name('warehouse-containers');
 
 	});
 

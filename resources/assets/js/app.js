@@ -59,6 +59,7 @@ import RentPeriodIndex from './views/RentPeriodIndex'
 import VariationTypeIndex from './views/VariationTypeIndex'
 import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
+import ProductIndex from './views/ProductIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -143,6 +144,11 @@ const router = new VueRouter({
             path: '/product-categories',
             name: 'product-categories',
             component: ProductCategoryIndex,
+        },
+        {
+            path: '/products',
+            name: 'products',
+            component: ProductIndex,
         },
     ],
 });

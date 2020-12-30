@@ -199,13 +199,13 @@
 								</a>
 								<ul class="pcoded-submenu">
 									<li class="">
-										<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Categories</span>
+										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Products</span>
 										</router-link>
 									</li>
 									<li class="">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
+										<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Categories</span>
 										</router-link>
 									</li>
 								</ul>

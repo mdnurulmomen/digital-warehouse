@@ -8,15 +8,21 @@ use Illuminate\Support\Facades\Hash;
 
 class MerchantController extends Controller
 {
-    public function showAllMerchants($perPage)
+    public function showAllMerchants($perPage = false)
     {
-    	return response()->json([
+    	if ($perPage) {
+            
+            return response()->json([
 
-    		'approved' => Merchant::where('active', 1)->paginate($perPage),
-            'pending' => Merchant::where('active', 0)->paginate($perPage),
-    		'trashed' => Merchant::onlyTrashed()->paginate($perPage),
+        		'approved' => Merchant::where('active', 1)->paginate($perPage),
+                'pending' => Merchant::where('active', 0)->paginate($perPage),
+        		'trashed' => Merchant::onlyTrashed()->paginate($perPage),
 
-    	], 200);
+        	], 200);
+
+        }
+
+        return Merchant::all();
     }
 
     public function storeNewMerchant(Request $request, $perPage)

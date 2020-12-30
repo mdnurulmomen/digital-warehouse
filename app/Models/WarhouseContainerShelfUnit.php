@@ -27,4 +27,8 @@ class WarhouseContainerShelfUnit extends Model
         return $this->morphMany(Rent::class, 'warhouse_storer');
     }
 
+    public function warhouseContainer()
+    {
+        return $this->belongsTo(WarhouseContainer::class, 'warhouse_container_id', 'id');
+    }
 }
