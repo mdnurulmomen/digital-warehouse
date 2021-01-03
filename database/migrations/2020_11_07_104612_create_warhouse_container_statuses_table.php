@@ -16,8 +16,8 @@ class CreateWarhouseContainerStatusesTable extends Migration
         Schema::create('warhouse_container_statuses', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            // $table->boolean('engaged')->default(false);
-            $table->unsignedDecimal('engaged', $precision = 2, $scale = 1)->default(0);
+            // $table->boolean('hired')->default(false);
+            $table->unsignedDecimal('engaged', $precision = 2, $scale = 1)->default(0);  // 1 for full engaged, .5 for partial engaged
             $table->unsignedInteger('warhouse_container_id');
         });
     }

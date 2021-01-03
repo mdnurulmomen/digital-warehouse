@@ -132,7 +132,7 @@
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Variation Type</label>
 									<multiselect 
-                              			v-model="singleAssetData.variation"
+                              			v-model="singleAssetData.variation_type"
                               			placeholder="Variation Type" 
                                   		label="name" 
                                   		track-by="id" 
@@ -230,7 +230,7 @@
 								<label class="font-weight-bold">Type</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.variation.name }}
+								{{ singleAssetData.variation_type ? singleAssetData.variation_type.name : 'NA' }}
 							</div>
 						</div>
 
@@ -302,7 +302,7 @@
 		},
 
 		watch: {
-			'singleAssetData.variation': function (object) {
+			'singleAssetData.variation_type': function (object) {
 				if (Object.keys(object).length > 0) {
 					this.singleAssetData.variation_type_id = object.id;
 				}
@@ -605,7 +605,7 @@
 
 					case 'variation_type' :
 
-						if (Object.keys(this.singleAssetData.variation).length == 0) {
+						if (Object.keys(this.singleAssetData.variation_type).length == 0) {
 							this.errors.asset.variation_type = 'Type is required';
 						}
 						else{

@@ -524,7 +524,7 @@
 							      
 						          	<div class="col-sm-12">
 						          		<div class="form-row">	
-		                              		<div class="col-md-12 form-group" v-if="singleWarhouseData.storages.length">
+		                              		<div class="col-md-12 form-group" v-if="singleWarhouseData.storages.length && singleWarhouseData.storages.length==errors.warhouse.storage_types.length">
 
 			                              		<transition-group name="new-storage">
 
@@ -610,7 +610,7 @@
 																</div>
 															</div>
 
-															<div class="form-row" v-if="singleWarhouseData.storages[index].feature">
+															<div class="form-row" v-if="singleWarhouseData.storages[index].feature && singleWarhouseData.storages.length==errors.warhouse.storage_features.length">
 																<div class="col-md-12 form-group">
 																	<label>Features</label>
 
@@ -699,7 +699,7 @@
 							      
 						          	<div class="col-sm-12">
 						          		<div class="form-row">	
-		                              		<div class="col-md-12 form-group" v-if="singleWarhouseData.containers.length">
+		                              		<div class="col-md-12 form-group" v-if="singleWarhouseData.containers.length && singleWarhouseData.containers.length==errors.warhouse.containers.length">
 
 			                              		<transition-group name="new-container">
 
@@ -754,7 +754,10 @@
 												    			</div>
 												    		</div>
 
-												    		<div class="form-row">	
+												    		<div 
+												    			class="form-row"
+												    			v-if="singleWarhouseData.containers.length==errors.warhouse.containers.length"
+												    		>	
 																<div class="col-sm-12 form-group">
 																	<label for="phone">Rents</label>
 																	<ul class="nav nav-tabs tabs justify-content-center" role="tablist">

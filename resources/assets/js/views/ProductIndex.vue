@@ -1293,7 +1293,7 @@
 	        	productsToShow : [],
 	        	allFetchedProducts : [],
 
-	        	// allContainers : [],
+	        	allContainers : [],
 	        	
 	        	emptyContainers : [],
 	        	emptyShelfContainers : [],
@@ -1494,7 +1494,7 @@
 				this.query = '';
 				this.error = '';
 				// this.loading = true;
-				// this.allContainers = [];
+				this.allContainers = [];
 				this.emptyContainers = [];
 				this.emptyShelfContainers = [];
 				this.emptyUnitContainers = [];
@@ -1503,13 +1503,16 @@
 					.get('/api/warhouse-containers')
 					.then(response => {
 						if (response.status == 200) {
-							// this.allContainers = response.data;
-							// this.emptyContainers = this.allContainers.emptyContainers;
-							// this.emptyShelfContainers = this.allContainers.emptyShelfContainers;
-							// this.emptyUnitContainers = this.allContainers.emptyUnitContainers;
-							this.emptyContainers = response.data.emptyContainers;
-							this.emptyShelfContainers = response.data.emptyShelfContainers;
-							this.emptyUnitContainers = response.data.emptyUnitContainers;							
+							
+							this.allContainers = response.data;
+							this.setAvailableSpaces();
+							
+							/*
+								this.emptyContainers = response.data.emptyContainers;
+								this.emptyShelfContainers = response.data.emptyShelfContainers;
+								this.emptyUnitContainers = response.data.emptyUnitContainers;
+							*/
+					
 						}
 					})
 					.catch(error => {
@@ -2053,7 +2056,14 @@
 			*/
 		
 			},
+			setAvailableSpaces() {
+				this.emptyContainers = this.allContainers.emptyContainers;
+				this.emptyShelfContainers = this.allContainers.emptyShelfContainers;
+				this.emptyUnitContainers = this.allContainers.emptyUnitContainers;
+			},
 			resetAvailableSpaces() {
+
+				this.setAvailableSpaces();
 
 				this.singleProductData.spaces.forEach(
 

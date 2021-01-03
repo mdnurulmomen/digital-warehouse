@@ -217,7 +217,7 @@
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Type</label>
+								<label class="font-weight-bold">Parent Category</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
 								{{ singleAssetData.category ? singleAssetData.category.name : 'None' }}
