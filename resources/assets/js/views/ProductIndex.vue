@@ -1556,7 +1556,7 @@
 				.then(response => {
 					this.allFetchedProducts = response.data;
 					this.productsToShow = this.allFetchedProducts.all.data;
-					this.pagination = response.data.all;
+					this.pagination = this.allFetchedProducts.all;
 				})
 				.catch(e => {
 					this.error = e.toString();

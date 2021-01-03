@@ -248,16 +248,18 @@ class ProductController extends Controller
 
     public function searchAllProducts($search, $perPage)
     {
-        $columnsToSearch = ['name'];
-
-        $query = ProductCategory::withTrashed();
-
-        foreach($columnsToSearch as $column){
-            $query->orWhere($column, 'like', "%$search%");
-        }
+        $query = Product::where('name', 'like', "%$search%")
+                        ->orWhere('sku', 'like', "%$search%")
+                        ->orWhere('price', 'like', "%$search%")
+                        ->orWhere('initial_quantity', 'like', "%$search%")
+                        ->orWhere('available_quantity', 'like', "%$search%")
+                        ->orWhere('quantity_type', 'like', "%$search%")
+                        ->whereHas('category', function ($q) use ($search) {
+                            $q->where('name', 'like', "%$search%");
+                        });
 
         return response()->json([
-            'all' => $query->paginate($perPage),    
+            'all' => new ProductCollection($query->paginate($perPage)),  
         ], 200);
     }
 
