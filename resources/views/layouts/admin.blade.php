@@ -153,9 +153,18 @@
 										</li>
  									--}}
 										<li>
-											<a href="{{ route('logout') }}">
-												<i class="feather icon-log-out"></i> Logout
-											</a>
+
+											<a href="{{ route('admin.logout') }}"
+		                                       onclick="event.preventDefault();
+		                                                     document.getElementById('admin-logout-form').submit();">
+		                                        <i class="feather icon-log-out"></i>
+		                                        {{ __('Logout') }}
+		                                    </a>
+
+		                                    <form id="admin-logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
+		                                        @csrf
+		                                    </form>
+
 										</li>
 									</ul>
 								</div>

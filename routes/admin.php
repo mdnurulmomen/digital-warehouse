@@ -118,6 +118,8 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/warhouse-containers/{perPage?}', 'WarhouseController@showAllWarhouseContainers')->name('warehouse-containers');
 
+		Route::post('/api/logout', 'Auth\LoginController@logout')->name('logout');
+
 	});
 
 });
