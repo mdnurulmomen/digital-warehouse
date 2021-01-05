@@ -48,8 +48,8 @@
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='products' ? 'active' : ''">
-										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
+									<li :class="currentRouteName=='my-products' ? 'active' : ''">
+										<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">My Products</span>
 										</router-link>
 									</li>

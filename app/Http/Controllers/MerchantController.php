@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\Web\ProductCollection;
 
 class MerchantController extends Controller
 {
@@ -120,4 +122,52 @@ class MerchantController extends Controller
             'all' => $query->paginate($perPage),    
         ], 200);
     }
+
+    // Products
+    public function currentMerchant()
+    {
+        if (\Auth::check()) {
+            // The merchant is logged in...
+            return response()->json([
+
+                'user' => \Auth::user(),
+
+            ], 200);
+        }
+
+    }
+
+    public function showMerchantAllProducts($merchant, $perPage)
+    {
+        return response()->json([
+
+            'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)
+                                                     ->where('merchant_id', $merchant)
+                                                     ->paginate($perPage)),
+            'bulk' => new ProductCollection(Product::whereNull('product_category_id')
+                                                   ->orWhere('product_category_id', 0)
+                                                   ->where('merchant_id', $merchant)
+                                                   ->paginate($perPage)),
+
+        ], 200);
+    }
+
+    public function searchMerchantAllProducts($merchant, $search, $perPage)
+    {
+        $query = Product::where('name', 'like', "%$search%")
+                        ->orWhere('sku', 'like', "%$search%")
+                        ->orWhere('price', 'like', "%$search%")
+                        ->orWhere('initial_quantity', 'like', "%$search%")
+                        ->orWhere('available_quantity', 'like', "%$search%")
+                        ->orWhere('quantity_type', 'like', "%$search%")
+                        ->orWhereHas('category', function ($q) use ($search) {
+                            $q->where('name', 'like', "%$search%");
+                        })
+                        ->where('merchant_id', $merchant);
+
+        return response()->json([
+            'all' => new ProductCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
 }

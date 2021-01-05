@@ -47,7 +47,7 @@ import MerchantSideMenuBar from './views/MerchantSideMenuBar'
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Profile from './views/ProfileComponent'
-import ProductIndex from './views/ProductIndex'
+import ProductIndex from './views/MerchantProductIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

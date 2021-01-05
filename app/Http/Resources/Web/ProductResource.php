@@ -34,6 +34,7 @@ class ProductResource extends JsonResource
             'variation_type' => $this->when($this->has_variations, $this->has_variations ? $this->variations()->first()->variation->VariationType->loadMissing('variations') : 'NA'),
             'variations' => $this->when($this->has_variations, $this->variations->loadMissing('variation')),
             'spaces' => new ProductAddressCollection($this->addresses),
+            // 'secret' => $this->when(Auth::user()->isAdmin(), 'secret-value'),
         ];
     }
 }

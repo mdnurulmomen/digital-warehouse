@@ -98,15 +98,6 @@ class ProductController extends Controller
     public function showAllProducts($perPage=false)
     {
         if ($perPage) {
-            
-        /*    
-            return response()->json([
-
-                'retail' => Product::where('product_category_id', '>', 0)->paginate($perPage),
-                'bulk' => Product::whereNull('product_category_id')->orWhere('product_category_id', 0)->paginate($perPage),
-
-            ], 200);
-        */
 
             return response()->json([
 
@@ -254,7 +245,7 @@ class ProductController extends Controller
                         ->orWhere('initial_quantity', 'like', "%$search%")
                         ->orWhere('available_quantity', 'like', "%$search%")
                         ->orWhere('quantity_type', 'like', "%$search%")
-                        ->whereHas('category', function ($q) use ($search) {
+                        ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
                         });
 
