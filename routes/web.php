@@ -19,4 +19,16 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::name('merchant.')->group(function () {
+
+	Route::middleware(['auth:merchant'])->group(function () {
+
+		Route::get('/{any}', 'HomeController@index')->name('home');
+
+		Route::get('/api/profile', 'ProfileController@showMerchantProfile')->name('profile');	
+		Route::put('/profile', 'ProfileController@updateMerchantProfile')->name('profile');	
+		Route::post('/password', 'ProfileController@updateMerchantPassword')->name('password');
+
+	});
+
+});

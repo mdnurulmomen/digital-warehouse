@@ -48,7 +48,7 @@ class Merchant extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['deals', 'profilePreview'];
+    protected $with = ['profilePreview'];
 
     /**
      * Set the user's first name.
@@ -85,8 +85,10 @@ class Merchant extends Authenticatable
         return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
     }
 
+    /*
     public function deals()
     {
         return $this->hasMany(MerchantDeal::class, 'merchant_id', 'id');
     }
+    */
 }
