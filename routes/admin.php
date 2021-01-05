@@ -25,9 +25,10 @@ Route::name('admin.')->group(function () {
 
 	});
 
-	Route::get('/{any}', 'HomeController@adminHome')->name('home');
 
 	Route::middleware(['auth:admin'])->group(function () {
+		
+		Route::get('/{any}', 'HomeController@adminHome')->name('home');
 		
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');
 		Route::put('/payment-settings', 'SettingController@updatePaymentSetting')->name('payment-settings');
@@ -118,7 +119,7 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/warhouse-containers/{perPage?}', 'WarhouseController@showAllWarhouseContainers')->name('warehouse-containers');
 
-		Route::post('/api/logout', 'Auth\LoginController@logout')->name('logout');
+		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 	});
 

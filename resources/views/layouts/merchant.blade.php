@@ -12,6 +12,7 @@
 	<meta name="keywords" content="flat ui, merchant, Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
 	<meta name="csrf-token" content={{csrf_token()}}>
 
+	<link rel="icon" href="{{ URL::asset('uploads/application/application_favicon.png') }}" type="image/x-icon" sizes="16x16"/>
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Quicksand:500,700" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">

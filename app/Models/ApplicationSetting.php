@@ -28,7 +28,7 @@ class ApplicationSetting extends Model
             }
 
             $img = Image::make($encodedImageFile)->resize(50, 50);
-            $img->save($imagePath.'application_logo.png');
+            $img->save($imagePath.'application_logo.png', 100);
 
             $this->attributes['application_logo'] = $imagePath.'application_logo.png';
 
@@ -51,8 +51,8 @@ class ApplicationSetting extends Model
                 File::makeDirectory($imagePath, 0777, true, true);
             }
 
-            $img = Image::make($encodedImageFile)->resize(50, 50);
-            $img->save($imagePath.'application_favicon.png');
+            $img = Image::make($encodedImageFile)->resize(32, 32);
+            $img->save($imagePath.'application_favicon.png', 100);
 
             $this->attributes['application_favicon'] = $imagePath.'application_favicon.png';
 
