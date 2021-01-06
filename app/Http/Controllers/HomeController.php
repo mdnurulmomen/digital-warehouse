@@ -57,7 +57,7 @@ class HomeController extends Controller
      */
     public function ownerHome()
     {
-        return view('home');
+        return view('layouts.owner');
     }
 
     /**

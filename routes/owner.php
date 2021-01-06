@@ -25,6 +25,16 @@ Route::name('owner.')->group(function () {
 	
 	});
 
-	Route::get('/home', 'HomeController@ownerHome')->name('home');
+	Route::middleware(['auth:owner'])->group(function () {
+	    
+		Route::get('/{any}', 'HomeController@ownerHome')->name('home');
+
+		Route::get('/api/profile', 'ProfileController@showOwnerProfile')->name('profile');	
+		Route::put('/profile', 'ProfileController@updateOwnerProfile')->name('profile');	
+		Route::post('/password', 'ProfileController@updateOwnerPassword')->name('password');
+
+		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+	
+	});
 
 });

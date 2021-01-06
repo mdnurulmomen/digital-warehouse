@@ -108,4 +108,55 @@ class ProfileController extends Controller
 
 		return response("Password doesn't match", 401);
 	}
+
+	// Owner
+	public function showOwnerProfile()
+	{
+		return response(Auth::guard('owner')->user(), 200);
+	}
+
+	public function updateOwnerProfile(Request $request)
+	{
+		$owner = Auth::guard('owner')->user();
+
+		$request->validate([
+            'first_name' => 'nullable|string|max:100',
+            'last_name' => 'nullable|string|max:100',
+            'user_name' => 'required|string|max:100|unique:warhouse_owners,user_name,'.$owner->id,
+            'email' => 'required|string|max:100|unique:warhouse_owners,email,'.$owner->id,
+            'mobile' => 'required|string|max:50|unique:warhouse_owners,mobile,'.$owner->id,
+        ]);
+
+		$owner->first_name = $request->first_name;
+		$owner->last_name = $request->last_name;
+		$owner->user_name = $request->user_name;
+		$owner->email = $request->email;
+		$owner->mobile = $request->mobile;
+		$owner->profile_preview = $request->profile_preview['preview'] ?? NULL;
+
+		$owner->save();
+
+		return $this->showMerchantProfile();
+	}
+
+	public function updateOwnerPassword(Request $request)
+	{
+		$request->validate([
+            'current_password' => 'required|string|max:255',
+            'password' => 'required|string|max:255|confirmed',
+        ]);
+
+        $owner = Auth::guard('owner')->user();
+
+		if (Hash::check($request->current_password, $owner->password)) {
+		    
+			$owner->update([
+	            'password' => Hash::make($request->password)
+	        ]);
+
+			return response('Password has been updated', 200);
+		}
+
+		return response("Password doesn't match", 401);
+	}
 }
