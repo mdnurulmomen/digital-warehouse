@@ -36,8 +36,8 @@
 								</ul>
 							</li>
 
-							<li :class="currentRouteName=='warehouses' ? 'active' : ''">
-								<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
+							<li :class="currentRouteName=='my-warehouses' ? 'active' : ''">
+								<router-link :to="{ name: 'my-warehouses' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="feather icon-aperture"></i>
 									</span>

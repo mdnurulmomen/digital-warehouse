@@ -19,6 +19,7 @@ class WarhouseContainerResource extends JsonResource
             'quantity' => $this->quantity,
             'container_id' => $this->container_id,
             'engaged_quantity' => $this->containerStatuses()->where('engaged', '!=' , 0)->count(),
+            'partially_engaged' => $this->containerStatuses()->where('engaged', 0.5)->count(),
             'container' => $this->container->loadMissing('shelf.unit'),
             'rents' => new WarhouseRentResource($this),
         ];

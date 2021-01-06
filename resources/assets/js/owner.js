@@ -47,6 +47,7 @@ import OwnerSideMenuBar from './views/OwnerSideMenuBar'
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Profile from './views/ProfileComponent'
+import MyWarhouseIndex from './views/MyWarhouseIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -71,6 +72,11 @@ const router = new VueRouter({
             path: '/profile',
             name: 'profile',
             component: Profile,
+        },
+        {
+            path: '/my-warehouses',
+            name: 'my-warehouses',
+            component: MyWarhouseIndex,
         },
     ],
 });
