@@ -67,6 +67,6 @@ class HomeController extends Controller
      */
     public function warhouseHome()
     {
-        return view('home');
+        return view('layouts.warhouse');
     }
 }

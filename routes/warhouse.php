@@ -25,6 +25,12 @@ Route::name('warhouse.')->group(function () {
 	
 	});
 
-	Route::get('/home', 'HomeController@warhouseHome')->name('home');
+	Route::middleware(['auth:warhouse'])->group(function () {
+	    
+		Route::get('/{any}', 'HomeController@warhouseHome')->name('home');
+
+		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+	
+	});
 
 });
