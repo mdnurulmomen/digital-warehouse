@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\Web\WarhouseResource;
 
 class ProfileController extends Controller
 {
@@ -159,4 +160,116 @@ class ProfileController extends Controller
 
 		return response("Password doesn't match", 401);
 	}
+
+	// Warhouse
+	public function showWarhouseProfile()
+	{
+		// return response(Auth::guard('warhouse')->user(), 200);
+		return new WarhouseResource(Auth::guard('warhouse')->user());
+	}
+
+	public function updateWarhouseProfile(Request $request)
+	{
+		$warhouse = Auth::guard('warhouse')->user();
+
+		$request->validate([
+            'name' => 'nullable|string|max:100',
+            'code' => 'required|string|max:100|unique:warhouses,code,'.$warhouse->id,
+            'user_name' => 'required|string|max:100|unique:warhouses,user_name,'.$warhouse->id,
+            'email' => 'required|string|max:100|unique:warhouses,email,'.$warhouse->id,
+            'mobile' => 'required|string|max:50|unique:warhouses,mobile,'.$warhouse->id,
+        ]);
+
+		$warhouse->name = $request->name;
+		$warhouse->code = $request->code;
+		$warhouse->user_name = $request->user_name;
+		$warhouse->email = $request->email;
+		$warhouse->mobile = $request->mobile;
+		$warhouse->map_preview = $request->site_map_preview ?? NULL;
+
+		$warhouse->save();
+
+		return $this->showWarhouseProfile();
+	}
+
+	public function updateWarhouseDeal(Request $request)
+	{
+		$warhouse = Auth::guard('warhouse')->user();
+
+		$request->validate([
+           	'warhouse_owner_id' => 'required|numeric|exists:warhouse_owners,id',
+        	'warhouse_deal' => 'required|string|max:255', 
+        ]);
+
+		$warhouse->warhouse_owner_id = $request->warhouse_owner_id;
+		$warhouse->warhouse_deal = $request->warhouse_deal;
+
+		$warhouse->save();
+
+		return $this->showWarhouseProfile();
+	}
+
+	public function updateWarhouseFeaturesAndPreviews(Request $request)
+	{
+		$warhouse = Auth::guard('warhouse')->user();
+
+		$request->validate([
+            
+        ]);
+
+        $warhouse->name = $request->name;
+
+		$warhouse->save();
+
+	}
+
+	public function updateWarhouseStorages(Request $request)
+	{
+		$warhouse = Auth::guard('warhouse')->user();
+
+		$request->validate([
+            
+        ]);
+
+        $warhouse->name = $request->name;
+
+		$warhouse->save();
+
+	}
+
+	public function updateWarhouseContainers(Request $request)
+	{
+		$warhouse = Auth::guard('warhouse')->user();
+
+		$request->validate([
+            
+        ]);
+
+        $warhouse->name = $request->name;
+
+		$warhouse->save();
+
+	}
+
+	public function updateWarhousePassword(Request $request)
+	{
+		$request->validate([
+            'current_password' => 'required|string|max:255',
+            'password' => 'required|string|max:255|confirmed',
+        ]);
+
+        $warhouse = Auth::guard('warhouse')->user();
+
+		if (Hash::check($request->current_password, $warhouse->password)) {
+		    
+			$warhouse->update([
+	            'password' => Hash::make($request->password)
+	        ]);
+
+			return response('Password has been updated', 200);
+		}
+
+		return response("Password doesn't match", 401);
+	}
+
 }
