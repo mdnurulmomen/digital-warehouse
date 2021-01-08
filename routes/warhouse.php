@@ -31,7 +31,10 @@ Route::name('warhouse.')->group(function () {
 
 		Route::get('/api/profile', 'ProfileController@showWarhouseProfile')->name('profile');	
 		Route::put('/warhouse-profile', 'ProfileController@updateWarhouseProfile')->name('profile');
-		Route::put('/warhouse-deal', 'ProfileController@updateWarhouseDeal')->name('deal');		
+		Route::put('/warhouse-deal', 'ProfileController@updateWarhouseDeal')->name('deal');
+		Route::put('/warhouse-feature-previews', 'ProfileController@updateWarhouseFeaturesAndPreviews')->name('feature-previews');
+		Route::put('/warhouse-storages', 'ProfileController@updateWarhouseStorages')->name('storages');
+		Route::put('/warhouse-containers', 'ProfileController@updateWarhouseContainers')->name('containers');
 		Route::post('/password', 'ProfileController@updateWarhousePassword')->name('password');
 
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');

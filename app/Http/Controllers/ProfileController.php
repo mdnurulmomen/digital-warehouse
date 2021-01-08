@@ -214,13 +214,24 @@ class ProfileController extends Controller
 		$warhouse = Auth::guard('warhouse')->user();
 
 		$request->validate([
-            
+            'feature.features' => 'required|string',
+            'previews' => 'required|array',
         ]);
 
-        $warhouse->name = $request->name;
+        $warhouse->feature()->updateOrCreate(
+            [ 'warhouse_id' => $warhouse->id ],
+            [ 'features' => $request->feature['features']]
+        );
 
-		$warhouse->save();
+        if (count($request->previews)) {
+            
+            $warhouse->warhouse_previews = $request->previews;
 
+        }
+
+		// $warhouse->save();
+
+		return $this->showWarhouseProfile();
 	}
 
 	public function updateWarhouseStorages(Request $request)
@@ -228,13 +239,21 @@ class ProfileController extends Controller
 		$warhouse = Auth::guard('warhouse')->user();
 
 		$request->validate([
-            
+            'storages' => 'required|array',
+            'storages.*.feature.features' => 'required|string',
+            'storages.*.previews' => 'required|array',
+            'storages.*.storage_type' => 'required',
         ]);
 
-        $warhouse->name = $request->name;
+        if (count($request->storages)) {
+            
+            $warhouse->warhouse_storages = $request->storages;
 
-		$warhouse->save();
+        }
 
+		// $warhouse->save();
+
+		return $this->showWarhouseProfile();
 	}
 
 	public function updateWarhouseContainers(Request $request)
@@ -242,13 +261,19 @@ class ProfileController extends Controller
 		$warhouse = Auth::guard('warhouse')->user();
 
 		$request->validate([
-            
+            'containers' => 'required|array',
+            'containers.*.container.id' => 'required|exists:containers,id',
+            'containers.*.quantity' => 'required|integer|min:0',
+            'containers.*.rents' => 'required',
         ]);
 
-        $warhouse->name = $request->name;
+        if (count($request->containers)) {
+            
+            $warhouse->warhouse_containers = $request->containers;
 
-		$warhouse->save();
+        }
 
+		return $this->showWarhouseProfile();
 	}
 
 	public function updateWarhousePassword(Request $request)

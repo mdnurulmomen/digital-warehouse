@@ -549,7 +549,7 @@
 
 															<div 
 																class="form-group row" 
-																v-if="warhouse.storages[index].feature && warhouse.storages.length==errors.storage_features.length"
+																v-if="warhouse.storages[index].feature"
 															>
 																	
 																<label class="col-sm-3 col-form-label text-right">
@@ -660,10 +660,7 @@
 												    			</div>
 												    		</div>
 
-												    		<div 
-												    			class="form-row"
-												    			v-if="warhouse.containers.length==errors.containers.length"
-												    		>	
+												    		<div class="form-row">	
 																<div class="col-sm-12 form-group">
 
 																	<label>Rents</label>
@@ -1301,6 +1298,95 @@
 					});
 
 			},
+			warhouseFeatureAndPreviewsUpdation() {
+
+				this.validateFormInput('warhouse_preview');
+				this.validateFormInput('warhouse_feature');
+
+				if (this.errors.constructor === Object && (this.errors.preview || this.errors.feature)) {
+
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.put('/warhouse-feature-previews/', this.warhouse)
+					.then(response => {
+						if (response.status == 200) {
+							this.warhouse = response.data.data || {};
+							this.$toastr.s("Feature and Previews has been updated", "Success");
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					});
+
+			},
+			storageUpdation() {
+
+				this.validateFormInput('storage_type');
+				this.validateFormInput('storage_preview');
+				this.validateFormInput('storage_feature');
+
+				if (this.errors.constructor === Object && (this.errorInArray(this.errors.storage_types) || this.errors.storage_preview || this.errorInArray(this.errors.storage_features))) {
+
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.put('/warhouse-storages/', this.warhouse)
+					.then(response => {
+						if (response.status == 200) {
+							this.warhouse = response.data.data || {};
+							this.$toastr.s("Storages has been updated", "Success");
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					});
+
+			},
+			containerUpdation() {
+
+				this.validateFormInput('container');
+				this.validateFormInput('container_quantity');
+				
+				this.validateFormInput('container_price');
+	        	this.validateFormInput('shelf_price');
+	        	this.validateFormInput('unit_price');
+
+				if (this.errors.constructor === Object && this.errorInObject(this.errors.containers)) {
+
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.put('/warhouse-containers/', this.warhouse)
+					.then(response => {
+						if (response.status == 200) {
+							this.warhouse = response.data.data || {};
+							this.$toastr.s("Container has been updated", "Success");
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					});
+
+			},
 			passwordUpdation() {
 
 				if (!this.password.current_password || !this.password.password || !this.password.password_confirmation) {
@@ -1335,6 +1421,22 @@
 							this.$toastr.e("Wrong Current Password", "Oops");	
 				      	}
 					});
+			},
+			errorInArray(array) {
+
+				const error = (element) => element !== null;
+
+				return array.some(error);
+
+			},
+			errorInObject(array) {
+
+				const error = (container) => {
+	        							return Object.keys(container).length > 0
+	        						};
+
+	        	return array.some(error);
+
 			},
 			onSiteMapChange(evnt) {
 				let files = evnt.target.files || evnt.dataTransfer.files;

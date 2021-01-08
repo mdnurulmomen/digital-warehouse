@@ -509,7 +509,7 @@ class Warhouse extends Authenticatable
 
             // container statuses
             $warhouseContainerStatus = $warhouseContainer->containerStatuses()->create([
-                'name' => 'wr-'.$this->id.'-cnt-'.$inputedContainer->container->id.'-'.($i+1),
+                'name' => 'cnt'.$inputedContainer->container->id.'-'.($i+1),
             ]);
 
             if ($inputedContainer->container->has_shelve) {
