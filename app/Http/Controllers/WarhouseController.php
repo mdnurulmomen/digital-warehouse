@@ -388,4 +388,56 @@ class WarhouseController extends Controller
                                 
     }
 
+    // containers of specific warehouse
+    public function showWarhouseAllContainers($perPage = false) {
+        
+        if ($perPage) {
+            
+            $currentWarhouse = \Auth::guard('warhouse')->user();
+
+            $emptyContainers = WarhouseContainerStatus::where('engaged', 0)
+                                                ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
+                                                    $query->where('warhouse_id', $currentWarhouse->id);
+                                                })
+                                                ->paginate($perPage);
+
+            $partialContainers = WarhouseContainerStatus::where('engaged', 0.5)
+                                                ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
+                                                    $query->where('warhouse_id', $currentWarhouse->id);
+                                                })
+                                                ->paginate($perPage);
+
+            $engagedContainers = WarhouseContainerStatus::where('engaged', 1)
+                                                ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
+                                                    $query->where('warhouse_id', $currentWarhouse->id);
+                                                })
+                                                ->paginate($perPage);
+
+            return [
+                'empty' => $emptyContainers, 
+                'partial' => $partialContainers, 
+                'engaged' => $engagedContainers, 
+            ];
+
+        }
+                                
+    }
+
+    public function searchWarhouseAllContainers($search, $perPage)
+    {
+        $currentWarhouse = \Auth::guard('warhouse')->user();
+
+        $query = WarhouseContainerStatus::where('name', 'like', "%$search%")
+                                        ->orWhereHas('warhouseContainer.container', function ($query) use ($search) {
+                                                $query->where('name', 'like', "%$search%");
+                                            })
+                                        ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
+                                                $query->where('warhouse_id', $currentWarhouse->id);
+                                            });
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
 }

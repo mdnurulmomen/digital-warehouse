@@ -1171,7 +1171,7 @@
 				this.allContainers = [];
 				
 				axios
-					.get('/api/containers/')
+					.get('/api/container-types/')
 					.then(response => {
 						if (response.status == 200) {
 							this.allContainers = response.data;

@@ -40,7 +40,10 @@ Route::name('warhouse.')->group(function () {
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
 		Route::get('/api/owners/{perPage?}', 'WarhouseController@showAllOwners')->name('warhouse-owners');
 		Route::get('/api/storage-types/{perPage?}','AssetController@showAllStorageTypes')->name('storage-types');
-		Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('containers');
+		Route::get('/api/container-types/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
+
+		Route::get('/api/containers/{perPage?}', 'WarhouseController@showWarhouseAllContainers')->name('containers');
+		Route::get('/api/search-containers/{search}/{perPage}', 'WarhouseController@searchWarhouseAllContainers')->name('containers');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 	
