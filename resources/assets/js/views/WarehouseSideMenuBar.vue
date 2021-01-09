@@ -36,7 +36,7 @@
 								</ul>
 							</li>
 
-							<li :class="['my-containers', 'container-shelves'].includes(currentRouteName) ? 'active' : ''">
+							<li :class="['my-containers', 'container-shelves', 'shelf-units'].includes(currentRouteName) ? 'active' : ''">
 								<router-link :to="{ name: 'my-containers' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="feather icon-aperture"></i>

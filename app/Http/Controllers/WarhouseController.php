@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\WarhouseContainerStatus;
 use App\Models\WarhouseContainerShelfStatus;
 use App\Http\Resources\Web\WarhouseCollection;
+use App\Models\WarhouseContainerShelfUnitStatus;
 
 class WarhouseController extends Controller
 {
@@ -351,41 +352,42 @@ class WarhouseController extends Controller
 
     // warehouse-contaners
     public function showAllWarhouseContainers($perPage = false) {
+        
         if ($perPage) {
             
+            $emptyContainers = WarhouseContainerStatus::where('engaged', 0)->get();
+
+
+            $emptyShelfContainers = WarhouseContainerStatus::whereHas('containerShelfStatuses', function ($query) {
+                                                                $query->where('engaged', 0);
+                                                            })
+                                                            ->with([
+                                                                'containerShelfStatuses' => 
+                                                                    function ($query) {
+                                                                        $query->where('engaged', 0);
+                                                                    }
+                                                            ])
+                                                            ->get();
+
+            $emptyUnitContainers = WarhouseContainerStatus::whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
+                                                                function ($query) {
+                                                                $query->where('engaged', 0);
+                                                            })
+                                                            ->with([
+                                                                'containerShelfStatuses.containerShelfUnitStatuses' => 
+                                                                    function ($query) {
+                                                                        $query->where('engaged', 0);
+                                                                    }
+                                                            ])
+                                                            ->get();
+
+            return [
+                'emptyContainers' => $emptyContainers, 
+                'emptyShelfContainers' => $emptyShelfContainers, 
+                'emptyUnitContainers' => $emptyUnitContainers, 
+            ];
+
         }
-
-        $emptyContainers = WarhouseContainerStatus::where('engaged', 0)->get();
-
-
-        $emptyShelfContainers = WarhouseContainerStatus::whereHas('containerShelfStatuses', function ($query) {
-                                                            $query->where('engaged', 0);
-                                                        })
-                                                        ->with([
-                                                            'containerShelfStatuses' => 
-                                                                function ($query) {
-                                                                    $query->where('engaged', 0);
-                                                                }
-                                                        ])
-                                                        ->get();
-
-        $emptyUnitContainers = WarhouseContainerStatus::whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
-                                                            function ($query) {
-                                                            $query->where('engaged', 0);
-                                                        })
-                                                        ->with([
-                                                            'containerShelfStatuses.containerShelfUnitStatuses' => 
-                                                                function ($query) {
-                                                                    $query->where('engaged', 0);
-                                                                }
-                                                        ])
-                                                        ->get();
-
-        return [
-            'emptyContainers' => $emptyContainers, 
-            'emptyShelfContainers' => $emptyShelfContainers, 
-            'emptyUnitContainers' => $emptyUnitContainers, 
-        ];
                                 
     }
 
@@ -396,19 +398,22 @@ class WarhouseController extends Controller
             
             $currentWarhouse = \Auth::guard('warhouse')->user();
 
-            $emptyContainers = WarhouseContainerStatus::where('engaged', 0)
+            $emptyContainers = WarhouseContainerStatus::with(['containerShelfStatuses'])
+                                                ->where('engaged', 0)
                                                 ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
                                                     $query->where('warhouse_id', $currentWarhouse->id);
                                                 })
                                                 ->paginate($perPage);
 
-            $partialContainers = WarhouseContainerStatus::where('engaged', 0.5)
+            $partialContainers = WarhouseContainerStatus::with(['containerShelfStatuses'])
+                                                ->where('engaged', 0.5)
                                                 ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
                                                     $query->where('warhouse_id', $currentWarhouse->id);
                                                 })
                                                 ->paginate($perPage);
 
-            $engagedContainers = WarhouseContainerStatus::where('engaged', 1)
+            $engagedContainers = WarhouseContainerStatus::with(['containerShelfStatuses'])
+                                                ->where('engaged', 1)
                                                 ->whereHas('warhouseContainer', function ($query) use ($currentWarhouse) {
                                                     $query->where('warhouse_id', $currentWarhouse->id);
                                                 })
@@ -428,7 +433,8 @@ class WarhouseController extends Controller
     {
         $currentWarhouse = \Auth::guard('warhouse')->user();
 
-        $query = WarhouseContainerStatus::where('name', 'like', "%$search%")
+        $query = WarhouseContainerStatus::with(['containerShelfStatuses'])
+                                        ->where('name', 'like', "%$search%")
                                         ->orWhereHas('warhouseContainer.container', function ($query) use ($search) {
                                                 $query->where('name', 'like', "%$search%");
                                             })
@@ -441,7 +447,7 @@ class WarhouseController extends Controller
         ], 200);
     }
 
-    // containers of specific warehouse
+    // shelves of specific container
     public function showContainerAllShelves($containerId, $perPage = false) {
         
         if ($perPage) {
@@ -452,22 +458,19 @@ class WarhouseController extends Controller
 
             if ($expectedContainer && $expectedContainer->warhouseContainer->warhouse_id==$currentWarhouse->id) {
                 
-                $emptyShelves = WarhouseContainerShelfStatus::where('engaged', 0)
-                                                ->whereHas('parentContainer', function ($query) use ($expectedContainer) {
-                                                    $query->where('warhouse_container_status_id', $expectedContainer->id);
-                                                })
+                $emptyShelves = WarhouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
+                                                ->where('engaged', 0)
+                                                ->where('warhouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
-                $partialShelves = WarhouseContainerShelfStatus::where('engaged', 0.5)
-                                                ->whereHas('parentContainer', function ($query) use ($expectedContainer) {
-                                                    $query->where('warhouse_container_status_id', $expectedContainer->id);
-                                                })
+                $partialShelves = WarhouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
+                                                ->where('engaged', 0.5)
+                                                ->where('warhouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
-                $engagedShelves = WarhouseContainerShelfStatus::where('engaged', 1)
-                                                ->whereHas('parentContainer', function ($query) use ($expectedContainer) {
-                                                    $query->where('warhouse_container_status_id', $expectedContainer->id);
-                                                })
+                $engagedShelves = WarhouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
+                                                ->where('engaged', 1)
+                                                ->where('warhouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
                 return [
@@ -498,7 +501,77 @@ class WarhouseController extends Controller
 
             if ($expectedContainer && $expectedContainer->warhouseContainer->warhouse_id==$currentWarhouse->id) {
 
-                $query = WarhouseContainerShelfStatus::where('name', 'like', "%$search%");
+                $query = WarhouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
+                                                     ->where('name', 'like', "%$search%")
+                                                     ->where('warhouse_container_status_id', $expectedContainer->id);
+
+                return response()->json([
+                    'all' => $query->paginate($perPage),    
+                ], 200);
+
+            }
+
+            return response()->json([
+                'all' => [],    
+            ], 200);
+
+        }
+
+    }
+
+    // units of specific shelf
+    public function showShelfAllUnits($shelf, $perPage = false) {
+        
+        if ($perPage) {
+            
+            $currentWarhouse = \Auth::guard('warhouse')->user();
+
+            $expectedShelf = WarhouseContainerShelfStatus::findOrFail($shelf);
+
+            if ($expectedShelf && $expectedShelf->warhouseContainer->warhouse_id==$currentWarhouse->id) {
+                
+                $emptyUnits = WarhouseContainerShelfUnitStatus::where('engaged', 0)
+                                                ->where('warhouse_container_shelf_status_id', $expectedShelf->id)
+                                                ->paginate($perPage);
+
+                $partialUnits = WarhouseContainerShelfUnitStatus::where('engaged', 0.5)
+                                                ->where('warhouse_container_shelf_status_id', $expectedShelf->id)
+                                                ->paginate($perPage);
+
+                $engagedUnits = WarhouseContainerShelfUnitStatus::where('engaged', 1)
+                                                ->where('warhouse_container_shelf_status_id', $expectedShelf->id)
+                                                ->paginate($perPage);
+
+                return [
+                    'empty' => $emptyUnits, 
+                    'partial' => $partialUnits, 
+                    'engaged' => $engagedUnits, 
+                ];
+
+            }
+
+            return [
+                'empty' => [], 
+                'partial' => [], 
+                'engaged' => [], 
+            ];
+
+        }
+                                
+    }
+
+    public function searchShelfAllUnits($shelf, $search, $perPage)
+    {
+        if ($perPage) {
+
+            $currentWarhouse = \Auth::guard('warhouse')->user();
+
+            $expectedShelf = WarhouseContainerShelfStatus::findOrFail($shelf);
+
+            if ($expectedShelf && $expectedShelf->warhouseContainer->warhouse_id==$currentWarhouse->id) {
+
+                $query = WarhouseContainerShelfUnitStatus::where('name', 'like', "%$search%")
+                                                     ->where('warhouse_container_shelf_status_id', $expectedShelf->id);
 
                 return response()->json([
                     'all' => $query->paginate($perPage),    

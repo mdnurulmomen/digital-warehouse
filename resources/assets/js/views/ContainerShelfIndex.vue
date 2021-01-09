@@ -118,10 +118,16 @@
 																		<td>
 																			<button type="button" 
 																					class="btn btn-grd-info btn-icon"  
+																					v-show="content.container_shelf_unit_statuses.length" 
 																					@click="showShelfUnitDetails(content)"
 																			>
 																				<i class="fas fa-eye"></i>
 																			</button>
+																			<span class="text-danger" 
+																				v-show="!content.container_shelf_unit_statuses.length" 
+																			>
+																				No Unit
+																			</span>
 																		</td>
 																    
 																	</tr>
@@ -312,7 +318,10 @@
 
 			},
 			showShelfUnitDetails(object) {	
-				// this.$router.push.push({ name: 'user', params: { userId: '123' } });
+				const shelfId = object.id;
+				const shelfName = object.name;
+				// this.$router.push({ name: 'container-shelves', params: { shelfId,  shelfName} })
+				this.$router.push({ path: `/shelf-units/` + shelfId + '/' + shelfName });
 			},
             changeNumberContents(expectedContentsPerPage) {
 				this.pagination.current_page = 1;
