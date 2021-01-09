@@ -27,7 +27,7 @@
 
 												<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
-															Warhouse Containers List
+															{{ $route.params.name }} Shelves List
 											  		</div>
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 
@@ -57,7 +57,7 @@
 											
 											<div class="col-sm-12 col-lg-12">
 
-												<ul class="nav nav-tabs md-tabs" role="tablist">
+												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query === ''">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
 															data-toggle="tab" 
@@ -118,7 +118,7 @@
 																		<td>
 																			<button type="button" 
 																					class="btn btn-grd-info btn-icon"  
-																					@click="showContainerShelfDetails(content)"
+																					@click="showShelfUnitDetails(content)"
 																			>
 																				<i class="fas fa-eye"></i>
 																			</button>
@@ -164,7 +164,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? fetchAllContainers() : searchData()"
+																@click="query === '' ? fetchContainerAllShelves() : searchData()"
 															>
 																Reload
 																<i class="fas fa-sync"></i>
@@ -175,7 +175,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllContainers() : searchData()"
+																@paginate="query === '' ? fetchContainerAllShelves() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -231,7 +231,7 @@
 		
 		created(){
 
-			this.fetchAllContainers();
+			this.fetchContainerAllShelves();
 
 		},
 
@@ -240,7 +240,7 @@
 			query : function(val){
 				
 				if (val==='') {
-					this.fetchAllContainers();
+					this.fetchContainerAllShelves();
 				}
 				else {
 					this.searchData();
@@ -252,7 +252,7 @@
 		
 		methods : {
 
-			fetchAllContainers() {
+			fetchContainerAllShelves() {
 				
 				this.query = '';
 				this.error = '';
@@ -260,7 +260,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/containers/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/container-shelves/' + this.$route.params.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -299,7 +299,7 @@
 				
 				axios
 				.get(
-					"/api/search-containers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-container-shelves/" + this.$route.params.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -311,18 +311,15 @@
 				});
 
 			},
-			showContainerShelfDetails(object) {
-				const containerId = object.id;
-				const containerName = object.name;
-				// this.$router.push({ name: 'container-shelves', params: { containerId,  containerName} })
-				this.$router.push({ path: `/container-shelves/` + containerId + '/' + containerName }) // -> /user/123
+			showShelfUnitDetails(object) {	
+				// this.$router.push.push({ name: 'user', params: { userId: '123' } });
 			},
             changeNumberContents(expectedContentsPerPage) {
 				this.pagination.current_page = 1;
 				this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
-					this.fetchAllContainers();
+					this.fetchContainerAllShelves();
 				}
 				else {
 					this.searchData();
@@ -360,16 +357,3 @@
   	}
 
 </script>
-
-<style scoped>
-	.branches-enter-active {
-  		transition: all 1s ease;
-	}
-	.branches-leave-active {
-  		transition: all 1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-	}
-	.branches-enter, .branches-leave-to {
-  		transform: translateX(10px);
-  		opacity: 0;
-	}
-</style>

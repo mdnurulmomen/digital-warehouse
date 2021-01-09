@@ -45,6 +45,9 @@ Route::name('warhouse.')->group(function () {
 		Route::get('/api/containers/{perPage?}', 'WarhouseController@showWarhouseAllContainers')->name('containers');
 		Route::get('/api/search-containers/{search}/{perPage}', 'WarhouseController@searchWarhouseAllContainers')->name('containers');
 
+		Route::get('/api/container-shelves/{container}/{perPage?}', 'WarhouseController@showContainerAllShelves')->name('container-shelves');
+		Route::get('/api/search-container-shelves/{container}/{search}/{perPage}', 'WarhouseController@searchContainerAllShelves')->name('search-container-shelves');
+
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 	
 	});

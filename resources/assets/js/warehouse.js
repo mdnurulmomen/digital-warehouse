@@ -48,6 +48,7 @@ import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Profile from './views/WarhouseProfileComponent'
 import ContainerIndex from './views/WarhouseContainerIndex'
+import ContainerShelfIndex from './views/ContainerShelfIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -78,6 +79,12 @@ const router = new VueRouter({
             name: 'my-containers',
             component: ContainerIndex,
         },
+        {
+            path: '/container-shelves/:id/:name',
+            name: 'container-shelves',
+            component: ContainerShelfIndex,
+        },
+
     ],
 });
 
