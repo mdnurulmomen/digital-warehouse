@@ -42,13 +42,13 @@
 							</li>
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['owners', 'warhouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['owners', 'warehouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="feather icon-command"></i>
 									</span>
-									<span class="pcoded-mtext">Warhouse</span>
+									<span class="pcoded-mtext">Warehouse</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
@@ -57,9 +57,9 @@
 											<span class="pcoded-mtext">Owners</span>
 										</router-link>
 									</li>
-									<li :class="currentRouteName=='warhouses' ? 'active' : ''">
-										<router-link :to="{ name: 'warhouses' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Warhouses</span>
+									<li :class="currentRouteName=='warehouses' ? 'active' : ''">
+										<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Warehouses</span>
 										</router-link>
 									</li>
 								</ul>

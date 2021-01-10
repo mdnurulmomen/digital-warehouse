@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warhouse;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
-use App\Http\Resources\Web\WarhouseCollection;
+use App\Http\Resources\Web\WarehouseCollection;
 
 class OwnerController extends Controller
 {
@@ -26,11 +26,11 @@ class OwnerController extends Controller
     {
         return [
 
-            'approved' => new WarhouseCollection(Warhouse::where('active', 1)
-            											 ->where('warhouse_owner_id', $owner)
+            'approved' => new WarehouseCollection(Warehouse::where('active', 1)
+            											 ->where('warehouse_owner_id', $owner)
             											 ->paginate($perPage)),
-            'pending' => new WarhouseCollection(Warhouse::where('active', 0)
-            											->where('warhouse_owner_id', $owner)
+            'pending' => new WarehouseCollection(Warehouse::where('active', 0)
+            											->where('warehouse_owner_id', $owner)
             											->paginate($perPage)),
 
         ];
@@ -38,9 +38,9 @@ class OwnerController extends Controller
 
     public function searchOwnerAllWarehouses($owner, $search, $perPage)
     {
-        $columnsToSearch = ['user_name', 'email', 'mobile', 'warhouse_deal'];
+        $columnsToSearch = ['user_name', 'email', 'mobile', 'warehouse_deal'];
 
-        $query = Warhouse::where('name', "%$search%");
+        $query = Warehouse::where('name', "%$search%");
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");
@@ -54,10 +54,10 @@ class OwnerController extends Controller
               ->orWhere('mobile', 'like', "%$search%");
         });
 
-        $query->where('warhouse_owner_id', $owner);
+        $query->where('warehouse_owner_id', $owner);
 
         return response()->json([
-            'all' => new WarhouseCollection($query->paginate($perPage)),    
+            'all' => new WarehouseCollection($query->paginate($perPage)),    
         ], 200);
     }
 }

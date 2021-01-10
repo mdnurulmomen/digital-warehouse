@@ -305,7 +305,7 @@
 	</div>
 
 	<!-- Scripts -->
-    <script src="{{ mix('js/app.js') }}"></script>
+    <script src="{{ mix('js/admin.js') }}"></script>
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/jquery-ui.min.js')}}"></script>
 	<script src="{{asset('js/waves.min.js')}}" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script>
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/jquery.slimscroll.js')}}"></script>

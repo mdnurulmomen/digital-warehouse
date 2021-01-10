@@ -56,7 +56,7 @@ class SettingController extends Controller
         return $this->showApplicationSetting();
     }
 
-    public function updateWarhouseSetting(Request $request)
+    public function updateWarehouseSetting(Request $request)
     {
         $request->validate([
             'default_selling_price' => 'required|numeric|min:0',

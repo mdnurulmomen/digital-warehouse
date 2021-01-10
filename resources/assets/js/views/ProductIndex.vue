@@ -1082,7 +1082,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ containerAddress.warhouse_container ? containerAddress.warhouse_container.container.name : 'NA' }}
+																		{{ containerAddress.warehouse_container ? containerAddress.warehouse_container.container.name : 'NA' }}
 																	</label>
 																</div>
 
@@ -1100,7 +1100,7 @@
 
 														<div 
 															class="card" 
-															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('shelves') && productAddress.hasOwnProperty('container') &&  productAddress.container.hasOwnProperty('warhouse_container')"
+															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('shelves') && productAddress.hasOwnProperty('container') &&  productAddress.container.hasOwnProperty('warehouse_container')"
 														>
 															<div class="card-body">
 
@@ -1111,7 +1111,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warhouse_container.container.name }}
+																		{{ productAddress.container.warehouse_container.container.name }}
 																	</label>
 																</div>
 
@@ -1151,7 +1151,7 @@
 
 														<div 
 															class="card" 
-															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('units') && productAddress.hasOwnProperty('container') && productAddress.container.hasOwnProperty('warhouse_container')"
+															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('units') && productAddress.hasOwnProperty('container') && productAddress.container.hasOwnProperty('warehouse_container')"
 														>
 															<div class="card-body">
 																
@@ -1162,7 +1162,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warhouse_container.container.name }}
+																		{{ productAddress.container.warehouse_container.container.name }}
 																	</label>
 																</div>
 
@@ -1500,7 +1500,7 @@
 				this.emptyUnitContainers = [];
 
 				axios
-					.get('/api/warhouse-containers')
+					.get('/api/warehouse-containers')
 					.then(response => {
 						if (response.status == 200) {
 							
@@ -1905,28 +1905,28 @@
 					this.availableVariations = this.singleProductData.variation_type.variations;
 				}
 			},
-			resetEmptyContainers({engaged, id, name, container_shelf_statuses, warhouse_container_id}) {
+			resetEmptyContainers({engaged, id, name, container_shelf_statuses, warehouse_container_id}) {
 
 				const existingContainer = currentContainer => 
-					currentContainer.id==id && currentContainer.name==name && currentContainer.warhouse_container_id==warhouse_container_id;
+					currentContainer.id==id && currentContainer.name==name && currentContainer.warehouse_container_id==warehouse_container_id;
 
 				if (!this.emptyContainers.some(existingContainer)) {
 
-					this.emptyContainers.push({engaged, id, name, warhouse_container_id});
+					this.emptyContainers.push({engaged, id, name, warehouse_container_id});
 				}
 
 				if (container_shelf_statuses) {
 
 					if (!this.emptyShelfContainers.some(existingContainer)) {
 
-						this.emptyShelfContainers.push({engaged, id, name, container_shelf_statuses, warhouse_container_id});
+						this.emptyShelfContainers.push({engaged, id, name, container_shelf_statuses, warehouse_container_id});
 					}
 
 					if (container_shelf_statuses.some(shelf=>shelf.hasOwnProperty('container_shelf_unit_statuses') && shelf.container_shelf_unit_statuses.length)) {
 
 						if (!this.emptyUnitContainers.some(existingContainer)) {
 
-							this.emptyUnitContainers.push({engaged, id, name, container_shelf_statuses, warhouse_container_id});
+							this.emptyUnitContainers.push({engaged, id, name, container_shelf_statuses, warehouse_container_id});
 						}
 
 					}
@@ -1935,20 +1935,20 @@
 
 			},
 		/*
-			resetEmptyShelves({engaged, id, name, warhouse_container_id, warhouse_container_status_id}) {
+			resetEmptyShelves({engaged, id, name, warehouse_container_id, warehouse_container_status_id}) {
 
 				console.log(engaged);
 				console.log(id);
 				console.log(name);
-				console.log(warhouse_container_id);
-				console.log(warhouse_container_status_id);
+				console.log(warehouse_container_id);
+				console.log(warehouse_container_status_id);
 
 				const existingShelf = currentContainer => 
-					currentContainer.id==id && currentContainer.name==name && currentContainer.warhouse_container_id==warhouse_container_id && currentContainer.warhouse_container_status_id==warhouse_container_status_id;
+					currentContainer.id==id && currentContainer.name==name && currentContainer.warehouse_container_id==warehouse_container_id && currentContainer.warehouse_container_status_id==warehouse_container_status_id;
 
 				if (!this.emptyShelves.some(existingShelf)) {
 
-					this.emptyShelves.push({engaged, id, name, warhouse_container_id, warhouse_container_status_id});
+					this.emptyShelves.push({engaged, id, name, warehouse_container_id, warehouse_container_status_id});
 				
 				}
 
@@ -1956,7 +1956,7 @@
 
 					if (!this.emptyUnitContainers.some(existingContainer)) {
 
-						this.emptyUnitContainers.push({engaged, id, name, container_shelf_statuses, warhouse_container_id});
+						this.emptyUnitContainers.push({engaged, id, name, container_shelf_statuses, warehouse_container_id});
 					}
 
 				}	
@@ -1973,7 +1973,7 @@
 						}
 						else if (space.type=='shelves') {
 							let searchedContainer = this.emptyShelfContainers.find(
-								container => container.id==space.container.id && container.name==space.container.name && container.warhouse_container_id==space.container.warhouse_container_id
+								container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
 							)
 
 							if (searchedContainer) {
@@ -1983,12 +1983,12 @@
 						}
 						else if (space.type=='units') {
 
-							const containerExists = container => container.id==space.container.id && container.name==space.container.name && container.warhouse_container_id==space.container.warhouse_container_id;
+							const containerExists = container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id;
 
 							if (this.emptyUnitContainers.some(containerExists)) {
 
 								let searchedContainer = this.emptyUnitContainers.find(
-									container => container.id==space.container.id && container.name==space.container.name && container.warhouse_container_id==space.container.warhouse_container_id
+									container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
 								);
 
 								if (searchedContainer) {
@@ -1996,7 +1996,7 @@
 									this.emptyUnitShelves = searchedContainer.container_shelf_statuses;
 
 									let searchedShelf = searchedContainer.container_shelf_statuses.find(
-										shelf => shelf.id==space.container.shelf.id && shelf.name==space.container.shelf.name && shelf.warhouse_container_id==space.container.shelf.warhouse_container_id &&  shelf.warhouse_container_status_id==space.container.shelf.warhouse_container_status_id 
+										shelf => shelf.id==space.container.shelf.id && shelf.name==space.container.shelf.name && shelf.warehouse_container_id==space.container.shelf.warehouse_container_id &&  shelf.warehouse_container_status_id==space.container.shelf.warehouse_container_status_id 
 									);
 
 									if (searchedShelf) {
@@ -2079,7 +2079,7 @@
 									// containers with empty shelves
 									var selectedContainerIndex = this.emptyShelfContainers.findIndex(
 										(currentContainer) => 
-											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warhouse_container_id == selectedContainer.warhouse_container_id
+											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
 										
 									);
 
@@ -2095,7 +2095,7 @@
 									// containers with empty units
 									var selectedContainerIndex = this.emptyUnitContainers.findIndex(
 										(currentContainer) => 
-											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warhouse_container_id == selectedContainer.warhouse_container_id
+											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
 										
 									);
 
@@ -2126,12 +2126,12 @@
 
 										(emptyUnitContainer) => {
 
-											if (emptyUnitContainer.id==productAddress.container.id && emptyUnitContainer.name==productAddress.container.name && emptyUnitContainer.warhouse_container_id==productAddress.container.warhouse_container_id) {
+											if (emptyUnitContainer.id==productAddress.container.id && emptyUnitContainer.name==productAddress.container.name && emptyUnitContainer.warehouse_container_id==productAddress.container.warehouse_container_id) {
 
 												// unit
 												var selectedShelfIndex = emptyUnitContainer.container_shelf_statuses.findIndex(
 													(containerShelf) => 
-														containerShelf.id == selectedShelf.id && containerShelf.name == selectedShelf.name && containerShelf.warhouse_container_id == selectedShelf.warhouse_container_id && containerShelf.warhouse_container_status_id == selectedShelf.warhouse_container_status_id
+														containerShelf.id == selectedShelf.id && containerShelf.name == selectedShelf.name && containerShelf.warehouse_container_id == selectedShelf.warehouse_container_id && containerShelf.warehouse_container_status_id == selectedShelf.warehouse_container_status_id
 												);
 
 												// console.log('Shelf Index in emptyUnitContainer : ' + selectedShelfIndex);
@@ -2155,7 +2155,7 @@
 							// for every empty containers
 							var selectedContainerIndex = this.emptyContainers.findIndex(
 								(currentContainer) => 
-									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warhouse_container_id == productAddress.container.warhouse_container_id
+									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warehouse_container_id == productAddress.container.warehouse_container_id
 							);
 
 							if (selectedContainerIndex > -1) {
@@ -2171,7 +2171,7 @@
 							// for every empty containers
 							var selectedContainerIndex = this.emptyContainers.findIndex(
 								(currentContainer) => 
-									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warhouse_container_id == productAddress.container.warhouse_container_id
+									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warehouse_container_id == productAddress.container.warehouse_container_id
 							);
 
 							if (selectedContainerIndex > -1) {
@@ -2186,11 +2186,11 @@
 
 								(emptyShelfContainer) => {
 
-									if (emptyShelfContainer.id == productAddress.container.id && emptyShelfContainer.name == productAddress.container.name && emptyShelfContainer.warhouse_container_id == productAddress.container.warhouse_container_id) {
+									if (emptyShelfContainer.id == productAddress.container.id && emptyShelfContainer.name == productAddress.container.name && emptyShelfContainer.warehouse_container_id == productAddress.container.warehouse_container_id) {
 
 
 										var selectedShelfIndex = emptyShelfContainer.container_shelf_statuses.findIndex(
-											(currentShelf) => currentShelf.id == productAddress.container.shelf.id && currentShelf.name == productAddress.container.shelf.name && currentShelf.warhouse_container_id == productAddress.container.shelf.warhouse_container_id
+											(currentShelf) => currentShelf.id == productAddress.container.shelf.id && currentShelf.name == productAddress.container.shelf.name && currentShelf.warehouse_container_id == productAddress.container.shelf.warehouse_container_id
 										)
 
 										if (selectedShelfIndex > -1) {

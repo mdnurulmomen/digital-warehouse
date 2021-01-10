@@ -35,8 +35,8 @@ Route::name('owner.')->group(function () {
 
 		Route::get('/api/current-owner', 'OwnerController@currentOwner')->name('current-user');
 
-		Route::get('/my-warhouses/{owner}/{perPage}', 'OwnerController@showOwnerAllWarehouses')->name('my-warehouses');
-		Route::get('/search-warhouses/{owner}/{search}/{perPage}', 'OwnerController@searchOwnerAllWarehouses')->name('search-warehouses');
+		Route::get('/my-warehouses/{owner}/{perPage}', 'OwnerController@showOwnerAllWarehouses')->name('my-warehouses');
+		Route::get('/search-warehouses/{owner}/{search}/{perPage}', 'OwnerController@searchOwnerAllWarehouses')->name('search-warehouses');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 	

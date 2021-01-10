@@ -33,19 +33,19 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');
 		Route::put('/payment-settings', 'SettingController@updatePaymentSetting')->name('payment-settings');
 		Route::put('/contact-settings', 'SettingController@updateContactSetting')->name('contact-settings');	
-		Route::put('/warhouse-settings', 'SettingController@updateWarhouseSetting')->name('warhouse-settings');	
+		Route::put('/warehouse-settings', 'SettingController@updateWarehouseSetting')->name('warehouse-settings');	
 		Route::put('/system-settings', 'SettingController@updateSystemSetting')->name('system-settings');
 
 		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
 		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
 		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');
 
-		Route::get('/api/owners/{perPage?}', 'WarhouseController@showAllOwners')->name('warhouse-owners');
-		Route::post('/owners/{perPage}', 'WarhouseController@storeNewOwner')->name('warhouse-owners');	
-		Route::put('/owners/{owner}/{perPage}', 'WarhouseController@updateOwner')->name('warhouse-owners');	
-		Route::delete('/owners/{owner}/{perPage}', 'WarhouseController@deleteOwner')->name('warhouse-owners');	
-		Route::patch('/owners/{owner}/{perPage}', 'WarhouseController@restoreOwner')->name('warhouse-owners');
-		Route::get('/api/search-owners/{search}/{perPage}', 'WarhouseController@searchAllOwners')->name('search-warhouse-owners');
+		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');
+		Route::post('/owners/{perPage}', 'WarehouseController@storeNewOwner')->name('warehouse-owners');	
+		Route::put('/owners/{owner}/{perPage}', 'WarehouseController@updateOwner')->name('warehouse-owners');	
+		Route::delete('/owners/{owner}/{perPage}', 'WarehouseController@deleteOwner')->name('warehouse-owners');	
+		Route::patch('/owners/{owner}/{perPage}', 'WarehouseController@restoreOwner')->name('warehouse-owners');
+		Route::get('/api/search-owners/{search}/{perPage}', 'WarehouseController@searchAllOwners')->name('search-warehouse-owners');
 
 		Route::get('/api/managers/{perPage}', 'ManagerController@showAllManagers')->name('managers');
 		Route::post('/managers/{perPage}', 'ManagerController@storeNewManager')->name('managers');	
@@ -75,12 +75,12 @@ Route::name('admin.')->group(function () {
 		Route::patch('/containers/{container}/{perPage}', 'AssetController@restoreContainer')->name('containers');
 		Route::get('/api/search-containers/{search}/{perPage}', 'AssetController@searchAllContainers')->name('search-containers');
 
-		Route::get('/api/warhouses/{perPage}', 'WarhouseController@showAllWarhouses')->name('warhouses');
-		Route::post('/warhouses/{perPage}', 'WarhouseController@storeNewWarhouse')->name('warhouses');	
-		Route::put('/warhouses/{warhouse}/{perPage}', 'WarhouseController@updateWarhouse')->name('warhouses');	
-		Route::delete('/warhouses/{warhouse}/{perPage}', 'WarhouseController@deleteWarhouse')->name('warhouses');	
-		Route::patch('/warhouses/{warhouse}/{perPage}', 'WarhouseController@restoreWarhouse')->name('warhouses');
-		Route::get('/api/search-warhouses/{search}/{perPage}', 'WarhouseController@searchAllWarhouses')->name('search-warhouses');
+		Route::get('/api/warehouses/{perPage}', 'WarehouseController@showAllWarehouses')->name('warehouses');
+		Route::post('/warehouses/{perPage}', 'WarehouseController@storeNewWarehouse')->name('warehouses');	
+		Route::put('/warehouses/{warehouse}/{perPage}', 'WarehouseController@updateWarehouse')->name('warehouses');	
+		Route::delete('/warehouses/{warehouse}/{perPage}', 'WarehouseController@deleteWarehouse')->name('warehouses');	
+		Route::patch('/warehouses/{warehouse}/{perPage}', 'WarehouseController@restoreWarehouse')->name('warehouses');
+		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
 		Route::post('/rent-periods/{perPage}', 'AssetController@storeNewRentPeriod')->name('rent-periods');	
@@ -91,9 +91,9 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/variation-types/{perPage?}', 'AssetController@showAllVariationTypes')->name('variationTypes');
 		Route::post('/variation-types/{perPage}', 'AssetController@storeVariationType')->name('variationTypes');	
-		Route::put('/variation-types/{warhouse}/{perPage}', 'AssetController@updateVariationType')->name('variationTypes');	
-		Route::delete('/variation-types/{warhouse}/{perPage}', 'AssetController@deleteVariationType')->name('variationTypes');	
-		Route::patch('/variation-types/{warhouse}/{perPage}', 'AssetController@restoreVariationType')->name('variationTypes');
+		Route::put('/variation-types/{warehouse}/{perPage}', 'AssetController@updateVariationType')->name('variationTypes');	
+		Route::delete('/variation-types/{warehouse}/{perPage}', 'AssetController@deleteVariationType')->name('variationTypes');	
+		Route::patch('/variation-types/{warehouse}/{perPage}', 'AssetController@restoreVariationType')->name('variationTypes');
 		Route::get('/api/search-variation-types/{search}/{perPage}', 'AssetController@searchVariationTypes')->name('search-variationTypes');
 
 		Route::get('/api/variations/{perPage}', 'AssetController@showAllVariations')->name('variations');
@@ -117,7 +117,7 @@ Route::name('admin.')->group(function () {
 		// Route::patch('/products/{asset}/{perPage}', 'ProductController@restoreProduct')->name('products');
 		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
 
-		Route::get('/api/warhouse-containers/{perPage?}', 'WarhouseController@showAllWarhouseContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 

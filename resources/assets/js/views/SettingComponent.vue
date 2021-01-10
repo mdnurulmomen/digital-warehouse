@@ -66,8 +66,8 @@
 														<div class="slide"></div>
 													</li>
 													<li class="nav-item">
-														<a class="nav-link" data-toggle="tab" href="#warhouse" role="tab">
-															<span class="sub-title">Warhouse</span>
+														<a class="nav-link" data-toggle="tab" href="#warehouse" role="tab">
+															<span class="sub-title">Warehouse</span>
 														</a>
 														<div class="slide"></div>
 													</li>
@@ -364,14 +364,14 @@
 														</div>
 													</div>
 
-													<div class="tab-pane fade show fade" id="warhouse">	
+													<div class="tab-pane fade show fade" id="warehouse">	
 														<div class="row">
 															<div  v-show="!loading" class="col-sm-12">
 																<div class="">
 																	
 															      	<form 
 																      	class="form-horizontal" 
-																      	v-on:submit.prevent="updateWarhouseSetting"
+																      	v-on:submit.prevent="updateWarehouseSetting"
 															      	>
 															      		<input 
 																      		type="hidden" 
@@ -383,7 +383,7 @@
 															              	<div class="col-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Selling Price
+																              			Default Selling Price
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
@@ -406,7 +406,7 @@
 															                <div class="col-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Storing Price
+																              			Default Storing Price
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
@@ -432,7 +432,7 @@
 															              	<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Length
+																              			Default Length
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
@@ -455,7 +455,7 @@
 															              	<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Width
+																              			Default Width
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
@@ -480,7 +480,7 @@
 														              		<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Height
+																              			Default Height
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
@@ -503,7 +503,7 @@
 															              	<div class="col-sm-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
-																              			Measurement Unit
+																              			Default Measurement Unit
 																              		</label>
 																	                <div class="col-sm-8">
 																	                  <input 
@@ -740,7 +740,14 @@
 			},
 			updatePaymentSetting() {
 
-				if (!this.applicationSettings.official_bank_name || !this.applicationSettings.official_merchant_name || !this.applicationSettings.official_bank_account_name || !this.applicationSettings.official_bank_account_number || !this.applicationSettings.official_merchant_account_number || !this.applicationSettings.vat_percentage) {
+				this.validateFormInput('official_bank_name');
+				this.validateFormInput('official_merchant_name');
+				this.validateFormInput('official_bank_account_name');
+				this.validateFormInput('official_bank_account_number');
+				this.validateFormInput('official_merchant_account_number');
+				this.validateFormInput('vat_percentage');
+
+				if (this.errors.applicationSettings.official_bank_name || this.errors.applicationSettings.official_merchant_name || this.errors.applicationSettings.official_bank_account_name || this.errors.applicationSettings.official_bank_account_number || this.errors.applicationSettings.official_merchant_account_number || this.errors.applicationSettings.vat_percentage) {
 
 					this.submitForm = false;
 					return;
@@ -764,7 +771,11 @@
 			},
 			updateContactSetting() {
 
-				if (!this.applicationSettings.official_customer_care_number || !this.applicationSettings.official_mail_address || !this.applicationSettings.official_contact_address) {
+				this.validateFormInput('official_customer_care_number');
+				this.validateFormInput('official_mail_address');
+				this.validateFormInput('official_contact_address');
+
+				if (this.errors.applicationSettings.official_customer_care_number || this.errors.applicationSettings.official_mail_address || this.errors.applicationSettings.official_contact_address) {
 
 					this.submitForm = false;
 					return false;
@@ -788,19 +799,27 @@
 
 					});
 			},
-			updateWarhouseSetting() {
+			updateWarehouseSetting() {
 
-				if (!this.applicationSettings.default_selling_price || !this.applicationSettings.default_storing_price || !this.applicationSettings.default_length || !this.applicationSettings.default_width || !this.applicationSettings.default_height || !this.applicationSettings.default_measure_unit_id) {
+				this.validateFormInput('default_selling_price');
+				this.validateFormInput('default_storing_price');
+				this.validateFormInput('default_length');
+				this.validateFormInput('default_width');
+				this.validateFormInput('default_height');
+				this.validateFormInput('default_measure_unit_id');
+
+
+				if (this.errors.applicationSettings.default_selling_price || this.errors.applicationSettings.default_storing_price || this.errors.applicationSettings.default_length || this.errors.applicationSettings.default_width || this.errors.applicationSettings.default_height || this.errors.applicationSettings.default_measure_unit_id) {
 
 					this.submitForm = false;
 					return false;
 				}
 
 				axios
-					.put('/warhouse-settings', this.applicationSettings)
+					.put('/warehouse-settings', this.applicationSettings)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Warhouse settings have been updated", "Success");
+							this.$toastr.s("Warehouse settings have been updated", "Success");
 						}
 					})
 					.catch(error => {

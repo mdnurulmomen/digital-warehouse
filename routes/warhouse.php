@@ -13,43 +13,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::name('warhouse.')->group(function () {
+Route::name('warehouse.')->group(function () {
 
-    Route::middleware(['guest:warhouse'])->group(function () {
+    Route::middleware(['guest:warehouse'])->group(function () {
 	    
 	    Route::get('/', function () {
-	       return view('auth.login', ['url' => 'warhouse']); 
+	       return view('auth.login', ['url' => 'warehouse']); 
 	    })->name('login');
 
-		Route::post('/', 'Auth\LoginController@warhouseLogin')->name('login');
+		Route::post('/', 'Auth\LoginController@warehouseLogin')->name('login');
 	
 	});
 
-	Route::middleware(['auth:warhouse'])->group(function () {
+	Route::middleware(['auth:warehouse'])->group(function () {
 	    
-		Route::get('/{any}', 'HomeController@warhouseHome')->name('home');	
+		Route::get('/{any}', 'HomeController@warehouseHome')->name('home');	
 
-		Route::get('/api/profile', 'ProfileController@showWarhouseProfile')->name('profile');	
-		Route::put('/warhouse-profile', 'ProfileController@updateWarhouseProfile')->name('profile');
-		Route::put('/warhouse-deal', 'ProfileController@updateWarhouseDeal')->name('deal');
-		Route::put('/warhouse-feature-previews', 'ProfileController@updateWarhouseFeaturesAndPreviews')->name('feature-previews');
-		Route::put('/warhouse-storages', 'ProfileController@updateWarhouseStorages')->name('storages');
-		Route::put('/warhouse-containers', 'ProfileController@updateWarhouseContainers')->name('containers');
-		Route::post('/password', 'ProfileController@updateWarhousePassword')->name('password');
+		Route::get('/api/profile', 'ProfileController@showWarehouseProfile')->name('profile');	
+		Route::put('/warehouse-profile', 'ProfileController@updateWarehouseProfile')->name('profile');
+		Route::put('/warehouse-deal', 'ProfileController@updateWarehouseDeal')->name('deal');
+		Route::put('/warehouse-feature-previews', 'ProfileController@updateWarehouseFeaturesAndPreviews')->name('feature-previews');
+		Route::put('/warehouse-storages', 'ProfileController@updateWarehouseStorages')->name('storages');
+		Route::put('/warehouse-containers', 'ProfileController@updateWarehouseContainers')->name('containers');
+		Route::post('/password', 'ProfileController@updateWarehousePassword')->name('password');
 
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
-		Route::get('/api/owners/{perPage?}', 'WarhouseController@showAllOwners')->name('warhouse-owners');
+		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');
 		Route::get('/api/storage-types/{perPage?}','AssetController@showAllStorageTypes')->name('storage-types');
 		Route::get('/api/container-types/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
 
-		Route::get('/api/containers/{perPage?}', 'WarhouseController@showWarhouseAllContainers')->name('containers');
-		Route::get('/api/search-containers/{search}/{perPage}', 'WarhouseController@searchWarhouseAllContainers')->name('containers');
+		Route::get('/api/containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('containers');
+		Route::get('/api/search-containers/{search}/{perPage}', 'WarehouseController@searchWarehouseAllContainers')->name('containers');
 
-		Route::get('/api/container-shelves/{container}/{perPage?}', 'WarhouseController@showContainerAllShelves')->name('container-shelves');
-		Route::get('/api/search-container-shelves/{container}/{search}/{perPage}', 'WarhouseController@searchContainerAllShelves')->name('search-container-shelves');
+		Route::get('/api/container-shelves/{container}/{perPage?}', 'WarehouseController@showContainerAllShelves')->name('container-shelves');
+		Route::get('/api/search-container-shelves/{container}/{search}/{perPage}', 'WarehouseController@searchContainerAllShelves')->name('search-container-shelves');
 
-		Route::get('/api/shelf-units/{shelf}/{perPage?}', 'WarhouseController@showShelfAllUnits')->name('shelf-units');
-		Route::get('/api/search-shelf-units/{shelf}/{search}/{perPage}', 'WarhouseController@searchShelfAllUnits')->name('search-shelf-units');
+		Route::get('/api/shelf-units/{shelf}/{perPage?}', 'WarehouseController@showShelfAllUnits')->name('shelf-units');
+		Route::get('/api/search-shelf-units/{shelf}/{search}/{perPage}', 'WarehouseController@searchShelfAllUnits')->name('search-shelf-units');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 	

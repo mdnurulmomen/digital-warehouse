@@ -93,7 +93,7 @@ class MerchantController extends Controller
     public function deleteMerchant($owner, $perPage)
     {
     	$userToDelete = Merchant::findOrFail($owner);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $userToDelete->delete();
 
         return $this->showAllMerchants($perPage);
@@ -102,7 +102,7 @@ class MerchantController extends Controller
     public function restoreMerchant($owner, $perPage)
     {
     	$userToRestore = Merchant::withTrashed()->findOrFail($owner);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $userToRestore->restore();
 
         return $this->showAllMerchants($perPage);

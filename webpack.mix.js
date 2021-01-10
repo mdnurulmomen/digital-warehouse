@@ -11,7 +11,7 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/assets/js/app.js', 'public/js')
+mix.js('resources/assets/js/admin.js', 'public/js')
     .js('resources/assets/js/merchant.js', 'public/js')
     .js('resources/assets/js/owner.js', 'public/js')
     .js('resources/assets/js/warehouse.js', 'public/js')

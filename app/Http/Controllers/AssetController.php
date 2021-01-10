@@ -64,7 +64,7 @@ class AssetController extends Controller
     public function deleteStorageType($asset, $perPage)
     {
     	$assetToDelete = StorageType::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
         return $this->showAllStorageTypes($perPage);
@@ -73,7 +73,7 @@ class AssetController extends Controller
     public function restoreStorageType($asset, $perPage)
     {
     	$userToRestore = StorageType::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $userToRestore->restore();
 
         return $this->showAllStorageTypes($perPage);
@@ -222,7 +222,7 @@ class AssetController extends Controller
     public function deleteContainer($asset, $perPage)
     {
         $containerToDelete = Container::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $containerToDelete->delete();
 
         return $this->showAllContainers($perPage);
@@ -231,7 +231,7 @@ class AssetController extends Controller
     public function restoreContainer($asset, $perPage)
     {
         $containerToRestore = Container::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $containerToRestore->restore();
 
         return $this->showAllContainers($perPage);
@@ -307,7 +307,7 @@ class AssetController extends Controller
     public function deleteRentPeriod($asset, $perPage)
     {
         $assetToDelete = RentPeriod::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
         return $this->showAllRentPeriods($perPage);
@@ -316,7 +316,7 @@ class AssetController extends Controller
     public function restoreRentPeriod($asset, $perPage)
     {
         $assetToRestore = RentPeriod::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $assetToRestore->restore();
 
         return $this->showAllRentPeriods($perPage);
@@ -392,7 +392,7 @@ class AssetController extends Controller
     public function deleteVariationType($asset, $perPage)
     {
         $assetToDelete = VariationType::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
         return $this->showAllVariationTypes($perPage);
@@ -401,7 +401,7 @@ class AssetController extends Controller
     public function restoreVariationType($asset, $perPage)
     {
         $assetToRestore = VariationType::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $assetToRestore->restore();
 
         return $this->showAllVariationTypes($perPage);
@@ -477,7 +477,7 @@ class AssetController extends Controller
     public function deleteVariation($asset, $perPage)
     {
         $assetToDelete = Variation::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
         return $this->showAllVariations($perPage);
@@ -486,7 +486,7 @@ class AssetController extends Controller
     public function restoreVariation($asset, $perPage)
     {
         $assetToRestore = Variation::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $assetToRestore->restore();
 
         return $this->showAllVariations($perPage);

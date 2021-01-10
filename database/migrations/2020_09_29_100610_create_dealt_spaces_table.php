@@ -14,11 +14,11 @@ class CreateDealtSpacesTable extends Migration
     public function up()
     {
         // each of many racks / shelfs / units  hired by merchant
-        // should update warhouse_container_shelf_units / warhouse_container_shelfs / warhouse_containers when it is included in dealt_spaces
+        // should update warehouse_container_shelf_units / warehouse_container_shelfs / warehouse_containers when it is included in dealt_spaces
         // should release related spaces when merchant_deal is expired
         Schema::create('dealt_spaces', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('space_type', 100);  // warhouse_container_shelf_units / warhouse_container_shelfs / warhouse_container_shelf_units
+            $table->string('space_type', 100);  // warehouse_container_shelf_units / warehouse_container_shelfs / warehouse_container_shelf_units
             $table->unsignedInteger('space_id');
             $table->unsignedInteger('merchant_deal_id');
         });

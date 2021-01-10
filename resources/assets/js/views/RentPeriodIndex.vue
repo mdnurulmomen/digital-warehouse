@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="'rent-periods'" 
-			:message="'All our warhouse rent-periods'"
+			:message="'All our warehouse rent-periods'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Resources\Web\WarhouseResource;
+use App\Http\Resources\Web\WarehouseResource;
 
 class ProfileController extends Controller
 {
@@ -123,9 +123,9 @@ class ProfileController extends Controller
 		$request->validate([
             'first_name' => 'nullable|string|max:100',
             'last_name' => 'nullable|string|max:100',
-            'user_name' => 'required|string|max:100|unique:warhouse_owners,user_name,'.$owner->id,
-            'email' => 'required|string|max:100|unique:warhouse_owners,email,'.$owner->id,
-            'mobile' => 'required|string|max:50|unique:warhouse_owners,mobile,'.$owner->id,
+            'user_name' => 'required|string|max:100|unique:warehouse_owners,user_name,'.$owner->id,
+            'email' => 'required|string|max:100|unique:warehouse_owners,email,'.$owner->id,
+            'mobile' => 'required|string|max:50|unique:warehouse_owners,mobile,'.$owner->id,
         ]);
 
 		$owner->first_name = $request->first_name;
@@ -161,82 +161,82 @@ class ProfileController extends Controller
 		return response("Password doesn't match", 401);
 	}
 
-	// Warhouse
-	public function showWarhouseProfile()
+	// Warehouse
+	public function showWarehouseProfile()
 	{
-		// return response(Auth::guard('warhouse')->user(), 200);
-		return new WarhouseResource(Auth::guard('warhouse')->user());
+		// return response(Auth::guard('warehouse')->user(), 200);
+		return new WarehouseResource(Auth::guard('warehouse')->user());
 	}
 
-	public function updateWarhouseProfile(Request $request)
+	public function updateWarehouseProfile(Request $request)
 	{
-		$warhouse = Auth::guard('warhouse')->user();
+		$warehouse = Auth::guard('warehouse')->user();
 
 		$request->validate([
             'name' => 'nullable|string|max:100',
-            'code' => 'required|string|max:100|unique:warhouses,code,'.$warhouse->id,
-            'user_name' => 'required|string|max:100|unique:warhouses,user_name,'.$warhouse->id,
-            'email' => 'required|string|max:100|unique:warhouses,email,'.$warhouse->id,
-            'mobile' => 'required|string|max:50|unique:warhouses,mobile,'.$warhouse->id,
+            'code' => 'required|string|max:100|unique:warehouses,code,'.$warehouse->id,
+            'user_name' => 'required|string|max:100|unique:warehouses,user_name,'.$warehouse->id,
+            'email' => 'required|string|max:100|unique:warehouses,email,'.$warehouse->id,
+            'mobile' => 'required|string|max:50|unique:warehouses,mobile,'.$warehouse->id,
         ]);
 
-		$warhouse->name = $request->name;
-		$warhouse->code = $request->code;
-		$warhouse->user_name = $request->user_name;
-		$warhouse->email = $request->email;
-		$warhouse->mobile = $request->mobile;
-		$warhouse->map_preview = $request->site_map_preview ?? NULL;
+		$warehouse->name = $request->name;
+		$warehouse->code = $request->code;
+		$warehouse->user_name = $request->user_name;
+		$warehouse->email = $request->email;
+		$warehouse->mobile = $request->mobile;
+		$warehouse->map_preview = $request->site_map_preview ?? NULL;
 
-		$warhouse->save();
+		$warehouse->save();
 
-		return $this->showWarhouseProfile();
+		return $this->showWarehouseProfile();
 	}
 
-	public function updateWarhouseDeal(Request $request)
+	public function updateWarehouseDeal(Request $request)
 	{
-		$warhouse = Auth::guard('warhouse')->user();
+		$warehouse = Auth::guard('warehouse')->user();
 
 		$request->validate([
-           	'warhouse_owner_id' => 'required|numeric|exists:warhouse_owners,id',
-        	'warhouse_deal' => 'required|string|max:255', 
+           	'warehouse_owner_id' => 'required|numeric|exists:warehouse_owners,id',
+        	'warehouse_deal' => 'required|string|max:255', 
         ]);
 
-		$warhouse->warhouse_owner_id = $request->warhouse_owner_id;
-		$warhouse->warhouse_deal = $request->warhouse_deal;
+		$warehouse->warehouse_owner_id = $request->warehouse_owner_id;
+		$warehouse->warehouse_deal = $request->warehouse_deal;
 
-		$warhouse->save();
+		$warehouse->save();
 
-		return $this->showWarhouseProfile();
+		return $this->showWarehouseProfile();
 	}
 
-	public function updateWarhouseFeaturesAndPreviews(Request $request)
+	public function updateWarehouseFeaturesAndPreviews(Request $request)
 	{
-		$warhouse = Auth::guard('warhouse')->user();
+		$warehouse = Auth::guard('warehouse')->user();
 
 		$request->validate([
             'feature.features' => 'required|string',
             'previews' => 'required|array',
         ]);
 
-        $warhouse->feature()->updateOrCreate(
-            [ 'warhouse_id' => $warhouse->id ],
+        $warehouse->feature()->updateOrCreate(
+            [ 'warehouse_id' => $warehouse->id ],
             [ 'features' => $request->feature['features']]
         );
 
         if (count($request->previews)) {
             
-            $warhouse->warhouse_previews = $request->previews;
+            $warehouse->warehouse_previews = $request->previews;
 
         }
 
-		// $warhouse->save();
+		// $warehouse->save();
 
-		return $this->showWarhouseProfile();
+		return $this->showWarehouseProfile();
 	}
 
-	public function updateWarhouseStorages(Request $request)
+	public function updateWarehouseStorages(Request $request)
 	{
-		$warhouse = Auth::guard('warhouse')->user();
+		$warehouse = Auth::guard('warehouse')->user();
 
 		$request->validate([
             'storages' => 'required|array',
@@ -247,18 +247,18 @@ class ProfileController extends Controller
 
         if (count($request->storages)) {
             
-            $warhouse->warhouse_storages = $request->storages;
+            $warehouse->warehouse_storages = $request->storages;
 
         }
 
-		// $warhouse->save();
+		// $warehouse->save();
 
-		return $this->showWarhouseProfile();
+		return $this->showWarehouseProfile();
 	}
 
-	public function updateWarhouseContainers(Request $request)
+	public function updateWarehouseContainers(Request $request)
 	{
-		$warhouse = Auth::guard('warhouse')->user();
+		$warehouse = Auth::guard('warehouse')->user();
 
 		$request->validate([
             'containers' => 'required|array',
@@ -269,25 +269,25 @@ class ProfileController extends Controller
 
         if (count($request->containers)) {
             
-            $warhouse->warhouse_containers = $request->containers;
+            $warehouse->warehouse_containers = $request->containers;
 
         }
 
-		return $this->showWarhouseProfile();
+		return $this->showWarehouseProfile();
 	}
 
-	public function updateWarhousePassword(Request $request)
+	public function updateWarehousePassword(Request $request)
 	{
 		$request->validate([
             'current_password' => 'required|string|max:255',
             'password' => 'required|string|max:255|confirmed',
         ]);
 
-        $warhouse = Auth::guard('warhouse')->user();
+        $warehouse = Auth::guard('warehouse')->user();
 
-		if (Hash::check($request->current_password, $warhouse->password)) {
+		if (Hash::check($request->current_password, $warehouse->password)) {
 		    
-			$warhouse->update([
+			$warehouse->update([
 	            'password' => Hash::make($request->password)
 	        ]);
 

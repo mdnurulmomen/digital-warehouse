@@ -63,7 +63,7 @@ class ProductController extends Controller
     public function deleteProductCategory($asset, $perPage)
     {
         $assetToDelete = ProductCategory::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
         return $this->showProductAllCategories($perPage);
@@ -72,7 +72,7 @@ class ProductController extends Controller
     public function restoreProductCategory($asset, $perPage)
     {
         $assetToRestore = ProductCategory::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $assetToRestore->restore();
 
         return $this->showProductAllCategories($perPage);
@@ -221,7 +221,7 @@ class ProductController extends Controller
     public function deleteProduct($asset, $perPage)
     {
         $assetToDelete = ProductCategory::findOrFail($asset);
-        // $userToDelete->warhouses()->delete();
+        // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
         return $this->showProductAllCategories($perPage);
@@ -230,7 +230,7 @@ class ProductController extends Controller
     public function restoreProduct($asset, $perPage)
     {
         $assetToRestore = ProductCategory::withTrashed()->findOrFail($asset);
-        // $userToRestore->warhouses()->restore();
+        // $userToRestore->warehouses()->restore();
         $assetToRestore->restore();
 
         return $this->showProductAllCategories($perPage);

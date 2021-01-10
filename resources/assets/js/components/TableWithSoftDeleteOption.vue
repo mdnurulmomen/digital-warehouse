@@ -217,8 +217,8 @@
 				else if (columnValue.match(/status/gi)) {
 					return object.active ? 'Approved' : 'Pending';
 				}
-				else if (columnValue.match(/total_warhouses/gi)) {
-					return object.warhouses.length;
+				else if (columnValue.match(/owner_total_warehouses/gi)) {
+					return object.warehouses.length;
 				}
 				else if (columnValue.match(/name/gi)) {
 					return object.name;
@@ -320,22 +320,22 @@
 					}
 
 				}
-				else if (columnName.match(/#/gi) && columnName.match(/warhouses/gi)) {
+				else if (columnName.match(/#/gi) && columnName.match(/warehouses/gi)) {
 					
 					if (this.ascending) {
 						this.ascending = false;
 						this.descending = true;
-						this.descendingArrayLength('warhouses');
+						this.descendingArrayLength('warehouses');
 					}
 					else if (this.descending) {
 						this.ascending = true;
 						this.descending = false;
-						this.ascendingArrayLength('warhouses');
+						this.ascendingArrayLength('warehouses');
 					}
 					else {
 						this.ascending = true;
 						this.descending = false;
-						this.ascendingArrayLength('warhouses');
+						this.ascendingArrayLength('warehouses');
 					}
 					
 				}

@@ -85,7 +85,7 @@ class ManagerController extends Controller
     public function deleteManager($manager, $perPage)
     {
     	$userToDelete = Manager::findOrFail($manager);
-        // $userToDelete->warhouse()->delete();
+        // $userToDelete->warehouse()->delete();
         $userToDelete->delete();
 
         return $this->showAllManagers($perPage);
@@ -94,7 +94,7 @@ class ManagerController extends Controller
     public function restoreManager($manager, $perPage)
     {
         $userToRestore = Manager::withTrashed()->findOrFail($manager);
-        // $userToRestore->warhouse()->restore();
+        // $userToRestore->warehouse()->restore();
         $userToRestore->restore();
 
         return $this->showAllManagers($perPage);
@@ -110,9 +110,9 @@ class ManagerController extends Controller
             $query->orWhere($column, 'like', "%$search%");
         }
 
-        $query->orWhereHas('warhouse.warhouse', function($q) use ($search){
+        $query->orWhereHas('warehouse.warehouse', function($q) use ($search){
             $q->where('name', 'like', "%$search%")
-              ->orWhere('warhouse_code', 'like', "%$search%");
+              ->orWhere('warehouse_code', 'like', "%$search%");
         });
 
         return response()->json([

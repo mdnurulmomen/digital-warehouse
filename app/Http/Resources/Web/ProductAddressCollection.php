@@ -40,7 +40,7 @@ class ProductAddressCollection extends ResourceCollection
         foreach ($this->collection as $productAddress) {
            
             if (strpos($productAddress->space_type, 'ContainerStatus')) {
-                array_push($containers['containers'], $productAddress->space->loadMissing('warhouseContainer.container'));
+                array_push($containers['containers'], $productAddress->space->loadMissing('warehouseContainer.container'));
             }
 
             else if (strpos($productAddress->space_type, 'ShelfStatus')) {
@@ -48,7 +48,7 @@ class ProductAddressCollection extends ResourceCollection
                 
                 if (count($shelves['container']) < 2) {
 
-                    $shelves['container'] = array_merge($shelves['container'], $productAddress->space->parentContainer->loadMissing('warhouseContainer.container')->toArray());
+                    $shelves['container'] = array_merge($shelves['container'], $productAddress->space->parentContainer->loadMissing('warehouseContainer.container')->toArray());
 
                 }
             }
@@ -61,7 +61,7 @@ class ProductAddressCollection extends ResourceCollection
                 }
 
                 if (count($units['container']) < 2) {
-                    $units['container'] = array_merge($units['container'], $productAddress->space->parentShelf->parentContainer->loadMissing('warhouseContainer.container')->toArray());
+                    $units['container'] = array_merge($units['container'], $productAddress->space->parentShelf->parentContainer->loadMissing('warehouseContainer.container')->toArray());
                 }
             }
 

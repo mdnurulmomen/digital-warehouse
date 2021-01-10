@@ -18,8 +18,8 @@ class CreateRentsTable extends Migration
             $table->unsignedSmallInteger('storing_price')->default(100);
             $table->unsignedSmallInteger('selling_price')->default(100);
             $table->unsignedTinyInteger('rent_period_id');
-            $table->string('warhouse_storer_type', 100);
-            $table->unsignedInteger('warhouse_storer_id');
+            $table->string('warehouse_storer_type', 100);
+            $table->unsignedInteger('warehouse_storer_id');
         });
     }
 

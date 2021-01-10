@@ -46,8 +46,8 @@ import WarehouseSideMenuBar from './views/WarehouseSideMenuBar'
 
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
-import Profile from './views/WarhouseProfileComponent'
-import ContainerIndex from './views/WarhouseContainerIndex'
+import Profile from './views/WarehouseProfileComponent'
+import ContainerIndex from './views/WarehouseContainerIndex'
 import ContainerShelfIndex from './views/ContainerShelfIndex'
 import ShelfUnitIndex from './views/ShelfUnitIndex'
 

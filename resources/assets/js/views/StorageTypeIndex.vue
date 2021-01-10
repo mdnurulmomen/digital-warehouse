@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="'storage-types'" 
-			:message="'All our warhouse storage-types'"
+			:message="'All our warehouse storage-types'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">

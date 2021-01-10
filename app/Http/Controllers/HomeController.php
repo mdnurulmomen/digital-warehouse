@@ -17,7 +17,7 @@ class HomeController extends Controller
         $this->middleware('auth:admin')->only('adminHome');
         $this->middleware('auth:manager')->only('managerHome');
         $this->middleware('auth:owner')->only('ownerHome');
-        $this->middleware('auth:warhouse')->only('warhouseHome');
+        $this->middleware('auth:warehouse')->only('warehouseHome');
     }
 
     /**
@@ -65,8 +65,8 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function warhouseHome()
+    public function warehouseHome()
     {
-        return view('layouts.warhouse');
+        return view('layouts.warehouse');
     }
 }

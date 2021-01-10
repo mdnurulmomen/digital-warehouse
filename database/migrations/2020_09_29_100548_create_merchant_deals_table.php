@@ -13,12 +13,12 @@ class CreateMerchantDealsTable extends Migration
      */
     public function up()
     {
-        // first step to store at any warhouse
+        // first step to store at any warehouse
         Schema::create('merchant_deals', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamp('issued_at')->useCurrent();
             $table->timestamp('expired_at')->useCurrent();
-            $table->unsignedMediumInteger('paid_amount')->default(0); // paid price for this product to warhouse authority
+            $table->unsignedMediumInteger('paid_amount')->default(0); // paid price for this product to warehouse authority
             // $table->boolean('e_commerce_fulfillment')->default(0); // whether merchant wants to delvery services or not
             $table->unsignedInteger('merchant_id');
         });
