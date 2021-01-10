@@ -9,7 +9,7 @@ class Product extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
     
-    // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warhouseContainer.container'];
+    // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warehouseContainer.container'];
 
     protected $casts = [
         'has_variations' => 'boolean'
@@ -32,7 +32,7 @@ class Product extends Model
 
     public function addresses()
     {
-        return $this->hasMany(WarhouseProduct::class, 'product_id', 'id');
+        return $this->hasMany(WarehouseProduct::class, 'product_id', 'id');
     }
 
     public function setProductVariationsAttribute($variations = array())
@@ -116,12 +116,12 @@ class Product extends Model
                     'engaged' => 0
                 ]);
 
-                if ($productAddress->space instanceof WarhouseContainerStatus) {
+                if ($productAddress->space instanceof WarehouseContainerStatus) {
 
                     $this->updateChildShelves($productAddress->space, 0);
 
                 }
-                else if ($productAddress->space instanceof WarhouseContainerShelfStatus) {
+                else if ($productAddress->space instanceof WarehouseContainerShelfStatus) {
 
                     $this->updateChildUnits($productAddress->space, 0);
 
@@ -142,17 +142,17 @@ class Product extends Model
 
             foreach ($containers as $container) {
                 
-                $warhouseExpectedContainer = WarhouseContainerStatus::find($container->id);
+                $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
-                $warhouseExpectedContainer->product()->create([
+                $warehouseExpectedContainer->product()->create([
                     'product_id' => $this->id,
                 ]);
 
-                $warhouseExpectedContainer->update([
+                $warehouseExpectedContainer->update([
                     'engaged' => 1
                 ]);
 
-                $this->updateChildShelves($warhouseExpectedContainer, 1);
+                $this->updateChildShelves($warehouseExpectedContainer, 1);
 
             }
         }
@@ -164,17 +164,17 @@ class Product extends Model
 
             foreach ($container->shelves as $containerShelf) {
                 
-                $warhouseExpectedShelf = WarhouseContainerShelfStatus::find($containerShelf->id);
+                $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
-                $warhouseExpectedShelf->product()->create([
+                $warehouseExpectedShelf->product()->create([
                     'product_id' => $this->id,
                 ]);
 
-                $warhouseExpectedShelf->update([
+                $warehouseExpectedShelf->update([
                     'engaged' => 1
                 ]);
 
-                $this->updateChildUnits($warhouseExpectedShelf, 1);
+                $this->updateChildUnits($warehouseExpectedShelf, 1);
 
             }
 
@@ -189,13 +189,13 @@ class Product extends Model
 
             foreach ($container->shelf->units as $containerShelfUnit) {
                 
-                $warhouseExpectedShelfUnit = WarhouseContainerShelfUnitStatus::find($containerShelfUnit->id);
+                $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                $warhouseExpectedShelfUnit->product()->create([
+                $warehouseExpectedShelfUnit->product()->create([
                     'product_id' => $this->id,
                 ]);
 
-                $warhouseExpectedShelfUnit->update([
+                $warehouseExpectedShelfUnit->update([
                     'engaged' => 1
                 ]);
 
@@ -209,17 +209,17 @@ class Product extends Model
 
     protected function updateParentContainer($containerId)
     {
-        $warhouseExpectedContainer = WarhouseContainerStatus::find($containerId);
+        $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
 
         // partially engaged
-        $warhouseExpectedContainer->update([
+        $warehouseExpectedContainer->update([
             'engaged' => 0.5
         ]);
 
         // all shelves are engaged
-        if ($warhouseExpectedContainer->containerShelfStatuses->count()===$warhouseExpectedContainer->containerShelfStatuses()->where('engaged', 1)->count()) {
+        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1)->count()) {
             
-            $warhouseExpectedContainer->update([
+            $warehouseExpectedContainer->update([
                 'engaged' => 1
             ]); 
 
@@ -229,17 +229,17 @@ class Product extends Model
     protected function updateParentShelf($container)
     {
         // Related Shelf
-        $warhouseExpectedShelf = WarhouseContainerShelfStatus::find($container->shelf->id);
+        $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
 
         // partially engaged
-        $warhouseExpectedShelf->update([
+        $warehouseExpectedShelf->update([
             'engaged' => 0.5
         ]);
 
         // all shelves are engaged
-        if ($warhouseExpectedShelf->containerShelfUnitStatuses->count()===$warhouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1)->count()) {
+        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1)->count()) {
             
-            $warhouseExpectedShelf->update([
+            $warehouseExpectedShelf->update([
                 'engaged' => 1
             ]);
 
@@ -249,7 +249,7 @@ class Product extends Model
         $this->updateParentContainer($container->id);
     }
 
-    protected function updateChildShelves(WarhouseContainerStatus $container, $newValue)
+    protected function updateChildShelves(WarehouseContainerStatus $container, $newValue)
     {
         foreach ($container->containerShelfStatuses as $containerShelf) {
            
@@ -262,7 +262,7 @@ class Product extends Model
         }
     }
 
-    protected function updateChildUnits(WarhouseContainerShelfStatus $shelf, $newValue)
+    protected function updateChildUnits(WarehouseContainerShelfStatus $shelf, $newValue)
     {
         $shelf->containerShelfUnitStatuses()->update([
             'engaged' => $newValue

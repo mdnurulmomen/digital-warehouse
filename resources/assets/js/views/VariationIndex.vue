@@ -303,7 +303,7 @@
 
 		watch: {
 			'singleAssetData.variation_type': function (object) {
-				if (Object.keys(object).length > 0) {
+				if (object && Object.keys(object).length > 0) {
 					this.singleAssetData.variation_type_id = object.id;
 				}
 			},
@@ -605,7 +605,7 @@
 
 					case 'variation_type' :
 
-						if (Object.keys(this.singleAssetData.variation_type).length == 0) {
+						if (!this.singleAssetData.variation_type || Object.keys(this.singleAssetData.variation_type).length == 0) {
 							this.errors.asset.variation_type = 'Type is required';
 						}
 						else{

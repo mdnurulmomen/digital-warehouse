@@ -525,7 +525,7 @@
 							      
 						          	<div class="col-sm-12">
 						          		<div class="form-row">	
-		                              		<div class="col-md-12 form-group" v-if="singleWarehouseData.storages.length && singleWarehouseData.storages.length==errors.warehouse.storage_types.length">
+		                              		<div class="col-md-12 form-group" v-if="singleWarehouseData.storages.length">
 
 			                              		<transition-group name="new-storage">
 
@@ -611,7 +611,7 @@
 																</div>
 															</div>
 
-															<div class="form-row" v-if="singleWarehouseData.storages[index].feature && singleWarehouseData.storages.length==errors.warehouse.storage_features.length">
+															<div class="form-row" v-if="singleWarehouseData.storages[index].feature">
 																<div class="col-md-12 form-group">
 																	<label>Features</label>
 
@@ -2173,6 +2173,11 @@
 							if (Object.keys(this.singleWarehouseData.storages[index].storage_type).length === 0) {
 								this.errors.warehouse.storage_types[index] = 'Storage type is required';
 							}
+							else if (this.singleWarehouseData.storages.filter(currentStorage=>currentStorage.storage_type.id==this.singleWarehouseData.storages[index].storage_type.id).length > 1) {
+
+								this.errors.warehouse.storage_types[index] = 'Same storage type selected';
+
+							}
 							else{
 								this.submitForm = true;
 								this.errors.warehouse.storage_types[index] = null;
@@ -2222,6 +2227,11 @@
 							
 							if (Object.keys(this.singleWarehouseData.containers[index].container).length < 2) {
 								this.errors.warehouse.containers[index].container = 'Container type is required';
+							}
+							else if (this.singleWarehouseData.containers.filter(currentContainer=>currentContainer.container.id==this.singleWarehouseData.containers[index].container.id).length > 1) {
+
+								this.errors.warehouse.containers[index].container = 'Same Container type selected';
+
 							}
 							else{
 								this.submitForm = true;

@@ -352,7 +352,7 @@ class AssetController extends Controller
 
         }
 
-        return VariationType::with('variations')->has('variations')->get();
+        return VariationType::with('variations')->get();
     }
 
     public function storeVariationType(Request $request, $perPage)

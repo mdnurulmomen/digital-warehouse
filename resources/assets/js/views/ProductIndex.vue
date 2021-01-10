@@ -2057,9 +2057,9 @@
 		
 			},
 			setAvailableSpaces() {
-				this.emptyContainers = this.allContainers.emptyContainers;
-				this.emptyShelfContainers = this.allContainers.emptyShelfContainers;
-				this.emptyUnitContainers = this.allContainers.emptyUnitContainers;
+				this.emptyContainers = [ ...this.allContainers.emptyContainers ];
+				this.emptyShelfContainers = [ ...this.allContainers.emptyShelfContainers ];
+				this.emptyUnitContainers = [ ...this.allContainers.emptyUnitContainers ];
 			},
 			resetAvailableSpaces() {
 

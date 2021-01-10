@@ -136,7 +136,7 @@
                               			placeholder="Parent Category" 
                                   		label="name" 
                                   		track-by="id" 
-                                  		:options="allCategories" 
+                                  		:options="categoriesToShow" 
                                   		:required="true" 
                                   		:allow-empty="false"
                                   		selectLabel = "Press/Click"
@@ -265,6 +265,8 @@
 	        	submitForm : true,
 
 	        	allCategories : [],
+	        	categoriesToShow : [],
+
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
 
@@ -410,6 +412,8 @@
 				this.createMode = true;
 	        	this.submitForm = true;
 	        	
+				this.categoriesToShow = [ ...this.allCategories ];
+
 				this.errors = {
 					asset : {},
 				};
@@ -423,6 +427,9 @@
 			openContentEditForm(object) {
 				this.submitForm = true;
 				this.createMode = false;
+
+				this.categoriesToShow = [ ...this.allCategories ];
+				this.categoriesToShow.splice(this.categoriesToShow.findIndex(category=>category.id==object.id), 1);
 
 				this.errors = {
 					asset : {},

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\ProfilePreview;
-use App\Models\WarhouseManager;
+use App\Models\WarehouseManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -48,7 +48,7 @@ class Manager extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['profilePreview', 'warhouse'];
+    protected $with = ['profilePreview', 'warehouse'];
 
     /**
      * Set the user's first name.
@@ -85,8 +85,8 @@ class Manager extends Authenticatable
         return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
     }
 
-    public function warhouse()
+    public function warehouse()
     {
-        return $this->hasOne(WarhouseManager::class, 'manager_id', 'id');
+        return $this->hasOne(WarehouseManager::class, 'manager_id', 'id');
     }
 }

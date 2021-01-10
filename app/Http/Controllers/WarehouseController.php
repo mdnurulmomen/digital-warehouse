@@ -353,7 +353,7 @@ class WarehouseController extends Controller
     // warehouse-contaners
     public function showAllWarehouseContainers($perPage = false) {
         
-        if ($perPage) {
+        // if ($perPage) {
             
             $emptyContainers = WarehouseContainerStatus::where('engaged', 0)->get();
 
@@ -387,7 +387,7 @@ class WarehouseController extends Controller
                 'emptyUnitContainers' => $emptyUnitContainers, 
             ];
 
-        }
+        // }
                                 
     }
 
