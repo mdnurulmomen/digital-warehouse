@@ -30,7 +30,7 @@
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllProducts="fetchAllProducts"
+											  		@fetchAllContents="fetchAllProducts"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -102,7 +102,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
+																				class="btn btn-grd-warning btn-icon" 
 																				@click="openContentDispatchForm(content)"
 																			>
 																				<i class="fas fa-truck"></i>
@@ -230,6 +230,7 @@
 	                                  		:options="['bulk', 'retail']" 
 	                                  		:required="true" 
 	                                  		:allow-empty="false" 
+	                                  		@input="setProductMode"
 	                              		>
 	                                	</multiselect>
 							        	Product Details
@@ -403,6 +404,7 @@
 													:color="{checked: 'green', unchecked: 'blue'}"
 													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
 													:readonly="!createMode" 
+													:disabled="productMode=='bulk'" 
 													@change="resetProductVariations()"
 												/>
 											</div>
@@ -437,7 +439,7 @@
 											</div>
 											<div 
 												class="form-group col-md-9" 
-												v-if="singleProductData.variations.length"
+												v-if="singleProductData.variations && singleProductData.variations.length"
 											>
 
 												<div 
@@ -601,6 +603,7 @@
 					                                  		:allow-empty="false"
 					                              			placeholder="Containers / Shelves / Units" 
 					                                  		:class="!errors.product.spaces[index].product_space_type  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleProductData.spaces.length > (index+1)" 
 					                                  		@input="setProductSpaceType(index)" 
 					                                  		@close="validateFormInput('product_space_type')"
 					                              		>
@@ -634,8 +637,8 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                                  		:class="!errors.product.spaces[index].product_containers  ? 'is-valid' : 'is-invalid'" 
-					                                  		@remove="resetEmptyContainers" 
-					                                  		@close="validateFormInput('product_containers')"
+					                                  		:disabled="singleProductData.spaces.length > (index+1)"
+					                                  		@close="validateFormInput('product_containers')" 
 					                              		>
 					                                	</multiselect>
 					                                	<div 
@@ -663,8 +666,9 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                                  		:class="!errors.product.spaces[index].product_container ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleProductData.spaces.length > (index+1)"
 					                                  		@input="setAvailableShelves(index)"
-					                                  		@close="validateFormInput('product_container')"
+					                                  		@close="validateFormInput('product_container')" 
 					                              		>
 					                                	</multiselect>
 					                                	<div 
@@ -694,7 +698,8 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                                  		:class="!errors.product.spaces[index].product_shelves ? 'is-valid' : 'is-invalid'" 
-					                                  		@close="validateFormInput('product_shelves')"
+					                                  		:disabled="singleProductData.spaces.length > (index+1)"
+					                                  		@close="validateFormInput('product_shelves')" 
 					                              		>
 					                                	</multiselect>
 					                                	<div 
@@ -719,8 +724,9 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                                  		:class="!errors.product.spaces[index].product_container  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleProductData.spaces.length > (index+1)"
 					                                  		@input="setAvailableUnitShelves(index)" 
-					                                  		@close="validateFormInput('product_container')"
+					                                  		@close="validateFormInput('product_container')" 
 					                              		>
 					                                	</multiselect>
 					                                	<div 
@@ -746,8 +752,9 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                                  		:class="!errors.product.spaces[index].product_shelf  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleProductData.spaces.length > (index+1)"
 					                                  		@input="setAvailableUnits(index)" 
-					                                  		@close="validateFormInput('product_shelf')"
+					                                  		@close="validateFormInput('product_shelf')" 
 					                              		>
 					                                	</multiselect>
 					                                	<div 
@@ -777,7 +784,8 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                                  		:class="!errors.product.spaces[index].product_units ? 'is-valid' : 'is-invalid'" 
-					                                  		@close="validateFormInput('product_units')"
+					                                  		:disabled="singleProductData.spaces.length > (index+1)"
+					                                  		@close="validateFormInput('product_units')" 
 					                              		>
 					                                	</multiselect>
 					                                	<div 
@@ -864,14 +872,6 @@
 
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
-
-	<!-- 
-		<asset-view-modal 
-			:caller-page="'variation'" 
-			:asset-to-view="singleProductData" 
-			:properties-to-show="['name']"
-		></asset-view-modal>
- 	-->
 
  		<!-- Modal -->
 		<div class="modal fade" id="product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -985,7 +985,7 @@
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleProductData.variations.length">
+										<div class="form-row" v-if="singleProductData.has_variations && singleProductData.variations.length">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Variations :
 											</label>
@@ -1277,6 +1277,7 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
+	        	
 	        	currentTab : 'retail',
 	        	productMode : 'retail',
 
@@ -1462,7 +1463,8 @@
 					.get('/api/variation-types/')
 					.then(response => {
 						if (response.status == 200) {
-							this.allVariationTypes = response.data;
+							// this.allVariationTypes = response.data;
+							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 1);
 						}
 					})
 					.catch(error => {
@@ -1608,6 +1610,9 @@
 				$('#product-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
+				
+				// console.log(object);
+
 				this.step = 1;
 				this.createMode = false;
 	        	this.submitForm = true;
@@ -1637,65 +1642,14 @@
 				
 				}
 
-				this.singleProductData = Object.assign({}, this.singleProductData, object);
+				// this.singleProductData = Object.assign({}, this.singleProductData, object);
+				// this.singleProductData = { ...object };
+				this.singleProductData = JSON.parse(JSON.stringify(object));
 
 				this.setAvailableShelvesAndUnits();
 
 				$('#product-createOrEdit-modal').modal('show');
 			},
-			
-		/*
-			openContentDeleteForm(object) {	
-				this.singleProductData = object;
-				$('#delete-confirmation-modal').modal('show');
-			},
-			openContentRestoreForm(object) {	
-				this.singleProductData = object;
-				$('#restore-confirmation-modal').modal('show');
-			},
-    		deleteAsset(singleProductData) {
-				
-				axios
-					.delete('/products/' + singleProductData.id + '/' + this.perPage, singleProductData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("Category has been deleted", "Success");
-							this.allFetchedProducts = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-							$('#delete-confirmation-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					});
-
-			},
-			restoreAsset(singleProductData) {
-				
-				axios
-					.patch('/products/' + singleProductData.id + '/' + this.perPage, singleProductData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("Category has been restored", "Success");
-							this.allFetchedProducts = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-							$('#restore-confirmation-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					});
-
-			},
-		*/
 			storeProduct() {
 				
 				if (!this.verifyUserInput()) {
@@ -1815,7 +1769,7 @@
 
 					}
 
-					if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations) && !this.errorInArray(this.errors.product.spaces)) {
+					if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations)) {
 						this.step += 1;
 						this.submitForm = true;
 					}
@@ -1847,17 +1801,21 @@
 			addMoreSpace() {
 				if (this.singleProductData.spaces.length < 3) {
 					
-					this.resetAvailableSpaces();
+					// this.resetAvailableSpaces();
 
 					this.singleProductData.spaces.push({});
 					this.errors.product.spaces.push({});
 				}
 			},
 			removeSpace() {
-				if (this.singleProductData.spaces.length > 1) {	
+					
+				if (this.singleProductData.spaces.length > 1) {
+
 					this.singleProductData.spaces.pop();
 					this.errors.product.spaces.pop();
+				
 				}
+				
 			},
 			objectNameWithCapitalized ({ name, user_name }) {
 		      	if (name) {
@@ -1905,6 +1863,12 @@
 					this.availableVariations = this.singleProductData.variation_type.variations;
 				}
 			},
+			setProductMode() {
+				if (this.productMode=='bulk') {
+					this.singleProductData.has_variations = false;
+				}
+			},
+		/*
 			resetEmptyContainers({engaged, id, name, container_shelf_statuses, warehouse_container_id}) {
 
 				const existingContainer = currentContainer => 
@@ -1934,6 +1898,7 @@
 				}
 
 			},
+		*/
 		/*
 			resetEmptyShelves({engaged, id, name, warehouse_container_id, warehouse_container_status_id}) {
 
@@ -2043,17 +2008,7 @@
 
 				this.errors.product.spaces[index] = {};
 
-			/*
-				if (this.singleProductData.spaces[index].type=='containers') {
-					this.emptyContainers = this.allContainers.emptyContainers;
-				}
-				else if (this.singleProductData.spaces[index].type=='shelves') {
-					this.emptyShelfContainers = this.allContainers.emptyShelfContainers;
-				}
-				else if (this.singleProductData.spaces[index].type=='units') {
-					this.emptyUnitContainers = this.allContainers.emptyUnitContainers;
-				}
-			*/
+				this.resetAvailableSpaces();
 		
 			},
 			setAvailableSpaces() {

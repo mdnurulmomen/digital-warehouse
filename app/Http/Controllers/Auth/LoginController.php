@@ -83,7 +83,7 @@ class LoginController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function warhouseLogin(Request $request)
+    public function warehouseLogin(Request $request)
     {
         $this->validateLogin($request);
 
@@ -97,7 +97,7 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        if ($this->attemptWarhouseLogin($request)) {
+        if ($this->attemptWarehouseLogin($request)) {
             return $this->sendLoginResponse($request);
         }
 
@@ -203,9 +203,9 @@ class LoginController extends Controller
         return Auth::guard('manager')->attempt($this->attemptWithUsername($request), $request->filled('remember')) || Auth::guard('manager')->attempt($this->attemptWithMobile($request), $request->filled('remember')) || Auth::guard('manager')->attempt($this->attemptWithEmail($request), $request->filled('remember'));
     }
 
-    protected function attemptWarhouseLogin(Request $request)
+    protected function attemptWarehouseLogin(Request $request)
     {
-        return Auth::guard('warhouse')->attempt($this->attemptWithUsername($request), $request->filled('remember')) || Auth::guard('warhouse')->attempt($this->attemptWithMobile($request), $request->filled('remember')) || Auth::guard('warhouse')->attempt($this->attemptWithEmail($request), $request->filled('remember'));
+        return Auth::guard('warehouse')->attempt($this->attemptWithUsername($request), $request->filled('remember')) || Auth::guard('warehouse')->attempt($this->attemptWithMobile($request), $request->filled('remember')) || Auth::guard('warehouse')->attempt($this->attemptWithEmail($request), $request->filled('remember'));
     }
 
     protected function attemptWithEmail(Request $request)
@@ -257,7 +257,7 @@ class LoginController extends Controller
         Auth::guard('admin')->logout();
         Auth::guard('owner')->logout();
         Auth::guard('manager')->logout();
-        Auth::guard('warhouse')->logout();
+        Auth::guard('warehouse')->logout();
 
         $request->session()->invalidate();
 

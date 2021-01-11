@@ -30,7 +30,7 @@
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllWarehouses="fetchAllWarehouses"
+											  		@fetchAllContents="fetchAllWarehouses"
 											  	></search-and-addition-option>
 											</div>
 											

@@ -124,6 +124,12 @@ class Product extends Model
                 else if ($productAddress->space instanceof WarehouseContainerShelfStatus) {
 
                     $this->updateChildUnits($productAddress->space, 0);
+                    $this->updateParentContainer($productAddress->space->parentContainer);
+
+                }
+                else if ($productAddress->space instanceof WarehouseContainerShelfUnitStatus) {
+
+                    $this->updateParentShelf($productAddress->space->parentShelf);
 
                 }
 
@@ -178,7 +184,7 @@ class Product extends Model
 
             }
 
-            $this->updateParentContainer($container->id);
+            $this->updateParentContainer($warehouseExpectedShelf->parentContainer);
 
         }
     }
@@ -202,19 +208,14 @@ class Product extends Model
             }
 
             // Parent Shelf
-            $this->updateParentShelf($container);
+            $this->updateParentShelf($warehouseExpectedShelfUnit->parentShelf);
 
         }
     }
 
-    protected function updateParentContainer($containerId)
+    protected function updateParentContainer(WarehouseContainerStatus $warehouseExpectedContainer)
     {
-        $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
-
-        // partially engaged
-        $warehouseExpectedContainer->update([
-            'engaged' => 0.5
-        ]);
+        // $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
 
         // all shelves are engaged
         if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1)->count()) {
@@ -224,19 +225,31 @@ class Product extends Model
             ]); 
 
         }
+        // no shelf is engaged
+        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 0)->count()) {
+            
+            $warehouseExpectedContainer->update([
+                'engaged' => 0
+            ]); 
+
+        }
+        else {
+
+            // partially engaged
+            $warehouseExpectedContainer->update([
+                'engaged' => 0.5
+            ]);
+
+        }
+
     }
 
-    protected function updateParentShelf($container)
+    protected function updateParentShelf(WarehouseContainerShelfStatus $warehouseExpectedShelf)
     {
         // Related Shelf
-        $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
+        // $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
 
-        // partially engaged
-        $warehouseExpectedShelf->update([
-            'engaged' => 0.5
-        ]);
-
-        // all shelves are engaged
+        // all units are engaged
         if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1)->count()) {
             
             $warehouseExpectedShelf->update([
@@ -244,29 +257,54 @@ class Product extends Model
             ]);
 
         }
+        // no unit is engaged
+        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 0)->count()) {
+            
+            $warehouseExpectedShelf->update([
+                'engaged' => 0
+            ]);
+
+        }
+        else {
+
+            // partially engaged
+            $warehouseExpectedShelf->update([
+                'engaged' => 0.5
+            ]);
+
+        }
 
         // parent Container
-        $this->updateParentContainer($container->id);
+        $this->updateParentContainer($warehouseExpectedShelf->parentContainer);
+
     }
 
     protected function updateChildShelves(WarehouseContainerStatus $container, $newValue)
     {
-        foreach ($container->containerShelfStatuses as $containerShelf) {
-           
-            $containerShelf->update([
-                'engaged' => $newValue
-            ]);
+        if ($container->containerShelfStatuses->count()) {
+            
+            foreach ($container->containerShelfStatuses as $containerShelf) {
+               
+                $containerShelf->update([
+                    'engaged' => $newValue
+                ]);
 
-            $this->updateChildUnits($containerShelf, $newValue);
+                $this->updateChildUnits($containerShelf, $newValue);
+
+            }
 
         }
     }
 
     protected function updateChildUnits(WarehouseContainerShelfStatus $shelf, $newValue)
     {
-        $shelf->containerShelfUnitStatuses()->update([
-            'engaged' => $newValue
-        ]);
+        if ($shelf->containerShelfUnitStatuses->count()) {
+            
+            $shelf->containerShelfUnitStatuses()->update([
+                'engaged' => $newValue
+            ]);
+
+        }
     }
 
     protected function generateProductVariationSKU($productSKU, $variationId)
