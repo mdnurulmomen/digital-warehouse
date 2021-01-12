@@ -297,4 +297,54 @@ class ProfileController extends Controller
 		return response("Password doesn't match", 401);
 	}
 
+	// Manager
+	public function showManagerProfile()
+	{
+		return response(Auth::guard('manager')->user(), 200);
+	}
+
+	public function updateManagerProfile(Request $request)
+	{
+		$manager = Auth::guard('manager')->user();
+
+		$request->validate([
+            'first_name' => 'nullable|string|max:100',
+            'last_name' => 'nullable|string|max:100',
+            'user_name' => 'required|string|max:100|unique:managers,user_name,'.$manager->id,
+            'email' => 'required|string|max:100|unique:managers,email,'.$manager->id,
+            'mobile' => 'required|string|max:50|unique:managers,mobile,'.$manager->id,
+        ]);
+
+		$manager->first_name = $request->first_name;
+		$manager->last_name = $request->last_name;
+		$manager->user_name = $request->user_name;
+		$manager->email = $request->email;
+		$manager->mobile = $request->mobile;
+		$manager->profile_preview = $request->profile_preview['preview'] ?? NULL;
+
+		$manager->save();
+
+		return $this->showMerchantProfile();
+	}
+
+	public function updateManagerPassword(Request $request)
+	{
+		$request->validate([
+            'current_password' => 'required|string|max:255',
+            'password' => 'required|string|max:255|confirmed',
+        ]);
+
+        $manager = Auth::guard('manager')->user();
+
+		if (Hash::check($request->current_password, $manager->password)) {
+			$manager->update([
+	            'password' => Hash::make($request->password)
+	        ]);
+
+			return response('Password has been updated', 200);
+		}
+
+		return response("Password doesn't match", 401);
+	}
+
 }
