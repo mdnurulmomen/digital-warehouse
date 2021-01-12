@@ -89,12 +89,12 @@ Route::name('admin.')->group(function () {
 		Route::patch('/rent-periods/{period}/{perPage}', 'AssetController@restoreRentPeriod')->name('rent-periods');
 		Route::get('/api/search-rent-periods/{search}/{perPage}', 'AssetController@searchAllRentPeriods')->name('search-rent-periods');
 
-		Route::get('/api/variation-types/{perPage?}', 'AssetController@showAllVariationTypes')->name('variationTypes');
-		Route::post('/variation-types/{perPage}', 'AssetController@storeVariationType')->name('variationTypes');	
-		Route::put('/variation-types/{warehouse}/{perPage}', 'AssetController@updateVariationType')->name('variationTypes');	
-		Route::delete('/variation-types/{warehouse}/{perPage}', 'AssetController@deleteVariationType')->name('variationTypes');	
-		Route::patch('/variation-types/{warehouse}/{perPage}', 'AssetController@restoreVariationType')->name('variationTypes');
-		Route::get('/api/search-variation-types/{search}/{perPage}', 'AssetController@searchVariationTypes')->name('search-variationTypes');
+		Route::get('/api/variation-types/{perPage?}', 'AssetController@showAllVariationTypes')->name('variation-types');
+		Route::post('/variation-types/{perPage}', 'AssetController@storeVariationType')->name('variation-types');	
+		Route::put('/variation-types/{warehouse}/{perPage}', 'AssetController@updateVariationType')->name('variation-types');	
+		Route::delete('/variation-types/{warehouse}/{perPage}', 'AssetController@deleteVariationType')->name('variation-types');	
+		Route::patch('/variation-types/{warehouse}/{perPage}', 'AssetController@restoreVariationType')->name('variation-types');
+		Route::get('/api/search-variation-types/{search}/{perPage}', 'AssetController@searchVariationTypes')->name('search-variation-types');
 
 		Route::get('/api/variations/{perPage}', 'AssetController@showAllVariations')->name('variations');
 		Route::post('/variations/{perPage}', 'AssetController@storeNewVariation')->name('variations');	
@@ -112,9 +112,7 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/products/{perPage}', 'ProductController@showAllProducts')->name('products');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	
-		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');	
-		// Route::delete('/products/{asset}/{perPage}', 'ProductController@deleteProduct')->name('products');
-		// Route::patch('/products/{asset}/{perPage}', 'ProductController@restoreProduct')->name('products');
+		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');
 		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
 
 		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');

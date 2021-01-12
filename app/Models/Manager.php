@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\ProfilePreview;
-use App\Models\WarehouseManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +19,7 @@ class Manager extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'user_name', 'email', 'mobile', 'password',
+        'first_name', 'last_name', 'user_name', 'email', 'mobile', 'password', 'active'
     ];
 
     /**

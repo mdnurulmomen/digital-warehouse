@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\ProfilePreview;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;

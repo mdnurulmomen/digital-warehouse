@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -20,7 +19,7 @@ class WarehouseOwner extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'user_name', 'email', 'mobile', 'password',
+        'first_name', 'last_name', 'user_name', 'email', 'mobile', 'password', 'active'
     ];
 
     /**

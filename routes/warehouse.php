@@ -43,7 +43,7 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/container-types/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
 
 		Route::get('/api/containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('containers');
-		Route::get('/api/search-containers/{search}/{perPage}', 'WarehouseController@searchWarehouseAllContainers')->name('containers');
+		Route::get('/api/search-containers/{search}/{perPage}', 'WarehouseController@searchWarehouseAllContainers')->name('search-containers');
 
 		Route::get('/api/container-shelves/{container}/{perPage?}', 'WarehouseController@showContainerAllShelves')->name('container-shelves');
 		Route::get('/api/search-container-shelves/{container}/{search}/{perPage}', 'WarehouseController@searchContainerAllShelves')->name('search-container-shelves');

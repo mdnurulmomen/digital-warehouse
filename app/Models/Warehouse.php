@@ -2,14 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\WarehouseOwner;
-use App\Models\WarehousePreview;
-use App\Models\WarehouseFeature;
-use App\Models\WarehouseContainer;
-use App\Models\WarehouseStorageType;
 use Illuminate\Support\Facades\File;
-use App\Models\WarehouseStoragePreview;
-use App\Models\WarehouseStorageFeature;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -25,14 +18,12 @@ class Warehouse extends Authenticatable
      *
      * @var array
      */
+    protected $fillable = [
+        'name', 'code', 'user_name', 'email', 'mobile', 'password', 'site_map_preview', 'lat', 'lng', 'warehouse_deal', 'active', 'warehouse_owner_id'
+    ];
     
-    /*
-        protected $fillable = [
-            'name', 'code', 'user_name', 'email', 'mobile', 'password',
-        ];
-    */
    
-    protected $guarded = ['id'];
+    // protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for arrays.
