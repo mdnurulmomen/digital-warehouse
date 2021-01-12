@@ -47,7 +47,7 @@ import MerchantSideMenuBar from './views/MerchantSideMenuBar'
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Profile from './views/ProfileComponent'
-import ProductIndex from './views/MerchantProductIndex'
+import MyProductIndex from './views/MyProductIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -76,7 +76,7 @@ const router = new VueRouter({
         {
             path: '/my-products',
             name: 'my-products',
-            component: ProductIndex,
+            component: MyProductIndex,
         },
     ],
 });

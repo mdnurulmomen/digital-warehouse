@@ -1079,57 +1079,57 @@
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.name }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.name }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Code :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.code }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.code }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.user_name }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.user_name }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.email }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.email }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.mobile }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.mobile }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Location :</label>
-									<label class="col-sm-6 form-control-plaintext"></label>
+									<label class="col-sm-6 col-form-label"></label>
 								</div>
 							</div>
 
 							<div class="tab-pane" id="owner" role="tabpanel" v-if="singleWarehouseData.owner">
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Owner name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ getOwnerFullName(singleWarehouseData.owner) }}</label>
+									<label class="col-sm-6 col-form-label">{{ getOwnerFullName(singleWarehouseData.owner) }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.owner.user_name }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.user_name }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.owner.email }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.email }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleWarehouseData.owner.mobile }}</label>
+									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.mobile }}</label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Deal Details :</label>
-									<label class="col-sm-6 form-control-plaintext" v-html="singleWarehouseData.warehouse_deal"></label>
+									<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.warehouse_deal"></label>
 								</div>
 							</div>
 
 							<div class="tab-pane" id="features" role="tabpanel">	
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Warehouse Features:</label>
-									<label class="col-sm-6 form-control-plaintext" v-html="singleWarehouseData.feature.features"></label>
+									<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.feature.features"></label>
 								</div>
 								<div class="form-group form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1165,17 +1165,17 @@
 												<label class="col-sm-6 col-form-label font-weight-bold text-right">
 													Storage Name:
 												</label>
-												<label class="col-sm-6 form-control-plaintext" v-html="warehouseStorageType.storage_type.name"></label>
+												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
 											</div>
 
 											<div class="form-group form-row">
 												<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Code:</label>
-												<label class="col-sm-6 form-control-plaintext" v-html="warehouseStorageType.storage_type.code"></label>
+												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.code"></label>
 											</div>
 
 											<div class="form-group form-row">
 												<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Features:</label>
-												<label class="col-sm-6 form-control-plaintext" v-html="warehouseStorageType.feature.features"></label>
+												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.feature.features"></label>
 											</div>
 											
 								    		<div class="form-group form-row">
@@ -1216,22 +1216,35 @@
 												<label class="col-sm-6 col-form-label font-weight-bold text-right">
 													Container Type:
 												</label>
-												<label class="col-sm-6 form-control-plaintext">
+												<label class="col-sm-6 col-form-label">
 													{{ warehouseContainer.container.name }}
 												</label>
 											</div>
 
 											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Quantity:</label>
-												<label class="col-sm-6 form-control-plaintext">
+												<label class="col-sm-6 col-form-label font-weight-bold text-right">
+													Total Quantity:
+												</label>
+												<label class="col-sm-6 col-form-label">
 													{{ warehouseContainer.quantity }}
 												</label>
 											</div>
 
 											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Engaged Quantity:</label>
-												<label class="col-sm-6 form-control-plaintext">
+												<label class="col-sm-6 col-form-label font-weight-bold text-right">
+													Completely Engaged:
+												</label>
+												<label class="col-sm-6 col-form-label">
 													{{ warehouseContainer.engaged_quantity }}
+												</label>
+											</div>
+
+											<div class="form-group form-row">
+												<label class="col-sm-6 col-form-label font-weight-bold text-right">
+													Partially Engaged:
+												</label>
+												<label class="col-sm-6 col-form-label">
+													{{ warehouseContainer.partially_engaged }}
 												</label>
 											</div>
 											
@@ -1239,7 +1252,7 @@
 												<label class="col-sm-6 col-form-label font-weight-bold text-right">
 													Rents:
 												</label>
-												<label class="col-sm-6 form-control-plaintext">
+												<label class="col-sm-6 col-form-label">
 													{{ warehouseContainer.rents }}
 												</label>
 									    		

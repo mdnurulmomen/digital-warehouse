@@ -57,7 +57,7 @@
 											
 											<div class="col-sm-12 col-lg-12">
 
-												<ul class="nav nav-tabs md-tabs" role="tablist">
+												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query==''">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
 															data-toggle="tab" 
@@ -324,9 +324,8 @@
 				// this.$router.push({ name: 'container-shelves', params: { containerId,  containerName} })
 				this.$router.push({ path: `/container-shelves/` + containerId + '/' + containerName });
 			},
-            changeNumberContents(expectedContentsPerPage) {
+            changeNumberContents() {
 				this.pagination.current_page = 1;
-				this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
 					this.fetchAllContainers();

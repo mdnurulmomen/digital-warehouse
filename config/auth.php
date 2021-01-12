@@ -52,9 +52,9 @@ return [
             'provider' => 'owners',
         ],
 
-        'warhouse' => [
+        'warehouse' => [
             'driver' => 'session',
-            'provider' => 'warhouses',
+            'provider' => 'warehouses',
         ],
 
         'merchant' => [
@@ -100,12 +100,12 @@ return [
 
         'owners' => [
             'driver' => 'eloquent',
-            'model' => App\Models\WarhouseOwner::class,
+            'model' => App\Models\WarehouseOwner::class,
         ],
 
-        'warhouses' => [
+        'warehouses' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Warhouse::class,
+            'model' => App\Models\Warehouse::class,
         ],
 
         'merchants' => [

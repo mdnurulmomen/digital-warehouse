@@ -46,11 +46,11 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapAdminRoutes();
 
-        $this->mapWarhouseOwnerRoutes();
+        $this->mapWarehouseOwnerRoutes();
 
-        $this->mapWarhouseManagerRoutes();
+        $this->mapWarehouseManagerRoutes();
 
-        $this->mapWarhouseRoutes();
+        $this->mapWarehouseRoutes();
 
         $this->mapWebRoutes();
     }
@@ -77,7 +77,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapWarhouseOwnerRoutes()
+    protected function mapWarehouseOwnerRoutes()
     {
         Route::middleware('web')
             ->namespace($this->namespace)
@@ -92,7 +92,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapWarhouseManagerRoutes()
+    protected function mapWarehouseManagerRoutes()
     {
         Route::middleware('web')
             ->namespace($this->namespace)
@@ -107,12 +107,12 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapWarhouseRoutes()
+    protected function mapWarehouseRoutes()
     {
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->domain('warhouse.'.env('APP_URL'))
-            ->group(base_path('routes/warhouse.php'));
+            ->domain('warehouse.'.env('APP_URL'))
+            ->group(base_path('routes/warehouse.php'));
     }
 
     /**

@@ -52,6 +52,12 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/search-shelf-units/{shelf}/{search}/{perPage}', 'WarehouseController@searchShelfAllUnits')->name('search-shelf-units');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+
+		Route::fallback(function () {
+		    
+			return view('layouts.warehouse');
+		    
+		});
 	
 	});
 

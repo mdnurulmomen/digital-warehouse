@@ -323,9 +323,8 @@
 				// this.$router.push({ name: 'container-shelves', params: { shelfId,  shelfName} })
 				this.$router.push({ path: `/shelf-units/` + shelfId + '/' + shelfName });
 			},
-            changeNumberContents(expectedContentsPerPage) {
+            changeNumberContents() {
 				this.pagination.current_page = 1;
-				this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
 					this.fetchContainerAllShelves();

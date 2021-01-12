@@ -33,10 +33,10 @@ Route::name('owner.')->group(function () {
 		Route::put('/profile', 'ProfileController@updateOwnerProfile')->name('profile');	
 		Route::post('/password', 'ProfileController@updateOwnerPassword')->name('password');
 
-		Route::get('/api/current-owner', 'OwnerController@currentOwner')->name('current-user');
+		// Route::get('/api/current-owner', 'OwnerController@currentOwner')->name('current-user');
 
-		Route::get('/my-warehouses/{owner}/{perPage}', 'OwnerController@showOwnerAllWarehouses')->name('my-warehouses');
-		Route::get('/search-warehouses/{owner}/{search}/{perPage}', 'OwnerController@searchOwnerAllWarehouses')->name('search-warehouses');
+		Route::get('/my-warehouses/{perPage}', 'OwnerController@showOwnerAllWarehouses')->name('my-warehouses');
+		Route::get('/search-warehouses/{search}/{perPage}', 'OwnerController@searchOwnerAllWarehouses')->name('search-warehouses');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 	

@@ -137,33 +137,46 @@ class MerchantController extends Controller
 
     }
 
-    public function showMerchantAllProducts($merchant, $perPage)
+    public function showMerchantAllProducts($perPage)
     {
+        $currentMerchant = \Auth::user();
+
         return response()->json([
 
-            'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)
-                                                     ->where('merchant_id', $merchant)
+            'retail' => new ProductCollection(Product::where('product_category_id', '>', 0)
+                                                     ->where('merchant_id', $currentMerchant->id)
                                                      ->paginate($perPage)),
-            'bulk' => new ProductCollection(Product::whereNull('product_category_id')
-                                                   ->orWhere('product_category_id', 0)
-                                                   ->where('merchant_id', $merchant)
+            'bulk' => new ProductCollection(Product::where(function ($query) {
+                                                        $query->whereNull('product_category_id')
+                                                              ->orWhere('product_category_id', 0);
+                                                    })
+                                                    ->where(function ($query) use ($currentMerchant) {
+                                                        $query->where('merchant_id', $currentMerchant->id);
+                                                    })
                                                    ->paginate($perPage)),
 
         ], 200);
+
     }
 
-    public function searchMerchantAllProducts($merchant, $search, $perPage)
+    public function searchMerchantAllProducts($search, $perPage)
     {
-        $query = Product::where('name', 'like', "%$search%")
-                        ->orWhere('sku', 'like', "%$search%")
-                        ->orWhere('price', 'like', "%$search%")
-                        ->orWhere('initial_quantity', 'like', "%$search%")
-                        ->orWhere('available_quantity', 'like', "%$search%")
-                        ->orWhere('quantity_type', 'like', "%$search%")
-                        ->orWhereHas('category', function ($q) use ($search) {
-                            $q->where('name', 'like', "%$search%");
-                        })
-                        ->where('merchant_id', $merchant);
+        $currentMerchant = \Auth::user();
+
+        $query = $query = Product::where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%$search%")
+                            ->orWhere('sku', 'like', "%$search%")
+                            ->orWhere('price', 'like', "%$search%")
+                            ->orWhere('initial_quantity', 'like', "%$search%")
+                            ->orWhere('available_quantity', 'like', "%$search%")
+                            ->orWhere('quantity_type', 'like', "%$search%")
+                            ->orWhereHas('category', function ($q) use ($search) {
+                                $q->where('name', 'like', "%$search%");
+                            });
+                })
+                ->where(function ($query) use ($currentMerchant) {
+                    $query->where('merchant_id', $currentMerchant->id);
+                });
 
         return response()->json([
             'all' => new ProductCollection($query->paginate($perPage)),  

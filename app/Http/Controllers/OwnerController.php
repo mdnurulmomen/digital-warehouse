@@ -22,39 +22,36 @@ class OwnerController extends Controller
 
     }
 
-    public function showOwnerAllWarehouses($owner, $perPage)
+    public function showOwnerAllWarehouses($perPage)
     {
+        $currentOwner = \Auth::guard('owner')->user();
+
         return [
 
             'approved' => new WarehouseCollection(Warehouse::where('active', 1)
-            											 ->where('warehouse_owner_id', $owner)
+            											 ->where('warehouse_owner_id', $currentOwner->id)
             											 ->paginate($perPage)),
             'pending' => new WarehouseCollection(Warehouse::where('active', 0)
-            											->where('warehouse_owner_id', $owner)
+            											->where('warehouse_owner_id', $currentOwner->id)
             											->paginate($perPage)),
 
         ];
     }
 
-    public function searchOwnerAllWarehouses($owner, $search, $perPage)
+    public function searchOwnerAllWarehouses($search, $perPage)
     {
-        $columnsToSearch = ['user_name', 'email', 'mobile', 'warehouse_deal'];
+        $currentOwner = \Auth::guard('owner')->user();
 
-        $query = Warehouse::where('name', "%$search%");
-
-        foreach($columnsToSearch as $column){
-            $query->orWhere($column, 'like', "%$search%");
-        }
-
-        $query->orWhereHas('owner', function($q) use ($search){
-            $q->where('first_name', 'like', "%$search%")
-              ->orWhere('last_name', 'like', "%$search%")
-              ->orWhere('user_name', 'like', "%$search%")
-              ->orWhere('email', 'like', "%$search%")
-              ->orWhere('mobile', 'like', "%$search%");
-        });
-
-        $query->where('warehouse_owner_id', $owner);
+        $query = Warehouse::where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                      ->orWhere('user_name', 'like', "%$search%")
+                      ->orWhere('email', 'like', "%$search%")
+                      ->orWhere('mobile', 'like', "%$search%")
+                      ->orWhere('warehouse_deal', 'like', "%$search%");
+                    })
+                    ->where(function ($q) use ($currentOwner) {
+                        $q->where('warehouse_owner_id', $currentOwner->id);
+                });        
 
         return response()->json([
             'all' => new WarehouseCollection($query->paginate($perPage)),    

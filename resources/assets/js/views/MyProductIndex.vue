@@ -24,6 +24,7 @@
 										<div class="row">											
 
 											<div class="col-sm-12 sub-title">
+										  	<!-- 
 											  	<search-and-addition-option 
 											  		:query="query" 
 											  		:caller-page="'product'" 
@@ -32,6 +33,36 @@
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllProducts"
 											  	></search-and-addition-option>
+ 											-->
+ 												
+ 												<div class="row d-flex align-items-center">
+											  		<div class="col-sm-3 text-left">	
+															Product List
+											  		</div>
+											  		<div class="col-sm-9 was-validated text-center">
+											  			<input 	type="text" 
+														  		v-model="query" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		class="form-control" 
+														  		placeholder="Search"
+													  	>
+													  	<div class="invalid-feedback">
+													  		Please search with releavant input
+													  	</div>
+											  		</div>
+												<!-- 
+											  		<div class="col-sm-3 text-right">
+											  			<button 
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="$emit('showContentCreateForm')"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New {{ callerPage | capitalize }}
+											  			</button>
+											  		</div>
+										  		-->
+											  	</div>
+
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -242,7 +273,10 @@
 									</label>
 								</div>
 
-								<div class="form-row" v-if="singleProductData.variations.length">
+								<div 
+									class="form-row" 
+									v-if="singleProductData.has_variations && singleProductData.variations.length"
+								>
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
 										Variations :
 									</label>
@@ -472,7 +506,7 @@
 
 	        	submitForm : true,
 
-	        	currentUser : {},
+	        	// currentUser : {},
 
 	        	editor: ClassicEditor,
 
@@ -501,12 +535,27 @@
 		
 		created(){
 
-			this.getCurrentUser();
+			this.fetchAllProducts();
+			// this.getCurrentUser();
 		
+		},
+
+		watch : {
+
+			query : function(val){
+				if (val==='') {
+					this.fetchAllProducts();
+				}
+				else {
+					this.searchData();
+				}
+			},
+
 		},
 		
 		methods : {
 			
+		/*
 			getCurrentUser() {
 
 				axios
@@ -541,6 +590,7 @@
 					});
 
 			},
+		*/
 			fetchAllProducts() {
 				
 				this.query = '';
@@ -549,7 +599,7 @@
 				this.allFetchedProducts = [];
 				
 				axios
-					.get('/products/' + this.currentUser.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/products/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedProducts = response.data;
@@ -618,18 +668,14 @@
 					});
 
 			},
-			searchData(emitedValue=false) {
-
-				if (emitedValue) {
-					this.query=emitedValue;
-				}
+			searchData() {
 
 				this.error = '';
 				this.allFetchedProducts = [];
 				this.pagination.current_page = 1;
 				
 				axios
-				.get('/search-products/' + this.currentUser.id + '/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
+				.get('/search-products/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
 				.then(response => {
 					this.allFetchedProducts = response.data;
 					this.productsToShow = this.allFetchedProducts.all.data;
@@ -640,10 +686,9 @@
 				});
 
 			},
-			changeNumberContents(expectedContentsPerPage) {
+			changeNumberContents() {
 				
 				this.pagination.current_page = 1;
-				this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
 					this.fetchAllProducts();
@@ -651,6 +696,7 @@
 				else {
 					this.searchData();
 				}
+				
     		},
 			showSelectedTabProducts() {
 				

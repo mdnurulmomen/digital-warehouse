@@ -18,7 +18,7 @@ class WarehouseContainerResource extends JsonResource
         return [
             'quantity' => $this->quantity,
             'container_id' => $this->container_id,
-            'engaged_quantity' => $this->containerStatuses()->where('engaged', '!=' , 0)->count(),
+            'engaged_quantity' => $this->containerStatuses()->where('engaged', 1)->count(),
             'partially_engaged' => $this->containerStatuses()->where('engaged', 0.5)->count(),
             'container' => $this->container->loadMissing('shelf.unit'),
             'rents' => new WarehouseRentResource($this),

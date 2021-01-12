@@ -433,14 +433,16 @@ class WarehouseController extends Controller
     {
         $currentWarehouse = \Auth::guard('warehouse')->user();
 
-        $query = WarehouseContainerStatus::with(['containerShelfStatuses'])
-                                        ->where('name', 'like', "%$search%")
-                                        ->orWhereHas('warehouseContainer.container', function ($query) use ($search) {
-                                                $query->where('name', 'like', "%$search%");
-                                            })
-                                        ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
-                                                $query->where('warehouse_id', $currentWarehouse->id);
-                                            });
+        $query = WarehouseContainerStatus::with('containerShelfStatuses')
+                            ->where(function ($query) use ($search) {
+                                $query->where('name', 'like', "%$search%")
+                                      ->orWhereHas('warehouseContainer.container', function ($q) use ($search) {
+                                            $q->where('name', 'like', "%$search%");
+                                       });
+                            })
+                            ->whereHas('warehouseContainer', function ($q) use ($currentWarehouse) {
+                                $q->where('warehouse_id', $currentWarehouse->id);
+                            });
 
         return response()->json([
             'all' => $query->paginate($perPage),    

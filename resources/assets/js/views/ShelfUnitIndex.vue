@@ -300,9 +300,8 @@
 				});
 
 			},
-            changeNumberContents(expectedContentsPerPage) {
+            changeNumberContents() {
 				this.pagination.current_page = 1;
-				this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
 					this.fetchShelfAllUnits();
