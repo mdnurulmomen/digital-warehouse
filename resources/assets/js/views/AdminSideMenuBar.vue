@@ -230,6 +230,30 @@
 									</li>
 								</ul>
 							</li>
+							<li 
+								class="pcoded-hasmenu" 
+								:class="['dispatches', 'requisitions'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+							>
+								<a href="javascript:void(0)" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="feather icon-crosshair"></i>
+									</span>
+									<span class="pcoded-mtext">Dispatch</span>
+									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
+								</a>
+								<ul class="pcoded-submenu">
+									<li :class="currentRouteName=='dispatches' ? 'active' : ''">
+										<router-link :to="{ name: 'dispatches' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Dispatches</span>
+										</router-link>
+									</li>
+									<li :class="currentRouteName=='requisitions' ? 'active' : ''">
+										<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Requisitions</span>
+										</router-link>
+									</li>
+								</ul>
+							</li>
 						</ul>
 					</div>
 

@@ -117,6 +117,10 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
 
+		Route::get('/api/requisitions/{perPage?}', 'AdminController@showAllRequisitions')->name('requisitions');
+		// Route::post('/requisitions/{perPage}', 'AdminController@makeNewRequisition')->name('requisitions');
+		Route::get('/api/search-requisitions/{search}/{perPage?}', 'AdminController@searchAllRequisitions')->name('search-requisitions');
+
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 	});

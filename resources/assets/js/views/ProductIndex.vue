@@ -99,14 +99,6 @@
 																			>
 																				<i class="fas fa-edit"></i>
 																			</button>
-
-																			<button 
-																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
-																				@click="openContentDispatchForm(content)"
-																			>
-																				<i class="fas fa-truck"></i>
-																			</button>
 																		</td>
 																    
 																	</tr>
