@@ -14,8 +14,10 @@ class CreateRequiredProductsTable extends Migration
     public function up()
     {
         Schema::create('required_products', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->increments('id');
+            $table->unsignedInteger('product_id');
+            $table->unsignedMediumInteger('quantity');
+            $table->unsignedInteger('requisition_id');
         });
     }
 

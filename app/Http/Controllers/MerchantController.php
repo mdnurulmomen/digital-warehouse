@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Merchant;
+use App\Models\Requisition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\Web\ProductResource;
 use App\Http\Resources\Web\ProductCollection;
 
 class MerchantController extends Controller
@@ -137,25 +139,31 @@ class MerchantController extends Controller
 
     }
 
-    public function showMerchantAllProducts($perPage)
+    public function showMerchantAllProducts($perPage=false)
     {
         $currentMerchant = \Auth::user();
+        
+        if ($perPage) {
+            
+            return response()->json([
 
-        return response()->json([
+                'retail' => new ProductCollection(Product::where('product_category_id', '>', 0)
+                                                         ->where('merchant_id', $currentMerchant->id)
+                                                         ->paginate($perPage)),
+                'bulk' => new ProductCollection(Product::where(function ($query) {
+                                                            $query->whereNull('product_category_id')
+                                                                  ->orWhere('product_category_id', 0);
+                                                        })
+                                                        ->where(function ($query) use ($currentMerchant) {
+                                                            $query->where('merchant_id', $currentMerchant->id);
+                                                        })
+                                                       ->paginate($perPage)),
 
-            'retail' => new ProductCollection(Product::where('product_category_id', '>', 0)
-                                                     ->where('merchant_id', $currentMerchant->id)
-                                                     ->paginate($perPage)),
-            'bulk' => new ProductCollection(Product::where(function ($query) {
-                                                        $query->whereNull('product_category_id')
-                                                              ->orWhere('product_category_id', 0);
-                                                    })
-                                                    ->where(function ($query) use ($currentMerchant) {
-                                                        $query->where('merchant_id', $currentMerchant->id);
-                                                    })
-                                                   ->paginate($perPage)),
+            ], 200);
 
-        ], 200);
+        }
+
+        return ProductResource::collection(Product::where('merchant_id', $currentMerchant->id)->get());
 
     }
 
@@ -180,6 +188,72 @@ class MerchantController extends Controller
 
         return response()->json([
             'all' => new ProductCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
+    // Requisition
+    public function showMerchantAllRequisitions($perPage = false)
+    {
+        $currentMerchant = \Auth::user();
+            
+        if ($perPage) {
+
+            return response()->json([
+
+                'pending' => Requisition::with('products.product')->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage),  
+                'dispatched' => Requisition::with('products.product')->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage),  
+            
+            ], 200);
+
+        }
+
+        return Requisition::with('products.product')->where('merchant_id', $currentMerchant->id)->get();
+
+    }
+
+    public function makeNewRequisition(Request $request, $perPage)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|numeric|exists:products,id',
+            'products.*.quantity' => 'required|numeric|min:1',
+        ]);
+
+        $currentMerchant = \Auth::user();
+
+        $newRequisition = new Requisition();
+
+        $newRequisition->subject = $request->subject;
+        $newRequisition->description = $request->description;
+        $newRequisition->merchant_id = $currentMerchant->id;
+
+        $newRequisition->save();
+
+        $newRequisition->required_products = $request->products;
+
+        return $this->showMerchantAllRequisitions($perPage);
+    }
+
+    public function searchMerchantAllRequisitions($search, $perPage)
+    {
+        $currentMerchant = \Auth::user();
+
+        $query = $query = Requisition::with('products.product')
+                                ->where(function ($query) use ($search) {
+                                    $query->where('subject', 'like', "%$search%")
+                                            ->orWhere('description', 'like', "%$search%")
+                                            ->orWhereHas('products.product', function ($q) use ($search) {
+                                                $q->where('name', 'like', "%$search%");
+                                            });
+                                })
+                                ->where(function ($query) use ($currentMerchant) {
+                                    $query->where('merchant_id', $currentMerchant->id);
+                                });
+
+        return response()->json([
+            'all' => $query->paginate($perPage),  
         ], 200);
     }
 

@@ -14,7 +14,11 @@ class CreateRequisitionsTable extends Migration
     public function up()
     {
         Schema::create('requisitions', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->string('subject');
+            $table->string('description')->nullable();
+            $table->boolean('status')->default(false); // pending / dispatched
+            $table->unsignedInteger('merchant_id');
             $table->timestamps();
         });
     }

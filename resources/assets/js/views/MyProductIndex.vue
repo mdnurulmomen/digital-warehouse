@@ -599,7 +599,7 @@
 				this.allFetchedProducts = [];
 				
 				axios
-					.get('/products/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/products/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedProducts = response.data;

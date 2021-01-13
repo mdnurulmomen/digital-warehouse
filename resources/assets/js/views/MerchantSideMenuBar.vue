@@ -61,12 +61,12 @@
 								</ul>
 							</li>
 
-							<li :class="currentRouteName=='requests' ? 'active' : ''">
-								<router-link :to="{ name: 'requests' }" class="waves-effect waves-dark">
+							<li :class="currentRouteName=='my-requisitions' ? 'active' : ''">
+								<router-link :to="{ name: 'my-requisitions' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="feather icon-aperture"></i>
 									</span>
-									<span class="pcoded-mtext">Requests</span>
+									<span class="pcoded-mtext">Requisitions</span>
 								</router-link>
 							</li>
 
