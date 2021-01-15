@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\Web\ProductResource;
 use App\Http\Resources\Web\ProductCollection;
+use App\Http\Resources\Web\RequisitionCollection;
 
 class MerchantController extends Controller
 {
@@ -145,7 +146,7 @@ class MerchantController extends Controller
         
         if ($perPage) {
             
-            return response()->json([
+            return [
 
                 'retail' => new ProductCollection(Product::where('product_category_id', '>', 0)
                                                          ->where('merchant_id', $currentMerchant->id)
@@ -158,8 +159,7 @@ class MerchantController extends Controller
                                                             $query->where('merchant_id', $currentMerchant->id);
                                                         })
                                                        ->paginate($perPage)),
-
-            ], 200);
+            ];
 
         }
 
@@ -186,9 +186,9 @@ class MerchantController extends Controller
                     $query->where('merchant_id', $currentMerchant->id);
                 });
 
-        return response()->json([
+        return [
             'all' => new ProductCollection($query->paginate($perPage)),  
-        ], 200);
+        ];
     }
 
     // Requisition
@@ -198,12 +198,12 @@ class MerchantController extends Controller
             
         if ($perPage) {
 
-            return response()->json([
+            return [
 
-                'pending' => Requisition::with('products.product')->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage),  
-                'dispatched' => Requisition::with('products.product')->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage),  
+                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
-            ], 200);
+            ];
 
         }
 
@@ -218,7 +218,14 @@ class MerchantController extends Controller
             'description' => 'nullable|string|max:255',
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|numeric|exists:products,id',
-            'products.*.quantity' => 'required|numeric|min:1',
+            'products.*.total_quantity' => 'required|numeric|min:1',
+
+            'delivery_service' => 'nullable|boolean',
+            'agent' => 'required_if:delivery_service,0,',
+            'agent.name' => 'required_if:delivery_service,0,',
+            'agent.mobile' => 'required_if:delivery_service,0,',
+            'delivery' => 'required_if:delivery_service,1',
+            'delivery.address' => 'required_if:delivery_service,1',
         ]);
 
         $currentMerchant = \Auth::user();
@@ -233,6 +240,23 @@ class MerchantController extends Controller
 
         $newRequisition->required_products = $request->products;
 
+        if ($request->delivery_service) {
+            
+            $newRequisition->delivery()->create([
+                'address' => $request->delivery['address'],
+            ]);
+        
+        }
+
+        else {
+
+           $newRequisition->agent()->create([
+                'name' => $request->agent['name'],
+                'mobile' => $request->agent['mobile'],
+            ]); 
+
+        }
+
         return $this->showMerchantAllRequisitions($perPage);
     }
 
@@ -240,7 +264,7 @@ class MerchantController extends Controller
     {
         $currentMerchant = \Auth::user();
 
-        $query = $query = Requisition::with('products.product')
+        $query = $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])
                                 ->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
@@ -252,9 +276,9 @@ class MerchantController extends Controller
                                     $query->where('merchant_id', $currentMerchant->id);
                                 });
 
-        return response()->json([
-            'all' => $query->paginate($perPage),  
-        ], 200);
+        return [
+            'all' => new RequisitionCollection($query->paginate($perPage)),  
+        ];
     }
 
 }

@@ -12,9 +12,9 @@ class Variation extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    protected $with = ['VariationType'];
+    protected $with = ['variationType'];
 
-    public function VariationType()
+    public function variationType()
     {
     	return $this->belongsTo(VariationType::class, 'variation_type_id', 'id')->withTrashed();
     }

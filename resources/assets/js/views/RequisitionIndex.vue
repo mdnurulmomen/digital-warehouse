@@ -408,20 +408,25 @@
 										</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#requisition-store" role="tab">
+										<a class="nav-link" data-toggle="tab" href="#requisition-product" role="tab">
 											Product
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#requisition-address" role="tab">
+											Address
 										</a>
 									</li>
 								</ul>
 
 								<div class="tab-content tabs card-block">
-									<div class="tab-pane active" id="requisition-profile" role="tabpanel">
-										
+									
+									<div class="tab-pane active" id="requisition-profile" role="tabpanel">	
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Subject :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleRequisitionData.subject }}
 											</label>
 										</div>
@@ -430,14 +435,14 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Description :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												<span v-html="singleRequisitionData.description"></span>
 											</label>
 										</div>
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
-											<label class="col-sm-6 form-control-plaintext">
+											<label class="col-sm-6 col-form-label">
 												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">{{ singleRequisitionData.status ? 'Available' : 'NA' }}</span>
 											</label>
 										</div>
@@ -446,15 +451,13 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Requested on :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleRequisitionData.created_at }}
 											</label>
 										</div>
-
 									</div>
 
-									<div class="tab-pane" id="requisition-store" role="tabpanel">
-
+									<div class="tab-pane" id="requisition-product" role="tabpanel">
 										<div 
 											class="form-row" 
 											v-if="singleRequisitionData.products && singleRequisitionData.products.length"
@@ -468,7 +471,7 @@
 													<div 
 														class="col-md-12 ml-auto" 
 														v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
-														:key="'requisition-address-' + requiredProduct.id + productIndex"
+														:key="'requisition-detail-' + requiredProduct.id + productIndex"
 													>
 														<div class="card">
 															<div class="card-body">
@@ -476,16 +479,16 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Product Name :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ requiredProduct.product ? requiredProduct.product.name : 'NA' }}
 																	</label>
 																</div>
 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Quantity :
+																		Total Quantity :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ requiredProduct.quantity }}
 																	</label>
 																</div>
@@ -494,7 +497,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Available Quantity :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ requiredProduct.product ? requiredProduct.product.available_quantity : 'NA' }}
 																	</label>
 																</div>
@@ -506,12 +509,48 @@
 												</div>
 											</div>
 										</div>
-
 									</div>
+
+									<div class="tab-pane" id="requisition-address" role="tabpanel">	
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Delivery Service :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span :class="[singleRequisitionData.address ? 'badge-success' : 'badge-danger', 'badge']">{{ singleRequisitionData.address ? 'Available' : 'NA' }}</span>
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.address">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Delivery Address :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span v-html="singleRequisitionData.address.delivery_address"></span>
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleRequisitionData.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Name :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleRequisitionData.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Mobile :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
+											</label>
+										</div>
+									</div>
+
 								</div>
 
-								
-							
 							</div>
 						</div>
 					</div>

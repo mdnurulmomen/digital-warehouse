@@ -31,10 +31,25 @@ class Requisition extends Model
 
     		foreach ($requiredProducts as $requiredProduct) {
     			
-    			$this->products()->create([
+    			$requisitionedProduct = $this->products()->create([
     				'product_id' => $requiredProduct->id,
-    				'quantity' => $requiredProduct->quantity,
+                    'quantity' => $requiredProduct->total_quantity,
+    				'has_variations' => $requiredProduct->product->has_variations ?? false,
     			]);
+
+                if ($requiredProduct->product->has_variations) {
+                    
+                    foreach ($requiredProduct->product->variations as $requiredProductVariation) {
+                
+                        $requisitionedProduct->variations()->create([
+                            'product_variation_id' => $requiredProductVariation->id,
+                            'quantity' => $requiredProductVariation->required_quantity,
+                            'requisition_id' => $this->id,
+                        ]);
+
+                    }
+
+                }
 
     		}
 
@@ -44,5 +59,15 @@ class Requisition extends Model
     public function products()
     {
     	return $this->hasMany(RequiredProduct::class, 'requisition_id', 'id');
+    }
+
+    public function delivery()
+    {
+        return $this->hasOne(RequisitionAddress::class, 'requisition_id', 'id');
+    }
+
+    public function agent()
+    {
+        return $this->hasOne(RequisitionAgent::class, 'requisition_id', 'id');
     }
 }

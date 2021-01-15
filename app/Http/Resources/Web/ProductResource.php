@@ -31,7 +31,7 @@ class ProductResource extends JsonResource
             'merchant_id' => $this->merchant_id,
             'category' => $this->category,
             'merchant' => $this->merchant,
-            'variation_type' => $this->when($this->has_variations, $this->has_variations ? $this->variations()->first()->variation->VariationType->loadMissing('variations') : 'NA'),
+            'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->variationType->loadMissing('variations') : 'NA'),
             'variations' => $this->when($this->has_variations, $this->variations->loadMissing('variation')),
             'spaces' => new ProductAddressCollection($this->addresses),
             // 'spaces' => $this->when(Auth::user()->isAdmin(), new ProductAddressCollection($this->addresses)),
