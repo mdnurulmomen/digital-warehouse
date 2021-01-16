@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Http\Resources\Web\RequisitionCollection;
 
 
 class AdminController extends Controller
@@ -13,12 +14,12 @@ class AdminController extends Controller
     {       
         if ($perPage) {
 
-            return response()->json([
+            return [
 
-                'pending' => Requisition::with('products.product')->where('status', 0)->paginate($perPage),  
-                'dispatched' => Requisition::with('products.product')->where('status', 1)->paginate($perPage),  
+                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 1)->paginate($perPage)),  
             
-            ], 200);
+            ];
 
         }
 
@@ -55,7 +56,7 @@ class AdminController extends Controller
 
     public function searchAllRequisitions($search, $perPage)
     {
-        $query = $query = Requisition::with('products.product')
+        $query = $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])
                                 ->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
@@ -64,8 +65,8 @@ class AdminController extends Controller
                                             });
                                 });
 
-        return response()->json([
-            'all' => $query->paginate($perPage),  
-        ], 200);
+        return [
+            'all' => new RequisitionCollection($query->paginate($perPage)),  
+        ];
     }
 }

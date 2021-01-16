@@ -413,8 +413,8 @@
 										</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#requisition-address" role="tab">
-											Address
+										<a class="nav-link" data-toggle="tab" href="#requisition-despatch" role="tab">
+											Despatch
 										</a>
 									</li>
 								</ul>
@@ -480,7 +480,7 @@
 																		Product Name :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.product ? requiredProduct.product.name : 'NA' }}
+																		{{ requiredProduct.product_name }}
 																	</label>
 																</div>
 
@@ -495,11 +495,29 @@
 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Available Quantity :
+																		Variations :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.product ? requiredProduct.product.available_quantity : 'NA' }}
+																		<span :class="[requiredProduct.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ requiredProduct.has_variations ? 'Yes' : 'No' }}
+																		</span>
 																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
+																	<div 
+																		class="col-sm-12" 
+																		v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+																		:key="'required-product-variation-' + productVariation.id + variationIndex"
+																	>
+																		<div class="form-row">
+																			<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																				 {{ productVariation.variation_name }} :
+																			</label>
+																			<label class="col-sm-6 col-form-label">
+																				{{ productVariation.quantity }}
+																			</label>
+																		</div>
+																	</div>
 																</div>
 
 															</div>
@@ -511,22 +529,22 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="requisition-address" role="tabpanel">	
+									<div class="tab-pane" id="requisition-despatch" role="tabpanel">	
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Delivery Service :
+												Service :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.address ? 'badge-success' : 'badge-danger', 'badge']">{{ singleRequisitionData.address ? 'Available' : 'NA' }}</span>
+												<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.address">
+										<div class="form-row" v-if="singleRequisitionData.delivery">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Address :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span v-html="singleRequisitionData.address.delivery_address"></span>
+												<span v-html="singleRequisitionData.delivery.address"></span>
 											</label>
 										</div>
 
@@ -577,7 +595,11 @@
 
 		products : [
 			{}
-		]
+		],
+
+		agent : {},
+
+		delivery : {},
 				
     };
 
@@ -761,8 +783,8 @@
 				
     		},
     		showContentDetails(object) {		
-				// this.singleRequisitionData = { ...object };
-				this.singleRequisitionData = Object.assign({}, this.singleRequisitionData, object);
+				this.singleRequisitionData = { ...object };
+				// this.singleRequisitionData = Object.assign({}, this.singleRequisitionData, object);
 				$('#requisition-view-modal').modal('show');
 			},
 /*
@@ -830,6 +852,7 @@
 				}
 
 			},
+		/*
 			verifyUserInput() {
 
 				this.validateFormInput('product_id');
@@ -867,6 +890,7 @@
 				}
 
 			},
+		*/
 			showPendingContents() {
 				this.currentTab = 'pending';
 				this.showSelectedTabProducts();
@@ -875,6 +899,7 @@
 				this.currentTab = 'dispatched';
 				this.showSelectedTabProducts();
 			},
+		/*
 			addMoreProduct() {
 				if (this.singleRequisitionData.products.length < 3) {
 
@@ -895,6 +920,8 @@
 				}
 				
 			},
+		*/
+		/*
 			objectNameWithCapitalized ({ name, user_name }) {
 		      	if (name) {
 				    name = name.toString()
@@ -912,13 +939,14 @@
 					this.singleRequisitionData.products[index].id = this.singleRequisitionData.products[index].product.id;
 				}
 			},
-		
+		*/
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
 
 				switch(formInputName) {
 
+				/*
 					case 'subject' :
 
 						if (!this.singleRequisitionData.subject) {
@@ -933,7 +961,6 @@
 						}
 
 						break;
-				/*
 					case 'description' :
 
 						if (this.singleRequisitionData.description && !this.singleRequisitionData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
@@ -945,7 +972,6 @@
 						}
 
 						break;
-				*/
 
 					case 'product_id' :
 
@@ -990,6 +1016,7 @@
 						);
 
 						break;
+				*/
 
 				}
 	 
