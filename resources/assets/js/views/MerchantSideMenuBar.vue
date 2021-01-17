@@ -36,29 +36,13 @@
 								</ul>
 							</li>
 
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['products', 'product-dispatches'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
+							<li :class="currentRouteName=='my-products' ? 'active' : ''">
+								<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="feather icon-box"></i>
 									</span>
-									<span class="pcoded-mtext">Products</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='my-products' ? 'active' : ''">
-										<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">My Products</span>
-										</router-link>
-									</li>
-									<li :class="currentRouteName=='product-dispatches' ? 'active' : ''">
-										<router-link :to="{ name: 'product-dispatches' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dispatches</span>
-										</router-link>
-									</li>
-								</ul>
+									<span class="pcoded-mtext">My Products</span>
+								</router-link>
 							</li>
 
 							<li :class="currentRouteName=='my-requisitions' ? 'active' : ''">
@@ -66,7 +50,7 @@
 									<span class="pcoded-micon">
 										<i class="feather icon-aperture"></i>
 									</span>
-									<span class="pcoded-mtext">Requisitions</span>
+									<span class="pcoded-mtext">My Requisitions</span>
 								</router-link>
 							</li>
 

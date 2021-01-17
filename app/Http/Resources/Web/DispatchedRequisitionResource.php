@@ -3,9 +3,8 @@
 namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Web\RequiredProductResource;
 
-class RequisitionResource extends JsonResource
+class DispatchedRequisitionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,10 +21,10 @@ class RequisitionResource extends JsonResource
             'status' => $this->status,
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at->diffForHumans(),
-            'products' => RequiredProductResource::collection($this->products),
+            // 'products' => RequiredProductResource::collection($this->products),
             'delivery' =>  $this->when($this->delivery, $this->delivery),
             'agent' => $this->when($this->agent, $this->agent),
-            'dispatch' => $this->when($this->status, new RequisitionDispatchResource($this->dispatch)),
+            // 'dispatch' => $this->when($this->status, new RequisitionDispatchResource($this->dispatch)),
         ];
     }
 }

@@ -17,7 +17,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-home"></i>
+										<i class="fa fa-home"></i>
 									</span>
 									<span class="pcoded-mtext">Home</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -70,7 +70,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-user"></i>
+										<i class="fa fa-user"></i>
 									</span>
 									<span class="pcoded-mtext">Manager</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -94,7 +94,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-users"></i>
+										<i class="fa fa-users"></i>
 									</span>
 									<span class="pcoded-mtext">Merchant</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -118,7 +118,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-briefcase"></i>
+										<i class="fa fa-elementor"></i>
 									</span>
 									<span class="pcoded-mtext">Assets</span>
 									<!-- <span class="pcoded-badge label label-danger">NEW</span> -->
@@ -212,7 +212,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-crosshair"></i>
+										<i class="fab fa-product-hunt"></i>
 									</span>
 									<span class="pcoded-mtext">Product</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -236,7 +236,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-crosshair"></i>
+										<i class="fa fa-truck"></i>
 									</span>
 									<span class="pcoded-mtext">Dispatch</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->

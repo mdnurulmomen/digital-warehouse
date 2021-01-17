@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RequiredProductVariationResource extends JsonResource
+class DispatchedProductResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,11 +15,14 @@ class RequiredProductVariationResource extends JsonResource
     public function toArray($request)
     {
         return [
+
             'id' => $this->id,
-            'product_variation_id' => $this->product_variation_id,
-            'variation_name' => $this->productVariation->variation->name,
+            'product_id' => $this->product_id,
+            'product_name' => $this->product->name,
             'quantity' => $this->quantity,
-            'available_quantity' => $this->productVariation->available_quantity,
+            'has_variations' => $this->has_variations,
+            'variations' => $this->when($this->has_variations, RequiredProductVariationResource::collection($this->variations)),
+
         ];
     }
 }

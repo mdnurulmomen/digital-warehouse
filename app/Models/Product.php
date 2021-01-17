@@ -35,6 +35,23 @@ class Product extends Model
         return $this->hasMany(WarehouseProduct::class, 'product_id', 'id');
     }
 
+    public function nonDispatchedRequests()
+    {
+        return $this->hasMany(RequiredProduct::class, 'product_id', 'id')->whereHas('requisition', function ($query) {
+            $query->where('status', 0);
+        });
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(RequiredProduct::class, 'product_id', 'id');
+    }
+
+    public function dispatches()
+    {
+        return $this->hasMany(ProductDispatch::class, 'product_id', 'id');
+    }
+
     public function setProductVariationsAttribute($variations = array())
     {
         if (count($variations)) {

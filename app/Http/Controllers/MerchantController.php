@@ -163,7 +163,7 @@ class MerchantController extends Controller
 
         }
 
-        return ProductResource::collection(Product::where('merchant_id', $currentMerchant->id)->get());
+        return ProductResource::collection(Product::where('merchant_id', $currentMerchant->id)->where('available_quantity', '>', 0)->get());
 
     }
 
@@ -200,8 +200,8 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
@@ -264,8 +264,7 @@ class MerchantController extends Controller
     {
         $currentMerchant = \Auth::user();
 
-        $query = $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])
-                                ->where(function ($query) use ($search) {
+        $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery'])->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
                                             ->orWhereHas('products.product', function ($q) use ($search) {

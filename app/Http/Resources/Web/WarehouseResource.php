@@ -29,7 +29,7 @@ class WarehouseResource extends JsonResource
             'warehouse_deal' => $this->warehouse_deal,
             'active' => $this->active,
             'warehouse_owner_id' => $this->warehouse_owner_id,
-            'deleted_at' => $this->deleted_at,
+            'deleted_at' => $this->deleted_at->diffForHumans(),
 
             'owner' => $this->owner,
             'previews' => $this->previews,

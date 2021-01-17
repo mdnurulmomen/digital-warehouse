@@ -61,6 +61,7 @@ import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
 import ProductIndex from './views/ProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
+import DispatchIndex from './views/DispatchIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -155,6 +156,11 @@ const router = new VueRouter({
             path: '/requisitions',
             name: 'requisitions',
             component: RequisitionIndex,
+        },
+        {
+            path: '/dispatches',
+            name: 'dispatches',
+            component: DispatchIndex,
         },
     ],
 });

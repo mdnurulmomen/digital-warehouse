@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'requisitions'" 
-			:message="'All our requisitions'"
+			:title="'dispatches'" 
+			:message="'All our dispatches'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -24,11 +24,21 @@
 										<div class="row">											
 
 											<div class="col-sm-12 sub-title">
-
+											  	<!-- 
+												  	<search-and-addition-option 
+												  		:query="query" 
+												  		:caller-page="'requisition'" 
+												  		
+												  		@showDispatchCreateForm="showDispatchCreateForm" 
+												  		@searchData="searchData($event)" 
+												  		@fetchAllContents="fetchAllDispatches"
+												  	></search-and-addition-option>
+	 											-->
  												<div class="row d-flex align-items-center">										  	
-											  		<div class="col-sm-3 text-left">	Requisitions List
+											  		<div class="col-sm-3 text-left">	
+															Dispatches List
 											  		</div>
-											  		<div class="col-sm-9 was-validated text-center">
+											  		<div class="col-sm-6 was-validated text-center">
 											  			<input 	type="text" 
 														  		v-model="query" 
 														  		pattern="[^'!#$%^()\x22]+" 
@@ -39,65 +49,54 @@
 													  		Please search with releavant input
 													  	</div>
 											  		</div>
+										  			 
+											  		<div class="col-sm-3 text-right">
+											  			<button 
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="showDispatchCreateForm"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Dispatch
+											  			</button>
+											  		</div>
+ 													
 											  	</div>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-										  		
-										  		<tab 
-										  			v-show="query === ''" 
-										  			:tab-names="['pending', 'dispatched']" 
-										  			:current-tab="'pending'" 
 
-										  			@showPendingContents="showPendingContents" 
-										  			@showDispatchedContents="showDispatchedContents" 
-										  		></tab>
-
- 												<div class="tab-content card-block">
+ 												<div class="tab-dispatch card-block">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
 																<thead>
 																	<tr>
-																		<th>Subject</th>
-																		<th>Status</th>
+																		<th>Requisition</th>
+																		<th>Released at</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
 																<tbody>
 
-																	<tr v-for="content in requisitionsToShow" :key="'content-' + content.id"
+																	<tr 
+																		v-for="dispatch in allDispatches" 
+																		:key="'dispatch-' + dispatch.id"
 																	>
-																		<td>{{ content.subject }}</td>
+																		<td>{{ dispatch.requisition.subject }}</td>
+																		<td>{{ dispatch.released_at }}</td>
 																		<td>
-																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ content.status ? 'Despatched' : 'Pending' }}
-																			</span>
-																		</td>
-																		<td>
-																			
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon"  
-																				@click="showContentDetails(content)"
+																				@click="showDispatchDetails(dispatch)"
 																			>
 																				<i class="fas fa-eye"></i>
 																			</button>
-
-																			<button 
-																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
-																				@click="showProductDispatchForm(content)" 
-																				v-show="!content.status"
-																			>
-																				<i class="fas fa-truck"></i>
-																			</button>
-
 																		</td>
 																    
 																	</tr>
 																	<tr 
-																  		v-show="!requisitionsToShow.length"
+																  		v-show="!allDispatches.length"
 																  	>
 															    		<td colspan="3">
 																      		<div class="alert alert-danger" role="alert">
@@ -108,16 +107,16 @@
 
 																</tbody>
 																<tfoot>
-																	<tr>	
-																		<th>Name</th>
-																		<th>Status</th>
+																	<tr>
+																		<th>Requisition</th>
+																		<th>Released at</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
 															</table>
 														</div>
 													</div>
-													<div class="row d-flex align-items-center align-content-center">
+													<div class="row d-flex align-items-center align-dispatch-center">
 														<div class="col-sm-2">
 															<select 
 																class="form-control" 
@@ -135,7 +134,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? fetchAllRequisitions() : searchData()"
+																@click="query === '' ? fetchAllDispatches() : searchData()"
 															>
 																Reload
 																<i class="fas fa-sync"></i>
@@ -146,7 +145,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllRequisitions() : searchData()"
+																@paginate="query === '' ? fetchAllDispatches() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -201,15 +200,13 @@
 							        <div class="col-md-12">	
 										<div class="form-row">
 											<div class="form-group col-md-12">
-												<label for="inputFirstName">
-													Selected Requisition
-												</label>
+												<label for="inputFirstName">Select Requisition</label>
 												<multiselect 
 			                              			v-model="singleDispatchData.requisition"
 			                              			placeholder="Requisition Subject" 
 			                                  		track-by="id" 
 			                                  		:custom-label="objectNameWithCapitalized" 
-			                                  		:options="availableRequisitions" 
+			                                  		:options="allRequisitions" 
 			                                  		:required="true" 
 			                                  		:allow-empty="false"
 			                                  		:class="!errors.requisition_id ? 'is-valid' : 'is-invalid'" 
@@ -243,7 +240,7 @@
 										</div>
 									</div>
 
-									<div class="col-md-12">
+									<div class="col-md-12 card-footer">
 								    	<div class="form-row">
 									    	<div class="col-sm-12 text-right">
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
@@ -320,6 +317,25 @@
 													>
 												</div>
 
+											<!-- 
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Dispatched Total Quantity
+													</label>
+													<input 
+														type="number" 
+														class="form-control" 
+														v-model.number="requiredProduct.product_dispatched_quantity" 
+														placeholder="Product Total Quantity" 
+														:class="!errors.products[productIndex].total_dispatched_quantity ? 'is-valid' : 'is-invalid'" 
+														@input="validateFormInput('total_dispatched_quantity')" 
+													>
+													<div class="invalid-feedback">
+												    	{{ errors.products[productIndex].total_dispatched_quantity }}
+												    </div>
+												</div>
+ 											-->
+
 											</div>
 
 											<div class="card" v-if="requiredProduct.has_variations">
@@ -365,6 +381,19 @@
 															>
 														</div>
 
+														<!-- 
+														<div class="form-group col-md-4">
+															<label for="inputFirstName">Dispatched Quantity</label>
+															<input 
+																type="number" 
+																class="form-control" 
+																v-model.number="requiredProduct.variations[variationIndex].variation_dispatched_quantity" 
+																placeholder="Dispatched Quantity" 
+																@input="validateFormInput('variation_total_dispatched_quantity')"  
+															>
+														</div>
+													 	-->
+
 													</div>
 													
 													<!-- 
@@ -403,7 +432,7 @@
 										</div>
 									</div>
 										
-									<div class="col-md-12">
+									<div class="col-md-12 card-footer">
 							        	<div class="form-row">
 											<div class="col-sm-12 text-right">
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
@@ -430,7 +459,9 @@
 									<h2 class="mx-auto mb-4 lead">Delivery Details</h2>	
 									
 									<div class="form-group col-md-12 text-center">
-										<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+										<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">
+											{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}
+										</span>
 									</div>
 
 									<div 
@@ -469,8 +500,7 @@
 
 											<div class="form-group col-md-6  align-self-center">
 												<div class="custom-file">
-												    <input 
-												    	type="file" 
+												    <input type="file" 
 												    	class="form-control custom-file-input" 
 														:class="!errors.agent.agent_receipt  ? 'is-valid' : 'is-invalid'" 
 											    	 	@change="onAgentReceiptChange" 
@@ -528,7 +558,24 @@
 											</div>
 										</div>
 
-										<div class="form-row">
+										<div class="form-row">	
+											<!-- 
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Destination</label>
+												<input 
+													type="text" 
+													class="form-control" 
+													v-model="singleDispatchData.delivery.address" 
+													placeholder="Delivery Address" 
+													:class="!errors.delivery.delivery_address ? 'is-valid' : 'is-invalid'"
+													@change="validateFormInput('delivery_address')"
+												>
+												<div class="invalid-feedback">
+											    	{{ errors.delivery.delivery_address }}
+											    </div>
+											</div>
+ 											-->
+
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">
 													Delivery Price
@@ -546,10 +593,9 @@
 											    </div>
 											</div>
 										</div>
-
 									</div>
 
-									<div class="col-md-12">
+									<div class="col-md-12 card-footer">
 							        	<div class="form-row">
 											<div class="col-sm-12 text-right" v-show="!submitForm">
 												<span class="text-danger small mb-1">
@@ -579,11 +625,11 @@
 		</div>
 
  		<!-- View Modal -->
-		<div class="modal fade" id="requisition-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="dispatch-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Requisition Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">Dispatch Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -606,7 +652,7 @@
 									</li>
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#requisition-despatch" role="tab">
-											Despatch
+											Dispatch
 										</a>
 									</li>
 								</ul>
@@ -619,7 +665,7 @@
 												Subject :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.subject }}
+												{{ singleDispatchData.requisition.subject }}
 											</label>
 										</div>
 
@@ -628,16 +674,7 @@
 												Description :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span v-html="singleRequisitionData.description"></span>
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
-											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
-													{{ singleRequisitionData.status ? 'Dispatched' : 'Pending' }}
-												</span>
+												<span v-html="singleDispatchData.requisition.description"></span>
 											</label>
 										</div>
 
@@ -646,7 +683,7 @@
 												Requested on :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.created_at }}
+												{{ singleDispatchData.requisition.created_at }}
 											</label>
 										</div>
 									</div>
@@ -654,7 +691,7 @@
 									<div class="tab-pane" id="requisition-product" role="tabpanel">
 										<div 
 											class="form-row" 
-											v-if="singleRequisitionData.products && singleRequisitionData.products.length"
+											v-if="singleDispatchData.products && singleDispatchData.products.length"
 										>
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Product Detail :
@@ -664,8 +701,8 @@
 													
 													<div 
 														class="col-md-12 ml-auto" 
-														v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
-														:key="'requisition-detail-' + requiredProduct.id + productIndex"
+														v-for="(dispatchedProduct, productIndex) in singleDispatchData.products" 
+														:key="'requisition-detail-' + dispatchedProduct.id + productIndex"
 													>
 														<div class="card">
 															<div class="card-body">
@@ -674,7 +711,7 @@
 																		Product Name :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.product_name }}
+																		{{ dispatchedProduct.product_name }}
 																	</label>
 																</div>
 
@@ -683,7 +720,7 @@
 																		Total Quantity :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.quantity }}
+																		{{ dispatchedProduct.quantity }}
 																	</label>
 																</div>
 
@@ -692,15 +729,15 @@
 																		Variations :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		<span :class="[requiredProduct.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ requiredProduct.has_variations ? 'Yes' : 'No' }}
+																		<span :class="[dispatchedProduct.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ dispatchedProduct.has_variations ? 'Yes' : 'No' }}
 																		</span>
 																	</label>
 																</div>
 
-																<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
+																<div class="form-row" v-if="dispatchedProduct.has_variations && dispatchedProduct.variations && dispatchedProduct.variations.length">
 																	<div 
 																		class="col-sm-12" 
-																		v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+																		v-for="(productVariation, variationIndex) in dispatchedProduct.variations" 
 																		:key="'required-product-variation-' + productVariation.id + variationIndex"
 																	>
 																		<div class="form-row">
@@ -725,12 +762,12 @@
 
 									<div class="tab-pane" id="requisition-despatch" role="tabpanel">
 
-										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
+										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Dispatched on :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.dispatch.released_at }}
+												{{ singleDispatchData.released_at }}
 											</label>
 										</div>
 
@@ -739,47 +776,47 @@
 												Service :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+												<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.delivery">
+										<div class="form-row" v-if="singleDispatchData.requisition.delivery">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Address :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span v-html="singleRequisitionData.delivery.address"></span>
+												<span v-html="singleDispatchData.requisition.delivery.address"></span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch && singleRequisitionData.dispatch.delivery">
+										<div class="form-row" v-if="singleDispatchData.delivery">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Receipt :
 											</label>
 											<label class="col-sm-6 col-form-label">
 												<img 
 													class="img-fluid" 
-													:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
-													alt="agent_receipt" 
+													:src="singleDispatchData.delivery.receipt_preview || ''"
+													alt="delivery_receipt" 
 												>
 											</label>
 										</div>
 
-										<div class="form-row" v-show="singleRequisitionData.agent">
+										<div class="form-row" v-if="singleDispatchData.requisition.agent">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Agent Name :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
+												{{ singleDispatchData.requisition.agent.name  }}
 											</label>
 										</div>
 
-										<div class="form-row" v-show="singleRequisitionData.agent">
+										<div class="form-row" v-if="singleDispatchData.requisition.agent">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Agent Mobile :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
+												{{ singleDispatchData.requisition.agent.mobile }}
 											</label>
 										</div>
 									</div>
@@ -808,18 +845,6 @@
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-    let singleRequisitionData = {
-
-		products : [
-			{}
-		],
-
-		agent : {},
-
-		delivery : {},
-				
-    };
-
     let singleDispatchData = {
 
 		requisition : {},
@@ -847,48 +872,43 @@
     			perPage : 10,
 	        	loading : false,
 	        	
-	        	currentTab : 'pending',
-	        	
 	        	editor: ClassicEditor,
 
 	        	submitForm : true,
 
-	        	requisitionsToShow : [],
-	        	allFetchedRequisitions : [],
-
-	        	availableRequisitions : [],
+	        	// dispatchesToShow : [],
+	        	allDispatches : [],
 	        	
-	        	// availableProducts : [],
+	        	allRequisitions : [],
 
 	        	pagination: {
 		        	current_page: 1
 		      	},
 
 	        	singleDispatchData : singleDispatchData,
-	        	singleRequisitionData : singleRequisitionData,
 
-		   		errors : {
+	        	errors : {
 					// products : [],
 					delivery : {},
 					agent : {}
 				},
 
-	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('dispatch'),
 
 	        }
 
 		},
 		
 		created(){
+			this.fetchAllDispatches();
 			this.fetchAllRequisitions();
-			this.fetchAvailableRequisitions();
 		},
 
 		watch : {
 
 			query : function(val){
 				if (val==='') {
-					this.fetchAllRequisitions();
+					this.fetchAllDispatches();
 				}
 				else {
 					this.searchData();
@@ -899,57 +919,59 @@
 		
 		methods : {
 
+			fetchAllDispatches() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allDispatches = [];
+				
+				axios
+					.get('/api/dispatches/' + this.perPage + "?page=" + this.pagination.current_page)
+					.then(response => {
+						if (response.status == 200) {
+							this.allDispatches = response.data.data;
+							this.pagination = response.data;
+							// this.dispatchesToShow = this.allDispatches.pending.data;
+							// this.showSelectedTabProducts();
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 			fetchAllRequisitions() {
 				
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.allFetchedRequisitions = [];
-				
-				axios
-					.get('/api/requisitions/' + this.perPage + "?page=" + this.pagination.current_page)
-					.then(response => {
-						if (response.status == 200) {
-							this.allFetchedRequisitions = response.data;
-							this.showSelectedTabProducts();
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
-						}
-
-					})
-					.finally(response => {
-						this.loading = false;
-					});
-
-			},
-			fetchAvailableRequisitions() {
-				
-				this.query = '';
-				this.error = '';
-				this.loading = true;
-				this.availableRequisitions = [];
+				this.allRequisitions = [];
 				
 				axios
 					.get('/api/requisitions/')
 					.then(response => {
 						if (response.status == 200) {
-							this.availableRequisitions = response.data.data;
+							this.allRequisitions = response.data.data;
 						}
 					})
 					.catch(error => {
@@ -976,12 +998,59 @@
 					});
 
 			},
-			showProductDispatchForm(object) {
+			searchData() {
 
+				this.error = '';
+				this.allDispatches = [];
+				this.pagination.current_page = 1;
+				
+				axios
+				.get(
+					"/api/search-dispatches/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+				)
+				.then(response => {
+					this.allDispatches = response.data.all.data;
+					// this.dispatchesToShow = this.allDispatches.all.data;
+					this.pagination = response.data.all;
+				})
+				.catch(e => {
+					this.error = e.toString();
+				});
+
+			},
+			changeNumberContents() {
+				
+				this.pagination.current_page = 1;
+
+				if (this.query === '') {
+					this.fetchAllDispatches();
+				}
+				else {
+					this.searchData();
+				}
+				
+    		},
+    		showDispatchDetails(object) {
+    			
+    			// console.log(object);
+
+				this.singleDispatchData = { ...object };
+				// this.singleDispatchData = Object.assign({}, this.singleDispatchData, object);
+				$('#dispatch-view-modal').modal('show');
+			},
+			showDispatchCreateForm() {
 				this.step = 1;
 	        	this.submitForm = true;
 	        	
-				this.singleDispatchData.requisition = { ...object };
+				this.singleDispatchData = {
+
+					requisition : {},
+
+					delivery : {},
+
+					agent : {}
+							
+			    };
 
 				this.errors = {
 					// products : [],
@@ -990,7 +1059,6 @@
 				};
 
 				$('#dispatch-createOrEdit-modal').modal('show');
-
 			},
 			makeDispatch() {
 				
@@ -1003,10 +1071,10 @@
 					.post('/dispatches/' + this.perPage, this.singleDispatchData)
 					.then(response => {
 						if (response.status == 200) {
-
 							this.$toastr.s("Requisition has been dispatched", "Success");
-							this.query !== '' ? this.searchData() : this.fetchAllRequisitions();
-							
+							this.query !== '' ? this.searchData() : this.fetchAllDispatches();
+							// this.allDispatches = response.data;
+							// this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							$('#dispatch-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1018,79 +1086,39 @@
 				      	}
 					})
 					.finally(response => {
-						// this.fetchAllRequisitions();
+						
 					});
 
 			},
 			verifyUserInput() {
 
-				// this.validateFormInput('delivery_address');
+				this.validateFormInput('requisition_id');
 				this.validateFormInput('delivery_price');
 				this.validateFormInput('delivery_receipt');
 				this.validateFormInput('agent_receipt');
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && Object.keys(this.errors.delivery).length == 0 && Object.keys(this.errors.agent).length == 0) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 4 && Object.keys(this.errors.delivery).length == 0 && Object.keys(this.errors.agent).length == 0) {
 
-					// console.log('verified');
+					console.log('verified');
 					return true;
 				
 				}
 
 				return false;
 			},
-			searchData() {
-
-				this.error = '';
-				this.allFetchedRequisitions = [];
-				this.pagination.current_page = 1;
-				
-				axios
-				.get(
-					"/api/search-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
-				.then(response => {
-					this.allFetchedRequisitions = response.data;
-					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
-					this.pagination = this.allFetchedRequisitions.all;
-				})
-				.catch(e => {
-					this.error = e.toString();
-				});
-
-			},
-			changeNumberContents() {
-				
-				this.pagination.current_page = 1;
-
-				if (this.query === '') {
-					this.fetchAllRequisitions();
-				}
-				else {
-					this.searchData();
-				}
-				
-    		},
-    		showContentDetails(object) {		
-				this.singleRequisitionData = { ...object };
-				$('#requisition-view-modal').modal('show');
-			},
-			showSelectedTabProducts() {
-				
-				if (this.currentTab=='pending') {
-					this.requisitionsToShow = this.allFetchedRequisitions.pending.data;
-					this.pagination = this.allFetchedRequisitions.pending;
-				}
-				else {
-					this.requisitionsToShow = this.allFetchedRequisitions.dispatched.data;
-					this.pagination = this.allFetchedRequisitions.dispatched;
-				}
-
-			},
 			nextPage() {
-				
+					
 				if (this.step==1) {
 					this.validateFormInput('requisition_id');
+					// this.setRequiredErrors();
 				}
+			
+			/*
+				else if (this.step == 2) {
+					// this.validateFormInput('total_dispatched_quantity');
+					// this.validateFormInput('variation_total_dispatched_quantity');
+				}
+			*/
 
 				if (!this.errors.requisition_id && this.step < 3) {
 					this.step += 1;
@@ -1101,22 +1129,26 @@
 				}
 
 			},
-			showPendingContents() {
-				this.currentTab = 'pending';
-				this.showSelectedTabProducts();
+		/*
+			errorInArray(array = []) {
+				
+				if (array.length) {
+
+					return array.some(element => Object.keys(element).length > 0);
+
+				}
+
+				return false;
 			},
-			showDispatchedContents() {
-				this.currentTab = 'dispatched';
-				this.showSelectedTabProducts();
-			},
-			objectNameWithCapitalized ({ subject, product_name, variation_name }) {
-		      	if (subject) {
-				    subject = subject.toString()
-				    return subject.charAt(0).toUpperCase() + subject.slice(1)
-		      	}
-		      	else if (product_name) {
-		      		product_name = product_name.toString()
+		*/
+			objectNameWithCapitalized ({subject, product_name, variation_name }) {
+		      	if (product_name) {
+				    product_name = product_name.toString()
 				    return product_name.charAt(0).toUpperCase() + product_name.slice(1)
+		      	}
+		      	else if (subject) {
+		      		subject = subject.toString()
+				    return subject.charAt(0).toUpperCase() + subject.slice(1)
 		      	}
 		      	else if (variation_name) {
 		      		variation_name = variation_name.toString()
@@ -1125,25 +1157,33 @@
 		      	else 
 		      		return ''
 		    },
-		    onAgentReceiptChange(evnt) {
+		/*
+			setRequiredErrors() {
 
-				let files = evnt.target.files || evnt.dataTransfer.files;
+				// console.log(this.singleDispatchData.requisition.products);
 
-                // Only process image files.
-		      	if (files.length && files[0].type.match('image.*')) {
-                	this.submitForm = true;
-                	this.errors.agent = {};
-                	this.createImage(files[0]);
-                	// this.$delete(this.errors.agent, 'agent_receipt');
-		      	}
-		      	else{
-		      		this.errors.agent.agent_receipt = 'Receipt is required';
-		      	}
+				if (this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
 
-		      	evnt.target.value = '';
-		      	return;
+					this.errors.products = [];
+
+					this.singleDispatchData.requisition.products.forEach(
+							
+						(requiredProduct, index) => {
+
+							this.errors.products.push({});
+
+						}
+						
+					);
+
+					// console.log('Hitted Inside');
+
+				}
+
+				// console.log('Hitted OutSide');
 
 			},
+		*/
 			onDeliveryReceiptChange(evnt) {
 
 				let files = evnt.target.files || evnt.dataTransfer.files;
@@ -1162,7 +1202,26 @@
 		      	return;
 
 			},
-			createImage(file, previewName, index=null) {
+			onAgentReceiptChange(evnt) {
+
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	this.submitForm = true;
+                	this.errors.agent = {};
+                	this.createImage(files[0]);
+                	// this.$delete(this.errors.agent, 'agent_receipt');
+		      	}
+		      	else{
+		      		this.errors.agent.agent_receipt = 'Receipt is required';
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+
+			},
+			createImage(file, previewName) {
                 let reader = new FileReader();
                 
                 reader.onload = (evnt) => {
@@ -1197,6 +1256,112 @@
 
 						break;
 
+					/*
+					case 'total_dispatched_quantity' :
+
+						if (this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+							
+								(requiredProduct, productIndex) => {
+
+									if (!requiredProduct.product_dispatched_quantity || requiredProduct.product_dispatched_quantity < 1) {
+										this.errors.products[productIndex].total_dispatched_quantity = 'Total Quantity is required';
+									}
+									else{
+										this.$delete(this.errors.products[productIndex], 'total_dispatched_quantity');
+									}
+
+									if (!this.errorInArray(this.errors.products)) {
+										this.submitForm = true;
+									}
+
+								}
+							);
+
+						}
+						else {
+
+							this.errors.products = [];
+
+						}
+
+						break;
+					*/
+
+					/*
+					case 'variation_total_dispatched_quantity' :
+
+						if (this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+							
+								(requiredProduct, productIndex) => {
+
+									if (requiredProduct.has_variations && requiredProduct.variations.length) {
+
+										let totalVariationQuantity = requiredProduct.variations.reduce((total, current) => total + current.variation_dispatched_quantity || 0, 0
+
+										);
+
+										if (requiredProduct.product_dispatched_quantity != totalVariationQuantity) {
+											this.errors.products[productIndex].variation_total_dispatched_quantity = 'Total quantity should be equal to variations quantity';
+										}
+										else{
+											
+											this.$delete(this.errors.products[productIndex], 'variation_total_dispatched_quantity');
+
+										}
+
+										if (!this.errorInArray(this.errors.products)) {
+											this.submitForm = true;
+										}
+
+									}
+									else {
+
+										this.errors.products[productIndex] = {};
+
+									}
+									
+								}
+							);
+
+						}
+						else {
+
+							this.errors.products = [];
+
+						}
+
+						break;
+					*/
+
+					/*
+					case 'delivery_address' :
+
+						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
+
+							if (Object.keys(this.singleDispatchData.delivery).length==0 || !this.singleDispatchData.delivery.address) {
+								this.errors.delivery.delivery_address = 'Address is required';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.delivery, 'delivery_address');
+							}
+
+						}
+
+						else {
+
+							this.errors.delivery = {};
+
+						}
+
+
+						break;
+					*/
+
 					case 'delivery_price' :
 
 						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
@@ -1217,6 +1382,7 @@
 							this.errors.delivery = {};
 
 						}
+
 
 						break;
 
@@ -1268,9 +1434,103 @@
 
 						break;
 
+				/*
+
+					case 'description' :
+
+						if (this.singleDispatchData.description && !this.singleDispatchData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.description = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'description');
+						}
+
+						break;
+
+					
+
+					case 'product_quantity' :
+
+						this.singleDispatchData.products.forEach(
+							
+							(requiredProduct, index) => {
+
+								if (!requiredProduct.quantity || requiredProduct.quantity < 1) {
+									this.errors.product_quantity[index] = 'Quantity is required';
+								}
+								else{
+									this.errors.product_quantity[index] = null;
+								}
+
+								if (!this.errorInArray(this.errors.product_quantity)) {
+									this.submitForm = true;
+								}
+
+							}
+						);
+
+						break;
+				*/
+
 				}
 	 
 			},
+
+		/*
+			showSelectedTabProducts() {
+				
+				if (this.currentTab=='pending') {
+					this.dispatchesToShow = this.allDispatches.pending.data;
+					this.pagination = this.allDispatches.pending;
+				}
+				else {
+					this.dispatchesToShow = this.allDispatches.dispatched.data;
+					this.pagination = this.allDispatches.dispatched;
+				}
+
+			},
+		*/
+		/*
+		*/
+		/*
+			showPendingContents() {
+				this.currentTab = 'pending';
+				this.showSelectedTabProducts();
+			},
+			showDispatchedContents() {
+				this.currentTab = 'dispatched';
+				this.showSelectedTabProducts();
+			},
+			addMoreProduct() {
+				if (this.singleDispatchData.products.length < 3) {
+
+					this.singleDispatchData.products.push({});
+					this.errors.product_id.push(null);
+					this.errors.product_quantity.push(null);
+
+				}
+			},
+			removeProduct() {
+					
+				if (this.singleDispatchData.products.length > 1) {
+
+					this.singleDispatchData.products.pop();
+					this.errors.product_id.pop();
+					this.errors.product_quantity.pop();
+				
+				}
+				
+			},
+		*/
+			
+		/*
+			setRequiredProduct(index) {
+				if (this.singleDispatchData.products[index].product && Object.keys(this.singleDispatchData.products[index].product).length > 0) {
+					this.singleDispatchData.products[index].id = this.singleDispatchData.products[index].product.id;
+				}
+			},
+		*/
             
 		}
   	}

@@ -62,8 +62,8 @@
 																	>
 																		<td>{{ content.subject }}</td>
 																		<td>
-																			<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ singleRequisitionData.status ? 'Despatched' : 'Pending' }}
+																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
+																				{{ content.status ? 'Despatched' : 'Pending' }}
 																			</span>
 																		</td>
 																		<td>
@@ -284,7 +284,10 @@
 												    </div>
 												</div>
 
-												<div class="form-group col-md-6">
+												<div 
+													class="form-group col-md-6" 
+													v-if="requiredProduct.product"
+												>
 													<label for="inputFirstName">Total Quantity</label>
 													<input type="number" 
 														class="form-control" 
@@ -293,7 +296,8 @@
 														:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
 														@change="validateFormInput('product_quantity')" 
 														required="true" 
-														min="1"
+														min="0" 
+														:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
 													>
 													<div class="invalid-feedback">
 											        	{{ errors.products[productIndex].product_quantity }}
@@ -324,13 +328,15 @@
 						                                	</multiselect>
 														</div>
 														<div class="form-group col-md-6">
-															<label for="inputFirstName">Variation Quantity</label>
+															<label for="inputFirstName">
+																Variation Quantity
+															</label>
 															<input type="number" 
 																class="form-control" 
 																v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
 																placeholder="Variation Quantity" 
-																min="1" 
-																:max="requiredProduct.total_quantity" 
+																min="0" 
+																:max="productVariation.available_quantity - productVariation.requested_quantity" 
 																@change="validateFormInput('variations_quantity')" 
 															>
 														</div>
@@ -481,7 +487,7 @@
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-													Save
+													Request
 												</button>
 											</div>
 								    	</div>
@@ -554,7 +560,7 @@
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">{{ singleRequisitionData.status ? 'Available' : 'NA' }}</span>
+												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">{{ singleRequisitionData.status ? 'Dispatched' : 'Pending' }}</span>
 											</label>
 										</div>
 
@@ -657,6 +663,18 @@
 											<label class="col-sm-6 col-form-label">
 												<span v-html="singleRequisitionData.delivery.address"></span>
 											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.delivery && singleRequisitionData.status && singleRequisitionData.dispatch">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Delivery Receipt :
+											</label>
+											<div class="col-sm-6">
+												<img 
+													class="img-fluid"  
+													:src="singleRequisitionData.dispatch.delivery.receipt_preview"
+												>
+											</div>
 										</div>
 
 										<div class="form-row" v-show="singleRequisitionData.agent">
@@ -969,7 +987,7 @@
 				      	}
 					})
 					.finally(response => {
-						// this.fetchAllContainers();
+						this.fetchMerchantAllProducts();
 					});
 
 			},
@@ -1040,7 +1058,7 @@
 				this.showSelectedTabProducts();
 			},
 			addMoreProduct() {
-				if (this.singleRequisitionData.products.length < 3) {
+				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
 					this.singleRequisitionData.products.push({});
 					this.errors.products.push({});
@@ -1151,12 +1169,13 @@
 									this.$delete(this.errors.products[productIndex], 'product_quantity');
 								}
 
-								if (!this.errorInArray(this.errors.products)) {
-									this.submitForm = true;
-								}
-
 							}
+
 						);
+								
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -1179,6 +1198,7 @@
 									}
 									else{
 										
+										// this.submitForm = true;
 										this.$delete(this.errors.products[productIndex], 'variations_quantity');
 
 									}
@@ -1186,13 +1206,18 @@
 								}
 								else {
 
+									// this.submitForm = true;
 									this.$delete(this.errors.products[productIndex], 'variations_quantity');
 
 								}
 
-
 							}
+
 						);
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -1211,6 +1236,7 @@
 							}
 						}
 						else {
+							this.submitForm = true;
 							this.errors.agent = {};
 						}
 
@@ -1234,6 +1260,7 @@
 
 						}
 						else {
+							this.submitForm = true;
 							this.errors.agent = {};
 						}
 
@@ -1255,6 +1282,7 @@
 
 						}
 						else {
+							this.submitForm = true;
 							this.errors.delivery = {};
 						}
 

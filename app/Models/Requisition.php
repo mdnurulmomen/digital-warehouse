@@ -70,4 +70,9 @@ class Requisition extends Model
     {
         return $this->hasOne(RequisitionAgent::class, 'requisition_id', 'id');
     }
+
+    public function dispatch()
+    {
+        return $this->hasOne(Dispatch::class, 'requisition_id', 'id');
+    }
 }

@@ -251,8 +251,7 @@
 										Primary Qty
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.initial_quantity }} 
-										{{ singleProductData.quantity_type }}
+										{{ singleProductData.initial_quantity + ' ' + singleProductData.quantity_type }} 
 									</label>
 								</div>
 
@@ -261,15 +260,23 @@
 										Available Qty:
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.available_quantity }}
-										{{ singleProductData.quantity_type }}
+										{{ singleProductData.available_quantity + ' ' + singleProductData.quantity_type }}
+									</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										Requested Qty:
+									</label>
+									<label class="col-sm-6 col-form-label text-left">
+										{{ singleProductData.requested_quantity + ' ' + singleProductData.quantity_type }}
 									</label>
 								</div>
 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
 									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[singleProductData.variations ? 'badge-success' : 'badge-danger', 'badge']">{{ singleProductData.variations ? 'Available' : 'NA' }}</span>
+										<span :class="[(singleProductData.has_variations && singleProductData.variations.length) ? 'badge-success' : 'badge-danger', 'badge']">{{ (singleProductData.has_variations && singleProductData.variations.length) ? 'Available' : 'NA' }}</span>
 									</label>
 								</div>
 
@@ -319,14 +326,21 @@
 														<div class="form-row">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">Primary Qty :</label>
 															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.initial_quantity }}
+																{{ productVariation.initial_quantity + ' ' + singleProductData.quantity_type }}
 															</label>
 														</div>
 
 														<div class="form-row">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
 															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.available_quantity }}
+																{{ productVariation.available_quantity + ' ' + singleProductData.quantity_type }}
+															</label>
+														</div>
+
+														<div class="form-row">
+															<label class="col-sm-6 col-form-label font-weight-bold text-right">Requested Qty :</label>
+															<label class="col-sm-6 col-form-label text-left">
+																{{ productVariation.requested_quantity + ' ' + singleProductData.quantity_type }}
 															</label>
 														</div>
 
@@ -474,9 +488,9 @@
     	// available_quantity : null,
     	// quantity_type : null,
     	// has_variations : null,
-    	variations : [
-			{},
-		],
+  		// variations : [
+		// 	{},
+		// ],
     	// product_category_id : null,
     	// merchant_id : null,
     	// category : {},

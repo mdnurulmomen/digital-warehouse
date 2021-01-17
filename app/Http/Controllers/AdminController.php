@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dispatch;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Http\Resources\Web\DispatchCollection;
+use App\Http\Resources\Web\RequisitionResource;
 use App\Http\Resources\Web\RequisitionCollection;
 
 
@@ -23,7 +26,7 @@ class AdminController extends Controller
 
         }
 
-        return Requisition::with('products.product')->get();
+        return RequisitionResource::collection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
 
     }
 
@@ -67,6 +70,91 @@ class AdminController extends Controller
 
         return [
             'all' => new RequisitionCollection($query->paginate($perPage)),  
+        ];
+    }
+
+    // Despatch
+    public function showAllDispatches($perPage = false)
+    {       
+        if ($perPage) {
+            
+            return new DispatchCollection(
+                Dispatch::with(['requisition', 'products', 'delivery', 'return'])->latest('released_at')->paginate($perPage)
+            );
+
+        }
+        
+        /*
+        if ($perPage) {
+
+            return Dispatch::with(['requisition', 'products', 'delivery', 'return'])->latest('released_at')->paginate($perPage);
+
+        }
+
+        return Dispatch::with(['requisition', 'products', 'delivery', 'return'])->latest('released_at')->get();
+        */
+
+    }
+
+
+    public function makeNewDispatch(Request $request, $perPage)
+    {
+        $request->validate([
+            
+            'requisition' => 'required',
+            'requisition.id' => 'required|exists:requisitions,id',
+            'requisition.products' => 'required|array|min:1',
+            'requisition.products.*.product_id' => 'required|exists:products,id',
+            'requisition.products.*.quantity' => 'required|numeric|min:1',
+            'requisition.products.*.variations' => 'nullable|array|min:1',
+
+            'agent' => 'required_if:delivery,0,',
+            'agent.agent_receipt' => 'required_if:delivery,0,',
+            
+            'delivery' => 'required_if:agent,0,',
+            // 'delivery.address' => 'required_if:agent,0,',
+            'delivery.delivery_price' => 'required_if:agent,0,',
+            'delivery.delivery_receipt' => 'required_if:agent,0,',
+
+        ]);
+
+        // $currentMerchant = \Auth::user();
+
+        $newDispatch = new Dispatch();
+        $newDispatch->requisition_id = $request->requisition['id'];
+        $newDispatch->save();
+
+        $newDispatch->dispatch_products = json_decode(json_encode($request->requisition['products']));
+
+        if (!empty($request->delivery) && !empty($request->delivery['delivery_price']) && !empty($request->delivery['delivery_receipt'])) {
+            
+            $newDispatch->deliver_requisition = json_decode(json_encode($request->delivery));
+        }
+        else if (!empty($request->agent) && !empty($request->agent['agent_receipt']))  {
+
+            $newDispatch->return_requisition = json_decode(json_encode($request->agent));
+        }
+
+        $newDispatch->requisition()->update([
+            'status' => true
+        ]);
+
+        return $this->showAllDispatches($perPage);
+    }
+
+
+    public function searchAllDispatches($search, $perPage)
+    {
+        $query = $query = Dispatch::with(['requisition', 'products', 'delivery', 'return'])
+                                ->where(function ($query) use ($search) {
+                                    $query->whereHas('requisition', function ($q) use ($search) {
+                                        $q->where('subject', 'like', "%$search%")
+                                          ->orWhere('description', 'like', "%$search%");
+                                    });
+                                });
+
+        return [
+            'all' => new DispatchCollection($query->paginate($perPage)),  
         ];
     }
 }

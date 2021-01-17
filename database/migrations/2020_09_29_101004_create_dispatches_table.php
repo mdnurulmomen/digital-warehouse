@@ -16,9 +16,10 @@ class CreateDispatchesTable extends Migration
         // history of all dispatches
         Schema::create('dispatches', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('receiver_type'); // product-delivery or product returns
-            $table->unsignedMediumInteger('receiver_id'); // for details of taker
-            $table->unsignedInteger('merchant_id');
+            // $table->string('receiver_type'); // product-delivery or product returns
+            // $table->unsignedMediumInteger('receiver_id'); // for details of taker
+            // $table->unsignedInteger('merchant_id');
+            $table->unsignedInteger('requisition_id');
             $table->timestamp('released_at')->useCurrent();
         });
     }

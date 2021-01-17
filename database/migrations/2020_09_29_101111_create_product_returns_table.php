@@ -15,8 +15,9 @@ class CreateProductReturnsTable extends Migration
     {
         Schema::create('product_returns', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('product_dispatch_id');
+            // $table->unsignedInteger('product_dispatch_id');
             $table->string('receipt_preview');
+            $table->unsignedInteger('dispatch_id');
         });
     }
 

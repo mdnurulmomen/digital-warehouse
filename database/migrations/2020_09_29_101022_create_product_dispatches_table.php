@@ -18,9 +18,10 @@ class CreateProductDispatchesTable extends Migration
         // space release should be a field when releasing products which should be filled with scan
         Schema::create('product_dispatches', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('sku', 100); // scanned from product / box or searched out
+            // $table->string('sku', 100); // scanned from product / box or searched out
             $table->unsignedSmallInteger('quantity')->default(100); // how many of this product with all variatons have been released / for the products that have no variation
-            $table->boolean('with_packaging')->default(0);
+            // $table->boolean('with_packaging')->default(0);
+            $table->boolean('has_variations')->default(0);
             $table->unsignedInteger('product_id');
             $table->unsignedInteger('dispatch_id');
         });

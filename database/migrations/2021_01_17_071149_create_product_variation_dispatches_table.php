@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductDispatchDetailsTable extends Migration
+class CreateProductVariationDispatchesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,11 +15,12 @@ class CreateProductDispatchDetailsTable extends Migration
     {
         // for the products with variations and dispatched
         // for product remaining combination calculation
-        Schema::create('product_dispatch_details', function (Blueprint $table) {
+        Schema::create('product_variation_dispatches', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('sku', 100); // depending on product code and variation combinations, scanned/auto-generated
+            // $table->string('sku', 100); // depending on product code and variation combinations, scanned/auto-generated
             $table->unsignedMediumInteger('quantity')->default(100); // how many of this variation has been released
-            $table->unsignedInteger('product_combination_id');  // how many of this product has been released
+            // $table->unsignedInteger('product_combination_id');  // how many of this product has been released
+            $table->unsignedInteger('product_variation_id');  // how many of this product has been released
             $table->unsignedInteger('product_dispatch_id');
         });
         // 'available_quantity' of product_combinations table should be updated after every row 
@@ -32,6 +33,6 @@ class CreateProductDispatchDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_dispatch_details');
+        Schema::dropIfExists('product_variation_dispatches');
     }
 }
