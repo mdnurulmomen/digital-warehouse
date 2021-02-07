@@ -224,6 +224,8 @@ class MerchantController extends Controller
             'agent' => 'required_if:delivery_service,0,',
             'agent.name' => 'required_if:delivery_service,0,',
             'agent.mobile' => 'required_if:delivery_service,0,',
+            'agent.code' => 'required_if:delivery_service,0,|string',
+            // 'agent.presence_confirmation' => 'nullable|boolean',
             'delivery' => 'required_if:delivery_service,1',
             'delivery.address' => 'required_if:delivery_service,1',
         ]);
@@ -253,6 +255,8 @@ class MerchantController extends Controller
            $newRequisition->agent()->create([
                 'name' => $request->agent['name'],
                 'mobile' => $request->agent['mobile'],
+                'code' => $request->agent['code'],
+                // 'presence_confirmation' => $request->agent['presence_confirmation'] ?? false,
             ]); 
 
         }
@@ -278,6 +282,32 @@ class MerchantController extends Controller
         return [
             'all' => new RequisitionCollection($query->paginate($perPage)),  
         ];
+    }
+
+    public function receiveDispatchedProducts(Request $request, $perPage)
+    {
+        $request->validate([
+            'id' => 'required|numeric|exists:requisitions,id|exists:dispatches,requisition_id',
+        ]);
+
+        $dispatchedRequisition = Requisition::findOrFail($request->id);
+
+        if ($dispatchedRequisition->dispatch && $dispatchedRequisition->agent) {
+            
+            $dispatchedRequisition->dispatch->return()->update([
+                'receiving_confirmation' => true,
+            ]);
+
+        }
+        else if ($dispatchedRequisition->dispatch && $dispatchedRequisition->delivery) {
+            
+            $dispatchedRequisition->dispatch->delivery()->update([
+                'receiving_confirmation' => true,
+            ]);
+
+        }
+
+        return $this->showMerchantAllRequisitions($perPage);
     }
 
 }

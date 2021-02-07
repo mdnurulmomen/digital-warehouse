@@ -61,6 +61,7 @@
 																	<tr>
 																		<th>Subject</th>
 																		<th>Status</th>
+																		<th>Confirmation</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -72,6 +73,18 @@
 																		<td>
 																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
 																				{{ content.status ? 'Despatched' : 'Pending' }}
+																			</span>
+																		</td>
+																		<td>
+																			<span 
+																			v-if="content.status && content.dispatch"
+																			:class="[!unconfirmed(content) ? 'badge-success' : 'badge-danger', 'badge']">
+																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Yet' }}
+																			</span>
+																			<span v-else 
+																			class="badge badge-secondary" 
+																			>
+																				NA
 																			</span>
 																		</td>
 																		<td>
@@ -99,7 +112,7 @@
 																	<tr 
 																  		v-show="!requisitionsToShow.length"
 																  	>
-															    		<td colspan="3">
+															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -111,6 +124,7 @@
 																	<tr>	
 																		<th>Name</th>
 																		<th>Status</th>
+																		<th>Confirmation</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -427,7 +441,7 @@
 									v-bind:key="'requisition-modal-step-' + 3" 
 									v-show="!loading && step==3"
 								>	
-									<h2 class="mx-auto mb-4 lead">Delivery Details</h2>	
+									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
 									
 									<div class="form-group col-md-12 text-center">
 										<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
@@ -457,8 +471,29 @@
 													readonly="true" 
 												>
 											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Code</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleDispatchData.requisition.agent.code" 
+													placeholder="Agent Code" 
+													readonly="true" 
+												>
+											</div>
+
+											<!-- 
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Presence</label>
+													
+												<span :class="[singleDispatchData.requisition.agent.presence_confirmation ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleDispatchData.requisition.agent.presence_confirmation ? 'Present' : 'Not Yet' }}
+												</span>
+											</div>											
+ 											-->
 										</div>
 
+										<!-- 
 										<div class="form-row d-flex">
 											<div class="form-group col-md-6">
 												<img class="img-fluid" 
@@ -485,6 +520,7 @@
 											  	</div>
 											</div>
 										</div>
+										-->
 									</div>
 
 									<div 
@@ -760,7 +796,7 @@
 												<img 
 													class="img-fluid" 
 													:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
-													alt="agent_receipt" 
+													alt="delivery receipt" 
 												>
 											</label>
 										</div>
@@ -780,6 +816,39 @@
 											</label>
 											<label class="col-sm-6 col-form-label">
 												{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleRequisitionData.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Code :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
+											</label>
+										</div>
+
+										<!-- 
+										<div class="form-row" v-show="singleRequisitionData.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Presence :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												
+												<span :class="[(singleRequisitionData.agent && singleRequisitionData.agent.presence_confirmation) ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ (singleRequisitionData.agent && singleRequisitionData.agent.presence_confirmation) ? 'Present' : 'Not Yet' }}
+												</span>
+
+											</label>
+										</div>
+										-->
+
+										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Received :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Yet' }}</span>
 											</label>
 										</div>
 									</div>
@@ -826,7 +895,7 @@
 
 		delivery : {},
 
-		agent : {}
+		// agent : {}
 				
     };
 
@@ -870,7 +939,7 @@
 		   		errors : {
 					// products : [],
 					delivery : {},
-					agent : {}
+					// agent : {}
 				},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -981,12 +1050,20 @@
 				this.step = 1;
 	        	this.submitForm = true;
 	        	
-				this.singleDispatchData.requisition = { ...object };
+				this.singleDispatchData = {
+
+					requisition : { ...object },
+
+					delivery : {},
+
+					// agent : {}
+							
+			    };
 
 				this.errors = {
 					// products : [],
 					delivery : {},
-					agent : {},
+					// agent : {},
 				};
 
 				$('#dispatch-createOrEdit-modal').modal('show');
@@ -1027,9 +1104,9 @@
 				// this.validateFormInput('delivery_address');
 				this.validateFormInput('delivery_price');
 				this.validateFormInput('delivery_receipt');
-				this.validateFormInput('agent_receipt');
+				// this.validateFormInput('agent_receipt');
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && Object.keys(this.errors.delivery).length == 0 && Object.keys(this.errors.agent).length == 0) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && Object.keys(this.errors.delivery).length == 0) {
 
 					// console.log('verified');
 					return true;
@@ -1086,6 +1163,17 @@
 				}
 
 			},
+			unconfirmed(object) {
+
+				if (object.status && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+
+					return true; 	// not confirmed
+
+				}
+
+				return false;  // confirmed
+				
+			},
 			nextPage() {
 				
 				if (this.step==1) {
@@ -1125,6 +1213,7 @@
 		      	else 
 		      		return ''
 		    },
+		    /*
 		    onAgentReceiptChange(evnt) {
 
 				let files = evnt.target.files || evnt.dataTransfer.files;
@@ -1144,6 +1233,7 @@
 		      	return;
 
 			},
+			*/
 			onDeliveryReceiptChange(evnt) {
 
 				let files = evnt.target.files || evnt.dataTransfer.files;
@@ -1152,7 +1242,8 @@
 		      	if (files.length && files[0].type.match('image.*')) {
                 	this.submitForm = true;
                 	this.$delete(this.errors.delivery, 'delivery_receipt');
-                	this.createImage(files[0], 'delivery_receipt');
+                	this.createImage(files[0]);
+                	// this.createImage(files[0], 'delivery_receipt');
 		      	}
 		      	else{
 		      		this.errors.delivery.delivery_receipt = 'Receipt is required';
@@ -1162,19 +1253,21 @@
 		      	return;
 
 			},
-			createImage(file, previewName, index=null) {
+			createImage(file) {
                 let reader = new FileReader();
                 
                 reader.onload = (evnt) => {
 
-                	if (previewName === 'delivery_receipt') {
+                	// if (previewName === 'delivery_receipt') {
 
                 		this.singleDispatchData.delivery.delivery_receipt = evnt.target.result;
-                	}
-                	else {
+                	// }
+                	// else {
 
-                    	this.singleDispatchData.agent.agent_receipt = evnt.target.result;
-                	}
+                 		// this.singleDispatchData.agent.agent_receipt = evnt.target.result;
+                	
+                	// }
+                
                 };
 
                 reader.readAsDataURL(file);
@@ -1244,6 +1337,7 @@
 
 						break;
 
+					/*
 					case 'agent_receipt' :
 
 						if (this.singleDispatchData.requisition.hasOwnProperty('agent')) {
@@ -1267,6 +1361,7 @@
 
 
 						break;
+					*/
 
 				}
 	 

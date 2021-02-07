@@ -16,7 +16,8 @@ class CreateProductReturnsTable extends Migration
         Schema::create('product_returns', function (Blueprint $table) {
             $table->increments('id');
             // $table->unsignedInteger('product_dispatch_id');
-            $table->string('receipt_preview');
+            // $table->string('receipt_preview');
+            $table->boolean('receiving_confirmation')->default(false);
             $table->unsignedInteger('dispatch_id');
         });
     }

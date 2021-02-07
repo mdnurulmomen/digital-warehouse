@@ -130,6 +130,7 @@ class Dispatch extends Model
      * @param  string  $value
      * @return void
      */
+    /*
     public function setReturnRequisitionAttribute($return = false)
     {
         if ($return) {
@@ -149,4 +150,5 @@ class Dispatch extends Model
 
         }
     }
+    */
 }

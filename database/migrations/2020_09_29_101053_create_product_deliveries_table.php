@@ -18,6 +18,7 @@ class CreateProductDeliveriesTable extends Migration
             // $table->string('destination_name', 100);
             $table->unsignedSmallInteger('delivery_price')->default(100);
             $table->string('receipt_preview'); // receit image of delivery company for delivery responsiblity
+            $table->boolean('receiving_confirmation')->default(false);
             $table->unsignedInteger('dispatch_id');
             // $table->unsignedInteger('product_dispatch_id');
             // $table->unsignedSmallInteger('delivery_company_id');

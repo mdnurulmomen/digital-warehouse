@@ -17,6 +17,8 @@ class CreateRequisitionAgentsTable extends Migration
             $table->increments('id');
             $table->string('name', 50);
             $table->string('mobile', 50);
+            $table->string('code', 50);
+            // $table->boolean('presence_confirmation')->default(false);
             $table->unsignedInteger('requisition_id');
         });
     }

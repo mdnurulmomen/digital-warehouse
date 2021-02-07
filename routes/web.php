@@ -38,6 +38,8 @@ Route::name('merchant.')->group(function () {
 		Route::post('/requisitions/{perPage}', 'MerchantController@makeNewRequisition')->name('requisitions');
 		Route::get('/api/search-requisitions/{search}/{perPage?}', 'MerchantController@searchMerchantAllRequisitions')->name('search-requisitions');
 
+		Route::post('/receive-dispatched-products/{perPage}', 'MerchantController@receiveDispatchedProducts')->name('receive-dispatched-products');
+
 	});
 
 });

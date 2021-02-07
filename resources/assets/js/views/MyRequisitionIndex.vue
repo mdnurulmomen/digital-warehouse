@@ -53,6 +53,7 @@
 																	<tr>
 																		<th>Subject</th>
 																		<th>Status</th>
+																		<th>Confirmation</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -67,6 +68,18 @@
 																			</span>
 																		</td>
 																		<td>
+																			<span 
+																			v-if="content.status && content.dispatch"
+																			:class="[!unconfirmed(content) ? 'badge-success' : 'badge-danger', 'badge']">
+																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Yet' }}
+																			</span>
+																			<span v-else 
+																			class="badge badge-secondary" 
+																			>
+																				NA
+																			</span>
+																		</td>
+																		<td>
 																			
 																			<button 
 																				type="button" 
@@ -74,7 +87,29 @@
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fas fa-eye"></i>
+																				<!-- Details -->
 																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-danger btn-icon" 
+																				v-if="unconfirmed(content)"
+																				@click="receiveDispatchedProducts(content)"
+																			>
+																				<i class="fa fa-check-circle" aria-hidden="true"></i>
+																				<!-- Receive -->
+																			</button>
+
+																			<!-- 
+																			<button 
+																				type="button" 
+																				class="btn btn-dark btn-icon" 
+																				v-show="content.hasOwnProperty('agent')"  
+																				@click="confirmAgentPresence(content)"
+																			>
+																				<i class="fa fa-user-secret "></i>
+																			</button>
+ 																			-->
 
 																		</td>
 																    
@@ -82,7 +117,7 @@
 																	<tr 
 																  		v-show="!requisitionsToShow.length"
 																  	>
-															    		<td colspan="3">
+															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -94,6 +129,7 @@
 																	<tr>	
 																		<th>Name</th>
 																		<th>Status</th>
+																		<th>Confirmation</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -451,6 +487,32 @@
 										        	{{ errors.agent.agent_mobile }}
 										  		</div>
 											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Code</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleRequisitionData.agent.code" 
+													placeholder="Secret Code" 
+													:class="!errors.agent.agent_code  ? 'is-valid' : 'is-invalid'" 
+													@input="validateFormInput('agent_code')" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.agent.agent_code }}
+										  		</div>
+											</div>
+											<!-- 
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Present</label>
+												<toggle-button 
+													v-model="singleRequisitionData.agent.presence_confirmation" 
+													:width=200 
+													:color="{checked: 'red', unchecked: 'green'}"
+													:labels="{checked: 'Now', unchecked: 'Later'}" 
+												/>
+											</div>
+											-->
 										</div>
 
 										<div class="form-row" v-if="singleRequisitionData.delivery_service">
@@ -694,6 +756,39 @@
 												{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
 											</label>
 										</div>
+
+										<div class="form-row" v-show="singleRequisitionData.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Code :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
+											</label>
+										</div>
+
+										<!-- 
+										<div class="form-row" v-show="singleRequisitionData.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Presence :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												
+												<span :class="[(singleRequisitionData.agent && singleRequisitionData.agent.presence_confirmation) ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ (singleRequisitionData.agent && singleRequisitionData.agent.presence_confirmation) ? 'Present' : 'Not Yet' }}
+												</span>
+
+											</label>
+										</div>
+										-->
+										
+										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Received :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Yet' }}</span>
+											</label>
+										</div>
 									</div>
 
 								</div>
@@ -878,41 +973,30 @@
 					});
 
 			},
-			searchData(emitedValue=false) {
+    		receiveDispatchedProducts(object) {
 
-				if (emitedValue) {
-					this.query=emitedValue;
-				}
+    			this.singleRequisitionData = { ...object };
 
-				this.error = '';
-				this.allFetchedRequisitions = [];
-				this.pagination.current_page = 1;
-				
-				axios
-				.get(
-					"/api/search-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
-				.then(response => {
-					this.allFetchedRequisitions = response.data;
-					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
-					this.pagination = this.allFetchedRequisitions.all;
-				})
-				.catch(e => {
-					this.error = e.toString();
-				});
+    			axios
+					.post('/receive-dispatched-products/' + this.perPage, this.singleRequisitionData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Dispatched products has been received", "Success");
+							this.allFetchedRequisitions = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						// this.fetchMerchantAllProducts();
+					});
 
-			},
-			changeNumberContents() {
-				
-				this.pagination.current_page = 1;
-
-				if (this.query === '') {
-					this.fetchAllRequisitions();
-				}
-				else {
-					this.searchData();
-				}
-				
     		},
     		showContentDetails(object) {		
 				this.singleRequisitionData = { ...object };
@@ -920,6 +1004,12 @@
 				// this.singleRequisitionData = object;
 				$('#requisition-view-modal').modal('show');
 			},
+		/*
+			confirmAgentPresence(object) {
+				this.singleRequisitionData = { ...object };
+				$('#requisition-view-modal').modal('show');
+			},
+		*/
 			showContentCreateForm() {
 				this.step = 1;
 	        	this.submitForm = true;
@@ -975,6 +1065,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New requisition has been stored", "Success");
 							this.allFetchedRequisitions = response.data;
+							// this.showSelectedTabProducts();
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							$('#requisition-createOrEdit-modal').modal('hide');
 						}
@@ -991,6 +1082,42 @@
 					});
 
 			},
+			searchData(emitedValue=false) {
+
+				if (emitedValue) {
+					this.query=emitedValue;
+				}
+
+				this.error = '';
+				this.allFetchedRequisitions = [];
+				this.pagination.current_page = 1;
+				
+				axios
+				.get(
+					"/api/search-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+				)
+				.then(response => {
+					this.allFetchedRequisitions = response.data;
+					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
+					this.pagination = this.allFetchedRequisitions.all;
+				})
+				.catch(e => {
+					this.error = e.toString();
+				});
+
+			},
+			changeNumberContents() {
+				
+				this.pagination.current_page = 1;
+
+				if (this.query === '') {
+					this.fetchAllRequisitions();
+				}
+				else {
+					this.searchData();
+				}
+				
+    		},
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='pending') {
@@ -1007,6 +1134,7 @@
 
 				this.validateFormInput('agent_name');
 				this.validateFormInput('agent_mobile');
+				this.validateFormInput('agent_code');
 				this.validateFormInput('delivery_address');
 
 				if (this.errors.constructor === Object && Object.keys(this.errors.agent).length == 0 && Object.keys(this.errors.delivery).length == 0) {
@@ -1092,7 +1220,17 @@
 					this.singleRequisitionData.products[index].id = this.singleRequisitionData.products[index].product.id;
 				}
 			},
-		
+			unconfirmed(object) {
+
+				if (object.status && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+
+					return true; 	// not confirmed
+
+				}
+
+				return false;  // confirmed
+				
+			},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -1256,6 +1394,29 @@
 							else{
 								this.submitForm = true;
 								this.$delete(this.errors.agent, 'agent_mobile');
+							}
+
+						}
+						else {
+							this.submitForm = true;
+							this.errors.agent = {};
+						}
+
+						break;
+
+					case 'agent_code' :
+
+						if (!this.singleRequisitionData.delivery_service) {
+							
+							if (!this.singleRequisitionData.agent || !this.singleRequisitionData.agent.code) {
+								this.errors.agent.agent_code = 'Agent code is required';
+							}
+							else if (this.singleRequisitionData.agent.code.length < 4 || this.singleRequisitionData.agent.code.length > 8) {
+								this.errors.agent.agent_code = 'Code length should be between 4 to 8';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.agent, 'agent_code');
 							}
 
 						}

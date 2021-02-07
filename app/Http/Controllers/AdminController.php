@@ -108,13 +108,13 @@ class AdminController extends Controller
             'requisition.products.*.quantity' => 'required|numeric|min:1',
             'requisition.products.*.variations' => 'nullable|array|min:1',
 
-            'agent' => 'required_if:delivery,0,',
-            'agent.agent_receipt' => 'required_if:delivery,0,',
+            // 'agent' => 'required_if:delivery,0,',
+            // 'agent.agent_receipt' => 'required_if:delivery,0,',
             
-            'delivery' => 'required_if:agent,0,',
+            'delivery' => 'required_if:requisition.agent,0,',
             // 'delivery.address' => 'required_if:agent,0,',
-            'delivery.delivery_price' => 'required_if:agent,0,',
-            'delivery.delivery_receipt' => 'required_if:agent,0,',
+            'delivery.delivery_price' => 'required_if:requisition.agent,0,',
+            'delivery.delivery_receipt' => 'required_if:requisition.agent,0,',
 
         ]);
 
@@ -130,10 +130,18 @@ class AdminController extends Controller
             
             $newDispatch->deliver_requisition = json_decode(json_encode($request->delivery));
         }
+        else {
+            $newDispatch->return()->create([
+                'receiving_confirmation' => false,
+            ]);
+        }
+        
+        /*
         else if (!empty($request->agent) && !empty($request->agent['agent_receipt']))  {
 
             $newDispatch->return_requisition = json_decode(json_encode($request->agent));
         }
+        */
 
         $newDispatch->requisition()->update([
             'status' => true

@@ -456,7 +456,7 @@
 									v-bind:key="'requisition-modal-step-' + 3" 
 									v-show="!loading && step==3"
 								>	
-									<h2 class="mx-auto mb-4 lead">Delivery Details</h2>	
+									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
 									
 									<div class="form-group col-md-12 text-center">
 										<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">
@@ -490,6 +490,7 @@
 											</div>
 										</div>
 
+										<!-- 
 										<div class="form-row d-flex">
 											<div class="form-group col-md-6">
 												<img class="img-fluid" 
@@ -515,6 +516,7 @@
 											  	</div>
 											</div>
 										</div>
+										-->
 									</div>
 
 									<div 
@@ -819,6 +821,24 @@
 												{{ singleDispatchData.requisition.agent.mobile }}
 											</label>
 										</div>
+
+										<div class="form-row" v-if="singleDispatchData.requisition.agent">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Agent Code :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleDispatchData.requisition.agent.code }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Received :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span :class="[!unconfirmed(singleDispatchData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleDispatchData) ? 'Confirmed' : 'Not Yet' }}</span>
+											</label>
+										</div>
 									</div>
 
 								</div>
@@ -851,7 +871,7 @@
 
 		delivery : {},
 
-		agent : {}
+		// agent : {}
 				
     };
 
@@ -890,7 +910,7 @@
 	        	errors : {
 					// products : [],
 					delivery : {},
-					agent : {}
+					// agent : {}
 				},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('dispatch'),
@@ -1048,14 +1068,14 @@
 
 					delivery : {},
 
-					agent : {}
+					// agent : {}
 							
 			    };
 
 				this.errors = {
 					// products : [],
 					delivery : {},
-					agent : {},
+					// agent : {},
 				};
 
 				$('#dispatch-createOrEdit-modal').modal('show');
@@ -1095,9 +1115,9 @@
 				this.validateFormInput('requisition_id');
 				this.validateFormInput('delivery_price');
 				this.validateFormInput('delivery_receipt');
-				this.validateFormInput('agent_receipt');
+				// this.validateFormInput('agent_receipt');
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 4 && Object.keys(this.errors.delivery).length == 0 && Object.keys(this.errors.agent).length == 0) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 4 && Object.keys(this.errors.delivery).length == 0) {
 
 					console.log('verified');
 					return true;
@@ -1105,6 +1125,17 @@
 				}
 
 				return false;
+			},
+			unconfirmed(object) {
+
+				if ((object.hasOwnProperty('agent') && !object.agent.receiving_confirmation) || (object.hasOwnProperty('delivery') && !object.delivery.receiving_confirmation)) {
+
+					return true; 	// not confirmed
+
+				}
+
+				return false;  // confirmed
+				
 			},
 			nextPage() {
 					
@@ -1202,6 +1233,7 @@
 		      	return;
 
 			},
+			/*
 			onAgentReceiptChange(evnt) {
 
 				let files = evnt.target.files || evnt.dataTransfer.files;
@@ -1221,19 +1253,22 @@
 		      	return;
 
 			},
+			*/
 			createImage(file, previewName) {
                 let reader = new FileReader();
                 
                 reader.onload = (evnt) => {
 
-                	if (previewName === 'delivery_receipt') {
+                	// if (previewName === 'delivery_receipt') {
 
                 		this.singleDispatchData.delivery.delivery_receipt = evnt.target.result;
-                	}
-                	else {
+                	// }
+                	// else {
 
-                    	this.singleDispatchData.agent.agent_receipt = evnt.target.result;
-                	}
+                 		// this.singleDispatchData.agent.agent_receipt = evnt.target.result;
+                	
+                	// }
+                
                 };
 
                 reader.readAsDataURL(file);
@@ -1410,6 +1445,7 @@
 
 						break;
 
+				/*
 					case 'agent_receipt' :
 
 						if (this.singleDispatchData.requisition.hasOwnProperty('agent')) {
@@ -1433,6 +1469,7 @@
 
 
 						break;
+				*/
 
 				/*
 
