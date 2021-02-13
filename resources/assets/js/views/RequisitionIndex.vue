@@ -72,7 +72,7 @@
 																		<td>{{ content.subject }}</td>
 																		<td>
 																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ content.status ? 'Despatched' : 'Pending' }}
+																				{{ content.status ? 'Dispatched' : 'Pending' }}
 																			</span>
 																		</td>
 																		<td>
@@ -641,8 +641,8 @@
 										</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#requisition-despatch" role="tab">
-											Despatch
+										<a class="nav-link" data-toggle="tab" href="#requisition-dispatch" role="tab">
+											Dispatch
 										</a>
 									</li>
 								</ul>
@@ -759,7 +759,7 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="requisition-despatch" role="tabpanel">
+									<div class="tab-pane" id="requisition-dispatch" role="tabpanel">
 
 										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -949,8 +949,17 @@
 		},
 		
 		created(){
+			
 			this.fetchAllRequisitions();
 			this.fetchAvailableRequisitions();
+
+			Echo.private(`new-requisition`)
+		    .listen('NewRequisitionMade', (e) => {
+		        console.log(e);
+		        this.$toastr.w("New requisition arrives", "Warning");
+		        this.allFetchedRequisitions.pending.data.push(e);
+		    });		    
+
 		},
 
 		watch : {

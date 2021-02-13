@@ -64,7 +64,7 @@
 																		<td>{{ content.subject }}</td>
 																		<td>
 																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ content.status ? 'Despatched' : 'Pending' }}
+																				{{ content.status ? 'Dispatched' : 'Pending' }}
 																			</span>
 																		</td>
 																		<td>
@@ -592,8 +592,8 @@
 										</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#requisition-despatch" role="tab">
-											Despatch
+										<a class="nav-link" data-toggle="tab" href="#requisition-dispatch" role="tab">
+											Dispatch
 										</a>
 									</li>
 								</ul>
@@ -708,7 +708,7 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="requisition-despatch" role="tabpanel">	
+									<div class="tab-pane" id="requisition-dispatch" role="tabpanel">	
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Service :
@@ -1301,6 +1301,9 @@
 
 								if (!requiredProduct.total_quantity || requiredProduct.total_quantity < 1) {
 									this.errors.products[productIndex].product_quantity = 'Quantity is required';
+								}
+								else if (requiredProduct.total_quantity > (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity)) {
+									this.errors.products[productIndex].product_quantity = 'Quantity is more than available';
 								}
 								else{
 									// this.errors.products[productIndex].product_quantity = null;
