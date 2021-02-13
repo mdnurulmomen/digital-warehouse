@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Events\NewRequisitionMade;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\Web\ProductResource;
 use App\Http\Resources\Web\ProductCollection;
@@ -137,7 +138,6 @@ class MerchantController extends Controller
 
             ], 200);
         }
-
     }
 
     public function showMerchantAllProducts($perPage=false)
@@ -200,8 +200,8 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
@@ -261,6 +261,8 @@ class MerchantController extends Controller
 
         }
 
+        NewRequisitionMade::dispatch($newRequisition);
+
         return $this->showMerchantAllRequisitions($perPage);
     }
 
@@ -268,7 +270,7 @@ class MerchantController extends Controller
     {
         $currentMerchant = \Auth::user();
 
-        $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery'])->where(function ($query) use ($search) {
+        $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
                                             ->orWhereHas('products.product', function ($q) use ($search) {

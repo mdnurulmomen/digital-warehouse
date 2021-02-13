@@ -20,7 +20,7 @@ class AdminController extends Controller
             return [
 
                 'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 1)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage)),  
             
             ];
 
@@ -59,7 +59,7 @@ class AdminController extends Controller
 
     public function searchAllRequisitions($search, $perPage)
     {
-        $query = $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])
+        $query = $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
                                 ->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
