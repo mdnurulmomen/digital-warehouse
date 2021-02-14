@@ -29,7 +29,7 @@ Route::name('merchant.')->group(function () {
 		Route::put('/profile', 'ProfileController@updateMerchantProfile')->name('profile');	
 		Route::post('/password', 'ProfileController@updateMerchantPassword')->name('password');
 
-		// Route::get('/api/current-user', 'MerchantController@currentMerchant')->name('current-user');
+		// Route::get('/api/current-merchant', 'MerchantController@currentMerchant')->name('current-user');
 		
 		Route::get('/api/products/{perPage?}', 'MerchantController@showMerchantAllProducts')->name('products');
 		Route::get('/search-products/{query}/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('products');

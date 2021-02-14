@@ -847,7 +847,8 @@
 	        	loading : false,
 	        	
 	        	currentTab : 'pending',
-	        	
+	        	// currentMerchant : null,
+
 	        	editor: ClassicEditor,
 
 	        	submitForm : true,
@@ -891,11 +892,15 @@
 		},
 		
 		created(){
+			
+			// this.currentMerchant();
 			this.fetchAllRequisitions();
 			this.fetchMerchantAllProducts();
+			
 		},
 		
 		methods : {
+		
 			fetchAllRequisitions() {
 				
 				this.query = '';
@@ -932,6 +937,7 @@
 					})
 					.finally(response => {
 						this.loading = false;
+						this.subscribeToChannel();
 					});
 
 			},
@@ -973,31 +979,6 @@
 					});
 
 			},
-    		receiveDispatchedProducts(object) {
-
-    			this.singleRequisitionData = { ...object };
-
-    			axios
-					.post('/receive-dispatched-products/' + this.perPage, this.singleRequisitionData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("Dispatched products has been received", "Success");
-							this.allFetchedRequisitions = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					})
-					.finally(response => {
-						// this.fetchMerchantAllProducts();
-					});
-
-    		},
     		showContentDetails(object) {		
 				this.singleRequisitionData = { ...object };
 				// this.singleRequisitionData = Object.assign({}, this.singleRequisitionData, object);
@@ -1082,6 +1063,31 @@
 					});
 
 			},
+			receiveDispatchedProducts(object) {
+
+    			this.singleRequisitionData = { ...object };
+
+    			axios
+					.post('/receive-dispatched-products/' + this.perPage, this.singleRequisitionData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Dispatched products has been received", "Success");
+							this.allFetchedRequisitions = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						// this.fetchMerchantAllProducts();
+					});
+
+    		},
 			searchData(emitedValue=false) {
 
 				if (emitedValue) {
@@ -1106,6 +1112,50 @@
 				});
 
 			},
+			subscribeToChannel(){
+
+				console.log(this.requisitionsToShow);
+
+				if (this.requisitionsToShow.length || this.allFetchedRequisitions.pending.data.length || this.allFetchedRequisitions.dispatched.data.length || (this.allFetchedRequisitions.all && this.allFetchedRequisitions.all.data.length)) {
+
+					Echo.private(`new-dispatch.` + this.requisitionsToShow[0].merchant_id || this.allFetchedRequisitions.pending.data[0].merchant_id || this.allFetchedRequisitions.dispatched.data[0].merchant_id || this.allFetchedRequisitions.all.data[0].merchant_id)
+				    .listen('RequisitionDispatched', (e) => {
+				        
+				        console.log(e);
+				        
+				        this.$toastr.w("Requisition has been dispatched", "Warning");
+
+				    	let index = this.requisitionsToShow.findIndex(requisition => requisition.id === e.id);
+
+				    	if (index > -1) {
+
+				    		// 	Vue.set(this.requisitionsToShow, index, e);
+				        	this.requisitionsToShow.splice(index, 1);
+				        	this.allFetchedRequisitions.pending.data.splice(index, 1);
+				        	this.allFetchedRequisitions.dispatched.data.push(e);
+				    	
+				    	}
+				        
+				    });
+
+				}
+
+			},
+			verifyUserInput() {
+
+				this.validateFormInput('agent_name');
+				this.validateFormInput('agent_mobile');
+				this.validateFormInput('agent_code');
+				this.validateFormInput('delivery_address');
+
+				if (this.errors.constructor === Object && Object.keys(this.errors.agent).length == 0 && Object.keys(this.errors.delivery).length == 0) {
+
+					return true;
+				
+				}
+
+				return false;
+			},
 			changeNumberContents() {
 				
 				this.pagination.current_page = 1;
@@ -1129,21 +1179,6 @@
 					this.pagination = this.allFetchedRequisitions.dispatched;
 				}
 
-			},
-			verifyUserInput() {
-
-				this.validateFormInput('agent_name');
-				this.validateFormInput('agent_mobile');
-				this.validateFormInput('agent_code');
-				this.validateFormInput('delivery_address');
-
-				if (this.errors.constructor === Object && Object.keys(this.errors.agent).length == 0 && Object.keys(this.errors.delivery).length == 0) {
-
-					return true;
-				
-				}
-
-				return false;
 			},
 			errorInArray(array = []) {
 				
@@ -1455,6 +1490,47 @@
 				}
 	 
 			},
+
+			/*
+			currentMerchant(){
+
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.currentMerchant = null;
+				
+				axios
+					.get('/api/current-merchant/')
+					.then(response => {
+						if (response.status == 200) {
+							this.currentMerchant = response.data.user;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			*/
             
 		}
   	}

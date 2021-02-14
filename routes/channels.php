@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Requisition;
 use Illuminate\Support\Facades\Broadcast;
-
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -22,3 +22,8 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 Broadcast::channel('new-requisition', function ($user) {
     return true;
 }, ['guards' => ['admin']]);
+
+Broadcast::channel('new-dispatch.{merchantId}', function ($user, $merchantId) {
+    // return true;
+    return (int) $user->id === (int) $merchantId;
+}, ['guards' => ['merchant']]);

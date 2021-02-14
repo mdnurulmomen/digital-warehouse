@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dispatch;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Events\RequisitionDispatched;
 use App\Http\Resources\Web\DispatchCollection;
 use App\Http\Resources\Web\RequisitionResource;
 use App\Http\Resources\Web\RequisitionCollection;
@@ -146,6 +147,8 @@ class AdminController extends Controller
         $newDispatch->requisition()->update([
             'status' => true
         ]);
+
+        RequisitionDispatched::dispatch($newDispatch->requisition);
 
         return $this->showAllDispatches($perPage);
     }

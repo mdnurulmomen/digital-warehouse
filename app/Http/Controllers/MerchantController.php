@@ -127,7 +127,7 @@ class MerchantController extends Controller
         ], 200);
     }
 
-    // Products
+    // Current User
     public function currentMerchant()
     {
         if (\Auth::check()) {
