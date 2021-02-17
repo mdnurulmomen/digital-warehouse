@@ -6,12 +6,12 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
-use App\Events\ProductReceived;
-use App\Events\NewRequisitionMade;
 use Illuminate\Support\Facades\Hash;
+use App\Jobs\BroadcastNewRequisition;
 use App\Http\Resources\Web\ProductResource;
 use App\Http\Resources\Web\ProductCollection;
 use App\Http\Resources\Web\RequisitionCollection;
+use App\Jobs\BroadcastProductReceiveConfirmation;
 
 class MerchantController extends Controller
 {
@@ -262,7 +262,7 @@ class MerchantController extends Controller
 
         }
 
-        NewRequisitionMade::dispatch($newRequisition);
+        BroadcastNewRequisition::dispatch($newRequisition);
 
         return $this->showMerchantAllRequisitions($perPage);
     }
@@ -310,7 +310,7 @@ class MerchantController extends Controller
 
         }
 
-        ProductReceived::dispatch($dispatchedRequisition);
+        BroadcastProductReceiveConfirmation::dispatch($dispatchedRequisition);
 
         return $this->showMerchantAllRequisitions($perPage);
     }
