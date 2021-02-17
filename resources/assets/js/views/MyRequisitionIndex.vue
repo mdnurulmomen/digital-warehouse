@@ -789,6 +789,14 @@
 												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Yet' }}</span>
 											</label>
 										</div>
+
+										<div class="form-row" v-else>
+											<label class="col-sm-12 col-form-label text-center">
+												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleRequisitionData.status ? 'Dispatched' : 'Not Dispatched Yet' }}
+												</span>
+											</label>
+										</div>
 									</div>
 
 								</div>
@@ -936,8 +944,8 @@
 
 					})
 					.finally(response => {
-						this.loading = false;
 						this.subscribeToChannel();
+						this.loading = false;
 					});
 
 			},
@@ -1114,25 +1122,25 @@
 			},
 			subscribeToChannel(){
 
-				console.log(this.requisitionsToShow);
+				if (this.allFetchedRequisitions.pending.data.length || this.allFetchedRequisitions.dispatched.data.length) {
 
-				if (this.requisitionsToShow.length || this.allFetchedRequisitions.pending.data.length || this.allFetchedRequisitions.dispatched.data.length || (this.allFetchedRequisitions.all && this.allFetchedRequisitions.all.data.length)) {
+					let merchantId = this.requisitionsToShow[0]?.merchant_id ?? this.allFetchedRequisitions.pending.data[0]?.merchant_id ?? this.allFetchedRequisitions.dispatched.data[0]?.merchant_id;
 
-					Echo.private(`new-dispatch.` + this.requisitionsToShow[0].merchant_id || this.allFetchedRequisitions.pending.data[0].merchant_id || this.allFetchedRequisitions.dispatched.data[0].merchant_id || this.allFetchedRequisitions.all.data[0].merchant_id)
+					Echo.private(`new-dispatch.` + merchantId)
 				    .listen('RequisitionDispatched', (e) => {
 				        
-				        console.log(e);
-				        
+				        // console.log(e);
+
 				        this.$toastr.w("Requisition has been dispatched", "Warning");
 
-				    	let index = this.requisitionsToShow.findIndex(requisition => requisition.id === e.id);
+				    	let index = this.requisitionsToShow.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
 
 				    	if (index > -1) {
 
-				    		// 	Vue.set(this.requisitionsToShow, index, e);
-				        	this.requisitionsToShow.splice(index, 1);
-				        	this.allFetchedRequisitions.pending.data.splice(index, 1);
-				        	this.allFetchedRequisitions.dispatched.data.push(e);
+				    		Vue.set(this.requisitionsToShow, index, e);
+				        	// this.requisitionsToShow.splice(index, 1);
+				        	this.allFetchedRequisitions.pending?.data.splice(index, 1);
+				        	this.allFetchedRequisitions.dispatched?.data.push(e);
 				    	
 				    	}
 				        

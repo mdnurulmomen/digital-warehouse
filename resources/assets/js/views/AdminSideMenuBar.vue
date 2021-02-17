@@ -118,7 +118,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-elementor"></i>
+										<i class="feather icon-box"></i>
 									</span>
 									<span class="pcoded-mtext">Assets</span>
 									<!-- <span class="pcoded-badge label label-danger">NEW</span> -->

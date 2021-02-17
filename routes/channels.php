@@ -27,3 +27,7 @@ Broadcast::channel('new-dispatch.{merchantId}', function ($user, $merchantId) {
     // return true;
     return (int) $user->id === (int) $merchantId;
 }, ['guards' => ['merchant']]);
+
+Broadcast::channel('product-received', function ($user) {
+    return true;
+}, ['guards' => ['admin']]);

@@ -73,32 +73,42 @@
 																	<tr>
 																		<th>Requisition</th>
 																		<th>Released at</th>
+																		<th>Confirmation</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
 																<tbody>
 
 																	<tr 
-																		v-for="dispatch in allDispatches" 
-																		:key="'dispatch-' + dispatch.id"
+																		v-for="dispatchedReq in allDispatchedRequisition" 
+																		:key="'dispatch-' + dispatchedReq.id"
 																	>
-																		<td>{{ dispatch.requisition.subject }}</td>
-																		<td>{{ dispatch.released_at }}</td>
+																		<td>
+																			{{ dispatchedReq.subject }}
+																		</td>
+																		<td>
+																			{{ dispatchedReq.dispatch.released_at }}
+																		</td>
+																		<td>
+																			<span 
+																			:class="[!unconfirmed(dispatchedReq) ? 'badge-success' : 'badge-danger', 'badge']">
+																				{{ !unconfirmed(dispatchedReq) ? 'Confirmed' : 'Not Yet' }}
+																			</span>
+																		</td>
 																		<td>
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon"  
-																				@click="showDispatchDetails(dispatch)"
+																				@click="showDispatchDetails(dispatchedReq)"
 																			>
 																				<i class="fas fa-eye"></i>
 																			</button>
 																		</td>
-																    
 																	</tr>
 																	<tr 
-																  		v-show="!allDispatches.length"
+																  		v-show="!allDispatchedRequisition.length"
 																  	>
-															    		<td colspan="3">
+															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -110,6 +120,7 @@
 																	<tr>
 																		<th>Requisition</th>
 																		<th>Released at</th>
+																		<th>Confirmation</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -202,7 +213,7 @@
 											<div class="form-group col-md-12">
 												<label for="inputFirstName">Select Requisition</label>
 												<multiselect 
-			                              			v-model="singleDispatchData.requisition"
+			                              			v-model="singleDispatchedReqData.requisition"
 			                              			placeholder="Requisition Subject" 
 			                                  		track-by="id" 
 			                                  		:custom-label="objectNameWithCapitalized" 
@@ -225,14 +236,14 @@
 
 										<div 
 											class="form-row" 
-											v-if="Object.keys(singleDispatchData.requisition).length > 0"
+											v-if="singleDispatchedReqData.hasOwnProperty('requisition') && Object.keys(singleDispatchedReqData.requisition).length > 0"
 										>
 											<div class="form-group col-md-12">
 												<label for="inputFirstName">Description</label>
 												<ckeditor 
 					                              	class="form-control" 
 					                              	:editor="editor" 
-					                              	v-model="singleDispatchData.requisition.description" 
+					                              	v-model="singleDispatchedReqData.requisition.description" 
 					                              	:disabled="true"
 					                            >
 				                              	</ckeditor>
@@ -268,11 +279,11 @@
 
 									<div 
 										class="col-md-12" 
-										v-if="Object.keys(singleDispatchData.requisition).length > 0 && singleDispatchData.requisition.products && singleDispatchData.requisition.products.length"
+										v-if="singleDispatchedReqData.hasOwnProperty('requisition') && Object.keys(singleDispatchedReqData.requisition).length > 0 && singleDispatchedReqData.requisition.products && singleDispatchedReqData.requisition.products.length"
 									>
 										<div 
 											class="card card-body" 
-											v-for="(requiredProduct, productIndex) in singleDispatchData.requisition.products" 
+											v-for="(requiredProduct, productIndex) in singleDispatchedReqData.requisition.products" 
 											:key="'required-product-' + productIndex"
 										>
 											<div class="form-row">
@@ -281,12 +292,12 @@
 														Product
 													</label>
 													<multiselect 
-				                              			v-model="singleDispatchData.requisition.products[productIndex]"
+				                              			v-model="singleDispatchedReqData.requisition.products[productIndex]"
 				                              			placeholder="Product Name" 
 				                              			label="product_name" 
 				                                  		track-by="product_id" 
 				                                  		:custom-label="objectNameWithCapitalized" 
-				                                  		:options="singleDispatchData.requisition.products"
+				                                  		:options="singleDispatchedReqData.requisition.products"
 				                                  		:disabled="true"
 				                              		>
 				                                	</multiselect>
@@ -294,7 +305,7 @@
 
 												<div class="form-group col-md-4">
 													<label for="inputFirstName">
-														Required
+														Total Required
 													</label>
 													<input 
 														type="number" 
@@ -307,7 +318,7 @@
 
 												<div class="form-group col-md-4">
 													<label for="inputFirstName">
-														Available
+														Total Available
 													</label>
 													<input 
 														type="number" 
@@ -338,7 +349,7 @@
 
 											</div>
 
-											<div class="card" v-if="requiredProduct.has_variations">
+											<div class="card" v-if="requiredProduct.has_variations && requiredProduct.variations.length">
 												<div class="card-body">
 													<div 
 														class="form-row" 
@@ -355,7 +366,7 @@
 						                              			label="variation_name" 
 						                                  		track-by="product_variation_id" 
 						                                  		:custom-label="objectNameWithCapitalized" 
-						                                  		:options="singleDispatchData.requisition.products"
+						                                  		:options="singleDispatchedReqData.requisition.products"
 						                                  		:disabled="true"
 						                              		>
 						                                	</multiselect>
@@ -459,21 +470,24 @@
 									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
 									
 									<div class="form-group col-md-12 text-center">
-										<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">
-											{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}
+										<span :class="[(singleDispatchedReqData.hasOwnProperty('requisition')
+                                           && singleDispatchedReqData.requisition.delivery) ? 'badge-success' : 'badge-info', 'badge']">
+											{{ (singleDispatchedReqData.hasOwnProperty('requisition')
+                                           && singleDispatchedReqData.requisition.delivery) ? 'Delivery Service' : 'Agent Service' }}
 										</span>
 									</div>
 
 									<div 
 										class="col-sm-12" 
-										v-if="!singleDispatchData.requisition.delivery && singleDispatchData.requisition.agent"
+										v-if="singleDispatchedReqData.hasOwnProperty('requisition')
+                                           && !singleDispatchedReqData.requisition.delivery && singleDispatchedReqData.requisition.agent"
 									>
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">Agent Name</label>
 												<input type="text" 
 													class="form-control" 
-													v-model="singleDispatchData.requisition.agent.name" 
+													v-model="singleDispatchedReqData.requisition.agent.name" 
 													placeholder="Agent Name" 
 													readonly="true" 
 												>
@@ -483,8 +497,18 @@
 												<label for="inputFirstName">Agent Mobile</label>
 												<input type="text" 
 													class="form-control" 
-													v-model="singleDispatchData.requisition.agent.mobile" 
+													v-model="singleDispatchedReqData.requisition.agent.mobile" 
 													placeholder="Agent Mobile" 
+													readonly="true" 
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Code</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleDispatchedReqData.requisition.agent.code" 
+													placeholder="Agent Code" 
 													readonly="true" 
 												>
 											</div>
@@ -494,7 +518,7 @@
 										<div class="form-row d-flex">
 											<div class="form-group col-md-6">
 												<img class="img-fluid" 
-													:src="singleDispatchData.agent.agent_receipt || ''"
+													:src="singleDispatchedReqData.agent.agent_receipt || ''"
 													alt="agent_receipt" 
 												>
 											</div>
@@ -521,7 +545,8 @@
 
 									<div 
 										class="col-sm-12" 
-										v-if="singleDispatchData.requisition.delivery && !singleDispatchData.requisition.agent"
+										v-if="singleDispatchedReqData.hasOwnProperty('requisition')
+                                           && singleDispatchedReqData.requisition.delivery && !singleDispatchedReqData.requisition.agent"
 									>
 										<div class="form-row">
 											<div class="form-group col-md-12">
@@ -529,7 +554,7 @@
 												<ckeditor 
 					                              	class="form-control" 
 					                              	:editor="editor" 
-					                              	v-model="singleDispatchData.requisition.delivery.address" 
+					                              	v-model="singleDispatchedReqData.requisition.delivery.address" 
 					                              	:disabled="true" 
 					                            >
 				                              	</ckeditor>
@@ -539,7 +564,7 @@
 										<div class="form-row d-flex">
 											<div class="form-group col-md-6 text-center">
 												<img class="img-fluid" 
-													:src="singleDispatchData.delivery.delivery_receipt || ''"
+													:src="singleDispatchedReqData.delivery.delivery_receipt || ''"
 													alt="delivery_receipt" 
 												>
 											</div>
@@ -567,7 +592,7 @@
 												<input 
 													type="text" 
 													class="form-control" 
-													v-model="singleDispatchData.delivery.address" 
+													v-model="singleDispatchedReqData.delivery.address" 
 													placeholder="Delivery Address" 
 													:class="!errors.delivery.delivery_address ? 'is-valid' : 'is-invalid'"
 													@change="validateFormInput('delivery_address')"
@@ -585,7 +610,7 @@
 												<input 
 													type="number" 
 													class="form-control" 
-													v-model.number="singleDispatchData.delivery.delivery_price" 
+													v-model.number="singleDispatchedReqData.delivery.delivery_price" 
 													placeholder="Delivery Price" 
 													:class="!errors.delivery.delivery_price ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('delivery_price')" 
@@ -653,7 +678,7 @@
 										</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#requisition-despatch" role="tab">
+										<a class="nav-link" data-toggle="tab" href="#requisition-dispatch" role="tab">
 											Dispatch
 										</a>
 									</li>
@@ -667,7 +692,7 @@
 												Subject :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleDispatchData.requisition.subject }}
+												{{ singleDispatchedReqData.subject }}
 											</label>
 										</div>
 
@@ -676,7 +701,7 @@
 												Description :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span v-html="singleDispatchData.requisition.description"></span>
+												<span v-html="singleDispatchedReqData.description"></span>
 											</label>
 										</div>
 
@@ -685,7 +710,7 @@
 												Requested on :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleDispatchData.requisition.created_at }}
+												{{ singleDispatchedReqData.created_at }}
 											</label>
 										</div>
 									</div>
@@ -693,7 +718,7 @@
 									<div class="tab-pane" id="requisition-product" role="tabpanel">
 										<div 
 											class="form-row" 
-											v-if="singleDispatchData.products && singleDispatchData.products.length"
+											v-if="singleDispatchedReqData.products && singleDispatchedReqData.products.length"
 										>
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Product Detail :
@@ -703,7 +728,7 @@
 													
 													<div 
 														class="col-md-12 ml-auto" 
-														v-for="(dispatchedProduct, productIndex) in singleDispatchData.products" 
+														v-for="(dispatchedProduct, productIndex) in singleDispatchedReqData.products" 
 														:key="'requisition-detail-' + dispatchedProduct.id + productIndex"
 													>
 														<div class="card">
@@ -762,14 +787,14 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="requisition-despatch" role="tabpanel">
+									<div class="tab-pane" id="requisition-dispatch" role="tabpanel">
 
-										<div class="form-row">
+										<div class="form-row" v-if="singleDispatchedReqData.dispatch">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Dispatched on :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleDispatchData.released_at }}
+												{{ singleDispatchedReqData.dispatch.released_at }}
 											</label>
 										</div>
 
@@ -778,56 +803,56 @@
 												Service :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+												<span :class="[singleDispatchedReqData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleDispatchedReqData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleDispatchData.requisition.delivery">
+										<div class="form-row" v-if="singleDispatchedReqData.delivery">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Address :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span v-html="singleDispatchData.requisition.delivery.address"></span>
+												<span v-html="singleDispatchedReqData.delivery.address"></span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleDispatchData.delivery">
+										<div class="form-row" v-if="singleDispatchedReqData.dispatch && singleDispatchedReqData.dispatch.delivery">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Receipt :
 											</label>
 											<label class="col-sm-6 col-form-label">
 												<img 
 													class="img-fluid" 
-													:src="singleDispatchData.delivery.receipt_preview || ''"
+													:src="singleDispatchedReqData.dispatch.delivery.receipt_preview || ''"
 													alt="delivery_receipt" 
 												>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleDispatchData.requisition.agent">
+										<div class="form-row" v-if="singleDispatchedReqData.agent">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Agent Name :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleDispatchData.requisition.agent.name  }}
+												{{ singleDispatchedReqData.agent.name  }}
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleDispatchData.requisition.agent">
+										<div class="form-row" v-if="singleDispatchedReqData.agent">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Agent Mobile :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleDispatchData.requisition.agent.mobile }}
+												{{ singleDispatchedReqData.agent.mobile }}
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleDispatchData.requisition.agent">
+										<div class="form-row" v-if="singleDispatchedReqData.agent">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Agent Code :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleDispatchData.requisition.agent.code }}
+												{{ singleDispatchedReqData.agent.code }}
 											</label>
 										</div>
 
@@ -836,7 +861,7 @@
 												Received :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[!unconfirmed(singleDispatchData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleDispatchData) ? 'Confirmed' : 'Not Yet' }}</span>
+												<span :class="[!unconfirmed(singleDispatchedReqData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleDispatchedReqData) ? 'Confirmed' : 'Not Yet' }}</span>
 											</label>
 										</div>
 									</div>
@@ -865,7 +890,7 @@
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-    let singleDispatchData = {
+    let singleDispatchedReqData = {
 
 		requisition : {},
 
@@ -897,7 +922,7 @@
 	        	submitForm : true,
 
 	        	// dispatchesToShow : [],
-	        	allDispatches : [],
+	        	allDispatchedRequisition : [],
 	        	
 	        	allRequisitions : [],
 
@@ -905,7 +930,7 @@
 		        	current_page: 1
 		      	},
 
-	        	singleDispatchData : singleDispatchData,
+	        	singleDispatchedReqData : singleDispatchedReqData,
 
 	        	errors : {
 					// products : [],
@@ -920,8 +945,26 @@
 		},
 		
 		created(){
+			
 			this.fetchAllDispatches();
 			this.fetchAllRequisitions();
+
+			Echo.private(`product-received`)
+		    .listen('ProductReceived', (e) => {
+		        
+		        // console.log(e);
+		        this.$toastr.s("Dispatched product has been received", "Success");
+		    	
+		    	let index = this.allDispatchedRequisition.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
+
+		    	if (index > -1) {
+
+	    			Vue.set(this.allDispatchedRequisition, index, e);
+		    	
+		    	}
+
+		    });
+
 		},
 
 		watch : {
@@ -944,15 +987,15 @@
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.allDispatches = [];
+				this.allDispatchedRequisition = [];
 				
 				axios
 					.get('/api/dispatches/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
-							this.allDispatches = response.data.data;
+							this.allDispatchedRequisition = response.data.data;
 							this.pagination = response.data;
-							// this.dispatchesToShow = this.allDispatches.pending.data;
+							// this.dispatchesToShow = this.allDispatchedRequisition.pending.data;
 							// this.showSelectedTabProducts();
 						}
 					})
@@ -1021,7 +1064,7 @@
 			searchData() {
 
 				this.error = '';
-				this.allDispatches = [];
+				this.allDispatchedRequisition = [];
 				this.pagination.current_page = 1;
 				
 				axios
@@ -1029,8 +1072,8 @@
 					"/api/search-dispatches/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
-					this.allDispatches = response.data.all.data;
-					// this.dispatchesToShow = this.allDispatches.all.data;
+					this.allDispatchedRequisition = response.data.all.data;
+					// this.dispatchesToShow = this.allDispatchedRequisition.all.data;
 					this.pagination = response.data.all;
 				})
 				.catch(e => {
@@ -1051,18 +1094,19 @@
 				
     		},
     		showDispatchDetails(object) {
-    			
     			// console.log(object);
-
-				this.singleDispatchData = { ...object };
-				// this.singleDispatchData = Object.assign({}, this.singleDispatchData, object);
+				this.singleDispatchedReqData = {};  // reseting
+				this.singleDispatchedReqData = { ...object };
+				// this.singleDispatchedReqData = Object.assign({}, this.singleDispatchedReqData, object);
 				$('#dispatch-view-modal').modal('show');
 			},
 			showDispatchCreateForm() {
 				this.step = 1;
 	        	this.submitForm = true;
 	        	
-				this.singleDispatchData = {
+				this.singleDispatchedReqData = {};  // reseting
+
+				this.singleDispatchedReqData = {
 
 					requisition : {},
 
@@ -1088,17 +1132,27 @@
 				}
 
 				axios
-					.post('/dispatches/' + this.perPage, this.singleDispatchData)
+					.post('/dispatches/' + this.perPage, this.singleDispatchedReqData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Requisition has been dispatched", "Success");
 							this.query !== '' ? this.searchData() : this.fetchAllDispatches();
-							// this.allDispatches = response.data;
+							// this.allDispatchedRequisition = response.data;
 							// this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							
+							let index = this.allRequisitions.findIndex(requisition => requisition.id == this.singleDispatchedReqData.requisition.id && requisition.merchant_id == this.singleDispatchedReqData.requisition.merchant_id);
+
+					    	if (index > -1) {
+
+					    		this.allRequisitions.splice(index, 1);
+
+					    	}
+
 							$('#dispatch-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
+						console.log(error);
 						if (error.response.status == 422) {
 							for (var x in error.response.data.errors) {
 								this.$toastr.w(error.response.data.errors[x], "Warning");
@@ -1119,7 +1173,6 @@
 
 				if (this.errors.constructor === Object && Object.keys(this.errors).length < 4 && Object.keys(this.errors.delivery).length == 0) {
 
-					console.log('verified');
 					return true;
 				
 				}
@@ -1128,7 +1181,7 @@
 			},
 			unconfirmed(object) {
 
-				if ((object.hasOwnProperty('agent') && !object.agent.receiving_confirmation) || (object.hasOwnProperty('delivery') && !object.delivery.receiving_confirmation)) {
+				if (object.hasOwnProperty('dispatch') && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
 
 					return true; 	// not confirmed
 
@@ -1191,13 +1244,13 @@
 		/*
 			setRequiredErrors() {
 
-				// console.log(this.singleDispatchData.requisition.products);
+				// console.log(this.singleDispatchedReqData.requisition.products);
 
-				if (this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+				if (this.singleDispatchedReqData.requisition.products && this.singleDispatchedReqData.requisition.products.length) {
 
 					this.errors.products = [];
 
-					this.singleDispatchData.requisition.products.forEach(
+					this.singleDispatchedReqData.requisition.products.forEach(
 							
 						(requiredProduct, index) => {
 
@@ -1261,11 +1314,12 @@
 
                 	// if (previewName === 'delivery_receipt') {
 
-                		this.singleDispatchData.delivery.delivery_receipt = evnt.target.result;
+                		this.singleDispatchedReqData.delivery.delivery_receipt = evnt.target.result;
+                	
                 	// }
                 	// else {
 
-                 		// this.singleDispatchData.agent.agent_receipt = evnt.target.result;
+                 		// this.singleDispatchedReqData.agent.agent_receipt = evnt.target.result;
                 	
                 	// }
                 
@@ -1281,7 +1335,7 @@
 
 					case 'requisition_id' :
 
-						if (Object.keys(this.singleDispatchData.requisition).length==0) {
+						if (!this.singleDispatchedReqData.hasOwnProperty('requisition') || Object.keys(this.singleDispatchedReqData.requisition).length==0) {
 							this.errors.requisition_id = 'Requisition is required';
 						}
 						else{
@@ -1294,9 +1348,9 @@
 					/*
 					case 'total_dispatched_quantity' :
 
-						if (this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+						if (this.singleDispatchedReqData.requisition.products && this.singleDispatchedReqData.requisition.products.length) {
 
-							this.singleDispatchData.requisition.products.forEach(
+							this.singleDispatchedReqData.requisition.products.forEach(
 							
 								(requiredProduct, productIndex) => {
 
@@ -1327,9 +1381,9 @@
 					/*
 					case 'variation_total_dispatched_quantity' :
 
-						if (this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+						if (this.singleDispatchedReqData.requisition.products && this.singleDispatchedReqData.requisition.products.length) {
 
-							this.singleDispatchData.requisition.products.forEach(
+							this.singleDispatchedReqData.requisition.products.forEach(
 							
 								(requiredProduct, productIndex) => {
 
@@ -1375,9 +1429,9 @@
 					/*
 					case 'delivery_address' :
 
-						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
+						if (this.singleDispatchedReqData.requisition.hasOwnProperty('delivery')) {
 
-							if (Object.keys(this.singleDispatchData.delivery).length==0 || !this.singleDispatchData.delivery.address) {
+							if (Object.keys(this.singleDispatchedReqData.delivery).length==0 || !this.singleDispatchedReqData.delivery.address) {
 								this.errors.delivery.delivery_address = 'Address is required';
 							}
 							else{
@@ -1399,9 +1453,9 @@
 
 					case 'delivery_price' :
 
-						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
+						if (this.singleDispatchedReqData.hasOwnProperty('requisition') && this.singleDispatchedReqData.requisition.hasOwnProperty('delivery')) {
 
-							if (Object.keys(this.singleDispatchData.delivery).length==0 || !this.singleDispatchData.delivery.delivery_price || this.singleDispatchData.delivery.delivery_price < 1) {
+							if (Object.keys(this.singleDispatchedReqData.delivery).length==0 || !this.singleDispatchedReqData.delivery.delivery_price || this.singleDispatchedReqData.delivery.delivery_price < 1) {
 								this.errors.delivery.delivery_price = 'Price is required';
 							}
 							else{
@@ -1423,9 +1477,9 @@
 
 					case 'delivery_receipt' :
 
-						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
+						if (this.singleDispatchedReqData.hasOwnProperty('requisition') && this.singleDispatchedReqData.requisition.hasOwnProperty('delivery')) {
 
-							if (Object.keys(this.singleDispatchData.delivery).length==0 || !this.singleDispatchData.delivery.delivery_receipt) {
+							if (Object.keys(this.singleDispatchedReqData.delivery).length==0 || !this.singleDispatchedReqData.delivery.delivery_receipt) {
 								this.errors.delivery.delivery_receipt = 'Receipt is required';
 							}
 							else{
@@ -1448,9 +1502,9 @@
 				/*
 					case 'agent_receipt' :
 
-						if (this.singleDispatchData.requisition.hasOwnProperty('agent')) {
+						if (this.singleDispatchedReqData.requisition.hasOwnProperty('agent')) {
 
-							if (Object.keys(this.singleDispatchData.agent).length==0 || !this.singleDispatchData.agent.agent_receipt) {
+							if (Object.keys(this.singleDispatchedReqData.agent).length==0 || !this.singleDispatchedReqData.agent.agent_receipt) {
 								this.errors.agent.agent_receipt = 'Receipt is required';
 							}
 							else{
@@ -1475,7 +1529,7 @@
 
 					case 'description' :
 
-						if (this.singleDispatchData.description && !this.singleDispatchData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						if (this.singleDispatchedReqData.description && !this.singleDispatchedReqData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
 							this.errors.description = 'No special character';
 						}
 						else{
@@ -1489,7 +1543,7 @@
 
 					case 'product_quantity' :
 
-						this.singleDispatchData.products.forEach(
+						this.singleDispatchedReqData.products.forEach(
 							
 							(requiredProduct, index) => {
 
@@ -1518,12 +1572,12 @@
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='pending') {
-					this.dispatchesToShow = this.allDispatches.pending.data;
-					this.pagination = this.allDispatches.pending;
+					this.dispatchesToShow = this.allDispatchedRequisition.pending.data;
+					this.pagination = this.allDispatchedRequisition.pending;
 				}
 				else {
-					this.dispatchesToShow = this.allDispatches.dispatched.data;
-					this.pagination = this.allDispatches.dispatched;
+					this.dispatchesToShow = this.allDispatchedRequisition.dispatched.data;
+					this.pagination = this.allDispatchedRequisition.dispatched;
 				}
 
 			},
@@ -1540,9 +1594,9 @@
 				this.showSelectedTabProducts();
 			},
 			addMoreProduct() {
-				if (this.singleDispatchData.products.length < 3) {
+				if (this.singleDispatchedReqData.products.length < 3) {
 
-					this.singleDispatchData.products.push({});
+					this.singleDispatchedReqData.products.push({});
 					this.errors.product_id.push(null);
 					this.errors.product_quantity.push(null);
 
@@ -1550,9 +1604,9 @@
 			},
 			removeProduct() {
 					
-				if (this.singleDispatchData.products.length > 1) {
+				if (this.singleDispatchedReqData.products.length > 1) {
 
-					this.singleDispatchData.products.pop();
+					this.singleDispatchedReqData.products.pop();
 					this.errors.product_id.pop();
 					this.errors.product_quantity.pop();
 				
@@ -1563,8 +1617,8 @@
 			
 		/*
 			setRequiredProduct(index) {
-				if (this.singleDispatchData.products[index].product && Object.keys(this.singleDispatchData.products[index].product).length > 0) {
-					this.singleDispatchData.products[index].id = this.singleDispatchData.products[index].product.id;
+				if (this.singleDispatchedReqData.products[index].product && Object.keys(this.singleDispatchedReqData.products[index].product).length > 0) {
+					this.singleDispatchedReqData.products[index].id = this.singleDispatchedReqData.products[index].product.id;
 				}
 			},
 		*/

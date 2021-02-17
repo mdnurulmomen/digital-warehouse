@@ -851,6 +851,14 @@
 												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Yet' }}</span>
 											</label>
 										</div>
+
+										<div class="form-row" v-else>
+											<label class="col-sm-12 col-form-label text-center">
+												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleRequisitionData.status ? 'Dispatched' : 'Not Dispatched Yet' }}
+												</span>
+											</label>
+										</div>
 									</div>
 
 								</div>
@@ -957,8 +965,24 @@
 		    .listen('NewRequisitionMade', (e) => {
 		        console.log(e);
 		        this.$toastr.w("New requisition arrives", "Warning");
-		        this.allFetchedRequisitions.pending.data.push(e);
-		    });		    
+		        this.allFetchedRequisitions.pending?.data.push(e);
+		    });
+
+		    Echo.private(`product-received`)
+		    .listen('ProductReceived', (e) => {
+		        
+		        // console.log(e);
+		        this.$toastr.s("Dispatched product has been received", "Success");
+		    	
+		    	let index = this.allFetchedRequisitions.dispatched?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
+
+		    	if (index > -1) {
+
+	    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
+		    	
+		    	}
+
+		    });	    
 
 		},
 

@@ -12,8 +12,10 @@
 
 <script type="text/javascript">
 	export default {
+		/*
 		mounted() {
             console.log('Loading mounted.')
         }
+		*/
 	}
 </script>

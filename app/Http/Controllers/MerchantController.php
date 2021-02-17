@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Events\ProductReceived;
 use App\Events\NewRequisitionMade;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\Web\ProductResource;
@@ -308,6 +309,8 @@ class MerchantController extends Controller
             ]);
 
         }
+
+        ProductReceived::dispatch($dispatchedRequisition);
 
         return $this->showMerchantAllRequisitions($perPage);
     }

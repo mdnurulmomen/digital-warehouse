@@ -6,7 +6,7 @@ use App\Models\Dispatch;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
 use App\Events\RequisitionDispatched;
-use App\Http\Resources\Web\DispatchCollection;
+// use App\Http\Resources\Web\DispatchCollection;
 use App\Http\Resources\Web\RequisitionResource;
 use App\Http\Resources\Web\RequisitionCollection;
 
@@ -79,22 +79,9 @@ class AdminController extends Controller
     {       
         if ($perPage) {
             
-            return new DispatchCollection(
-                Dispatch::with(['requisition', 'products', 'delivery', 'return'])->latest('released_at')->paginate($perPage)
-            );
+            return new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage));
 
         }
-        
-        /*
-        if ($perPage) {
-
-            return Dispatch::with(['requisition', 'products', 'delivery', 'return'])->latest('released_at')->paginate($perPage);
-
-        }
-
-        return Dispatch::with(['requisition', 'products', 'delivery', 'return'])->latest('released_at')->get();
-        */
-
     }
 
 
@@ -156,16 +143,15 @@ class AdminController extends Controller
 
     public function searchAllDispatches($search, $perPage)
     {
-        $query = $query = Dispatch::with(['requisition', 'products', 'delivery', 'return'])
-                                ->where(function ($query) use ($search) {
-                                    $query->whereHas('requisition', function ($q) use ($search) {
-                                        $q->where('subject', 'like', "%$search%")
-                                          ->orWhere('description', 'like', "%$search%");
-                                    });
+        $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
+                                ->where('status', 1)
+                                ->where(function ($q) use ($search) {
+                                    $q->where('subject', 'like', "%$search%")
+                                      ->orWhere('description', 'like', "%$search%");
                                 });
 
         return [
-            'all' => new DispatchCollection($query->paginate($perPage)),  
+            'all' => new RequisitionCollection($query->paginate($perPage)),
         ];
     }
 }

@@ -113,12 +113,12 @@ class Dispatch extends Model
             }
 
             $img = Image::make($delivery->delivery_receipt)->resize(300, 300);
-            $img->save($imagePath.$this->id.'.jpg');
+            $img->save($imagePath.'dispatch-'.$this->id.'.jpg');
 
             $this->delivery()->create([
                 // 'destination_name' => $delivery->address,
                 'delivery_price' => $delivery->delivery_price,
-                'receipt_preview' => $imagePath.$this->id.'.jpg',
+                'receipt_preview' => $imagePath.'dispatch-'.$this->id.'.jpg',
             ]);
 
         }
