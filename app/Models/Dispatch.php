@@ -56,14 +56,16 @@ class Dispatch extends Model
 
                 if ($expectedProduct->available_quantity >= $productToDispatch->quantity) {
                     
+                /*
                     $dispatchedProduct = $expectedProduct->dispatches()->create([
                         'quantity' => $productToDispatch->quantity,
                         'has_variations' => $productToDispatch->has_variations ?? false,
                         'dispatch_id' => $this->id,
                     ]);
+                */
 
                     $expectedProduct->update([
-                        'available_quantity' => $expectedProduct->available_quantity - $dispatchedProduct->quantity 
+                        'available_quantity' => $expectedProduct->available_quantity - $productToDispatch->quantity 
                     ]);
 
                     if ($expectedProduct->has_variations && $productToDispatch->has_variations) {
@@ -74,18 +76,33 @@ class Dispatch extends Model
 
                             if ($variationToDispatch->quantity <= $productExpectedVariation->available_quantity) {
 
+                            /*
                                 $dispatchedProductVariation = $dispatchedProduct->variations()->create([
                                     'quantity' => $variationToDispatch->quantity,
                                     'product_variation_id' => $variationToDispatch->product_variation_id,
                                 ]);
+                            */
 
                                 $productExpectedVariation->update([
-                                    'available_quantity' => $productExpectedVariation->available_quantity - $dispatchedProductVariation->quantity 
+                                    'available_quantity' => $productExpectedVariation->available_quantity - $variationToDispatch->quantity 
                                 ]);   
                                 
                             }
 
                         }
+
+                    }
+
+                    // Updating Product Addresses
+                    if ($expectedProduct->available_quantity==0) {  // No more products available
+                        
+                        $expectedProduct->deleteOldAddresses();
+                        // $expectedProduct->variations()->delete();
+
+                    }
+                    else if ($expectedProduct->available_quantity > 0) {
+                        
+                        $expectedProduct->product_address = $productToDispatch->spaces;
 
                     }
 

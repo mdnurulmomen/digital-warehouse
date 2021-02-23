@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dispatch;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Jobs\BroadcastRequisitionDispatch;
 // use App\Http\Resources\Web\DispatchCollection;
 use App\Http\Resources\Web\RequisitionResource;
@@ -84,13 +85,19 @@ class AdminController extends Controller
         }
     }
 
-
     public function makeNewDispatch(Request $request, $perPage)
     {
         $request->validate([
             
             'requisition' => 'required',
-            'requisition.id' => 'required|exists:requisitions,id',
+
+            'requisition.id' => [
+                'required',
+                Rule::exists('requisitions', 'id')->where(function ($query) {
+                    return $query->where('status', 0);
+                }),
+            ],
+
             'requisition.products' => 'required|array|min:1',
             'requisition.products.*.product_id' => 'required|exists:products,id',
             'requisition.products.*.quantity' => 'required|numeric|min:1',
@@ -104,7 +111,11 @@ class AdminController extends Controller
             'delivery.delivery_price' => 'required_if:requisition.agent,0,',
             'delivery.delivery_receipt' => 'required_if:requisition.agent,0,',
 
-        ]);
+        ],
+        [
+            'requisition.id.exists' => 'Dispatched Requisition, Please Refresh !',
+        ]
+        );
 
         // $currentMerchant = \Auth::user();
 

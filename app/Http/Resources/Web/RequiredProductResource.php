@@ -3,7 +3,6 @@
 namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Web\RequiredProductVariationResource;
 
 class RequiredProductResource extends JsonResource
 {
@@ -24,6 +23,7 @@ class RequiredProductResource extends JsonResource
             'has_variations' => $this->has_variations,
             'requisition_id' => $this->requisition_id,
             'variations' => $this->when($this->has_variations, RequiredProductVariationResource::collection($this->variations)),
+            'spaces' => new ProductAddressCollection($this->product->addresses),
         ];
     }
 }

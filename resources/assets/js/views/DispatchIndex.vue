@@ -275,7 +275,7 @@
 									v-bind:key="'requisition-modal-step-' + 2" 
 									v-show="!loading && step==2"
 								>								  	
-									<h2 class="mx-auto mb-4 lead">Requisition Products</h2>
+									<h2 class="mx-auto mb-4 lead">Required Products</h2>
 
 									<div 
 										class="col-md-12" 
@@ -464,8 +464,216 @@
 
 								<div 
 									class="row" 
-									v-bind:key="'requisition-modal-step-' + 3" 
+									v-bind:key="3" 
 									v-show="!loading && step==3"
+								>
+									<h2 class="mx-auto mb-4 lead">Product Address</h2>
+
+									<div 
+										class="col-md-12" 
+										v-if="singleDispatchedReqData.hasOwnProperty('requisition') && Object.keys(singleDispatchedReqData.requisition).length > 0 && singleDispatchedReqData.requisition.products && singleDispatchedReqData.requisition.products.length"
+									>
+										<div 
+											class="card"
+											v-for="(requiredProduct, productIndex) in singleDispatchedReqData.requisition.products" 
+											:key="'required-product-index-' + productIndex"
+										>
+											<div class="card-header">
+												{{ requiredProduct.product_name }}
+											</div>
+
+											<div 
+											class="card-body" 
+											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.spaces" 
+											:key="'required-product-index-' + productIndex + '-address-index' + productAddressIndex" 
+											v-show="requiredProduct.available_quantity >= requiredProduct.quantity"
+											>
+												<div class="form-row ml-5 mr-5">
+													<div class="form-group col-md-12 text-center">
+														<label for="inputFirstName">
+															Space Type {{ productAddressIndex + 1 }}
+														</label>
+														<multiselect 
+					                              			v-model="requiredProductAddress.type"
+					                                  		:options="['containers', 'shelves', 'units']" 
+					                                  		:custom-label="nameWithCapitalized" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                              			placeholder="Containers / Shelves / Units" 
+					                                  		:disabled="true" 
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-if="requiredProductAddress.type=='containers'"
+												>
+													<div class="form-group col-md-12">
+														<label for="inputFirstName">
+															Selected Containers
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.spaces[productAddressIndex].containers"
+					                              			placeholder="Select Containers" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="requiredProduct.spaces[productAddressIndex].containers" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-if="requiredProductAddress.type=='shelves'"
+												>
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">
+															Parent Container
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.spaces[productAddressIndex].container"
+					                              			placeholder="Parent Container" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-6" 
+														v-if="requiredProduct.spaces[productAddressIndex].container"
+													>
+														<label for="inputFirstName">
+															Selected Shelves
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.spaces[productAddressIndex].container.shelves"
+					                              			placeholder="Select Shelves" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="requiredProduct.spaces[productAddressIndex].container.shelves" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+
+												<div class="form-row" v-if="requiredProductAddress.type=='units'">
+													<div class="form-group col-md-4">
+														<label for="inputFirstName">
+															Parent Container
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.spaces[productAddressIndex].container"
+					                              			placeholder="Parent Container" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-if="requiredProduct.spaces[productAddressIndex].container"
+													>
+														<label for="inputFirstName">
+															Parent Shelf
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.spaces[productAddressIndex].container.shelf"
+					                              			placeholder="Parent Shelf" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-if="requiredProduct.spaces[productAddressIndex].container && requiredProduct.spaces[productAddressIndex].container.shelf"
+													>
+														<label for="inputFirstName">
+															Selected Units
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.spaces[productAddressIndex].container.shelf.units"
+					                              			placeholder="Select Units" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="requiredProduct.spaces[productAddressIndex].container.shelf.units" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+											</div>
+
+											<div class="card-footer">
+												<div class="form-row">
+													<div class="form-group col-md-12">
+														<button 
+															type="button" 
+															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															:disabled="requiredProduct.spaces.length==1"
+															@click="removeSpace(productIndex)" 
+														>
+															Remove Space
+														</button>
+													</div>
+												</div>
+											</div>
+
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+								          	</div>
+								          	<div class="col-md-12">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+										</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'requisition-modal-step-' + 4" 
+									v-show="!loading && step==4"
 								>	
 									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
 									
@@ -1136,7 +1344,8 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Requisition has been dispatched", "Success");
-							this.query !== '' ? this.searchData() : this.fetchAllDispatches();
+							this.query !== '' ? this.searchData() : this.allDispatchedRequisition = response.data.data;
+							
 							// this.allDispatchedRequisition = response.data;
 							// this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
@@ -1202,11 +1411,29 @@
 					// this.validateFormInput('total_dispatched_quantity');
 					// this.validateFormInput('variation_total_dispatched_quantity');
 				}
-			*/
+			*/	
+				if (!this.errors.requisition_id && this.step < 4) {
+					
+					if (this.step==2) {
 
-				if (!this.errors.requisition_id && this.step < 3) {
-					this.step += 1;
+						const productRemains = this.singleDispatchedReqData.requisition.products.some(
+							requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0
+						);
+
+						if (productRemains) {
+							this.step += 1;
+						}
+						else {
+							this.step += 2;
+						}
+
+					}
+					else{
+						this.step += 1;
+					}
+					
 					this.submitForm = true;
+					
 				}
 				else {
 					this.submitForm = false;
@@ -1225,6 +1452,11 @@
 				return false;
 			},
 		*/
+			nameWithCapitalized (name) {
+				if (!name) return ''
+			    name = name.toString()
+			    return name.charAt(0).toUpperCase() + name.slice(1)
+		    },
 			objectNameWithCapitalized ({subject, product_name, variation_name }) {
 		      	if (product_name) {
 				    product_name = product_name.toString()
