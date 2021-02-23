@@ -47,6 +47,15 @@ class Product extends Model
         return $this->hasMany(RequiredProduct::class, 'product_id', 'id');
     }
 
+    public function getProductRequisitionAttribute()
+    {
+        if ($this->requests()->count()) {
+            return true;   
+        }
+
+        return false;
+    }
+
     public function dispatches()
     {
         return $this->hasMany(ProductDispatch::class, 'product_id', 'id');
@@ -56,7 +65,24 @@ class Product extends Model
     {
         if (count($variations)) {
 
-            $this->variations()->delete();
+            if ($this->getProductRequisitionAttribute()) {
+                
+                foreach ($this->variations() as $productVariation) {
+                    
+                    if (!$productVariation->variation_requisition) {
+
+                        $productVariation->delete();
+
+                    }
+
+                }
+
+            }
+            else {
+
+                $this->variations()->delete();
+
+            }
             
             $variations = json_decode(json_encode($variations));
 
@@ -78,13 +104,27 @@ class Product extends Model
 
                 // else {
 
-                    $this->variations()->create([
-                        'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
-                        'initial_quantity' => $variation->initial_quantity,
-                        'available_quantity' => $variation->initial_quantity,
-                        'price' => $variation->price,
-                        'variation_id' => $variation->variation->id,
-                    ]);
+                    if (empty($variation->has_requisitions) || is_null($variation->has_requisitions)) {
+                        
+                        $this->variations()->create([
+                            'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
+                            'initial_quantity' => $variation->initial_quantity,
+                            'available_quantity' => $variation->initial_quantity,
+                            'price' => $variation->price,
+                            'variation_id' => $variation->variation->id,
+                        ]);
+
+                    }
+                    else {
+
+                        $this->variations()->where('variation_id', $variation->variation->id)->update([
+                            'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
+                            'initial_quantity' => $variation->initial_quantity,
+                            // 'available_quantity' => $variation->initial_quantity,
+                            'price' => $variation->price,
+                        ]);
+
+                    }
 
                 // }
 
@@ -123,7 +163,7 @@ class Product extends Model
         }
     }
 
-    protected function deleteOldAddresses()
+    public function deleteOldAddresses()
     {
         if (count($this->addresses)) {
             

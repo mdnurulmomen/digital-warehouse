@@ -371,10 +371,16 @@
 																class="form-control" 
 																v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
 																placeholder="Variation Quantity" 
+																:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
 																min="0" 
 																:max="productVariation.available_quantity - productVariation.requested_quantity" 
-																@change="validateFormInput('variations_quantity')" 
+																@change="validateFormInput('variations_total_quantity')" 
 															>
+															<div 
+																class="invalid-feedback" 
+															>
+													        	{{ errors.products[productIndex].variation_quantities[variationIndex] }}
+													  		</div>
 														</div>
 													</div>
 												</div>
@@ -385,9 +391,9 @@
 													<div 
 														class="invalid-feedback" 
 														style="display: block;" 
-														v-show="errors.products[productIndex].variations_quantity"
+														v-show="errors.products[productIndex].variations_total_quantity"
 													>
-											        	{{ errors.products[productIndex].variations_quantity }}
+											        	{{ errors.products[productIndex].variations_total_quantity }}
 											  		</div>
 												</div>
 											</div>
@@ -398,6 +404,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													:disabled="singleRequisitionData.products.length >= merchantAllProducts.length"
 													@click="addMoreProduct()"
 												>
 													More Product
@@ -407,6 +414,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													:disabled="singleRequisitionData.products.length < 2"
 													@click="removeProduct()"
 												>
 													Remove Product
@@ -882,7 +890,8 @@
 						{
 							// product_id : '',
 							// product_quantity : '',
-							// variations_quantity : ''
+							// variations_total_quantity : ''
+							variation_quantities : []
 						}
 
 					],
@@ -1028,7 +1037,8 @@
 						{
 							// product_id : '',
 							// product_quantity : '',
-							// variations_quantity : ''
+							// variations_total_quantity : ''
+							variation_quantities : []
 						}
 						
 					],
@@ -1131,7 +1141,7 @@
 				        
 				        // console.log(e);
 
-				        this.$toastr.w("Requisition has been dispatched", "Warning");
+				        this.$toastr.i("Requisition has been dispatched", "Success");
 
 				    	let index = this.requisitionsToShow.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
 
@@ -1192,7 +1202,7 @@
 				
 				if (array.length) {
 
-					return array.some(element => Object.keys(element).length > 0);
+					return array.some(product => Object.keys(product).length > 1 || product.variation_quantities.some(productVariation => productVariation != null));
 
 				}
 
@@ -1207,7 +1217,7 @@
 				else if (this.step == 2) {
 					this.validateFormInput('product_id');
 					this.validateFormInput('product_quantity');
-					this.validateFormInput('variations_quantity');
+					this.validateFormInput('variations_total_quantity');
 				}
 
 
@@ -1363,7 +1373,7 @@
 
 						break;
 
-					case 'variations_quantity' :
+					case 'variations_total_quantity' :
 
 						this.singleRequisitionData.products.forEach(
 
@@ -1371,19 +1381,45 @@
 
 								if (requiredProduct.product && requiredProduct.product.has_variations) {
 
-									let totalVariationQuantity = requiredProduct.product.variations.reduce((total, current) => total + current.required_quantity || 0, 0
+									let variationTotalQuantity = 0;
 
-									);
+									requiredProduct.product.variations.forEach(current => variationTotalQuantity += current.required_quantity ?? 0);
 
-									// console.log(totalVariationQuantity);
+									console.log(variationTotalQuantity);
 
-									if (requiredProduct.total_quantity != totalVariationQuantity) {
-										this.errors.products[productIndex].variations_quantity = 'Total quantity should be equal to variations quantity';
+									if (requiredProduct.total_quantity != variationTotalQuantity) {
+										this.errors.products[productIndex].variations_total_quantity = 'Total quantity should be equal to variations quantity';
 									}
 									else{
+
+										requiredProduct.product.variations.forEach(
+
+											(productVariation, variationIndex) => {
+
+												if (productVariation.required_quantity < 0) {
+
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity cant be zero or negative';
+
+												}
+												else if (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity)) {
+
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available';
+
+												}
+												else {
+
+													this.errors.products[productIndex].variation_quantities[variationIndex] = null;
+
+													// this.errors.products[productIndex].variation_quantities.splice(variationIndex, 1);
+													
+												}
+
+											}
+
+										);
 										
 										// this.submitForm = true;
-										this.$delete(this.errors.products[productIndex], 'variations_quantity');
+										this.$delete(this.errors.products[productIndex], 'variations_total_quantity');
 
 									}
 
@@ -1391,7 +1427,7 @@
 								else {
 
 									// this.submitForm = true;
-									this.$delete(this.errors.products[productIndex], 'variations_quantity');
+									this.$delete(this.errors.products[productIndex], 'variations_total_quantity');
 
 								}
 

@@ -19,6 +19,15 @@ class ProductVariation extends Model
         return $this->hasMany(RequiredProductVariation::class, 'product_variation_id', 'id');
     }
 
+    public function getVariationRequisitionAttribute()
+    {
+        if ($this->requests()->count()) {
+            return true;   
+        }
+
+        return false;
+    }
+
     public function nonDispatchedRequests()
     {
         return $this->hasMany(RequiredProductVariation::class, 'product_variation_id', 'id')->whereHas('requisition', function ($query) {

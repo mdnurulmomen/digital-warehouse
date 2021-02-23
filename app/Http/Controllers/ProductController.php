@@ -200,7 +200,13 @@ class ProductController extends Controller
         // $productToUpdate->initial_quantity = $request->initial_quantity;
         // $productToUpdate->available_quantity = $request->initial_quantity;
         // $productToUpdate->quantity_type = $request->quantity_type;
-        $productToUpdate->has_variations = $request->has_variations ?? false;
+        
+        if (!$productToUpdate->product_requisition) {
+            
+            $productToUpdate->has_variations = $request->has_variations ?? false;
+            
+        }
+        
         $productToUpdate->product_category_id = $request->product_category_id;
         $productToUpdate->merchant_id = $request->merchant_id;
 

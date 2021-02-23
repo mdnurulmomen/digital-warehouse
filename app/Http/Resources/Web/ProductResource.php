@@ -29,6 +29,7 @@ class ProductResource extends JsonResource
             // 'total_requested_quantity' => $this->available_quantity,
             'quantity_type' => $this->quantity_type,
             'has_variations' => $this->has_variations,
+            'has_requisitions' => $this->product_requisition,
             'product_category_id' => $this->product_category_id,
             'merchant_id' => $this->merchant_id,
             'category' => $this->category,

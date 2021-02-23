@@ -277,6 +277,7 @@
 											    </div>
 											</div>
 										</div>
+
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">Name</label>
@@ -303,6 +304,7 @@
 				                              	</ckeditor>
 											</div>
 										</div>
+
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">SKU/Barcode</label>
@@ -336,6 +338,7 @@
 										  		</div>
 											</div>
 										</div>
+
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">Qty</label>
@@ -387,6 +390,7 @@
 										  		</div>
 											</div>
 										</div>
+
 										<div class="form-row mt-2">
 											<div class="form-group col-md-12 text-center">
 												<toggle-button 
@@ -396,7 +400,7 @@
 													:color="{checked: 'green', unchecked: 'blue'}"
 													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
 													:readonly="!createMode" 
-													:disabled="productMode=='bulk'" 
+													:disabled="productMode=='bulk' || singleProductData.has_requisitions" 
 													@change="resetProductVariations()"
 												/>
 											</div>
@@ -416,7 +420,8 @@
 			                                  		:allow-empty="false"
 			                                  		selectLabel = "Press/Click"
 			                                  		deselect-label="Can't remove single value" 
-			                                  		:class="!errors.product.product_variation_type  ? 'is-valid' : 'is-invalid'"
+			                                  		:class="!errors.product.product_variation_type  ? 'is-valid' : 'is-invalid'" 
+			                                  		:disabled="singleProductData.has_requisitions"
 			                                  		@close="validateFormInput('product_variation_type')" 
 			                                  		@input="setProductVariation"
 			                              		>
@@ -456,6 +461,7 @@
 					                                  		:allow-empty="false"
 					                                  		selectLabel = "Press/Click"
 					                                  		deselect-label="Can't remove single value" 
+					                                  		:disabled="singleProductData.variations[index].has_requisitions"
 					                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
 					                                  		@close="validateFormInput('product_variation_id')"
 					                              		>
@@ -476,6 +482,7 @@
 														<input type="number" 
 															class="form-control" 
 															v-model.number="singleProductData.variations[index].initial_quantity" 
+															:min="singleProductData.variations[index].requested_quantity"
 															:max="singleProductData.initial_quantity" 
 															placeholder="Product Qty" 
 															:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
@@ -532,13 +539,14 @@
 															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
 															@click="addMoreVariation()"
 														>
-															More Variation
+															Add Variation
 														</button>
 													</div>
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															:disabled="singleProductData.variations[singleProductData.variations.length-1].has_requisitions || singleProductData.variations.length < 3"
 															@click="removeVariation()"
 														>
 															Remove Variation
@@ -550,7 +558,7 @@
 										</div>
 								    
 								    	<div class="form-row">
-									    	<div class="form-group col-sm-12 mb-2 text-right">
+									    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
@@ -574,7 +582,7 @@
 									<div 
 										class="col-md-12"
 										v-for="(productSpace, index) in singleProductData.spaces" 
-														:key="'product-space-' + index"
+										:key="'product-space-' + index"
 									>
 										<div 
 											class="card"
@@ -618,7 +626,7 @@
 														<label for="inputFirstName">Select Containers</label>
 														<multiselect 
 					                              			v-model="singleProductData.spaces[index].containers"
-					                              			placeholder="Select Contaners" 
+					                              			placeholder="Select Containers" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="emptyContainers" 
@@ -648,10 +656,10 @@
 													v-show="singleProductData.spaces[index].type=='shelves'"
 												>
 													<div class="form-group col-md-6">
-														<label for="inputFirstName">Select Parent Containers</label>
+														<label for="inputFirstName">Select Parent Container</label>
 														<multiselect 
 					                              			v-model="singleProductData.spaces[index].container"
-					                              			placeholder="Parent Contaner" 
+					                              			placeholder="Parent Container" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="emptyShelfContainers" 
@@ -709,7 +717,7 @@
 														<label for="inputFirstName">Select Parent Container</label>
 														<multiselect 
 					                              			v-model="singleProductData.spaces[index].container"
-					                              			placeholder="Parent Contaner" 
+					                              			placeholder="Parent Container" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="emptyUnitContainers" 
@@ -794,6 +802,15 @@
 										</div>
 									</div>
 
+									<div 
+										class="col-md-12 text-center" 
+										v-show="!singleProductData.spaces.length"
+									>
+										<p class="text-danger">
+											No Space Found.
+										</p>
+									</div>
+
 									<div class="col-md-12">
 										<div class="form-row">
 											<div class="form-group col-md-6">
@@ -802,7 +819,7 @@
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
 													@click="addMoreSpace()"
 												>
-													More Space
+													Add Space
 												</button>
 											</div>
 											<div class="form-group col-md-6">
@@ -817,7 +834,7 @@
 										</div>
 									</div>
 
-									<div class="col-sm-12">
+									<div class="col-sm-12 card-footer">
 										<div class="form-row">
 											<div class="col-sm-12 text-right" v-show="!submitForm">
 												<span class="text-danger small mb-1">
@@ -829,7 +846,7 @@
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-													Save
+													{{ createMode ? 'Save' : 'Update' }}
 												</button>
 											</div>
 										</div>
@@ -1199,9 +1216,19 @@
 															</div>
 														</div>
 													</div> 
-												
 
 												</div>
+											</div>
+										</div>
+
+										<div class="form-row" v-else>
+											<div 
+												class="col-md-12 text-center" 
+												v-show="!singleProductData.spaces.length"
+											>
+												<p class="text-danger">
+													No Space Found.
+												</p>
 											</div>
 										</div>
 
@@ -1785,7 +1812,7 @@
 				this.errors.product.variations.push({});
 			},
 			removeVariation() {
-				if (this.singleProductData.variations.length > 1) {	
+				if (this.singleProductData.variations.length > 2) {	
 					this.singleProductData.variations.pop();
 					this.errors.product.variations.pop();
 				}
@@ -2284,12 +2311,13 @@
 									else {
 										this.$delete(this.errors.product.variations[index], 'product_variation_id');
 									}
-
-									if (!this.errorInArray(this.errors.product.variations)) {
-										this.submitForm = true;
-									}
 								}
 							);
+							
+							if (!this.errorInArray(this.errors.product.variations)) {
+								this.submitForm = true;
+							}
+
 						}
 						else {
 							this.submitForm = true;
@@ -2310,15 +2338,21 @@
 									if (!productVariation.hasOwnProperty('initial_quantity') || productVariation.initial_quantity < 1) {
 										this.errors.product.variations[index].product_variation_quantity = 'Variation quantity is required';
 									}
+									else if (productVariation.initial_quantity < productVariation.requested_quantity) {
+										this.errors.product.variations[index].product_variation_quantity = 'Quantity cant be less than required quantity';
+									}
 									else {
 										this.$delete(this.errors.product.variations[index], 'product_variation_quantity');
 									}
 
-									if (!this.errorInArray(this.errors.product.variations)) {
-										this.submitForm = true;
-									}
 								}
+								
 							);
+								
+							if (!this.errorInArray(this.errors.product.variations)) {
+								this.submitForm = true;
+							}
+							
 						}
 						else {
 							this.submitForm = true;
@@ -2341,12 +2375,12 @@
 									else {
 										this.$delete(this.errors.product.variations[index], 'product_variation_price');
 									}
-
-									if (!this.errorInArray(this.errors.product.variations)) {
-										this.submitForm = true;
-									}
 								}
 							);
+							
+							if (!this.errorInArray(this.errors.product.variations)) {
+								this.submitForm = true;
+							}
 						}
 						else {
 							this.submitForm = true;
@@ -2404,13 +2438,13 @@
 									this.$delete(this.errors.product.spaces[index], 'product_space_type');
 								}
 
-								if (!this.errorInArray(this.errors.product.spaces)) {
-									this.submitForm = true;
-								}
-
 							}
 
 						);
+						
+						if (!this.errorInArray(this.errors.product.spaces)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -2427,13 +2461,13 @@
 									this.$delete(this.errors.product.spaces[index], 'product_containers');
 								}
 
-								if (!this.errorInArray(this.errors.product.spaces)) {
-									this.submitForm = true;
-								}
-
 							}
 
 						);
+
+						if (!this.errorInArray(this.errors.product.spaces)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -2450,12 +2484,12 @@
 									this.$delete(this.errors.product.spaces[index], 'product_container');
 								}
 
-								if (!this.errorInArray(this.errors.product.spaces)) {
-									this.submitForm = true;
-								}
-
 							}
 						);
+
+						if (!this.errorInArray(this.errors.product.spaces)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -2472,12 +2506,12 @@
 									this.$delete(this.errors.product.spaces[index], 'product_shelves');
 								}
 
-								if (!this.errorInArray(this.errors.product.spaces)) {
-									this.submitForm = true;
-								}
-
 							}
 						);
+
+						if (!this.errorInArray(this.errors.product.spaces)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -2494,12 +2528,12 @@
 									this.$delete(this.errors.product.spaces[index], 'product_shelf');
 								}
 
-								if (!this.errorInArray(this.errors.product.spaces)) {
-									this.submitForm = true;
-								}
-
 							}
 						);
+
+						if (!this.errorInArray(this.errors.product.spaces)) {
+							this.submitForm = true;
+						}
 
 						break;
 
@@ -2517,12 +2551,12 @@
 									this.$delete(this.errors.product.spaces[index], 'product_units');
 								}
 
-								if (!this.errorInArray(this.errors.product.spaces)) {
-									this.submitForm = true;
-								}
-
 							}
 						);
+
+						if (!this.errorInArray(this.errors.product.spaces)) {
+							this.submitForm = true;
+						}
 
 						break;
 
