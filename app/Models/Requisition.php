@@ -41,11 +41,15 @@ class Requisition extends Model
                     
                     foreach ($requiredProduct->product->variations as $requiredProductVariation) {
                 
-                        $requisitionedProduct->variations()->create([
-                            'product_variation_id' => $requiredProductVariation->id,
-                            'quantity' => $requiredProductVariation->required_quantity,
-                            'requisition_id' => $this->id,
-                        ]);
+                        if (!empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0) {
+                           
+                            $requisitionedProduct->variations()->create([
+                                'product_variation_id' => $requiredProductVariation->id,
+                                'quantity' => $requiredProductVariation->required_quantity,
+                                'requisition_id' => $this->id,
+                            ]);
+
+                        }
 
                     }
 

@@ -1242,7 +1242,9 @@
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
 					this.singleRequisitionData.products.push({});
-					this.errors.products.push({});
+					this.errors.products.push({
+						variation_quantities : []
+					});
 
 				}
 			},
@@ -1366,6 +1368,8 @@
 							}
 
 						);
+
+						this.validateFormInput('variations_total_quantity');
 								
 						if (!this.errorInArray(this.errors.products)) {
 							this.submitForm = true;
@@ -1385,7 +1389,7 @@
 
 									requiredProduct.product.variations.forEach(current => variationTotalQuantity += current.required_quantity ?? 0);
 
-									console.log(variationTotalQuantity);
+									// console.log(variationTotalQuantity);
 
 									if (requiredProduct.total_quantity != variationTotalQuantity) {
 										this.errors.products[productIndex].variations_total_quantity = 'Total quantity should be equal to variations quantity';
@@ -1401,7 +1405,7 @@
 													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity cant be zero or negative';
 
 												}
-												else if (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity)) {
+												else if (productVariation.required_quantity > 0 && (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity))) {
 
 													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available';
 
@@ -1427,6 +1431,7 @@
 								else {
 
 									// this.submitForm = true;
+									this.errors.products[productIndex].variation_quantities = [];
 									this.$delete(this.errors.products[productIndex], 'variations_total_quantity');
 
 								}

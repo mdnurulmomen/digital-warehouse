@@ -486,7 +486,7 @@
 											class="card-body" 
 											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.spaces" 
 											:key="'required-product-index-' + productIndex + '-address-index' + productAddressIndex" 
-											v-show="requiredProduct.available_quantity >= requiredProduct.quantity"
+											v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 											>
 												<div class="form-row ml-5 mr-5">
 													<div class="form-group col-md-12 text-center">
@@ -639,7 +639,8 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															:disabled="requiredProduct.spaces.length==1"
+															:disabled="requiredProduct.spaces.length==1" 
+															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 															@click="removeSpace(productIndex)" 
 														>
 															Remove Space
@@ -1452,6 +1453,15 @@
 				return false;
 			},
 		*/
+			removeSpace(productIndex) {	
+				
+				if (this.singleDispatchedReqData.requisition.products.length && this.singleDispatchedReqData.requisition.products[productIndex].spaces.length > 1) {
+						
+					this.singleDispatchedReqData.requisition.products[productIndex].spaces.pop();
+				
+				}
+
+			},
 			nameWithCapitalized (name) {
 				if (!name) return ''
 			    name = name.toString()

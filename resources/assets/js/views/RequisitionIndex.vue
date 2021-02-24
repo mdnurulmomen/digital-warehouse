@@ -458,7 +458,7 @@
 											class="card-body" 
 											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.spaces" 
 											:key="'required-product-index-' + productIndex + '-address-index' + productAddressIndex" 
-											v-show="requiredProduct.available_quantity >= requiredProduct.quantity"
+											v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 											>
 												<div class="form-row ml-5 mr-5">
 													<div class="form-group col-md-12 text-center">
@@ -611,7 +611,8 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															:disabled="requiredProduct.spaces.length==1"
+															:disabled="requiredProduct.spaces.length==1" 
+															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 															@click="removeSpace(productIndex)"
 														>
 															Remove Space
@@ -1170,7 +1171,7 @@
 
 			Echo.private(`new-requisition`)
 		    .listen('NewRequisitionMade', (e) => {
-		        console.log(e);
+		        // console.log(e);
 		        this.$toastr.w("New requisition arrives", "Warning");
 		        this.allFetchedRequisitions.pending?.data.push(e);
 		    });

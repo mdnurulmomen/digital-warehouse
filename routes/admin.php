@@ -117,13 +117,12 @@ Route::name('admin.')->group(function () {
 
 		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
 
-		Route::get('/api/requisitions/{perPage?}', 'AdminController@showAllRequisitions')->name('requisitions');
-		// Route::post('/requisitions/{perPage}', 'AdminController@makeNewRequisition')->name('requisitions');
-		Route::get('/api/search-requisitions/{search}/{perPage?}', 'AdminController@searchAllRequisitions')->name('search-requisitions');
+		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');
+		Route::get('/api/search-requisitions/{search}/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
 
-		Route::get('/api/dispatches/{perPage?}', 'AdminController@showAllDispatches')->name('dispatches');
-		Route::post('/dispatches/{perPage}', 'AdminController@makeNewDispatch')->name('dispatches');
-		Route::get('/api/search-dispatches/{search}/{perPage?}', 'AdminController@searchAllDispatches')->name('search-dispatches');
+		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
+		Route::post('/dispatches/{perPage}', 'DispatchController@makeNewDispatch')->name('dispatches');
+		Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
