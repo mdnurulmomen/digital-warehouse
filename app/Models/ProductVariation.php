@@ -19,10 +19,18 @@ class ProductVariation extends Model
         return $this->hasMany(RequiredProductVariation::class, 'product_variation_id', 'id');
     }
 
-    public function getVariationRequisitionAttribute()
+    public function stocks()
+    {
+        return $this->hasMany(ProductVariationStock::class, 'product_variation_id', 'id')->latest();
+    }
+
+    public function getVariationImmutabilityAttribute()
     {
         if ($this->requests()->count()) {
             return true;   
+        }
+        else if ($this->stocks()->count()) {
+             return true;
         }
 
         return false;
@@ -30,7 +38,7 @@ class ProductVariation extends Model
 
     public function nonDispatchedRequests()
     {
-        return $this->hasMany(RequiredProductVariation::class, 'product_variation_id', 'id')->whereHas('requisition', function ($query) {
+        return $this->requests()->whereHas('requiredProduct.requisition', function ($query) {
             $query->where('status', 0);
         });
     }

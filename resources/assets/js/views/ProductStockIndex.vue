@@ -1,0 +1,2088 @@
+
+<template>
+
+	<div class="pcoded-content">
+
+		<breadcrumb 
+			:title="'products'" 
+			:message="'All our products'"
+		></breadcrumb>			
+
+		<div class="pcoded-inner-content">
+			<div class="main-body">
+				<div class="page-wrapper">	
+					<div class="page-body">
+
+						<loading v-show="loading"></loading>
+
+						<alert v-show="error" :error="error"></alert>
+				
+					  	<div class="row" v-show="!loading">
+							<div class="col-sm-12">
+							  	<div class="card">
+									<div class="card-block">
+										<div class="row">											
+
+											<div class="col-sm-12 sub-title">
+											  	<search-and-addition-option 
+											  		:query="query" 
+											  		:caller-page="'stocks'" 
+											  		
+											  		@showContentCreateForm="showContentCreateForm" 
+											  		@searchData="searchData($event)" 
+											  		@fetchAllContents="fetchProductAllStocks"
+											  	></search-and-addition-option>
+											</div>
+											
+											<div class="col-sm-12 col-lg-12">
+
+									  		<!-- 
+										  		<table-with-soft-delete-option 
+										  			:query="query" 
+										  			:per-page="perPage"  
+										  			:column-names="['name']" 
+										  			:column-values-to-show="['name']" 
+										  			:contents-to-show = "stocksToShow" 
+										  			:pagination = "pagination"
+
+										  			@showContentDetails="showContentDetails($event)" 
+										  			@openContentEditForm="openContentEditForm($event)" 
+										  			@openContentDeleteForm="openContentDeleteForm($event)" 
+										  			@openContentRestoreForm="openContentRestoreForm($event)" 
+										  			@changeNumberContents="changeNumberContents($event)" 
+										  			@fetchProductAllStocks="fetchProductAllStocks" 
+										  			@searchData="searchData" 
+										  		>	
+										  		</table-with-soft-delete-option>
+ 											-->
+
+ 												<div class="tab-content card-block">
+													<div class="card">
+														<div class="table-responsive">
+															<table class="table table-striped table-bordered nowrap text-center">
+																<thead>
+																	<tr>
+																		<th>Date</th>
+																		<th>Stock Qty</th>
+																		<th>Available Qty</th>
+																		<th>Actions</th>
+																	</tr>
+																</thead>
+																<tbody>
+
+																	<tr v-for="stock in stocksToShow" :key="'stock-' + stock.id"
+																	>
+																		<td>
+																			{{ stock.created_at }}
+																		</td>
+																		<td>
+																			{{ stock.stock_quantity }}
+																		</td>
+																		<td>
+																			{{ stock.available_quantity }}
+																		</td>
+																		
+																		<td>
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-info btn-icon"  
+																				@click="showContentDetails(stock)"
+																			>
+																				<i class="fas fa-eye"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-primary btn-icon"  
+																				@click="openContentEditForm(stock)"
+																			>
+																				<i class="fas fa-edit"></i>
+																			</button>
+																		</td>
+																    
+																	</tr>
+																	<tr 
+																  		v-show="!stocksToShow.length"
+																  	>
+															    		<td colspan="4">
+																      		<div class="alert alert-danger" role="alert">
+																      			Sorry, No data found.
+																      		</div>
+																    	</td>
+																  	</tr>
+
+																</tbody>
+																<tfoot>
+																	<tr>	
+																		<th>Date</th>
+																		<th>Stock Qty</th>
+																		<th>Available Qty</th>
+																		<th>Actions</th>
+																	</tr>
+																</tfoot>
+															</table>
+														</div>
+													</div>
+													<div class="row d-flex align-items-center align-content-center">
+														<div class="col-sm-2">
+															<select 
+																class="form-control" 
+																v-model.number="perPage" 
+																@change="changeNumberContents"
+															>
+																<option>10</option>
+																<option>20</option>
+																<option>30</option>
+																<option>40</option>
+																<option>50</option>
+															</select>
+														</div>
+														<div class="col-sm-2">
+															<button 
+																type="button" 
+																class="btn btn-primary btn-sm" 
+																@click="query === '' ? fetchProductAllStocks() : searchData()"
+															>
+																Reload
+																<i class="fas fa-sync"></i>
+															</button>
+														</div>
+														<div class="col-sm-8">
+															<pagination
+																v-if="pagination.last_page > 1"
+																:pagination="pagination"
+																:offset="5"
+																@paginate="query === '' ? fetchProductAllStocks() : searchData()"
+															>
+															</pagination>
+														</div>
+													</div>
+												</div>
+
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div> 
+				
+				</div>
+			</div>
+		</div>
+
+	<!-- 
+		<asset-create-or-edit-modal 
+			:create-mode="createMode" 
+			:caller-page="'variation'" 
+			:single-asset-data="singleStockData" 
+			:csrf="csrf"
+
+			@storeStock="storeStock($event)" 
+			@updateStock="updateStock($event)" 
+		></asset-create-or-edit-modal>
+ 	-->
+
+ 		<!--Create Or Edit Modal -->
+		<div class="modal fade" id="stock-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							{{ createMode ? 'Create '+ productName +' Stock' : 'Update '+ productName +' Stock' }}
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+						
+					<form 	
+						class="form-horizontal" 
+						v-on:submit.prevent="createMode ? storeStock() : updateStock()" 
+						autocomplete="off" 
+						novalidate="true" 
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-body">
+
+							<transition-group name="fade">
+							        		
+								<div 
+									class="row" 
+									v-bind:key="'product-modal-step-' + 1" 
+									v-show="!loading && step==1"
+								>
+									<h2 class="mx-auto mb-4 lead">Product Profile</h2>
+
+									<div class="col-md-12">
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Product Category :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.category ? product.category.name : 'Bulk Product' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.merchant ? product.merchant.user_name : 'None' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Name :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.name }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												SKU Code :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.sku }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Price :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.price || 'NA' }}
+											</label>
+										</div>
+
+										<!-- 
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Description :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												<span v-html="product.description"></span>
+											</label>
+										</div>
+ 										-->
+
+ 										<div class="form-row form-group">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stock Qty :
+											</label>
+											<div class="col-sm-6">
+												<div class="input-group mb-0">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singleStockData.stock_quantity" 
+														placeholder="Product initial qty" 
+														:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
+														@change="validateFormInput('product_stock_quantity')" 
+														required="true" 
+													>
+													<div class="input-group-append">
+														<span class="input-group-text">
+															{{ product.quantity_type }}
+														</span>
+													</div>
+												</div>
+												<div class="invalid-feedback" 
+													style="display: block;" 
+													v-show="errors.stock.product_stock_quantity"
+												>
+										        	{{ errors.stock.product_stock_quantity }}
+										  		</div>
+											</div>
+										</div>
+
+									<!-- 
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Available Qty:
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.available_quantity }}
+												{{ product.quantity_type }}
+											</label>
+										</div>
+ 									-->
+
+										<div class="form-row mt-2">
+											<div class="form-group col-md-12 text-center">
+												<toggle-button 
+													v-model="product.has_variations" 
+													:width=150 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'blue'}"
+													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
+													:disabled="true" 
+												/>
+											</div>
+										</div>
+
+										<div class="form-row" v-if="product.has_variations">
+											<div 
+												class="form-group col-md-12" 
+												v-if="product.hasOwnProperty('variations') && singleStockData.variations.length"
+											>
+												<div 
+													class="form-row" 
+													v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+													:key="'product-variation-index-' + variationIndex + 'A'"
+												>	
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Variaiton</label>
+														<multiselect 
+					                              			v-model="singleStockData.variations[variationIndex].variation"
+					                              			placeholder="Select Variation" 
+					                                  		label="name" 
+					                                  		track-by="id" 
+					                                  		:custom-label="objectNameWithCapitalized" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-6"
+													>
+														<label for="inputFirstName">Variation Qty</label>
+														<input type="number" 
+															class="form-control" 
+															v-model.number="singleStockData.variations[variationIndex].stock_quantity" 
+															placeholder="Product Qty" 
+															:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('product_variation_quantity')" 
+															required="true" 
+														>
+
+														<div class="invalid-feedback">
+												        	{{ errors.stock.variations[variationIndex].product_variation_quantity }}
+												  		</div>
+													</div>
+													
+													<!-- 
+													<div class="form-group col-md-3">
+														<label for="inputFirstName">Price</label>
+														<label class="col-form-label text-left">
+															{{ productVariation.price }}
+														</label>
+													</div>
+
+													<div class="form-group col-md-3">
+														<label for="inputFirstName">SKU</label>
+														<label class="col-form-label text-left">
+															{{ productVariation.sku }}
+														</label>
+													</div>
+ 													-->
+												</div>
+											</div>
+										</div>
+								    	 
+								    	<div class="form-row">
+									    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+								    	</div>
+									</div>
+							    </div>
+						     
+							    <div 
+									class="row" 
+									v-bind:key="'product-modal-step-' + 2" 
+									v-show="!loading && step==2" 
+									v-if="singleStockData.addresses.length"
+								>
+									<h2 class="mx-auto mb-4 lead">Store Stock</h2>
+
+									<div 
+										class="col-md-12"
+										v-for="(stockSpace, spaceIndex) in singleStockData.addresses" 
+										:key="'product-space-' + spaceIndex"
+									>
+										<div 
+											class="card"
+											v-if="singleStockData.addresses[spaceIndex] && errors.stock.addresses[spaceIndex]"
+										>
+											<div class="card-body">
+
+												<div class="form-row ml-5 mr-5">
+													<div class="form-group col-md-12 text-center">
+														<label for="inputFirstName">
+															Required Space Type {{ spaceIndex + 1 }}
+														</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].type"
+					                                  		:options="['containers', 'shelves', 'units']" 
+					                                  		:custom-label="nameWithCapitalized" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                              			placeholder="Containers / Shelves / Units" 
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_space_type  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)" 
+					                                  		@input="setProductSpaceType(spaceIndex)" 
+					                                  		@close="validateFormInput('product_space_type')"
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_space_type"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_space_type }}
+													    </div>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-show="singleStockData.addresses[spaceIndex].type=='containers'"
+												>
+													<div class="form-group col-md-12">
+														<label for="inputFirstName">Select Containers</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].containers"
+					                              			placeholder="Select Containers" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="emptyContainers" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_containers  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@close="validateFormInput('product_containers')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_containers"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_containers }}
+													    </div>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-show="singleStockData.addresses[spaceIndex].type=='shelves'"
+												>
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Select Parent Container</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].container"
+					                              			placeholder="Parent Container" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="emptyShelfContainers" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_container ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@input="setAvailableShelves(spaceIndex)"
+					                                  		@close="validateFormInput('product_container')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_container"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_container }}
+													    </div>
+													</div>
+
+													<div 
+														class="form-group col-md-6" 
+														v-if="singleStockData.addresses[spaceIndex].container"
+													>
+														<label for="inputFirstName">Select Shelves</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].container.shelves"
+					                              			placeholder="Select Shelves" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="emptyShelves" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@close="validateFormInput('product_shelves')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_shelves"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_shelves }}
+													    </div>
+													</div>
+												</div>
+
+												<div class="form-row" v-show="singleStockData.addresses[spaceIndex].type=='units'">
+													<div class="form-group col-md-4">
+														<label for="inputFirstName">Select Parent Container</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].container"
+					                              			placeholder="Parent Container" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="emptyUnitContainers" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@input="setAvailableUnitShelves(spaceIndex)" 
+					                                  		@close="validateFormInput('product_container')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_container"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_container }}
+													    </div>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-if="singleStockData.addresses[spaceIndex].container"
+													>
+														<label for="inputFirstName">Select Parent Shelf</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].container.shelf"
+					                              			placeholder="Parent Shelf" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="emptyUnitShelves" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@input="setAvailableUnits(spaceIndex)" 
+					                                  		@close="validateFormInput('product_shelf')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_shelf"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_shelf }}
+													    </div>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-if="singleStockData.addresses[spaceIndex].container && singleStockData.addresses[spaceIndex].container.shelf"
+													>
+														<label for="inputFirstName">Select Units</label>
+														<multiselect 
+					                              			v-model="singleStockData.addresses[spaceIndex].container.shelf.units"
+					                              			placeholder="Select Units" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="emptyUnits" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@close="validateFormInput('product_units')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div 
+						                                	class="invalid-feedback" 
+						                                	style="display: block;" 
+						                                	v-show="errors.stock.addresses[spaceIndex].product_units"
+					                                	>
+													    	{{ errors.stock.addresses[spaceIndex].product_units }}
+													    </div>
+													</div>
+												</div>
+
+											</div>
+										</div>
+									</div>
+
+									<div 
+										class="col-md-12 text-center" 
+										v-show="!singleStockData.addresses.length"
+									>
+										<p class="text-danger">
+											No Space Found.
+										</p>
+									</div>
+
+									<div class="col-md-12">
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													@click="addMoreSpace()"
+												>
+													Add Space
+												</button>
+											</div>
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													@click="removeSpace()"
+												>
+													Remove Space
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+													{{ createMode ? 'Stock' : 'Update' }}
+												</button>
+											</div>
+										</div>
+									</div>
+								</div> 
+
+							</transition-group>
+
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+
+	<!-- 
+		<delete-confirmation-modal 
+			:csrf="csrf" 
+			:submit-method-name="'deleteAsset'" 
+			:content-to-delete="singleStockData"
+			:restoration-message="'But once you think, you can restore this item !'" 
+			
+			@deleteAsset="deleteAsset($event)" 
+		></delete-confirmation-modal>
+
+		<restore-confirmation-modal 
+			:csrf="csrf" 
+			:submit-method-name="'restoreAsset'" 
+			:content-to-restore="singleStockData"
+			:restoration-message="'This will restore all related items !'" 
+
+			@restoreAsset="restoreAsset($event)" 
+		></restore-confirmation-modal>
+ 	-->
+
+ 		<!-- Modal -->
+		<div class="modal fade" id="stock-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Product Details</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<div class="card">
+							<div class="card-body">
+								
+								<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
+									<!-- 
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#product-profile" role="tab">
+											Product
+										</a>
+									</li>
+ 									-->
+									<li class="nav-item">
+										<a class="nav-link active" data-toggle="tab" href="#product-stock" role="tab">
+											Stock
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#product-address" role="tab">
+											Address
+										</a>
+									</li>
+								</ul>
+
+								<div class="tab-content tabs card-block">
+									
+									<!-- 
+									<div class="tab-pane active" id="product-profile" role="tabpanel">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Type :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.category ? product.category.name : 'Bulk Product' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.merchant ? product.merchant.user_name : 'None' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Name :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.name }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												SKU Code :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.sku }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Price :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.price || 'NA' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Description :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												<span v-html="product.description"></span>
+											</label>
+										</div>
+
+										
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Available Qty:
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.available_quantity }}
+												{{ product.quantity_type }}
+											</label>
+										</div>
+ 										
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
+											<label class="col-sm-6 form-control-plaintext">
+												<span :class="[product.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ product.has_variations ? 'Available' : 'NA' }}</span>
+											</label>
+										</div>
+
+										<div class="form-row" v-if="product.has_variations && product.variations.length">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Variations :
+											</label>
+											<div class="col-sm-12">
+												<div class="form-row">
+													
+													<div 
+														class="col-md-6 ml-auto" 
+														v-for="(productVariation, variationIndex) in product.variations" 
+														:key="'product-variation-' + variationIndex"
+													>
+														<div class="card">
+															<div class="card-body">
+																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Name :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.variation ? productVariation.variation.name : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		SKU :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.sku }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Price :</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.price }}
+																	</label>
+																</div>
+
+																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.available_quantity }}
+																	</label>
+																</div>
+ 																
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+ 									-->
+
+ 									<div class="tab-pane active" id="product-stock" role="tabpanel">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Product Name :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.name }}
+											</label>
+										</div>
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stock Quantity :
+											</label>
+											<div class="col-sm-6 col-form-label text-left">
+												
+												{{ singleStockData.stock_quantity }}
+												
+												<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
+													<div 
+														class="form-group col-md-12" 
+														v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+															:key="'product-variation-index-' + variationIndex + 'B'"
+													>
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																{{ stockVariation.variation.name }} :
+															</label>
+															<label class="col-form-label text-left">
+																{{ stockVariation.stock_quantity }}
+															</label>
+														</div>
+														
+														<!-- 
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																Available Quantity :
+															</label>
+															<label class="col-form-label text-left">
+																{{ stockVariation.available_quantity }}
+															</label>
+														</div>
+														-->
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Available Quantity (then) :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleStockData.available_quantity }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stocked on :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleStockData.created_at }}
+											</label>
+										</div>
+									</div>
+
+									<div class="tab-pane" id="product-address" role="tabpanel">
+										<div 
+											class="form-row" 
+											v-if="singleStockData.hasOwnProperty('addresses') && singleStockData.addresses.length"
+										>
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Address Detail :
+											</label>
+											<div class="col-sm-12">
+												<div class="form-row">
+													<div 
+														class="col-md-6 ml-auto" 
+														v-for="(stockAddress, addressIndex) in singleStockData.addresses" 
+														:key="'stock-address-' + stockAddress.type + addressIndex"
+													>
+														<div 
+															class="card" 
+															v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('containers')"
+														>
+															<div 
+																class="card-body" 
+																v-for="containerAddress in stockAddress.containers" 
+																:key="'container-address-' + containerAddress.id"
+															>
+																<h6>Container Address</h6>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container Type :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ containerAddress.warehouse_container ? containerAddress.warehouse_container.container.name : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container # :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ containerAddress.name.substring(containerAddress.name.indexOf("-")+1) }}
+																	</label>
+																</div>
+
+															</div>
+														</div>
+
+														<div 
+															class="card" 
+															v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('shelves') && stockAddress.hasOwnProperty('container') &&  stockAddress.container.hasOwnProperty('warehouse_container')"
+														>
+															<div class="card-body">
+
+																<h6>Shelves Address</h6>
+																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container Type :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ stockAddress.container.warehouse_container.container.name }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container # :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
+																	</label>
+																</div>
+
+																<div 
+																	class="form-row"
+																>
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Shelf # :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+
+																		<ul id="shelf-addresses">
+																			<li 
+																				v-for="shelfAddress in stockAddress.container.shelves" 
+																				:key="'shelf-address-' + shelfAddress.id"
+																			>
+
+																				{{ shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) }}
+																				
+																			</li>
+																		</ul>
+
+																	</label>
+																</div>
+
+															</div>
+														</div>
+
+														<div 
+															class="card" 
+															v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('units') && stockAddress.hasOwnProperty('container') && stockAddress.container.hasOwnProperty('warehouse_container')"
+														>
+															<div class="card-body">
+																
+																<h6>Units Address</h6>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container Type :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ stockAddress.container.warehouse_container.container.name }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container # :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Shelf # :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ stockAddress.container.shelf.name.substring(stockAddress.container.shelf.name.lastIndexOf("-")+1) }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Unit # :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+
+																		<ul id="unit-addresses">
+																			<li 
+																				v-for="unitAddress in stockAddress.container.shelf.units" 
+																				:key="'unit-address-' + unitAddress.id"
+																			>
+
+																				{{ unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) }}
+																				
+																			</li>
+																		</ul>
+
+																	</label>
+																</div>
+
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-row" v-else>
+											<div 
+												class="col-md-12 text-center" 
+												v-show="!singleStockData.hasOwnProperty('addresses') || !singleStockData.addresses.length"
+											>
+												<p class="text-danger">
+													No Space Found.
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								 
+							
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</template>
+
+<script type="text/javascript">
+
+	import axios from 'axios';
+	import Multiselect from 'vue-multiselect';
+
+	export default {
+
+	    components: { 
+			multiselect : Multiselect,
+		},
+
+	    props: {
+
+			product:{
+				type: Object,
+				required: true,
+			},
+			productName:{
+				type: String,
+				required: true,
+			},
+
+		},
+
+	    data() {
+
+	        return {
+
+	        	step : 1,
+	        	query : '',
+	        	error : '',
+    			perPage : 10,
+	        	loading : false,
+
+	        	createMode : true,
+	        	submitForm : true,
+
+	        	stocksToShow : [],
+
+	        	allContainers : [],
+	        	
+	        	emptyContainers : [],
+	        	emptyShelfContainers : [],
+	        	emptyUnitContainers : [],
+
+	        	emptyShelves : [],
+	        	emptyUnitShelves : [],
+
+	        	emptyUnits : [],
+
+	        	pagination: {
+		        	current_page: 1
+		      	},
+
+	        	singleStockData : {
+
+	        		product_id : this.product.id,
+	        		variations : this.product.variations ?? [],
+					addresses : [
+						{},
+					],
+
+	        	},
+
+	        	errors : {
+					stock : {
+						variations : [],
+						
+						addresses : [
+							{}
+						],
+						
+					},
+				},
+
+	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+
+	        }
+
+		},
+		
+		created() {
+			
+			this.fetchAllContainers();
+			this.fetchProductAllStocks();
+			this.manupulatePropData();
+
+		},
+		
+		methods: {
+
+			fetchProductAllStocks() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.stocksToShow = [];
+				
+				axios
+					.get('/api/product-stocks/' + this.product.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.then(response => {
+						if (response.status == 200) {
+							// console.log(response);
+							this.pagination = response.data;
+							this.stocksToShow = response.data.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllContainers() {
+				
+				this.query = '';
+				this.error = '';
+				// this.loading = true;
+				this.allContainers = [];
+				this.emptyContainers = [];
+				this.emptyShelfContainers = [];
+				this.emptyUnitContainers = [];
+
+				axios
+					.get('/api/warehouse-containers')
+					.then(response => {
+						if (response.status == 200) {
+							
+							this.allContainers = response.data;
+							this.setAvailableSpaces();
+							
+							// this.emptyContainers = response.data.emptyContainers;
+							// this.emptyShelfContainers = response.data.emptyShelfContainers;
+							// this.emptyUnitContainers = response.data.emptyUnitContainers;
+					
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						// this.loading = false;
+					});
+
+			},
+			manupulatePropData() {
+
+				this.errors = {
+					stock : {
+						variations : [],
+						addresses : [
+							{}
+						],
+					},
+				};
+
+				if (this.product.has_variations && this.product.category && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+						
+					this.product.variations.forEach(
+						(productVariation, index) => {
+							this.errors.stock.variations.push({});
+						}
+					);
+
+				}
+
+			},
+			searchData() {
+
+				this.error = '';
+				this.stocksToShow = [];
+				this.pagination.current_page = 1;
+				
+				axios
+				.get(
+					"/api/search-product-stocks/" + this.product.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+				)
+				.then(response => {
+					this.stocksToShow = response.data.all.data;
+					this.pagination = response.data.all;
+				})
+				.catch(e => {
+					this.error = e.toString();
+				});
+
+			},
+			changeNumberContents() {
+				
+				this.pagination.current_page = 1;
+
+				if (this.query === '') {
+					this.fetchProductAllStocks();
+				}
+				else {
+					this.searchData();
+				}
+    		},
+    		showContentDetails(object) {		
+				// this.singleStockData = { ...object };
+				this.singleStockData = Object.assign({}, this.singleStockData, object);
+				$('#stock-view-modal').modal('show');
+			},
+			showContentCreateForm() {
+				this.step = 1;
+				this.createMode = true;
+	        	this.submitForm = true;
+
+				// singleStockData configuration
+				this.singleStockData = {
+
+	        		product_id : this.product.id,
+	        		variations : this.product.variations ?? [],
+					addresses : [
+						{},
+					],
+
+	        	};
+
+				// new errors configuration
+				this.errors = {
+					stock : {
+						variations : [],
+						
+						addresses : [
+							{},
+						],
+						
+					},
+				};
+
+				if (this.product.hasOwnProperty('category') && this.product.has_variations && this.product.variations.length) {
+	
+					this.product.variations.forEach(
+						(productVariation, index) => {
+							this.errors.stock.variations.push({});
+						}
+					);					
+
+				}
+
+				$('#stock-createOrEdit-modal').modal('show');
+			},
+			openContentEditForm(object) {
+
+				this.step = 1;
+				this.createMode = false;
+	        	this.submitForm = true;
+				
+				// new errors configuration
+				this.errors = {
+					stock : {
+						variations : [],
+						addresses : [],
+					},
+				};
+
+				if (object.addresses.length) {
+
+					object.addresses.forEach(
+						(productAddress, index) => {
+							this.errors.stock.addresses.push({});
+						}
+					);
+
+				}
+			
+				if (this.product.hasOwnProperty('category') && this.product.has_variations && this.product.variations.length) {
+						
+					this.product.variations.forEach(
+						(productVariation, index) => {
+							this.errors.stock.variations.push({});
+						}
+					);
+					
+				}
+
+				this.singleStockData = JSON.parse(JSON.stringify(object));
+
+				this.setAvailableShelvesAndUnits();
+
+				$('#stock-createOrEdit-modal').modal('show');
+			},
+			storeStock() {
+				
+				if (!this.verifyUserInput()) {
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.post('/product-stocks/' + this.perPage, this.singleStockData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Stock has been stored", "Success");
+							this.query !== '' ? this.searchData() : this.fetchProductAllStocks();
+							$('#stock-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.fetchAllContainers();
+					});
+
+			},
+			updateStock() {
+				
+				if (!this.verifyUserInput()) {
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.put('/product-stocks/' + this.singleStockData.id + '/' + this.perPage, this.singleStockData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Stock has been updated", "Success");
+							this.query !== '' ? this.searchData() : this.fetchProductAllStocks();
+							$('#stock-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.fetchAllContainers();
+					});
+
+			},
+			verifyUserInput() {
+
+				this.validateFormInput('product_space_type');
+				this.validateFormInput('product_container');
+				this.validateFormInput('product_containers');
+				this.validateFormInput('product_shelf');
+				this.validateFormInput('product_shelves');
+				this.validateFormInput('product_units');
+
+				if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && !this.errorInArray(this.errors.stock.variations) && !this.errorInArray(this.errors.stock.addresses)) {
+
+					return true;
+				
+				}
+
+				return false;
+		
+			},
+			errorInArray(array = []) {
+				const variationError = (variation) => {
+	        							return Object.keys(variation).length > 0
+	        						}; 
+
+				if (array.length) {
+					return array.some(variationError);
+				}
+
+				return false;
+			},
+			objectNameWithCapitalized ({ name }) {
+		      	if (name) {
+				    name = name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else 
+		      		return ''
+		    },
+			nextPage() {
+				
+				if (this.step==1) {
+					
+					this.validateFormInput('product_stock_quantity');
+
+					if (this.product.has_variations) {
+						
+						this.validateFormInput('product_variation_quantity');
+						this.validateFormInput('product_variation_total_quantity');
+
+					}
+
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && !this.errorInArray(this.errors.stock.variations)) {
+						this.step += 1;
+						this.submitForm = true;
+					}
+					else {
+						this.submitForm = false;
+					}
+
+				}
+
+			},
+			addMoreSpace() {
+				if (this.singleStockData.addresses.length < 3) {
+
+					this.singleStockData.addresses.push({});
+					this.errors.stock.addresses.push({});
+
+				}
+			},
+			removeSpace() {
+					
+				if (this.singleStockData.addresses.length > 1) {
+
+					this.singleStockData.addresses.pop();
+					this.errors.stock.addresses.pop();
+				
+				}
+				
+			},
+			nameWithCapitalized (name) {
+				
+				if (!name) return ''
+
+				const words = name.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+				}
+
+				return words.join(" ");
+
+		    },
+			setAvailableShelvesAndUnits() {
+
+				this.singleStockData.addresses.forEach(
+					space => {
+
+						if (space.type=='containers') {
+
+						}
+						else if (space.type=='shelves') {
+							let searchedContainer = this.emptyShelfContainers.find(
+								container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
+							)
+
+							if (searchedContainer) {
+
+								this.emptyShelves = searchedContainer.container_shelf_statuses;
+							}
+						}
+						else if (space.type=='units') {
+
+							const containerExists = container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id;
+
+							if (this.emptyUnitContainers.some(containerExists)) {
+
+								let searchedContainer = this.emptyUnitContainers.find(
+									container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
+								);
+
+								if (searchedContainer) {
+
+									this.emptyUnitShelves = searchedContainer.container_shelf_statuses;
+
+									let searchedShelf = searchedContainer.container_shelf_statuses.find(
+										shelf => shelf.id==space.container.shelf.id && shelf.name==space.container.shelf.name && shelf.warehouse_container_id==space.container.shelf.warehouse_container_id &&  shelf.warehouse_container_status_id==space.container.shelf.warehouse_container_status_id 
+									);
+
+									if (searchedShelf) {
+
+										this.emptyUnits = searchedShelf.container_shelf_unit_statuses;
+
+									}
+
+								}
+
+							}
+
+						}
+
+					}
+				);
+
+			},
+			setAvailableShelves(index) {
+				// console.log('container if has been triggered');
+				if (this.singleStockData.addresses[index].container && Object.keys(this.singleStockData.addresses[index].container).length > 0) {
+					this.$delete(this.singleStockData.addresses[index].container, 'shelves');
+					this.emptyShelves = this.singleStockData.addresses[index].container.container_shelf_statuses;
+				}
+			},
+			setAvailableUnitShelves(index) {
+				// console.log('container if has been triggered');
+				if (this.singleStockData.addresses[index].container && Object.keys(this.singleStockData.addresses[index].container).length > 0) {
+					this.$delete(this.singleStockData.addresses[index].container, 'shelf');
+					this.emptyUnitShelves = this.singleStockData.addresses[index].container.container_shelf_statuses;
+				}
+			},
+			setAvailableUnits(index) {
+				// console.log('shelf if has been triggered');
+				if (this.singleStockData.addresses[index].container && Object.keys(this.singleStockData.addresses[index].container).length > 0 && Object.keys(this.singleStockData.addresses[index].container.shelf).length > 0) {
+					this.$delete(this.singleStockData.addresses[index].container.shelf, 'units');
+					this.emptyUnits = this.singleStockData.addresses[index].container.shelf.container_shelf_unit_statuses;
+				}
+			},
+			setProductSpaceType(index) {
+				// resetting
+				this.$delete(this.singleStockData.addresses[index], 'container');
+				this.$delete(this.singleStockData.addresses[index], 'containers');
+
+				this.errors.stock.addresses[index] = {};
+
+				this.resetAvailableSpaces();
+		
+			},
+			setAvailableSpaces() {
+				
+				// this.emptyContainers = [ ...this.allContainers.emptyContainers ];
+				// this.emptyShelfContainers = [ ...this.allContainers.emptyShelfContainers ];
+				// this.emptyUnitContainers = [ ...this.allContainers.emptyUnitContainers ];
+
+				this.emptyContainers = JSON.parse( JSON.stringify( this.allContainers.emptyContainers ) );
+				this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allContainers.emptyShelfContainers ) );
+				this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allContainers.emptyUnitContainers ) );
+
+			},
+			resetAvailableSpaces() {
+
+				this.setAvailableSpaces();
+
+				this.singleStockData.addresses.forEach(
+
+					(productAddress, index) => {
+						
+						if (productAddress.type=='containers' && productAddress.containers && productAddress.containers.length) {
+
+							// for every selected container
+							productAddress.containers.forEach(
+
+								(selectedContainer) => {
+
+									// containers with empty shelves
+									var selectedContainerIndex = this.emptyShelfContainers.findIndex(
+										(currentContainer) => 
+											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+										
+									);
+
+									// console.log('Container Index in emptyShelfContainers : ' + selectedContainerIndex);
+
+									if (selectedContainerIndex > -1) {
+
+										this.emptyShelfContainers.splice(selectedContainerIndex, 1);
+									
+									}
+
+
+									// containers with empty units
+									var selectedContainerIndex = this.emptyUnitContainers.findIndex(
+										(currentContainer) => 
+											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+										
+									);
+
+									// console.log('Container Index in emptyUnitContainers : ' + selectedContainerIndex);
+
+									if (selectedContainerIndex > -1) {
+
+										this.emptyUnitContainers.splice(selectedContainerIndex, 1);
+
+									}
+
+								}
+
+							);
+
+						}
+						else if (productAddress.type=='shelves' && productAddress.container && productAddress.container.shelves && productAddress.container.shelves.length) {
+
+							// downward
+
+							// for every container-shelves with empty units
+							this.emptyUnitContainers.forEach(
+
+								(emptyUnitContainer) => {
+
+									if (emptyUnitContainer.id==productAddress.container.id && emptyUnitContainer.name==productAddress.container.name && emptyUnitContainer.warehouse_container_id==productAddress.container.warehouse_container_id) {
+
+										
+										// for every selected shelves
+										productAddress.container.shelves.forEach(
+
+											(selectedShelf) => {
+
+												// unit
+												var selectedShelfIndex = emptyUnitContainer.container_shelf_statuses.findIndex(
+													(containerShelf) => 
+														containerShelf.id == selectedShelf.id && containerShelf.name == selectedShelf.name && containerShelf.warehouse_container_status_id == selectedShelf.warehouse_container_status_id
+												);
+
+												if (selectedShelfIndex > -1) {
+
+													emptyUnitContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
+												}
+
+											}
+
+										);
+
+									}
+
+								}
+
+							);
+
+							// upward
+							// for every empty containers
+							var selectedContainerIndex = this.emptyContainers.findIndex(
+								(currentContainer) => 
+									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warehouse_container_id == productAddress.container.warehouse_container_id
+							);
+
+							if (selectedContainerIndex > -1) {
+
+								this.emptyContainers.splice(selectedContainerIndex, 1);
+
+							}
+
+						}
+						else if (productAddress.type=='units' && productAddress.container && productAddress.container.shelf && productAddress.container.shelf.units && productAddress.container.shelf.units.length) {
+
+							// upward
+							// for every empty containers
+							var selectedContainerIndex = this.emptyContainers.findIndex(
+								(currentContainer) => 
+									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warehouse_container_id == productAddress.container.warehouse_container_id
+							);
+
+							if (selectedContainerIndex > -1) {
+
+								this.emptyContainers.splice(selectedContainerIndex, 1);
+
+							}
+
+							// upward
+							// for containers with empty shelves
+							this.emptyShelfContainers.forEach(
+
+								(emptyShelfContainer) => {
+
+									if (emptyShelfContainer.id == productAddress.container.id && emptyShelfContainer.name == productAddress.container.name && emptyShelfContainer.warehouse_container_id == productAddress.container.warehouse_container_id) {
+
+
+										var selectedShelfIndex = emptyShelfContainer.container_shelf_statuses.findIndex(
+											(currentShelf) => currentShelf.id == productAddress.container.shelf.id && currentShelf.name == productAddress.container.shelf.name && currentShelf.warehouse_container_id == productAddress.container.shelf.warehouse_container_id
+										)
+
+										if (selectedShelfIndex > -1) {
+
+											emptyShelfContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
+
+										}
+
+									}
+
+								}
+								
+							);
+
+						}
+					}
+				);
+			},
+		
+			validateFormInput (formInputName) {
+
+				this.submitForm = false;
+
+				switch(formInputName) {
+
+					case 'product_stock_quantity' :
+
+						if (!this.singleStockData.stock_quantity || this.singleStockData.stock_quantity < 1) {
+							this.errors.stock.product_stock_quantity = 'Stock quantity is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'product_stock_quantity');
+						}
+
+						break;
+
+					case 'product_variation_quantity' :
+
+						if (this.product.has_variations) {
+
+							this.singleStockData.variations.forEach(
+								(productVariation, index) => {
+
+									if (productVariation.stock_quantity < 0) {
+										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is invalid';
+									}
+									else {
+										this.$delete(this.errors.stock.variations[index], 'product_variation_quantity');
+									}
+
+								}
+								
+							);
+								
+							if (!this.errorInArray(this.errors.stock.variations)) {
+								this.submitForm = true;
+							}
+							
+						}
+						else {
+							this.submitForm = true;
+							this.errors.stock.variations = [];
+						}
+
+						break;
+					
+					
+					case 'product_variation_total_quantity' :
+
+						if (this.product.has_variations) {
+
+							if (!this.errorInArray(this.errors.stock.variations)) {
+
+								let variationTotalQuantity = this.singleStockData.variations.reduce(
+									(value, currentObject) => {
+										return value + (currentObject.stock_quantity || 0);
+									}, 
+								0);
+
+								if (variationTotalQuantity !== this.singleStockData.stock_quantity) {
+									this.errors.stock.variations[this.singleStockData.variations.length-1].product_variation_quantity = 'Total variation qty should be equal to qty';
+								}
+								else {
+									this.$delete(this.errors.stock.variations[this.singleStockData.variations.length-1], 'product_variation_quantity');
+								}
+							}
+
+						}
+						else {
+							this.submitForm = true;
+							this.errors.stock.variations = [];
+						}
+
+						break;
+					
+				
+					case 'product_space_type' :
+
+						this.singleStockData.addresses.forEach(
+							
+							(productSpace, index) => {
+
+								if (!productSpace.type) {
+									this.errors.stock.addresses[index].product_space_type = 'Space type is required';
+								}
+								else if (this.singleStockData.addresses.filter((obj) => obj.type === productSpace.type).length > 1) {
+
+									this.errors.stock.addresses[index].product_space_type = 'Same type selected';
+								}
+								else {
+									this.$delete(this.errors.stock.addresses[index], 'product_space_type');
+								}
+
+							}
+
+						);
+						
+						if (!this.errorInArray(this.errors.stock.addresses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_containers' :
+
+						this.singleStockData.addresses.forEach(
+							
+							(productSpace, index) => {
+
+								if (productSpace.type=='containers' && (!productSpace.containers || productSpace.containers.length == 0)) {
+									this.errors.stock.addresses[index].product_containers = 'Container is required';
+								}
+								else{
+									this.$delete(this.errors.stock.addresses[index], 'product_containers');
+								}
+
+							}
+
+						);
+
+						if (!this.errorInArray(this.errors.stock.addresses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_container' :
+
+						this.singleStockData.addresses.forEach(
+							
+							(productSpace, index) => {
+
+								if ((productSpace.type=='shelves' || productSpace.type=='units') && (!productSpace.container || Object.keys(productSpace.container).length==0)) {
+									this.errors.stock.addresses[index].product_container = 'Container is required';
+								}
+								else{
+									this.$delete(this.errors.stock.addresses[index], 'product_container');
+								}
+
+							}
+						);
+
+						if (!this.errorInArray(this.errors.stock.addresses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_shelves' : 
+
+						this.singleStockData.addresses.forEach(
+							
+							(productSpace, index) => {
+
+								if (productSpace.type=='shelves' && (!productSpace.container || !productSpace.container.shelves || productSpace.container.shelves.length == 0)) {
+									this.errors.stock.addresses[index].product_shelves = 'Shelf is required';
+								}
+								else{
+									this.$delete(this.errors.stock.addresses[index], 'product_shelves');
+								}
+
+							}
+						);
+
+						if (!this.errorInArray(this.errors.stock.addresses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_shelf' :
+
+						this.singleStockData.addresses.forEach(
+							
+							(productSpace, index) => {
+
+								if (productSpace.type=='units' && (!productSpace.container || !productSpace.container.shelf || Object.keys(productSpace.container.shelf).length==0)) {
+									this.errors.stock.addresses[index].product_shelf = 'Shelf is required';
+								}
+								else{
+									this.$delete(this.errors.stock.addresses[index], 'product_shelf');
+								}
+
+							}
+						);
+
+						if (!this.errorInArray(this.errors.stock.addresses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+
+					case 'product_units' :
+
+						this.singleStockData.addresses.forEach(
+							
+							(productSpace, index) => {
+
+								if (productSpace.type=='units' && (!productSpace.container || !productSpace.container.shelf || !productSpace.container.shelf.units || productSpace.container.shelf.units.length == 0)) {
+									this.errors.stock.addresses[index].product_units = 'Unit is required';
+								}
+								else{
+									this.$delete(this.errors.stock.addresses[index], 'product_units');
+								}
+
+							}
+						);
+
+						if (!this.errorInArray(this.errors.stock.addresses)) {
+							this.submitForm = true;
+						}
+
+						break;
+				
+
+				}
+	 
+			},
+            
+		}
+  	}
+
+</script>
+
+<style scoped>
+	@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
+	.fade-enter-active {
+  		transition: all .3s ease;
+	}
+	.fade-leave-active {
+  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	}
+	.fade-enter, .fade-leave-to {
+  		transform: translateX(10px);
+  		opacity: 0;
+	}
+</style>

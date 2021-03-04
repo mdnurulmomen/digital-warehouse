@@ -124,7 +124,18 @@ Route::name('admin.')->group(function () {
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeNewDispatch')->name('dispatches');
 		Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
+		Route::get('/api/product-stocks/{product}/{perPage?}', 'ProductController@showProductAllStocks')->name('product-stocks');
+		Route::post('/product-stocks/{perPage?}', 'ProductController@storeProductStock')->name('product-stocks');
+		Route::put('/product-stocks/{stock}/{perPage?}', 'ProductController@updateProductStock')->name('product-stocks');
+		Route::delete('/product-stocks/{stock}/{perPage?}', 'ProductController@deleteProductStock')->name('product-stocks');
+		Route::patch('/product-stocks/{stock}/{perPage?}', 'ProductController@restoreProductStock')->name('product-stocks');
+		Route::get('/api/search-product-stocks/{product}/{search}/{perPage?}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
+
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+
+		Route::fallback(function () {
+			return view('layouts.admin');
+		});
 
 	});
 

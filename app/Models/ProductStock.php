@@ -4,146 +4,50 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class ProductStock extends Model
 {
-    public $timestamps = false;
     protected $guarded = ['id'];
-    
-    // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warehouseContainer.container'];
 
-    protected $casts = [
-        'has_variations' => 'boolean'
-    ];
-
-    public function category()
+    public function product()
     {
-    	return $this->belongsTo(ProductCategory::class, 'product_category_id', 'id');
-    }
-
-    public function merchant()
-    {
-    	return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
+    	return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
     public function variations()
     {
-        return $this->hasMany(ProductVariation::class, 'product_id', 'id');
+        return $this->hasMany(ProductVariationStock::class, 'product_stock_id', 'id')->latest();
     }
 
     public function addresses()
     {
-        return $this->hasMany(WarehouseProduct::class, 'product_id', 'id');
+        return $this->hasMany(WarehouseProduct::class, 'product_stock_id', 'id');
     }
 
-    public function nonDispatchedRequests()
-    {
-        return $this->hasMany(RequiredProduct::class, 'product_id', 'id')->whereHas('requisition', function ($query) {
-            $query->where('status', 0);
-        });
-    }
-
-    public function requests()
-    {
-        return $this->hasMany(RequiredProduct::class, 'product_id', 'id');
-    }
-
-    public function stocks()
-    {
-        return $this->hasMany(ProductStock::class, 'product_id', 'id')->latest();
-    }
-
-    public function getProductImmutabilityAttribute()
-    {
-        if ($this->requests()->count()) {
-            return true;   
-        }
-        else if ($this->stocks()->count()) {
-             return true;
-        }
-
-        return false;
-    }
-
-    /*
-    public function dispatches()
-    {
-        return $this->hasMany(ProductDispatch::class, 'product_id', 'id');
-    }
-    */
-
-    public function setProductVariationsAttribute($variations = array())
+    public function setStockVariations($variations = [], $product)
     {
         if (count($variations)) {
+           
+            $this->variations()->delete();
 
-            if ($this->getProductImmutabilityAttribute()) {
-                
-                foreach ($this->variations() as $productVariation) {
+            foreach ($variations as $stockVariation) {
+               
+                if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
                     
-                    if (!$productVariation->variation_immutability) {
-
-                        $productVariation->delete();
-
-                    }
-
-                }
-
-            }
-            else {
-
-                $this->variations()->delete();
-
-            }
-            
-            $variations = json_decode(json_encode($variations));
-
-            foreach ($variations as $variation) {
-
-                // $existingVariation = $this->variations()->where('variation_id', $variation->variation->id)->first();
-
-            /*
-                if ($existingVariation) {
-                    
-                    $existingVariation->update([
-                       'initial_quantity' => ($existingVariation->initial_quantity + $variation->initial_quantity), 
-                       'available_quantity' => ($existingVariation->available_quantity + $variation->initial_quantity),
-                       'price' => $variation->price, 
+                    $this->variations()->create([
+                        'stock_quantity' => $stockVariation->stock_quantity,
+                        'available_quantity' => $this->variations()->where('product_variation_id', $stockVariation->id)->first()->available_quantity ?? 0 + $stockVariation->stock_quantity,
+                        'product_variation_id' => $stockVariation->id,
+                        'product_stock_id' => $this->id,
                     ]);
 
                 }
-            */
-
-                // else {
-
-                    if (empty($variation->variation_immutability) || is_null($variation->variation_immutability)) {
-                        
-                        $this->variations()->create([
-                            'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
-                            // 'initial_quantity' => $variation->initial_quantity,
-                            // 'available_quantity' => $variation->initial_quantity,
-                            'price' => $variation->price,
-                            'variation_id' => $variation->variation->id,
-                        ]);
-
-                    }
-                    else {
-
-                        $this->variations()->where('variation_id', $variation->variation->id)->update([
-                            'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
-                            // 'initial_quantity' => $variation->initial_quantity,
-                            // 'available_quantity' => $variation->initial_quantity,
-                            'price' => $variation->price,
-                        ]);
-
-                    }
-
-                // }
 
             }
+
         }
     }
 
-    /*
-    public function setProductAddressAttribute($spaces = [])
+    public function setStockAddresses($spaces = [], $product)
     {
         if (count($spaces)) {
             
@@ -155,17 +59,17 @@ class Product extends Model
                 
                 if ($space->type == "containers" && !empty($space->containers)) {
                 
-                    $this->setProductContainers($space->containers);
+                    $this->setProductContainers($space->containers, $product);
 
                 }
                 else if ($space->type == "shelves" && !empty($space->container->shelves)) {
                     
-                    $this->setProductShelves($space->container);
+                    $this->setProductShelves($space->container, $product);
                     
                 }
                 else if ($space->type == "units" && !empty($space->container->shelf->units)) {
                     
-                    $this->setProductUnits($space->container);
+                    $this->setProductUnits($space->container, $product);
                     
                 }
 
@@ -178,30 +82,30 @@ class Product extends Model
     {
         if (count($this->addresses)) {
             
-            foreach ($this->addresses as $productAddress) {
+            foreach ($this->addresses as $stockAddress) {
                 
-                $productAddress->space->update([
+                $stockAddress->space->update([
                     'engaged' => 0
                 ]);
 
-                if ($productAddress->space instanceof WarehouseContainerStatus) {
+                if ($stockAddress->space instanceof WarehouseContainerStatus) {
 
-                    $this->updateChildShelves($productAddress->space, 0);
-
-                }
-                else if ($productAddress->space instanceof WarehouseContainerShelfStatus) {
-
-                    $this->updateChildUnits($productAddress->space, 0);
-                    $this->updateParentContainer($productAddress->space->parentContainer);
+                    $this->updateChildShelves($stockAddress->space, 0);
 
                 }
-                else if ($productAddress->space instanceof WarehouseContainerShelfUnitStatus) {
+                else if ($stockAddress->space instanceof WarehouseContainerShelfStatus) {
 
-                    $this->updateParentShelf($productAddress->space->parentShelf);
+                    $this->updateChildUnits($stockAddress->space, 0);
+                    $this->updateParentContainer($stockAddress->space->parentContainer);
+
+                }
+                else if ($stockAddress->space instanceof WarehouseContainerShelfUnitStatus) {
+
+                    $this->updateParentShelf($stockAddress->space->parentShelf);
 
                 }
 
-                $productAddress->delete();
+                $stockAddress->delete();
 
             }
 
@@ -210,7 +114,7 @@ class Product extends Model
         // $this->addresses()->delete();
     }
 
-    protected function setProductContainers($containers = array())
+    protected function setProductContainers($containers = array(), $product)
     {
         if (count($containers)) {
 
@@ -219,7 +123,8 @@ class Product extends Model
                 $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
                 $warehouseExpectedContainer->product()->create([
-                    'product_id' => $this->id,
+                    'product_stock_id' => $this->id,
+                    'product_id' => $product,
                 ]);
 
                 $warehouseExpectedContainer->update([
@@ -232,7 +137,7 @@ class Product extends Model
         }
     }
 
-    protected function setProductShelves($container = NULL)
+    protected function setProductShelves($container = NULL, $product)
     {
         if ($container) {
 
@@ -241,7 +146,8 @@ class Product extends Model
                 $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
                 $warehouseExpectedShelf->product()->create([
-                    'product_id' => $this->id,
+                    'product_stock_id' => $this->id,
+                    'product_id' => $product,
                 ]);
 
                 $warehouseExpectedShelf->update([
@@ -257,7 +163,7 @@ class Product extends Model
         }
     }
 
-    protected function setProductUnits($container = NULL)
+    protected function setProductUnits($container = NULL, $product)
     {
         if ($container) {
 
@@ -266,7 +172,8 @@ class Product extends Model
                 $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
                 $warehouseExpectedShelfUnit->product()->create([
-                    'product_id' => $this->id,
+                    'product_stock_id' => $this->id,
+                    'product_id' => $product,
                 ]);
 
                 $warehouseExpectedShelfUnit->update([
@@ -373,11 +280,5 @@ class Product extends Model
             ]);
 
         }
-    }
-    */
-
-    protected function generateProductVariationSKU($productSKU, $variationId)
-    {
-        return $productSKU.'VR'.$variationId;
     }
 }

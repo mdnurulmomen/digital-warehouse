@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductCategory;
 use App\Http\Resources\Web\ProductCollection;
+use App\Http\Resources\Web\ProductStockCollection;
 
 class ProductController extends Controller
 {
@@ -120,14 +122,14 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:65535',
             'sku' => 'nullable|string|max:100|unique:products,sku',
             'price' => 'nullable|numeric|min:0', // min 0 due to bulk products
-            'initial_quantity' => 'required|numeric|min:1',
+            // 'initial_quantity' => 'required|numeric|min:1',
             // 'available_quantity' => 'required|numeric|min:0',
             'quantity_type' => 'required|string|max:100',
             'has_variations' => 'nullable|boolean',
             // 'variation_type_id' => 'required_if:has_variations,1',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
-            'variations.*.initial_quantity' => 'required_if:has_variations,1',
+            // 'variations.*.initial_quantity' => 'required_if:has_variations,1',
             'variations.*.price' => 'required_if:has_variations,1',
 
             // 'space_type' => 'required|in:containers,shelves,units',
@@ -144,8 +146,8 @@ class ProductController extends Controller
         $newProduct->description = $request->description;
         $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
         $newProduct->price = $request->price ?? 0;
-        $newProduct->initial_quantity = $request->initial_quantity;
-        $newProduct->available_quantity = $request->initial_quantity;
+        // $newProduct->initial_quantity = $request->initial_quantity;
+        // $newProduct->available_quantity = $request->initial_quantity;
         $newProduct->quantity_type = $request->quantity_type;
         $newProduct->has_variations = $request->has_variations ?? false;
         $newProduct->product_category_id = $request->product_category_id;
@@ -159,7 +161,7 @@ class ProductController extends Controller
 
         }
 
-        $newProduct->product_address = $request->spaces;
+        // $newProduct->product_address = json_decode(json_encode($request->spaces));
 
         return $this->showAllProducts($perPage);
     }
@@ -175,14 +177,14 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:65535',
             'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
             'price' => 'required|numeric|min:0', // min 0 due to bulk products
-            'initial_quantity' => 'required|numeric|min:1',
+            // 'initial_quantity' => 'required|numeric|min:1',
             // 'available_quantity' => 'required|numeric|min:0',
             'quantity_type' => 'required|string|max:100',
             'has_variations' => 'nullable|boolean',
             // 'variation_type_id' => 'required_if:has_variations,1',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
-            'variations.*.initial_quantity' => 'required_if:has_variations,1',
+            // 'variations.*.initial_quantity' => 'required_if:has_variations,1',
             'variations.*.price' => 'required_if:has_variations,1',
 
             // 'space_type' => 'required|in:containers,shelves,units',
@@ -207,7 +209,7 @@ class ProductController extends Controller
             
         }
         
-        $productToUpdate->product_category_id = $request->product_category_id;
+        $productToUpdate->product_category_id = $request->product_category_id ?? NULL;
         $productToUpdate->merchant_id = $request->merchant_id;
 
         $productToUpdate->save();
@@ -218,7 +220,7 @@ class ProductController extends Controller
 
         }
 
-        $productToUpdate->product_address = $request->spaces;
+        // $productToUpdate->product_address = json_decode(json_encode($request->spaces));
 
         return $this->showAllProducts($perPage);
     }
@@ -248,8 +250,8 @@ class ProductController extends Controller
         $query = Product::where('name', 'like', "%$search%")
                         ->orWhere('sku', 'like', "%$search%")
                         ->orWhere('price', 'like', "%$search%")
-                        ->orWhere('initial_quantity', 'like', "%$search%")
-                        ->orWhere('available_quantity', 'like', "%$search%")
+                        // ->orWhere('initial_quantity', 'like', "%$search%")
+                        // ->orWhere('available_quantity', 'like', "%$search%")
                         ->orWhere('quantity_type', 'like', "%$search%")
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
@@ -260,11 +262,81 @@ class ProductController extends Controller
         ], 200);
     }
 
+    public function showProductAllStocks($product, $perPage)
+    {
+        return new ProductStockCollection(ProductStock::with(['addresses', 'variations'])->where('product_id', $product)->paginate($perPage));
+    }
+
+    public function storeProductStock(Request $request, $perPage)
+    {
+        $request->validate([
+            'stock_quantity' => 'required|numeric|min:1',
+            'product_id' => 'required|numeric|exists:products,id',
+        ]);
+
+        $product = Product::find($request->product_id);
+
+        $newStock = $product->stocks()->create([
+            'stock_quantity' => $request->stock_quantity,
+            'available_quantity' => $product->stocks->first()->available_quantity ?? 0 + $request->stock_quantity,
+        ]);
+
+        if ($product->has_variations && !empty($request->variations) && count($request->variations)) {
+            
+            $newStock->setStockVariations(json_decode(json_encode($request->variations)), $product->id);
+
+        }
+
+        $newStock->setStockAddresses(json_decode(json_encode($request->spaces)), $product->id);
+
+        return $this->showProductAllStocks($request->product_id, $perPage);
+    }
+
+    public function updateProductStock(Request $request, $stock, $perPage)
+    {
+        $request->validate([
+            'stock_quantity' => 'required|numeric|min:1',
+            'product_id' => 'required|numeric|exists:products,id',
+        ]);
+
+        $product = Product::find($request->product_id);
+
+        $stockToUpdate = ProductStock::findOrFail($stock);
+
+        if ($request->stock_quantity > $stockToUpdate->stock_quantity) {
+            
+            $stockToUpdate->update([
+                'stock_quantity' => $request->stock_quantity,
+                'available_quantity' => $stockToUpdate->available_quantity ?? 0 + ($request->stock_quantity - $stockToUpdate->stock_quantity),
+            ]);
+
+        }
+        else if ($request->stock_quantity < $stockToUpdate->stock_quantity) {
+            
+            $stockToUpdate->update([
+                'stock_quantity' => $request->stock_quantity,
+                'available_quantity' => $stockToUpdate->available_quantity ?? 0 - ($stockToUpdate->stock_quantity - $request->stock_quantity),
+            ]);
+
+        }
+
+
+        if ($product->has_variations && !empty($request->variations) && count($request->variations)) {
+            
+            $newStock->setStockVariations(json_decode(json_encode($request->variations)), $product->id);
+
+        }
+
+        $newStock->setStockAddresses(json_decode(json_encode($request->spaces)), $product->id);
+
+        return $this->showProductAllStocks($product, $perPage);
+    }
+
     protected function generateProductSKU(Request $request)
     {
         if ($request->product_category_id) {
             return 'MR'.$request->merchant_id.'CT'.$request->product_category_id;
         }
-        return 'MR'.$request->merchant_id.'BX'.$request->initial_quantity;
+        return 'MR'.$request->merchant_id.'BX'.$request->name;
     }
 }

@@ -20,8 +20,6 @@ class CreateProductsTable extends Migration
             $table->string('sku', 100); // scanned or generated on product-code & merchant code
             // $table->unsignedMediumInteger('price')->default(100); // minimum-one if has variations, 0 for bulk items
             $table->unsignedDecimal('price', $precision = 8, $scale = 2);
-            $table->unsignedMediumInteger('initial_quantity')->default(100); // quantity including all box / variations
-            $table->unsignedMediumInteger('available_quantity')->default(100); // quantity of all box / variations
             $table->string('quantity_type', 100)->default('box');  // kg / meter / pc's
             $table->boolean('has_variations')->default(0);
             $table->unsignedSmallInteger('product_category_id')->nullable()->default(0); // stationary / garments

@@ -62,6 +62,7 @@ import ProductCategoryIndex from './views/ProductCategoryIndex'
 import ProductIndex from './views/ProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
 import DispatchIndex from './views/DispatchIndex'
+import ProductStockIndex from './views/ProductStockIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -161,6 +162,12 @@ const router = new VueRouter({
             path: '/dispatches',
             name: 'dispatches',
             component: DispatchIndex,
+        },
+        {
+            path: '/product-stocks/:productName',
+            name: 'product-stocks',
+            component: ProductStockIndex,
+            props: true,
         },
     ],
 });
