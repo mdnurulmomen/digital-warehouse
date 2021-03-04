@@ -46,7 +46,7 @@ class Requisition extends Model
                             $requisitionedProduct->variations()->create([
                                 'product_variation_id' => $requiredProductVariation->id,
                                 'quantity' => $requiredProductVariation->required_quantity,
-                                'requisition_id' => $this->id,
+                                // 'requisition_id' => $this->id,
                             ]);
 
                         }

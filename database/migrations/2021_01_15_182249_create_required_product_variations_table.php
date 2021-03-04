@@ -15,9 +15,9 @@ class CreateRequiredProductVariationsTable extends Migration
     {
         Schema::create('required_product_variations', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedSmallInteger('product_variation_id');
+            $table->unsignedMediumInteger('product_variation_id');
             $table->unsignedMediumInteger('quantity');
-            $table->unsignedInteger('requisition_id');
+            // $table->unsignedInteger('requisition_id');
             $table->unsignedInteger('required_product_id');
             
         });

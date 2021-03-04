@@ -9,16 +9,6 @@ class WarehouseContainerShelf extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'engaged' => 'boolean',
-        'has_units' => 'boolean',
-    ];
-
     public function warehouseContainer()
     {
     	return $this->belongsTo(WarehouseContainer::class, 'warehouse_container_id');
