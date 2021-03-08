@@ -161,7 +161,7 @@ class ProductController extends Controller
 
         }
 
-        // $newProduct->product_address = json_decode(json_encode($request->spaces));
+        // $newProduct->product_address = json_decode(json_encode($request->addresses));
 
         return $this->showAllProducts($perPage);
     }
@@ -220,7 +220,7 @@ class ProductController extends Controller
 
         }
 
-        // $productToUpdate->product_address = json_decode(json_encode($request->spaces));
+        // $productToUpdate->product_address = json_decode(json_encode($request->addresses));
 
         return $this->showAllProducts($perPage);
     }
@@ -275,19 +275,24 @@ class ProductController extends Controller
         ]);
 
         $product = Product::find($request->product_id);
+        $lastAvailableQuantity = $product->stocks->first()->available_quantity ?? 0;
+
+        $currentUser = \Auth::guard('admin')->user() ?? Auth::guard('manager')->user();
 
         $newStock = $product->stocks()->create([
             'stock_quantity' => $request->stock_quantity,
-            'available_quantity' => $product->stocks->first()->available_quantity ?? 0 + $request->stock_quantity,
+            'available_quantity' => $lastAvailableQuantity + $request->stock_quantity,
+            'user_type' => class_basename($currentUser),
+            'user_id' => $currentUser->id,
         ]);
 
-        if ($product->has_variations && !empty($request->variations) && count($request->variations)) {
+        if ($product->has_variations && !empty($request->variations)) {
             
-            $newStock->setStockVariations(json_decode(json_encode($request->variations)), $product->id);
+            $newStock->stock_variations = json_decode(json_encode($request->variations));
 
         }
 
-        $newStock->setStockAddresses(json_decode(json_encode($request->spaces)), $product->id);
+        $newStock->setStockAddresses(json_decode(json_encode($request->addresses)), $product->id);
 
         return $this->showProductAllStocks($request->product_id, $perPage);
     }
@@ -299,37 +304,96 @@ class ProductController extends Controller
             'product_id' => 'required|numeric|exists:products,id',
         ]);
 
-        $product = Product::find($request->product_id);
+        // $product = Product::find($request->product_id);
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
         $stockToUpdate = ProductStock::findOrFail($stock);
 
-        if ($request->stock_quantity > $stockToUpdate->stock_quantity) {
+        if (!empty($currentUser) && !empty($stockToUpdate)) {
             
-            $stockToUpdate->update([
-                'stock_quantity' => $request->stock_quantity,
-                'available_quantity' => $stockToUpdate->available_quantity ?? 0 + ($request->stock_quantity - $stockToUpdate->stock_quantity),
-            ]);
+            if ($request->stock_quantity > $stockToUpdate->stock_quantity) {
+
+                $difference = $request->stock_quantity - $stockToUpdate->stock_quantity;
+
+                $stockToUpdate->update([
+                    'stock_quantity' => $request->stock_quantity,
+                    'available_quantity' => ($stockToUpdate->available_quantity + $difference),
+                    'user_type' => class_basename($currentUser),
+                    'user_id' => $currentUser->id,
+                ]);
+
+                $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
+
+            }
+            else if ($request->stock_quantity < $stockToUpdate->stock_quantity) {
+
+                $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
+
+                $stockToUpdate->update([
+                    'stock_quantity' => $request->stock_quantity,
+                    'available_quantity' => ($stockToUpdate->available_quantity - $difference),
+                    'user_type' => class_basename($currentUser),
+                    'user_id' => $currentUser->id,
+                ]);
+
+                $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
+
+            }
+
+            if ($stockToUpdate->variations->count() && !empty($request->variations)) {
+                
+                $stockToUpdate->stock_Variations = json_decode(json_encode($request->variations));
+
+            }
+
+            $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $request->product_id);
 
         }
-        else if ($request->stock_quantity < $stockToUpdate->stock_quantity) {
+
+        return $this->showProductAllStocks($request->product_id, $perPage);
+    }
+
+    public function deleteProductStock($stock, $perPage)
+    {
+        $stockToDelete = ProductStock::findOrFail($stock);
+
+        // $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
+
+        $productId = $stockToDelete->product_id;
+
+        $this->decreaseStockAvailableQuantity($stockToDelete, $stockToDelete->stock_quantity);
             
-            $stockToUpdate->update([
-                'stock_quantity' => $request->stock_quantity,
-                'available_quantity' => $stockToUpdate->available_quantity ?? 0 - ($stockToUpdate->stock_quantity - $request->stock_quantity),
-            ]);
+        $stockToDelete->deleteStockVariations();
 
-        }
+        $stockToDelete->deleteOldAddresses();
 
+        $stockToDelete->delete();
 
-        if ($product->has_variations && !empty($request->variations) && count($request->variations)) {
-            
-            $newStock->setStockVariations(json_decode(json_encode($request->variations)), $product->id);
+        return $this->showProductAllStocks($productId, $perPage);
+    }
 
-        }
+    public function searchProductAllStocks($product, $search, $perPage)
+    {
+        $query = ProductStock::with(['addresses', 'variations'])
+                        ->where('product_id', $product)
+                        ->where(function($q) use ($search) {
+                            $q->where('stock_quantity', 'like', "%$search%")
+                            ->orWhere('available_quantity', 'like', "%$search%");
+                        });
 
-        $newStock->setStockAddresses(json_decode(json_encode($request->spaces)), $product->id);
+        return response()->json([
+            'all' => new ProductStockCollection($query->paginate($perPage)),  
+        ], 200);
+    }
 
-        return $this->showProductAllStocks($product, $perPage);
+    protected function increaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
+    {
+        ProductStock::where('product_id', $stockToUpdate->product_id)->where('created_at', '>', $stockToUpdate->created_at)->increment('available_quantity', $amount);
+    }
+
+    protected function decreaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
+    {
+        ProductStock::where('product_id', $stockToUpdate->product_id)->where('created_at', '>', $stockToUpdate->created_at)->decrement('available_quantity', $amount);
     }
 
     protected function generateProductSKU(Request $request)

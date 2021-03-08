@@ -15,7 +15,7 @@ class ProductStock extends Model
 
     public function variations()
     {
-        return $this->hasMany(ProductVariationStock::class, 'product_stock_id', 'id')->latest();
+        return $this->hasMany(ProductVariationStock::class, 'product_stock_id', 'id');
     }
 
     public function addresses()
@@ -23,28 +23,85 @@ class ProductStock extends Model
         return $this->hasMany(WarehouseProduct::class, 'product_stock_id', 'id');
     }
 
-    public function setStockVariations($variations = [], $product)
+    public function deleteStockVariations()
+    {
+        if ($this->variations()->count()) {
+            
+            foreach ($this->variations as $variation) {
+
+                $this->decreaseSuccessorStockVariations($variation, $variation->stock_quantity);
+                $variation->delete();
+
+            }
+
+        }
+    }
+
+    public function setStockVariationsAttribute($variations = [])
     {
         if (count($variations)) {
-           
-            $this->variations()->delete();
-
-            foreach ($variations as $stockVariation) {
-               
-                if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
+            
+            // update / old stock
+            if ($this->variations()->count()) {
+                
+                foreach ($variations as $stockVariation) {
                     
-                    $this->variations()->create([
-                        'stock_quantity' => $stockVariation->stock_quantity,
-                        'available_quantity' => $this->variations()->where('product_variation_id', $stockVariation->id)->first()->available_quantity ?? 0 + $stockVariation->stock_quantity,
-                        'product_variation_id' => $stockVariation->id,
-                        'product_stock_id' => $this->id,
-                    ]);
+                    $existingStockVariation = $this->variations()->where('id', $stockVariation->id)->first();
+
+                    if ($existingStockVariation->stock_quantity > $stockVariation->stock_quantity) {
+                        
+                        // decrease quantity
+                        $difference = $existingStockVariation->stock_quantity - $stockVariation->stock_quantity;
+
+                        $existingStockVariation->update([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => ($existingStockVariation->available_quantity - $difference),
+                        ]);
+
+                        $this->decreaseSuccessorStockVariations($existingStockVariation, $difference);
+
+                    }
+                    else if ($existingStockVariation->stock_quantity < $stockVariation->stock_quantity) {
+                        
+                        // increase quantity
+                        $difference = $stockVariation->stock_quantity - $existingStockVariation->stock_quantity;
+                        
+                        $existingStockVariation->update([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => ($existingStockVariation->available_quantity + $difference),
+                        ]);
+
+                        $this->increaseSuccessorStockVariations($existingStockVariation, $difference);
+
+                    }
+
+                }
+
+            }
+            else {  // as usual / new stock
+                
+                foreach ($variations as $stockVariation) {
+               
+                    if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
+                        
+                        $variationLastAvailableValue = ProductVariation::find($stockVariation->id)->stocks->first()->available_quantity ?? 0;
+
+                        $this->variations()->create([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity),
+                            'product_variation_id' => $stockVariation->id,
+                            'product_stock_id' => $this->id,
+                            'created_at' => now(),
+                        ]);
+
+                    }
 
                 }
 
             }
 
         }
+
     }
 
     public function setStockAddresses($spaces = [], $product)
@@ -122,16 +179,20 @@ class ProductStock extends Model
                 
                 $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
-                $warehouseExpectedContainer->product()->create([
-                    'product_stock_id' => $this->id,
-                    'product_id' => $product,
-                ]);
+                if (!empty($warehouseExpectedContainer) && $warehouseExpectedContainer->engaged==0.0) {
+                    
+                    $warehouseExpectedContainer->product()->create([
+                        'product_stock_id' => $this->id,
+                        'product_id' => $product,
+                    ]);
 
-                $warehouseExpectedContainer->update([
-                    'engaged' => 1
-                ]);
+                    $warehouseExpectedContainer->update([
+                        'engaged' => 1
+                    ]);
 
-                $this->updateChildShelves($warehouseExpectedContainer, 1);
+                    $this->updateChildShelves($warehouseExpectedContainer, 1);
+
+                }
 
             }
         }
@@ -145,16 +206,20 @@ class ProductStock extends Model
                 
                 $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
-                $warehouseExpectedShelf->product()->create([
-                    'product_stock_id' => $this->id,
-                    'product_id' => $product,
-                ]);
+                if (!empty($warehouseExpectedShelf) && $warehouseExpectedShelf->engaged==0.0) {
+                    
+                    $warehouseExpectedShelf->product()->create([
+                        'product_stock_id' => $this->id,
+                        'product_id' => $product,
+                    ]);
 
-                $warehouseExpectedShelf->update([
-                    'engaged' => 1
-                ]);
+                    $warehouseExpectedShelf->update([
+                        'engaged' => 1
+                    ]);
+                    
+                    $this->updateChildUnits($warehouseExpectedShelf, 1);
 
-                $this->updateChildUnits($warehouseExpectedShelf, 1);
+                }
 
             }
 
@@ -171,14 +236,18 @@ class ProductStock extends Model
                 
                 $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                $warehouseExpectedShelfUnit->product()->create([
-                    'product_stock_id' => $this->id,
-                    'product_id' => $product,
-                ]);
+                if (!empty($warehouseExpectedShelfUnit) && $warehouseExpectedShelfUnit->engaged==0.0) {
+                    
+                    $warehouseExpectedShelfUnit->product()->create([
+                        'product_stock_id' => $this->id,
+                        'product_id' => $product,
+                    ]);
 
-                $warehouseExpectedShelfUnit->update([
-                    'engaged' => 1
-                ]);
+                    $warehouseExpectedShelfUnit->update([
+                        'engaged' => 1
+                    ]);
+
+                }
 
             }
 
@@ -280,5 +349,15 @@ class ProductStock extends Model
             ]);
 
         }
+    }
+
+    protected function increaseSuccessorStockVariations(ProductVariationStock $variationToUpdate, $amount)
+    {
+        ProductVariationStock::where('product_variation_id', $variationToUpdate->product_variation_id)->where('id', '>', $variationToUpdate->id)->increment('available_quantity', $amount);
+    }
+
+    protected function decreaseSuccessorStockVariations(ProductVariationStock $variationToUpdate, $amount)
+    {
+        ProductVariationStock::where('product_variation_id', $variationToUpdate->product_variation_id)->where('id', '>', $variationToUpdate->id)->decrement('available_quantity', $amount);
     }
 }

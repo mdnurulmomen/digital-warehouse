@@ -15,12 +15,12 @@ class CreateProductVariationStocksTable extends Migration
     {
         Schema::create('product_variation_stocks', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedMediumInteger('stock_quantity')->default(0);
-            $table->unsignedMediumInteger('available_quantity')->default(0); 
+            $table->mediumInteger('stock_quantity');
+            $table->mediumInteger('available_quantity'); 
             // $table->unsignedMediumInteger('total_quantity')->default(0);
-            $table->unsignedSmallInteger('product_variation_id'); // stationary / garments
+            $table->unsignedMediumInteger('product_variation_id'); // stationary / garments
             $table->unsignedInteger('product_stock_id');
-            $table->timestamps();
+            // $table->timestamp('created_at');
         });
     }
 

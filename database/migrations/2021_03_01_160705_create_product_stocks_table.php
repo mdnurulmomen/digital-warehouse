@@ -16,10 +16,12 @@ class CreateProductStocksTable extends Migration
         Schema::create('product_stocks', function (Blueprint $table) {
             $table->increments('id');
             // quantity including all variations
-            $table->unsignedMediumInteger('stock_quantity')->default(0); 
-            $table->unsignedMediumInteger('available_quantity')->default(0);
+            $table->mediumInteger('stock_quantity')->default(0); 
+            $table->mediumInteger('available_quantity')->default(0);
             // $table->unsignedMediumInteger('total_quantity')->default(0);
             $table->unsignedInteger('product_id');
+            $table->string('user_type');
+            $table->string('user_id');
             $table->timestamps();
         });
     }

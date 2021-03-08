@@ -164,7 +164,9 @@ class MerchantController extends Controller
 
         }
 
-        return ProductResource::collection(Product::where('merchant_id', $currentMerchant->id)->where('available_quantity', '>', 0)->get());
+        return ProductResource::collection(Product::with('stocks')->where('merchant_id', $currentMerchant->id)->whereHas('stocks', function ($query) {
+                $query->where('available_quantity', '>', 0);
+            })->get());
 
     }
 
@@ -176,8 +178,6 @@ class MerchantController extends Controller
                     $query->where('name', 'like', "%$search%")
                             ->orWhere('sku', 'like', "%$search%")
                             ->orWhere('price', 'like', "%$search%")
-                            ->orWhere('initial_quantity', 'like', "%$search%")
-                            ->orWhere('available_quantity', 'like', "%$search%")
                             ->orWhere('quantity_type', 'like', "%$search%")
                             ->orWhereHas('category', function ($q) use ($search) {
                                 $q->where('name', 'like', "%$search%");

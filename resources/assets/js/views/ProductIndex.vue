@@ -1768,7 +1768,7 @@
 			},
 			goProductStore(object) {
 
-				console.log(object);
+				// console.log(object);
 				this.$router.push({ name: 'product-stocks', params: { product: object, productName: object.name }});
 
 			},

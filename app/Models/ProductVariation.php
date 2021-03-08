@@ -21,7 +21,7 @@ class ProductVariation extends Model
 
     public function stocks()
     {
-        return $this->hasMany(ProductVariationStock::class, 'product_variation_id', 'id')->latest();
+        return $this->hasMany(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
     }
 
     public function getVariationImmutabilityAttribute()

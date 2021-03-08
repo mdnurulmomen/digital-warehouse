@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'products'" 
-			:message="'All our products'"
+			:title="productName + ' stocks'" 
+			:message="'All stocks for ' + productName"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,9 +26,8 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'stocks'" 
-											  		
-											  		@showContentCreateForm="showContentCreateForm" 
+											  		:caller-page="'stocks'" 											  
+											  		@showContentCreateForm="showStockCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchProductAllStocks"
 											  	></search-and-addition-option>
@@ -42,11 +41,11 @@
 										  			:per-page="perPage"  
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
-										  			:contents-to-show = "stocksToShow" 
+										  			:contents-to-show = "allStocks" 
 										  			:pagination = "pagination"
 
-										  			@showContentDetails="showContentDetails($event)" 
-										  			@openContentEditForm="openContentEditForm($event)" 
+										  			@showStockDetails="showStockDetails($event)" 
+										  			@openStockEditForm="openStockEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
@@ -70,7 +69,7 @@
 																</thead>
 																<tbody>
 
-																	<tr v-for="stock in stocksToShow" :key="'stock-' + stock.id"
+																	<tr v-for="stock in allStocks" :key="'stock-' + stock.id"
 																	>
 																		<td>
 																			{{ stock.created_at }}
@@ -86,7 +85,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon"  
-																				@click="showContentDetails(stock)"
+																				@click="showStockDetails(stock)"
 																			>
 																				<i class="fas fa-eye"></i>
 																			</button>
@@ -94,15 +93,23 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
-																				@click="openContentEditForm(stock)"
+																				@click="openStockEditForm(stock)"
 																			>
 																				<i class="fas fa-edit"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-danger btn-icon"  
+																				@click="openStockDeleteForm(stock)"
+																			>
+																				<i class="fas fa-trash"></i>
 																			</button>
 																		</td>
 																    
 																	</tr>
 																	<tr 
-																  		v-show="!stocksToShow.length"
+																  		v-show="!allStocks.length"
 																  	>
 															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
@@ -331,7 +338,7 @@
 										<div class="form-row" v-if="product.has_variations">
 											<div 
 												class="form-group col-md-12" 
-												v-if="product.hasOwnProperty('variations') && singleStockData.variations.length"
+												v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length"
 											>
 												<div 
 													class="form-row" 
@@ -406,7 +413,6 @@
 									class="row" 
 									v-bind:key="'product-modal-step-' + 2" 
 									v-show="!loading && step==2" 
-									v-if="singleStockData.addresses.length"
 								>
 									<h2 class="mx-auto mb-4 lead">Store Stock</h2>
 
@@ -640,6 +646,10 @@
 										<p class="text-danger">
 											No Space Found.
 										</p>
+
+										<p class="text-danger" v-show="errors.stock.product_address">
+											{{ errors.stock.product_address }}
+										</p>
 									</div>
 
 									<div class="col-md-12">
@@ -648,6 +658,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													:disabled="singleStockData.addresses.length > 2" 
 													@click="addMoreSpace()"
 												>
 													Add Space
@@ -657,6 +668,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													:disabled="createMode ? singleStockData.addresses.length < 2 : singleStockData.addresses.length < 1" 
 													@click="removeSpace()"
 												>
 													Remove Space
@@ -693,16 +705,16 @@
 			</div>
 		</div>
 
-	<!-- 
 		<delete-confirmation-modal 
 			:csrf="csrf" 
-			:submit-method-name="'deleteAsset'" 
+			:submit-method-name="'deleteStock'" 
 			:content-to-delete="singleStockData"
-			:restoration-message="'But once you think, you can restore this item !'" 
+			:restoration-message="'You can not restore this item again !'" 
 			
-			@deleteAsset="deleteAsset($event)" 
+			@deleteStock="deleteStock($event)" 
 		></delete-confirmation-modal>
 
+	<!-- 
 		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
@@ -901,7 +913,7 @@
 												
 												<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
 													<div 
-														class="form-group col-md-12" 
+														class="col-md-12" 
 														v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 															:key="'product-variation-index-' + variationIndex + 'B'"
 													>
@@ -970,7 +982,7 @@
 															<div 
 																class="card-body" 
 																v-for="containerAddress in stockAddress.containers" 
-																:key="'container-address-' + containerAddress.id"
+																:key="'container-address-' + containerAddress.id + 'address-index-' + addressIndex + '-stock-id-' + singleStockData.id"
 															>
 																<h6>Container Address</h6>
 
@@ -1176,7 +1188,7 @@
 	        	createMode : true,
 	        	submitForm : true,
 
-	        	stocksToShow : [],
+	        	allStocks : [],
 
 	        	allContainers : [],
 	        	
@@ -1197,7 +1209,7 @@
 
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
-					addresses : [
+					addresses : this.product.addresses ?? [
 						{},
 					],
 
@@ -1206,11 +1218,7 @@
 	        	errors : {
 					stock : {
 						variations : [],
-						
-						addresses : [
-							{}
-						],
-						
+						addresses : [],
 					},
 				},
 
@@ -1235,15 +1243,14 @@
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.stocksToShow = [];
+				this.allStocks = [];
 				
 				axios
 					.get('/api/product-stocks/' + this.product.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// console.log(response);
-							this.pagination = response.data;
-							this.stocksToShow = response.data.data;
+							this.setAvailableContents(response);
 						}
 					})
 					.catch(error => {
@@ -1320,14 +1327,43 @@
 			},
 			manupulatePropData() {
 
+				// new error configuration
 				this.errors = {
 					stock : {
 						variations : [],
-						addresses : [
-							{}
-						],
+						addresses : [],
 					},
 				};
+
+				if (this.singleStockData.addresses.length || this.product.addresses.length) {
+
+					if (this.singleStockData.addresses.length) {
+
+						this.singleStockData.addresses.forEach(
+							(productAddress, index) => {
+								this.errors.stock.addresses.push({});
+							}
+						);
+
+					}
+					else {
+
+						this.product.addresses.forEach(
+							(productAddress, index) => {
+								this.errors.stock.addresses.push({});
+							}
+						);
+
+					}
+
+				}
+				else {
+
+					this.errors.stock.addresses = [
+						{},
+					];
+
+				}
 
 				if (this.product.has_variations && this.product.category && this.product.hasOwnProperty('variations') && this.product.variations.length) {
 						
@@ -1340,42 +1376,12 @@
 				}
 
 			},
-			searchData() {
-
-				this.error = '';
-				this.stocksToShow = [];
-				this.pagination.current_page = 1;
-				
-				axios
-				.get(
-					"/api/search-product-stocks/" + this.product.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
-				.then(response => {
-					this.stocksToShow = response.data.all.data;
-					this.pagination = response.data.all;
-				})
-				.catch(e => {
-					this.error = e.toString();
-				});
-
-			},
-			changeNumberContents() {
-				
-				this.pagination.current_page = 1;
-
-				if (this.query === '') {
-					this.fetchProductAllStocks();
-				}
-				else {
-					this.searchData();
-				}
-    		},
-    		showContentDetails(object) {		
+    		showStockDetails(object) {		
 				// this.singleStockData = { ...object };
 				this.singleStockData = Object.assign({}, this.singleStockData, object);
 				$('#stock-view-modal').modal('show');
 			},
-			showContentCreateForm() {
+			showStockCreateForm() {
 				this.step = 1;
 				this.createMode = true;
 	        	this.submitForm = true;
@@ -1385,9 +1391,7 @@
 
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
-					addresses : [
-						{},
-					],
+					addresses : this.singleStockData.addresses.length ? this.singleStockData.addresses : this.product.addresses.length ? this.product.addresses : [ {}, ],
 
 	        	};
 
@@ -1395,13 +1399,39 @@
 				this.errors = {
 					stock : {
 						variations : [],
-						
-						addresses : [
-							{},
-						],
-						
+						addresses : [],
 					},
 				};
+
+				if (this.singleStockData.addresses.length || this.product.addresses.length) {
+
+					if (this.singleStockData.addresses.length) {
+
+						this.singleStockData.addresses.forEach(
+							(productAddress, index) => {
+								this.errors.stock.addresses.push({});
+							}
+						);
+
+					}
+					else {
+
+						this.product.addresses.forEach(
+							(productAddress, index) => {
+								this.errors.stock.addresses.push({});
+							}
+						);
+
+					}
+
+				}
+				else {
+
+					this.errors.stock.addresses = [
+						{},
+					];
+
+				}
 
 				if (this.product.hasOwnProperty('category') && this.product.has_variations && this.product.variations.length) {
 	
@@ -1415,12 +1445,15 @@
 
 				$('#stock-createOrEdit-modal').modal('show');
 			},
-			openContentEditForm(object) {
+			openStockEditForm(object) {
 
 				this.step = 1;
 				this.createMode = false;
 	        	this.submitForm = true;
 				
+				this.singleStockData = JSON.parse(JSON.stringify(object));
+				this.singleStockData.product_id = this.product.id;
+
 				// new errors configuration
 				this.errors = {
 					stock : {
@@ -1429,9 +1462,9 @@
 					},
 				};
 
-				if (object.addresses.length) {
+				if (this.singleStockData.addresses.length) {
 
-					object.addresses.forEach(
+					this.singleStockData.addresses.forEach(
 						(productAddress, index) => {
 							this.errors.stock.addresses.push({});
 						}
@@ -1449,11 +1482,13 @@
 					
 				}
 
-				this.singleStockData = JSON.parse(JSON.stringify(object));
-
 				this.setAvailableShelvesAndUnits();
 
 				$('#stock-createOrEdit-modal').modal('show');
+			},
+			openStockDeleteForm(object) {
+				this.singleStockData = object;
+				$('#delete-confirmation-modal').modal('show');
 			},
 			storeStock() {
 				
@@ -1467,7 +1502,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been stored", "Success");
-							this.query !== '' ? this.searchData() : this.fetchProductAllStocks();
+							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1495,7 +1530,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been updated", "Success");
-							this.query !== '' ? this.searchData() : this.fetchProductAllStocks();
+							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1511,8 +1546,53 @@
 					});
 
 			},
+			deleteStock(singleAssetData) {
+				
+				axios
+					.delete('/product-stocks/' + this.singleStockData.id + '/' + this.perPage, this.singleStockData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Stock has been deleted", "Success");
+							this.allFetchedContents = response.data;
+							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
+							$('#delete-confirmation-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					});
+
+			},
+			searchData(emittedValue) {
+
+				if (emittedValue) {
+					this.query = emittedValue;
+				}
+
+				this.error = '';
+				this.allStocks = [];
+				this.pagination.current_page = 1;
+				
+				axios
+				.get(
+					"/api/search-product-stocks/" + this.product.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+				)
+				.then(response => {
+					this.allStocks = response.data.all.data;
+					this.pagination = response.data.all;
+				})
+				.catch(e => {
+					this.error = e.toString();
+				});
+
+			},
 			verifyUserInput() {
 
+				this.validateFormInput('product_address');
 				this.validateFormInput('product_space_type');
 				this.validateFormInput('product_container');
 				this.validateFormInput('product_containers');
@@ -1540,14 +1620,6 @@
 
 				return false;
 			},
-			objectNameWithCapitalized ({ name }) {
-		      	if (name) {
-				    name = name.toString()
-				    return name.charAt(0).toUpperCase() + name.slice(1)
-		      	}
-		      	else 
-		      		return ''
-		    },
 			nextPage() {
 				
 				if (this.step==1) {
@@ -1582,14 +1654,43 @@
 			},
 			removeSpace() {
 					
-				if (this.singleStockData.addresses.length > 1) {
+				if (this.createMode && this.singleStockData.addresses.length > 1) {
 
 					this.singleStockData.addresses.pop();
 					this.errors.stock.addresses.pop();
 				
 				}
+				else if (!this.createMode && this.singleStockData.addresses.length > 0) {
+
+					this.singleStockData.addresses.pop();
+					this.errors.stock.addresses.pop();
+
+				}
+
+				if (!this.errorInArray(this.errors.stock.addresses)) {
+					this.submitForm = true;
+				}
 				
 			},
+			changeNumberContents() {
+				
+				this.pagination.current_page = 1;
+
+				if (this.query === '') {
+					this.fetchProductAllStocks();
+				}
+				else {
+					this.searchData();
+				}
+    		},
+    		objectNameWithCapitalized ({ name }) {
+		      	if (name) {
+				    name = name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else 
+		      		return ''
+		    },
 			nameWithCapitalized (name) {
 				
 				if (!name) return ''
@@ -1654,6 +1755,10 @@
 					}
 				);
 
+			},
+			setAvailableContents(response) {
+				this.pagination = response.data;
+				this.allStocks = response.data.data;
 			},
 			setAvailableShelves(index) {
 				// console.log('container if has been triggered');
@@ -1923,6 +2028,20 @@
 						break;
 					
 				
+					case 'product_address' : 
+
+						if (this.createMode && this.singleStockData.addresses.length < 1) {
+							this.submitForm = false;
+							this.errors.stock.product_address = 'Address is required';
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'product_address');
+						}
+
+						break;
+
+
 					case 'product_space_type' :
 
 						this.singleStockData.addresses.forEach(

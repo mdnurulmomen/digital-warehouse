@@ -246,6 +246,7 @@
 									</label>
 								</div>
 
+								<!-- 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
 										Primary Qty
@@ -254,6 +255,7 @@
 										{{ singleProductData.initial_quantity + ' ' + singleProductData.quantity_type }} 
 									</label>
 								</div>
+ 								-->
 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -323,12 +325,14 @@
 															</label>
 														</div>
 
+														<!-- 
 														<div class="form-row">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">Primary Qty :</label>
 															<label class="col-sm-6 col-form-label text-left">
 																{{ productVariation.initial_quantity + ' ' + singleProductData.quantity_type }}
 															</label>
 														</div>
+ 														-->
 
 														<div class="form-row">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
