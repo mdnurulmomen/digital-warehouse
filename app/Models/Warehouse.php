@@ -13,6 +13,8 @@ class Warehouse extends Authenticatable
 {
     use SoftDeletes, Notifiable;
 
+    protected $guard = 'warehouse';
+
     /**
      * The attributes that are mass assignable.
      *

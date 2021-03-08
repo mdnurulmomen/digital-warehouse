@@ -13,6 +13,8 @@ class Merchant extends Authenticatable
 {
     use Notifiable, SoftDeletes;
 
+    protected $guard = 'merchant';
+    
     /**
      * The attributes that are mass assignable.
      *

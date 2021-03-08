@@ -13,6 +13,8 @@ class Manager extends Authenticatable
 {
     use SoftDeletes, Notifiable;
 
+    protected $guard = 'manager';
+
     /**
      * The attributes that are mass assignable.
      *
