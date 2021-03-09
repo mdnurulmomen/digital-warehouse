@@ -466,6 +466,19 @@
 										class="form-row" 
 										v-if="!singleRequisitionData.delivery_service && singleRequisitionData.agent"
 										>	
+											<div class="form-group col-md-12" v-show="merchantAllAgents.length">
+												<label for="inputFirstName">Select Previous Agent</label>
+												<multiselect 
+			                              			v-model="singleRequisitionData.agent"
+			                              			placeholder="Agent Name" 
+			                              			label="name" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="merchantAllAgents" 
+			                              		>
+			                                	</multiselect>
+											</div>
+
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">Agent Name</label>
 												<input type="text" 
@@ -873,6 +886,7 @@
 	        	allFetchedRequisitions : [],
 	        	
 	        	merchantAllProducts : [],
+	        	merchantAllAgents : [],
 
 	        	pagination: {
 		        	current_page: 1
@@ -912,6 +926,7 @@
 			
 			// this.currentMerchant();
 			this.fetchAllRequisitions();
+			this.fetchMerchantAllAgents();
 			this.fetchMerchantAllProducts();
 			
 		},
@@ -970,6 +985,44 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllProducts = response.data.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchMerchantAllAgents() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.merchantAllAgents = [];
+				
+				axios
+					.get('/api/agents/')
+					.then(response => {
+						if (response.status == 200) {
+							this.merchantAllAgents = Object.values(response.data);
 						}
 					})
 					.catch(error => {
@@ -1202,7 +1255,9 @@
 				
 				if (array.length) {
 
-					return array.some(product => Object.keys(product).length > 1 || product.variation_quantities.some(productVariation => productVariation != null));
+					return array.some(
+						product => Object.keys(product).length > 1 || product.variation_quantities.some(productVariation => productVariation != null)
+					);
 
 				}
 

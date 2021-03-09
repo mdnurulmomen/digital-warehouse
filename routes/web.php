@@ -31,6 +31,8 @@ Route::name('merchant.')->group(function () {
 
 		// Route::get('/api/current-merchant', 'MerchantController@currentMerchant')->name('current-user');
 		
+		Route::get('/api/agents/{perPage?}', 'MerchantController@showMerchantAllAgents')->name('agents');
+
 		Route::get('/api/products/{perPage?}', 'MerchantController@showMerchantAllProducts')->name('products');
 		Route::get('/search-products/{query}/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('products');
 

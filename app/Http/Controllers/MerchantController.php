@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Models\RequisitionAgent;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\BroadcastNewRequisition;
 use App\Http\Resources\Web\ProductResource;
@@ -190,6 +191,15 @@ class MerchantController extends Controller
         return [
             'all' => new ProductCollection($query->paginate($perPage)),  
         ];
+    }
+
+    public function showMerchantAllAgents()
+    {
+        $currentMerchant = \Auth::user();
+
+        return RequisitionAgent::whereHas('requisition', function ($query) use ($currentMerchant) {
+            $query->where('merchant_id', $currentMerchant->id);
+        })->get()->unique('name');
     }
 
     // Requisition

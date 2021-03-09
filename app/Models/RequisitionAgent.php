@@ -9,6 +9,11 @@ class RequisitionAgent extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    public function requisition()
+    {
+        return $this->belongsTo(Requisition::class, 'requisition_id', 'id');
+    }
+
     /**
      * The attributes that should be cast.
      *
