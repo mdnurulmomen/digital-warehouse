@@ -23,7 +23,7 @@ class RequiredProductResource extends JsonResource
             'has_variations' => $this->has_variations,
             'requisition_id' => $this->requisition_id,
             'variations' => $this->when($this->has_variations, RequiredProductVariationResource::collection($this->variations)),
-            'spaces' => new ProductAddressCollection($this->product->addresses),
+            'addresses' => new ProductAddressCollection($this->product->addresses),
         ];
     }
 }

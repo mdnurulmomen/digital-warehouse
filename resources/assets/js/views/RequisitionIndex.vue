@@ -26,7 +26,8 @@
 											<div class="col-sm-12 sub-title">
 
  												<div class="row d-flex align-items-center">										  	
-											  		<div class="col-sm-3 text-left">	Requisitions List
+											  		<div class="col-sm-3 text-left">	
+											  			Requisitions List
 											  		</div>
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 
@@ -439,7 +440,7 @@
 									v-bind:key="3" 
 									v-show="!loading && step==3"
 								>
-									<h2 class="mx-auto mb-4 lead">Product Address</h2>
+									<h2 class="mx-auto mb-4 lead">Released Addresses</h2>
 
 									<div 
 										class="col-md-12" 
@@ -456,14 +457,14 @@
 
 											<div 
 											class="card-body" 
-											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.spaces" 
+											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.addresses" 
 											:key="'required-product-index-' + productIndex + '-address-index' + productAddressIndex" 
 											v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 											>
 												<div class="form-row ml-5 mr-5">
 													<div class="form-group col-md-12 text-center">
 														<label for="inputFirstName">
-															Space Type {{ productAddressIndex + 1 }}
+															Released Space Type {{ productAddressIndex + 1 }}
 														</label>
 														<multiselect 
 					                              			v-model="requiredProductAddress.type"
@@ -484,20 +485,19 @@
 												>
 													<div class="form-group col-md-12">
 														<label for="inputFirstName">
-															Selected Containers
+															Released Containers
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.spaces[productAddressIndex].containers"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].released_containers"
 					                              			placeholder="Select Contaners" 
 					                              			label="name" 
 					                                  		track-by="id" 
-					                                  		:options="requiredProduct.spaces[productAddressIndex].containers" 
+					                                  		:options="requiredProduct.addresses[productAddressIndex].containers" 
 					                                  		:multiple="true" 
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:disabled="requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].containers.length < 2"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -509,10 +509,10 @@
 												>
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">
-															Parent Container
+															Selected Container
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.spaces[productAddressIndex].container"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container"
 					                              			placeholder="Parent Contaner" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -524,23 +524,22 @@
 
 													<div 
 														class="form-group col-md-6" 
-														v-if="requiredProduct.spaces[productAddressIndex].container"
+														v-if="requiredProduct.addresses[productAddressIndex].container"
 													>
 														<label for="inputFirstName">
-															Selected Shelves
+															Released Shelves
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.spaces[productAddressIndex].container.shelves"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container.released_shelves"
 					                              			placeholder="Select Shelves" 
 					                              			label="name" 
 					                                  		track-by="id" 
-					                                  		:options="requiredProduct.spaces[productAddressIndex].container.shelves" 
+					                                  		:options="requiredProduct.addresses[productAddressIndex].container.shelves" 
 					                                  		:multiple="true" 
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:disabled="requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelves.length < 2"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -549,10 +548,10 @@
 												<div class="form-row" v-if="requiredProductAddress.type=='units'">
 													<div class="form-group col-md-4">
 														<label for="inputFirstName">
-															Parent Container
+															Selected Container
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.spaces[productAddressIndex].container"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container"
 					                              			placeholder="Parent Contaner" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -564,13 +563,13 @@
 
 													<div 
 														class="form-group col-md-4" 
-														v-if="requiredProduct.spaces[productAddressIndex].container"
+														v-if="requiredProduct.addresses[productAddressIndex].container"
 													>
 														<label for="inputFirstName">
-															Parent Shelf
+															Selected Shelf
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.spaces[productAddressIndex].container.shelf"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container.shelf"
 					                              			placeholder="Parent Shelf" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -582,23 +581,22 @@
 
 													<div 
 														class="form-group col-md-4" 
-														v-if="requiredProduct.spaces[productAddressIndex].container && requiredProduct.spaces[productAddressIndex].container.shelf"
+														v-if="requiredProduct.addresses[productAddressIndex].container && requiredProduct.addresses[productAddressIndex].container.shelf"
 													>
 														<label for="inputFirstName">
-															Selected Units
+															Released Units
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.spaces[productAddressIndex].container.shelf.units"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container.shelf.released_units"
 					                              			placeholder="Select Units" 
 					                              			label="name" 
 					                                  		track-by="id" 
-					                                  		:options="requiredProduct.spaces[productAddressIndex].container.shelf.units" 
+					                                  		:options="requiredProduct.addresses[productAddressIndex].container.shelf.units" 
 					                                  		:multiple="true" 
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:disabled="requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelf.units.length < 2"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -611,7 +609,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															:disabled="requiredProduct.spaces.length==1" 
+															:disabled="requiredProduct.addresses.length==1" 
 															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 															@click="removeSpace(productIndex)"
 														>
@@ -1471,9 +1469,9 @@
 			},
 			removeSpace(productIndex) {	
 				
-				if (this.singleDispatchData.requisition.products.length && this.singleDispatchData.requisition.products[productIndex].spaces.length > 1) {
+				if (this.singleDispatchData.requisition.products.length && this.singleDispatchData.requisition.products[productIndex].addresses.length > 1) {
 						
-					this.singleDispatchData.requisition.products[productIndex].spaces.pop();
+					this.singleDispatchData.requisition.products[productIndex].addresses.pop();
 				
 				}
 

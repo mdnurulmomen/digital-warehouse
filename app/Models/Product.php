@@ -142,38 +142,6 @@ class Product extends Model
         }
     }
 
-    /*
-    public function setProductAddressAttribute($spaces = [])
-    {
-        if (count($spaces)) {
-            
-            // $spaces = json_decode(json_encode($spaces));
-            
-            $this->deleteOldAddresses();
-
-            foreach ($spaces as $space) {
-                
-                if ($space->type == "containers" && !empty($space->containers)) {
-                
-                    $this->setProductContainers($space->containers);
-
-                }
-                else if ($space->type == "shelves" && !empty($space->container->shelves)) {
-                    
-                    $this->setProductShelves($space->container);
-                    
-                }
-                else if ($space->type == "units" && !empty($space->container->shelf->units)) {
-                    
-                    $this->setProductUnits($space->container);
-                    
-                }
-
-            }
-
-        }
-    }
-
     public function deleteOldAddresses()
     {
         if (count($this->addresses)) {
@@ -210,7 +178,60 @@ class Product extends Model
         // $this->addresses()->delete();
     }
 
-    protected function setProductContainers($containers = array())
+    public function setProductAddressAttribute($addresses = [])
+    {
+        if (count($addresses)) {
+            
+            // $spaces = json_decode(json_encode($spaces));
+            
+            foreach ($addresses as $dispatchedProductAddress) {
+                
+                if ($dispatchedProductAddress->type == "containers" && !empty($dispatchedProductAddress->released_containers)) {
+
+                    $this->removeProductContainers($dispatchedProductAddress->released_containers);
+
+                }
+                else if ($dispatchedProductAddress->type == "shelves" && !empty($dispatchedProductAddress->container->released_shelves)) {
+                    
+                    $this->removeProductShelves($dispatchedProductAddress->container);
+                    
+                }
+                else if ($dispatchedProductAddress->type == "units" && !empty($dispatchedProductAddress->container->shelf->released_units)) {
+                    
+                    $this->removeProductUnits($dispatchedProductAddress->container);
+                    
+                }
+
+            }
+
+        /*
+            $this->deleteOldAddresses();
+
+            foreach ($spaces as $space) {
+                
+                if ($space->type == "containers" && !empty($space->containers)) {
+                
+                    $this->setProductContainers($space->containers);
+
+                }
+                else if ($space->type == "shelves" && !empty($space->container->shelves)) {
+                    
+                    $this->setProductShelves($space->container);
+                    
+                }
+                else if ($space->type == "units" && !empty($space->container->shelf->units)) {
+                    
+                    $this->setProductUnits($space->container);
+                    
+                }
+
+            }
+        */
+
+        }
+    }
+
+    protected function removeProductContainers($containers = array())
     {
         if (count($containers)) {
 
@@ -218,37 +239,33 @@ class Product extends Model
                 
                 $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
-                $warehouseExpectedContainer->product()->create([
-                    'product_id' => $this->id,
-                ]);
+                $warehouseExpectedContainer->product()->delete();
 
                 $warehouseExpectedContainer->update([
-                    'engaged' => 1
+                    'engaged' => 0
                 ]);
 
-                $this->updateChildShelves($warehouseExpectedContainer, 1);
+                $this->updateChildShelves($warehouseExpectedContainer, 0);
 
             }
         }
     }
 
-    protected function setProductShelves($container = NULL)
+    protected function removeProductShelves($container = NULL)
     {
         if ($container) {
 
-            foreach ($container->shelves as $containerShelf) {
+            foreach ($container->released_shelves as $containerShelf) {
                 
                 $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
-                $warehouseExpectedShelf->product()->create([
-                    'product_id' => $this->id,
-                ]);
+                $warehouseExpectedShelf->product()->delete();
 
                 $warehouseExpectedShelf->update([
-                    'engaged' => 1
+                    'engaged' => 0
                 ]);
 
-                $this->updateChildUnits($warehouseExpectedShelf, 1);
+                $this->updateChildUnits($warehouseExpectedShelf, 0);
 
             }
 
@@ -257,20 +274,18 @@ class Product extends Model
         }
     }
 
-    protected function setProductUnits($container = NULL)
+    protected function removeProductUnits($container = NULL)
     {
         if ($container) {
 
-            foreach ($container->shelf->units as $containerShelfUnit) {
+            foreach ($container->shelf->released_units as $containerShelfUnit) {
                 
                 $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                $warehouseExpectedShelfUnit->product()->create([
-                    'product_id' => $this->id,
-                ]);
+                $warehouseExpectedShelfUnit->product()->delete();
 
                 $warehouseExpectedShelfUnit->update([
-                    'engaged' => 1
+                    'engaged' => 0
                 ]);
 
             }
@@ -371,6 +386,79 @@ class Product extends Model
             $shelf->containerShelfUnitStatuses()->update([
                 'engaged' => $newValue
             ]);
+
+        }
+    }
+
+    /*
+
+    protected function setProductContainers($containers = array())
+    {
+        if (count($containers)) {
+
+            foreach ($containers as $container) {
+                
+                $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
+
+                $warehouseExpectedContainer->product()->create([
+                    'product_id' => $this->id,
+                ]);
+
+                $warehouseExpectedContainer->update([
+                    'engaged' => 1
+                ]);
+
+                $this->updateChildShelves($warehouseExpectedContainer, 1);
+
+            }
+        }
+    }
+
+    protected function setProductShelves($container = NULL)
+    {
+        if ($container) {
+
+            foreach ($container->shelves as $containerShelf) {
+                
+                $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
+
+                $warehouseExpectedShelf->product()->create([
+                    'product_id' => $this->id,
+                ]);
+
+                $warehouseExpectedShelf->update([
+                    'engaged' => 1
+                ]);
+
+                $this->updateChildUnits($warehouseExpectedShelf, 1);
+
+            }
+
+            $this->updateParentContainer($warehouseExpectedShelf->parentContainer);
+
+        }
+    }
+
+    protected function setProductUnits($container = NULL)
+    {
+        if ($container) {
+
+            foreach ($container->shelf->units as $containerShelfUnit) {
+                
+                $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
+
+                $warehouseExpectedShelfUnit->product()->create([
+                    'product_id' => $this->id,
+                ]);
+
+                $warehouseExpectedShelfUnit->update([
+                    'engaged' => 1
+                ]);
+
+            }
+
+            // Parent Shelf
+            $this->updateParentShelf($warehouseExpectedShelfUnit->parentShelf);
 
         }
     }

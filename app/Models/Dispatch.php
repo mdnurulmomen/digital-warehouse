@@ -54,7 +54,9 @@ class Dispatch extends Model
                 
                 $expectedProduct = Product::find($productToDispatch->product_id);
 
-                if ($expectedProduct->available_quantity >= $productToDispatch->quantity) {
+                $productAvailableQuantity = $expectedProduct->stocks->first()->available_quantity ?? 0;
+
+                if ($productAvailableQuantity >= $productToDispatch->quantity) {
                     
                 /*
                     $dispatchedProduct = $expectedProduct->dispatches()->create([
@@ -64,8 +66,8 @@ class Dispatch extends Model
                     ]);
                 */
 
-                    $expectedProduct->update([
-                        'available_quantity' => $expectedProduct->available_quantity - $productToDispatch->quantity 
+                    $expectedProduct->stocks->first()->update([
+                        'available_quantity' => $productAvailableQuantity - $productToDispatch->quantity 
                     ]);
 
                     if ($expectedProduct->has_variations && $productToDispatch->has_variations) {
@@ -74,7 +76,10 @@ class Dispatch extends Model
                     
                             $productExpectedVariation = $expectedProduct->variations()->where('id', $variationToDispatch->product_variation_id)->first();
 
-                            if ($variationToDispatch->quantity <= $productExpectedVariation->available_quantity) {
+                            $variationAvailableQuantity = $productExpectedVariation->stocks->first()->available_quantity ?? 0;
+
+
+                            if ($variationToDispatch->quantity <= $variationAvailableQuantity) {
 
                             /*
                                 $dispatchedProductVariation = $dispatchedProduct->variations()->create([
@@ -83,8 +88,8 @@ class Dispatch extends Model
                                 ]);
                             */
 
-                                $productExpectedVariation->update([
-                                    'available_quantity' => $productExpectedVariation->available_quantity - $variationToDispatch->quantity 
+                                $productExpectedVariation->stocks->first()->update([
+                                    'available_quantity' => $variationAvailableQuantity - $variationToDispatch->quantity 
                                 ]);   
                                 
                             }
@@ -94,15 +99,15 @@ class Dispatch extends Model
                     }
 
                     // Updating Product Addresses
-                    if ($expectedProduct->available_quantity==0) {  // No more products available
+                    if ($productAvailableQuantity==0) {  // No more products available
                         
                         $expectedProduct->deleteOldAddresses();
                         // $expectedProduct->variations()->delete();
 
                     }
-                    else if ($expectedProduct->available_quantity > 0) {
+                    else if ($productAvailableQuantity > 0) {
                         
-                        $expectedProduct->product_address = $productToDispatch->spaces;
+                        $expectedProduct->product_address = json_decode(json_encode($productToDispatch->addresses));
 
                     }
 
