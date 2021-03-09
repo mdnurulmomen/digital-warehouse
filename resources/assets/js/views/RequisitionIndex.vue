@@ -459,7 +459,6 @@
 											class="card-body" 
 											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.addresses" 
 											:key="'required-product-index-' + productIndex + '-address-index' + productAddressIndex" 
-											v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 											>
 												<div class="form-row ml-5 mr-5">
 													<div class="form-group col-md-12 text-center">
@@ -497,7 +496,7 @@
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:disabled="requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].containers.length < 2"
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].containers.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -539,7 +538,7 @@
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:disabled="requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelves.length < 2"
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelves.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -596,7 +595,7 @@
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:disabled="requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelf.units.length < 2"
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelf.units.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -1443,6 +1442,7 @@
 							this.step += 1;
 						}
 						else {
+							this.setProductReleasedAddresses();
 							this.step += 2;
 						}
 
@@ -1474,6 +1474,46 @@
 					this.singleDispatchData.requisition.products[productIndex].addresses.pop();
 				
 				}
+
+			},
+			setProductReleasedAddresses() {
+
+				this.singleDispatchData.requisition.products.forEach(
+							
+					(requiredProduct, productIndex) => {
+
+						if (requiredProduct.available_quantity == requiredProduct.quantity) {
+
+
+							requiredProduct.addresses.forEach(
+				
+								(requiredProductAddress, productAddressIndex) => {
+
+									if (requiredProductAddress.type=='containers') {
+
+										requiredProduct.addresses[productAddressIndex].released_containers = requiredProduct.addresses[productAddressIndex].containers;
+
+									}
+									else if (requiredProductAddress.type=='shelves') {
+
+										requiredProduct.addresses[productAddressIndex].container.released_shelves = requiredProduct.addresses[productAddressIndex].container.shelves;
+
+									}
+									else if (requiredProductAddress.type=='units') {
+
+										requiredProduct.addresses[productAddressIndex].container.shelf.released_units = requiredProduct.addresses[productAddressIndex].container.shelf.units;
+
+									}
+
+								}
+								
+							);
+
+						}
+
+					}
+					
+				);
 
 			},
 			nameWithCapitalized (name) {
