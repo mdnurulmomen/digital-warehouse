@@ -17,7 +17,8 @@ class CreateRequisitionsTable extends Migration
             $table->increments('id');
             $table->string('subject');
             $table->string('description')->nullable();
-            $table->boolean('status')->default(false); // pending / dispatched
+            $table->tinyInteger('status')->default(0);      // pending / dispatched / cancelled
+            // $table->boolean('status')->default(false); // pending / dispatched
             $table->unsignedInteger('merchant_id');
             $table->timestamps();
         });

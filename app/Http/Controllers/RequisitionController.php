@@ -18,6 +18,7 @@ class RequisitionController extends Controller
 
                 'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
                 'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
@@ -25,6 +26,17 @@ class RequisitionController extends Controller
 
         return RequisitionResource::collection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
 
+    }
+
+    public function cancelRequisition($requisition, $perPage)
+    {
+        $expectedRequisition = Requisition::findOrFail($requisition);
+
+        $expectedRequisition->update([
+            'status' => -1,
+        ]);
+
+        return $this->showAllRequisitions($perPage);
     }
 
     public function searchAllRequisitions($search, $perPage)

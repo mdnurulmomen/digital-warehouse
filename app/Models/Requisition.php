@@ -14,7 +14,7 @@ class Requisition extends Model
      * @var array
      */
     protected $casts = [
-        'status' => 'boolean',
+        // 'status' => 'boolean',
     ];
 
     /**

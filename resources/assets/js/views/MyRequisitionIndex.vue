@@ -38,11 +38,12 @@
 										  		
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['pending', 'dispatched']" 
+										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
 										  			:current-tab="'pending'" 
 
 										  			@showPendingContents="showPendingContents" 
 										  			@showDispatchedContents="showDispatchedContents" 
+										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
 
  												<div class="tab-content card-block">
@@ -63,13 +64,13 @@
 																	>
 																		<td>{{ content.subject }}</td>
 																		<td>
-																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ content.status ? 'Dispatched' : 'Pending' }}
+																			<span :class="[content.status==1 ? 'badge-success' : content.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
+																				{{ content.status==1 ? 'Dispatched' : content.status==0 ? 'Pending' : 'Cancelled' }}
 																			</span>
 																		</td>
 																		<td>
 																			<span 
-																			v-if="content.status && content.dispatch"
+																			v-if="content.status==1 && content.dispatch"
 																			:class="[!unconfirmed(content) ? 'badge-success' : 'badge-danger', 'badge']">
 																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Yet' }}
 																			</span>
@@ -643,7 +644,7 @@
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">{{ singleRequisitionData.status ? 'Dispatched' : 'Pending' }}</span>
+												<span :class="[singleRequisitionData.status==1 ? 'badge-success' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">{{ singleRequisitionData.status==1 ? 'Dispatched' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}</span>
 											</label>
 										</div>
 
@@ -748,7 +749,7 @@
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.delivery && singleRequisitionData.status && singleRequisitionData.dispatch">
+										<div class="form-row" v-if="singleRequisitionData.delivery && singleRequisitionData.status==1 && singleRequisitionData.dispatch">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Receipt :
 											</label>
@@ -802,7 +803,7 @@
 										</div>
 										-->
 										
-										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.dispatch">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Received :
 											</label>
@@ -813,8 +814,8 @@
 
 										<div class="form-row" v-else>
 											<label class="col-sm-12 col-form-label text-center">
-												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
-													{{ singleRequisitionData.status ? 'Dispatched' : 'Not Dispatched Yet' }}
+												<span :class="[singleRequisitionData.status==1 ? 'badge-success' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
+													{{ singleRequisitionData.status==1 ? 'Dispatched' : singleRequisitionData.status==0 ? 'Not Dispatched Yet' : 'Cancelled' }}
 												</span>
 											</label>
 										</div>
@@ -1116,9 +1117,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New requisition has been stored", "Success");
+							
 							this.allFetchedRequisitions = response.data;
-							// this.showSelectedTabProducts();
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
 							$('#requisition-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1143,8 +1145,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Dispatched products has been received", "Success");
+
 							this.allFetchedRequisitions = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
 						}
 					})
 					.catch(error => {
@@ -1245,6 +1249,10 @@
 					this.requisitionsToShow = this.allFetchedRequisitions.pending.data;
 					this.pagination = this.allFetchedRequisitions.pending;
 				}
+				else if (this.currentTab=='cancelled') {
+					this.requisitionsToShow = this.allFetchedRequisitions.cancelled.data;
+					this.pagination = this.allFetchedRequisitions.cancelled;
+				}
 				else {
 					this.requisitionsToShow = this.allFetchedRequisitions.dispatched.data;
 					this.pagination = this.allFetchedRequisitions.dispatched;
@@ -1293,6 +1301,10 @@
 				this.currentTab = 'dispatched';
 				this.showSelectedTabProducts();
 			},
+			showCancelledContents() {
+				this.currentTab = 'cancelled';
+				this.showSelectedTabProducts();
+			},
 			addMoreProduct() {
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
@@ -1332,7 +1344,7 @@
 			},
 			unconfirmed(object) {
 
-				if (object.status && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+				if (object.status==1 && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
 
 					return true; 	// not confirmed
 

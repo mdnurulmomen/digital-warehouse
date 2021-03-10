@@ -47,11 +47,12 @@
 										  		
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['pending', 'dispatched']" 
+										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
 										  			:current-tab="'pending'" 
 
 										  			@showPendingContents="showPendingContents" 
 										  			@showDispatchedContents="showDispatchedContents" 
+										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
 
  												<div class="tab-content card-block">
@@ -72,13 +73,13 @@
 																	>
 																		<td>{{ content.subject }}</td>
 																		<td>
-																			<span :class="[content.status ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ content.status ? 'Dispatched' : 'Pending' }}
+																			<span :class="[content.status==1 ? 'badge-success' : content.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+																				{{ content.status==1 ? 'Dispatched' : content.status==0 ? 'Pending' : 'Cancelled' }}
 																			</span>
 																		</td>
 																		<td>
 																			<span 
-																			v-if="content.status && content.dispatch"
+																			v-if="content.status==1 && content.dispatch"
 																			:class="[!unconfirmed(content) ? 'badge-success' : 'badge-danger', 'badge']">
 																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Yet' }}
 																			</span>
@@ -102,9 +103,18 @@
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
 																				@click="showProductDispatchForm(content)" 
-																				v-show="!content.status"
+																				v-show="content.status==0"
 																			>
 																				<i class="fas fa-truck"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-danger btn-icon"  
+																				@click="openContentDeleteForm(content)" 
+																				v-show="content.status==0"
+																			>
+																				<i class="fas fa-trash"></i>
 																			</button>
 
 																		</td>
@@ -797,11 +807,14 @@
 											  		Please input required fields
 											  	</span>
 											</div>
-											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+											<div class="col-sm-12 d-flex justify-content-between">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+							                  	<button type="button" class="btn btn-danger" @click="openContentDeleteForm(singleDispatchData.requisition)">
+													Cancel
+												</button>
+												<button type="submit" class="btn btn-primary" :disabled="!submitForm">
 													Dispatch
 												</button>
 											</div>
@@ -876,8 +889,8 @@
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
-													{{ singleRequisitionData.status ? 'Dispatched' : 'Pending' }}
+												<span :class="[singleRequisitionData.status==1 ? 'badge-success' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+													{{ singleRequisitionData.status==1 ? 'Dispatched' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
 												</span>
 											</label>
 										</div>
@@ -966,7 +979,7 @@
 
 									<div class="tab-pane" id="requisition-dispatch" role="tabpanel">
 
-										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.dispatch">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Dispatched on :
 											</label>
@@ -993,7 +1006,7 @@
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch && singleRequisitionData.dispatch.delivery">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('delivery')">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Receipt :
 											</label>
@@ -1048,7 +1061,7 @@
 										</div>
 										-->
 
-										<div class="form-row" v-if="singleRequisitionData.status && singleRequisitionData.dispatch">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch')">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Received :
 											</label>
@@ -1059,8 +1072,8 @@
 
 										<div class="form-row" v-else>
 											<label class="col-sm-12 col-form-label text-center">
-												<span :class="[singleRequisitionData.status ? 'badge-success' : 'badge-danger', 'badge']">
-													{{ singleRequisitionData.status ? 'Dispatched' : 'Not Dispatched Yet' }}
+												<span :class="[singleRequisitionData.status==1 ? 'badge-success' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
+													{{ singleRequisitionData.status==1 ? 'Dispatched' : singleRequisitionData.status==0 ? 'Not Dispatched Yet' : 'Cancelled' }}
 												</span>
 											</label>
 										</div>
@@ -1075,6 +1088,37 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<form 
+						class="form-horizontal" 
+						v-on:submit.prevent="cancelRequisition()" 
+						autocomplete="off"
+					>
+						
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-header bg-danger">
+							<h5 class="modal-title" id="exampleModalLongTitle">Cancel Confirmation</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body text-center">
+							<h4 class="text-danger">Want to cancel {{ singleRequisitionData.subject }} ?</h4>
+							<h6 class="sub-heading text-secondary">Remember : You can not retrieve this action !</h6>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-danger">Cancel</button>
+						</div>
+						
+					</form>
 				</div>
 			</div>
 		</div>
@@ -1295,6 +1339,12 @@
 					});
 
 			},
+			openContentDeleteForm(object) {
+
+				this.singleRequisitionData = { ...object };
+				$('#cancel-confirmation-modal').modal('show');
+
+			},
 			showProductDispatchForm(object) {
 
 				this.step = 1;
@@ -1332,9 +1382,38 @@
 						if (response.status == 200) {
 
 							this.$toastr.s("Requisition has been dispatched", "Success");
-							this.query !== '' ? this.searchData() : this.fetchAllRequisitions();
+
+							this.allFetchedRequisitions = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
 							$('#dispatch-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						// this.fetchAllRequisitions();
+					});
+
+			},
+			cancelRequisition() {
+
+				axios
+					.put('/requisitions/' + this.singleRequisitionData.id + '/' + this.perPage)
+					.then(response => {
+						if (response.status == 200) {
+
+							this.$toastr.s("Requisition has been cancelled", "Success");
+
+							this.allFetchedRequisitions = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							
+							$('#cancel-confirmation-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -1407,6 +1486,10 @@
 					this.requisitionsToShow = this.allFetchedRequisitions.pending.data;
 					this.pagination = this.allFetchedRequisitions.pending;
 				}
+				else if (this.currentTab=='cancelled') {
+					this.requisitionsToShow = this.allFetchedRequisitions.cancelled.data;
+					this.pagination = this.allFetchedRequisitions.cancelled;
+				}
 				else {
 					this.requisitionsToShow = this.allFetchedRequisitions.dispatched.data;
 					this.pagination = this.allFetchedRequisitions.dispatched;
@@ -1415,7 +1498,7 @@
 			},
 			unconfirmed(object) {
 
-				if (object.status && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+				if (object.status==1 && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
 
 					return true; 	// not confirmed
 
@@ -1465,6 +1548,10 @@
 			},
 			showDispatchedContents() {
 				this.currentTab = 'dispatched';
+				this.showSelectedTabProducts();
+			},
+			showCancelledContents() {
+				this.currentTab = 'cancelled';
 				this.showSelectedTabProducts();
 			},
 			removeSpace(productIndex) {	
