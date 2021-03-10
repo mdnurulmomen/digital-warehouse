@@ -1413,7 +1413,7 @@
 									this.errors.products[productIndex].product_quantity = 'Quantity is required';
 								}
 								else if (requiredProduct.total_quantity > (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity)) {
-									this.errors.products[productIndex].product_quantity = 'Quantity is more than available';
+									this.errors.products[productIndex].product_quantity = 'Quantity is more than available (max : ' + requiredProduct.product.available_quantity + ').';
 								}
 								else{
 									// this.errors.products[productIndex].product_quantity = null;
@@ -1462,7 +1462,7 @@
 												}
 												else if (productVariation.required_quantity > 0 && (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity))) {
 
-													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available';
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available (max : ' + productVariation.available_quantity + ').';
 
 												}
 												else {
