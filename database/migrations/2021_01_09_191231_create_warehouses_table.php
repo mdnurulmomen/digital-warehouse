@@ -17,7 +17,7 @@ class CreateWarehousesTable extends Migration
             $table->smallIncrements('id');
             $table->string('name', 100)->nullable();
             // (auto-generated if no input)
-            $table->string('code', 100)->unique(); 
+            // $table->string('code', 100)->unique(); 
             $table->string('user_name', 100)->unique();
             $table->string('email', 100)->unique();
             $table->string('mobile', 50)->unique();

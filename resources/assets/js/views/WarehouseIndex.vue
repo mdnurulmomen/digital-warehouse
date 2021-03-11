@@ -47,8 +47,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'code', 'email', 'mobile', 'status']" 
-										  			:column-values-to-show="['name', 'code', 'email', 'mobile', 'status']" 
+										  			:column-names="['name', 'email', 'mobile', 'status']" 
+										  			:column-values-to-show="['name', 'email', 'mobile', 'status']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 
@@ -187,6 +187,25 @@
 										        	{{ errors.warehouse.name }}
 										  		</div>
 											</div>
+
+											<div class="col-md-6 form-group">
+												<label for="phone">Mobile</label>
+												<input type="tel" 
+													class="form-control" 
+													v-model="singleWarehouseData.mobile" 
+													placeholder="Mobile should be unique" 
+													autocomplete="new-password" 
+													:class="!errors.warehouse.mobile ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('mobile')" 
+													required="true" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.warehouse.mobile }}
+										  		</div>
+											</div>
+											
+											<!-- 
 											<div class="col-md-6 form-group">
 												<label>Short Code (for recognizing)</label>
 												<input type="text" 
@@ -202,6 +221,7 @@
 										        	{{ errors.warehouse.code }}
 										  		</div>
 											</div>
+ 											-->
 										</div>
 
 			                            <div class="form-row">    
@@ -238,24 +258,7 @@
 				                        </div>
 
 				                        <div class="form-row">
-											<div class="col-md-6 form-group">
-												<label for="phone">Mobile</label>
-												<input type="tel" 
-													class="form-control" 
-													v-model="singleWarehouseData.mobile" 
-													placeholder="Mobile should be unique" 
-													autocomplete="new-password" 
-													:class="!errors.warehouse.mobile ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('mobile')" 
-													required="true" 
-												>
-
-												<div class="invalid-feedback">
-										        	{{ errors.warehouse.mobile }}
-										  		</div>
-											</div>
-
-											<div class="col-md-6 form-group">
+											<div class="col-md-12 form-group">
 												<label>Location</label>
 												<!-- 
 												<vue-google-autocomplete
@@ -352,6 +355,7 @@
 				                                  		label="user_name" 
 				                                  		track-by="id" 
 				                                  		:options="allWarehouseOwners" 
+				                                  		:custom-label="objectNameWithCapitalized" 
 				                                  		:required="true" 
 				                                  		:class="!errors.warehouse.owner  ? 'is-valid' : 'is-invalid'"
 				                                  		:allow-empty="false"
@@ -569,6 +573,7 @@
 								                                  		label="name" 
 								                                  		track-by="id" 
 								                                  		:options="allStorageTypes" 
+								                                  		:custom-label="objectNameWithCapitalized" 
 								                                  		:required="true" 
 								                                  		:class="!errors.warehouse.storage_types[index] ? 'is-valid' : 'is-invalid'"
 								                                  		:allow-empty="false"
@@ -744,6 +749,7 @@
 								                                  		label="name" 
 								                                  		track-by="id" 
 								                                  		:options="allContainers" 
+								                                  		:custom-label="objectNameWithCapitalized" 
 								                                  		:required="true" 
 								                                  		:class="!errors.warehouse.containers[containerIndex].container ? 'is-valid' : 'is-invalid'"
 								                                  		:allow-empty="false"
@@ -943,8 +949,10 @@
 												    	</div>
 												  	</div>
 
-											  	</transition-group>
+											  	</transition-group>	
+		                              		</div>
 
+		                              		<div class="col-md-12 form-group">
 											  	<div class="form-row">
 													<div class="form-group col-sm-6">
 														<button 
@@ -960,13 +968,12 @@
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
 															@click="removeContainer" 
-															:disabled="singleWarehouseData.containers.length==1"
+															:disabled="singleWarehouseData.containers.length<=1"
 														>
 															Remove Container
 														</button>	
 													</div>
 												</div>
-			                              		
 		                              		</div>
 			                            </div>   
 						          	</div>
@@ -1075,10 +1082,12 @@
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
 										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.name }}</label>
 									</div>
+									<!-- 
 									<div class="form-group form-row">
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">Code :</label>
 										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.code }}</label>
 									</div>
+									 -->
 									<div class="form-group form-row">
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
 										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.user_name }}</label>
@@ -1162,10 +1171,12 @@
 													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
 												</div>
 
+												<!-- 
 												<div class="form-group form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Code:</label>
 													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.code"></label>
 												</div>
+												 -->
 
 												<div class="form-group form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Features:</label>
@@ -2064,11 +2075,47 @@
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
 			},
+			objectNameWithCapitalized ({ name, user_name }) {
+		      	if (name) {
+				    name = name.toString();
+					const words = name.split(" ");
+
+					for (let i = 0; i < words.length; i++) {
+						
+						if (words[i]) {
+
+					    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+						
+						}
+						
+					}
+
+					return words.join(" ");
+		      	}
+		      	else if (user_name) {
+				    user_name = user_name.toString();
+					const words = user_name.split(" ");
+
+					for (let i = 0; i < words.length; i++) {
+						
+						if (words[i]) {
+
+					    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+						
+						}
+						
+					}
+
+					return words.join(" ");
+		      	}
+		      	else 
+		      		return ''
+		    },
 			nextPage() {
 				if (this.step==1) {
 					this.validateFormInput('site_map_preview');
 					this.validateFormInput('name');
-					this.validateFormInput('code');
+					// this.validateFormInput('code');
 					this.validateFormInput('user_name');
 					this.validateFormInput('email');
 					this.validateFormInput('mobile');
@@ -2137,6 +2184,7 @@
 
 						break;
 
+					/*
 					case 'code' :
 
 						if (!this.singleWarehouseData.code) {
@@ -2151,6 +2199,7 @@
 						}
 
 						break;
+					*/
 
 					case 'user_name' :
 

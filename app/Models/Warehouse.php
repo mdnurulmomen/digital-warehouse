@@ -21,7 +21,7 @@ class Warehouse extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'code', 'user_name', 'email', 'mobile', 'password', 'site_map_preview', 'lat', 'lng', 'warehouse_deal', 'active', 'warehouse_owner_id'
+        'name', 'user_name', 'email', 'mobile', 'password', 'site_map_preview', 'lat', 'lng', 'warehouse_deal', 'active', 'warehouse_owner_id'
     ];
     
    
@@ -45,6 +45,54 @@ class Warehouse extends Authenticatable
         'active' => 'boolean',
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the user's image.
+     */
+    public function previews()
+    {
+        return $this->hasMany(WarehousePreview::class, 'warehouse_id');
+    }
+
+    public function feature()
+    {
+        return $this->hasOne(WarehouseFeature::class, 'warehouse_id');
+    }
+
+    public function storages()
+    {
+        return $this->hasMany(WarehouseStorageType::class, 'warehouse_id')->withTrashed();
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(WarehouseOwner::class, 'warehouse_owner_id');
+    }
+
+    /**
+     * Get all of the posts for the country.
+     */
+    public function storagePreviews()
+    {
+        return $this->hasManyThrough(WarehouseStoragePreview::class, WarehouseStorageType::class);
+    }
+
+    public function storageFeatures()
+    {
+        return $this->hasManyThrough(WarehouseStorageFeature::class, WarehouseStorageType::class);
+    }
+
+/*
+    public function containerTypes()
+    {
+        return $this->hasMany(WarehouseContainerType::class, 'warehouse_id')->withTrashed();
+    }
+*/
+
+    public function containers()
+    {
+        return $this->hasMany(WarehouseContainer::class, 'warehouse_id')->withTrashed();
+    }
 
     /**
      * Set the user's first name.
@@ -315,54 +363,6 @@ class Warehouse extends Authenticatable
         }
     }
 */
-
-    /**
-     * Get the user's image.
-     */
-    public function previews()
-    {
-        return $this->hasMany(WarehousePreview::class, 'warehouse_id');
-    }
-
-    public function feature()
-    {
-        return $this->hasOne(WarehouseFeature::class, 'warehouse_id');
-    }
-
-    public function storages()
-    {
-        return $this->hasMany(WarehouseStorageType::class, 'warehouse_id')->withTrashed();
-    }
-
-    public function owner()
-    {
-        return $this->belongsTo(WarehouseOwner::class, 'warehouse_owner_id');
-    }
-
-    /**
-     * Get all of the posts for the country.
-     */
-    public function storagePreviews()
-    {
-        return $this->hasManyThrough(WarehouseStoragePreview::class, WarehouseStorageType::class);
-    }
-
-    public function storageFeatures()
-    {
-        return $this->hasManyThrough(WarehouseStorageFeature::class, WarehouseStorageType::class);
-    }
-
-/*
-    public function containerTypes()
-    {
-        return $this->hasMany(WarehouseContainerType::class, 'warehouse_id')->withTrashed();
-    }
-*/
-
-    public function containers()
-    {
-        return $this->hasMany(WarehouseContainer::class, 'warehouse_id')->withTrashed();
-    }
 
     protected function createContainerUpdatedRents($warehouseContainer, $inputedContainer)
     {          

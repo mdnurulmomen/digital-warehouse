@@ -122,8 +122,8 @@ class WarehouseController extends Controller
         }
 
         $query->orWhereHas('warehouses', function($q) use ($search){
-            $q->where('name', 'like', "%$search%")
-              ->orWhere('code', 'like', "%$search%");
+            $q->where('name', 'like', "%$search%");
+              // ->orWhere('code', 'like', "%$search%");
         });
 
         return response()->json([
@@ -157,7 +157,7 @@ class WarehouseController extends Controller
     {
         $request->validate([
             'name' => 'nullable|string|max:100',
-            'code' => 'required|string|max:100|unique:warehouses,code',
+            // 'code' => 'required|string|max:100|unique:warehouses,code',
             'user_name' => 'required|string|max:100|unique:warehouses,user_name',
             'email' => 'required|string|max:100|unique:warehouses,email',
             'mobile' => 'required|string|max:50|unique:warehouses,mobile',
@@ -182,7 +182,7 @@ class WarehouseController extends Controller
         $newWarehouse = new Warehouse();
 
         $newWarehouse->name = $request->name;
-        $newWarehouse->code = $request->code;
+        // $newWarehouse->code = $request->code;
         $newWarehouse->user_name = $request->user_name;
         $newWarehouse->email = $request->email;
         $newWarehouse->mobile = $request->mobile;
@@ -234,7 +234,7 @@ class WarehouseController extends Controller
 
         $request->validate([
             'name' => 'nullable|string|max:100',
-            'code' => 'required|string|max:100|unique:warehouses,code,'.$warehouseToUpdate->id,
+            // 'code' => 'required|string|max:100|unique:warehouses,code,'.$warehouseToUpdate->id,
             'user_name' => 'required|string|max:100|unique:warehouses,user_name,'.$warehouseToUpdate->id,
             'email' => 'required|string|max:100|unique:warehouses,email,'.$warehouseToUpdate->id,
             'mobile' => 'required|string|max:50|unique:warehouses,mobile,'.$warehouseToUpdate->id,
@@ -257,7 +257,7 @@ class WarehouseController extends Controller
         ]);
 
         $warehouseToUpdate->name = $request->name;
-        $warehouseToUpdate->code = $request->code;
+        // $warehouseToUpdate->code = $request->code;
         $warehouseToUpdate->user_name = $request->user_name;
         $warehouseToUpdate->email = $request->email;
         $warehouseToUpdate->mobile = $request->mobile;

@@ -18,7 +18,7 @@ class WarehouseStorageResource extends JsonResource
             'feature' => $this->feature,
             'previews' => $this->previews,
             'storage_type' => $this->storageType,
-            'deleted_at' => $this->deleted_at->diffForHumans()
+            'deleted_at' => !empty($this->deleted_at) ? $this->deleted_at->diffForHumans() : NULL
         ];
     }
 }

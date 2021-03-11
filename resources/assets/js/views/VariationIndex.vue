@@ -134,6 +134,7 @@
                                   		label="name" 
                                   		track-by="id" 
                                   		:options="allVariationTypes" 
+                                  		:custom-label="objectNameWithCapitalized" 
                                   		:required="true" 
                                   		:class="!errors.asset.variation_type  ? 'is-valid' : 'is-invalid'"
                                   		:allow-empty="false"
@@ -601,6 +602,26 @@
 
 				return false;
 			},
+			objectNameWithCapitalized ({ name }) {
+		      	if (name) {
+				    name = name.toString();
+					const words = name.split(" ");
+
+					for (let i = 0; i < words.length; i++) {
+						
+						if (words[i]) {
+
+					    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+						
+						}
+						
+					}
+
+					return words.join(" ");
+		      	}
+		      	else 
+		      		return ''
+		    },
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
