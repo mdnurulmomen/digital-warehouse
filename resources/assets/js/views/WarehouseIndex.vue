@@ -22,7 +22,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
@@ -35,7 +34,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
@@ -63,9 +61,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -89,8 +85,36 @@
 					    	<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
-					<div class="modal-body">
 
+
+					<div class="modal-body">
+						
+						<div class="row" v-show="!loading">
+							<div class="col-sm-12">
+							  	<div class="card">
+								    <div class="card-header text-center">
+								      	<div class="progress">
+								        	<div class="progress-bar bg-info" style="width:20%" v-show="step>=1">
+								          		Profile
+								        	</div>
+								        	<div class="progress-bar bg-danger" style="width:20%" v-show="step>=2">
+								          		Contract Info
+								        	</div>
+								        	<div class="progress-bar bg-warning" style="width:20%" v-show="step>=3">
+								          		Features
+								        	</div>
+								        	<div class="progress-bar bg-primary" style="width:20%" v-show="step>=4">
+								          		Storages
+								        	</div>
+								        	<div class="progress-bar bg-success" style="width:20%" v-show="step==5">
+								          		Containers
+								        	</div>
+								      	</div>
+								    </div>
+							  	</div>
+							</div>
+						</div>
+						
 				  		<!-- form start -->
 						<form 
 							class="form-horizontal" 
@@ -100,7 +124,6 @@
 							<input type="hidden" name="_token" :value="csrf">
 
 							<transition-group name="fade">
-
 								<div 
 									class="row" 
 									v-bind:key="1" 
@@ -118,6 +141,7 @@
 															alt="site_map_preview" 
 														>
 													</div>
+													
 													<div class="form-group col-md-6">
 														<div class="custom-file">
 														    <input type="file" 
@@ -164,7 +188,7 @@
 										  		</div>
 											</div>
 											<div class="col-md-6 form-group">
-												<label>Code</label>
+												<label>Short Code (for recognizing)</label>
 												<input type="text" 
 													class="form-control" 
 													v-model="singleWarehouseData.code" 
@@ -298,7 +322,7 @@
 										</div>
 						          	</div>  
 							        
-						          	<div class="col-sm-12 mb-2 text-right">
+						          	<div class="col-sm-12 p-3 border text-right">
 						          		<div class="text-danger small" v-show="!submitForm">
 									  		Please input required fields
 							          	</div>
@@ -375,7 +399,7 @@
 						                    
 						          	</div>  
 							        
-						          	<div class="col-sm-12 mb-2">
+						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 
 					          				<div class="col-6">
@@ -486,7 +510,7 @@
    
 						          	</div>  
 
-						          	<div class="col-sm-12 mb-2">
+						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 
 					          				<div class="col-6">
@@ -661,7 +685,7 @@
 			                            </div>   
 						          	</div>  
 							        
-						          	<div class="col-sm-12 mb-2">
+						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 
 					          				<div class="col-6">
@@ -706,8 +730,8 @@
 
 				                              		<div 
 				                              			class="card" 
-				                              			v-for="(warehouseContainer, index) in singleWarehouseData.containers" 
-				                              			:key="'F' + index + warehouseContainer.id"
+				                              			v-for="(warehouseContainer, containerIndex) in singleWarehouseData.containers" 
+				                              			:key="'F' + containerIndex + warehouseContainer.id"
 				                              		>
 												    	<div class="card-body">
 
@@ -715,27 +739,27 @@
 												    			<div class="form-group col-sm-6">
 												    				<label>Container Type</label>
 												    				<multiselect 
-							                                  			v-model="singleWarehouseData.containers[index].container"
+							                                  			v-model="singleWarehouseData.containers[containerIndex].container"
 							                                  			placeholder="Container Type" 
 								                                  		label="name" 
 								                                  		track-by="id" 
 								                                  		:options="allContainers" 
 								                                  		:required="true" 
-								                                  		:class="!errors.warehouse.containers[index].container ? 'is-valid' : 'is-invalid'"
+								                                  		:class="!errors.warehouse.containers[containerIndex].container ? 'is-valid' : 'is-invalid'"
 								                                  		:allow-empty="false"
 								                                  		selectLabel = "Press/Click"
 								                                  		deselect-label="Can't remove single value"
 								                                  		@close="validateFormInput('container')" 
-								                                  		@input="changeContainerRents(index)"
+								                                  		@input="changeContainerRents(containerIndex)"
 							                                  		>
 								                                	</multiselect>
 
 								                                	<div 
 									                                	class="invalid-feedback" 
 									                                	style="display: block;" 
-									                                	v-show="errors.warehouse.containers[index].container"
+									                                	v-show="errors.warehouse.containers[containerIndex].container"
 								                                	>
-																    	{{ errors.warehouse.containers[index].container }}
+																    	{{ errors.warehouse.containers[containerIndex].container }}
 																    </div>
 												    			</div>
 
@@ -743,14 +767,14 @@
 												    				<label for="phone">Quantity</label>
 																	<input type="number" 
 																		class="form-control" 
-																		v-model.number="singleWarehouseData.containers[index].quantity" 
+																		v-model.number="singleWarehouseData.containers[containerIndex].quantity" 
 																		placeholder="Lenght of container" 
-																		:class="!errors.warehouse.containers[index].container_quantity ? 'is-valid' : 'is-invalid'" 
+																		:class="!errors.warehouse.containers[containerIndex].container_quantity ? 'is-valid' : 'is-invalid'" 
 																		@blur="validateFormInput('container_quantity')" 
 																		required="true" 
 																	>
 																	<div class="invalid-feedback">
-															        	{{ errors.warehouse.containers[index].container_quantity }}
+															        	{{ errors.warehouse.containers[containerIndex].container_quantity }}
 															  		</div>
 												    			</div>
 												    		</div>
@@ -770,7 +794,7 @@
 																			<a 
 																				class="nav-link" 
 																				data-toggle="tab" 
-																				:href="'#' + rentPeriod.name + index" 
+																				:href="'#' + rentPeriod.name + containerIndex" 
 																				role="tab" 
 																				aria-selected="false" 
 																				:class="{'active': rentIndex === 0}"
@@ -783,7 +807,7 @@
 																	<div class="tab-content tabs card-block">
 																		<div 
 																			class="tab-pane" 
-																			:id="rentPeriod.name+ index" 
+																			:id="rentPeriod.name+ containerIndex" 
 																			role="tabpanel" 
 																			v-for="(rentPeriod, rentIndex) in allRentPeriods" 
 																			:key="'x' + rentPeriod.id + rentPeriod.name" 
@@ -801,13 +825,13 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[index].rents['container_storing_price_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_storing_price_' + rentPeriod.name]" 
 																								placeholder="Storing price" 
-																								:class="!errors.warehouse.containers[index]['container_storing_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="!errors.warehouse.containers[containerIndex]['container_storing_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[index]['container_storing_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['container_storing_price_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    			<div class="col-sm-12 form-group">	
@@ -815,13 +839,13 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[index].rents['container_selling_price_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_selling_price_' + rentPeriod.name]" 
 																								placeholder="Selling price" 
-																								:class="!errors.warehouse.containers[index]['container_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="!errors.warehouse.containers[containerIndex]['container_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[index]['container_selling_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['container_selling_price_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    		</div>
@@ -829,7 +853,7 @@
 																    			<!-- shelf -->
 																    			<div 
 																    				class="mr-1 p-2 border w-100" 
-																    				v-show="singleWarehouseData.containers[index].container.has_shelve"
+																    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve"
 																    			>
 																		    		<div class="form-row">
 																    					<div class="sub-title">Shelf</div>
@@ -841,13 +865,13 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[index].rents['shelf_storing_price_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_storing_price_' + rentPeriod.name]" 
 																								placeholder="Storing price" 
-																								:class="!errors.warehouse.containers[index]['shelf_storing_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="!errors.warehouse.containers[containerIndex]['shelf_storing_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[index]['shelf_storing_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['shelf_storing_price_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    			<div class="col-sm-12 form-group">	
@@ -855,13 +879,13 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[index].rents['shelf_selling_price_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_selling_price_' + rentPeriod.name]" 
 																								placeholder="Selling price" 
-																								:class="!errors.warehouse.containers[index]['shelf_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="!errors.warehouse.containers[containerIndex]['shelf_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[index]['shelf_selling_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['shelf_selling_price_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    		</div>
@@ -869,7 +893,7 @@
 																    			<!-- unit -->
 																    			<div 
 																    				class="mr-1 p-2 border w-100" 
-																    				v-show="singleWarehouseData.containers[index].container.has_shelve && singleWarehouseData.containers[index].container.shelf.has_units"
+																    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
 																    			>
 																		    		<div class="form-row">
 																    					<div class="sub-title">Unit</div>
@@ -881,13 +905,13 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[index].rents['unit_storing_price_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_storing_price_' + rentPeriod.name]" 
 																								placeholder="Storing price"
-																								:class="!errors.warehouse.containers[index]['unit_storing_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="!errors.warehouse.containers[containerIndex]['unit_storing_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[index]['unit_storing_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['unit_storing_price_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    			<div class="col-sm-12 form-group">	
@@ -895,13 +919,13 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[index].rents['unit_selling_price_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_selling_price_' + rentPeriod.name]" 
 																								placeholder="Selling price" 
-																								:class="!errors.warehouse.containers[index]['unit_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="!errors.warehouse.containers[containerIndex]['unit_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[index]['unit_selling_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['unit_selling_price_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    		</div>
@@ -912,8 +936,8 @@
 																</div>
 												    		</div>
 
-												    		<div class="invalid-feedback text-center" style="display: block;" v-show="errors.warehouse.containers[index].container_price">
-												    			{{ errors.warehouse.containers[index].container_price }}
+												    		<div class="invalid-feedback text-center" style="display: block;" v-show="errors.warehouse.containers[containerIndex].container_price">
+												    			{{ errors.warehouse.containers[containerIndex].container_price }}
 												    		</div>
 
 												    	</div>
@@ -936,7 +960,7 @@
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
 															@click="removeContainer" 
-															:disabled="singleWarehouseData.containers.length===1"
+															:disabled="singleWarehouseData.containers.length==1"
 														>
 															Remove Container
 														</button>	
@@ -945,9 +969,9 @@
 			                              		
 		                              		</div>
 			                            </div>   
-						          	</div>  
+						          	</div>
 							        
-						          	<div class="col-sm-12 mb-2">
+						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 
 					          				<div class="col-6">
@@ -970,50 +994,17 @@
 							                  		class="btn btn-primary btn-sm btn-round" 
 							                  		:disabled="formSubmitted"
 							                  	>
-								                    Save Warehouse
+								                    {{ createMode ? 'Save' : 'Update' }} Warehouse
 							                  	</button>
 								          	</div>
 
 						          		</div>
 						          	</div>
-						            
 								</div>
-
 							</transition-group>
-
-							<div class="row" v-show="!loading">
-								<div class="col-sm-12">
-
-								  	<div class="card">
-									    <div class="card-header text-center">
-
-									      	<div class="progress">
-									        	<div class="progress-bar bg-info w-20" v-show="step>=1">
-									          		Profile
-									        	</div>
-									        	<div class="progress-bar bg-danger w-20" v-show="step>=2">
-									          		Contract Info
-									        	</div>
-									        	<div class="progress-bar bg-warning w-20" v-show="step>=3">
-									          		Previews & Features
-									        	</div>
-									        	<div class="progress-bar bg-primary w-20" v-show="step>=4">
-									          		Storages
-									        	</div>
-									        	<div class="progress-bar bg-success w-20" v-show="step==5">
-									          		Containers
-									        	</div>
-									      	</div>
-
-									    </div>
-								  	</div>
-								  
-								</div>
-							</div>
 
 						</form>
 						<!-- form end -->
-						
 					</div>
 				</div>
 				<!-- /.modal-content -->
@@ -1035,235 +1026,340 @@
 						</button>
 					</div>
 
-					<div class="modal-body">	
+					<div class="modal-body">
+
+						<div class="card">
+							<ul class="nav nav-pills mx-auto" role="tablist">
+								<li class="nav-item">
+									<a class="nav-link active show" data-toggle="tab" href="#profile" role="tab" aria-selected="false">
+										Profile
+									</a>
+								</li>
+								
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#owner" role="tab" aria-selected="false">
+										Deal
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#features" role="tab" aria-selected="true">
+										Features
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#storage-details" role="tab" aria-selected="false">
+										Storage
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#container-details" role="tab" aria-selected="false">
+										Container
+									</a>
+								</li>
+							</ul>
 							
-						<ul class="nav nav-tabs tabs" role="tablist">
-							<li class="nav-item">
-								<a class="nav-link active show" data-toggle="tab" href="#profile" role="tab" aria-selected="false">
-									Profile
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#owner" role="tab" aria-selected="false">
-									Deal
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#features" role="tab" aria-selected="true">
-									Features
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#storage-details" role="tab" aria-selected="false">
-									Storage
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#container-details" role="tab" aria-selected="false">
-									Container
-								</a>
-							</li>
-						
-						</ul>
-
-						<div class="tab-content tabs card-block">
-
-							<div class="tab-pane active" id="profile" role="tabpanel">	
-					    		<div class="form-group form-row text-center">
-									<div class="col-md-12 text-center">
-										<img class="img-fluid" 
-											:src="singleWarehouseData.site_map_preview || ''"
-											alt="site_map_preview" 
-										>
+							<div class="tab-content tabs card-block">
+								<div class="tab-pane active" id="profile" role="tabpanel">	
+						    		<div class="form-group form-row text-center">
+										<div class="col-md-12 text-center">
+											<img class="img-fluid" 
+												:src="singleWarehouseData.site_map_preview || ''"
+												alt="site_map_preview" 
+											>
+										</div>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.name }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Code :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.code }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.user_name }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.email }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.mobile }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Location :</label>
+										<label class="col-sm-6 col-form-label"></label>
 									</div>
 								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.name }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Code :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.code }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.user_name }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.email }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.mobile }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Location :</label>
-									<label class="col-sm-6 col-form-label"></label>
-								</div>
-							</div>
 
-							<div class="tab-pane" id="owner" role="tabpanel" v-if="singleWarehouseData.owner">
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Owner name :</label>
-									<label class="col-sm-6 col-form-label">{{ getOwnerFullName(singleWarehouseData.owner) }}</label>
+								<div class="tab-pane" id="owner" role="tabpanel" v-if="singleWarehouseData.owner">
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Owner name :</label>
+										<label class="col-sm-6 col-form-label">{{ getOwnerFullName(singleWarehouseData.owner) }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.user_name }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.email }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.mobile }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Deal Details :</label>
+										<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.warehouse_deal"></label>
+									</div>
 								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.user_name }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.email }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.mobile }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Deal Details :</label>
-									<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.warehouse_deal"></label>
-								</div>
-							</div>
 
-							<div class="tab-pane" id="features" role="tabpanel">	
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Warehouse Features:</label>
-									<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.feature.features"></label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Warehouse Previews:
-									</label>
-						    		<div class="col-sm-6">
-										<div class="form-row" v-show="singleWarehouseData.previews.length">
-											<div 
-												class="form-group col-sm-6" 
-												v-for="(warehousePreview, index) in singleWarehouseData.previews" 
-												:key="'A' + index + warehousePreview.id"
-											>
-												<img class="img-fluid" 
-													:src="warehousePreview.preview || ''"
-													alt="warehouse preview" 
+								<div class="tab-pane" id="features" role="tabpanel">	
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Warehouse Features:</label>
+										<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.feature.features"></label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Warehouse Previews:
+										</label>
+							    		<div class="col-sm-6">
+											<div class="form-row" v-show="singleWarehouseData.previews.length">
+												<div 
+													class="form-group col-sm-6" 
+													v-for="(warehousePreview, index) in singleWarehouseData.previews" 
+													:key="'A' + index + warehousePreview.id"
 												>
+													<img class="img-fluid" 
+														:src="warehousePreview.preview || ''"
+														alt="warehouse preview" 
+													>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							
-							<div class="tab-pane" id="storage-details" role="tabpanel">
-								<div v-if="singleWarehouseData.storages.length">
-									<div 
-										class="card" 
-										v-for="(warehouseStorageType, index) in singleWarehouseData.storages" 
-								    	:key="'B' + index + warehouseStorageType.id"
-									>
-								    	<div class="card-body">
+								
+								<div class="tab-pane" id="storage-details" role="tabpanel">
+									<div v-if="singleWarehouseData.storages.length">
+										<div 
+											class="card" 
+											v-for="(warehouseStorageType, index) in singleWarehouseData.storages" 
+									    	:key="'B' + index + warehouseStorageType.id"
+										>
+									    	<div class="card-body">
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Storage Name:
-												</label>
-												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Storage Name:
+													</label>
+													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Code:</label>
-												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.code"></label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Code:</label>
+													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.code"></label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Features:</label>
-												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.feature.features"></label>
-											</div>
-											
-								    		<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Storage Previews:
-												</label>
-									    		<div class="col-sm-6">
-													<div class="form-row" v-show="warehouseStorageType.previews.length">
-														<div 
-															class="form-group col-sm-6" 
-															v-for="(storagePreview, index) in warehouseStorageType.previews" 
-															:key="'C' + index + storagePreview.id"
-														>
-															<img class="img-fluid" 
-																:src="storagePreview.preview || ''"
-																alt="storage preview" 
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Features:</label>
+													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.feature.features"></label>
+												</div>
+												
+									    		<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Storage Previews:
+													</label>
+										    		<div class="col-sm-6">
+														<div class="form-row" v-show="warehouseStorageType.previews.length">
+															<div 
+																class="form-group col-sm-6" 
+																v-for="(storagePreview, index) in warehouseStorageType.previews" 
+																:key="'C' + index + storagePreview.id"
 															>
+																<img class="img-fluid" 
+																	:src="storagePreview.preview || ''"
+																	alt="storage preview" 
+																>
+															</div>
 														</div>
 													</div>
 												</div>
-											</div>
 
-								    	</div>
-								    </div>
+									    	</div>
+									    </div>
+									</div>
 								</div>
-							</div>
 
-							<div class="tab-pane" id="container-details" role="tabpanel">
-								<div v-if="singleWarehouseData.containers.length">
-									<div 
-										class="card" 
-										v-for="(warehouseContainer, index) in singleWarehouseData.containers" 
-								    	:key="'C' + index + warehouseContainer.id"
-									>
-								    	<div class="card-body">
+								<div class="tab-pane" id="container-details" role="tabpanel">
+									<div v-if="singleWarehouseData.containers.length">
+										<div 
+											class="card" 
+											v-for="(warehouseContainer, containerIndex) in singleWarehouseData.containers" 
+									    	:key="'warehouse-container-' + containerIndex + warehouseContainer.id"
+										>
+									    	<div class="card-body">
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Container Type:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.container.name }}
-												</label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Container Type:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.container.name }}
+													</label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Total Quantity:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.quantity }}
-												</label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Total Quantity:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.quantity }}
+													</label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Completely Engaged:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.engaged_quantity }}
-												</label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Completely Engaged:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.engaged_quantity }}
+													</label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Partially Engaged:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.partially_engaged }}
-												</label>
-											</div>
-											
-								    		<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Rents:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.rents }}
-												</label>
-									    		
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Partially Engaged:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.partially_engaged }}
+													</label>
+												</div>
+												
+									    		<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Rents:
+													</label>
+													<div class="col-sm-6 ">
+														<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
+															<li 
+																class="nav-item"
+																v-for="(rentPeriod, rentIndex) in allRentPeriods" 
+																:key="'l-rent-period-id-' + rentPeriod.id + 'rent-period-name-' + rentPeriod.name" 
+															>
+																<a 
+																	class="nav-link" 
+																	data-toggle="tab" 
+																	:href="'#rent-period-name-' + rentPeriod.name + '-container-index-' + containerIndex" 
+																	role="tab" 
+																	aria-selected="false" 
+																	:class="{'active': rentIndex === 0}"
+																>
+																	{{ rentPeriod.name | capitalize }}
+																</a>
+															</li>
+														</ul>
 
-								    	</div>
-								    </div>
+														<div class="tab-content tabs card-block">
+															<div 
+																class="tab-pane" 
+																:id="'rent-period-name-' + rentPeriod.name + '-container-index-' + containerIndex" 
+																role="tabpanel" 
+																v-for="(rentPeriod, rentIndex) in allRentPeriods" 
+																:key="'d-rent-period-id' + rentPeriod.id + 'rent-period-name-' + rentPeriod.name" 
+																:class="{'active': rentIndex === 0}"
+															>
+																<div class="d-flex">
+														    		<!-- container -->
+													    			<div class="mr-1 p-2 border w-100">
+													    				<div class="form-row">
+													    					<div class="sub-title">Container</div>
+													    				</div>
+															    		<div class="form-row">
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Storing Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['container_storing_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Selling Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['container_selling_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    		</div>
+													    			</div>
+													    			<!-- shelf -->
+													    			<div 
+													    				class="mr-1 p-2 border w-100" 
+													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve"
+													    			>
+															    		<div class="form-row">
+													    					<div class="sub-title">Shelf</div>
+													    				</div>
+
+															    		<div class="form-row">
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Storing Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_storing_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Selling Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_selling_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    		</div>
+													    			</div>
+													    			<!-- unit -->
+													    			<div 
+													    				class="mr-1 p-2 border w-100" 
+													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
+													    			>
+															    		<div class="form-row">
+													    					<div class="sub-title">Unit</div>
+													    				</div>
+
+															    		<div class="form-row">
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Storing Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['unit_storing_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Selling Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['unit_selling_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    		</div>
+													    			</div>
+													    		</div>
+															</div>
+														</div>
+													</div>
+												</div>
+
+									    	</div>
+									    </div>
+									</div>
 								</div>
 							</div>
 						</div>
+					</div>
 
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -2046,8 +2142,8 @@
 						if (!this.singleWarehouseData.code) {
 							this.errors.warehouse.code = 'Code is required';
 						}
-						else if (!this.singleWarehouseData.code.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.warehouse.code = 'No special character';
+						else if (!this.singleWarehouseData.code.match(/^[-\w\.\@]{3,}$/g)) {
+							this.errors.warehouse.code = 'No space or special character';
 						}
 						else{
 							this.submitForm = true;
