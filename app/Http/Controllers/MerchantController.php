@@ -48,10 +48,10 @@ class MerchantController extends Controller
 
         $newUser = new Merchant();
 
-        $newUser->first_name = $request->first_name;
-        $newUser->last_name = $request->last_name;
-        $newUser->user_name = $request->user_name;
-        $newUser->email = $request->email;
+        $newUser->first_name = strtolower($request->first_name);
+        $newUser->last_name = strtolower($request->last_name);
+        $newUser->user_name = strtolower($request->user_name);
+        $newUser->email = strtolower($request->email);
         $newUser->mobile = $request->mobile;
         $newUser->password = Hash::make($request->password);
         $newUser->active = $request->active;
@@ -80,10 +80,10 @@ class MerchantController extends Controller
             'active' => 'required|boolean',
         ]);
 
-        $userToUpdate->first_name = $request->first_name;
-        $userToUpdate->last_name = $request->last_name;
-        $userToUpdate->user_name = $request->user_name;
-        $userToUpdate->email = $request->email;
+        $userToUpdate->first_name = strtolower($request->first_name);
+        $userToUpdate->last_name = strtolower($request->last_name);
+        $userToUpdate->user_name = strtolower($request->user_name);
+        $userToUpdate->email = strtolower($request->email);
         $userToUpdate->mobile = $request->mobile;
         $userToUpdate->profile_preview = $request->profile_preview['preview'] ?? NULL;
         $userToUpdate->active = $request->active;
@@ -251,8 +251,8 @@ class MerchantController extends Controller
 
         $newRequisition = new Requisition();
 
-        $newRequisition->subject = $request->subject;
-        $newRequisition->description = $request->description;
+        $newRequisition->subject = strtolower($request->subject);
+        $newRequisition->description = strtolower($request->description);
         $newRequisition->merchant_id = $currentMerchant->id;
 
         $newRequisition->save();

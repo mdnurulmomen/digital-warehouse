@@ -31,13 +31,13 @@ class AssetController extends Controller
     {
     	$request->validate([
             'name' => 'required|string|max:100|unique:storage_types,name',
-            'code' => 'required|string|max:100|unique:storage_types,code',
+            // 'code' => 'required|string|max:100|unique:storage_types,code',
         ]);
 
         $newAsset = new StorageType();
 
-        $newAsset->name = $request->name;
-        $newAsset->code = $request->code;
+        $newAsset->name = strtolower($request->name);
+        // $newAsset->code = strtolower($request->code);
 
         $newAsset->save();
 
@@ -50,11 +50,11 @@ class AssetController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:storage_types,name,'.$assetToUpdate->id,
-            'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
+            // 'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
         ]);
 
-        $assetToUpdate->name = $request->name;
-        $assetToUpdate->code = $request->code;
+        $assetToUpdate->name = strtolower($request->name);
+        // $assetToUpdate->code = strtolower($request->code);
 
         $assetToUpdate->save();
 
@@ -81,7 +81,7 @@ class AssetController extends Controller
 
     public function searchAllStorageTypes($search, $perPage)
     {
-        $columnsToSearch = ['name', 'code'];
+        $columnsToSearch = ['name'];
 
         $query = StorageType::withTrashed();
 
@@ -131,7 +131,7 @@ class AssetController extends Controller
 
         $newContainer = new Container();
 
-        $newContainer->name = $request->name;
+        $newContainer->name = strtolower($request->name);
         $newContainer->length = $request->length;
         $newContainer->width = $request->width;
         $newContainer->height = $request->height;
@@ -182,7 +182,7 @@ class AssetController extends Controller
         ]);
 
         $containerToUpdate->update([
-            'name' => $request->name,
+            'name' => strtolower($request->name),
             // 'storing_price' => $request->storing_price,
             // 'selling_price' => $request->selling_price,
             // 'length' => $request->length,
@@ -279,7 +279,7 @@ class AssetController extends Controller
 
         $newAsset = new RentPeriod();
 
-        $newAsset->name = $request->name;
+        $newAsset->name = strtolower($request->name);
         // $newAsset->code = $request->code;
 
         $newAsset->save();
@@ -296,7 +296,7 @@ class AssetController extends Controller
             // 'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
         ]);
 
-        $assetToUpdate->name = $request->name;
+        $assetToUpdate->name = strtolower($request->name);
         // $assetToUpdate->code = $request->code;
 
         $assetToUpdate->save();
@@ -364,7 +364,7 @@ class AssetController extends Controller
 
         $newAsset = new VariationType();
 
-        $newAsset->name = $request->name;
+        $newAsset->name = strtolower($request->name);
         // $newAsset->code = $request->code;
 
         $newAsset->save();
@@ -381,7 +381,7 @@ class AssetController extends Controller
             // 'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
         ]);
 
-        $assetToUpdate->name = $request->name;
+        $assetToUpdate->name = strtolower($request->name);
         // $assetToUpdate->code = $request->code;
 
         $assetToUpdate->save();
@@ -449,7 +449,7 @@ class AssetController extends Controller
 
         $newAsset = new Variation();
 
-        $newAsset->name = $request->name;
+        $newAsset->name = strtolower($request->name);
         $newAsset->variation_type_id = $request->variation_type_id;
 
         $newAsset->save();
@@ -466,7 +466,7 @@ class AssetController extends Controller
             'variation_type_id' => 'required|numeric|exists:variation_types,id',
         ]);
 
-        $assetToUpdate->name = $request->name;
+        $assetToUpdate->name = strtolower($request->name);
         $assetToUpdate->variation_type_id = $request->variation_type_id;
 
         $assetToUpdate->save();

@@ -26,10 +26,10 @@ class ProfileController extends Controller
             'mobile' => 'required|string|max:50|unique:admins,mobile,'.$admin->id,
         ]);
 
-		$admin->first_name = $request->first_name;
-		$admin->last_name = $request->last_name;
-		$admin->user_name = $request->user_name;
-		$admin->email = $request->email;
+		$admin->first_name = strtolower($request->first_name);
+		$admin->last_name = strtolower($request->last_name);
+		$admin->user_name = strtolower($request->user_name);
+		$admin->email = strtolower($request->email);
 		$admin->mobile = $request->mobile;
 		$admin->profile_preview = $request->profile_preview['preview'] ?? NULL;
 
@@ -77,10 +77,10 @@ class ProfileController extends Controller
             'mobile' => 'required|string|max:50|unique:merchants,mobile,'.$merchant->id,
         ]);
 
-		$merchant->first_name = $request->first_name;
-		$merchant->last_name = $request->last_name;
-		$merchant->user_name = $request->user_name;
-		$merchant->email = $request->email;
+		$merchant->first_name = strtolower($request->first_name);
+		$merchant->last_name = strtolower($request->last_name);
+		$merchant->user_name = strtolower($request->user_name);
+		$merchant->email = strtolower($request->email);
 		$merchant->mobile = $request->mobile;
 		$merchant->profile_preview = $request->profile_preview['preview'] ?? NULL;
 
@@ -128,10 +128,10 @@ class ProfileController extends Controller
             'mobile' => 'required|string|max:50|unique:warehouse_owners,mobile,'.$owner->id,
         ]);
 
-		$owner->first_name = $request->first_name;
-		$owner->last_name = $request->last_name;
-		$owner->user_name = $request->user_name;
-		$owner->email = $request->email;
+		$owner->first_name = strtolower($request->first_name);
+		$owner->last_name = strtolower($request->last_name);
+		$owner->user_name = strtolower($request->user_name);
+		$owner->email = strtolower($request->email);
 		$owner->mobile = $request->mobile;
 		$owner->profile_preview = $request->profile_preview['preview'] ?? NULL;
 
@@ -180,10 +180,10 @@ class ProfileController extends Controller
             'mobile' => 'required|string|max:50|unique:warehouses,mobile,'.$warehouse->id,
         ]);
 
-		$warehouse->name = $request->name;
-		$warehouse->code = $request->code;
-		$warehouse->user_name = $request->user_name;
-		$warehouse->email = $request->email;
+		$warehouse->name = strtolower($request->name);
+		$warehouse->code = strtolower($request->code);
+		$warehouse->user_name = strtolower($request->user_name);
+		$warehouse->email = strtolower($request->email);
 		$warehouse->mobile = $request->mobile;
 		$warehouse->map_preview = $request->site_map_preview ?? NULL;
 
@@ -220,7 +220,7 @@ class ProfileController extends Controller
 
         $warehouse->feature()->updateOrCreate(
             [ 'warehouse_id' => $warehouse->id ],
-            [ 'features' => $request->feature['features']]
+            [ 'features' => strtolower($request->feature['features'])]
         );
 
         if (count($request->previews)) {
@@ -315,10 +315,10 @@ class ProfileController extends Controller
             'mobile' => 'required|string|max:50|unique:managers,mobile,'.$manager->id,
         ]);
 
-		$manager->first_name = $request->first_name;
-		$manager->last_name = $request->last_name;
-		$manager->user_name = $request->user_name;
-		$manager->email = $request->email;
+		$manager->first_name = strtolower($request->first_name);
+		$manager->last_name = strtolower($request->last_name);
+		$manager->user_name = strtolower($request->user_name);
+		$manager->email = strtolower($request->email);
 		$manager->mobile = $request->mobile;
 		$manager->profile_preview = $request->profile_preview['preview'] ?? NULL;
 
