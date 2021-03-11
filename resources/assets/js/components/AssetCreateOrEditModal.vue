@@ -7,9 +7,11 @@
 				<div class="modal-header">
 					<h5 class="modal-title">
 						{{ createMode ? 'Create' : 'Edit' }} {{ callerPage | capitalize }}
+						<!-- 
 						<span v-show="!createMode">
 							({{ singleAssetData.code }})
 						</span>
+						 -->
 					</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
@@ -43,6 +45,7 @@
 						  		</div>
 							</div>
 						</div>
+						<!-- 
 						<div class="form-row">
 							<div class="form-group col-md-12">
 								<label for="inputUsername">Short Code (for recognizing)</label>
@@ -50,7 +53,6 @@
 									class="form-control" 
 									v-model="singleAssetData.code" 
 									placeholder="Code should be unique" 
-									required="true" 
 									:class="!errors.asset.code  ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('code')"
 								>
@@ -60,6 +62,7 @@
 						  		</div>
 							</div>
 						</div>
+						 -->
 
 					</div>
 					<div class="modal-footer flex-column">
@@ -73,7 +76,7 @@
 								Close
 							</button>
 							<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-								Save
+								{{ createMode ? 'Save' : 'Update' }}
 							</button>
 						</div>
 					</div>
@@ -127,8 +130,20 @@
 		filters: {
 			capitalize: function (value) {
 				if (!value) return ''
-				value = value.toString()
-				return value.charAt(0).toUpperCase() + value.slice(1)
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+					
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+					
+				}
+
+				return words.join(" ");
 			}
 		},
 
@@ -137,7 +152,7 @@
             verifyUserInput() {
 
 				this.validateFormInput('name');
-				this.validateFormInput('code');
+				// this.validateFormInput('code');
             	
             	if (Object.keys(this.errors.asset).length !== 0 && this.errors.asset.constructor === Object) {
 					this.submitForm = false;
@@ -167,7 +182,7 @@
 					case 'name' :
 
 						if (!this.singleAssetData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.asset.name = 'No special character';
+							this.errors.asset.name = 'No space or special character';
 						}
 						else{
 							this.submitForm = true;
@@ -176,12 +191,10 @@
 
 						break;
 
+					/*
 					case 'code' :
 
-						if (!this.singleAssetData.code) {
-							this.errors.asset.code = 'Code is required';
-						}
-						else if (!this.singleAssetData.code.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						if (this.singleAssetData.code && !this.singleAssetData.code.match(/^[-\w\.\@]{3,}$/g)) {
 							this.errors.asset.code = 'No special character';
 						}
 						else{
@@ -190,6 +203,7 @@
 						}
 
 						break;
+					*/
 
 				}
 	 

@@ -22,7 +22,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
@@ -35,7 +34,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
@@ -63,9 +61,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -294,7 +290,7 @@
 			deleteUser(singleOwnerDetails) {
 				
 				axios
-					.delete('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
+					.delete('/owners/' + singleOwnerDetails.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Owner has been deleted", "Success");
@@ -315,7 +311,7 @@
 			restoreUser(singleOwnerDetails) {
 				
 				axios
-					.patch('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
+					.patch('/owners/' + singleOwnerDetails.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Owner has been restored", "Success");

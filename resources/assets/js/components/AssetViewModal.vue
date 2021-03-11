@@ -27,7 +27,7 @@
 
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
@@ -64,8 +64,18 @@
 		filters: {
 			capitalize: function (value) {
 				if (!value) return ''
-				value = value.toString()
-				return value.charAt(0).toUpperCase() + value.slice(1)
+				
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+					
+					if (words[i]) {
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+					}
+
+				}
+
+				return words.join(" ");
 			}
 		},
 
@@ -73,11 +83,13 @@
 
 			getPropertyValue(property) {
 				if (property.match(/name/gi)) {
-					return this.assetToView.name;
+					return this.$options.filters.capitalize(this.assetToView.name);
 				}
+				/*
 				else if (property.match(/code/gi)) {
-					return this.assetToView.code;
+					return this.$options.filters.capitalize(this.assetToView.code);
 				}
+				*/
 			}
 
 		}

@@ -383,7 +383,7 @@
 									Close
 								</button>
 								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-									Save
+									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
 						</div>
@@ -417,7 +417,7 @@
 								<h4 class="card-title">Container</h4>
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.name }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.name | capitalize }}</label>
 								</div>
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
@@ -497,7 +497,10 @@
 								 -->
 							</div>
 						</div>
+					</div>
 
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -584,6 +587,26 @@
 
 			this.fetchAllContents();
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+				
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {

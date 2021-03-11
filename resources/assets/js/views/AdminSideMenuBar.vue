@@ -42,78 +42,6 @@
 							</li>
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['owners', 'warehouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
-									<span class="pcoded-micon">
-										<i class="feather icon-command"></i>
-									</span>
-									<span class="pcoded-mtext">Warehouse</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='owners' ? 'active' : ''">
-										<router-link :to="{ name: 'owners' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Owners</span>
-										</router-link>
-									</li>
-									<li :class="currentRouteName=='warehouses' ? 'active' : ''">
-										<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Warehouses</span>
-										</router-link>
-									</li>
-								</ul>
-							</li>
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['managers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
-									<span class="pcoded-micon">
-										<i class="fa fa-user"></i>
-									</span>
-									<span class="pcoded-mtext">Manager</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='managers' ? 'active' : ''">
-										<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Managers</span>
-										</router-link>
-									</li>
-									<li class="">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
-										</router-link>
-									</li>
-								</ul>
-							</li>
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['merchants'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
-									<span class="pcoded-micon">
-										<i class="fa fa-users"></i>
-									</span>
-									<span class="pcoded-mtext">Merchant</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='merchants' ? 'active' : ''">
-										<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Merchants</span>
-										</router-link>
-									</li>
-									<li class="">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
-										</router-link>
-									</li>
-								</ul>
-							</li>
-							<li 
-								class="pcoded-hasmenu" 
 								:class="['storage-types', 'containers', 'rent-periods', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -203,6 +131,78 @@
 												</router-link>
 											</li>
 										</ul>
+									</li>
+								</ul>
+							</li>
+							<li 
+								class="pcoded-hasmenu" 
+								:class="['owners', 'warehouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+							>
+								<a href="javascript:void(0)" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="feather icon-command"></i>
+									</span>
+									<span class="pcoded-mtext">Warehouse</span>
+									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
+								</a>
+								<ul class="pcoded-submenu">
+									<li :class="currentRouteName=='owners' ? 'active' : ''">
+										<router-link :to="{ name: 'owners' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Owners</span>
+										</router-link>
+									</li>
+									<li :class="currentRouteName=='warehouses' ? 'active' : ''">
+										<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Warehouses</span>
+										</router-link>
+									</li>
+								</ul>
+							</li>
+							<li 
+								class="pcoded-hasmenu" 
+								:class="['managers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+							>
+								<a href="javascript:void(0)" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="fa fa-user"></i>
+									</span>
+									<span class="pcoded-mtext">Manager</span>
+									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
+								</a>
+								<ul class="pcoded-submenu">
+									<li :class="currentRouteName=='managers' ? 'active' : ''">
+										<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Managers</span>
+										</router-link>
+									</li>
+									<li class="">
+										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Dashboard 2</span>
+										</router-link>
+									</li>
+								</ul>
+							</li>
+							<li 
+								class="pcoded-hasmenu" 
+								:class="['merchants'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+							>
+								<a href="javascript:void(0)" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="fa fa-users"></i>
+									</span>
+									<span class="pcoded-mtext">Merchant</span>
+									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
+								</a>
+								<ul class="pcoded-submenu">
+									<li :class="currentRouteName=='merchants' ? 'active' : ''">
+										<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Merchants</span>
+										</router-link>
+									</li>
+									<li class="">
+										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Dashboard 2</span>
+										</router-link>
 									</li>
 								</ul>
 							</li>

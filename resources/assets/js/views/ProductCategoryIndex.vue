@@ -26,7 +26,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
-											  		:caller-page="'product categories'" 
+											  		:caller-page="'product category'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -158,7 +158,7 @@
 									Close
 								</button>
 								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-									Save
+									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
 						</div>
@@ -226,7 +226,7 @@
 
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -459,8 +459,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New category has been created", "Success");
+
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -470,6 +472,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchProductAllCategories();
 					});
 
 			},
@@ -485,8 +490,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Category has been updated", "Success");
+
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -496,6 +503,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchProductAllCategories();
 					});
 
 			},
@@ -506,8 +516,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Category has been deleted", "Success");
+
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -517,6 +529,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchProductAllCategories();
 					});
 
 			},
@@ -527,8 +542,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Category has been restored", "Success");
+
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})
@@ -538,6 +555,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchProductAllCategories();
 					});
 
 			},

@@ -39,8 +39,20 @@
 		filters : {
 			capitalize: function (value) {
 				if (!value) return ''
-				value = value.toString()
-				return value.charAt(0).toUpperCase() + value.slice(1)
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
 			}
 		}
 

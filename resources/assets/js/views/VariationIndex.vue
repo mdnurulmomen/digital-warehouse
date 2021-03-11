@@ -22,7 +22,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		:query="query" 
@@ -35,7 +34,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['current', 'trashed']" 
@@ -45,6 +43,7 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
@@ -62,9 +61,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -110,7 +107,6 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
 							<div class="form-row">
 								<div class="form-group col-md-12">
 									<label for="inputFirstName">Name</label>
@@ -128,6 +124,7 @@
 							  		</div>
 								</div>
 							</div>
+							
 							<div class="form-row">
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Variation Type</label>
@@ -155,8 +152,8 @@
 							  		</div>
 								</div>
 							</div>
-
 						</div>
+
 						<div class="modal-footer flex-column">
 							<div class="col-sm-12 text-right" v-show="!submitForm">
 								<span class="text-danger small">
@@ -172,7 +169,6 @@
 								</button>
 							</div>
 						</div>
-
 					</form>
 				</div>
 			</div>
@@ -196,13 +192,13 @@
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
 
-	<!-- 
+		<!-- 
 		<asset-view-modal 
 			:caller-page="'variation'" 
 			:asset-to-view="singleAssetData" 
 			:properties-to-show="['name']"
 		></asset-view-modal>
- 	-->
+ 		-->
 
  		<!-- Modal -->
 		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -218,25 +214,25 @@
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Name</label>
+								<label class="font-weight-bold">Name: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.name }}
+								{{ singleAssetData.name | capitalize }}
 							</div>
 						</div>
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Type</label>
+								<label class="font-weight-bold">Variation Type: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.variation_type ? singleAssetData.variation_type.name : 'NA' }}
+								{{ singleAssetData.variation_type ? this.$options.filters.capitalize(singleAssetData.variation_type.name) : 'NA' }}
 							</div>
 						</div>
 
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -299,6 +295,26 @@
 			this.fetchAllContents();
 			this.fetchAllVariationTypes();
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 
 		watch: {
@@ -431,8 +447,8 @@
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
-				this.submitForm = true;
 				this.createMode = false;
+				this.submitForm = true;
 
 				this.errors = {
 					asset : {},
@@ -505,7 +521,7 @@
 			deleteAsset(singleAssetData) {
 				
 				axios
-					.delete('/variations/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.delete('/variations/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation has been deleted", "Success");
@@ -526,7 +542,7 @@
 			restoreAsset(singleAssetData) {
 				
 				axios
-					.patch('/variations/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.patch('/variations/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation has been restored", "Success");

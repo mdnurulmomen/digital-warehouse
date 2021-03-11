@@ -45,6 +45,154 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<div class="tab-content card-block">
+											  		<div class="table-responsive">
+														<table class="table table-striped table-bordered nowrap text-center">
+															<thead>
+																<tr>
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeNamesOrder"
+																		> 
+																			Name
+																			<span v-show="ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="!ascending && !descending">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+																	<th>
+																		Actions
+																	</th>
+																</tr>
+															</thead>
+															<tbody>
+
+																<tr 
+																	v-for="content in contentsToShow" 
+																	:key="'content-key-' + content.id" 
+																>
+																	<td>
+																		{{ content.name | capitalize }}
+																	</td>
+																	
+																	<td>
+																		<!-- 
+																		<button type="button" 
+																				class="btn btn-grd-info btn-icon"  
+																				@click="$emit('showContentDetails', content)"
+																		>
+																			<i class="fas fa-eye"></i>
+																		</button>
+ 																		-->
+
+																		<button type="button" 
+																				class="btn btn-grd-primary btn-icon" 
+																				v-show="!content.deleted_at" 
+																				@click="openContentEditForm(content)"
+																		>
+																			<i class="fas fa-edit"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-danger btn-icon" 
+																				v-show="!content.deleted_at" 
+																				@click="openContentDeleteForm(content)"
+																		>
+																			<i class="fas fa-trash"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-warning btn-icon" 
+																				v-show="content.deleted_at" 
+																				@click="openContentRestoreForm(content)"
+																		>
+																			<i class="fas fa-undo"></i>
+																		</button>
+																	</td>
+															    
+																</tr>
+																<tr 
+															  		v-show="!contentsToShow.length"
+															  	>
+														    		<td :colspan="2">
+															      		<div class="alert alert-danger" role="alert">
+															      			Sorry, No data found.
+															      		</div>
+															    	</td>
+															  	</tr>
+
+															</tbody>
+															<tfoot>
+																<tr>	
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeNamesOrder"
+																		> 
+																			Name
+																			<span v-show="ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="!ascending && !descending">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+																	<th>
+																		Actions
+																	</th>
+																</tr>
+															</tfoot>
+														</table>
+													</div>
+
+													<div class="row d-flex align-items-center align-content-center">
+														<div class="col-sm-2">
+															<select 
+																class="form-control" 
+																v-model.number="perPage" 
+																@change="changeNumberContents()"
+															>
+																<option>10</option>
+																<option>20</option>
+																<option>30</option>
+																<option>40</option>
+																<option>50</option>
+															</select>
+														</div>
+														<div class="col-sm-2">
+															<button 
+																type="button" 
+																class="btn btn-primary btn-sm" 
+																@click="query === '' ? fetchAllContents() : searchData()"
+															>
+																Reload
+																<i class="fas fa-sync"></i>
+															</button>
+														</div>
+														<div class="col-sm-8">
+															<pagination
+																v-if="pagination.last_page > 1"
+																:pagination="pagination"
+																:offset="5"
+																@paginate="query === '' ? fetchAllContents() : searchData()"
+															>
+															</pagination>
+														</div>
+													</div>
+										  		</div>
+
+										  		<!-- 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
@@ -62,7 +210,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-
+												-->
 											</div>
 
 										</div>
@@ -104,11 +252,13 @@
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
 
+		<!-- 
 		<asset-view-modal 
 			:caller-page="'variation type'" 
 			:asset-to-view="singleAssetData" 
 			:properties-to-show="['name']"
 		></asset-view-modal>
+ 		-->
 
 	</div>
 
@@ -134,6 +284,9 @@
 	        	loading : false,
 	        	currentTab : 'current',
 
+	        	ascending : false,
+	      		descending : false,
+
 	        	createMode : true,
 
 	        	allFetchedContents : [],
@@ -155,6 +308,26 @@
 
 			this.fetchAllContents();
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {
@@ -268,7 +441,7 @@
 			updateAsset(singleAssetData) {
 				
 				axios
-					.put('/variation-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.put('/variation-types/' + this.singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation type has been updated", "Success");
@@ -289,7 +462,7 @@
 			deleteAsset(singleAssetData) {
 				
 				axios
-					.delete('/variation-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.delete('/variation-types/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation type has been deleted", "Success");
@@ -310,7 +483,7 @@
 			restoreAsset(singleAssetData) {
 				
 				axios
-					.patch('/variation-types/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.patch('/variation-types/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation type has been restored", "Success");
@@ -328,9 +501,9 @@
 					});
 
 			},
-            changeNumberContents(expectedContentsPerPage) {
+            changeNumberContents() {
 				this.pagination.current_page = 1;
-				this.perPage = expectedContentsPerPage;
+				// this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
 					this.fetchAllContents();
@@ -358,6 +531,56 @@
 			showTrashedContents() {
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
+			},
+			changeNamesOrder() {
+
+				if (this.ascending) {
+
+					this.ascending = false;
+					this.descending = true;
+
+					this.descendingAlphabets('name');
+
+				}
+				else if (this.descending) {
+
+					this.ascending = true;
+					this.descending = false;
+
+					this.ascendingAlphabets('name');
+
+				}
+				else {
+
+					this.ascending = true;
+					this.descending = false;
+
+					this.ascendingAlphabets('name');
+
+				}
+				
+			},
+			ascendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x < y) {return -1;}
+						if (x > y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			descendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x > y) {return -1;}
+						if (x < y) {return 1;}
+						return 0;
+					}
+				);
 			},
             
 		}
