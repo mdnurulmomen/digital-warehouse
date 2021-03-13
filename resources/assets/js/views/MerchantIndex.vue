@@ -108,7 +108,7 @@
 		<user-profile-view-modal 
 			:user="'merchant'" 
 			:profile-to-view="singleUserDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
 		></user-profile-view-modal>
 
 	</div>

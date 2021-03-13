@@ -952,6 +952,16 @@
 											  	</transition-group>	
 		                              		</div>
 
+		                              		<div class="col-sm-12 form-group text-center">
+		                              			<div 
+				                                	class="invalid-feedback" 
+				                                	style="display: block;" 
+				                                	v-show="errors.warehouse.container"
+			                                	>
+											    	{{ errors.warehouse.container }}
+											    </div>
+		                              		</div>
+
 		                              		<div class="col-md-12 form-group">
 											  	<div class="form-row">
 													<div class="form-group col-sm-6">
@@ -1099,6 +1109,16 @@
 									<div class="form-group form-row">
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
 										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.mobile }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Status :
+										</label>
+										<label class="col-sm-6 col-form-label">
+											<span :class="[singleWarehouseData.active ? 'badge-success' : 'badge-danger', 'badge']">
+												{{ singleWarehouseData.active ? 'Active' : 'Pending' }}
+											</span>
+										</label>
 									</div>
 									<div class="form-group form-row">
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">Location :</label>
@@ -1936,8 +1956,12 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New warehouse has been created", "Success");
+
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
+							this.formSubmitted = false;
+
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1980,8 +2004,12 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse has been updated", "Success");
+
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
+							this.formSubmitted = false;
+
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2001,8 +2029,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse has been deleted", "Success");
+
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -2022,8 +2052,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse has been restored", "Success");
+
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})
@@ -2381,35 +2413,46 @@
 
 					case 'container' :
 
-						for (let index = 0; index < this.singleWarehouseData.containers.length; index++) {
+						if (this.singleWarehouseData.containers.length==0) {
 							
-							if (Object.keys(this.singleWarehouseData.containers[index].container).length < 2) {
-								this.errors.warehouse.containers[index].container = 'Container type is required';
-							}
-							else if (this.singleWarehouseData.containers.filter(currentContainer=>currentContainer.container.id==this.singleWarehouseData.containers[index].container.id).length > 1) {
-
-								this.errors.warehouse.containers[index].container = 'Same Container type selected';
-
-							}
-							else{
-								this.submitForm = true;
-								this.$delete(this.errors.warehouse.containers[index], 'container');
-							}
+							this.errors.warehouse.container = 'Container is required';
 
 						}
+						else {
+
+							this.$delete(this.errors.warehouse, 'container');
+
+							for (let containerIndex = 0; containerIndex < this.singleWarehouseData.containers.length; containerIndex++) {
+								
+								if (Object.keys(this.singleWarehouseData.containers[containerIndex].container).length < 2) {
+									this.errors.warehouse.containers[containerIndex].container = 'Container type is required';
+								}
+								else if (this.singleWarehouseData.containers.filter(currentContainer=>currentContainer.container.id==this.singleWarehouseData.containers[containerIndex].container.id).length > 1) {
+
+									this.errors.warehouse.containers[containerIndex].container = 'Same Container type selected';
+
+								}
+								else{
+									this.submitForm = true;
+									this.$delete(this.errors.warehouse.containers[containerIndex], 'container');
+								}
+
+							}
+							
+						}						
 
 						break;
 
 					case 'container_quantity' :
 
-						for (let index = 0; index < this.singleWarehouseData.containers.length; index++) {
+						for (let containerIndex = 0; containerIndex < this.singleWarehouseData.containers.length; containerIndex++) {
 
-							if (!this.singleWarehouseData.containers[index].quantity || this.singleWarehouseData.containers[index].quantity < 1) {
-								this.errors.warehouse.containers[index].container_quantity = 'Container quantity is required';
+							if (!this.singleWarehouseData.containers[containerIndex].quantity || this.singleWarehouseData.containers[containerIndex].quantity < 1) {
+								this.errors.warehouse.containers[containerIndex].container_quantity = 'Container quantity is required';
 							}
 							else{
 								this.submitForm = true;
-								this.$delete(this.errors.warehouse.containers[index], 'container_quantity');
+								this.$delete(this.errors.warehouse.containers[containerIndex], 'container_quantity');
 							}
 
 						}
@@ -2419,15 +2462,15 @@
 					case 'container_price' :
 
 						this.singleWarehouseData.containers.forEach(
-							(container, index) => {
+							(container, containerIndex) => {
 
 								if (Object.keys(container.rents).length === 0) {
-									this.errors.warehouse.containers[index].container_price = 'One Price is required';
+									this.errors.warehouse.containers[containerIndex].container_price = 'One Price is required';
 								}
 
 								else {
 
-									this.$delete(this.errors.warehouse.containers[index], 'container_price');
+									this.$delete(this.errors.warehouse.containers[containerIndex], 'container_price');
 
 									this.allRentPeriods.forEach(
 										rentPeriod => {
@@ -2437,12 +2480,12 @@
 
 												if (container.rents['container_storing_price_' + rentPeriod.name]) {
 
-													this.errors.warehouse.containers[index]['container_selling_price_' + rentPeriod.name] = 'Both field to be filled';
+													this.errors.warehouse.containers[containerIndex]['container_selling_price_' + rentPeriod.name] = 'Both field to be filled';
 
 												}
 												else {
 
-													this.errors.warehouse.containers[index]['container_storing_price_' + rentPeriod.name] = 'Both field to be filled';
+													this.errors.warehouse.containers[containerIndex]['container_storing_price_' + rentPeriod.name] = 'Both field to be filled';
 
 												}
 
@@ -2451,8 +2494,8 @@
 											else {
 												this.submitForm = true;
 
-												this.$delete(this.errors.warehouse.containers[index], 'container_selling_price_'+ rentPeriod.name);
-												this.$delete(this.errors.warehouse.containers[index], 'container_storing_price_'+ rentPeriod.name);
+												this.$delete(this.errors.warehouse.containers[containerIndex], 'container_selling_price_'+ rentPeriod.name);
+												this.$delete(this.errors.warehouse.containers[containerIndex], 'container_storing_price_'+ rentPeriod.name);
 
 												// this.errors.warehouse.containers[index]['container_selling_price_' + rentPeriod.name] = null;
 												// this.errors.warehouse.containers[index]['container_storing_price_' + rentPeriod.name] = null;
@@ -2470,7 +2513,7 @@
 					case 'shelf_price' :
 
 						this.singleWarehouseData.containers.forEach(
-							(container, index) => {
+							(container, containerIndex) => {
 
 								this.allRentPeriods.forEach(
 									rentPeriod => {
@@ -2480,12 +2523,12 @@
 
 											if (container.rents['shelf_storing_price_' + rentPeriod.name]) {
 
-												this.errors.warehouse.containers[index]['shelf_selling_price_' + rentPeriod.name] = 'Both field to be filled';
+												this.errors.warehouse.containers[containerIndex]['shelf_selling_price_' + rentPeriod.name] = 'Both field to be filled';
 
 											}
 											else {
 
-												this.errors.warehouse.containers[index]['shelf_storing_price_' + rentPeriod.name] = 'Both field to be filled';
+												this.errors.warehouse.containers[containerIndex]['shelf_storing_price_' + rentPeriod.name] = 'Both field to be filled';
 
 											}
 
@@ -2494,8 +2537,8 @@
 										else {
 											this.submitForm = true;
 
-											this.$delete(this.errors.warehouse.containers[index], 'shelf_selling_price_'+ rentPeriod.name);
-											this.$delete(this.errors.warehouse.containers[index], 'shelf_storing_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[containerIndex], 'shelf_selling_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[containerIndex], 'shelf_storing_price_'+ rentPeriod.name);
 
 											// this.errors.warehouse.containers[index]['shelf_selling_price_' + rentPeriod.name] = null;
 											// this.errors.warehouse.containers[index]['shelf_storing_price_' + rentPeriod.name] = null;
@@ -2511,7 +2554,7 @@
 					case 'unit_price' :
 
 						this.singleWarehouseData.containers.forEach(
-							(container, index) => {
+							(container, containerIndex) => {
 
 								this.allRentPeriods.forEach(
 									rentPeriod => {
@@ -2521,12 +2564,12 @@
 
 											if (container.rents['unit_storing_price_' + rentPeriod.name]) {
 
-												this.errors.warehouse.containers[index]['unit_selling_price_' + rentPeriod.name] = 'Both field to be filled';
+												this.errors.warehouse.containers[containerIndex]['unit_selling_price_' + rentPeriod.name] = 'Both field to be filled';
 
 											}
 											else {
 
-												this.errors.warehouse.containers[index]['unit_storing_price_' + rentPeriod.name] = 'Both field to be filled';
+												this.errors.warehouse.containers[containerIndex]['unit_storing_price_' + rentPeriod.name] = 'Both field to be filled';
 
 											}
 
@@ -2534,8 +2577,8 @@
 										else {
 											this.submitForm = true;
 
-											this.$delete(this.errors.warehouse.containers[index], 'unit_selling_price_'+ rentPeriod.name);
-											this.$delete(this.errors.warehouse.containers[index], 'unit_storing_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[containerIndex], 'unit_selling_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[containerIndex], 'unit_storing_price_'+ rentPeriod.name);
 
 											// this.errors.warehouse.containers[index]['unit_selling_price_' + rentPeriod.name] = null;
 											// this.errors.warehouse.containers[index]['unit_storing_price_' + rentPeriod.name] = null;

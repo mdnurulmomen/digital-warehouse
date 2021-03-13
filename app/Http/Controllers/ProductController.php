@@ -124,7 +124,7 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0', // min 0 due to bulk products
             // 'initial_quantity' => 'required|numeric|min:1',
             // 'available_quantity' => 'required|numeric|min:0',
-            'quantity_type' => 'required|string|max:100',
+            'quantity_type' => 'nullable|string|max:100',
             'has_variations' => 'nullable|boolean',
             // 'variation_type_id' => 'required_if:has_variations,1',
             'variations' => 'required_if:has_variations,1|array',
@@ -148,7 +148,7 @@ class ProductController extends Controller
         $newProduct->price = $request->price ?? 0;
         // $newProduct->initial_quantity = $request->initial_quantity;
         // $newProduct->available_quantity = $request->initial_quantity;
-        $newProduct->quantity_type = $request->quantity_type;
+        $newProduct->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
         $newProduct->has_variations = $request->has_variations ?? false;
         $newProduct->product_category_id = $request->product_category_id;
         $newProduct->merchant_id = $request->merchant_id;
@@ -179,7 +179,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0', // min 0 due to bulk products
             // 'initial_quantity' => 'required|numeric|min:1',
             // 'available_quantity' => 'required|numeric|min:0',
-            'quantity_type' => 'required|string|max:100',
+            'quantity_type' => 'nullable|string|max:100',
             'has_variations' => 'nullable|boolean',
             // 'variation_type_id' => 'required_if:has_variations,1',
             'variations' => 'required_if:has_variations,1|array',
@@ -275,7 +275,7 @@ class ProductController extends Controller
         ]);
 
         $product = Product::find($request->product_id);
-        $lastAvailableQuantity = $product->stocks->first()->available_quantity ?? 0;
+        $lastAvailableQuantity = $product->latestStock->available_quantity ?? 0;
 
         $currentUser = \Auth::guard('admin')->user() ?? Auth::guard('manager')->user();
 

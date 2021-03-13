@@ -34,11 +34,11 @@
 												  		@fetchAllContents="fetchAllDispatches"
 												  	></search-and-addition-option>
 	 											-->
- 												<div class="row d-flex align-items-center">										  	
-											  		<div class="col-sm-3 text-left">	
+ 												<div class="row d-flex align-items-center text-center">										  	
+											  		<div class="col-sm-3 form-group">	
 															Dispatches List
 											  		</div>
-											  		<div class="col-sm-6 was-validated text-center">
+											  		<div class="col-sm-6 was-validated form-group">
 											  			<input 	type="text" 
 														  		v-model="query" 
 														  		pattern="[^'!#$%^()\x22]+" 
@@ -50,7 +50,7 @@
 													  	</div>
 											  		</div>
 										  			 
-											  		<div class="col-sm-3 text-right">
+											  		<div class="col-sm-3 form-group">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
 												  			@click="showDispatchCreateForm"
@@ -127,8 +127,8 @@
 															</table>
 														</div>
 													</div>
-													<div class="row d-flex align-items-center align-dispatch-center">
-														<div class="col-sm-2">
+													<div class="row d-flex align-items-center">
+														<div class="col-sm-2 col-4">
 															<select 
 																class="form-control" 
 																v-model.number="perPage" 
@@ -141,7 +141,7 @@
 																<option>50</option>
 															</select>
 														</div>
-														<div class="col-sm-2">
+														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
@@ -151,7 +151,7 @@
 																<i class="fas fa-sync"></i>
 															</button>
 														</div>
-														<div class="col-sm-8">
+														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"

@@ -17,7 +17,7 @@ class Product extends Model
 
     public function category()
     {
-    	return $this->belongsTo(ProductCategory::class, 'product_category_id', 'id');
+    	return $this->belongsTo(ProductCategory::class, 'product_category_id', 'id')->withTrashed();
     }
 
     public function merchant()
@@ -62,6 +62,11 @@ class Product extends Model
         }
 
         return false;
+    }
+
+    public function latestStock()
+    {
+        return $this->hasOne(ProductStock::class, 'product_id', 'id')->latest();
     }
 
     /*

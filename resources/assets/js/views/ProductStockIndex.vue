@@ -100,7 +100,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon"  
+																				class="btn btn-grd-danger btn-icon" 
+																				:disabled="formSubmitted"  
 																				@click="openStockDeleteForm(stock)"
 																			>
 																				<i class="fas fa-trash"></i>
@@ -131,7 +132,7 @@
 														</div>
 													</div>
 													<div class="row d-flex align-items-center align-content-center">
-														<div class="col-sm-2">
+														<div class="col-sm-2 col-4">
 															<select 
 																class="form-control" 
 																v-model.number="perPage" 
@@ -144,7 +145,7 @@
 																<option>50</option>
 															</select>
 														</div>
-														<div class="col-sm-2">
+														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
@@ -154,7 +155,7 @@
 																<i class="fas fa-sync"></i>
 															</button>
 														</div>
-														<div class="col-sm-8">
+														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
@@ -688,7 +689,11 @@
 												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+												<button 
+													type="submit" 
+													class="btn btn-primary float-right" 
+													:disabled="!submitForm || formSubmitted"
+												>
 													{{ createMode ? 'Stock' : 'Update' }}
 												</button>
 											</div>
@@ -1187,6 +1192,7 @@
 
 	        	createMode : true,
 	        	submitForm : true,
+	        	formSubmitted : false,
 
 	        	allStocks : [],
 
@@ -1385,6 +1391,7 @@
 				this.step = 1;
 				this.createMode = true;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 
 				// singleStockData configuration
 				this.singleStockData = {
@@ -1450,6 +1457,7 @@
 				this.step = 1;
 				this.createMode = false;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 				
 				this.singleStockData = JSON.parse(JSON.stringify(object));
 				this.singleStockData.product_id = this.product.id;
@@ -1497,6 +1505,8 @@
 					return;
 				}
 
+				this.formSubmitted = true;
+
 				axios
 					.post('/product-stocks/' + this.perPage, this.singleStockData)
 					.then(response => {
@@ -1514,6 +1524,7 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						this.fetchAllContainers();
 					});
 
@@ -1524,6 +1535,8 @@
 					this.submitForm = false;
 					return;
 				}
+
+				this.formSubmitted = true;
 
 				axios
 					.put('/product-stocks/' + this.singleStockData.id + '/' + this.perPage, this.singleStockData)
@@ -1542,18 +1555,20 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						this.fetchAllContainers();
 					});
 
 			},
 			deleteStock(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/product-stocks/' + this.singleStockData.id + '/' + this.perPage, this.singleStockData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been deleted", "Success");
-							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
 							$('#delete-confirmation-modal').modal('hide');
 						}
@@ -1564,6 +1579,10 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						this.fetchAllContainers();
 					});
 
 			},

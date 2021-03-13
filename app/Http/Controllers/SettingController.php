@@ -64,7 +64,7 @@ class SettingController extends Controller
             'default_length' => 'required|numeric|min:0',
             'default_width' => 'required|numeric|min:0',
             'default_height' => 'required|numeric|min:0',
-            'default_measure_unit_id' => 'string|max:100',
+            'default_measure_unit' => 'string|max:100',
         ]);
 
         $adminSettings = ApplicationSetting::firstOrCreate([]);
@@ -74,7 +74,7 @@ class SettingController extends Controller
         $adminSettings->default_length = $request->default_length;
         $adminSettings->default_width = $request->default_width;
         $adminSettings->default_height = $request->default_height;
-        $adminSettings->default_measure_unit_id = $request->default_measure_unit_id;
+        $adminSettings->default_measure_unit = $request->default_measure_unit;
 
         $adminSettings->save();
 

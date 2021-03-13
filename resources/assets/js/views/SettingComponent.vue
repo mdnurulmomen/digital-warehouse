@@ -509,14 +509,14 @@
 																	                  <input 
 																	                  	type="text" 
 																						class="form-control" 
-																						v-model="applicationSettings.default_measure_unit_id" 
+																						v-model="applicationSettings.default_measure_unit" 
 																						required="true"
 																						placeholder="Default Unit" 		
-																						:class="!errors.applicationSettings.default_measure_unit_id  ? 'is-valid' : 'is-invalid'"
-																						@keyup="validateFormInput('default_measure_unit_id')"
+																						:class="!errors.applicationSettings.default_measure_unit  ? 'is-valid' : 'is-invalid'"
+																						@keyup="validateFormInput('default_measure_unit')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_measure_unit_id }}
+																				        	{{ errors.applicationSettings.default_measure_unit }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -806,10 +806,10 @@
 				this.validateFormInput('default_length');
 				this.validateFormInput('default_width');
 				this.validateFormInput('default_height');
-				this.validateFormInput('default_measure_unit_id');
+				this.validateFormInput('default_measure_unit');
 
 
-				if (this.errors.applicationSettings.default_selling_price || this.errors.applicationSettings.default_storing_price || this.errors.applicationSettings.default_length || this.errors.applicationSettings.default_width || this.errors.applicationSettings.default_height || this.errors.applicationSettings.default_measure_unit_id) {
+				if (this.errors.applicationSettings.default_selling_price || this.errors.applicationSettings.default_storing_price || this.errors.applicationSettings.default_length || this.errors.applicationSettings.default_width || this.errors.applicationSettings.default_height || this.errors.applicationSettings.default_measure_unit) {
 
 					this.submitForm = false;
 					return false;
@@ -1118,14 +1118,14 @@
 
 						break;
 
-					case 'default_measure_unit_id' :
+					case 'default_measure_unit' :
 
-						if (!this.applicationSettings.default_measure_unit_id) {
-							this.errors.applicationSettings.default_measure_unit_id = 'Default unit is required';
+						if (!this.applicationSettings.default_measure_unit) {
+							this.errors.applicationSettings.default_measure_unit = 'Default unit is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_measure_unit_id');
+							this.$delete(this.errors.applicationSettings, 'default_measure_unit');
 						}
 
 						break;

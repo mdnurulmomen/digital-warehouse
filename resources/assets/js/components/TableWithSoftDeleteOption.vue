@@ -107,8 +107,8 @@
 			</table>
 		</div>
 		
-		<div class="row d-flex align-items-center align-content-center">
-			<div class="col-sm-2">
+		<div class="row d-flex align-items-center">
+			<div class="col-sm-2 col-4">
 				<select 
 					class="form-control" 
 					v-model.number="contentsPerPage" 
@@ -121,7 +121,7 @@
 					<option>50</option>
 				</select>
 			</div>
-			<div class="col-sm-2">
+			<div class="col-sm-2 col-8">
 				<button 
 					type="button" 
 					class="btn btn-primary btn-sm" 
@@ -131,7 +131,7 @@
 					<i class="fas fa-sync"></i>
 				</button>
 			</div>
-			<div class="col-sm-8">
+			<div class="col-sm-8 col-12 text-right form-group">
 				<pagination
 					v-if="pagination.last_page > 1"
 					:pagination="pagination"

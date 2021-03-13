@@ -364,7 +364,7 @@
 						if (!this.singleUserDetails.user_name) {
 							this.errors.user.user_name = 'Username is required';
 						}
-						else if (!this.singleUserDetails.user_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						else if (!this.singleUserDetails.user_name.match(/^[-\w\.\$@\*\!]{3,30}$/g)) {
 							this.errors.user.user_name = 'No special character';
 						}
 						else{

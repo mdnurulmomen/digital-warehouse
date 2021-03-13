@@ -49,8 +49,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'username', 'email', 'mobile', 'status']" 
-										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'status']" 
+										  			:column-names="['name', 'username', 'email', 'mobile']" 
+										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination"
 

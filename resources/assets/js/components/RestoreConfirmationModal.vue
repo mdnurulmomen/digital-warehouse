@@ -19,7 +19,7 @@
 						</button>
 					</div>
 					<div class="modal-body text-center">
-						<h4 class="text-warning">Want to restore {{ contentToRestore.user_name || contentToRestore.name }} ?</h4>
+						<h4 class="text-warning">Want to restore '{{ contentToRestore.user_name || contentToRestore.name | capitalize }}' ?</h4>
 						<h6 class="sub-heading text-secondary">{{ restorationMessage }}</h6>
 					</div>
 					<div class="modal-footer">
@@ -59,7 +59,29 @@
 				required : true
 			}
 
-		}
+		},
+
+		filters: {
+
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
+			
+		},
 
 	}
 

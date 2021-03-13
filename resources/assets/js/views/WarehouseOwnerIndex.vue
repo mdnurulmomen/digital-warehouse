@@ -104,7 +104,7 @@
 		<user-profile-view-modal 
 			:user="'owner'" 
 			:profile-to-view="singleOwnerDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'registered at']"
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
 		></user-profile-view-modal>
 
 	</div>

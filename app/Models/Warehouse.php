@@ -174,7 +174,7 @@ class Warehouse extends Authenticatable
     {
         if (count($storages)) {
             
-            $storages = json_decode(json_encode($storages));
+            // $storages = json_decode(json_encode($storages));
 
             $imagePath = 'uploads/warehouse/';
 
@@ -263,7 +263,7 @@ class Warehouse extends Authenticatable
             // deleting all containers of this warehouse initially
             $this->containers()->delete();
 
-            $inputedContainers = json_decode(json_encode($inputedContainers));
+            // $inputedContainers = json_decode(json_encode($inputedContainers));
             
             foreach ($inputedContainers as $inputedContainer) {
                 

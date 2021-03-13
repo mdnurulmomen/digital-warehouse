@@ -167,7 +167,8 @@ class MerchantController extends Controller
         }
 
         return ProductResource::collection(
-            Product::where(ProductStock::select('available_quantity')
+            Product::where('merchant_id', $currentMerchant->id)
+                ->where(ProductStock::select('available_quantity')
                 ->whereColumn('product_stocks.product_id', 'products.id')
                 ->latest()
                 ->take(1), '>', 0)

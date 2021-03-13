@@ -84,7 +84,7 @@ class ProductStock extends Model
                
                     if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
                         
-                        $variationLastAvailableValue = ProductVariation::find($stockVariation->id)->stocks->first()->available_quantity ?? 0;
+                        $variationLastAvailableValue = ProductVariation::find($stockVariation->id)->latestStock->available_quantity ?? 0;
 
                         $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,

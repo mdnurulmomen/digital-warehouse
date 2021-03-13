@@ -25,11 +25,11 @@
 
 											<div class="col-sm-12 sub-title">
 
- 												<div class="row d-flex align-items-center">										  	
-											  		<div class="col-sm-3 text-left">	
+ 												<div class="row d-flex align-items-center text-center">										  	
+											  		<div class="col-sm-3 form-group">	
 											  			Requisitions List
 											  		</div>
-											  		<div class="col-sm-9 was-validated text-center">
+											  		<div class="col-sm-9 was-validated form-group">
 											  			<input 	type="text" 
 														  		v-model="query" 
 														  		pattern="[^'!#$%^()\x22]+" 
@@ -71,7 +71,7 @@
 
 																	<tr v-for="content in requisitionsToShow" :key="'content-' + content.id"
 																	>
-																		<td>{{ content.subject }}</td>
+																		<td>{{ content.subject | capitalize }}</td>
 																		<td>
 																			<span :class="[content.status==1 ? 'badge-success' : content.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
 																				{{ content.status==1 ? 'Dispatched' : content.status==0 ? 'Pending' : 'Cancelled' }}
@@ -142,8 +142,8 @@
 															</table>
 														</div>
 													</div>
-													<div class="row d-flex align-items-center align-content-center">
-														<div class="col-sm-2">
+													<div class="row d-flex align-items-center">
+														<div class="col-sm-2 col-4">
 															<select 
 																class="form-control" 
 																v-model.number="perPage" 
@@ -156,7 +156,7 @@
 																<option>50</option>
 															</select>
 														</div>
-														<div class="col-sm-2">
+														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
@@ -166,7 +166,7 @@
 																<i class="fas fa-sync"></i>
 															</button>
 														</div>
-														<div class="col-sm-8">
+														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
@@ -213,9 +213,7 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
 							<transition-group name="fade">
-
 								<div 
 									class="row" 
 									v-bind:key="'requisition-modal-step-' + 1" 
@@ -284,7 +282,6 @@
 								          	</div>
 								    	</div>
 							        </div>
-
 							    </div>
 
 						        <div 
@@ -800,7 +797,7 @@
 
 									</div>
 
-									<div class="col-md-12">
+									<div class="col-md-12 card-footer">
 							        	<div class="form-row">
 											<div class="col-sm-12 text-right" v-show="!submitForm">
 												<span class="text-danger small mb-1">
@@ -812,7 +809,7 @@
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 							                  	<button type="button" class="btn btn-danger" @click="openContentDeleteForm(singleDispatchData.requisition)">
-													Cancel
+													Cancel Requisition
 												</button>
 												<button type="submit" class="btn btn-primary" :disabled="!submitForm">
 													Dispatch
@@ -820,11 +817,8 @@
 											</div>
 								    	</div>
 							        </div>
-
 						        </div>
-
 							</transition-group>
-
 						</div>
 
 					</form>
@@ -1258,6 +1252,26 @@
 				}
 			},
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {

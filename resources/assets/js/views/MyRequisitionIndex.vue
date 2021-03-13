@@ -62,7 +62,7 @@
 
 																	<tr v-for="content in requisitionsToShow" :key="'content-' + content.id"
 																	>
-																		<td>{{ content.subject }}</td>
+																		<td>{{ content.subject | capitalize }}</td>
 																		<td>
 																			<span :class="[content.status==1 ? 'badge-success' : content.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
 																				{{ content.status==1 ? 'Dispatched' : content.status==0 ? 'Pending' : 'Cancelled' }}
@@ -260,7 +260,7 @@
 										</div>
 							        </div>
 
-							        <div class="col-md-12">
+							        <div class="col-md-12 card-footer">
 								    	<div class="form-row">
 									    	<div class="col-sm-12 text-right">
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
@@ -424,7 +424,7 @@
 										</div>
 									</div>
 
-									<div class="col-md-12">
+									<div class="col-md-12 card-footer">
 							        	<div class="form-row">
 											<div class="col-sm-12 text-right">
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
@@ -559,7 +559,7 @@
 										</div>
 							        </div>
 
-							        <div class="col-md-12">
+							        <div class="col-md-12 card-footer">
 							        	<div class="form-row">
 											<div class="col-sm-12 text-right" v-show="!submitForm">
 												<span class="text-danger small mb-1">
@@ -930,6 +930,26 @@
 			this.fetchMerchantAllAgents();
 			this.fetchMerchantAllProducts();
 			
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {
@@ -1425,7 +1445,7 @@
 									this.errors.products[productIndex].product_quantity = 'Quantity is required';
 								}
 								else if (requiredProduct.total_quantity > (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity)) {
-									this.errors.products[productIndex].product_quantity = 'Quantity is more than available (max : ' + requiredProduct.product.available_quantity + ').';
+									this.errors.products[productIndex].product_quantity = 'Quantity is more than available (max : ' + (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity) + ').';
 								}
 								else{
 									// this.errors.products[productIndex].product_quantity = null;
@@ -1474,7 +1494,7 @@
 												}
 												else if (productVariation.required_quantity > 0 && (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity))) {
 
-													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available (max : ' + productVariation.available_quantity + ').';
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available (max : ' + (productVariation.available_quantity - productVariation.requested_quantity) + ').';
 
 												}
 												else {

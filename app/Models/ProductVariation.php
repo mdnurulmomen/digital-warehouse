@@ -36,6 +36,11 @@ class ProductVariation extends Model
         return false;
     }
 
+    public function latestStock()
+    {
+        return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
+    }
+
     public function nonDispatchedRequests()
     {
         return $this->requests()->whereHas('requiredProduct.requisition', function ($query) {

@@ -117,7 +117,6 @@
 				}
 
 			},
-
 			getReadableDate(timestamp) {
 				return new Date(timestamp).toDateString();
 			}

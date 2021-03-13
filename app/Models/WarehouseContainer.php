@@ -22,6 +22,11 @@ class WarehouseContainer extends Model
     	return $this->hasOneThrough(WarehouseContainerShelfUnit::class, WarehouseContainerShelf::class, 'warehouse_container_id', 'warehouse_container_shelf_id');
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
+
     public function container()
     {
         return $this->belongsTo(Container::class, 'container_id', 'id');
