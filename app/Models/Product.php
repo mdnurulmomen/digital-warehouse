@@ -99,7 +99,7 @@ class Product extends Model
 
             }
             
-            $variations = json_decode(json_encode($variations));
+            // $variations = json_decode(json_encode($variations));
 
             foreach ($variations as $variation) {
 

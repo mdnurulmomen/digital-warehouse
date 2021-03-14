@@ -25,9 +25,9 @@ class SettingController extends Controller
 
         $adminSettings = ApplicationSetting::firstOrCreate([]);
 
-    	$adminSettings->official_bank_name = $request->official_bank_name;
-    	$adminSettings->official_merchant_name = $request->official_merchant_name;
-    	$adminSettings->official_bank_account_name = $request->official_bank_account_name;
+    	$adminSettings->official_bank_name = strtolower($request->official_bank_name);
+    	$adminSettings->official_merchant_name = strtolower($request->official_merchant_name);
+    	$adminSettings->official_bank_account_name = strtolower($request->official_bank_account_name);
     	$adminSettings->official_bank_account_number = $request->official_bank_account_number;
     	$adminSettings->official_merchant_account_number = $request->official_merchant_account_number;
     	$adminSettings->vat_percentage = $request->vat_percentage;
@@ -48,8 +48,8 @@ class SettingController extends Controller
         $adminSettings = ApplicationSetting::firstOrCreate([]);
 
         $adminSettings->official_customer_care_number = $request->official_customer_care_number;
-        $adminSettings->official_mail_address = $request->official_mail_address;
-        $adminSettings->official_contact_address = $request->official_contact_address;
+        $adminSettings->official_mail_address = strtolower($request->official_mail_address);
+        $adminSettings->official_contact_address = strtolower($request->official_contact_address);
 
         $adminSettings->save();
 
@@ -74,7 +74,7 @@ class SettingController extends Controller
         $adminSettings->default_length = $request->default_length;
         $adminSettings->default_width = $request->default_width;
         $adminSettings->default_height = $request->default_height;
-        $adminSettings->default_measure_unit = $request->default_measure_unit;
+        $adminSettings->default_measure_unit = strtolower($request->default_measure_unit);
 
         $adminSettings->save();
 

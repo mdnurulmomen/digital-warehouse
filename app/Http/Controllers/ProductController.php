@@ -201,9 +201,9 @@ class ProductController extends Controller
         $productToUpdate->price = $request->price ?? 0;
         // $productToUpdate->initial_quantity = $request->initial_quantity;
         // $productToUpdate->available_quantity = $request->initial_quantity;
-        // $productToUpdate->quantity_type = $request->quantity_type;
+        $productToUpdate->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
         
-        if (!$productToUpdate->product_requisition) {
+        if (!$productToUpdate->product_immutability) {
             
             $productToUpdate->has_variations = $request->has_variations ?? false;
             
@@ -216,7 +216,7 @@ class ProductController extends Controller
 
         if ($productToUpdate->has_variations && !empty($request->variations)) {
 
-            $productToUpdate->product_variations = $request->variations;
+            $productToUpdate->product_variations = json_decode(json_encode($request->variations));
 
         }
 
