@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="productName + ' stocks'" 
-			:message="'All stocks for ' + productName"
+			:title="product.name + ' stocks'" 
+			:message="'All stocks for ' + product.name"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -198,7 +198,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create '+ productName +' Stock' : 'Update '+ productName +' Stock' }}
+							{{ createMode ? 'Create '+ product.name +' Stock' : 'Update '+ product.name +' Stock' }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -249,7 +249,7 @@
 												Name :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.name }}
+												{{ product.name | capitalize }}
 											</label>
 										</div>
 
@@ -905,7 +905,7 @@
 												Product Name :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.name }}
+												{{ product.name | capitalize }}
 											</label>
 										</div>
 										<div class="form-row">
@@ -996,7 +996,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ containerAddress.warehouse_container ? containerAddress.warehouse_container.container.name : 'NA' }}
+																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.container.name) : 'NA' }}
 																	</label>
 																</div>
 
@@ -1025,7 +1025,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ stockAddress.container.warehouse_container.container.name }}
+																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
@@ -1076,7 +1076,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ stockAddress.container.warehouse_container.container.name }}
+																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
@@ -1240,6 +1240,26 @@
 			this.fetchProductAllStocks();
 			this.manupulatePropData();
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods: {

@@ -775,6 +775,7 @@
 																		class="form-control" 
 																		v-model.number="singleWarehouseData.containers[containerIndex].quantity" 
 																		placeholder="Lenght of container" 
+																		:min="singleWarehouseData.containers[containerIndex].engaged_quantity + singleWarehouseData.containers[containerIndex].partially_engaged" 
 																		:class="!errors.warehouse.containers[containerIndex].container_quantity ? 'is-valid' : 'is-invalid'" 
 																		@blur="validateFormInput('container_quantity')" 
 																		required="true" 
@@ -1960,8 +1961,6 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							this.formSubmitted = false;
-
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1971,6 +1970,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -2008,8 +2010,6 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							this.formSubmitted = false;
-
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2019,6 +2019,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -2177,7 +2180,7 @@
 					this.step++;
 					this.submitForm = true;
 				}
-				else if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && this.step >= 4 && !this.errors.warehouse.storage_features.some(errorInArray) && !this.errors.warehouse.storage_types.some(errorInArray)) {
+				else if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && this.step < 5 && !this.errors.warehouse.storage_features.some(errorInArray) && !this.errors.warehouse.storage_types.some(errorInArray)) {
 					
 					this.step++;
 					this.submitForm = true;
@@ -2449,6 +2452,11 @@
 
 							if (!this.singleWarehouseData.containers[containerIndex].quantity || this.singleWarehouseData.containers[containerIndex].quantity < 1) {
 								this.errors.warehouse.containers[containerIndex].container_quantity = 'Container quantity is required';
+							}
+							else if (this.singleWarehouseData.containers[containerIndex].quantity < (this.singleWarehouseData.containers[containerIndex].engaged_quantity + this.singleWarehouseData.containers[containerIndex].partially_engaged)) {
+
+								this.errors.warehouse.containers[containerIndex].container_quantity = 'Less than minimum engaged quantity.(min: '+ (this.singleWarehouseData.containers[containerIndex].engaged_quantity + this.singleWarehouseData.containers[containerIndex].partially_engaged) +')';
+
 							}
 							else{
 								this.submitForm = true;

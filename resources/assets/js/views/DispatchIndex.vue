@@ -84,7 +84,7 @@
 																		:key="'dispatch-' + dispatchedReq.id"
 																	>
 																		<td>
-																			{{ dispatchedReq.subject }}
+																			{{ dispatchedReq.subject | capitalize }}
 																		</td>
 																		<td>
 																			{{ dispatchedReq.dispatch.released_at }}
@@ -1183,6 +1183,26 @@
 				}
 			},
 
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {

@@ -80,7 +80,7 @@
 
 																	<tr v-for="content in productsToShow" :key="'content-' + content.id"
 																	>
-																		<td>{{ content.name }}</td>
+																		<td>{{ content.name | capitalize }}</td>
 																		<td>{{ content.sku }}</td>
 																		
 																		<td>
@@ -956,7 +956,7 @@
 												Name :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.name }}
+												{{ singleProductData.name | capitalize }}
 											</label>
 										</div>
 
@@ -1115,7 +1115,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ containerAddress.warehouse_container ? containerAddress.warehouse_container.container.name : 'NA' }}
+																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.container.name) : 'NA' }}
 																	</label>
 																</div>
 
@@ -1144,7 +1144,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warehouse_container.container.name }}
+																		{{ productAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
@@ -1195,7 +1195,7 @@
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warehouse_container.container.name }}
+																		{{ productAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
@@ -1380,6 +1380,26 @@
 			// this.fetchAllContainers();
 			this.fetchAllVariationTypes();
 			this.fetchProductAllCategories();
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {
