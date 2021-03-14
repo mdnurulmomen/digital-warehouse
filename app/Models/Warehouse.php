@@ -297,21 +297,24 @@ class Warehouse extends Authenticatable
                     else if ($warehouseExistingContainer->quantity > $inputedContainer->quantity) {
                         
 
-                        $allRemoved = $this->removeExtraContainerProperties($warehouseExistingContainer, $inputedContainer);
+                        $removedContainerNumber = $this->removeExtraContainerProperties($warehouseExistingContainer, $inputedContainer);
 
 
                         if ($inputedContainer->quantity > 0) {
                             
-                            if ($allRemoved) {
-                                // update container quantity to warehouse containers
-                                $this->updateContainerQuantityStatus($warehouseExistingContainer, $inputedContainer);
+                            if ($removedContainerNumber!=($warehouseExistingContainer->quantity - $inputedContainer->quantity)) {
+                            
+                                $inputedContainer->quantity = ($warehouseExistingContainer->quantity - $removedContainerNumber);
+                            
                             }
 
+                            // update container quantity to warehouse containers
+                            $this->updateContainerQuantityStatus($warehouseExistingContainer, $inputedContainer);
                             // updating old rents
                             $this->createContainerUpdatedRents($warehouseExistingContainer, $inputedContainer);
                         
                         }
-                        else if ($allRemoved && $inputedContainer->quantity==0) {
+                        else if ($removedContainerNumber && $inputedContainer->quantity==0) {
                                
                             $warehouseExistingContainer->unit()->rents()->delete();
                             $warehouseExistingContainer->shelf()->rents()->delete();
@@ -536,6 +539,7 @@ class Warehouse extends Authenticatable
         }
     }
 
+/*
     protected function removeExtraContainerProperties($warehouseContainer, $inputedContainer)
     {
         // descending
@@ -566,13 +570,44 @@ class Warehouse extends Authenticatable
 
         return false;
     }
+*/
+
+    protected function removeExtraContainerProperties($warehouseContainer, $inputedContainer)
+    {
+        $deletedContainers = 0;
+
+        // descending
+        for($i=$warehouseContainer->quantity; $i>$inputedContainer->quantity; $i--) {
+
+            // warehouse last container of required type
+            $warehouseLastContainer = $warehouseContainer->containerStatuses()->where('engaged', 0.0)->latest('id')->first();
+
+            // if completely vacant when 1 is full enaged and .5 is partially enganged
+            if ($warehouseLastContainer->engaged==0.0) {
+                
+                $deletedContainers++;
+
+                // deleting related units and shelves
+                $warehouseLastContainer->containerShelfUnitStatuses()->delete();
+                $warehouseLastContainer->containerShelfStatuses()->delete();
+                $warehouseLastContainer->delete();
+
+            }
+            else {
+                continue;
+            }
+
+        }
+
+        return $deletedContainers;
+    }
 
     public function removeDeletedContainers()
     {
         foreach ($this->containers()->onlyTrashed()->get() as $warehouseTrashedContainer) {
 
             // warehouse last container of required type
-            $warehouseEngagedContainer = $warehouseTrashedContainer->containerStatuses()->where('engaged', '!=', 0)->exists();
+            $warehouseEngagedContainer = $warehouseTrashedContainer->containerStatuses()->where('engaged', '>', 0)->exists();
 
             // if completely vacant when 1 is full enaged and .5 is partially enganged
             if ($warehouseEngagedContainer) {

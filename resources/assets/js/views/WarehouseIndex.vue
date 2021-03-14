@@ -979,7 +979,7 @@
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
 															@click="removeContainer" 
-															:disabled="singleWarehouseData.containers.length<=1"
+															:disabled="singleWarehouseData.containers.length<=1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged"
 														>
 															Remove Container
 														</button>	
@@ -2744,7 +2744,7 @@
 				this.singleWarehouseData.containers.push(warehouseNewContainer);
 			},
 			removeContainer() {
-				if (this.singleWarehouseData.containers.length > 1) {
+				if (this.singleWarehouseData.containers.length > 1 && !this.singleWarehouseData.containers[this.singleWarehouseData.containers.length-1].engaged_quantity && !this.singleWarehouseData.containers[this.singleWarehouseData.containers.length-1].partially_engaged) {
 					this.singleWarehouseData.containers.pop();
 					this.errors.warehouse.containers.pop();
 				}
