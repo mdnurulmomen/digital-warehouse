@@ -19,7 +19,7 @@ class RequiredProductVariationResource extends JsonResource
             'product_variation_id' => $this->product_variation_id,
             'variation_name' => $this->productVariation->variation->name,
             'quantity' => $this->quantity,
-            'available_quantity' => $this->productVariation->stocks->first()->available_quantity,
+            'available_quantity' => $this->productVariation->latestStock->available_quantity,
         ];
     }
 }

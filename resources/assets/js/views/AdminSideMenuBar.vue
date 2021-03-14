@@ -208,7 +208,7 @@
 							</li>
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['products', 'product-categories'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['products', 'product-categories', 'product-stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">

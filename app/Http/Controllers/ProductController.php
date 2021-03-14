@@ -282,11 +282,12 @@ class ProductController extends Controller
         $newStock = $product->stocks()->create([
             'stock_quantity' => $request->stock_quantity,
             'available_quantity' => $lastAvailableQuantity + $request->stock_quantity,
+            'has_variations' => $product->has_variations,
             'user_type' => class_basename($currentUser),
             'user_id' => $currentUser->id,
         ]);
 
-        if ($product->has_variations && !empty($request->variations)) {
+        if ($newStock->has_variations && !empty($request->variations)) {
             
             $newStock->stock_variations = json_decode(json_encode($request->variations));
 
@@ -340,9 +341,9 @@ class ProductController extends Controller
 
             }
 
-            if ($stockToUpdate->variations->count() && !empty($request->variations)) {
+            if ($stockToUpdate->has_variations && !empty($request->variations)) {
                 
-                $stockToUpdate->stock_Variations = json_decode(json_encode($request->variations));
+                $stockToUpdate->stock_variations = json_decode(json_encode($request->variations));
 
             }
 

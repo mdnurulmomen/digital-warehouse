@@ -23,7 +23,7 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'sku' => $this->sku,
             'price' => $this->price,
-            'available_quantity' => $this->stocks->first()->available_quantity ?? 0,
+            'available_quantity' => $this->latestStock->available_quantity ?? 0,
             'requested_quantity' => $this->nonDispatchedRequests->sum('quantity'),
             'quantity_type' => $this->quantity_type,
             'has_variations' => $this->has_variations,

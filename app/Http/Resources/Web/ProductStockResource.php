@@ -19,9 +19,9 @@ class ProductStockResource extends JsonResource
             // 'name' => $this->product->name,
             'stock_quantity' => $this->stock_quantity ?? 0,
             'available_quantity' => $this->available_quantity ?? 0,
+            'has_variations' => $this->has_variations,
             // 'quantity_type' => $this->product->quantity_type,
-            // 'has_variations' => $this->product->has_variations,
-            'variations' => $this->when($this->product->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('productVariation.variation'))),
+            'variations' => $this->when($this->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('productVariation.variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),
             'created_at' => $this->created_at->diffForHumans(),
         ];

@@ -1371,7 +1371,7 @@
 
 				}
 
-				if (this.product.has_variations && this.product.category && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+				if (this.product.category && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
 						
 					this.product.variations.forEach(
 						(productVariation, index) => {
@@ -1440,7 +1440,7 @@
 
 				}
 
-				if (this.product.hasOwnProperty('category') && this.product.has_variations && this.product.variations.length) {
+				if (this.product.category && this.product.has_variations && this.product.variations.length) {
 	
 					this.product.variations.forEach(
 						(productVariation, index) => {
@@ -1480,7 +1480,7 @@
 
 				}
 			
-				if (this.product.hasOwnProperty('category') && this.product.has_variations && this.product.variations.length) {
+				if (this.product.category && this.singleStockData.has_variations && this.singleStockData.variations.length) {
 						
 					this.product.variations.forEach(
 						(productVariation, index) => {

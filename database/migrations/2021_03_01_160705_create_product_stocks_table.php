@@ -18,6 +18,7 @@ class CreateProductStocksTable extends Migration
             // quantity including all variations
             $table->mediumInteger('stock_quantity')->default(0); 
             $table->mediumInteger('available_quantity')->default(0);
+            $table->boolean('has_variations')->default(false);
             // $table->unsignedMediumInteger('total_quantity')->default(0);
             $table->unsignedInteger('product_id');
             $table->string('user_type');
