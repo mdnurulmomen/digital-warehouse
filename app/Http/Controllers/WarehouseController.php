@@ -209,7 +209,7 @@ class WarehouseController extends Controller
 
         if (count($request->previews)) {
             
-            $newWarehouse->warehouse_previews = $request->previews;
+            $newWarehouse->warehouse_previews = json_decode(json_encode($request->previews));
 
         }
 
@@ -290,7 +290,7 @@ class WarehouseController extends Controller
 
         if (count($request->previews)) {
             
-            $warehouseToUpdate->warehouse_previews = $request->previews;
+            $warehouseToUpdate->warehouse_previews = json_decode(json_encode($request->previews));
 
         }
 

@@ -111,9 +111,9 @@ class Warehouse extends Authenticatable
             }
 
             $img = Image::make($encodedImageFile);
-            $img->save($imagePath.$this->id.'-site-map.jpg');
+            $img->save($imagePath.'w-'.$this->id.'-site-map.jpg');
 
-            $this->attributes['site_map_preview'] = $imagePath.$this->id.'-site-map.jpg';
+            $this->attributes['site_map_preview'] = $imagePath.'w-'.$this->id.'-site-map.jpg';
 
         }
     }
@@ -135,10 +135,10 @@ class Warehouse extends Authenticatable
             }
 
             // storing previews to the directory
-            foreach ($encodedPreviews as $key => $warehousePreview) {
+            foreach ($encodedPreviews as $i => $warehousePreview) {
 
-                $img = Image::make($warehousePreview['preview']);
-                $img->save($imagePath.$this->id.'-preview-'.($key+1).'.jpg');
+                $img = Image::make($warehousePreview->preview);
+                $img->save($imagePath.'w-'.$this->id.'-preview-'.($i+1).'.jpg');
 
             }
 
@@ -160,7 +160,7 @@ class Warehouse extends Authenticatable
                 for ($i = $this->previews->count(); $i < count($encodedPreviews); $i++) { 
                     
                     $this->previews()->create([
-                        'preview' => $imagePath.$this->id.'-preview-'.($i+1).'.jpg',
+                        'preview' => $imagePath.'w-'.$this->id.'-preview-'.($i+1).'.jpg',
                     ]);
 
                 }
@@ -185,71 +185,57 @@ class Warehouse extends Authenticatable
             // deleting warehouse all storage-types initially
             $this->storages()->delete();
 
-            foreach ($storages as $key => $storage) {
+            // creating new storages
+            foreach ($storages as $newStorageIndex => $newStorage) {
+                
+                $warehouseNewStorageType = $this->storages()->updateOrCreate(
+                    ['storage_type_id' => $newStorage->storage_type->id, 'warehouse_id' => $this->id],
+                    ['deleted_at' => NULL]
+                );
 
-                // if given storage type was already deleted
-                if (empty($storage->deleted_at)) {
+                $warehouseStorageTypeNewFeature = $warehouseNewStorageType->feature()->updateOrCreate(
+                    ['warehouse_storage_type_id' => $warehouseNewStorageType->id],
+                    ['features' => $newStorage->feature->features]
+                );
+
+                // storing previews to the directory & database
+                foreach ($newStorage->previews as $newStoragePreviewIndex => $newStoragePreview) {
+
+                    $img = Image::make($newStoragePreview->preview);
+                    $img->save($imagePath.'w-'.$this->id.'-st-'.$newStorage->storage_type->id.'-preview-'.($newStoragePreviewIndex+1).'.jpg');
+
+                    $warehouseStorageNewPreview = $warehouseNewStorageType->previews()->firstOrCreate([
+                        'preview' => $imagePath.'w-'.$this->id.'-st-'.$newStorage->storage_type->id.'-preview-'.($newStoragePreviewIndex+1).'.jpg'
+                    ]);
+
+                }
+
+                if (count($newStorage->previews) < $warehouseNewStorageType->previews->count()) {
                     
-                    // storing previews to the directory
-                    foreach ($storage->previews as $index => $storagePreview) {
-
-                        $img = Image::make($storagePreview->preview);
-                        $img->save($imagePath.$this->id.'-'.$storage->storage_type->id.'-preview-'.($index+1).'.jpg');
-
-                    }
-
-                    $warehouseStorageType = $this->storages()->updateOrCreate(
-                        ['storage_type_id' => $storage->storage_type->id, 'warehouse_id' => $this->id],
-                        ['deleted_at' => NULL]
-                    );
-
-                    // if existing preview number of this warehouse-storage is greater than updated preview number 
-                    if ($warehouseStorageType->previews->count() > count($storage->previews)) {
+                    for ($i=count($newStorage->previews); $i<$warehouseNewStorageType->previews->count(); $i++) { 
                         
-                        // removing extra previews from directory & database
-                        for ($i = count($storage->previews); $i < $warehouseStorageType->previews->count(); $i++) { 
-                            
-                            $storageLastPreview = $warehouseStorageType->previews()->orderBy('id', 'desc')->first();
-                            File::delete($storageLastPreview->preview);         // deleting preview from directory
-                            $storageLastPreview->delete();                     // deleting preview from database
-
-                        }
-
-                    }else {
-
-                        // adding previews to the database
-                        for ($i = $warehouseStorageType->previews->count(); $i < count($storage->previews); $i++) { 
-                            
-                            // adding previews to the database
-                            $warehouseStorageType->previews()->create([
-                                'preview' => $imagePath.$this->id.'-'.$storage->storage_type->id.'-preview-'.($i+1).'.jpg', 
-                            ]);
-
-                        }
+                        // deleting preview from directory and database
+                        File::delete($warehouseNewStorageType->previews()->skip($i)->first()->preview);
+                        $warehouseNewStorageType->previews()->skip($i)->first()->delete();
 
                     }
-
-                    $warehouseStorageType->feature()->updateOrCreate(
-                        [ 'warehouse_storage_type_id'=> $warehouseStorageType->id ],
-                        [ 'features' => $storage->feature->features, ]
-                    );
 
                 }
 
             }
 
-            // as we initially deleted all related storage types, now deleting previews and feature of related storage type
-            foreach ($this->storages()->onlyTrashed()->get() as $key => $warehouseDeletedStorageType) {
+              // remove trashed warehouse-storages 
+            foreach ($this->storages()->onlyTrashed()->get() as $trashedStorageIndex => $warehouseTrashedStorageType) {
                 
-                // deleting preview from directory
-                foreach ($warehouseDeletedStorageType->previews as $warehouseDeletedStoragePreview) {
-                    File::delete($warehouseDeletedStoragePreview->preview);
+                foreach ($warehouseTrashedStorageType->previews as $storagePreviewIndex => $warehouseStoragePreview) {
+                    
+                    File::delete($warehouseStoragePreview->preview);
+                    $warehouseStoragePreview->delete();
+
                 }
 
-                // deleting from database
-                $warehouseDeletedStorageType->previews()->delete();
-                $warehouseDeletedStorageType->feature()->delete();
-                $warehouseDeletedStorageType->forceDelete();
+                $warehouseTrashedStorageType->feature()->delete();
+                $warehouseTrashedStorageType->forcedelete();
 
             }
 
@@ -298,23 +284,20 @@ class Warehouse extends Authenticatable
                         
 
                         $removedContainerNumber = $this->removeExtraContainerProperties($warehouseExistingContainer, $inputedContainer);
-
-
-                        if ($inputedContainer->quantity > 0) {
                             
-                            if ($removedContainerNumber!=($warehouseExistingContainer->quantity - $inputedContainer->quantity)) {
-                            
-                                $inputedContainer->quantity = ($warehouseExistingContainer->quantity - $removedContainerNumber);
-                            
-                            }
-
-                            // update container quantity to warehouse containers
-                            $this->updateContainerQuantityStatus($warehouseExistingContainer, $inputedContainer);
-                            // updating old rents
-                            $this->createContainerUpdatedRents($warehouseExistingContainer, $inputedContainer);
+                        if ($removedContainerNumber != ($warehouseExistingContainer->quantity - $inputedContainer->quantity)) {
+                        
+                            $inputedContainer->quantity = ($warehouseExistingContainer->quantity - $removedContainerNumber);
                         
                         }
-                        else if ($removedContainerNumber && $inputedContainer->quantity==0) {
+
+                        // update container quantity to warehouse containers
+                        $this->updateContainerQuantityStatus($warehouseExistingContainer, $inputedContainer);
+                        // updating old rents
+                        $this->createContainerUpdatedRents($warehouseExistingContainer, $inputedContainer);
+                    
+                    /*
+                        if ($removedContainerNumber==$warehouseExistingContainer->quantity && $inputedContainer->quantity==0) {
                                
                             $warehouseExistingContainer->unit()->rents()->delete();
                             $warehouseExistingContainer->shelf()->rents()->delete();
@@ -325,6 +308,7 @@ class Warehouse extends Authenticatable
                             $warehouseExistingContainer->forceDelete();
 
                         }
+                    */
 
                     }   
 
@@ -539,45 +523,12 @@ class Warehouse extends Authenticatable
         }
     }
 
-/*
-    protected function removeExtraContainerProperties($warehouseContainer, $inputedContainer)
-    {
-        // descending
-        for($i=$warehouseContainer->quantity; $i>$inputedContainer->quantity; $i--) {
-
-            // warehouse last container of required type
-            $warehouseLastContainer = $warehouseContainer->containerStatuses()->latest('id')->first();
-
-            // if completely vacant when 1 is full enaged and .5 is partially enganged
-            if ($warehouseLastContainer->engaged===0) {
-                
-                // deleting related units and shelves
-                $warehouseLastContainer->containerShelfUnitStatuses()->delete();
-                $warehouseLastContainer->containerShelfStatuses()->delete();
-                $warehouseLastContainer->delete();
-
-            }
-            else {
-                break;
-            }
-
-        }
-
-        // if loop was completed
-        if ($i===$inputedContainer->quantity) {
-           return true; 
-        }
-
-        return false;
-    }
-*/
-
     protected function removeExtraContainerProperties($warehouseContainer, $inputedContainer)
     {
         $deletedContainers = 0;
 
         // descending
-        for($i=$warehouseContainer->quantity; $i>$inputedContainer->quantity; $i--) {
+        for($i=$inputedContainer->quantity; $i<$warehouseContainer->quantity; $i++) {
 
             // warehouse last container of required type
             $warehouseLastContainer = $warehouseContainer->containerStatuses()->where('engaged', 0.0)->latest('id')->first();
@@ -593,16 +544,13 @@ class Warehouse extends Authenticatable
                 $warehouseLastContainer->delete();
 
             }
-            else {
-                continue;
-            }
 
         }
 
         return $deletedContainers;
     }
 
-    public function removeDeletedContainers()
+    protected function removeDeletedContainers()
     {
         foreach ($this->containers()->onlyTrashed()->get() as $warehouseTrashedContainer) {
 

@@ -57,7 +57,7 @@
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
-										  			@fetchAllWarehouses="fetchAllWarehouses" 
+										  			@fetchAllContents="fetchAllWarehouses" 
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
@@ -553,10 +553,11 @@
 							      
 						          	<div class="col-sm-12">
 						          		<div class="form-row">	
-		                              		<div class="col-md-12 form-group" v-if="singleWarehouseData.storages.length">
-
+		                              		<div 
+			                              		class="col-md-12 form-group" 
+			                              		v-if="singleWarehouseData.storages.length"
+		                              		>
 			                              		<transition-group name="new-storage">
-
 				                              		<div 
 				                              			class="card" 
 				                              			v-for="(warehouseStorageType, index) in singleWarehouseData.storages" 
@@ -661,9 +662,14 @@
 
 												    	</div>
 												  	</div>
-
 											  	</transition-group>
+		                              		</div>
 
+											<div class="col-sm-12 form-group text-center" v-else>
+												<span class="text-danger">No storages found yet</span>	
+											</div>
+											
+		                              		<div class="col-sm-12 form-group">
 											  	<div class="form-row">
 													<div class="form-group col-sm-6">
 														<button 
@@ -674,25 +680,24 @@
 															More Storage
 														</button>	
 													</div>
+
 													<div class="form-group col-sm-6">
 														<button 
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
 															@click="removeStorage" 
-															:disabled="singleWarehouseData.storages.length===1"
+															:disabled="singleWarehouseData.storages.length<=1"
 														>
 															Remove Storage
 														</button>	
 													</div>
 												</div>
-			                              		
 		                              		</div>
 			                            </div>   
 						          	</div>  
 							        
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
-
 					          				<div class="col-6">
 							                  	<button type="button" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
@@ -715,7 +720,6 @@
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
-
 						          		</div>
 						          	</div>
 								</div>
@@ -729,17 +733,17 @@
 							      
 						          	<div class="col-sm-12">
 						          		<div class="form-row">	
-		                              		<div class="col-md-12 form-group" v-if="singleWarehouseData.containers.length && singleWarehouseData.containers.length==errors.warehouse.containers.length">
-
+		                              		<div 
+		                              			class="col-md-12 form-group"
+	                              		 		v-if="singleWarehouseData.containers.length && singleWarehouseData.containers.length==errors.warehouse.containers.length"
+		                              		>
 			                              		<transition-group name="new-container">
-
 				                              		<div 
 				                              			class="card" 
 				                              			v-for="(warehouseContainer, containerIndex) in singleWarehouseData.containers" 
 				                              			:key="'F' + containerIndex + warehouseContainer.id"
 				                              		>
 												    	<div class="card-body">
-
 												    		<div class="form-row">
 												    			<div class="form-group col-sm-6">
 												    				<label>Container Type</label>
@@ -946,10 +950,8 @@
 												    		<div class="invalid-feedback text-center" style="display: block;" v-show="errors.warehouse.containers[containerIndex].container_price">
 												    			{{ errors.warehouse.containers[containerIndex].container_price }}
 												    		</div>
-
 												    	</div>
 												  	</div>
-
 											  	</transition-group>	
 		                              		</div>
 
@@ -1020,7 +1022,6 @@
 						          	</div>
 								</div>
 							</transition-group>
-
 						</form>
 						<!-- form end -->
 					</div>
@@ -1184,7 +1185,6 @@
 									    	:key="'B' + index + warehouseStorageType.id"
 										>
 									    	<div class="card-body">
-
 												<div class="form-group form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
 														Storage Name:
@@ -1200,7 +1200,9 @@
 												 -->
 
 												<div class="form-group form-row">
-													<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Features:</label>
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Storage Features:
+													</label>
 													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.feature.features"></label>
 												</div>
 												
@@ -1223,9 +1225,14 @@
 														</div>
 													</div>
 												</div>
-
 									    	</div>
 									    </div>
+									</div>
+
+									<div class="form-group form-row" v-else>
+										<label class="col-sm-12 col-form-label text-danger text-center">
+											No storage found
+										</label>
 									</div>
 								</div>
 
@@ -1237,13 +1244,12 @@
 									    	:key="'warehouse-container-' + containerIndex + warehouseContainer.id"
 										>
 									    	<div class="card-body">
-
 												<div class="form-group form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
 														Container Type:
 													</label>
 													<label class="col-sm-6 col-form-label">
-														{{ warehouseContainer.container.name }}
+														{{ warehouseContainer.container.name | capitalize }}
 													</label>
 												</div>
 
@@ -1278,7 +1284,7 @@
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
 														Rents:
 													</label>
-													<div class="col-sm-6 ">
+													<div class="col-sm-6">
 														<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
 															<li 
 																class="nav-item"
@@ -1381,9 +1387,14 @@
 														</div>
 													</div>
 												</div>
-
 									    	</div>
 									    </div>
+									</div>
+
+									<div class="form-group form-row" v-else>
+										<label class="col-sm-12 col-form-label text-danger text-center">
+											No container found
+										</label>
 									</div>
 								</div>
 							</div>
@@ -1545,8 +1556,20 @@
 		filters: {
 			capitalize: function (value) {
 				if (!value) return ''
-				value = value.toString()
-				return value.charAt(0).toUpperCase() + value.slice(1)
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
 			}
 		},
 
