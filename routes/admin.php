@@ -47,6 +47,15 @@ Route::name('admin.')->group(function () {
 		Route::patch('/owners/{owner}/{perPage}', 'WarehouseController@restoreOwner')->name('warehouse-owners');
 		Route::get('/api/search-owners/{search}/{perPage}', 'WarehouseController@searchAllOwners')->name('search-warehouse-owners');
 
+		Route::get('/api/warehouses/{perPage}', 'WarehouseController@showAllWarehouses')->name('warehouses');
+		Route::post('/warehouses/{perPage}', 'WarehouseController@storeNewWarehouse')->name('warehouses');	
+		Route::put('/warehouses/{warehouse}/{perPage}', 'WarehouseController@updateWarehouse')->name('warehouses');	
+		Route::delete('/warehouses/{warehouse}/{perPage}', 'WarehouseController@deleteWarehouse')->name('warehouses');	
+		Route::patch('/warehouses/{warehouse}/{perPage}', 'WarehouseController@restoreWarehouse')->name('warehouses');
+		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
+
+		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
+
 		Route::get('/api/managers/{perPage}', 'ManagerController@showAllManagers')->name('managers');
 		Route::post('/managers/{perPage}', 'ManagerController@storeNewManager')->name('managers');	
 		Route::put('/managers/{manager}/{perPage}', 'ManagerController@updateManager')->name('managers');	
@@ -74,13 +83,6 @@ Route::name('admin.')->group(function () {
 		Route::delete('/containers/{container}/{perPage}', 'AssetController@deleteContainer')->name('containers');	
 		Route::patch('/containers/{container}/{perPage}', 'AssetController@restoreContainer')->name('containers');
 		Route::get('/api/search-containers/{search}/{perPage}', 'AssetController@searchAllContainers')->name('search-containers');
-
-		Route::get('/api/warehouses/{perPage}', 'WarehouseController@showAllWarehouses')->name('warehouses');
-		Route::post('/warehouses/{perPage}', 'WarehouseController@storeNewWarehouse')->name('warehouses');	
-		Route::put('/warehouses/{warehouse}/{perPage}', 'WarehouseController@updateWarehouse')->name('warehouses');	
-		Route::delete('/warehouses/{warehouse}/{perPage}', 'WarehouseController@deleteWarehouse')->name('warehouses');	
-		Route::patch('/warehouses/{warehouse}/{perPage}', 'WarehouseController@restoreWarehouse')->name('warehouses');
-		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
 		Route::post('/rent-periods/{perPage}', 'AssetController@storeNewRentPeriod')->name('rent-periods');	
@@ -115,7 +117,12 @@ Route::name('admin.')->group(function () {
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');
 		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
 
-		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
+		Route::get('/api/product-stocks/{product}/{perPage?}', 'ProductController@showProductAllStocks')->name('product-stocks');
+		Route::post('/product-stocks/{perPage?}', 'ProductController@storeProductStock')->name('product-stocks');
+		Route::put('/product-stocks/{stock}/{perPage?}', 'ProductController@updateProductStock')->name('product-stocks');
+		Route::delete('/product-stocks/{stock}/{perPage?}', 'ProductController@deleteProductStock')->name('product-stocks');
+		Route::patch('/product-stocks/{stock}/{perPage?}', 'ProductController@restoreProductStock')->name('product-stocks');
+		Route::get('/api/search-product-stocks/{product}/{search}/{perPage?}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
 
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');
 		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions');
@@ -124,13 +131,6 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeNewDispatch')->name('dispatches');
 		Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
-
-		Route::get('/api/product-stocks/{product}/{perPage?}', 'ProductController@showProductAllStocks')->name('product-stocks');
-		Route::post('/product-stocks/{perPage?}', 'ProductController@storeProductStock')->name('product-stocks');
-		Route::put('/product-stocks/{stock}/{perPage?}', 'ProductController@updateProductStock')->name('product-stocks');
-		Route::delete('/product-stocks/{stock}/{perPage?}', 'ProductController@deleteProductStock')->name('product-stocks');
-		Route::patch('/product-stocks/{stock}/{perPage?}', 'ProductController@restoreProductStock')->name('product-stocks');
-		Route::get('/api/search-product-stocks/{product}/{search}/{perPage?}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 

@@ -14,7 +14,7 @@ class Permission extends Model
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'roles_permissions', 'permission_id', 'role_id');
+        return $this->belongsToMany(Role::class, 'role_has_permissions', 'permission_id', 'role_id');
     }
 
     /**
@@ -22,14 +22,7 @@ class Permission extends Model
      */
     public function managers()
     {
-        return $this->morphedByMany(Manager::class, 'user', 'users_permissions');
+        return $this->morphedByMany(Manager::class, 'model', 'model_has_permissions');
     }
 
-    /**
-     * Get all of the owners that are assigned this permission.
-     */
-    public function owners()
-    {
-        return $this->morphedByMany(WarehouseOwner::class, 'user', 'users_permissions');
-    }
 }

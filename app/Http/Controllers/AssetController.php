@@ -11,6 +11,29 @@ use App\Models\VariationType;
 
 class AssetController extends Controller
 {
+    public function __construct()
+    {
+        $currentGuard = 'merchant';
+
+        if (Auth::guard('admin')->check()) {
+            $currentGuard = 'admin';
+        }
+        else if (Auth::guard('manager')->check()) {
+            $currentGuard = 'manager';
+        }
+        else if (Auth::guard('warehouse')->check()) {
+            $currentGuard = 'warehouse';
+        }
+        else if (Auth::guard('owner')->check()) {
+            $currentGuard = 'owner';
+        }
+
+        $this->middleware("permission:$currentGuard,show-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods']);
+        $this->middleware("permission:$currentGuard,create-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod']);
+        $this->middleware("permission:$currentGuard,update-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod']);
+        $this->middleware("permission:$currentGuard,delete-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
+    }
+
     public function showAllStorageTypes($perPage=false)
     {
     	if ($perPage) {
