@@ -19,25 +19,10 @@ class MerchantController extends Controller
 {
     public function __construct()
     {
-        $currentGuard = 'merchant';
-
-        if (Auth::guard('admin')->check()) {
-            $currentGuard = 'admin';
-        }
-        else if (Auth::guard('manager')->check()) {
-            $currentGuard = 'manager';
-        }
-        else if (Auth::guard('warehouse')->check()) {
-            $currentGuard = 'warehouse';
-        }
-        else if (Auth::guard('owner')->check()) {
-            $currentGuard = 'owner';
-        }
-
-        $this->middleware("permission:$currentGuard,show-merchant-index")->only(['showAllMerchants', 'searchAllMerchants']);
-        $this->middleware("permission:$currentGuard,create-merchant")->only('storeNewMerchant');
-        $this->middleware("permission:$currentGuard,update-merchant")->only('updateMerchant');
-        $this->middleware("permission:$currentGuard,delete-merchant")->only(['deleteMerchant', 'restoreMerchant']);
+        $this->middleware("permission:view-merchant-index")->only(['showAllMerchants', 'searchAllMerchants']);
+        $this->middleware("permission:create-merchant")->only('storeNewMerchant');
+        $this->middleware("permission:update-merchant")->only('updateMerchant');
+        $this->middleware("permission:delete-merchant")->only(['deleteMerchant', 'restoreMerchant']);
     }
 
     public function showAllMerchants($perPage = false)

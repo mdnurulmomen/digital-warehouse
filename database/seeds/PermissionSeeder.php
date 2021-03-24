@@ -14,36 +14,77 @@ class PermissionSeeder extends Seeder
     {   
         if (Permission::all()->isEmpty()) {
             
-            $distinctModels = [
-            	'ApplicationSetting',
+            $modelsCRUDable = [
             	'Asset',
-            	'Dispatch',
             	'Manager',
             	'Merchant',
             	// 'MerchantDeal',
             	// 'PackagingPackage',
             	// 'DeliveryCompany',
-            	'Permission',
+            	'Product-Category',
             	'Product',
-            	'ProductCategory',
-            	'ProductStock',
-            	'Requisition',
+            	'Product-Stock',
             	'Role',
+            	'Warehouse-Owner',
             	'Warehouse',
             	// 'WarehouseDeliveryCompany'
             	// 'WarehouseManager'
-            	'WarehouseOwner',
-            	'WarehouseProduct',
+            	// 'WarehouseProduct',
             ];
 
-            foreach ($distinctModels as $distinctModel) {
+            $modelsViewableAndUpdatable = [
+                'Application-Setting',  // view / update
+                'Requisition', // view / update(cancel)
+            ];
+
+            $modelsViewableAndMakeable = [
+                'Dispatch',  // view / make
+            ];
+
+            $modelsViewable = [
+                'Permission',  // view
+            ];
+
+            foreach ($modelsCRUDable as $model) {
             	
             	Permission::insert([
                 
-                    [ 'name' => 'create-'.strtolower($distinctModel) ],
-                    [ 'name' => 'view-'.strtolower($distinctModel).'-index' ],
-                    [ 'name' => 'update-'.strtolower($distinctModel) ],
-                    [ 'name' => 'delete-'.strtolower($distinctModel) ]
+                    [ 'name' => 'create-'.strtolower($model) ],
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
+                    [ 'name' => 'update-'.strtolower($model) ],
+                    [ 'name' => 'delete-'.strtolower($model) ]
+
+                ]);
+
+            }
+
+            foreach ($modelsViewableAndUpdatable as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
+                    [ 'name' => 'update-'.strtolower($model) ],
+
+                ]);
+
+            }
+
+            foreach ($modelsViewableAndMakeable as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
+                    [ 'name' => 'make-'.strtolower($model) ],
+
+                ]);
+
+            }
+
+            foreach ($modelsViewable as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
 
                 ]);
 

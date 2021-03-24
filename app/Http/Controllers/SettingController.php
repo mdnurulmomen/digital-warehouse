@@ -7,6 +7,13 @@ use App\Models\ApplicationSetting;
 
 class SettingController extends Controller
 {
+    public function __construct()
+    {   
+        $this->middleware("permission:view-application-setting-index")->only('showApplicationSetting');
+        $this->middleware("permission:update-application-setting")->only(['updatePaymentSetting', 'updateContactSetting', 'updateWarehouseSetting', 'updateSystemSetting']);
+    }
+
+    // Application Setting
     public function showApplicationSetting()
     {
     	return response(ApplicationSetting::first(), 200);

@@ -8,32 +8,22 @@ use App\Models\RentPeriod;
 use App\Models\StorageType;
 use Illuminate\Http\Request;
 use App\Models\VariationType;
+use Illuminate\Support\Facades\Auth;
 
 class AssetController extends Controller
 {
     public function __construct()
     {
-        $currentGuard = 'merchant';
+        $this->middleware("permission:view-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods', 'showAllVariationTypes', 'searchVariationTypes', 'showAllVariations', 'searchAllVariations']);
 
-        if (Auth::guard('admin')->check()) {
-            $currentGuard = 'admin';
-        }
-        else if (Auth::guard('manager')->check()) {
-            $currentGuard = 'manager';
-        }
-        else if (Auth::guard('warehouse')->check()) {
-            $currentGuard = 'warehouse';
-        }
-        else if (Auth::guard('owner')->check()) {
-            $currentGuard = 'owner';
-        }
+        $this->middleware("permission:create-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod', 'storeVariationType', 'storeNewVariation']);
 
-        $this->middleware("permission:$currentGuard,show-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods']);
-        $this->middleware("permission:$currentGuard,create-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod']);
-        $this->middleware("permission:$currentGuard,update-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod']);
-        $this->middleware("permission:$currentGuard,delete-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
+        $this->middleware("permission:update-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod', 'updateVariationType', 'updateVariation']);
+        
+        $this->middleware("permission:delete-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod', 'deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation']);
     }
 
+    // storage types
     public function showAllStorageTypes($perPage=false)
     {
     	if ($perPage) {
@@ -529,6 +519,5 @@ class AssetController extends Controller
             'all' => $query->paginate($perPage),    
         ], 200);
     }
-
     
 }

@@ -13,6 +13,22 @@ use App\Models\WarehouseContainerShelfUnitStatus;
 
 class WarehouseController extends Controller
 {
+    public function __construct()
+    {
+        // Warehouse Owner
+        $this->middleware("permission:view-warehouse-owner-index")->only(['showAllOwners', 'searchAllOwners']);
+        $this->middleware("permission:create-warehouse-owner")->only('storeNewOwner');
+        $this->middleware("permission:update-warehouse-owner")->only('updateOwner');
+        $this->middleware("permission:delete-warehouse-owner")->only(['deleteOwner', 'restoreOwner']);
+
+        // Warehouse
+        $this->middleware("permission:view-warehouse-index")->only(['showAllWarehouses', 'searchAllWarehouses']);
+        $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
+        $this->middleware("permission:update-warehouse")->only('updateWarehouse');
+        $this->middleware("permission:delete-warehouse")->only(['deleteWarehouse', 'restoreWarehouse']);
+    }
+
+    // Warehouse Owner
     public function showAllOwners($perPage=false)
     {
     	if ($perPage) {
@@ -358,7 +374,7 @@ class WarehouseController extends Controller
             $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) {
                                         $query->where('active', 1);
                                     })
-                                    ->where('engaged', 0)
+                                    ->where('engaged', 0.0)
                                     ->get();
 
 
@@ -367,12 +383,12 @@ class WarehouseController extends Controller
                                     })
                                     ->whereHas('containerShelfStatuses', 
                                     function ($query) {
-                                        $query->where('engaged', 0);
+                                        $query->where('engaged', 0.0);
                                     })
                                     ->with([
                                         'containerShelfStatuses' => 
                                             function ($query) {
-                                                $query->where('engaged', 0);
+                                                $query->where('engaged', 0.0);
                                             }
                                     ])
                                     ->get();
@@ -382,18 +398,18 @@ class WarehouseController extends Controller
                                     })
                                     ->whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
                                     function ($query) {
-                                        $query->where('engaged', 0);
+                                        $query->where('engaged', 0.0);
                                     })
                                     ->with([
                                         'containerShelfStatuses' => 
                                             function ($query) {
-                                                $query->where('engaged', 0)
+                                                $query->where('engaged', 0.0)
                                                       ->orWhere('engaged', 0.5);
                                             },
 
                                         'containerShelfStatuses.containerShelfUnitStatuses' => 
                                             function ($query) {
-                                                $query->where('engaged', 0);
+                                                $query->where('engaged', 0.0);
                                             },
                                     ])
                                     ->get();
@@ -416,7 +432,7 @@ class WarehouseController extends Controller
             $currentWarehouse = \Auth::guard('warehouse')->user();
 
             $emptyContainers = WarehouseContainerStatus::with(['containerShelfStatuses'])
-                                                ->where('engaged', 0)
+                                                ->where('engaged', 0.0)
                                                 ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
                                                     $query->where('warehouse_id', $currentWarehouse->id);
                                                 })
@@ -478,7 +494,7 @@ class WarehouseController extends Controller
             if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
                 
                 $emptyShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
-                                                ->where('engaged', 0)
+                                                ->where('engaged', 0.0)
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
@@ -549,7 +565,7 @@ class WarehouseController extends Controller
 
             if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
                 
-                $emptyUnits = WarehouseContainerShelfUnitStatus::where('engaged', 0)
+                $emptyUnits = WarehouseContainerShelfUnitStatus::where('engaged', 0.0)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 

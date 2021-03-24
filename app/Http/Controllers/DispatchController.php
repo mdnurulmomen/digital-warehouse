@@ -11,6 +11,12 @@ use App\Http\Resources\Web\RequisitionCollection;
 
 class DispatchController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("permission:view-dispatch-index")->only(['showAllDispatches', 'searchAllDispatches']);
+        $this->middleware("permission:make-dispatch")->only('makeNewDispatch');
+    }
+
     // Despatch (Admin)
     public function showAllDispatches($perPage = false)
     {       

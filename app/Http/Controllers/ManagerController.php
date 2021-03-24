@@ -10,25 +10,10 @@ class ManagerController extends Controller
 {
     public function __construct()
     {
-        $currentGuard = 'merchant';
-
-        if (Auth::guard('admin')->check()) {
-            $currentGuard = 'admin';
-        }
-        else if (Auth::guard('manager')->check()) {
-            $currentGuard = 'manager';
-        }
-        else if (Auth::guard('warehouse')->check()) {
-            $currentGuard = 'warehouse';
-        }
-        else if (Auth::guard('owner')->check()) {
-            $currentGuard = 'owner';
-        }
-
-        $this->middleware("permission:$currentGuard,show-manager-index")->only(['showAllManagers', 'searchAllManagers']);
-        $this->middleware("permission:$currentGuard,create-manager")->only('storeNewManager');
-        $this->middleware("permission:$currentGuard,update-manager")->only('updateManager');
-        $this->middleware("permission:$currentGuard,delete-manager")->only(['deleteManager', 'restoreManager']);
+        $this->middleware("permission:view-manager-index")->only(['showAllManagers', 'searchAllManagers']);
+        $this->middleware("permission:create-manager")->only('storeNewManager');
+        $this->middleware("permission:update-manager")->only('updateManager');
+        $this->middleware("permission:delete-manager")->only(['deleteManager', 'restoreManager']);
     }
 
     public function showAllManagers($perPage)

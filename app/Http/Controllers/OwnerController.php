@@ -8,23 +8,15 @@ use App\Http\Resources\Web\WarehouseCollection;
 
 class OwnerController extends Controller
 {
-    // Products
-    public function currentOwner()
+    protected function currentOwner()
     {
-        if (\Auth::guard('owner')->check()) {
-            // The Owner is logged in...
-            return response()->json([
-
-                'user' => \Auth::guard('owner')->user(),
-
-            ], 200);
-        }
-
+        return \Auth::guard('owner')->user();
     }
 
+    // Warehouses
     public function showOwnerAllWarehouses($perPage)
     {
-        $currentOwner = \Auth::guard('owner')->user();
+        $currentOwner = $this->currentOwner();
 
         return [
 
@@ -40,7 +32,7 @@ class OwnerController extends Controller
 
     public function searchOwnerAllWarehouses($search, $perPage)
     {
-        $currentOwner = \Auth::guard('owner')->user();
+        $currentOwner = $this->currentOwner();
 
         $query = Warehouse::where(function ($q) use ($search) {
                     $q->where('name', 'like', "%$search%")

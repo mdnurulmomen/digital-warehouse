@@ -11,7 +11,27 @@ use App\Http\Resources\Web\ProductStockCollection;
 
 class ProductController extends Controller
 {
-    // Variations
+    public function __construct()
+    {
+        // Product-Category
+        $this->middleware("permission:view-product-category-index")->only(['showProductAllCategories', 'searchProductAllCategories']);
+        $this->middleware("permission:create-product-category")->only('storeProductNewCategory');
+        $this->middleware("permission:update-product-category")->only('updateProductCategory');
+        $this->middleware("permission:delete-product-category")->only(['deleteProductCategory', 'restoreProductCategory']);
+
+        // Product
+        $this->middleware("permission:view-product-index")->only(['showAllProducts', 'searchAllProducts']);
+        $this->middleware("permission:create-product")->only('storeNewProduct');
+        $this->middleware("permission:update-product")->only('updateProduct');
+        
+        // Product-Stock
+        $this->middleware("permission:view-product-stock-index")->only(['showProductAllStocks', 'searchProductAllStocks']);
+        $this->middleware("permission:create-product-stock")->only('storeProductStock');
+        $this->middleware("permission:update-product-stock")->only('updateProductStock');
+        $this->middleware("permission:delete-product-stock")->only('deleteProductStock');
+    }
+
+    // Product-Categories
     public function showProductAllCategories($perPage=false)
     {
         if ($perPage) {
@@ -157,7 +177,7 @@ class ProductController extends Controller
 
         if ($newProduct->has_variations && !empty($request->variations)) {
 
-            $newProduct->product_variations = $request->variations;
+            $newProduct->product_variations = json_decode(json_encode($request->variations));
 
         }
 
@@ -262,6 +282,7 @@ class ProductController extends Controller
         ], 200);
     }
 
+    // Product-Stock
     public function showProductAllStocks($product, $perPage)
     {
         return new ProductStockCollection(ProductStock::with(['addresses', 'variations'])->where('product_id', $product)->paginate($perPage));

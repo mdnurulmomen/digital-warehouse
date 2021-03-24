@@ -9,6 +9,12 @@ use App\Http\Resources\Web\RequisitionCollection;
 
 class RequisitionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("permission:view-requisition-index")->only(['showAllRequisitions', 'searchAllRequisitions']);
+        $this->middleware("permission:update-requisition")->only('cancelRequisition');
+    }
+
     // Requisition (Admin)
     public function showAllRequisitions($perPage = false)
     {       
