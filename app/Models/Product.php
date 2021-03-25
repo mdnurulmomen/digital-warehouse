@@ -52,6 +52,7 @@ class Product extends Model
         return $this->hasMany(ProductStock::class, 'product_id', 'id')->latest();
     }
 
+    // immutable product
     public function getProductImmutabilityAttribute()
     {
         if ($this->requests()->count()) {
@@ -76,9 +77,9 @@ class Product extends Model
     }
     */
 
-    public function setProductVariationsAttribute($variations = array())
+    public function setProductVariationsAttribute($productNewVariations = array())
     {
-        if (count($variations)) {
+        if (count($productNewVariations)) {
 
             if ($this->getProductImmutabilityAttribute()) {
                 
@@ -101,7 +102,7 @@ class Product extends Model
             
             // $variations = json_decode(json_encode($variations));
 
-            foreach ($variations as $variation) {
+            foreach ($productNewVariations as $productNewVariation) {
 
                 // $existingVariation = $this->variations()->where('variation_id', $variation->variation->id)->first();
 
@@ -119,24 +120,24 @@ class Product extends Model
 
                 // else {
 
-                    if (empty($variation->variation_immutability) || is_null($variation->variation_immutability)) {
+                    if (empty($productNewVariation->variation_immutability) || is_null($productNewVariation->variation_immutability)) {
                         
                         $this->variations()->create([
-                            'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
+                            'sku' => $productNewVariation->sku ?? $this->generateProductVariationSKU($this->sku, $productNewVariation->variation->id),
                             // 'initial_quantity' => $variation->initial_quantity,
                             // 'available_quantity' => $variation->initial_quantity,
-                            'price' => $variation->price,
-                            'variation_id' => $variation->variation->id,
+                            'price' => $productNewVariation->price,
+                            'variation_id' => $productNewVariation->variation->id,
                         ]);
 
                     }
                     else {
 
-                        $this->variations()->where('variation_id', $variation->variation->id)->update([
-                            'sku' => $variation->sku ?? $this->generateProductVariationSKU($this->sku, $variation->variation->id),
+                        $this->variations()->where('variation_id', $productNewVariation->variation->id)->update([
+                            'sku' => $productNewVariation->sku ?? $this->generateProductVariationSKU($this->sku, $productNewVariation->variation->id),
                             // 'initial_quantity' => $variation->initial_quantity,
                             // 'available_quantity' => $variation->initial_quantity,
-                            'price' => $variation->price,
+                            'price' => $productNewVariation->price,
                         ]);
 
                     }

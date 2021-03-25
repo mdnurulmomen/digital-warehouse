@@ -227,7 +227,7 @@
 								<label class="font-weight-bold">Variation Type: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.variation_type ? this.$options.filters.capitalize(singleAssetData.variation_type.name) : 'NA' }}
+								{{ singleAssetData.variation_type ? $options.filters.capitalize(singleAssetData.variation_type.name) : 'NA' }}
 							</div>
 						</div>
 

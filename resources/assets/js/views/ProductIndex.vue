@@ -1711,7 +1711,7 @@
 							}
 						);
 						
-						this.availableVariations = object.variation_type.variations;
+						this.availableVariations = object.variation_type.variations ?? [];
 					
 					}
 
@@ -1911,6 +1911,11 @@
 				if (this.singleProductData.variations.length > 2) {	
 					this.singleProductData.variations.pop();
 					this.errors.product.variations.pop();
+
+					if (!this.errorInArray(this.errors.product.variations)) {
+						this.submitForm = true;
+					}
+
 				}
 			},
 		/*
