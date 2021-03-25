@@ -134,6 +134,16 @@
 									</li>
 								</ul>
 							</li>
+							<li :class="currentRouteName=='roles' ? 'active' : ''">
+								<router-link :to="{ name: 'roles' }" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="feather icon-aperture rotate-refresh"></i>
+									</span>
+									<span class="pcoded-mtext">
+										Roles
+									</span>
+								</router-link>
+							</li>
 							<li 
 								class="pcoded-hasmenu" 
 								:class="['owners', 'warehouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"

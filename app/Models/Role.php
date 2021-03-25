@@ -10,6 +10,13 @@ class Role extends Model
     protected $guarded = ['id'];
 
     /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['permissions'];
+
+    /**
      * The permissions that belong to the role.
      */
     public function permissions()
@@ -23,6 +30,21 @@ class Role extends Model
     public function managers()
     {
         return $this->morphedByMany(Manager::class, 'model', 'model_has_roles');
+    }
+
+    public function setRolePermissionsAttribute($permissions = [])
+    {
+        if (count($permissions)) {
+            
+            $this->permissions()->delete();
+
+            foreach ($permissions as $permission) {
+
+                $this->permissions()->attach($permission->id);
+
+            }
+
+        }
     }
 
 }
