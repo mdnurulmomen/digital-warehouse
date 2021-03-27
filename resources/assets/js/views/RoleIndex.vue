@@ -343,17 +343,6 @@
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-											<!-- view -->
-											<div class="form-check">
-												<input 
-													type="checkbox" 
-													:value="getExpectedPermission('view-' + model + '-index')" 
-													:checked="permissionExists('view-' + model + '-index')" 
-													@input="insertPermission('view-' + model + '-index', $event)"
-												>
-												<label>{{ modelName('view-' + model + '-list') }}</label>
-											</div>
-
 											<!-- update -->
 											<div class="form-check">
 												<input 
@@ -363,6 +352,17 @@
 													@input="insertPermission('update-' + model, $event)"
 												>
 												<label>{{ modelName('update-' + model) }}</label>
+											</div>
+
+											<!-- view -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:value="getExpectedPermission('view-' + model + '-index')" 
+													:checked="permissionExists('view-' + model + '-index')" 
+													@input="insertPermission('view-' + model + '-index', $event)"
+												>
+												<label>{{ modelName('view-' + model + '-list') }}</label>
 											</div>
 										</div>
 
@@ -374,17 +374,6 @@
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-											<!-- view -->
-											<div class="form-check">
-												<input 
-													type="checkbox" 
-													:value="getExpectedPermission('view-' + model + '-index')" 
-													:checked="permissionExists('view-' + model + '-index')" 
-													@input="insertPermission('view-' + model + '-index', $event)"
-												>
-												<label>{{ modelName('view-' + model + '-list') }}</label>
-											</div>
-
 											<!-- make -->
 											<div class="form-check">
 												<input 
@@ -394,6 +383,17 @@
 													@input="insertPermission('make-' + model, $event)"
 												>
 												<label>{{ modelName('make-' + model) }}</label>
+											</div>
+											
+											<!-- view -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:value="getExpectedPermission('view-' + model + '-index')" 
+													:checked="permissionExists('view-' + model + '-index')" 
+													@input="insertPermission('view-' + model + '-index', $event)"
+												>
+												<label>{{ modelName('view-' + model + '-list') }}</label>
 											</div>
 										</div>
 
@@ -444,7 +444,7 @@
 									Close
 								</button>
 								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-									Save
+									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
 						</div>
@@ -457,11 +457,12 @@
 			:csrf="csrf" 
 			:submit-method-name="'deleteRole'" 
 			:content-to-delete="singleRoleData"
-			:restoration-message="'But once you think, you can restore this item !'" 
+			:restoration-message="'You can not retrieve this role again !'" 
 			
 			@deleteRole="deleteRole($event)" 
 		></delete-confirmation-modal>
 
+	<!-- 
 		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreRole'" 
@@ -470,7 +471,7 @@
 
 			@restoreRole="restoreRole($event)" 
 		></restore-confirmation-modal>
-
+ 	-->
 	<!-- 
 		<asset-view-modal 
 			:caller-page="'role'" 
@@ -875,10 +876,12 @@
 				this.singleRoleData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
+		/*
 			openContentRestoreForm(object) {	
 				this.singleRoleData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
+		*/
 			storeRole() {
 				
 				if (!this.verifyUserInput()) {

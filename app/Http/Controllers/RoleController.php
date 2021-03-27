@@ -73,7 +73,7 @@ class RoleController extends Controller
     public function deleteRole($role, $perPage)
     {
     	$roleToDelete = Role::findOrFail($role);
-        $roleToDelete->permissions()->delete();
+        $roleToDelete->permissions()->detach();
         $roleToDelete->delete();
 
         return $this->showAllRoles($perPage);

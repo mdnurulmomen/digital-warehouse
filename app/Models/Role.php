@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
@@ -36,13 +37,13 @@ class Role extends Model
     {
         if (count($permissions)) {
             
-            $this->permissions()->delete();
+            $this->permissions()->detach();
 
-            foreach ($permissions as $permission) {
+            // foreach ($permissions as $permission) {
 
-                $this->permissions()->attach($permission->id);
+                $this->permissions()->attach(Arr::pluck($permissions, 'id'));
 
-            }
+            // }
 
         }
     }
