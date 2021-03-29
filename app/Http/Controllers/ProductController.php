@@ -57,7 +57,7 @@ class ProductController extends Controller
 
         $newAsset = new ProductCategory();
 
-        $newAsset->name = $request->name;
+        $newAsset->name = strtolower($request->name);
         $newAsset->parent_category_id = $request->parent_category_id;
 
         $newAsset->save();
@@ -74,7 +74,7 @@ class ProductController extends Controller
             'parent_category_id' => 'nullable|exists:product_categories,id',
         ]);
 
-        $assetToUpdate->name = $request->name;
+        $assetToUpdate->name = strtolower($request->name);
         $assetToUpdate->parent_category_id = $request->parent_category_id;
 
         $assetToUpdate->save();
@@ -162,8 +162,8 @@ class ProductController extends Controller
 
         $newProduct = new Product();
 
-        $newProduct->name = $request->name;
-        $newProduct->description = $request->description;
+        $newProduct->name = strtolower($request->name);
+        $newProduct->description = strtolower($request->description);
         $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
         $newProduct->price = $request->price ?? 0;
         // $newProduct->initial_quantity = $request->initial_quantity;
@@ -215,8 +215,8 @@ class ProductController extends Controller
             // 'container.shelf.units' => 'required_if:space_type,units|array',
         ]);
 
-        $productToUpdate->name = $request->name;
-        $productToUpdate->description = $request->description;
+        $productToUpdate->name = strtolower($request->name);
+        $productToUpdate->description = strtolower($request->description);
         $productToUpdate->sku = $request->sku ?? $this->generateProductSKU($request);
         $productToUpdate->price = $request->price ?? 0;
         // $productToUpdate->initial_quantity = $request->initial_quantity;

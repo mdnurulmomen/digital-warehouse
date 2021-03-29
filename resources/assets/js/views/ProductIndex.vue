@@ -35,7 +35,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-										  		
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['retail', 'bulk']" 

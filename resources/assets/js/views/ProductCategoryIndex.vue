@@ -132,6 +132,7 @@
                               			placeholder="Parent Category" 
                                   		label="name" 
                                   		track-by="id" 
+                                  		:custom-label="objectNameWithCapitalized" 
                                   		:options="categoriesToShow" 
                                   		:required="true" 
                                   		:allow-empty="false"
@@ -207,7 +208,7 @@
 								<label class="font-weight-bold">Name</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.name }}
+								{{ singleAssetData.name | capitalize }}
 							</div>
 						</div>
 
@@ -216,7 +217,7 @@
 								<label class="font-weight-bold">Parent Category</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.category ? singleAssetData.category.name : 'None' }}
+								{{ singleAssetData.category ? singleAssetData.category.name : 'None' | capitalize }}
 							</div>
 						</div>
 
@@ -295,6 +296,26 @@
 					this.singleAssetData.parent_category_id = object.id;
 				}
 			},
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 		
 		methods : {
@@ -597,6 +618,14 @@
 
 				return false;
 			},
+			objectNameWithCapitalized ({ name }) {
+		      	if (name) {
+				    name = name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else 
+		      		return ''
+		    },
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
