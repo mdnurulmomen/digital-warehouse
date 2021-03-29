@@ -33,17 +33,36 @@ class Role extends Model
         return $this->morphedByMany(Manager::class, 'model', 'model_has_roles');
     }
 
+    /**
+     * Get all of the owners that are assigned this role.
+     */
+    public function owners()
+    {
+        return $this->morphedByMany(WarehouseOwner::class, 'model', 'model_has_roles');
+    }
+
+    /**
+     * Get all of the warehouses that are assigned this role.
+     */
+    public function warehouses()
+    {
+        return $this->morphedByMany(Warehouse::class, 'model', 'model_has_roles');
+    }
+
+    /**
+     * Get all of the merchants that are assigned this role.
+     */
+    public function merchants()
+    {
+        return $this->morphedByMany(Merchant::class, 'model', 'model_has_roles');
+    }
+
     public function setRolePermissionsAttribute($permissions = [])
     {
         if (count($permissions)) {
             
             $this->permissions()->detach();
-
-            // foreach ($permissions as $permission) {
-
-                $this->permissions()->attach(Arr::pluck($permissions, 'id'));
-
-            // }
+            $this->permissions()->attach(Arr::pluck($permissions, 'id'));
 
         }
     }
