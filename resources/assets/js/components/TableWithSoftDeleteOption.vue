@@ -240,7 +240,7 @@
 					return object.active ? 'Approved' : 'Pending';
 				}
 				else if (columnValue.match(/owner_total_warehouses/gi)) {
-					return object.warehouses.length;
+					return object.warehouses_count;
 				}
 				else if (columnValue.match(/name/gi)) {
 					return this.$options.filters.capitalize(object.name);
