@@ -92,16 +92,8 @@ class RoleController extends Controller
 
     public function searchAllRoles($search, $perPage)
     {
-        $columnsToSearch = ['name'];
-
-        $query = Role::withTrashed();
-
-        foreach($columnsToSearch as $column){
-            $query->orWhere($column, 'like', "%$search%");
-        }
-
         return response()->json([
-            'all' => $query->paginate($perPage),    
+            'all' => Role::where('name', 'like', "%$search%")->paginate($perPage),    
         ], 200);
     }
 

@@ -124,9 +124,11 @@ class ManagerController extends Controller
             $query->orWhere($column, 'like', "%$search%");
         }
 
-        $query->orWhereHas('warehouse.warehouse', function($q) use ($search){
+        $query->orWhereHas('warehouses.warehouse', function($q) use ($search){
             $q->where('name', 'like', "%$search%")
-              ->orWhere('code', 'like', "%$search%");
+              ->orWhere('user_name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('mobile', 'like', "%$search%");
         });
 
         return response()->json([

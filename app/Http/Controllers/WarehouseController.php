@@ -144,8 +144,10 @@ class WarehouseController extends Controller
         }
 
         $query->orWhereHas('warehouses', function($q) use ($search){
-            $q->where('name', 'like', "%$search%");
-              // ->orWhere('code', 'like', "%$search%");
+            $q->where('name', 'like', "%$search%")
+              ->orWhere('user_name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('mobile', 'like', "%$search%");
         });
 
         return response()->json([
