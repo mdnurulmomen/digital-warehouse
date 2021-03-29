@@ -49,7 +49,7 @@ class Admin extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['profilePreview'];
+    protected $with = ['profilePreview', 'roles', 'permissions'];
 
     /**
      * Set the user's first name.

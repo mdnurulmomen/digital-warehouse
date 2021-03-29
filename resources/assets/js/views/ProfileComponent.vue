@@ -10,7 +10,9 @@
 						<i class="feather icon-user bg-c-blue"></i>
 						<div class="d-inline">
 							<h5>Profile</h5>
-							<span>Here, you may update your profile info</span>
+							<span>
+								Here, you may update your profile basic info's
+							</span>
 						</div>
 					</div>
 				</div>
@@ -82,7 +84,14 @@
 												                		{{ user.user_name }}
 												                	</h3>
 
-												                	<p class="text-muted text-center">Role Name</p>
+												                	<p class="text-muted text-center">
+												                		<span v-for="userRole in user.roles">
+												                			{{ userRole.name | capitalize }}
+												                			<span v-show="user.roles.length > 1">
+												                				, 
+												                			</span> 
+												                		</span>
+												                	</p>
 
 												                	<div class="row">
 														                <div class="col-sm-12">
@@ -356,9 +365,31 @@
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 	        }
 		},
+
 		created(){
 			this.fetchUserData();
 		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
+		},
+
 		computed : {
 			fullName : function() {
 				if (!this.user.first_name && !this.user.last_name) {
@@ -368,6 +399,7 @@
 				return (this.user.first_name || '' +' '+ this.user.last_name || '');
 			}
 		},
+
 		methods : {
 			fetchUserData() {
 				

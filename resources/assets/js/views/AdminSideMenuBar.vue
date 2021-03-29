@@ -137,7 +137,7 @@
 							<li :class="currentRouteName=='roles' ? 'active' : ''">
 								<router-link :to="{ name: 'roles' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-aperture rotate-refresh"></i>
+										<i class="fa fa-tasks" aria-hidden="true"></i>
 									</span>
 									<span class="pcoded-mtext">
 										Roles

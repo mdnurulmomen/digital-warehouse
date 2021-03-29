@@ -20,9 +20,9 @@ class ManagerController extends Controller
     {
     	return response()->json([
 
-    		'approved' => Manager::where('active', 1)->paginate($perPage),
-            'pending' => Manager::where('active', 0)->paginate($perPage),
-    		'trashed' => Manager::onlyTrashed()->paginate($perPage),
+    		'approved' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 1)->paginate($perPage),
+            'pending' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 0)->paginate($perPage),
+    		'trashed' => Manager::with(['warehouses', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage),
 
     	], 200);
     }
@@ -56,6 +56,9 @@ class ManagerController extends Controller
             $newUser->save();
         }
 
+        $newUser->user_permissions = json_decode(json_encode($request->permissions));
+        $newUser->user_roles = json_decode(json_encode($request->roles));
+
         return $this->showAllManagers($perPage);
     }
 
@@ -85,6 +88,9 @@ class ManagerController extends Controller
             $userToUpdate->password = Hash::make($request->password);
         }
 
+        $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
+        $userToUpdate->user_roles = json_decode(json_encode($request->roles));
+
         $userToUpdate->save();
 
         return $this->showAllManagers($perPage);
@@ -112,7 +118,7 @@ class ManagerController extends Controller
     {
         $columnsToSearch = ['first_name', 'last_name', 'user_name', 'mobile', 'email'];
 
-        $query = Manager::withTrashed();
+        $query = Manager::with(['warehouses', 'roles', 'permissions'])->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

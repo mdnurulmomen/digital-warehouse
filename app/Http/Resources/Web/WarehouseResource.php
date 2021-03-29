@@ -36,6 +36,9 @@ class WarehouseResource extends JsonResource
             'feature' => $this->feature,
             'storages' => WarehouseStorageResource::collection($this->storages),
             'containers' => WarehouseContainerResource::collection($this->containers),
+
+            'roles' => $this->roles,
+            'permissions' => $this->permissions,
         ];
     }
 }

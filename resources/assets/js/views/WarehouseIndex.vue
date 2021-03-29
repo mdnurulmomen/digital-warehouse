@@ -88,7 +88,6 @@
 
 
 					<div class="modal-body">
-						
 						<div class="row" v-show="!loading">
 							<div class="col-sm-12">
 							  	<div class="card">
@@ -97,17 +96,20 @@
 								        	<div class="progress-bar bg-info" style="width:20%" v-show="step>=1">
 								          		Profile
 								        	</div>
-								        	<div class="progress-bar bg-danger" style="width:20%" v-show="step>=2">
-								          		Contract Info
+								        	<div class="progress-bar bg-danger" style="width:10%" v-show="step>=2">
+								          		Contract
 								        	</div>
-								        	<div class="progress-bar bg-warning" style="width:20%" v-show="step>=3">
+								        	<div class="progress-bar bg-warning" style="width:10%" v-show="step>=3">
 								          		Features
 								        	</div>
 								        	<div class="progress-bar bg-primary" style="width:20%" v-show="step>=4">
 								          		Storages
 								        	</div>
-								        	<div class="progress-bar bg-success" style="width:20%" v-show="step==5">
+								        	<div class="progress-bar bg-success" style="width:30%" v-show="step>=5">
 								          		Containers
+								        	</div>
+								        	<div class="progress-bar bg-default" style="width:10%" v-show="step==6">
+								          		Permissions
 								        	</div>
 								      	</div>
 								    </div>
@@ -124,6 +126,7 @@
 							<input type="hidden" name="_token" :value="csrf">
 
 							<transition-group name="fade">
+								<!-- Warehouse Profile -->
 								<div 
 									class="row" 
 									v-bind:key="1" 
@@ -335,6 +338,7 @@
 						          	</div>
 								</div>
 
+								<!-- Warehouse Owner -->
 								<div 
 									class="row" 
 									v-bind:key="2" 
@@ -343,7 +347,6 @@
 							        <h2 class="ml-auto mr-auto mb-4 lead">Owner & Deal</h2>
 							      
 						          	<div class="col-sm-12">
-
 						          		<div class="form-row">	
 		                              		<div class="col-md-12 form-group">
 			                              		<label>Owner</label>
@@ -400,12 +403,10 @@
 											  	</div>
 					                        </div>
 				                        </div> 
-						                    
 						          	</div>  
 							        
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
-
 					          				<div class="col-6">
 							                  	<button type="button" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
@@ -428,11 +429,11 @@
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
-
 						          		</div>
 						          	</div>
 								</div>
 
+								<!-- Previews & Features -->
 								<div 
 									class="row" 
 									v-bind:key="3" 
@@ -441,7 +442,6 @@
 							        <h2 class="ml-auto mr-auto mb-4 lead">Previews & Features</h2>
 							      
 						          	<div class="col-sm-12">
-
 				                    	<div class="card">
 									    	<div class="card-body">
 
@@ -510,13 +510,11 @@
 											        {{ errors.warehouse.feature }}
 											  	</div>
 					                        </div>
-				                        </div> 
-   
+				                        </div>
 						          	</div>  
 
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
-
 					          				<div class="col-6">
 							                  	<button type="button" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
@@ -539,11 +537,11 @@
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
-
 						          		</div>
 						          	</div>
 								</div>
 
+								<!-- Warehouse Storages -->
 								<div 
 									class="row" 
 									v-bind:key="4" 
@@ -724,6 +722,7 @@
 						          	</div>
 								</div>
 
+								<!-- Warehouse Containers -->
 								<div 
 									class="row" 
 									v-bind:key="5" 
@@ -990,6 +989,215 @@
 		                              		</div>
 			                            </div>   
 						          	</div>
+
+						          	<div class="col-sm-12 p-3 border">
+						          		<div class="row">
+					          				<div class="col-6">
+							                  	<button type="button" 
+							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		v-on:click="step-=1"
+							                  	>
+								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+							                </div>
+						          			
+						          			<div class="col-6 text-right">
+							                	<div class="text-danger small" 
+							                		v-show="!submitForm"
+							                	>
+											  		Please input required fields
+									          	</div>
+							                  	<button type="button" 
+							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		v-on:click="nextPage"
+							                  	>
+								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+						          		</div>
+						          	</div>
+								</div>
+
+								<!-- Roles & Permissions -->
+								<div 
+									class="row" 
+									v-bind:key="6" 
+									v-show="step==6"
+								>								  	
+							        <h2 class="ml-auto mr-auto mb-4 lead">Roles & Permissions</h2>
+							      	
+							      	<div class="col-md-12">
+										<div class="form-row">
+											<div class="form-group col-md-12">
+												<label for="inputUsername">Role</label>
+												<multiselect 
+				                          			v-model="singleWarehouseData.roles" 
+				                              		label="name" 
+				                              		track-by="id" 
+				                              		:custom-label="objectNameWithCapitalized" 
+				                              		:options="allRoles" 
+				                              		:multiple="true" 
+				                              		:close-on-select="false" 
+				                              		placeholder="Parent Category" 
+				                              		selectLabel = "Press/Click"
+				                              		deselect-label="Can't remove single value" 
+				                              		@close="checkAvailableCheckboxes"
+				                          		>
+				                            	</multiselect>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-12">
+												<label for="inputUsername">Special Permissions</label>
+												<div class="row">
+													<!-- CRUD Models -->
+													<div 
+														class="col-md-6" 
+														v-for="model in modelsCRUDable" 
+														:key="'crud-model-permission-name-' + model"
+													>
+														<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+														<!-- create -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('create-' + model)" 
+																:checked="permissionExists('create-' + model)" 
+																@input="insertPermission('create-' + model, $event)" 
+																:ref="'create-' + model.toLowerCase()"
+															>
+															<label>{{ modelName('create-' + model) }}</label>
+														</div>
+
+														<!-- update -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('update-' + model)" 
+																:checked="permissionExists('update-' + model)" 
+																@input="insertPermission('update-' + model, $event)" 
+																:ref="'update-' + model.toLowerCase()"
+															>
+															<label>{{ modelName('update-' + model) }}</label>
+														</div>
+
+														<!-- delete -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('delete-' + model)" 
+																:checked="permissionExists('delete-' + model)" 
+																@input="insertPermission('delete-' + model, $event)" 
+																:ref="'delete-' + model.toLowerCase()"
+															>
+															<label>{{ modelName('delete-' + model) }}</label>
+														</div>
+
+														<!-- view -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('view-' + model + '-index')" 
+																:checked="permissionExists('view-' + model + '-index')" 
+																@input="insertPermission('view-' + model + '-index', $event)" 
+																:ref="'view-' + model.toLowerCase() + '-index'"
+															>
+															<label>{{ modelName('view-' + model + '-list') }}</label>
+														</div>
+													</div>
+
+													<!-- Viewable and Updatable CRUD -->
+													<div 
+														class="col-md-6" 
+														v-for="model in modelsViewableAndUpdatable" 
+														:key="'crud-model-permission-name-' + model"
+													>
+														<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+														<!-- update -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('update-' + model)" 
+																:checked="permissionExists('update-' + model)" 
+																@input="insertPermission('update-' + model, $event)" 
+																:ref="'update-' + model.toLowerCase()"
+															>
+															<label>{{ modelName('update-' + model) }}</label>
+														</div>
+
+														<!-- view -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('view-' + model + '-index')" 
+																:checked="permissionExists('view-' + model + '-index')" 
+																@input="insertPermission('view-' + model + '-index', $event)" 
+																:ref="'view-' + model.toLowerCase() + '-index'"
+															>
+															<label>{{ modelName('view-' + model + '-list') }}</label>
+														</div>
+													</div>
+
+													<!-- Viewable and Makeable -->
+													<div 
+														class="col-md-6" 
+														v-for="model in modelsViewableAndMakeable" 
+														:key="'crud-model-permission-name-' + model"
+													>
+														<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+														<!-- make -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('make-' + model)" 
+																:checked="permissionExists('make-' + model)" 
+																@input="insertPermission('make-' + model, $event)" 
+																:ref="'make-' + model.toLowerCase()"
+															>
+															<label>{{ modelName('make-' + model) }}</label>
+														</div>
+														
+														<!-- view -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('view-' + model + '-index')" 
+																:checked="permissionExists('view-' + model + '-index')" 
+																@input="insertPermission('view-' + model + '-index', $event)" 
+																:ref="'view-' + model.toLowerCase() + '-index'"
+															>
+															<label>{{ modelName('view-' + model + '-list') }}</label>
+														</div>
+													</div>
+
+													<!-- Viewable -->
+													<div 
+														class="col-md-6" 
+														v-for="model in modelsViewable" 
+														:key="'crud-model-permission-name-' + model"
+													>
+														<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+														<!-- view -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:value="getExpectedPermission('view-' + model + '-index')" 
+																:checked="permissionExists('view-' + model + '-index')" 
+																@input="insertPermission('view-' + model + '-index', $event)" 
+																:ref="'view-' + model.toLowerCase() + '-index'"
+															>
+															<label>{{ modelName('view-' + model + '-list') }}</label>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div> 
 							        
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
@@ -1076,6 +1284,12 @@
 								<li class="nav-item">
 									<a class="nav-link" data-toggle="tab" href="#container-details" role="tab" aria-selected="false">
 										Container
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#roles-permissions" role="tab" aria-selected="false">
+										Permissions
 									</a>
 								</li>
 							</ul>
@@ -1397,6 +1611,47 @@
 										</label>
 									</div>
 								</div>
+
+								<div class="tab-pane" id="roles-permissions" role="tabpanel">
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Roles :</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="singleWarehouseData.roles.length"
+										>
+											<span v-for="role in singleWarehouseData.roles">
+												{{ role.name | capitalize }}
+												<span v-show="singleWarehouseData.roles.length > 1">, </span>
+											</span>
+										</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="!singleWarehouseData.roles.length"
+										>
+											NA
+										</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Permissions :
+										</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="singleWarehouseData.permissions.length"
+										>
+											<span v-for="permission in singleWarehouseData.permissions">
+												{{ permission.name | capitalize }}
+												<span v-show="singleWarehouseData.permissions.length > 1">, </span>
+											</span>
+										</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="!singleWarehouseData.permissions.length"
+										>
+											NA
+										</label>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1440,6 +1695,7 @@
     let singleWarehouseData = {
     	owner : {},
     	previews : [],
+    	
     	feature : {
     		features : ''
     	},
@@ -1480,6 +1736,9 @@
 
 			},
     	],
+
+    	roles : [],
+    	permissions : []
 
     };
 
@@ -1539,12 +1798,42 @@
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
+	            allRoles : [],
+				allPermissions : [],
+
+				modelsCRUDable : [
+	        		'Asset',
+	            	'Manager',
+	            	'Merchant',
+	            	'Product-Category',
+	            	'Product',
+	            	'Product-Stock',
+	            	'Role',
+	            	'Warehouse-Owner',
+	            	'Warehouse',
+	        	],
+
+	        	modelsViewableAndUpdatable : [
+	        		'Application-Setting',  // view / update
+                	'Requisition', // view / update(cancel)
+	        	],
+
+	        	modelsViewableAndMakeable : [
+	        		'Dispatch',  // view / make
+	        	],
+
+	        	modelsViewable : [
+	        		'Permission',  // view
+	        	],
+
 	        }
 
 		},
 		
 		created(){
 
+			this.fetchAllRoles();
+			this.fetchAllPermissions();
 			this.fetchAllWarehouses();
 			this.fetchAllRentPeriods();
 			this.fetchAllStorageTypes();
@@ -1557,7 +1846,7 @@
 			capitalize: function (value) {
 				if (!value) return ''
 
-				const words = value.split(" ");
+				const words = value.split(/[\s-]/);
 
 				for (let i = 0; i < words.length; i++) {
 				    
@@ -1628,7 +1917,82 @@
 		},
 		
 		methods : {
+			fetchAllRoles() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allRoles = [];
+				
+				axios
+					.get('/api/roles/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allRoles = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
 
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllPermissions() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allPermissions = [];
+				
+				axios
+					.get('/api/permissions/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allPermissions = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 			fetchAllWarehouses() {
 				
 				this.query = '';
@@ -1869,9 +2233,11 @@
 				this.singleWarehouseData = {
 					// owner : {},
 					previews : [],
+			    	
 			    	feature : {
 			    		features : ''
 			    	},
+
 			    	storages : [  
 			    		{	// warehouse_storage_types
 							previews : [],
@@ -1881,6 +2247,7 @@
 							},
 						},
 			    	],
+
 			    	containers : [
 						{	/*warehouse_containers*/	
 							
@@ -1906,6 +2273,9 @@
 
 						},
 			    	],
+
+			    	roles : [],
+    				permissions : []
 				};
 
 				$('#warehouse-createOrEdit-modal').modal('show');
@@ -1939,6 +2309,9 @@
 
 				this.singleWarehouseData = { ...object };
 
+				this.resetAllPermissions();
+				this.disableExistingRolePermissions();
+
 				$('#warehouse-createOrEdit-modal').modal('show');
 				
 			},
@@ -1951,27 +2324,6 @@
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeWarehouse() {
-	        	
-	        	this.validateFormInput('container');
-	        	this.validateFormInput('container_quantity');
-
-	        	this.validateFormInput('container_price');
-	        	this.validateFormInput('shelf_price');
-	        	this.validateFormInput('unit_price');
-
-				const errorInArray = (element) => {
-										return element !== null
-									};
-
-	        	const containerError = (container) => {
-	        							return Object.keys(container).length > 0
-	        						};
-
-				if (this.errors.warehouse.constructor === Object && (Object.keys(this.errors.warehouse).length > 3 || this.errors.warehouse.storage_features.some(errorInArray) || this.errors.warehouse.storage_types.some(errorInArray) || this.errors.warehouse.containers.some(containerError))) {
-					
-					this.submitForm = false;
-					return;
-				}
 
 				this.formSubmitted = true;
 
@@ -2000,27 +2352,6 @@
 
 			},
 			updateWarehouse() {
-	        	
-	        	this.validateFormInput('container');
-	        	this.validateFormInput('container_quantity');
-
-	        	this.validateFormInput('container_price');
-	        	this.validateFormInput('shelf_price');
-	        	this.validateFormInput('unit_price');
-
-				const errorInArray = (element) => {
-										return element !== null
-									};
-
-	        	const containerError = (container) => {
-	        							return Object.keys(container).length > 0
-	        						};
-
-				if (this.errors.warehouse.constructor === Object && (Object.keys(this.errors.warehouse).length > 3 || this.errors.warehouse.storage_features.some(errorInArray) || this.errors.warehouse.storage_types.some(errorInArray) || this.errors.warehouse.containers.some(containerError))) {
-					
-					this.submitForm = false;
-					return;
-				}
 
 				this.formSubmitted = true;
 				
@@ -2095,6 +2426,7 @@
 
 			},
             changeNumberContents(expectedContentsPerPage) {
+
 				this.pagination.current_page = 1;
 				this.perPage = expectedContentsPerPage;
 
@@ -2104,6 +2436,7 @@
 				else {
 					this.searchData();
 				}
+
     		},
     		showSelectedTabContents() {
 				
@@ -2170,6 +2503,7 @@
 		      		return ''
 		    },
 			nextPage() {
+
 				if (this.step==1) {
 					this.validateFormInput('site_map_preview');
 					this.validateFormInput('name');
@@ -2193,12 +2527,25 @@
 					this.validateFormInput('storage_preview');
 					this.validateFormInput('storage_feature');
 				}
+				else if (this.step==5) {
+					this.validateFormInput('container');
+		        	this.validateFormInput('container_quantity');
+
+		        	this.validateFormInput('container_price');
+		        	this.validateFormInput('shelf_price');
+		        	this.validateFormInput('unit_price');
+				}
 
 				const errorInArray = (element) => {
 										return element !== null
 									};
 
-				if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && this.step <= 4) {
+	        	const containerError = (container) => {
+	        							return Object.keys(container).length > 0
+	        						};
+
+			/*
+				if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && this.step < 4) {
 
 					this.step++;
 					this.submitForm = true;
@@ -2208,9 +2555,141 @@
 					this.step++;
 					this.submitForm = true;
 				}
+			*/
+
+				if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && !this.errors.warehouse.storage_features.some(errorInArray) && !this.errors.warehouse.storage_types.some(errorInArray) && !this.errors.warehouse.containers.some(containerError) && this.step < 6) {
+					
+					this.step++;
+					this.submitForm = true;
+				}
 				else {
 					this.submitForm = false;
 				}
+
+			},
+			modelName(name) {
+				if (!name) return ''
+
+				const words = name.split("-");
+
+				for (let i = 0; i < words.length; i++) {
+
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+
+				}
+
+				return words.join(" ");
+			},
+			permissionExists(permissionName) {
+
+				permissionName = permissionName.toLowerCase();
+
+				if (this.singleWarehouseData.permissions.length) {
+
+					return this.singleWarehouseData.permissions.some(
+						permission => permission.name === permissionName
+					);
+
+				}
+
+				return false;
+
+			},
+			getExpectedPermission(permissionName) {
+
+				permissionName = permissionName.toLowerCase();
+
+				if (this.allPermissions.length) {
+
+					return this.allPermissions.find(
+						permission => permission.name === permissionName
+					);
+				
+				}
+
+				return;
+
+			},
+			insertPermission(permissionName, event) {
+
+				if (event.target.checked && (!this.singleWarehouseData.permissions.length || !this.permissionExists(permissionName))) {
+
+					this.submitForm = true;
+					let permission = this.getExpectedPermission(permissionName);
+
+					if (permission) {
+				   		this.singleWarehouseData.permissions.push(permission);
+					}
+
+				}
+				else if (!event.target.checked && this.permissionExists(permissionName)) {
+
+					permissionName = permissionName.toLowerCase();
+
+					let uncheckedPermissionIndex = this.singleWarehouseData.permissions.findIndex(
+						permission => permission.name==permissionName
+					);
+
+					if (uncheckedPermissionIndex > -1) {
+						this.singleWarehouseData.permissions.splice(uncheckedPermissionIndex, 1);
+					}
+
+				}
+
+			},
+			checkAvailableCheckboxes() {
+
+				this.singleWarehouseData.permissions = [];
+
+				// reseting all permissions
+				this.resetAllPermissions();
+				this.disableExistingRolePermissions();
+
+			},
+			resetAllPermissions() {
+
+				for (var ref in this.$refs) {				// as this.$refs is an object not an array
+					
+					this.$refs[ref][0].checked = false;
+					this.$refs[ref][0].disabled = false;	
+
+				}
+
+			},
+			disableExistingRolePermissions() {
+
+				if (this.singleWarehouseData.roles.length) {
+
+					this.singleWarehouseData.roles.forEach(
+						
+						userRole => {
+							
+							for (var ref in this.$refs) {
+
+								// console.log(this.$refs[ref]);
+
+								const samePermission = (permission) => permission.name == ref;
+
+								if (userRole.permissions.some(samePermission)) {
+
+									// console.log('matched');
+									this.$refs[ref][0].checked = true;
+									this.$refs[ref][0].disabled = true;
+
+								}
+
+							}
+
+						}
+
+					);
+
+				}
+
 			},
 			validateFormInput (formInputName) {
 				

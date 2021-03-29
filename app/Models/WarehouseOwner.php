@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Arr;
 use App\Traits\HasPermissionTrait;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
@@ -49,7 +50,20 @@ class WarehouseOwner extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['warehouses', 'profilePreview'];
+    protected $with = ['profilePreview'];
+
+    /**
+     * Get the user's image.
+     */
+    public function profilePreview()
+    {
+        return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
+    }
+
+    public function warehouses()
+    {
+        return $this->hasMany(Warehouse::class, 'warehouse_owner_id', 'id');
+    }
 
     /**
      * Set the user's first name.
@@ -78,16 +92,24 @@ class WarehouseOwner extends Authenticatable
         }
     }
 
-    /**
-     * Get the user's image.
-     */
-    public function profilePreview()
+    public function setUserPermissionsAttribute($permissions = [])
     {
-        return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
+        // if (count($permissions)) {
+            
+            $this->permissions()->detach();
+            $this->permissions()->attach(Arr::pluck($permissions, 'id'));
+
+        // }
     }
 
-    public function warehouses()
+    public function setUserRolesAttribute($roles = [])
     {
-        return $this->hasMany(Warehouse::class, 'warehouse_owner_id', 'id');
+        // if (count($roles)) {
+            
+            $this->roles()->detach();
+            $this->roles()->attach(Arr::pluck($roles, 'id'));
+
+        // }
     }
+
 }

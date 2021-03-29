@@ -104,7 +104,7 @@
 		<user-profile-view-modal 
 			:user="'owner'" 
 			:profile-to-view="singleOwnerDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'permissions']"
 		></user-profile-view-modal>
 
 	</div>
@@ -117,7 +117,9 @@
 
     let singleOwnerDetails = {
     	active : false,
-    	profile_preview : {}
+    	profile_preview : {},
+    	roles : [],
+    	permissions : []
     };
 
 	export default {
@@ -228,7 +230,9 @@
 				this.createMode = true;
 				this.singleOwnerDetails = {
 					active : false,
-					profile_preview : {}
+					profile_preview : {},
+					roles : [],
+					permissions : []
 				};
 				$('#user-createOrEdit-modal').modal('show');
 			},

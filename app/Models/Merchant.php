@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Arr;
 use App\Traits\HasPermissionTrait;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
@@ -52,6 +53,21 @@ class Merchant extends Authenticatable
     protected $with = ['profilePreview'];
 
     /**
+     * Get the user's image.
+     */
+    public function profilePreview()
+    {
+        return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
+    }
+
+    /*
+        public function deals()
+        {
+            return $this->hasMany(MerchantDeal::class, 'merchant_id', 'id');
+        }
+    */
+
+    /**
      * Set the user's first name.
      *
      * @param  string  $value
@@ -78,18 +94,24 @@ class Merchant extends Authenticatable
         }
     }
 
-    /**
-     * Get the user's image.
-     */
-    public function profilePreview()
+    public function setUserPermissionsAttribute($permissions = [])
     {
-        return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
+        // if (count($permissions)) {
+            
+            $this->permissions()->detach();
+            $this->permissions()->attach(Arr::pluck($permissions, 'id'));
+
+        // }
     }
 
-    /*
-    public function deals()
+    public function setUserRolesAttribute($roles = [])
     {
-        return $this->hasMany(MerchantDeal::class, 'merchant_id', 'id');
+        // if (count($roles)) {
+            
+            $this->roles()->detach();
+            $this->roles()->attach(Arr::pluck($roles, 'id'));
+
+        // }
     }
-    */
+    
 }

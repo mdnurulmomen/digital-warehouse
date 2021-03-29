@@ -27,7 +27,7 @@
 						:key="property"
 					> 
 					    <div class="form-group col-md-6 text-right">
-							<label class="font-weight-bold">{{ property | capitalize }}</label>
+							<label class="font-weight-bold">{{ property + ': ' | capitalize }}</label>
 						</div>
 						<div class="form-group col-md-6 text-left">
 							{{ getPropertyValue(property) }}
@@ -74,7 +74,7 @@
 			capitalize: function (value) {
 				if (!value) return ''
 
-				const words = value.split(" ");
+				const words = value.split(/[\s-]/);
 
 				for (let i = 0; i < words.length; i++) {
 					
@@ -95,23 +95,67 @@
 			getPropertyValue(property) {
 
 				if (property.match(/first name/gi)) {
-					return this.profileToView.first_name || 'NA';
+					return this.$options.filters.capitalize(this.profileToView.first_name) || 'NA';
 				}
+				
 				else if (property.match(/last name/gi)) {
-					return this.profileToView.last_name || 'NA';
+					return this.$options.filters.capitalize(this.profileToView.last_name) || 'NA';
 				}
+				
 				else if (property.match(/username/gi)) {
-					return this.profileToView.user_name;
+					return this.$options.filters.capitalize(this.profileToView.user_name);
 				}
+				
 				else if (property.match(/email/gi)) {
 					return this.profileToView.email;
 				}
+				
 				else if (property.match(/mobile/gi)) {
 					return this.profileToView.mobile;
 				}
+				
 				else if (property.match(/status/gi)) {
 					return this.profileToView.active ? 'Approved' : 'Pending';
 				}
+				
+				else if (property.match(/roles/gi)) {
+					let roles = [];
+					
+					if (this.profileToView.roles.length) {
+
+						for (var i = 0; i < this.profileToView.roles.length; i++) {
+							roles.push(this.$options.filters.capitalize(' ' + this.profileToView.roles[i].name));
+						}
+
+					}
+					else {
+
+						roles.push('NA');
+
+					}
+
+					return roles.toString();
+				}
+
+				else if (property.match(/permissions/gi)) {
+					let permissions = [];
+					
+					if (this.profileToView.permissions.length) {
+
+						for (var i = 0; i < this.profileToView.permissions.length; i++) {
+							permissions.push(this.$options.filters.capitalize(' ' + this.profileToView.permissions[i].name));
+						}
+
+					}
+					else {
+
+						permissions.push('NA');
+
+					}
+
+					return permissions.toString();
+				}
+				
 				else if (property.match(/registered/gi)) {
 					return this.profileToView.created_at ? this.getReadableDate(this.profileToView.created_at) : 'No Date';
 				}

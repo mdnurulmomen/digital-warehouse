@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Arr;
 use App\Traits\HasPermissionTrait;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
@@ -48,11 +49,23 @@ class Warehouse extends Authenticatable
     ];
 
     /**
-     * Get the user's image.
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    // protected $with = [];
+
+    /**
+     * Get the warehouse's previews.
      */
     public function previews()
     {
         return $this->hasMany(WarehousePreview::class, 'warehouse_id');
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(WarehouseOwner::class, 'warehouse_owner_id');
     }
 
     public function feature()
@@ -65,14 +78,11 @@ class Warehouse extends Authenticatable
         return $this->hasMany(WarehouseStorageType::class, 'warehouse_id')->withTrashed();
     }
 
-    public function owner()
-    {
-        return $this->belongsTo(WarehouseOwner::class, 'warehouse_owner_id');
-    }
-
     /**
      * Get all of the posts for the country.
      */
+    
+/*
     public function storagePreviews()
     {
         return $this->hasManyThrough(WarehouseStoragePreview::class, WarehouseStorageType::class);
@@ -83,7 +93,6 @@ class Warehouse extends Authenticatable
         return $this->hasManyThrough(WarehouseStorageFeature::class, WarehouseStorageType::class);
     }
 
-/*
     public function containerTypes()
     {
         return $this->hasMany(WarehouseContainerType::class, 'warehouse_id')->withTrashed();
@@ -120,7 +129,7 @@ class Warehouse extends Authenticatable
     }
 
     /**
-     * Set the user's first name.
+     * Set the warehouse's preview.
      *
      * @param  string  $value
      * @return void
@@ -335,7 +344,26 @@ class Warehouse extends Authenticatable
 
         }
 
+    }
 
+    public function setUserPermissionsAttribute($permissions = [])
+    {
+        // if (count($permissions)) {
+            
+            $this->permissions()->detach();
+            $this->permissions()->attach(Arr::pluck($permissions, 'id'));
+
+        // }
+    }
+
+    public function setUserRolesAttribute($roles = [])
+    {
+        // if (count($roles)) {
+            
+            $this->roles()->detach();
+            $this->roles()->attach(Arr::pluck($roles, 'id'));
+
+        // }
     }
 
 /*
@@ -592,4 +620,5 @@ class Warehouse extends Authenticatable
 
         }
     }
+
 }

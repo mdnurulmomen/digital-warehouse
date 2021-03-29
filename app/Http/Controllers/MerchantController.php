@@ -31,9 +31,9 @@ class MerchantController extends Controller
             
             return response()->json([
 
-        		'approved' => Merchant::where('active', 1)->paginate($perPage),
-                'pending' => Merchant::where('active', 0)->paginate($perPage),
-        		'trashed' => Merchant::onlyTrashed()->paginate($perPage),
+        		'approved' => Merchant::with(['roles', 'permissions'])->where('active', 1)->paginate($perPage),
+                'pending' => Merchant::with(['roles', 'permissions'])->where('active', 0)->paginate($perPage),
+        		'trashed' => Merchant::with(['roles', 'permissions'])->onlyTrashed()->paginate($perPage),
 
         	], 200);
 
@@ -71,6 +71,9 @@ class MerchantController extends Controller
             $newUser->save();
         }
 
+        $newUser->user_permissions = json_decode(json_encode($request->permissions));
+        $newUser->user_roles = json_decode(json_encode($request->roles));
+
         return $this->showAllMerchants($perPage);
     }
 
@@ -100,6 +103,9 @@ class MerchantController extends Controller
             $userToUpdate->password = Hash::make($request->password);
         }
 
+        $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
+        $userToUpdate->user_roles = json_decode(json_encode($request->roles));
+
         $userToUpdate->save();
 
         return $this->showAllMerchants($perPage);
@@ -127,7 +133,7 @@ class MerchantController extends Controller
     {
         $columnsToSearch = ['first_name', 'last_name', 'user_name', 'mobile', 'email'];
 
-        $query = Merchant::withTrashed();
+        $query = Merchant::with(['roles', 'permissions'])->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");
