@@ -25,22 +25,21 @@ Route::name('admin.')->group(function () {
 
 	});
 
-
 	Route::middleware(['auth:admin'])->group(function () {
 		
 		Route::get('/{any}', 'HomeController@adminHome')->name('home');
 		
+		// profile
+		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
+		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
+		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');
+
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');
 		Route::put('/payment-settings', 'SettingController@updatePaymentSetting')->name('payment-settings');
 		Route::put('/contact-settings', 'SettingController@updateContactSetting')->name('contact-settings');	
 		Route::put('/warehouse-settings', 'SettingController@updateWarehouseSetting')->name('warehouse-settings');	
 		Route::put('/system-settings', 'SettingController@updateSystemSetting')->name('system-settings');
-
-		// profile
-		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
-		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
-		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');
 
 		// warehouse owner
 		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');

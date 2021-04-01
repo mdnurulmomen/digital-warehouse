@@ -8,11 +8,21 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+// importing plugin
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+import HasPermission from './mixins/HasPermission';
+Vue.mixin(HasPermission);
+
+// importing specific component only
 import { ToggleButton } from 'vue-js-toggle-button'
 Vue.component('ToggleButton', ToggleButton)
+
+// importing custom components
+import { routeNeedsPermission, userHasPermissionTo } from './public.js'
+
+window.toastr = require('vue-toastr');
 
 /**
  * The following block of code may be used to automatically register your
@@ -27,28 +37,27 @@ Vue.component('ToggleButton', ToggleButton)
 
 // Registering component globally
 Vue.component('tab', require('./components/TabComponent.vue').default);
-Vue.component('pagination', require('./components/PaginationComponent.vue').default);
+Vue.component('alert', require('./components/AlertComponent.vue').default);
 Vue.component('loading', require('./components/LoadingComponent.vue').default);
-Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
-Vue.component('restore-confirmation-modal', require('./components/RestoreConfirmationModal.vue').default);
+Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
+Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
+Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
+Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/SearchAndAdditionOption.vue').default);
+Vue.component('restore-confirmation-modal', require('./components/RestoreConfirmationModal.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
-
-Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
-Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
-
-Vue.component('alert', require('./components/AlertComponent.vue').default);
 
 import AdminSideMenuBar from './views/AdminSideMenuBar'
 
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
-import ApplicationSetting from './views/SettingComponent'
 import Profile from './views/ProfileComponent'
+// special components
+import ApplicationSetting from './views/SettingComponent'
 import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
 import ManagerIndex from './views/ManagerIndex'
 import MerchantIndex from './views/MerchantIndex'
@@ -63,6 +72,7 @@ import ProductIndex from './views/ProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
 import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
+import RoleIndex from './views/RoleIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -76,100 +86,199 @@ const router = new VueRouter({
         {
             path: '/home',
             name: 'home',
-            component: Dashboard
+            component: Dashboard,
+            meta: { 
+                // authRequired: true 
+            },
         },
         {
             path: '/dashboard-2',
             name: 'dashboar-2',
             component: Dashboard2,
+            meta: { 
+                // authRequired: true 
+            },
         },
         {
             path: '/dashboard-3',
             name: 'dashboar-3',
             component: Dashboard3,
-        },
-        {
-            path: '/settings',
-            name: 'settings',
-            component: ApplicationSetting,
+            meta: { 
+                // authRequired: true 
+            },
         },
         {
             path: '/profile',
             name: 'profile',
             component: Profile,
+            meta: { 
+                // authRequired: true 
+            },
         },
+        // special routes
         {
-            path: '/warehouse-owners',
-            name: 'owners',
-            component: WarehouseOwnerIndex,
-        },
-        {
-            path: '/managers',
-            name: 'managers',
-            component: ManagerIndex,
-        },
-        {
-            path: '/merchants',
-            name: 'merchants',
-            component: MerchantIndex,
+            path: '/settings',
+            name: 'settings',
+            component: ApplicationSetting,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-application-setting-index' 
+            },
         },
         {
             path: '/storage-types',
             name: 'storage-types',
             component: StorageTypeIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-asset-index' 
+            }
         },
         {
             path: '/containers',
             name: 'containers',
             component: ContainerIndex,
-        },
-        {
-            path: '/warehouses',
-            name: 'warehouses',
-            component: WarehouseIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-asset-index' 
+            }
         },
         {
             path: '/rent-periods',
             name: 'rent-periods',
             component: RentPeriodIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-asset-index' 
+            }
         },
         {
             path: '/variation-types',
             name: 'variation-types',
             component: VariationTypeIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-asset-index' 
+            }
         },
         {
             path: '/variations',
             name: 'variations',
             component: VariationIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-asset-index' 
+            }
+        },
+        {
+            path: '/warehouse-owners',
+            name: 'owners',
+            component: WarehouseOwnerIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-owner-index' 
+            }
+        },
+        {
+            path: '/managers',
+            name: 'managers',
+            component: ManagerIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-manager-index' 
+            }
+        },
+        {
+            path: '/merchants',
+            name: 'merchants',
+            component: MerchantIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-index' 
+            }
+        },
+        {
+            path: '/warehouses',
+            name: 'warehouses',
+            component: WarehouseIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-index' 
+            }
         },
         {
             path: '/product-categories',
             name: 'product-categories',
             component: ProductCategoryIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-category-index' 
+            }
         },
         {
             path: '/products',
             name: 'products',
             component: ProductIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-index' 
+            }
         },
         {
             path: '/requisitions',
             name: 'requisitions',
             component: RequisitionIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-requisition-index' 
+            }
         },
         {
             path: '/dispatches',
             name: 'dispatches',
             component: DispatchIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-dispatch-index' 
+            }
         },
         {
             path: '/product-stocks/:productName',
             name: 'product-stocks',
             component: ProductStockIndex,
             props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-stock-index' 
+            }
+        },
+        {
+            path: '/roles',
+            name: 'roles',
+            component: RoleIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-role-index' 
+            }
         },
     ],
+});
+
+// router guard
+router.beforeEach((to, from, next) => {
+
+    // routes that need not permissions
+    if (! to.matched.length || to.matched.find(routeNeedsPermission) === undefined) {
+        next();
+    }
+    // routes than need permission
+    else if (userHasPermissionTo(to.matched.find(routeNeedsPermission).meta.requiredPermission)) {
+        next();
+    }
+    else {
+        next(false);  // not authorized
+    }
+
 });
 
 const app = new Vue({
@@ -178,7 +287,7 @@ const app = new Vue({
     router
 });
 
-// custom scripts
+// public functions
 window.showSetting = () => {
     router.push({ name: 'settings' });
 }
@@ -187,4 +296,9 @@ window.showProfile = () => {
     router.push({ name: 'profile' });
 }
 
-window.toastr = require('vue-toastr');
+window.logout = () => {
+    window.localStorage.removeItem('roles');
+    window.localStorage.removeItem('permissions');
+}
+
+

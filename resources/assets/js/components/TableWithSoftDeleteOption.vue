@@ -1,4 +1,4 @@
-<template>
+<template v-if="userHasPermissionTo('view-' + callerPage + '-index')">
 	
 	<div class="tab-content card-block">
 		<div class="table-responsive">
@@ -38,7 +38,8 @@
 						<td>
 							<button type="button" 
 									class="btn btn-grd-info btn-icon"  
-									@click="$emit('showContentDetails', content)"
+									@click="$emit('showContentDetails', content)" 
+								 	v-if="userHasPermissionTo('view-' + callerPage + '-index')"
 							>
 								<i class="fas fa-eye"></i>
 							</button>
@@ -46,7 +47,8 @@
 							<button type="button" 
 									class="btn btn-grd-primary btn-icon" 
 									v-show="!content.deleted_at" 
-									@click="$emit('openContentEditForm', content)"
+									@click="$emit('openContentEditForm', content)" 
+									v-if="userHasPermissionTo('update-' + callerPage)"
 							>
 								<i class="fas fa-edit"></i>
 							</button>
@@ -54,7 +56,8 @@
 							<button type="button" 
 									class="btn btn-grd-danger btn-icon" 
 									v-show="!content.deleted_at" 
-									@click="$emit('openContentDeleteForm', content)"
+									@click="$emit('openContentDeleteForm', content)" 
+									v-if="userHasPermissionTo('delete-' + callerPage)"
 							>
 								<i class="fas fa-trash"></i>
 							</button>
@@ -62,7 +65,8 @@
 							<button type="button" 
 									class="btn btn-grd-warning btn-icon" 
 									v-show="content.deleted_at" 
-									@click="$emit('openContentRestoreForm', content)"
+									@click="$emit('openContentRestoreForm', content)" 
+									v-if="userHasPermissionTo('delete-' + callerPage)"
 							>
 								<i class="fas fa-undo"></i>
 							</button>
@@ -151,6 +155,10 @@
 
 		props: {
 			// Required string
+			callerPage: {
+				type: String,
+				required: true
+			},
 			query: {
 				type: String,
 				required: true

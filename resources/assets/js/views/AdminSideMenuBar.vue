@@ -10,7 +10,6 @@
 						<div class="pcoded-navigation-label">Navigation</div>
 
 						<ul class="pcoded-item pcoded-left-item">
-
 							<li 
 								class="pcoded-hasmenu" 
 								:class="['home', 'dashboar-2', 'dashboar-3'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
@@ -28,11 +27,13 @@
 											<span class="pcoded-mtext">Dashboard</span>
 										</router-link>
 									</li>
+
 									<li :class="currentRouteName=='dashboar-2' ? 'active' : ''">
 										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dashboard 2</span>
 										</router-link>
 									</li>
+
 									<li :class="currentRouteName=='dashboar-3' ? 'active' : ''">
 										<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dashboard 3</span>
@@ -40,9 +41,11 @@
 									</li>
 								</ul>
 							</li>
+
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['storage-types', 'containers', 'rent-periods', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['storage-types', 'containers', 'rent-periods', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								v-if="userHasPermissionTo('view-asset-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
@@ -52,66 +55,24 @@
 									<!-- <span class="pcoded-badge label label-danger">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<li 
-										class="pcoded-hasmenu" 
-										:class="['storage-types'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-									>
-										<a href="javascript:void(0)" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Storage</span>
-										</a>
-										<ul class="pcoded-submenu">
-											<li :class="currentRouteName=='storage-types' ? 'active' : ''">
-												<router-link :to="{ name: 'storage-types' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Types</span>
-												</router-link>
-											</li>
-											<li class="">
-												<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Dashboard</span>
-												</router-link>
-											</li>
-										</ul>
+									<li :class="currentRouteName=='storage-types' ? 'active' : ''">
+										<router-link :to="{ name: 'storage-types' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Storage Types</span>
+										</router-link>
 									</li>
-									<li 
-										class="pcoded-hasmenu" 
-										:class="['containers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-									>
-										<a href="javascript:void(0)" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Container</span>
-										</a>
-										<ul class="pcoded-submenu">
-											<li :class="currentRouteName=='containers' ? 'active' : ''">
-												<router-link :to="{ name: 'containers' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Types</span>
-												</router-link>
-											</li>
-											<li class="">
-												<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Dashboard</span>
-												</router-link>
-											</li>
-										</ul>
+
+									<li :class="currentRouteName=='containers' ? 'active' : ''">
+										<router-link :to="{ name: 'containers' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Container Types</span>
+										</router-link>
 									</li>
-									<li 
-										class="pcoded-hasmenu" 
-										:class="['rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
-									>
-										<a href="javascript:void(0)" class="waves-effect waves-dark">
+
+									<li :class="currentRouteName=='rent-periods' ? 'active' : ''">
+										<router-link :to="{ name: 'rent-periods' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Rent Periods</span>
-										</a>
-										<ul class="pcoded-submenu">
-											<li :class="currentRouteName=='rent-periods' ? 'active' : ''">
-												<router-link :to="{ name: 'rent-periods' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Periods</span>
-												</router-link>
-											</li>
-											<li class="">
-												<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Dashboard</span>
-												</router-link>
-											</li>
-										</ul>
+										</router-link>
 									</li>
+
 									<li 
 										class="pcoded-hasmenu" 
 										:class="['variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
@@ -134,7 +95,11 @@
 									</li>
 								</ul>
 							</li>
-							<li :class="currentRouteName=='roles' ? 'active' : ''">
+
+							<li 
+								:class="currentRouteName=='roles' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-role-index')"
+							>
 								<router-link :to="{ name: 'roles' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-tasks" aria-hidden="true"></i>
@@ -144,81 +109,63 @@
 									</span>
 								</router-link>
 							</li>
+
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['owners', 'warehouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['owners', 'warehouses'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								v-if="userHasPermissionTo('view-owner-index') || userHasPermissionTo('view-warehouse-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="feather icon-command"></i>
 									</span>
 									<span class="pcoded-mtext">Warehouse</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='owners' ? 'active' : ''">
+									<li :class="currentRouteName=='owners' ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-owner-index')">
 										<router-link :to="{ name: 'owners' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Owners</span>
 										</router-link>
 									</li>
-									<li :class="currentRouteName=='warehouses' ? 'active' : ''">
+
+									<li :class="currentRouteName=='warehouses' ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-index')">
 										<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Warehouses</span>
 										</router-link>
 									</li>
 								</ul>
 							</li>
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['managers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+
+							<li :class="currentRouteName=='managers' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-manager-index')"
 							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
+								<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-user"></i>
 									</span>
-									<span class="pcoded-mtext">Manager</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='managers' ? 'active' : ''">
-										<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Managers</span>
-										</router-link>
-									</li>
-									<li class="">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
-										</router-link>
-									</li>
-								</ul>
+									<span class="pcoded-mtext">
+										Managers
+									</span>
+								</router-link>
 							</li>
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['merchants'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+
+							<li :class="currentRouteName=='merchants' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-merchant-index')"
 							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
+								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-users"></i>
 									</span>
-									<span class="pcoded-mtext">Merchant</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='merchants' ? 'active' : ''">
-										<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Merchants</span>
-										</router-link>
-									</li>
-									<li class="">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
-										</router-link>
-									</li>
-								</ul>
+									<span class="pcoded-mtext">
+										Merchants
+									</span>
+								</router-link>
 							</li>
+
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['products', 'product-categories', 'product-stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['products', 'product-categories', 'product-stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('view-product-category-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
@@ -228,42 +175,72 @@
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='products' ? 'active' : ''">
+									<li 
+										:class="currentRouteName=='products' ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-product-index')"
+									>
 										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Products</span>
 										</router-link>
 									</li>
-									<li :class="currentRouteName=='product-categories' ? 'active' : ''">
+									
+									<li 
+										:class="currentRouteName=='product-categories' ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-product-category-index')"
+									>
 										<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Categories</span>
 										</router-link>
 									</li>
 								</ul>
 							</li>
+
+							<li :class="currentRouteName=='requisitions' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-requisition-index')"
+							>
+								<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="fa fa-truck"></i>
+									</span>
+									<span class="pcoded-mtext">
+										Requisitions
+									</span>
+								</router-link>
+							</li>
+							
+							<!-- 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['dispatches', 'requisitions'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['dispatches', 'requisitions'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								v-if="userHasPermissionTo('view-dispatch-index') || userHasPermissionTo('view-requisition-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-truck"></i>
 									</span>
 									<span class="pcoded-mtext">Dispatch</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='dispatches' ? 'active' : ''">
+									<li 
+										:class="currentRouteName=='dispatches' ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-dispatch-index')"
+									>
 										<router-link :to="{ name: 'dispatches' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dispatches</span>
 										</router-link>
 									</li>
-									<li :class="currentRouteName=='requisitions' ? 'active' : ''">
+ 								
+									<li 
+										:class="currentRouteName=='requisitions' ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-requisition-index')"
+									>
 										<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Requisitions</span>
 										</router-link>
 									</li>
 								</ul>
 							</li>
+							 -->
 						</ul>
 					</div>
 
@@ -272,8 +249,7 @@
 
 			<router-view></router-view>
 
-			<div id="styleSelector">
-			</div>
+			<div id="styleSelector"></div>
 
 		</div>
 	</div>
@@ -281,6 +257,7 @@
 </template>
 
 <script>
+
     export default {
 
     	computed: {
@@ -290,4 +267,5 @@
 		}
 
     }
+
 </script>
