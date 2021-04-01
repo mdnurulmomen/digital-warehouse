@@ -267,7 +267,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/containers/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-containers/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -306,7 +306,7 @@
 				
 				axios
 				.get(
-					"/api/search-containers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-my-containers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;

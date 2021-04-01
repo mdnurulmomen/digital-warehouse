@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-warehouse-index')">
 
 	<div class="pcoded-content">
 
@@ -24,6 +24,7 @@
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-warehouse-index') || userHasPermissionTo('create-warehouse')"
 											  		:query="query" 
 											  		:caller-page="'warehouse'" 
 											  		
@@ -35,6 +36,7 @@
 											
 											<div class="col-sm-12 col-lg-12">
 										  		<tab 
+										  			v-if="userHasPermissionTo('view-warehouse-index')"
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
@@ -45,6 +47,8 @@
 										  		></tab>
 
 										  		<table-with-soft-delete-option 
+										  			v-if="userHasPermissionTo('view-warehouse-index')"
+										  			:caller-page="'warehouse'"
 										  			:query="query" 
 										  			:per-page="perPage"  
 										  			:column-names="['name', 'email', 'mobile', 'status']" 
@@ -74,7 +78,10 @@
 		</div>
 
 		<!-- modal-createOrEdit-warehouse -->
-		<div class="modal fade" id="warehouse-createOrEdit-modal">
+		<div 
+			class="modal fade" id="warehouse-createOrEdit-modal" 
+			v-if="userHasPermissionTo('create-warehouse') || userHasPermissionTo('update-warehouse')"
+		>
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1241,7 +1248,7 @@
 		<!-- /modal-createOrEdit-warehouse -->
 
 		<!-- View Modal -->
-		<div class="modal fade" id="warehouse-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="warehouse-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('view-warehouse-index')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1664,6 +1671,7 @@
 		</div>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-warehouse')"
 			:csrf="csrf" 
 			:submit-method-name="'deleteWarehouse'" 
 			:content-to-delete="singleWarehouseData"
@@ -1673,6 +1681,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
+			v-if="userHasPermissionTo('delete-warehouse')"
 			:csrf="csrf" 
 			:submit-method-name="'restoreWarehouse'" 
 			:content-to-restore="singleWarehouseData"
@@ -1832,13 +1841,27 @@
 		
 		created(){
 
-			this.fetchAllRoles();
-			this.fetchAllPermissions();
-			this.fetchAllWarehouses();
-			this.fetchAllRentPeriods();
-			this.fetchAllStorageTypes();
-			this.fetchAllContainerTypes();
-			this.fetchAllWarehouseOwners();
+			if (this.userHasPermissionTo('view-role-index')) {
+				this.fetchAllRoles();
+			}
+
+			if (this.userHasPermissionTo('view-permission-index')) {
+				this.fetchAllPermissions();
+			}
+
+			if (this.userHasPermissionTo('view-warehouse-index')) {
+				this.fetchAllWarehouses();
+			}
+
+			if (this.userHasPermissionTo('view-asset-index')) {
+				this.fetchAllRentPeriods();
+				this.fetchAllStorageTypes();
+				this.fetchAllContainerTypes();
+			}
+
+			if (this.userHasPermissionTo('view-warehouse-owner-index')) {
+				this.fetchAllWarehouseOwners();
+			}
 
 		},
 
@@ -2278,6 +2301,8 @@
     				permissions : []
 				};
 
+				this.resetAllPermissions();
+
 				$('#warehouse-createOrEdit-modal').modal('show');
 
 			},
@@ -2307,9 +2332,10 @@
 	        		}
 	        	);
 
+				
 				this.singleWarehouseData = { ...object };
 
-				this.resetAllPermissions();
+				this.setWarehousePermissions();
 				this.disableExistingRolePermissions();
 
 				$('#warehouse-createOrEdit-modal').modal('show');
@@ -2670,8 +2696,6 @@
 							
 							for (var ref in this.$refs) {
 
-								// console.log(this.$refs[ref]);
-
 								const samePermission = (permission) => permission.name == ref;
 
 								if (userRole.permissions.some(samePermission)) {
@@ -2687,6 +2711,26 @@
 						}
 
 					);
+
+				}
+
+			},
+			setWarehousePermissions() {
+
+				for (var ref in this.$refs) {				// as this.$refs is an object not an array
+					
+					if (this.singleWarehouseData.permissions.some(permission => permission.name == ref)) {
+
+						this.$refs[ref][0].checked = true;
+
+					}
+					else {
+
+						this.$refs[ref][0].checked = false;
+
+					}
+
+					this.$refs[ref][0].disabled = false;
 
 				}
 

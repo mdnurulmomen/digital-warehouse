@@ -26,8 +26,8 @@ class Authenticate extends Middleware
             elseif (Str::contains($routeName, 'owner.')) {
                 return route('owner.login');
             }
-            elseif (Str::contains($routeName, 'warhouse.')) {
-                return route('warhouse.login');
+            elseif (Str::contains($routeName, 'warehouse.')) {
+                return route('warehouse.login');
             }
             elseif (Str::contains($routeName, 'manager.')) {
                 return route('manager.login');
