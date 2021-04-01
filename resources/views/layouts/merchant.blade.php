@@ -302,6 +302,12 @@
 	</div>
 
 	<!-- Scripts -->
+	<script type="text/javascript">
+		alert('Executed');
+		window.localStorage.setItem("roles", JSON.stringify(@json($roles)));
+		window.localStorage.setItem("permissions", JSON.stringify(@json($permissions)));
+		/*window.localStorage.setItem("access_token", JSON.stringify(@json($access_token)));*/
+	</script>
     <script src="{{ mix('js/merchant.js') }}"></script>
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/jquery-ui.min.js')}}"></script>
 	<script src="{{asset('js/waves.min.js')}}" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script>
