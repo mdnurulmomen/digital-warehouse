@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-role-index')">
 
 	<div class="pcoded-content">
 
@@ -25,8 +25,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-role-index') || userHasPermissionTo('create-role')" 
 											  		:query="query" 
 											  		:caller-page="'role'" 
+											  		:required-permission = "'role'"
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -86,7 +88,7 @@
 																	<td> 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
-																				@click="showContentDetails(content)"
+																				@click="showContentDetails(content)" 
 																		>
 																			<i class="fas fa-eye"></i>
 																		</button>
@@ -95,7 +97,8 @@
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
-																				@click="openContentEditForm(content)"
+																				@click="openContentEditForm(content)" 
+																				v-if="userHasPermissionTo('update-role')"
 																		>
 																			<i class="fas fa-edit"></i>
 																		</button>
@@ -103,7 +106,8 @@
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
 																				v-show="!content.deleted_at" 
-																				@click="openContentDeleteForm(content)"
+																				@click="openContentDeleteForm(content)" 
+																				v-if="userHasPermissionTo('delete-role')"
 																		>
 																			<i class="fas fa-trash"></i>
 																		</button>
@@ -111,7 +115,8 @@
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
 																				v-show="content.deleted_at" 
-																				@click="openContentRestoreForm(content)"
+																				@click="openContentRestoreForm(content)" 
+																				v-if="userHasPermissionTo('delete-role')"
 																		>
 																			<i class="fas fa-undo"></i>
 																		</button>
@@ -237,7 +242,7 @@
  	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="role-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="role-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-role') || userHasPermissionTo('update-role')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -463,6 +468,7 @@
 		</div>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-role')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteRole'" 
 			:content-to-delete="singleRoleData"
@@ -480,8 +486,7 @@
 
 			@restoreRole="restoreRole($event)" 
 		></restore-confirmation-modal>
- 	-->
-	<!-- 
+ 	
 		<asset-view-modal 
 			:caller-page="'role'" 
 			:asset-to-view="singleRoleData" 
@@ -735,14 +740,20 @@
 
 		},
 		
-		created(){
+		created(){			
 
 			this.fetchAllRoles();
-			this.fetchAllPermissions();
+
+			if (this.userHasPermissionTo('view-permission-index')) {
+
+				this.fetchAllPermissions();
+
+			}
 
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -760,6 +771,7 @@
 
 				return words.join(" ");
 			}
+			
 		},
 		
 		methods : {

@@ -27,6 +27,7 @@
 											  		v-if="userHasPermissionTo('view-warehouse-index') || userHasPermissionTo('create-warehouse')"
 											  		:query="query" 
 											  		:caller-page="'warehouse'" 
+											  		:required-permission="'warehouse'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -36,7 +37,6 @@
 											
 											<div class="col-sm-12 col-lg-12">
 										  		<tab 
-										  			v-if="userHasPermissionTo('view-warehouse-index')"
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
@@ -47,14 +47,13 @@
 										  		></tab>
 
 										  		<table-with-soft-delete-option 
-										  			v-if="userHasPermissionTo('view-warehouse-index')"
-										  			:caller-page="'warehouse'"
 										  			:query="query" 
 										  			:per-page="perPage"  
 										  			:column-names="['name', 'email', 'mobile', 'status']" 
 										  			:column-values-to-show="['name', 'email', 'mobile', 'status']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission="'warehouse-owner'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -1248,7 +1247,7 @@
 		<!-- /modal-createOrEdit-warehouse -->
 
 		<!-- View Modal -->
-		<div class="modal fade" id="warehouse-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('view-warehouse-index')">
+		<div class="modal fade" id="warehouse-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1841,31 +1840,38 @@
 		
 		created(){
 
+			this.fetchAllWarehouses();
+
 			if (this.userHasPermissionTo('view-role-index')) {
+
 				this.fetchAllRoles();
+
 			}
 
 			if (this.userHasPermissionTo('view-permission-index')) {
-				this.fetchAllPermissions();
-			}
 
-			if (this.userHasPermissionTo('view-warehouse-index')) {
-				this.fetchAllWarehouses();
+				this.fetchAllPermissions();
+
 			}
 
 			if (this.userHasPermissionTo('view-asset-index')) {
+
 				this.fetchAllRentPeriods();
 				this.fetchAllStorageTypes();
 				this.fetchAllContainerTypes();
+
 			}
 
 			if (this.userHasPermissionTo('view-warehouse-owner-index')) {
+
 				this.fetchAllWarehouseOwners();
+
 			}
 
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -1883,9 +1889,11 @@
 
 				return words.join(" ");
 			}
+
 		},
 
 		watch: {
+
 			ownerObject: function (object) {
 				if (Object.keys(object).length > 0) {
 					this.singleWarehouseData.warehouse_owner_id = object.id;
@@ -1937,10 +1945,19 @@
 
 	            deep: true
 	        }
+
 		},
 		
 		methods : {
+
 			fetchAllRoles() {
+
+				if (! this.userHasPermissionTo('view-role-index')) {
+
+					this.error = 'You do not have permission to view roles';
+					return;
+
+				}
 				
 				this.query = '';
 				this.error = '';
@@ -1979,6 +1996,13 @@
 
 			},
 			fetchAllPermissions() {
+
+				if (! this.userHasPermissionTo('view-permission-index')) {
+
+					this.error = 'You do not have permission to view permissions';
+					return;
+					
+				}
 				
 				this.query = '';
 				this.error = '';
@@ -2057,6 +2081,13 @@
 			},
 			fetchAllWarehouseOwners() {
 				
+				if (! this.userHasPermissionTo('view-warehouse-owner-index')) {
+
+					this.error = 'You do not have permission to view owners';
+					return;
+					
+				}
+
 				this.error = '';
 				this.loading = true;
 				this.allWarehouseOwners = [];
@@ -2093,6 +2124,13 @@
 
 			},
 			fetchAllStorageTypes() {
+
+				if (! this.userHasPermissionTo('view-asset-index')) {
+
+					this.error = 'You do not have permission to view storage types';
+					return;
+					
+				}
 				
 				this.error = '';
 				this.loading = true;
@@ -2130,6 +2168,13 @@
 
 			},
 			fetchAllContainerTypes() {
+
+				if (! this.userHasPermissionTo('view-asset-index')) {
+
+					this.error = 'You do not have permission to view container types';
+					return;
+					
+				}
 				
 				this.error = '';
 				this.loading = true;
@@ -2167,6 +2212,13 @@
 
 			},
 			fetchAllRentPeriods() {
+
+				if (! this.userHasPermissionTo('view-asset-index')) {
+
+					this.error = 'You do not have permission to view rent-periods';
+					return;
+					
+				}
 				
 				this.error = '';
 				this.loading = true;

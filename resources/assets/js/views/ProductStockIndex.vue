@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-product-stock-index')">
 
 	<div class="pcoded-content">
 
@@ -25,8 +25,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-product-stock-index') || userHasPermissionTo('create-product-stock')"
 											  		:query="query" 
-											  		:caller-page="'stocks'" 											  
+											  		:caller-page="'stocks'" 
+											  		:required-permission="'product-stock'" 										  
 											  		@showContentCreateForm="showStockCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchProductAllStocks"
@@ -93,7 +95,8 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
-																				@click="openStockEditForm(stock)"
+																				@click="openStockEditForm(stock)" 
+																				v-if="userHasPermissionTo('update-product-stock')"
 																			>
 																				<i class="fas fa-edit"></i>
 																			</button>
@@ -102,7 +105,8 @@
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
 																				:disabled="formSubmitted"  
-																				@click="openStockDeleteForm(stock)"
+																				@click="openStockDeleteForm(stock)" 
+																				v-if="userHasPermissionTo('delete-product-stock')"
 																			>
 																				<i class="fas fa-trash"></i>
 																			</button>
@@ -193,7 +197,7 @@
  	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="stock-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="stock-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-stock') || userHasPermissionTo('update-product-stock')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -711,6 +715,7 @@
 		</div>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-product-stock')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteStock'" 
 			:content-to-delete="singleStockData"
@@ -730,7 +735,7 @@
 		></restore-confirmation-modal>
  	-->
 
- 		<!-- Modal -->
+ 		<!-- View Modal -->
 		<div class="modal fade" id="stock-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
@@ -1237,12 +1242,15 @@
 		created() {
 			
 			this.fetchAllContainers();
+
 			this.fetchProductAllStocks();
+			
 			this.manupulatePropData();
 
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -1260,12 +1268,13 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods: {
 
 			fetchProductAllStocks() {
-				
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;

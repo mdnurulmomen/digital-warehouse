@@ -493,22 +493,29 @@
 
 		created(){
 
-			this.fetchAllRoles();
-			this.fetchAllPermissions();
+			if (this.userHasPermissionTo('view-role-index')) {
+
+				this.fetchAllRoles();
+
+			}
+
+			if (this.userHasPermissionTo('view-permission-index')) {
+
+				this.fetchAllPermissions();
+
+			}
 		
 		},
 
 		watch: {
 
 			singleUserDetails: function(newUserDetail, oldUserDetail) { // watch it
+				
 				this.step = 1;
+				
+				this.setUserPermissions(newUserDetail);
+				this.disableExistingRolePermissions();
 
-				if (newUserDetail.roles.length) {
-
-					this.resetAllPermissions();
-					this.disableExistingRolePermissions();
-
-				}
 			}
 			
 		},
@@ -516,6 +523,7 @@
 		filters: {
 
 			capitalize: function (value) {
+
 				if (!value) return ''
 				const words = value.split(" ");
 
@@ -530,6 +538,7 @@
 				}
 
 				return words.join(" ");
+
 			}
 
 		},
@@ -637,6 +646,7 @@
 
 			},
 			modelName(name) {
+
 				if (!name) return ''
 
 				const words = name.split("-");
@@ -652,6 +662,7 @@
 				}
 
 				return words.join(" ");
+				
 			},
 			permissionExists(permissionName) {
 
@@ -751,6 +762,26 @@
 					
 					this.$refs[ref][0].checked = false;
 					this.$refs[ref][0].disabled = false;	
+
+				}
+
+			},
+			setUserPermissions(newUserDetail) {
+
+				for (var ref in this.$refs) {				// as this.$refs is an object not an array
+					
+					if (newUserDetail.permissions.some(permission => permission.name == ref)) {
+
+						this.$refs[ref][0].checked = true;
+
+					}
+					else {
+
+						this.$refs[ref][0].checked = false;
+
+					}
+
+					this.$refs[ref][0].disabled = false;
 
 				}
 

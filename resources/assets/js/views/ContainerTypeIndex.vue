@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-asset-index')">
 
 	<div class="pcoded-content">
 
@@ -25,8 +25,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
 											  		:query="query" 
 											  		:caller-page="'container'" 
+											  		:required-permission="'asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData" 
@@ -51,7 +53,8 @@
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission="'asset'"
 
 										  			@showContentDetails="showContentDetails" 
 										  			@openContentEditForm="openContentEditForm" 
@@ -89,7 +92,7 @@
  	-->
 
  		<!-- modal-createOrEdit-container -->
-		<div class="modal fade" id="container-createOrEdit-modal">
+		<div class="modal fade" id="container-createOrEdit-modal" v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')" >
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					
@@ -507,6 +510,7 @@
 		</div>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -516,6 +520,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
+			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
@@ -590,6 +595,7 @@
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 				
@@ -607,6 +613,7 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods : {

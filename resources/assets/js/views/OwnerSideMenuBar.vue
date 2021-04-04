@@ -235,7 +235,7 @@
 										v-if="userHasPermissionTo('view-requisition-index')"
 									>
 										<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Requisitions</span>
+											<span class="pcoded-mtext">All Requisitions</span>
 										</router-link>
 									</li>
 								</ul>
@@ -257,6 +257,7 @@
 </template>
 
 <script>
+
     export default {
 
     	computed: {
@@ -266,4 +267,5 @@
 		}
 
     }
+    
 </script>

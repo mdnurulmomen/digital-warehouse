@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-manager-index')">
 
 	<div class="pcoded-content">
 
@@ -25,8 +25,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-manager-index') || userHasPermissionTo('create-manager')" 
 											  		:query="query" 
 											  		:caller-page="'manager'" 
+											  		:required-permission = "'manager'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -52,7 +54,8 @@
 										  			:column-names="['name', 'username', 'email', 'mobile']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission = "'manager'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -78,6 +81,7 @@
 		</div>
 
 		<user-profile-create-or-edit-modal 
+			v-if="userHasPermissionTo('create-manager') || userHasPermissionTo('update-manager')" 
 			:create-mode="createMode" 
 			:user="'manager'" 
 			:single-user-details="singleUserDetails" 
@@ -88,6 +92,7 @@
 		></user-profile-create-or-edit-modal>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-manager')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteUser'" 
 			:content-to-delete="singleUserDetails"
@@ -97,6 +102,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
+			v-if="userHasPermissionTo('delete-manager')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreUser'" 
 			:content-to-restore="singleUserDetails"

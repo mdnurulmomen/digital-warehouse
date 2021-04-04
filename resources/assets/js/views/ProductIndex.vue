@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-product-index')">
 
 	<div class="pcoded-content">
 
@@ -25,8 +25,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('create-product')" 
 											  		:query="query" 
 											  		:caller-page="'products'" 
+											  		:required-permission = "'product'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -94,7 +96,8 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
-																				@click="openContentEditForm(content)"
+																				@click="openContentEditForm(content)" 
+																				v-if="userHasPermissionTo('update-product')"
 																			>
 																				<i class="fas fa-edit"></i>
 																			</button>
@@ -102,7 +105,8 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
-																				@click="goProductStore(content)"
+																				@click="goProductStore(content)" 
+																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
 																				<i class="feather icon-command"></i>
 																			</button>
@@ -192,7 +196,7 @@
  	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="product-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="product-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product') || userHasPermissionTo('update-product')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1291,6 +1295,7 @@
     	// available_quantity : null,
     	// quantity_type : null,
     	// has_variations : null,
+    	
     	variations : [],
 		
 		/*
@@ -1374,14 +1379,28 @@
 		},
 		
 		created(){
+
 			this.fetchAllProducts();
-			this.fetchAllMerchants();
+
+			if (this.userHasPermissionTo('view-merchant-index')) {
+
+				this.fetchAllMerchants();
+
+			}
+
 			// this.fetchAllContainers();
-			this.fetchAllVariationTypes();
-			this.fetchProductAllCategories();
+			
+			if (this.userHasPermissionTo('view-asset-index')) {
+
+				this.fetchAllVariationTypes();
+				this.fetchProductAllCategories();
+
+			}
+
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -1399,11 +1418,13 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods : {
+
 			fetchAllProducts() {
-				
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
@@ -1442,6 +1463,13 @@
 
 			},
 			fetchProductAllCategories() {
+
+				if (! this.userHasPermissionTo('view-asset-index')) {
+
+					this.error = 'You do not have permission to view product-categories';
+					return;
+
+				}
 				
 				this.query = '';
 				this.error = '';
@@ -1481,6 +1509,13 @@
 			},
 			fetchAllMerchants() {
 				
+				if (! this.userHasPermissionTo('view-merchant-index')) {
+
+					this.error = 'You do not have permission to view merchants';
+					return;
+
+				}
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
@@ -1518,6 +1553,13 @@
 
 			},
 			fetchAllVariationTypes() {
+
+				if (! this.userHasPermissionTo('view-asset-index')) {
+
+					this.error = 'You do not have permission to view variation types';
+					return;
+
+				}
 				
 				this.query = '';
 				this.error = '';

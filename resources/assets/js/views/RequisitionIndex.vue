@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-requisition-index')">
 
 	<div class="pcoded-content">
 
@@ -24,11 +24,11 @@
 										<div class="row">											
 
 											<div class="col-sm-12 sub-title">
-
- 												<div class="row d-flex align-items-center text-center">										  	
+ 												<div class="row d-flex align-items-center text-center">
 											  		<div class="col-sm-3 form-group">	
 											  			Requisitions List
 											  		</div>
+
 											  		<div class="col-sm-9 was-validated form-group">
 											  			<input 	type="text" 
 														  		v-model="query" 
@@ -103,7 +103,8 @@
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
 																				@click="showProductDispatchForm(content)" 
-																				v-show="content.status==0"
+																				v-show="content.status==0" 
+																				v-if="userHasPermissionTo('make-dispatch')"
 																			>
 																				<i class="fas fa-truck"></i>
 																			</button>
@@ -112,7 +113,8 @@
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon"  
 																				@click="openContentDeleteForm(content)" 
-																				v-show="content.status==0"
+																				v-show="content.status==0" 
+																				v-if="userHasPermissionTo('update-requisition')"
 																			>
 																				<i class="fas fa-trash"></i>
 																			</button>
@@ -185,14 +187,13 @@
 								</div>
 							</div>
 						</div>
-					</div> 
-				
+					</div>
 				</div>
 			</div>
 		</div>
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-requisition') || userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -826,7 +827,7 @@
 			</div>
 		</div>
 
- 		<!-- View Modal -->
+ 		<!-- Requisition View Modal -->
 		<div class="modal fade" id="requisition-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
@@ -1086,7 +1087,8 @@
 			</div>
 		</div>
 
-		<div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<!-- Cancel Requisitions -->
+		<div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" v-if="userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<form 
@@ -1201,9 +1203,10 @@
 		
 		created(){
 			
-			this.fetchAllRequisitions();
 			this.fetchAvailableRequisitions();
 
+			this.fetchAllRequisitions();
+			
 			Echo.private(`new-requisition`)
 		    .listen('NewRequisitionMade', (e) => {
 		        // console.log(e);
@@ -1211,33 +1214,38 @@
 		        this.allFetchedRequisitions.pending?.data.push(e);
 		    });
 
-		    Echo.private(`product-received`)
-		    .listen('ProductReceived', (e) => {
-		        
-		        // console.log(e);
-		        this.$toastr.s("Dispatched product has been received", "Success");
-		    	
-		    	let index = this.allFetchedRequisitions.dispatched?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
+			
+			if (this.userHasPermissionTo('view-dispatch-index')) {
 
-		    	if (index > -1) {
+			    Echo.private(`product-received`)
+			    .listen('ProductReceived', (e) => {
+			        
+			        // console.log(e);
+			        this.$toastr.s("Dispatched product has been received", "Success");
+			    	
+			    	let index = this.allFetchedRequisitions.dispatched?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
 
-	    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
-		    	
-		    	}
-		    	else{
+			    	if (index > -1) {
 
-		    		let index2 = this.allFetchedRequisitions.pending?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
-
-		    		if (index2 > -1) {
-
-		    			this.allFetchedRequisitions.pending.data.splice(index2, 1);
-		    			this.allFetchedRequisitions.dispatched.data.push(e);
+		    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
 			    	
 			    	}
+			    	else{
 
-		    	}
+			    		let index2 = this.allFetchedRequisitions.pending?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
 
-		    });	    
+			    		if (index2 > -1) {
+
+			    			this.allFetchedRequisitions.pending.data.splice(index2, 1);
+			    			this.allFetchedRequisitions.dispatched.data.push(e);
+				    	
+				    	}
+
+			    	}
+
+			    });	    
+
+			}
 
 		},
 
@@ -1255,6 +1263,7 @@
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -1272,12 +1281,13 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods : {
 
 			fetchAllRequisitions() {
-				
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
@@ -1316,7 +1326,7 @@
 
 			},
 			fetchAvailableRequisitions() {
-				
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;

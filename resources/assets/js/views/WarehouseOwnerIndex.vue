@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-warehouse-owner-index')">
 
 	<div class="pcoded-content">
 
@@ -24,8 +24,10 @@
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('create-warehouse-owner')" 
 											  		:query="query" 
 											  		:caller-page="'owner'" 
+											  		:required-permission="'warehouse-owner'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -46,7 +48,8 @@
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
-										  			:per-page="perPage"  
+										  			:per-page="perPage" 
+										  			:required-permission="'warehouse-owner'" 
 										  			:column-names="['name', 'username', 'email', 'mobile', '# warehouses']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'owner_total_warehouses']" 
 										  			:contents-to-show = "contentsToShow" 
@@ -74,6 +77,7 @@
 		</div>
 
 		<user-profile-create-or-edit-modal 
+			v-if="userHasPermissionTo('create-warehouse-owner') || userHasPermissionTo('update-warehouse-owner')"
 			:create-mode="createMode" 
 			:user="'owner'" 
 			:single-user-details="singleOwnerDetails" 
@@ -84,6 +88,7 @@
 		></user-profile-create-or-edit-modal>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-warehouse-owner')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteUser'" 
 			:content-to-delete="singleOwnerDetails"
@@ -93,6 +98,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
+			v-if="userHasPermissionTo('delete-warehouse-owner')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreUser'" 
 			:content-to-restore="singleOwnerDetails"

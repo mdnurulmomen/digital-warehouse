@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-dispatch-index')">
 
 	<div class="pcoded-content">
 
@@ -50,7 +50,10 @@
 													  	</div>
 											  		</div>
 										  			 
-											  		<div class="col-sm-3 form-group">
+											  		<div 
+												  		class="col-sm-3 form-group" 
+												  		v-if="userHasPermissionTo('make-dispatch')"
+											  		>
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
 												  			@click="showDispatchCreateForm"
@@ -177,7 +180,7 @@
 		</div>
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('make-dispatch')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1150,9 +1153,8 @@
 		},
 		
 		created(){
-			
+
 			this.fetchAllDispatches();
-			this.fetchAllRequisitions();
 
 			Echo.private(`product-received`)
 		    .listen('ProductReceived', (e) => {
@@ -1170,6 +1172,12 @@
 
 		    });
 
+			if (this.userHasPermissionTo('view-requisition-index')) {
+
+				this.fetchAllRequisitions();
+
+			}
+
 		},
 
 		watch : {
@@ -1186,6 +1194,7 @@
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -1203,12 +1212,13 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods : {
 
 			fetchAllDispatches() {
-				
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
@@ -1250,6 +1260,13 @@
 			},
 			fetchAllRequisitions() {
 				
+				if (! this.userHasPermissionTo('view-requisition-index')) {
+
+					this.error = 'You do not have permission to view requisitions';
+					return;
+
+				}
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;

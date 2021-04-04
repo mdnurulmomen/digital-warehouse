@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-asset-index')">
 
 	<div class="pcoded-content">
 
@@ -25,8 +25,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
 											  		:query="query" 
 											  		:caller-page="'rent period'" 
+											  		:required-permission="'asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -94,7 +96,8 @@
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
-																				@click="openContentEditForm(content)"
+																				@click="openContentEditForm(content)" 
+																				v-if="userHasPermissionTo('update-asset')" 
 																		>
 																			<i class="fas fa-edit"></i>
 																		</button>
@@ -102,7 +105,8 @@
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
 																				v-show="!content.deleted_at" 
-																				@click="openContentDeleteForm(content)"
+																				@click="openContentDeleteForm(content)" 
+																				v-if="userHasPermissionTo('delete-asset')" 
 																		>
 																			<i class="fas fa-trash"></i>
 																		</button>
@@ -110,7 +114,8 @@
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
 																				v-show="content.deleted_at" 
-																				@click="openContentRestoreForm(content)"
+																				@click="openContentRestoreForm(content)" 
+																				v-if="userHasPermissionTo('delete-asset')" 
 																		>
 																			<i class="fas fa-undo"></i>
 																		</button>
@@ -224,6 +229,7 @@
 		</div>
 
 		<asset-create-or-edit-modal 
+			v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')" 
 			:create-mode="createMode" 
 			:caller-page="'rent period'" 
 			:single-asset-data="singleAssetData" 
@@ -234,6 +240,7 @@
 		></asset-create-or-edit-modal>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -243,6 +250,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
+			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
@@ -305,11 +313,12 @@
 		
 		created(){
 
-			this.fetchAllContents();
+			this.fetchAllContents();			
 
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -327,6 +336,7 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods : {

@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-asset-index')">
 
 	<div class="pcoded-content">
 
@@ -24,8 +24,10 @@
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
 											  		:query="query" 
 											  		:caller-page="'product category'" 
+											  		:required-permission = "'asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -49,7 +51,8 @@
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission="'asset'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -66,8 +69,7 @@
 								</div>
 							</div>
 						</div>
-					</div> 
-				
+					</div>
 				</div>
 			</div>
 		</div>
@@ -85,7 +87,7 @@
  	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -106,7 +108,6 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
 							<div class="form-row">
 								<div class="form-group col-md-12">
 									<label for="inputFirstName">Name</label>
@@ -124,6 +125,7 @@
 							  		</div>
 								</div>
 							</div>
+
 							<div class="form-row">
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Parent Category</label>
@@ -142,7 +144,6 @@
                                 	</multiselect>
 								</div>
 							</div>
-
 						</div>
 						<div class="modal-footer flex-column">
 							<div class="col-sm-12 text-right" v-show="!submitForm">
@@ -166,6 +167,7 @@
 		</div>
 
 		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -175,6 +177,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
+			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
@@ -191,7 +194,7 @@
 		></asset-view-modal>
  	-->
 
- 		<!-- Modal -->
+ 		<!-- View Modal -->
 		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -286,8 +289,8 @@
 		created(){
 
 			this.fetchAllContents();
-			this.fetchProductAllCategories();
-		
+			this.fetchProductAllCategories();			
+
 		},
 
 		watch: {
@@ -299,6 +302,7 @@
 		},
 
 		filters: {
+
 			capitalize: function (value) {
 				if (!value) return ''
 
@@ -316,6 +320,7 @@
 
 				return words.join(" ");
 			}
+
 		},
 		
 		methods : {

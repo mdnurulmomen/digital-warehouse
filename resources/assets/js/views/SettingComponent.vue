@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-application-setting-index')">
 
 	<div class="pcoded-content">
 
@@ -702,7 +702,9 @@
 	        }
 		},
 		created(){
+
 			this.fetchSettingData();
+
 		},
 		methods : {
 			fetchSettingData() {

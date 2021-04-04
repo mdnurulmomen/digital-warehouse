@@ -213,7 +213,7 @@
 									<span class="pcoded-micon">
 										<i class="fa fa-truck"></i>
 									</span>
-									<span class="pcoded-mtext">Dispatch</span>
+									<span class="pcoded-mtext">Requisitions</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
@@ -252,6 +252,7 @@
 </template>
 
 <script>
+
     export default {
 
     	computed: {
@@ -261,4 +262,5 @@
 		}
 
     }
+    
 </script>

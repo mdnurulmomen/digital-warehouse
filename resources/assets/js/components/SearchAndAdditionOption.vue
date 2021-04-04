@@ -1,10 +1,10 @@
-<template v-if="userHasPermissionTo('view-' + callerPage + '-index') || userHasPermissionTo('create-' + callerPage)">
+<template v-if="userHasPermissionTo('view-' + requiredPermission + '-index') || userHasPermissionTo('create-' + requiredPermission)">
 	
 	<div class="row d-flex align-items-center text-center">										  	
   		<div class="col-sm-3 form-group">	
 				{{ callerPage | capitalize }} List
   		</div>
-  		<div class="col-sm-6 was-validated form-group" v-if="userHasPermissionTo('view-' + callerPage + '-index')">
+  		<div class="col-sm-6 was-validated form-group" v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
   			<input 	type="text" 
 			  		v-model="search" 
 			  		pattern="[^'!#$%^()\x22]+" 
@@ -15,7 +15,7 @@
 		  		Please search with releavant input
 		  	</div>
   		</div>
-  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-' + callerPage)">
+  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
   			<button 
 	  			class="btn btn-success btn-outline-success btn-sm" 
 	  			@click="$emit('showContentCreateForm')"
@@ -42,6 +42,10 @@
 		      	type: String,
 		      	required: true
 		    },
+		    requiredPermission: {
+				type: String,
+				required: true
+			},
 		},
 
 		watch : {
