@@ -68,7 +68,7 @@
 																			</span>
 																		</a>
 																	</th>
-																	<th>
+																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		Actions
 																	</th>
 																</tr>
@@ -83,7 +83,7 @@
 																		{{ content.name | capitalize }}
 																	</td>
 																	
-																	<td>
+																	<td v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		<!-- 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
@@ -125,7 +125,7 @@
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
-														    		<td :colspan="2">
+														    		<td :colspan="(userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')) ? 2 : 1">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -152,7 +152,7 @@
 																			</span>
 																		</a>
 																	</th>
-																	<th>
+																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		Actions
 																	</th>
 																</tr>
@@ -229,7 +229,7 @@
 		</div>
 
 		<asset-create-or-edit-modal 
-			v-if="userHasPermissionTo('create-asset')" 
+			v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')" 
 			:create-mode="createMode" 
 			:caller-page="'storage type'" 
 			:single-asset-data="singleAssetData" 

@@ -69,7 +69,7 @@
 																			</span>
 																		</a>
 																	</th>
-																	<th>
+																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		Actions
 																	</th>
 																</tr>
@@ -84,7 +84,7 @@
 																		{{ content.name | capitalize }}
 																	</td>
 																	
-																	<td>
+																	<td v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		<!-- 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
@@ -98,7 +98,7 @@
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('udpate-asset')"
+																				v-if="userHasPermissionTo('update-asset')"
 																		>
 																			<i class="fas fa-edit"></i>
 																		</button>
@@ -126,7 +126,7 @@
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
-														    		<td :colspan="2">
+														    		<td :colspan="(userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')) ? 2 : 1">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -153,7 +153,7 @@
 																			</span>
 																		</a>
 																	</th>
-																	<th>
+																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		Actions
 																	</th>
 																</tr>
