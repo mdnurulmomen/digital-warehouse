@@ -146,7 +146,6 @@
 													:class="!errors.container.length ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('container_length')" 
 													required="true" 
-													:readonly="!createMode"
 												>
 
 												<div class="invalid-feedback">
@@ -163,7 +162,6 @@
 													:class="!errors.container.width ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('container_width')" 
 													required="true" 
-													:readonly="!createMode"
 												>
 
 												<div class="invalid-feedback">
@@ -180,7 +178,6 @@
 													:class="!errors.container.height ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('container_height')" 
 													required="true" 
-													:readonly="!createMode"
 												>
 
 												<div class="invalid-feedback">
