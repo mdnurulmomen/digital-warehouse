@@ -186,21 +186,29 @@ class AssetController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:containers,name,'.$containerToUpdate->id,
+            // 'code' => 'required|string|max:100|unique:containers,code',
+            'length' => 'required|numeric',
+            'width' => 'required|numeric',
+            'height' => 'required|numeric',
             // 'storing_price' => 'required|numeric',
             // 'selling_price' => 'required|numeric',
+            // 'has_shelve' => 'required|boolean',
+            'shelf.quantity' => 'required_if:has_shelve,1|numeric',
             // 'shelf.storing_price' => 'required_if:has_shelve,1|numeric',
             // 'shelf.selling_price' => 'required_if:has_shelve,1|numeric',
+            // 'shelf.has_units' => 'required_if:has_shelve,1|boolean',
+            'shelf.unit.quantity' => 'required_if:shelf.has_units,1|numeric',
             // 'shelf.unit.storing_price' => 'required_if:shelf.has_units,1|numeric',
             // 'shelf.unit.selling_price' => 'required_if:shelf.has_units,1|numeric',
         ]);
 
         $containerToUpdate->update([
             'name' => strtolower($request->name),
+            'length' => $request->length,
+            'width' => $request->width,
+            'height' => $request->height,
             // 'storing_price' => $request->storing_price,
             // 'selling_price' => $request->selling_price,
-            // 'length' => $request->length,
-            // 'width' => $request->width,
-            // 'height' => $request->height,
             // 'has_shelve' => $request->has_shelve,
         ]);
 
