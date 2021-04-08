@@ -5,7 +5,7 @@ namespace App\Traits;
 use App\Models\Role;
 use App\Models\Permission;
  
-trait HasPermissionTrait {
+trait HasPermissionsTrait {
  
     public function givePermissionsTo(... $permissions) {
 	

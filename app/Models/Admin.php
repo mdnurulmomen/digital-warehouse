@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\HasPermissionTrait;
+use App\Traits\HasPermissionsTrait;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable
 {
-    use Notifiable, HasPermissionTrait;
+    use Notifiable, HasPermissionsTrait;
 
     protected $guard = 'admin';
 

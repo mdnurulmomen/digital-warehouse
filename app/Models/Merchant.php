@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Arr;
-use App\Traits\HasPermissionTrait;
+use App\Traits\HasPermissionsTrait;
 use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Merchant extends Authenticatable
 {
-    use Notifiable, SoftDeletes, HasPermissionTrait;
+    use Notifiable, SoftDeletes, HasPermissionsTrait;
 
     protected $guard = 'merchant';
     
