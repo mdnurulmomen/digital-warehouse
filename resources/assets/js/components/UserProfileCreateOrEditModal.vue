@@ -217,7 +217,7 @@
 								<h2 class="mx-auto mb-4 lead">Roles & Permissions</h2>
 
 								<div class="col-md-12">
-									<div class="form-row">
+									<div class="form-row" v-show="allRoles.length">
 										<div class="form-group col-md-12">
 											<label for="inputUsername">Role</label>
 											<multiselect 
@@ -238,6 +238,12 @@
 									</div>
 
 									<div class="form-row">
+										<div class="form-group col-md-12" v-show="! allRoles.length">
+											<p class="text-center">You may not have permissions to assign roles</p>
+										</div>
+									</div>
+
+									<div class="form-row" v-show="allPermissions.length">
 										<div class="form-group col-md-12">
 											<label for="inputUsername">Special Permissions</label>
 											<div class="row">
@@ -253,9 +259,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('create-' + model)" 
 															:checked="permissionExists('create-' + model)" 
-															@input="insertPermission('create-' + model, $event)" 
+															@change="insertPermission('create-' + model, $event)" 
 															:ref="'create-' + model.toLowerCase()"
 														>
 														<label>{{ modelName('create-' + model) }}</label>
@@ -265,9 +270,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('update-' + model)" 
 															:checked="permissionExists('update-' + model)" 
-															@input="insertPermission('update-' + model, $event)" 
+															@change="insertPermission('update-' + model, $event)" 
 															:ref="'update-' + model.toLowerCase()"
 														>
 														<label>{{ modelName('update-' + model) }}</label>
@@ -277,9 +281,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('delete-' + model)" 
 															:checked="permissionExists('delete-' + model)" 
-															@input="insertPermission('delete-' + model, $event)" 
+															@change="insertPermission('delete-' + model, $event)" 
 															:ref="'delete-' + model.toLowerCase()"
 														>
 														<label>{{ modelName('delete-' + model) }}</label>
@@ -289,9 +292,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('view-' + model + '-index')" 
 															:checked="permissionExists('view-' + model + '-index')" 
-															@input="insertPermission('view-' + model + '-index', $event)" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
 															:ref="'view-' + model.toLowerCase() + '-index'"
 														>
 														<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -310,9 +312,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('update-' + model)" 
 															:checked="permissionExists('update-' + model)" 
-															@input="insertPermission('update-' + model, $event)" 
+															@change="insertPermission('update-' + model, $event)" 
 															:ref="'update-' + model.toLowerCase()"
 														>
 														<label>{{ modelName('update-' + model) }}</label>
@@ -322,9 +323,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('view-' + model + '-index')" 
 															:checked="permissionExists('view-' + model + '-index')" 
-															@input="insertPermission('view-' + model + '-index', $event)" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
 															:ref="'view-' + model.toLowerCase() + '-index'"
 														>
 														<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -343,9 +343,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('make-' + model)" 
 															:checked="permissionExists('make-' + model)" 
-															@input="insertPermission('make-' + model, $event)" 
+															@change="insertPermission('make-' + model, $event)" 
 															:ref="'make-' + model.toLowerCase()"
 														>
 														<label>{{ modelName('make-' + model) }}</label>
@@ -355,9 +354,8 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('view-' + model + '-index')" 
 															:checked="permissionExists('view-' + model + '-index')" 
-															@input="insertPermission('view-' + model + '-index', $event)" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
 															:ref="'view-' + model.toLowerCase() + '-index'"
 														>
 														<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -376,15 +374,20 @@
 													<div class="form-check">
 														<input 
 															type="checkbox" 
-															:value="getExpectedPermission('view-' + model + '-index')" 
 															:checked="permissionExists('view-' + model + '-index')" 
-															@input="insertPermission('view-' + model + '-index', $event)" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
 															:ref="'view-' + model.toLowerCase() + '-index'"
 														>
 														<label>{{ modelName('view-' + model + '-list') }}</label>
 													</div>
 												</div>
 											</div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-12" v-show="! allPermissions.length">
+											<p class="text-center">You may not have permissions to select permissions</p>
 										</div>
 									</div>
 								</div>
@@ -513,7 +516,7 @@
 				
 				this.step = 1;
 				
-				this.setUserPermissions(newUserDetail);
+				this.resetAllPermissions();
 				this.disableExistingRolePermissions();
 
 			}
@@ -664,7 +667,28 @@
 				return words.join(" ");
 				
 			},
-			permissionExists(permissionName) {
+			userHasPermissionThroughRole(permissionName) {
+
+				permissionName = permissionName.toLowerCase();
+
+				if (this.singleUserDetails.roles.length) {
+
+					return this.singleUserDetails.roles.some(
+
+						userRole => userRole.permissions.some(
+
+							rolePermission => rolePermission.name == permissionName
+							
+						)
+
+					);
+
+				}
+
+				return false;
+
+			},
+			userHasPermission(permissionName) {
 
 				permissionName = permissionName.toLowerCase();
 
@@ -674,6 +698,17 @@
 						permission => permission.name === permissionName
 					);
 
+				}
+
+				return false;
+
+			},
+			permissionExists(permissionName) {
+
+				if (this.userHasPermission(permissionName) || this.userHasPermissionThroughRole(permissionName)) {
+
+					return true;
+				
 				}
 
 				return false;
@@ -702,21 +737,21 @@
 					let permission = this.getExpectedPermission(permissionName);
 
 					if (permission) {
+				   		
 				   		this.singleUserDetails.permissions.push(permission);
-					}
-
-					if (permissionName.includes('create') || permissionName.includes('update') || permissionName.includes('delete') || permissionName.includes('make')) {
-
-						let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
 						
-						if (! this.$refs[viewPermission + '-index'][0].checked) {
+						if (permissionName.includes('create') || permissionName.includes('update') || permissionName.includes('delete') || permissionName.includes('make')) {
 
-							// this.$refs[viewPermission + '-index'][0].disabled = false;
-							this.$refs[viewPermission + '-index'][0].click();
+							let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
+							
+							if (! this.$refs[viewPermission + '-index'][0].checked) {
+
+								// this.$refs[viewPermission + '-index'][0].disabled = false;
+								this.$refs[viewPermission + '-index'][0].click();
+
+							}
 
 						}
-
-						// this.$refs[viewPermission + '-index'][0].disabled = true;
 
 					}
 
@@ -734,14 +769,14 @@
 					}
 
 					/*
-					let modelName = permissionName.replace(/create|update|delete|make/, "");
+						let modelName = permissionName.replace(/create|update|delete|make/, "");
 
-					if (! modelName.includes('view') && ! this.permissionExists('create' + modelName) && ! this.permissionExists('update' + modelName) && ! this.permissionExists('delete' + modelName) && ! this.permissionExists('make' + modelName)) {
+						if (! modelName.includes('view') && ! this.permissionExists('create' + modelName) && ! this.permissionExists('update' + modelName) && ! this.permissionExists('delete' + modelName) && ! this.permissionExists('make' + modelName)) {
 
-						let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
-						this.$refs[viewPermission + '-index'][0].disabled = false;
-					
-					}
+							let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
+							this.$refs[viewPermission + '-index'][0].disabled = false;
+						
+						}
 					*/
 
 				}
@@ -760,28 +795,7 @@
 
 				for (var ref in this.$refs) {				// as this.$refs is an object not an array
 					
-					this.$refs[ref][0].checked = false;
 					this.$refs[ref][0].disabled = false;	
-
-				}
-
-			},
-			setUserPermissions(newUserDetail) {
-
-				for (var ref in this.$refs) {				// as this.$refs is an object not an array
-					
-					if (newUserDetail.permissions.some(permission => permission.name == ref)) {
-
-						this.$refs[ref][0].checked = true;
-
-					}
-					else {
-
-						this.$refs[ref][0].checked = false;
-
-					}
-
-					this.$refs[ref][0].disabled = false;
 
 				}
 
@@ -796,14 +810,10 @@
 							
 							for (var ref in this.$refs) {
 
-								// console.log(this.$refs[ref]);
-
 								const samePermission = (permission) => permission.name == ref;
 
 								if (userRole.permissions.some(samePermission)) {
 
-									// console.log('matched');
-									this.$refs[ref][0].checked = true;
 									this.$refs[ref][0].disabled = true;
 
 								}
