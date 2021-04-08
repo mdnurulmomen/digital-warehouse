@@ -111,15 +111,6 @@
 																		>
 																			<i class="fas fa-trash"></i>
 																		</button>
-
-																		<button type="button" 
-																				class="btn btn-grd-warning btn-icon" 
-																				v-show="content.deleted_at" 
-																				@click="openContentRestoreForm(content)" 
-																				v-if="userHasPermissionTo('delete-role')"
-																		>
-																			<i class="fas fa-undo"></i>
-																		</button>
 																	</td>
 															    
 																</tr>
@@ -243,7 +234,7 @@
 
  		<!--Create Or Edit Modal -->
 		<div class="modal fade" id="role-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-role') || userHasPermissionTo('update-role')">
-			<div class="modal-dialog" role="document">
+			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
@@ -281,7 +272,7 @@
 								</div>
 							</div>
 							
-							<div class="form-row"> 
+							<div class="form-row" v-show="allPermissions.length"> 
 							    <div class="col-md-6">
 									<label for="inputFirstName">Select Permissions </label>
 								</div>
@@ -299,9 +290,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('create-' + model)" 
 													:checked="permissionExists('create-' + model)" 
-													@input="insertPermission('create-' + model, $event)" 
+													@change="insertPermission('create-' + model, $event)" 
 													:ref="'create-' + model.toLowerCase()"
 												>
 												<label>{{ modelName('create-' + model) }}</label>
@@ -311,9 +301,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('update-' + model)" 
 													:checked="permissionExists('update-' + model)" 
-													@input="insertPermission('update-' + model, $event)" 
+													@change="insertPermission('update-' + model, $event)" 
 													:ref="'update-' + model.toLowerCase()"
 												>
 												<label>{{ modelName('update-' + model) }}</label>
@@ -323,9 +312,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('delete-' + model)" 
 													:checked="permissionExists('delete-' + model)" 
-													@input="insertPermission('delete-' + model, $event)" 
+													@change="insertPermission('delete-' + model, $event)" 
 													:ref="'delete-' + model.toLowerCase()"
 												>
 												<label>{{ modelName('delete-' + model) }}</label>
@@ -335,9 +323,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('view-' + model + '-index')" 
 													:checked="permissionExists('view-' + model + '-index')" 
-													@input="insertPermission('view-' + model + '-index', $event)" 
+													@change="insertPermission('view-' + model + '-index', $event)" 
 													:ref="'view-' + model.toLowerCase() + '-index'"
 												>
 												<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -356,9 +343,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('update-' + model)" 
 													:checked="permissionExists('update-' + model)" 
-													@input="insertPermission('update-' + model, $event)" 
+													@change="insertPermission('update-' + model, $event)" 
 													:ref="'update-' + model.toLowerCase()"
 												>
 												<label>{{ modelName('update-' + model) }}</label>
@@ -368,9 +354,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('view-' + model + '-index')" 
 													:checked="permissionExists('view-' + model + '-index')" 
-													@input="insertPermission('view-' + model + '-index', $event)" 
+													@change="insertPermission('view-' + model + '-index', $event)" 
 													:ref="'view-' + model.toLowerCase() + '-index'"
 												>
 												<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -389,9 +374,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('make-' + model)" 
 													:checked="permissionExists('make-' + model)" 
-													@input="insertPermission('make-' + model, $event)" 
+													@change="insertPermission('make-' + model, $event)" 
 													:ref="'make-' + model.toLowerCase()"
 												>
 												<label>{{ modelName('make-' + model) }}</label>
@@ -401,9 +385,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('view-' + model + '-index')" 
 													:checked="permissionExists('view-' + model + '-index')" 
-													@input="insertPermission('view-' + model + '-index', $event)" 
+													@change="insertPermission('view-' + model + '-index', $event)" 
 													:ref="'view-' + model.toLowerCase() + '-index'"
 												>
 												<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -422,9 +405,8 @@
 											<div class="form-check">
 												<input 
 													type="checkbox" 
-													:value="getExpectedPermission('view-' + model + '-index')" 
 													:checked="permissionExists('view-' + model + '-index')" 
-													@input="insertPermission('view-' + model + '-index', $event)" 
+													@change="insertPermission('view-' + model + '-index', $event)" 
 													:ref="'view-' + model.toLowerCase() + '-index'"
 												>
 												<label>{{ modelName('view-' + model + '-list') }}</label>
@@ -443,6 +425,14 @@
 									  		</div>
 										</div>
 									</div>
+								</div>
+							</div>
+							
+							<div class="form-row" v-show="! allPermissions.length">
+								<div class="col-md-12">
+									<p class="text-danger text-center">
+										Sorry There is a problem with fetching permissions. You may not have permissions to select permissions
+									</p>
 								</div>
 							</div>
 						</div>
@@ -496,7 +486,7 @@
 
  		<!-- View Modal -->
 		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog" role="document">
+			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title" id="exampleModalLabel">Role Details</h5>
@@ -1141,32 +1131,39 @@
 			},
 			insertPermission(permissionName, event) {
 
-				if (event.target.checked && (!this.singleRoleData.permissions.length || !this.permissionExists(permissionName))) {
+				if (event.target.checked && (! this.singleRoleData.permissions.length || ! this.permissionExists(permissionName))) {
 
 					this.submitForm = true;
 					let permission = this.getExpectedPermission(permissionName);
 
 					if (permission) {
+				   		
 				   		this.singleRoleData.permissions.push(permission);
-					}
-
-					if (permissionName.includes('create') || permissionName.includes('update') || permissionName.includes('delete') || permissionName.includes('make')) {
-
-						let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
 						
-						if (! this.$refs[viewPermission + '-index'][0].checked) {
+						if (permissionName.includes('create') || permissionName.includes('update') || permissionName.includes('delete') || permissionName.includes('make')) {
 
-							// this.$refs[viewPermission + '-index'][0].disabled = false;
-							this.$refs[viewPermission + '-index'][0].click();
+							let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
+							
+							if (! this.$refs[viewPermission + '-index'][0].checked) {
+
+								// this.$refs[viewPermission + '-index'][0].disabled = false;
+								this.$refs[viewPermission + '-index'][0].click();
+
+							}
 
 						}
 
-						// this.$refs[viewPermission + '-index'][0].disabled = true;
-
 					}
+					/*
+						else {
+
+							this.error = 'There is a problem with fetching permissions. You may not have permission to view permissions';
+						
+						}
+					*/
 
 				}
-				else if (!event.target.checked && this.permissionExists(permissionName)) {
+				else if (! event.target.checked && this.permissionExists(permissionName)) {
 
 					permissionName = permissionName.toLowerCase();
 
