@@ -114,7 +114,7 @@
 		<user-profile-view-modal 
 			:user="'manager'" 
 			:profile-to-view="singleUserDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'permissions']"
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'special permissions']"
 		></user-profile-view-modal>
 
 	</div>

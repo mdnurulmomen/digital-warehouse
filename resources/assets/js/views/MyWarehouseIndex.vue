@@ -22,13 +22,12 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
-
 											  	<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
 															Warehouses List
 											  		</div>
+
 											  		<div class="col-sm-6 was-validated text-center">
 											  			<input 	type="text" 
 														  		v-model="query" 
@@ -40,13 +39,12 @@
 													  		Please search with releavant input
 													  	</div>
 											  		</div>
+
 											  		<div class="col-sm-3 text-right"></div>
 											  	</div>
-
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending']" 
@@ -180,230 +178,420 @@
 						</button>
 					</div>
 
-					<div class="modal-body">	
+					<div class="modal-body">
+
+						<div class="card">
+							<ul class="nav nav-pills mx-auto" role="tablist">
+								<li class="nav-item">
+									<a class="nav-link active show" data-toggle="tab" href="#profile" role="tab" aria-selected="false">
+										Profile
+									</a>
+								</li>
+								
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#owner" role="tab" aria-selected="false">
+										Deal
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#features" role="tab" aria-selected="true">
+										Features
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#storage-details" role="tab" aria-selected="false">
+										Storage
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#container-details" role="tab" aria-selected="false">
+										Container
+									</a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#roles-permissions" role="tab" aria-selected="false">
+										Permissions
+									</a>
+								</li>
+							</ul>
 							
-						<ul class="nav nav-tabs tabs" role="tablist">
-							<li class="nav-item">
-								<a class="nav-link active show" data-toggle="tab" href="#profile" role="tab" aria-selected="false">
-									Profile
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#owner" role="tab" aria-selected="false">
-									Deal
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#features" role="tab" aria-selected="true">
-									Features
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#storage-details" role="tab" aria-selected="false">
-									Storage
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#container-details" role="tab" aria-selected="false">
-									Container
-								</a>
-							</li>
-						
-						</ul>
-
-						<div class="tab-content tabs card-block">
-
-							<div class="tab-pane active" id="profile" role="tabpanel">	
-					    		<div class="form-group form-row text-center">
-									<div class="col-md-12 text-center">
-										<img class="img-fluid" 
-											:src="singleWarehouseData.site_map_preview || ''"
-											alt="site_map_preview" 
-										>
+							<div class="tab-content tabs card-block">
+								<div class="tab-pane active" id="profile" role="tabpanel">	
+						    		<div class="form-group form-row text-center">
+										<div class="col-md-12 text-center">
+											<img class="img-fluid" 
+												:src="singleWarehouseData.site_map_preview || ''"
+												alt="site_map_preview" 
+											>
+										</div>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.name }}</label>
+									</div>
+									<!-- 
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Code :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.code }}</label>
+									</div>
+									 -->
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.user_name }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.email }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.mobile }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Status :
+										</label>
+										<label class="col-sm-6 col-form-label">
+											<span :class="[singleWarehouseData.active ? 'badge-success' : 'badge-danger', 'badge']">
+												{{ singleWarehouseData.active ? 'Active' : 'Pending' }}
+											</span>
+										</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Location :</label>
+										<label class="col-sm-6 col-form-label"></label>
 									</div>
 								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.name }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Code :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.code }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.user_name }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.email }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.mobile }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Location :</label>
-									<label class="col-sm-6 col-form-label"></label>
-								</div>
-							</div>
 
-							<div class="tab-pane" id="owner" role="tabpanel" v-if="singleWarehouseData.owner">
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Owner name :</label>
-									<label class="col-sm-6 col-form-label">{{ getOwnerFullName(singleWarehouseData.owner) }}</label>
+								<div class="tab-pane" id="owner" role="tabpanel" v-if="singleWarehouseData.owner">
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Owner name :</label>
+										<label class="col-sm-6 col-form-label">{{ getOwnerFullName(singleWarehouseData.owner) }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.user_name }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.email }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
+										<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.mobile }}</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Deal Details :</label>
+										<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.warehouse_deal"></label>
+									</div>
 								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Username :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.user_name }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Email :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.email }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Mobile :</label>
-									<label class="col-sm-6 col-form-label">{{ singleWarehouseData.owner.mobile }}</label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Deal Details :</label>
-									<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.warehouse_deal"></label>
-								</div>
-							</div>
 
-							<div class="tab-pane" id="features" role="tabpanel">	
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Warehouse Features:</label>
-									<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.feature.features"></label>
-								</div>
-								<div class="form-group form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Warehouse Previews:
-									</label>
-						    		<div class="col-sm-6">
-										<div class="form-row" v-show="singleWarehouseData.previews.length">
-											<div 
-												class="form-group col-sm-6" 
-												v-for="(warehousePreview, index) in singleWarehouseData.previews" 
-												:key="'A' + index + warehousePreview.id"
-											>
-												<img class="img-fluid" 
-													:src="warehousePreview.preview || ''"
-													alt="warehouse preview" 
+								<div class="tab-pane" id="features" role="tabpanel">	
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Warehouse Features:</label>
+										<label class="col-sm-6 col-form-label" v-html="singleWarehouseData.feature.features"></label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Warehouse Previews:
+										</label>
+							    		<div class="col-sm-6">
+											<div class="form-row" v-show="singleWarehouseData.previews.length">
+												<div 
+													class="form-group col-sm-6" 
+													v-for="(warehousePreview, index) in singleWarehouseData.previews" 
+													:key="'A' + index + warehousePreview.id"
 												>
+													<img class="img-fluid" 
+														:src="warehousePreview.preview || ''"
+														alt="warehouse preview" 
+													>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							
-							<div class="tab-pane" id="storage-details" role="tabpanel">
-								<div v-if="singleWarehouseData.storages.length">
-									<div 
-										class="card" 
-										v-for="(warehouseStorageType, index) in singleWarehouseData.storages" 
-								    	:key="'B' + index + warehouseStorageType.id"
-									>
-								    	<div class="card-body">
+								
+								<div class="tab-pane" id="storage-details" role="tabpanel">
+									<div v-if="singleWarehouseData.storages.length">
+										<div 
+											class="card" 
+											v-for="(warehouseStorageType, index) in singleWarehouseData.storages" 
+									    	:key="'B' + index + warehouseStorageType.id"
+										>
+									    	<div class="card-body">
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Storage Name:
+													</label>
+													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Storage Name:
-												</label>
-												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
-											</div>
+												<!-- 
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Code:</label>
+													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.code"></label>
+												</div>
+												 -->
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Code:</label>
-												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.code"></label>
-											</div>
-
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Storage Features:</label>
-												<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.feature.features"></label>
-											</div>
-											
-								    		<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Storage Previews:
-												</label>
-									    		<div class="col-sm-6">
-													<div class="form-row" v-show="warehouseStorageType.previews.length">
-														<div 
-															class="form-group col-sm-6" 
-															v-for="(storagePreview, index) in warehouseStorageType.previews" 
-															:key="'C' + index + storagePreview.id"
-														>
-															<img class="img-fluid" 
-																:src="storagePreview.preview || ''"
-																alt="storage preview" 
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Storage Features:
+													</label>
+													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.feature.features"></label>
+												</div>
+												
+									    		<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Storage Previews:
+													</label>
+										    		<div class="col-sm-6">
+														<div class="form-row" v-show="warehouseStorageType.previews.length">
+															<div 
+																class="form-group col-sm-6" 
+																v-for="(storagePreview, index) in warehouseStorageType.previews" 
+																:key="'C' + index + storagePreview.id"
 															>
+																<img class="img-fluid" 
+																	:src="storagePreview.preview || ''"
+																	alt="storage preview" 
+																>
+															</div>
 														</div>
 													</div>
 												</div>
-											</div>
+									    	</div>
+									    </div>
+									</div>
 
-								    	</div>
-								    </div>
+									<div class="form-group form-row" v-else>
+										<label class="col-sm-12 col-form-label text-danger text-center">
+											No storage found
+										</label>
+									</div>
 								</div>
-							</div>
 
-							<div class="tab-pane" id="container-details" role="tabpanel">
-								<div v-if="singleWarehouseData.containers.length">
-									<div 
-										class="card" 
-										v-for="(warehouseContainer, index) in singleWarehouseData.containers" 
-								    	:key="'C' + index + warehouseContainer.id"
-									>
-								    	<div class="card-body">
+								<div class="tab-pane" id="container-details" role="tabpanel">
+									<div v-if="singleWarehouseData.containers.length">
+										<div 
+											class="card" 
+											v-for="(warehouseContainer, containerIndex) in singleWarehouseData.containers" 
+									    	:key="'warehouse-container-' + containerIndex + warehouseContainer.id"
+										>
+									    	<div class="card-body">
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Container Type:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.container.name | capitalize }}
+													</label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Container Type:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.container.name }}
-												</label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Total Quantity:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.quantity }}
+													</label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Total Quantity:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.quantity }}
-												</label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Completely Engaged:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.engaged_quantity }}
+													</label>
+												</div>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">
-													Completely Engaged:
-												</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.engaged_quantity }}
-												</label>
-											</div>
+												<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Partially Engaged:
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseContainer.partially_engaged }}
+													</label>
+												</div>
+												
+									    		<!-- 
+									    		<div class="form-group form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Rents:
+													</label>
+													<div class="col-sm-6">
+														<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
+															<li 
+																class="nav-item"
+																v-for="(rentPeriod, rentIndex) in allRentPeriods" 
+																:key="'l-rent-period-id-' + rentPeriod.id + 'rent-period-name-' + rentPeriod.name" 
+															>
+																<a 
+																	class="nav-link" 
+																	data-toggle="tab" 
+																	:href="'#rent-period-name-' + rentPeriod.name + '-container-index-' + containerIndex" 
+																	role="tab" 
+																	aria-selected="false" 
+																	:class="{'active': rentIndex === 0}"
+																>
+																	{{ rentPeriod.name | capitalize }}
+																</a>
+															</li>
+														</ul>
 
-											<div class="form-group form-row">
-												<label class="col-sm-6 col-form-label font-weight-bold text-right">Partially Engaged:</label>
-												<label class="col-sm-6 col-form-label">
-													{{ warehouseContainer.partially_engaged }}
-												</label>
-											</div>
+														<div class="tab-content tabs card-block">
+															<div 
+																class="tab-pane" 
+																:id="'rent-period-name-' + rentPeriod.name + '-container-index-' + containerIndex" 
+																role="tabpanel" 
+																v-for="(rentPeriod, rentIndex) in allRentPeriods" 
+																:key="'d-rent-period-id' + rentPeriod.id + 'rent-period-name-' + rentPeriod.name" 
+																:class="{'active': rentIndex === 0}"
+															>
+																<div class="d-flex">
+														    		// container 
+													    			<div class="mr-1 p-2 border w-100">
+													    				<div class="form-row">
+													    					<div class="sub-title">Container</div>
+													    				</div>
+															    		<div class="form-row">
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Storing Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['container_storing_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Selling Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['container_selling_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    		</div>
+													    			</div>
+													    			
+													    			// shelf
+													    			<div 
+													    				class="mr-1 p-2 border w-100" 
+													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve"
+													    			>
+															    		<div class="form-row">
+													    					<div class="sub-title">Shelf</div>
+													    				</div>
 
-								    	</div>
-								    </div>
+															    		<div class="form-row">
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Storing Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_storing_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Selling Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_selling_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    		</div>
+													    			</div>
+													    			
+													    			// unit
+													    			<div 
+													    				class="mr-1 p-2 border w-100" 
+													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
+													    			>
+															    		<div class="form-row">
+													    					<div class="sub-title">Unit</div>
+													    				</div>
+
+															    		<div class="form-row">
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Storing Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['unit_storing_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    			<div class="col-sm-12 form-group">	
+															    				<label for="phone">Selling Price : </label>
+															    				<label class="col-form-label">
+																					{{ singleWarehouseData.containers[containerIndex].rents['unit_selling_price_' + rentPeriod.name] || 'NA' }}
+																				</label>
+															    			</div>
+															    		</div>
+													    			</div>
+													    		</div>
+															</div>
+														</div>
+													</div>
+												</div> 
+												-->
+									    	</div>
+									    </div>
+									</div>
+
+									<div class="form-group form-row" v-else>
+										<label class="col-sm-12 col-form-label text-danger text-center">
+											No container found
+										</label>
+									</div>
+								</div>
+
+								<div class="tab-pane" id="roles-permissions" role="tabpanel">
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">Roles :</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="singleWarehouseData.roles.length"
+										>
+											<span v-for="role in singleWarehouseData.roles">
+												{{ role.name | capitalize }}
+												<span v-show="singleWarehouseData.roles.length > 1">, </span>
+											</span>
+										</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="!singleWarehouseData.roles.length"
+										>
+											NA
+										</label>
+									</div>
+									<div class="form-group form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Permissions :
+										</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="singleWarehouseData.permissions.length"
+										>
+											<span v-for="permission in singleWarehouseData.permissions">
+												{{ permission.name | capitalize }}
+												<span v-show="singleWarehouseData.permissions.length > 1">, </span>
+											</span>
+										</label>
+										<label 
+											class="col-sm-6 col-form-label" 
+											v-show="!singleWarehouseData.permissions.length"
+										>
+											NA
+										</label>
+									</div>
 								</div>
 							</div>
 						</div>
+					</div>
 
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
 		</div>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -452,8 +640,17 @@
 					}, 
 				},
 
+				/*
+					rents : {
+			    		
+			    	}
+				*/
+
 			},
     	],
+
+    	roles : [],
+    	permissions : []
 
     };
 
@@ -468,6 +665,8 @@
     			perPage : 10,
 	        	loading : false,
 	        	currentTab : 'approved',
+
+	        	// allRentPeriods : [],
 
 	        	contentsToShow : [],
 	        	allFetchedWarehouses : [],
@@ -490,6 +689,29 @@
 
 			// this.getCurrentUser();
 			this.fetchAllWarehouses();
+			// this.fetchAllRentPeriods();
+
+		},
+
+		filters: {
+
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(/[\s-]/);
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 
 		},
 
@@ -584,6 +806,52 @@
 					});
 
 			},
+			/*
+				fetchAllRentPeriods() {
+
+					if (! this.userHasPermissionTo('view-asset-index')) {
+
+						this.error = 'You do not have permission to view rent-periods';
+						return;
+						
+					}
+					
+					this.error = '';
+					this.loading = true;
+					this.allRentPeriods = [];
+					
+					axios
+						.get('/api/rent-periods/')
+						.then(response => {
+							if (response.status == 200) {
+								this.allRentPeriods = response.data;
+							}
+						})
+						.catch(error => {
+							this.error = error.toString();
+							// Request made and server responded
+							if (error.response) {
+								console.log(error.response.data);
+								console.log(error.response.status);
+								console.log(error.response.headers);
+								console.log(error.response.data.errors[x]);
+							} 
+							// The request was made but no response was received
+							else if (error.request) {
+								console.log(error.request);
+							} 
+							// Something happened in setting up the request that triggered an Error
+							else {
+								console.log('Error', error.message);
+							}
+
+						})
+						.finally(response => {
+							this.loading = false;
+						});
+
+				},
+			*/
 			searchData() {
 
 				this.error = '';
