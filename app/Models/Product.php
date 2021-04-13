@@ -12,7 +12,8 @@ class Product extends Model
     // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warehouseContainer.container'];
 
     protected $casts = [
-        'has_variations' => 'boolean'
+        'has_serials' => 'boolean',
+        'has_variations' => 'boolean',
     ];
 
     public function category()
@@ -35,13 +36,6 @@ class Product extends Model
         return $this->hasMany(WarehouseProduct::class, 'product_id', 'id');
     }
 
-    public function nonDispatchedRequests()
-    {
-        return $this->hasMany(RequiredProduct::class, 'product_id', 'id')->whereHas('requisition', function ($query) {
-            $query->where('status', 0);
-        });
-    }
-
     public function requests()
     {
         return $this->hasMany(RequiredProduct::class, 'product_id', 'id');
@@ -50,6 +44,18 @@ class Product extends Model
     public function stocks()
     {
         return $this->hasMany(ProductStock::class, 'product_id', 'id')->latest();
+    }
+
+    public function latestStock()
+    {
+        return $this->hasOne(ProductStock::class, 'product_id', 'id')->latest();
+    }
+
+    public function nonDispatchedRequests()
+    {
+        return $this->hasMany(RequiredProduct::class, 'product_id', 'id')->whereHas('requisition', function ($query) {
+            $query->where('status', 0);
+        });
     }
 
     // immutable product
@@ -63,11 +69,6 @@ class Product extends Model
         }
 
         return false;
-    }
-
-    public function latestStock()
-    {
-        return $this->hasOne(ProductStock::class, 'product_id', 'id')->latest();
     }
 
     /*

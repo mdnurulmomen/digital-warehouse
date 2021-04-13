@@ -23,6 +23,11 @@ class ProductStock extends Model
         return $this->hasMany(WarehouseProduct::class, 'product_stock_id', 'id');
     }
 
+    public function serials()
+    {
+        return $this->hasMany(ProductSerial::class, 'product_stock_id', 'id');
+    }
+
     public function deleteStockVariations()
     {
         if ($this->variations()->count()) {
@@ -46,34 +51,36 @@ class ProductStock extends Model
                 
                 foreach ($variations as $stockVariation) {
                     
-                    $existingStockVariation = $this->variations()->where('id', $stockVariation->id)->first();
+                    $variationExistingStock = $this->variations()->where('id', $stockVariation->id)->first();
 
-                    if ($existingStockVariation->stock_quantity > $stockVariation->stock_quantity) {
+                    if ($variationExistingStock->stock_quantity > $stockVariation->stock_quantity) {
                         
                         // decrease quantity
-                        $difference = $existingStockVariation->stock_quantity - $stockVariation->stock_quantity;
+                        $difference = $variationExistingStock->stock_quantity - $stockVariation->stock_quantity;
 
-                        $existingStockVariation->update([
+                        $variationExistingStock->update([
                             'stock_quantity' => $stockVariation->stock_quantity,
-                            'available_quantity' => ($existingStockVariation->available_quantity - $difference),
+                            'available_quantity' => ($variationExistingStock->available_quantity - $difference),
                         ]);
 
-                        $this->decreaseSuccessorStockVariations($existingStockVariation, $difference);
+                        $this->decreaseSuccessorStockVariations($variationExistingStock, $difference);
 
                     }
-                    else if ($existingStockVariation->stock_quantity < $stockVariation->stock_quantity) {
+                    else if ($variationExistingStock->stock_quantity < $stockVariation->stock_quantity) {
                         
                         // increase quantity
-                        $difference = $stockVariation->stock_quantity - $existingStockVariation->stock_quantity;
+                        $difference = $stockVariation->stock_quantity - $variationExistingStock->stock_quantity;
                         
-                        $existingStockVariation->update([
+                        $variationExistingStock->update([
                             'stock_quantity' => $stockVariation->stock_quantity,
-                            'available_quantity' => ($existingStockVariation->available_quantity + $difference),
+                            'available_quantity' => ($variationExistingStock->available_quantity + $difference),
                         ]);
 
-                        $this->increaseSuccessorStockVariations($existingStockVariation, $difference);
+                        $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
 
                     }
+
+                    $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock);
 
                 }
 
@@ -86,13 +93,15 @@ class ProductStock extends Model
                         
                         $variationLastAvailableValue = ProductVariation::find($stockVariation->id)->latestStock->available_quantity ?? 0;
 
-                        $this->variations()->create([
+                        $variationNewStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity),
                             'product_variation_id' => $stockVariation->id,
                             'product_stock_id' => $this->id,
                             'created_at' => now(),
                         ]);
+
+                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
 
                     }
 
@@ -128,6 +137,36 @@ class ProductStock extends Model
                     
                     $this->setProductUnits($space->container, $product);
                     
+                }
+
+            }
+
+        }
+    }
+
+    public function setStockSerialsAttribute($serials) 
+    {
+        if (count($serials)) {
+            
+            // deleting initially
+            $this->serials()->delete();
+
+            foreach ($serials as $serial) {
+                
+                $this->serials()->updateOrCreate(
+                    [ 'serial_no' => $serial ],
+                    [ 'deleted_at' => NULL ]
+                );
+
+            }
+
+            // deleting still deleted serials
+            foreach ($this->serials()->onlyTrashed() as $productTrashedSerial) {
+                
+                if (! $productTrashedSerial->has_requisitions && ! $productTrashedSerial->has_dispatched) {
+                    
+                    $productTrashedSerial->forceDelete();
+
                 }
 
             }
@@ -360,4 +399,35 @@ class ProductStock extends Model
     {
         ProductVariationStock::where('product_variation_id', $variationToUpdate->product_variation_id)->where('id', '>', $variationToUpdate->id)->decrement('available_quantity', $amount);
     }
+
+    protected function setProductVariationSerialNumbers($serials, ProductVariationStock $productVariationStock) 
+    {
+        if (count($serials)) {
+            
+            // deleting initially
+            $productVariationStock->serials()->delete();
+
+            foreach ($serials as $serial) {
+                
+                $productVariationStock->serials()->updateOrCreate(
+                    [ 'serial_no' => $serial ],
+                    [ 'deleted_at' => NULL ]
+                );
+
+            }
+
+            // deleting still deleted serials
+            foreach ($productVariationStock->serials()->onlyTrashed() as $variationTrashedSerial) {
+                
+                if (! $variationTrashedSerial->has_requisitions && ! $variationTrashedSerial->has_dispatched) {
+                    
+                    $variationTrashedSerial->forceDelete();
+
+                }
+
+            }
+
+        }
+    }
+
 }

@@ -24,6 +24,11 @@ class ProductVariation extends Model
         return $this->hasMany(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
     }
 
+    public function latestStock()
+    {
+        return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
+    }
+
     public function getVariationImmutabilityAttribute()
     {
         if ($this->requests()->count()) {
@@ -34,11 +39,6 @@ class ProductVariation extends Model
         }
 
         return false;
-    }
-
-    public function latestStock()
-    {
-        return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
     }
 
     public function nonDispatchedRequests()

@@ -70,15 +70,16 @@
 																	</tr>
 																</thead>
 																<tbody>
-
 																	<tr v-for="stock in allStocks" :key="'stock-' + stock.id"
 																	>
 																		<td>
 																			{{ stock.created_at }}
 																		</td>
+
 																		<td>
 																			{{ stock.stock_quantity }}
 																		</td>
+
 																		<td>
 																			{{ stock.available_quantity }}
 																		</td>
@@ -111,8 +112,8 @@
 																				<i class="fas fa-trash"></i>
 																			</button>
 																		</td>
-																    
 																	</tr>
+
 																	<tr 
 																  		v-show="!allStocks.length"
 																  	>
@@ -122,7 +123,6 @@
 																      		</div>
 																    	</td>
 																  	</tr>
-
 																</tbody>
 																<tfoot>
 																	<tr>	
@@ -179,7 +179,6 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -229,7 +228,6 @@
 									<h2 class="mx-auto mb-4 lead">Product Profile</h2>
 
 									<div class="col-md-12">
-
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Product Category :
@@ -357,6 +355,7 @@
 					                              			placeholder="Select Variation" 
 					                                  		label="name" 
 					                                  		track-by="id" 
+					                                  		class="form-control p-0 is-valid" 
 					                                  		:custom-label="objectNameWithCapitalized" 
 					                                  		:options="[]" 
 					                                  		:disabled="true"
@@ -368,6 +367,7 @@
 														class="form-group col-md-6"
 													>
 														<label for="inputFirstName">Variation Qty</label>
+														
 														<input type="number" 
 															class="form-control" 
 															v-model.number="singleStockData.variations[variationIndex].stock_quantity" 
@@ -413,11 +413,111 @@
 								    	</div>
 									</div>
 							    </div>
+
+							    <div 
+								    class="row" 
+								    v-bind:key="'product-modal-step-' + 2" 
+								    v-show="!loading && step==2"
+							    >
+							    	<h2 class="mx-auto mb-4 lead">Product Serials</h2>
+
+							    	<div 
+										class="col-md-12" 
+										v-if="product.has_serials && product.has_variations && singleStockData.variations.length && this.step==2"
+									>
+										<div 
+											class="form-row" 
+											v-for="(stockedVariation, stockedVariationIndex) in singleStockData.variations" 
+											:key="'product-variation-index-' + stockedVariationIndex + 'B'"
+										>	
+											<div class="card col-md-12" v-if="stockedVariation.stock_quantity > 0">
+												<div class="card-header">
+													{{ stockedVariation.variation.name | capitalize }} Serials
+												</div>
+												
+												<div class="card-body">
+													<div 
+														class="form-group" 
+														v-for="productVariationStockIndex in singleStockData.variations[stockedVariationIndex].stock_quantity" 
+														:key="'product-variation-' + stockedVariation.variation.name + '-serial-' + productVariationStockIndex"
+													>	
+														<label for="inputFirstName">
+															# {{ singleStockData.variations[stockedVariationIndex].variation.name + ' Serial ' + productVariationStockIndex | capitalize }}
+														</label>
+
+														<input 
+															type="text" 
+															class="form-control" 
+															v-model="stockedVariation.serials[productVariationStockIndex-1]" 
+															placeholder="Variation Serial number" 
+															:class="!errors.stock.variations[stockedVariationIndex].product_variation_serials[productVariationStockIndex-1] ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('product_variation_serials')" 
+															required="true" 
+														>
+
+														<div class="invalid-feedback">
+												        	{{ errors.stock.variations[stockedVariationIndex].product_variation_serials[productVariationStockIndex-1] }}
+												  		</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div 
+										class="col-md-12"
+										v-else-if="product.has_serials && ! product.has_variations && singleStockData.stock_quantity > 0"
+									>
+										<div 
+											class="form-row" 
+											v-for="stockedProductIndex in singleStockData.stock_quantity" 
+											:key="'product-serial-' + stockedProductIndex"
+										>
+											<div class="col-sm-12 form-group">
+												<label for="inputFirstName">
+													# Serial {{ stockedProductIndex }}
+												</label>
+												
+												<input 
+													type="text" 
+													class="form-control" 
+													v-model="singleStockData.serials[stockedProductIndex-1]" 
+													placeholder="Product Serial number" 
+													:class="!errors.stock.product_serials[stockedProductIndex-1] ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('product_serials')" 
+													required="true" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.stock.product_serials[stockedProductIndex-1] }}
+										  		</div>
+											</div>
+										</div>
+									</div>
+
+						          	<div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12 d-flex justify-content-between">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+											</div>
+										</div>
+									</div>
+							    </div>
 						     
 							    <div 
 									class="row" 
-									v-bind:key="'product-modal-step-' + 2" 
-									v-show="!loading && step==2" 
+									v-bind:key="'product-modal-step-' + 3" 
+									v-show="!loading && step==3" 
 								>
 									<h2 class="mx-auto mb-4 lead">Store Stock</h2>
 
@@ -444,17 +544,14 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false"
 					                              			placeholder="Containers / Shelves / Units" 
+					                              			class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_space_type  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)" 
 					                                  		@input="setProductSpaceType(spaceIndex)" 
 					                                  		@close="validateFormInput('product_space_type')"
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_space_type"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_space_type }}
 													    </div>
 													</div>
@@ -477,17 +574,14 @@
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
 					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_containers  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@close="validateFormInput('product_containers')" 
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_containers"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_containers }}
 													    </div>
 													</div>
@@ -506,18 +600,15 @@
 					                                  		track-by="id" 
 					                                  		:options="emptyShelfContainers" 
 					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_container ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@input="setAvailableShelves(spaceIndex)"
 					                                  		@close="validateFormInput('product_container')" 
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_container"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_container }}
 													    </div>
 													</div>
@@ -538,17 +629,14 @@
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
 					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@close="validateFormInput('product_shelves')" 
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_shelves"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_shelves }}
 													    </div>
 													</div>
@@ -564,18 +652,15 @@
 					                                  		track-by="id" 
 					                                  		:options="emptyUnitContainers" 
 					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@input="setAvailableUnitShelves(spaceIndex)" 
 					                                  		@close="validateFormInput('product_container')" 
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_container"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_container }}
 													    </div>
 													</div>
@@ -592,18 +677,15 @@
 					                                  		track-by="id" 
 					                                  		:options="emptyUnitShelves" 
 					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@input="setAvailableUnits(spaceIndex)" 
 					                                  		@close="validateFormInput('product_shelf')" 
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_shelf"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_shelf }}
 													    </div>
 													</div>
@@ -624,17 +706,14 @@
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
 					                                  		:required="true" 
-					                                  		:allow-empty="false"
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@close="validateFormInput('product_units')" 
 					                              		>
 					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.stock.addresses[spaceIndex].product_units"
-					                                	>
+					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_units }}
 													    </div>
 													</div>
@@ -1218,6 +1297,7 @@
 
 	        	singleStockData : {
 
+	        		serials : [],
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
 					addresses : this.product.addresses ?? [
@@ -1230,6 +1310,7 @@
 					stock : {
 						variations : [],
 						addresses : [],
+						product_serials : [],
 					},
 				},
 
@@ -1245,7 +1326,9 @@
 
 			this.fetchProductAllStocks();
 			
-			this.manupulatePropData();
+			this.resetErrorObject();
+
+			// this.configureProductErrorsWithPropData();
 
 		},
 
@@ -1360,19 +1443,21 @@
 					});
 
 			},
-			manupulatePropData() {
+		/*
+			configureProductErrorsWithPropData() {
 
 				// new error configuration
 				this.errors = {
 					stock : {
 						variations : [],
 						addresses : [],
+						product_serials : [],
 					},
 				};
 
-				if (this.singleStockData.addresses.length || this.product.addresses.length) {
+				if (this.singleStockData.addresses.length) {
 
-					if (this.singleStockData.addresses.length) {
+					// if (this.singleStockData.addresses.length) {
 
 						this.singleStockData.addresses.forEach(
 							(productAddress, index) => {
@@ -1380,16 +1465,18 @@
 							}
 						);
 
-					}
-					else {
+					// }
+					
+						else {
 
-						this.product.addresses.forEach(
-							(productAddress, index) => {
-								this.errors.stock.addresses.push({});
-							}
-						);
+							this.product.addresses.forEach(
+								(productAddress, index) => {
+									this.errors.stock.addresses.push({});
+								}
+							);
 
-					}
+						}
+					
 
 				}
 				else {
@@ -1411,6 +1498,7 @@
 				}
 
 			},
+		*/	
     		showStockDetails(object) {		
 				// this.singleStockData = { ...object };
 				this.singleStockData = Object.assign({}, this.singleStockData, object);
@@ -1425,59 +1513,30 @@
 				// singleStockData configuration
 				this.singleStockData = {
 
+	        		serials : [],
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
 					addresses : this.singleStockData.addresses.length ? this.singleStockData.addresses : this.product.addresses.length ? this.product.addresses : [ {}, ],
 
 	        	};
 
-				// new errors configuration
-				this.errors = {
-					stock : {
-						variations : [],
-						addresses : [],
-					},
-				};
+	        	if (this.product.has_serials && this.product.hasOwnProperty('variations') && this.product.variations.length) {
 
-				if (this.singleStockData.addresses.length || this.product.addresses.length) {
-
-					if (this.singleStockData.addresses.length) {
-
-						this.singleStockData.addresses.forEach(
-							(productAddress, index) => {
-								this.errors.stock.addresses.push({});
-							}
-						);
-
-					}
-					else {
-
-						this.product.addresses.forEach(
-							(productAddress, index) => {
-								this.errors.stock.addresses.push({});
-							}
-						);
-
-					}
-
-				}
-				else {
-
-					this.errors.stock.addresses = [
-						{},
-					];
-
-				}
-
-				if (this.product.category && this.product.has_variations && this.product.variations.length) {
-	
 					this.product.variations.forEach(
-						(productVariation, index) => {
-							this.errors.stock.variations.push({});
+					
+						(stockVariation, stockVariationIndex) => {								
+
+							// this.singleStockData.variations[stockVariationIndex].serials = [];
+							this.$set(this.singleStockData.variations[stockVariationIndex], 'serials', []);
+
 						}
-					);					
+
+					);
 
 				}
+
+				// new errors configuration
+				this.resetErrorObject();
 
 				$('#stock-createOrEdit-modal').modal('show');
 			},
@@ -1491,33 +1550,7 @@
 				this.singleStockData = JSON.parse(JSON.stringify(object));
 				this.singleStockData.product_id = this.product.id;
 
-				// new errors configuration
-				this.errors = {
-					stock : {
-						variations : [],
-						addresses : [],
-					},
-				};
-
-				if (this.singleStockData.addresses.length) {
-
-					this.singleStockData.addresses.forEach(
-						(productAddress, index) => {
-							this.errors.stock.addresses.push({});
-						}
-					);
-
-				}
-			
-				if (this.product.category && this.singleStockData.has_variations && this.singleStockData.variations.length) {
-						
-					this.product.variations.forEach(
-						(productVariation, index) => {
-							this.errors.stock.variations.push({});
-						}
-					);
-					
-				}
+				this.resetErrorObject();
 
 				this.setAvailableShelvesAndUnits();
 
@@ -1648,7 +1681,7 @@
 				this.validateFormInput('product_shelves');
 				this.validateFormInput('product_units');
 
-				if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && !this.errorInArray(this.errors.stock.variations) && !this.errorInArray(this.errors.stock.addresses)) {
+				if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && !this.errorInVariationsArray(this.errors.stock.variations) && !this.errorInAddressesArray(this.errors.stock.addresses)) {
 
 					return true;
 				
@@ -1657,13 +1690,45 @@
 				return false;
 		
 			},
-			errorInArray(array = []) {
+			errorInProductSerialsArray(array = []) {
+
+				const serialError = (serial) => {
+					return serial && serial.length > 0
+				}; 
+
+				if (array.length) {
+					return array.some(serialError);
+				}
+
+				return false;
+
+			},
+			errorInVariationsArray(array = []) {
+
+				const variationSerialError = (serial) => {
+					return serial && serial.length > 0
+				};
+
 				const variationError = (variation) => {
-	        							return Object.keys(variation).length > 0
-	        						}; 
+
+					return Object.keys(variation).length > 1 || variation.product_variation_serials.some(variationSerialError)
+
+				}; 
 
 				if (array.length) {
 					return array.some(variationError);
+				}
+
+				return false;
+
+			},
+			errorInAddressesArray(array = []) {
+				const addressError = (address) => {
+	        							return Object.keys(address).length > 0
+	        						}; 
+
+				if (array.length) {
+					return array.some(addressError);
 				}
 
 				return false;
@@ -1681,12 +1746,57 @@
 
 					}
 
-					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && !this.errorInArray(this.errors.stock.variations)) {
-						this.step += 1;
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && !this.errorInVariationsArray(this.errors.stock.variations)) {
+
+						if (this.product.has_serials) {
+
+							this.step += 1;
+
+						}
+						else {
+
+							this.step += 2;
+
+						}
+
 						this.submitForm = true;
+					
 					}
 					else {
+					
 						this.submitForm = false;
+					
+					}
+
+				}
+
+				else if (this.step == 2) {
+
+					if (this.product.has_serials) {
+
+						if (this.product.has_variations) {
+							
+							this.validateFormInput('product_variation_serials');
+
+						}
+						else {
+							
+							this.validateFormInput('product_serials');
+
+						}
+
+					}
+
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && ! this.errorInProductSerialsArray(this.errors.stock.product_serials) && ! this.errorInVariationsArray(this.errors.stock.variations)) {
+
+						this.step += 1;
+						this.submitForm = true;
+
+					}
+					else {
+
+						this.submitForm = false;
+						
 					}
 
 				}
@@ -1715,10 +1825,79 @@
 
 				}
 
-				if (!this.errorInArray(this.errors.stock.addresses)) {
+				if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 					this.submitForm = true;
 				}
 				
+			},
+			resetErrorObject() {
+
+				// new errors initialization
+				this.errors = {
+					stock : {
+						variations : [],
+						addresses : [],
+						product_serials : [],
+					},
+				};
+
+				if (this.singleStockData.addresses.length) {
+
+					// if (this.singleStockData.addresses.length) {
+
+						this.singleStockData.addresses.forEach(
+							(productAddress, index) => {
+								this.errors.stock.addresses.push({});
+							}
+						);
+
+					// }
+					/*
+						else {
+
+							this.product.addresses.forEach(
+								(productAddress, index) => {
+									this.errors.stock.addresses.push({});
+								}
+							);
+
+						}
+					*/
+					
+				}
+				else {
+
+					this.errors.stock.addresses = [
+						{},
+					];
+
+				}
+
+				if (this.product.category && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+	
+					this.product.variations.forEach(
+						(productVariation, index) => {
+							this.errors.stock.variations.push({});
+						}
+					);
+
+					if (this.product.has_serials) {
+
+						this.product.variations.forEach(
+						
+							(productVariation, stockVariationIndex) => {								
+
+								// this.errors.stock.variations[stockVariationIndex].product_variation_serials = [];
+								this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serials', []);
+
+							}
+
+						);
+
+					}				
+
+				}
+
 			},
 			changeNumberContents() {
 				
@@ -2034,7 +2213,7 @@
 								
 							);
 								
-							if (!this.errorInArray(this.errors.stock.variations)) {
+							if (!this.errorInVariationsArray(this.errors.stock.variations)) {
 								this.submitForm = true;
 							}
 							
@@ -2051,7 +2230,7 @@
 
 						if (this.product.has_variations) {
 
-							if (!this.errorInArray(this.errors.stock.variations)) {
+							if (!this.errorInVariationsArray(this.errors.stock.variations)) {
 
 								let variationTotalQuantity = this.singleStockData.variations.reduce(
 									(value, currentObject) => {
@@ -2111,7 +2290,7 @@
 
 						);
 						
-						if (!this.errorInArray(this.errors.stock.addresses)) {
+						if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -2134,7 +2313,7 @@
 
 						);
 
-						if (!this.errorInArray(this.errors.stock.addresses)) {
+						if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -2156,7 +2335,7 @@
 							}
 						);
 
-						if (!this.errorInArray(this.errors.stock.addresses)) {
+						if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -2178,7 +2357,7 @@
 							}
 						);
 
-						if (!this.errorInArray(this.errors.stock.addresses)) {
+						if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -2200,7 +2379,7 @@
 							}
 						);
 
-						if (!this.errorInArray(this.errors.stock.addresses)) {
+						if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -2223,12 +2402,129 @@
 							}
 						);
 
-						if (!this.errorInArray(this.errors.stock.addresses)) {
+						if (!this.errorInAddressesArray(this.errors.stock.addresses)) {
 							this.submitForm = true;
 						}
 
 						break;
-				
+
+					case 'product_serials' :
+
+						if (this.product.has_serials && ! this.product.has_variations) {
+							
+							for (let i = 0; i < this.singleStockData.stock_quantity; i++) {
+								
+								if (! this.singleStockData.serials[i] || this.singleStockData.serials[i].length < 1) {
+
+									// this.errors.stock.product_serials[i] = 'Serial number is required';
+									this.$set(this.errors.stock.product_serials, i, 'Serial number is required');
+								
+								}
+								else if (! this.singleStockData.serials[i].match(/^[a-zA-Z0-9-_]+$/)) {
+
+									// this.errors.stock.product_serials[i] = 'Invalide serial number';
+									this.$set(this.errors.stock.product_serials, i, 'Invalide serial number');
+
+								}
+								else if (this.singleStockData.serials.filter((value) => value === this.singleStockData.serials[i]).length > 1) {
+
+									this.$set(this.errors.stock.product_serials, i, 'Duplicate serial number');
+
+								}
+								else {
+
+									// this.errors.stock.product_serials[i] = null;
+									this.$set(this.errors.stock.product_serials, i, null);
+
+								}
+
+							}
+
+							if (! this.errorInProductSerialsArray(this.errors.stock.product_serials)) {
+
+								this.submitForm = true;
+
+							}
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.errors.stock.product_serials = [];
+						
+						}
+
+						break;
+					
+					case 'product_variation_serials' :
+
+
+						if (this.product.has_serials && this.product.has_variations && this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
+							
+							this.singleStockData.variations.forEach(
+							
+								(stockVariation, stockVariationIndex) => {
+
+									this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serials', []);
+
+									for (let i = 0; i < stockVariation.stock_quantity; i++) {
+										
+										if (! stockVariation.serials[i] || stockVariation.serials[i].length < 1) {
+
+											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = 'Serial number is required';
+
+											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Serial number is required');
+
+										}
+										else if (! stockVariation.serials[i].match(/^[a-zA-Z0-9-_]+$/)) {
+
+											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = 'Invalide serial number';
+
+											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Invalide serial number');
+
+										}
+										else if (stockVariation.serials.filter((value) => value === stockVariation.serials[i]).length > 1) {
+
+											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Duplicate serial number');
+
+										}
+										else {
+
+											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = null;
+
+											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, null);
+
+										}
+
+									}
+
+								}
+
+							);
+
+							if (! this.errorInVariationsArray(this.errors.stock.variations)) {
+
+								this.submitForm = true;
+
+							}
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.singleStockData.variations.forEach(
+							
+								(stockVariation, stockVariationIndex) => {
+
+									this.errors.stock.variations[stockVariationIndex].product_variation_serials = [];
+
+								}
+
+							);
+						
+						}
+
+						break;				
 
 				}
 	 

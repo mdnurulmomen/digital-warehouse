@@ -142,22 +142,12 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:65535',
             'sku' => 'nullable|string|max:100|unique:products,sku',
             'price' => 'nullable|numeric|min:0', // min 0 due to bulk products
-            // 'initial_quantity' => 'required|numeric|min:1',
-            // 'available_quantity' => 'required|numeric|min:0',
             'quantity_type' => 'nullable|string|max:100',
+            'has_serials' => 'nullable|boolean',
             'has_variations' => 'nullable|boolean',
-            // 'variation_type_id' => 'required_if:has_variations,1',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
-            // 'variations.*.initial_quantity' => 'required_if:has_variations,1',
             'variations.*.price' => 'required_if:has_variations,1',
-
-            // 'space_type' => 'required|in:containers,shelves,units',
-            // 'containers' => 'required_if:space_type,containers',
-            // 'container' => 'required_if:space_type,shelves|required_if:space_type,units',
-            // 'container.shelves' => 'required_if:space_type,shelves|array',
-            // 'container.shelf' => 'required_if:space_type,units',
-            // 'container.shelf.units' => 'required_if:space_type,units|array',
         ]);
 
         $newProduct = new Product();
@@ -166,10 +156,9 @@ class ProductController extends Controller
         $newProduct->description = strtolower($request->description);
         $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
         $newProduct->price = $request->price ?? 0;
-        // $newProduct->initial_quantity = $request->initial_quantity;
-        // $newProduct->available_quantity = $request->initial_quantity;
         $newProduct->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
-        $newProduct->has_variations = $request->has_variations ?? false;
+        $newProduct->has_serials = $request->has_serials;
+        $newProduct->has_variations = $request->has_variations;
         $newProduct->product_category_id = $request->product_category_id;
         $newProduct->merchant_id = $request->merchant_id;
 
@@ -180,8 +169,6 @@ class ProductController extends Controller
             $newProduct->product_variations = json_decode(json_encode($request->variations));
 
         }
-
-        // $newProduct->product_address = json_decode(json_encode($request->addresses));
 
         return $this->showAllProducts($perPage);
     }
@@ -197,35 +184,24 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:65535',
             'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
             'price' => 'required|numeric|min:0', // min 0 due to bulk products
-            // 'initial_quantity' => 'required|numeric|min:1',
-            // 'available_quantity' => 'required|numeric|min:0',
             'quantity_type' => 'nullable|string|max:100',
+            'has_serials' => 'nullable|boolean',
             'has_variations' => 'nullable|boolean',
-            // 'variation_type_id' => 'required_if:has_variations,1',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
-            // 'variations.*.initial_quantity' => 'required_if:has_variations,1',
             'variations.*.price' => 'required_if:has_variations,1',
-
-            // 'space_type' => 'required|in:containers,shelves,units',
-            // 'containers' => 'required_if:space_type,containers',
-            // 'container' => 'required_if:space_type,shelves|required_if:space_type,units',
-            // 'container.shelves' => 'required_if:space_type,shelves|array',
-            // 'container.shelf' => 'required_if:space_type,units',
-            // 'container.shelf.units' => 'required_if:space_type,units|array',
         ]);
 
         $productToUpdate->name = strtolower($request->name);
         $productToUpdate->description = strtolower($request->description);
         $productToUpdate->sku = $request->sku ?? $this->generateProductSKU($request);
         $productToUpdate->price = $request->price ?? 0;
-        // $productToUpdate->initial_quantity = $request->initial_quantity;
-        // $productToUpdate->available_quantity = $request->initial_quantity;
         $productToUpdate->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
         
-        if (!$productToUpdate->product_immutability) {
+        if (! $productToUpdate->product_immutability) {
             
-            $productToUpdate->has_variations = $request->has_variations ?? false;
+            $productToUpdate->has_serials = $request->has_serials;
+            $productToUpdate->has_variations = $request->has_variations;
             
         }
         
@@ -240,38 +216,34 @@ class ProductController extends Controller
 
         }
 
-        // $productToUpdate->product_address = json_decode(json_encode($request->addresses));
-
         return $this->showAllProducts($perPage);
     }
 
-/*
-    public function deleteProduct($asset, $perPage)
-    {
-        $assetToDelete = ProductCategory::findOrFail($asset);
-        // $userToDelete->warehouses()->delete();
-        $assetToDelete->delete();
+    /*
+        public function deleteProduct($asset, $perPage)
+        {
+            $assetToDelete = ProductCategory::findOrFail($asset);
+            // $userToDelete->warehouses()->delete();
+            $assetToDelete->delete();
 
-        return $this->showProductAllCategories($perPage);
-    }
+            return $this->showProductAllCategories($perPage);
+        }
 
-    public function restoreProduct($asset, $perPage)
-    {
-        $assetToRestore = ProductCategory::withTrashed()->findOrFail($asset);
-        // $userToRestore->warehouses()->restore();
-        $assetToRestore->restore();
+        public function restoreProduct($asset, $perPage)
+        {
+            $assetToRestore = ProductCategory::withTrashed()->findOrFail($asset);
+            // $userToRestore->warehouses()->restore();
+            $assetToRestore->restore();
 
-        return $this->showProductAllCategories($perPage);
-    }
-*/
+            return $this->showProductAllCategories($perPage);
+        }
+    */
 
     public function searchAllProducts($search, $perPage)
     {
         $query = Product::where('name', 'like', "%$search%")
                         ->orWhere('sku', 'like', "%$search%")
                         ->orWhere('price', 'like', "%$search%")
-                        // ->orWhere('initial_quantity', 'like', "%$search%")
-                        // ->orWhere('available_quantity', 'like', "%$search%")
                         ->orWhere('quantity_type', 'like', "%$search%")
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
@@ -298,19 +270,33 @@ class ProductController extends Controller
         $product = Product::find($request->product_id);
         $lastAvailableQuantity = $product->latestStock->available_quantity ?? 0;
 
-        $currentUser = \Auth::guard('admin')->user() ?? Auth::guard('manager')->user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
+
+        if (empty($product) || empty($currentUser)) {
+
+            // should through an exception laterly
+            return $this->showProductAllStocks($request->product_id, $perPage);
+            
+        }
 
         $newStock = $product->stocks()->create([
             'stock_quantity' => $request->stock_quantity,
             'available_quantity' => $lastAvailableQuantity + $request->stock_quantity,
             'has_variations' => $product->has_variations,
+            'has_serials' => $product->has_serials,
             'user_type' => class_basename($currentUser),
             'user_id' => $currentUser->id,
         ]);
 
-        if ($newStock->has_variations && !empty($request->variations)) {
+        if ($newStock->has_variations && ! empty($request->variations)) {
             
             $newStock->stock_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        if ($newStock->has_serials && ! $newStock->has_variations && ! empty($request->serials)) {
+            
+            $newStock->stock_serials = json_decode(json_encode($request->serials));
 
         }
 
@@ -326,8 +312,7 @@ class ProductController extends Controller
             'product_id' => 'required|numeric|exists:products,id',
         ]);
 
-        // $product = Product::find($request->product_id);
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
 
         $stockToUpdate = ProductStock::findOrFail($stock);
 
@@ -368,6 +353,12 @@ class ProductController extends Controller
 
             }
 
+            if ($stockToUpdate->has_serials && ! $stockToUpdate->has_variations && ! empty($request->serials)) {
+                
+                $stockToUpdate->stock_serials = json_decode(json_encode($request->serials));
+
+            }
+
             $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $request->product_id);
 
         }
@@ -378,8 +369,6 @@ class ProductController extends Controller
     public function deleteProductStock($stock, $perPage)
     {
         $stockToDelete = ProductStock::findOrFail($stock);
-
-        // $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
         $productId = $stockToDelete->product_id;
 

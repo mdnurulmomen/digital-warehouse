@@ -24,4 +24,9 @@ class ProductVariationStock extends Model
     {
     	return $this->belongsTo(ProductStock::class, 'product_stock_id', 'id');
     }
+
+    public function serials()
+    {
+        return $this->hasMany(ProductVariationSerial::class, 'product_variation_stock_id', 'id');
+    }
 }

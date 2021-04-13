@@ -223,7 +223,8 @@
 							        <div class="form-row">
 							        	<div class="form-group col-sm-12 text-center">
 								        	<multiselect 
-		                              			v-model="productMode"
+		                              			v-model="productMode" 
+		                              			class="form-control p-0 is-valid" 
 		                              			placeholder="Product Mode" 
 		                                  		:custom-label="nameWithCapitalized" 
 		                                  		:options="['bulk product', 'retail product']" 
@@ -239,7 +240,8 @@
 										<div class="form-group col-md-6">
 											<label for="inputUsername">Product Category</label>
 											<multiselect 
-		                              			v-model="singleProductData.category"
+		                              			v-model="singleProductData.category" 
+		                              			class="form-control p-0 is-valid" 
 		                              			placeholder="Product Category" 
 		                                  		label="name" 
 		                                  		track-by="id" 
@@ -267,17 +269,14 @@
 		                                  		:allow-empty="false"
 		                                  		selectLabel = "Press/Click"
 		                                  		deselect-label="Can't remove single value" 
+		                                  		class="form-control p-0" 
 		                                  		:class="!errors.product.product_merchant_id  ? 'is-valid' : 'is-invalid'"
 		                                  		@close="validateFormInput('product_merchant_id')" 
 		                                  		@input="setProductMerchant"
 		                              		>
 		                                	</multiselect>
 
-		                                	<div 
-			                                	class="invalid-feedback" 
-			                                	style="display: block;" 
-			                                	v-show="errors.product.product_merchant_id"
-		                                	>
+		                                	<div class="invalid-feedback">
 										    	{{ errors.product.product_merchant_id }}
 										    </div>
 										</div>
@@ -290,7 +289,7 @@
 												class="form-control" 
 												v-model="singleProductData.name" 
 												placeholder="Name should be unique" 
-												:class="!errors.product.product_name  ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.product.product_name ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_name')" 
 												required="true" 
 											>
@@ -325,7 +324,6 @@
 												v-model="singleProductData.quantity_type" 
 												placeholder="Kg / Meter / Box" 
 												:class="!errors.product.product_quantity_type  ? 'is-valid' : 'is-invalid'" 
-												:readonly="!createMode" 
 												@change="validateFormInput('product_quantity_type')" 
 												required="true" 
 											>
@@ -399,167 +397,180 @@
 										</div>
 									</div>
 
-									<div class="form-row mt-2">
-										<div class="form-group col-md-12 text-center">
-											<toggle-button 
-												v-model="singleProductData.has_variations" 
-												:width=150 
-												:sync="true"
-												:color="{checked: 'green', unchecked: 'blue'}"
-												:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
-												:disabled="productMode=='bulk product' || singleProductData.product_immutability" 
-												@change="resetProductVariations()"
-											/>
+									<div class="form-control form-group">
+										<div class="form-row mt-2">
+											<div class="col-md-12 text-center">
+												<toggle-button 
+													v-model="singleProductData.has_serials" 
+													:width=200 
+													:sync="true"
+													:color="{checked: 'orange', unchecked: 'green'}"
+													:labels="{checked: 'Has Serial', unchecked: 'No Serial'}" 
+													:disabled="productMode=='bulk product' || singleProductData.product_immutability" 
+												/>
+											</div>
 										</div>
 									</div>
 
-									<div class="form-row" v-show="singleProductData.has_variations">
-										<div class="form-group col-md-3">
-											<label for="inputFirstName">Variation Type</label>
-											<multiselect 
-		                              			v-model="singleProductData.variation_type"
-		                              			placeholder="Choose Type" 
-		                                  		label="name" 
-		                                  		track-by="id" 
-		                                  		:custom-label="objectNameWithCapitalized" 
-		                                  		:options="allVariationTypes" 
-		                                  		:required="true" 
-		                                  		:allow-empty="false"
-		                                  		selectLabel = "Press/Click"
-		                                  		deselect-label="Can't remove single value" 
-		                                  		:class="!errors.product.product_variation_type  ? 'is-valid' : 'is-invalid'" 
-		                                  		:disabled="singleProductData.product_immutability"
-		                                  		@close="validateFormInput('product_variation_type')" 
-		                                  		@input="setProductVariation"
-		                              		>
-		                                	</multiselect>
-		                                	<div 
-			                                	class="invalid-feedback" 
-			                                	style="display: block;" 
-			                                	v-show="errors.product.product_variation_type"
-		                                	>
-										    	{{ errors.product.product_variation_type }}
-										    </div>
+									<div class="form-control form-group">
+										<div class="form-row mt-3">
+											<div class="form-group col-md-12 text-center">
+												<toggle-button 
+													v-model="singleProductData.has_variations" 
+													:width=200 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'blue'}"
+													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
+													:disabled="productMode=='bulk product' || singleProductData.product_immutability" 
+													@change="resetProductVariations()"
+												/>
+											</div>
 										</div>
-										<div 
-											class="form-group col-md-9" 
-											v-if="singleProductData.variations && singleProductData.variations.length"
-										>
-
+										
+										<div class="form-row" v-show="singleProductData.has_variations">
+											<div class="form-group col-md-3">
+												<label for="inputFirstName">Variation Type</label>
+												<multiselect 
+			                              			v-model="singleProductData.variation_type"
+			                              			placeholder="Choose Type" 
+			                                  		label="name" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="allVariationTypes" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false"
+			                                  		selectLabel = "Press/Click"
+			                                  		deselect-label="Can't remove single value" 
+			                                  		class="form-control p-0" 
+			                                  		:class="!errors.product.product_variation_type  ? 'is-valid' : 'is-invalid'" 
+			                                  		:disabled="singleProductData.product_immutability"
+			                                  		@close="validateFormInput('product_variation_type')" 
+			                                  		@input="setProductVariation"
+			                              		>
+			                                	</multiselect>
+			                                	<div class="invalid-feedback">
+											    	{{ errors.product.product_variation_type }}
+											    </div>
+											</div>
 											<div 
-												class="form-row" 
-												v-for="(productVariation, index) in singleProductData.variations" 
-												:key="'product-variation-index' + index + 'A'"
-											>	
+												class="form-group col-md-9" 
+												v-if="singleProductData.variations && singleProductData.variations.length"
+											>
+
 												<div 
-													class="form-group col-md-4" 
-													v-if="singleProductData.variations[index] && errors.product.variations[index]"
-												>
-													<label for="inputFirstName">Variaiton</label>
-													<multiselect 
-				                              			v-model="singleProductData.variations[index].variation"
-				                              			placeholder="Select Variation" 
-				                                  		label="name" 
-				                                  		track-by="id" 
-				                                  		:custom-label="objectNameWithCapitalized" 
-				                                  		:options="availableVariations" 
-				                                  		:required="true" 
-				                                  		:allow-empty="false"
-				                                  		selectLabel = "Press/Click"
-				                                  		deselect-label="Can't remove single value" 
-				                                  		:disabled="singleProductData.variations[index].variation_immutability"
-				                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
-				                                  		@close="validateFormInput('product_variation_id')" 
-				                              		>
-				                                	</multiselect>
-				                                	<div 
-					                                	class="invalid-feedback" 
-					                                	style="display: block;" 
-					                                	v-show="errors.product.variations[index].product_variation_id"
-				                                	>
-												    	{{ errors.product.variations[index].product_variation_id }}
-												    </div>
+													class="form-row" 
+													v-for="(productVariation, index) in singleProductData.variations" 
+													:key="'product-variation-index' + index + 'A'"
+												>	
+													<div 
+														class="form-group col-md-4" 
+														v-if="singleProductData.variations[index] && errors.product.variations[index]"
+													>
+														<label for="inputFirstName">Variaiton</label>
+														<multiselect 
+					                              			v-model="singleProductData.variations[index].variation"
+					                              			placeholder="Select Variation" 
+					                                  		label="name" 
+					                                  		track-by="id" 
+					                                  		:custom-label="objectNameWithCapitalized" 
+					                                  		:options="availableVariations" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                                  		selectLabel = "Press/Click"
+					                                  		deselect-label="Can't remove single value" 
+					                                  		:disabled="singleProductData.variations[index].variation_immutability" 
+					                                  		class="form-control p-0" 
+					                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
+					                                  		@close="validateFormInput('product_variation_id')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div class="invalid-feedback">
+													    	{{ errors.product.variations[index].product_variation_id }}
+													    </div>
+													</div>
+
+												<!-- 
+													<div 
+														class="form-group col-md-3"
+														v-if="singleProductData.variations[index] && errors.product.variations[index]"
+													>
+														<label for="inputFirstName">Qty</label>
+														<input type="number" 
+															class="form-control" 
+															v-model.number="singleProductData.variations[index].initial_quantity" 
+															:min="singleProductData.variations[index].requested_quantity"
+															:max="singleProductData.initial_quantity" 
+															placeholder="Product Qty" 
+															:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('product_variation_quantity')" 
+															required="true" 
+														>
+
+														<div class="invalid-feedback">
+												        	{{ errors.product.variations[index].product_variation_quantity }}
+												  		</div>
+													</div>
+													-->
+													
+													<div 
+														class="form-group col-md-4"
+														v-if="singleProductData.variations[index] && errors.product.variations[index]"
+													>
+														<label for="inputFirstName">Price</label>
+														<input type="number" 
+															class="form-control" 
+															v-model.number="singleProductData.variations[index].price" 
+															placeholder="Product Price" 
+															:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('product_variation_price')" 
+															required="true" 
+														>
+
+														<div class="invalid-feedback">
+												        	{{ errors.product.variations[index].product_variation_price }}
+												  		</div>
+													</div>
+
+													<div 
+														class="form-group col-md-4"
+														v-if="singleProductData.variations[index] && errors.product.variations[index]"
+													>
+														<label for="inputFirstName">SKU</label>
+														<input type="text" 
+															class="form-control is-valid" 
+															v-model="singleProductData.variations[index].sku" 
+															placeholder="Unique SKU" 
+														>
+													</div>										
 												</div>
 
-											<!-- 
-												<div 
-													class="form-group col-md-3"
-													v-if="singleProductData.variations[index] && errors.product.variations[index]"
-												>
-													<label for="inputFirstName">Qty</label>
-													<input type="number" 
-														class="form-control" 
-														v-model.number="singleProductData.variations[index].initial_quantity" 
-														:min="singleProductData.variations[index].requested_quantity"
-														:max="singleProductData.initial_quantity" 
-														placeholder="Product Qty" 
-														:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
-														@change="validateFormInput('product_variation_quantity')" 
-														required="true" 
-													>
-
-													<div class="invalid-feedback">
-											        	{{ errors.product.variations[index].product_variation_quantity }}
-											  		</div>
-												</div>
-												-->
-												
-												<div 
-													class="form-group col-md-4"
-													v-if="singleProductData.variations[index] && errors.product.variations[index]"
-												>
-													<label for="inputFirstName">Price</label>
-													<input type="number" 
-														class="form-control" 
-														v-model.number="singleProductData.variations[index].price" 
-														placeholder="Product Price" 
-														:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-														@change="validateFormInput('product_variation_price')" 
-														required="true" 
-													>
-
-													<div class="invalid-feedback">
-											        	{{ errors.product.variations[index].product_variation_price }}
-											  		</div>
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<button 
+															type="button" 
+															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															@click="addMoreVariation()"
+														>
+															Add Variation
+														</button>
+													</div>
+													<div class="form-group col-md-6">
+														<button 
+															type="button" 
+															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
+															@click="removeVariation()"
+														>
+															Remove Variation
+														</button>
+													</div>
 												</div>
 
-												<div 
-													class="form-group col-md-4"
-													v-if="singleProductData.variations[index] && errors.product.variations[index]"
-												>
-													<label for="inputFirstName">SKU</label>
-													<input type="text" 
-														class="form-control" 
-														v-model="singleProductData.variations[index].sku" 
-														placeholder="Unique SKU" 
-													>
-												</div>										
 											</div>
-
-											<div class="form-row">
-												<div class="form-group col-md-6">
-													<button 
-														type="button" 
-														class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-														@click="addMoreVariation()"
-													>
-														Add Variation
-													</button>
-												</div>
-												<div class="form-group col-md-6">
-													<button 
-														type="button" 
-														class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-														:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
-														@click="removeVariation()"
-													>
-														Remove Variation
-													</button>
-												</div>
-											</div>
-
 										</div>
 									</div>
+
+
 
 									<div class="form-row card-footer">
 										<div class="col-sm-12 text-right" v-show="!submitForm">
@@ -1009,6 +1020,13 @@
 											<label class="col-sm-6 col-form-label text-left">
 												{{ singleProductData.available_quantity }}
 												{{ singleProductData.quantity_type }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Serial :</label>
+											<label class="col-sm-6 form-control-plaintext">
+												<span :class="[singleProductData.has_serials ? 'badge-success' : 'badge-danger', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
 											</label>
 										</div>
 

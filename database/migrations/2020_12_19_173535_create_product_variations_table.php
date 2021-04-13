@@ -15,8 +15,7 @@ class CreateProductVariationsTable extends Migration
     {
         Schema::create('product_variations', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('sku', 100); // scanned or generated on product-code & merchant code
-            // $table->unsignedMediumInteger('price')->default(100);
+            $table->string('sku'); // scanned or generated on product-code & merchant code
             $table->unsignedDecimal('price', $precision = 8, $scale = 2);
             $table->unsignedSmallInteger('variation_id'); // stationary / garments
             $table->unsignedInteger('product_id'); // stationary / garments

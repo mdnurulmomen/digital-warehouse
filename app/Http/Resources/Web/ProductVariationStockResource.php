@@ -18,7 +18,9 @@ class ProductVariationStockResource extends JsonResource
             'id' => $this->id,
             'stock_quantity' => $this->stock_quantity ?? 0,
             'available_quantity' => $this->available_quantity ?? 0,
+            'has_serials' => $this->has_serials,
             'variation' => $this->productVariation->variation,
+            'serials' => $this->when($this->has_serials, $this->serials->pluck('serial_no')),
         ];
     }
 }
