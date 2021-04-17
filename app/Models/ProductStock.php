@@ -8,6 +8,11 @@ class ProductStock extends Model
 {
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'has_serials' => 'boolean',
+        'has_variations' => 'boolean',
+    ];
+
     public function product()
     {
     	return $this->belongsTo(Product::class, 'product_id', 'id');
@@ -35,6 +40,7 @@ class ProductStock extends Model
             foreach ($this->variations as $variation) {
 
                 $this->decreaseSuccessorStockVariations($variation, $variation->stock_quantity);
+                $this->deleteStockVariationSerials($variation);
                 $variation->delete();
 
             }
@@ -51,7 +57,7 @@ class ProductStock extends Model
                 
                 foreach ($variations as $stockVariation) {
                     
-                    $variationExistingStock = $this->variations()->where('id', $stockVariation->id)->first();
+                    $variationExistingStock = $this->variations()->where('id', $stockVariation->id)->firstOrFail();
 
                     if ($variationExistingStock->stock_quantity > $stockVariation->stock_quantity) {
                         
@@ -91,11 +97,12 @@ class ProductStock extends Model
                
                     if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
                         
-                        $variationLastAvailableValue = ProductVariation::find($stockVariation->id)->latestStock->available_quantity ?? 0;
+                        $variationLastAvailableValue = ProductVariation::findOrFail($stockVariation->id)->latestStock->available_quantity ?? 0;
 
                         $variationNewStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity),
+                            'has_serials' => count($stockVariation->serials) > 0 ? true : false,
                             'product_variation_id' => $stockVariation->id,
                             'product_stock_id' => $this->id,
                             'created_at' => now(),
@@ -153,7 +160,7 @@ class ProductStock extends Model
 
             foreach ($serials as $serial) {
                 
-                $this->serials()->updateOrCreate(
+                $this->serials()->withTrashed()->updateOrCreate(
                     [ 'serial_no' => $serial ],
                     [ 'deleted_at' => NULL ]
                 );
@@ -161,7 +168,7 @@ class ProductStock extends Model
             }
 
             // deleting still deleted serials
-            foreach ($this->serials()->onlyTrashed() as $productTrashedSerial) {
+            foreach ($this->serials()->onlyTrashed()->get() as $productTrashedSerial) {
                 
                 if (! $productTrashedSerial->has_requisitions && ! $productTrashedSerial->has_dispatched) {
                     
@@ -208,6 +215,15 @@ class ProductStock extends Model
         }
 
         // $this->addresses()->delete();
+    }
+
+    public function deleteStockSerials()
+    {
+        if ($this->serials()->count() && $this->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count() < 1) {
+            
+            $this->serials()->forceDelete();
+
+        }
     }
 
     protected function setProductContainers($containers = array(), $product)
@@ -301,7 +317,7 @@ class ProductStock extends Model
         // $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
 
         // all shelves are engaged
-        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1)->count()) {
+        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1.0)->count()) {
             
             $warehouseExpectedContainer->update([
                 'engaged' => 1
@@ -309,7 +325,7 @@ class ProductStock extends Model
 
         }
         // no shelf is engaged
-        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 0)->count()) {
+        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 0.0)->count()) {
             
             $warehouseExpectedContainer->update([
                 'engaged' => 0
@@ -333,7 +349,7 @@ class ProductStock extends Model
         // $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
 
         // all units are engaged
-        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1)->count()) {
+        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1.0)->count()) {
             
             $warehouseExpectedShelf->update([
                 'engaged' => 1
@@ -341,7 +357,7 @@ class ProductStock extends Model
 
         }
         // no unit is engaged
-        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 0)->count()) {
+        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 0.0)->count()) {
             
             $warehouseExpectedShelf->update([
                 'engaged' => 0
@@ -409,7 +425,7 @@ class ProductStock extends Model
 
             foreach ($serials as $serial) {
                 
-                $productVariationStock->serials()->updateOrCreate(
+                $productVariationStock->serials()->withTrashed()->updateOrCreate(
                     [ 'serial_no' => $serial ],
                     [ 'deleted_at' => NULL ]
                 );
@@ -417,7 +433,7 @@ class ProductStock extends Model
             }
 
             // deleting still deleted serials
-            foreach ($productVariationStock->serials()->onlyTrashed() as $variationTrashedSerial) {
+            foreach ($productVariationStock->serials()->onlyTrashed()->get() as $variationTrashedSerial) {
                 
                 if (! $variationTrashedSerial->has_requisitions && ! $variationTrashedSerial->has_dispatched) {
                     
@@ -426,6 +442,15 @@ class ProductStock extends Model
                 }
 
             }
+
+        }
+    }
+
+    protected function deleteStockVariationSerials(ProductVariationStock $productVariationStock)
+    {
+        if ($productVariationStock->serials()->count() && $productVariationStock->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count() < 1) {
+            
+            $productVariationStock->serials()->forceDelete();
 
         }
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     public $timestamps = false;
+    
     protected $guarded = ['id'];
     
     // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warehouseContainer.container'];

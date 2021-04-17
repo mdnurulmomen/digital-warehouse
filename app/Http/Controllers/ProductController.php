@@ -157,8 +157,8 @@ class ProductController extends Controller
         $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
         $newProduct->price = $request->price ?? 0;
         $newProduct->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
-        $newProduct->has_serials = $request->has_serials;
-        $newProduct->has_variations = $request->has_variations;
+        $newProduct->has_serials = $request->has_serials ?? false;
+        $newProduct->has_variations = $request->has_variations ?? false;
         $newProduct->product_category_id = $request->product_category_id;
         $newProduct->merchant_id = $request->merchant_id;
 
@@ -200,8 +200,8 @@ class ProductController extends Controller
         
         if (! $productToUpdate->product_immutability) {
             
-            $productToUpdate->has_serials = $request->has_serials;
-            $productToUpdate->has_variations = $request->has_variations;
+            $productToUpdate->has_serials = $request->has_serials ?? false;
+            $productToUpdate->has_variations = $request->has_variations ?? false;
             
         }
         
@@ -257,7 +257,7 @@ class ProductController extends Controller
     // Product-Stock
     public function showProductAllStocks($product, $perPage)
     {
-        return new ProductStockCollection(ProductStock::with(['addresses', 'variations'])->where('product_id', $product)->paginate($perPage));
+        return new ProductStockCollection(ProductStock::with(['addresses', 'variations', 'serials'])->where('product_id', $product)->paginate($perPage));
     }
 
     public function storeProductStock(Request $request, $perPage)
@@ -309,7 +309,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'stock_quantity' => 'required|numeric|min:1',
-            'product_id' => 'required|numeric|exists:products,id',
+            // 'product_id' => 'required|numeric|exists:products,id',
         ]);
 
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
@@ -359,11 +359,11 @@ class ProductController extends Controller
 
             }
 
-            $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $request->product_id);
+            $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $stockToUpdate->product_id);
 
         }
 
-        return $this->showProductAllStocks($request->product_id, $perPage);
+        return $this->showProductAllStocks($stockToUpdate->product_id, $perPage);
     }
 
     public function deleteProductStock($stock, $perPage)
@@ -375,6 +375,8 @@ class ProductController extends Controller
         $this->decreaseStockAvailableQuantity($stockToDelete, $stockToDelete->stock_quantity);
             
         $stockToDelete->deleteStockVariations();
+
+        $stockToDelete->deleteStockSerials();
 
         $stockToDelete->deleteOldAddresses();
 

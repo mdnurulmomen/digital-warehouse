@@ -15,14 +15,13 @@ class CreateProductStocksTable extends Migration
     {
         Schema::create('product_stocks', function (Blueprint $table) {
             $table->increments('id');
-            // quantity including all variations
-            $table->mediumInteger('stock_quantity')->default(0); 
-            $table->mediumInteger('available_quantity')->default(0);
+            $table->mediumInteger('stock_quantity');    // quantity including all variations
+            $table->mediumInteger('available_quantity');
             $table->boolean('has_variations')->default(false);
-            // $table->unsignedMediumInteger('total_quantity')->default(0);
+            $table->boolean('has_serials')->default(false);
+            $table->string('user_type');        // stock keeper (admin, manager, warehouse, ...)
+            $table->unsignedInteger('user_id');
             $table->unsignedInteger('product_id');
-            $table->string('user_type');
-            $table->string('user_id');
             $table->timestamps();
         });
     }

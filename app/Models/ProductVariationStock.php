@@ -15,6 +15,10 @@ class ProductVariationStock extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'has_serials' => 'boolean',
+    ];
+
     public function productVariation()
     {
     	return $this->belongsTo(ProductVariation::class, 'product_variation_id', 'id');

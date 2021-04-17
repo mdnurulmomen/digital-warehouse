@@ -16,8 +16,8 @@ class CreateProductSerialsTable extends Migration
         Schema::create('product_serials', function (Blueprint $table) {
             $table->increments('id');
             $table->string('serial_no');
-            $table->boolean('has_requisitions')->nullable()->default(false);
-            $table->boolean('has_dispatched')->nullable()->default(false);
+            $table->boolean('has_requisitions')->default(false);
+            $table->boolean('has_dispatched')->default(false);
             $table->unsignedInteger('product_stock_id');
             $table->softDeletes();
         });

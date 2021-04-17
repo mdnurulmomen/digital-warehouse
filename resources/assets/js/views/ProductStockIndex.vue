@@ -127,8 +127,11 @@
 																<tfoot>
 																	<tr>	
 																		<th>Date</th>
+
 																		<th>Stock Qty</th>
+
 																		<th>Available Qty</th>
+
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -143,9 +146,13 @@
 																@change="changeNumberContents"
 															>
 																<option>10</option>
+
 																<option>20</option>
+
 																<option>30</option>
+
 																<option>40</option>
+
 																<option>50</option>
 															</select>
 														</div>
@@ -170,9 +177,7 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -423,14 +428,14 @@
 
 							    	<div 
 										class="col-md-12" 
-										v-if="product.has_serials && product.has_variations && singleStockData.variations.length && this.step==2"
+										v-if="product.has_serials && product.has_variations && singleStockData.variations.length && step==2"
 									>
 										<div 
 											class="form-row" 
 											v-for="(stockedVariation, stockedVariationIndex) in singleStockData.variations" 
 											:key="'product-variation-index-' + stockedVariationIndex + 'B'"
 										>	
-											<div class="card col-md-12" v-if="stockedVariation.stock_quantity > 0">
+											<div class="card col-md-12" v-if="stockedVariation.stock_quantity > 0 && stockedVariation.hasOwnProperty('serials')">
 												<div class="card-header">
 													{{ stockedVariation.variation.name | capitalize }} Serials
 												</div>
@@ -769,7 +774,7 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="product.has_serials ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 												<button 
@@ -837,11 +842,19 @@
 										</a>
 									</li>
  									-->
+									
 									<li class="nav-item">
 										<a class="nav-link active" data-toggle="tab" href="#product-stock" role="tab">
 											Stock
 										</a>
 									</li>
+
+									<li class="nav-item" v-show="product.has_serials">
+										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
+											Serials
+										</a>
+									</li>
+
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#product-address" role="tab">
 											Address
@@ -988,14 +1001,17 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Product Name :
 											</label>
+
 											<label class="col-sm-6 col-form-label text-left">
 												{{ product.name | capitalize }}
 											</label>
 										</div>
+
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Stock Quantity :
 											</label>
+
 											<div class="col-sm-6 col-form-label text-left">
 												
 												{{ singleStockData.stock_quantity }}
@@ -1008,8 +1024,9 @@
 													>
 														<div class="form-row">
 															<label class="col-form-label font-weight-bold text-right">
-																{{ stockVariation.variation.name }} :
+																{{ stockVariation.variation.name | capitalize }} :
 															</label>
+
 															<label class="col-form-label text-left">
 																{{ stockVariation.stock_quantity }}
 															</label>
@@ -1034,6 +1051,7 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Available Quantity (then) :
 											</label>
+											
 											<label class="col-sm-6 col-form-label text-left">
 												{{ singleStockData.available_quantity }}
 											</label>
@@ -1043,9 +1061,65 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Stocked on :
 											</label>
+
 											<label class="col-sm-6 col-form-label text-left">
 												{{ singleStockData.created_at }}
 											</label>
+										</div>
+									</div>
+
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleStockData.has_serials">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Serials :
+											</label>
+											<div class="col-sm-6 col-form-label text-left">
+												<ol 
+													v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
+												>
+													<li v-for="(productSerial,productIndex) in singleStockData.serials">
+														{{ productSerial }}
+														<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
+													</li>	
+												</ol>
+												
+												<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
+													<div 
+														class="col-md-12" 
+														v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+														:key="'product-variation-index-' + variationIndex + '-C'"
+													>
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																{{ stockVariation.variation.name | capitalize }} |
+															</label>
+
+															<label class="col-form-label text-left">
+																{{ stockVariation.stock_quantity }}
+																<ol 
+																	v-if="singleStockData.has_serials && stockVariation.serials.length"
+																>
+																	<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
+																		{{ variationSerial }}
+																		<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
+																	</li>	
+																</ol>
+															</label>
+														</div>
+														
+														<!-- 
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																Available Quantity :
+															</label>
+															<label class="col-form-label text-left">
+																{{ stockVariation.available_quantity }}
+															</label>
+														</div>
+														-->
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
 
@@ -1520,7 +1594,9 @@
 
 	        	};
 
-	        	if (this.product.has_serials && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+	        	if (this.product.has_serials && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+
+					this.$delete(this.singleStockData, 'serials');
 
 					this.product.variations.forEach(
 					
@@ -1548,7 +1624,7 @@
 	        	this.formSubmitted = false;
 				
 				this.singleStockData = JSON.parse(JSON.stringify(object));
-				this.singleStockData.product_id = this.product.id;
+				// this.singleStockData.product_id = this.product.id;
 
 				this.resetErrorObject();
 
@@ -1940,6 +2016,7 @@
 
 						}
 						else if (space.type=='shelves') {
+
 							let searchedContainer = this.emptyShelfContainers.find(
 								container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
 							)
@@ -1948,6 +2025,7 @@
 
 								this.emptyShelves = searchedContainer.container_shelf_statuses;
 							}
+							
 						}
 						else if (space.type=='units') {
 

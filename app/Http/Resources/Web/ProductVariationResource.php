@@ -22,6 +22,7 @@ class ProductVariationResource extends JsonResource
             'price' => $this->price,
             'variation_immutability' => $this->variation_immutability,
             'variation' => $this->variation,
+            'serials' => $this->when($this->product->has_serials, $this->stocks->loadMissing('serials')->pluck('serials')->collapse()->pluck('serial_no')),
         ];
     }
 }

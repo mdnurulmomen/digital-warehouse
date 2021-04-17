@@ -937,6 +937,13 @@
 											Profile
 										</a>
 									</li>
+
+									<li class="nav-item" v-show="singleProductData.has_serials">
+										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
+											Serials
+										</a>
+									</li>
+
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#product-store" role="tab">
 											Store
@@ -946,7 +953,6 @@
 
 								<div class="tab-content tabs card-block">
 									<div class="tab-pane active" id="product-profile" role="tabpanel">
-										
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Type :
@@ -1100,11 +1106,62 @@
 												</div>
 											</div>
 										</div>
+									</div>
 
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleProductData.has_serials">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Serials :
+											</label>
+											<div class="col-sm-6 col-form-label text-left">
+												<ol 
+													v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
+												>
+													<li v-for="(productSerial, productIndex) in singleProductData.serials">
+														{{ productSerial }}
+														<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span> 
+													</li>	
+												</ol>
+
+												<span class="text-danger" v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length==0">
+													No Serials Found
+												</span>
+												
+												<div class="form-row" v-if="singleProductData.hasOwnProperty('variations') && singleProductData.variations.length">
+													<div 
+														class="col-md-12" 
+														v-for="(productVariation, variationIndex) in singleProductData.variations" 
+														:key="'product-variation-index-' + variationIndex + '-C'"
+													>
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }} |
+															</label>
+
+															<label class="col-form-label text-left">
+																{{ productVariation.stock_quantity }}
+																
+																<ol 
+																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
+																>
+																	<li v-for="(variationSerial, variationIndex) in productVariation.serials">
+																		{{ variationSerial }}
+																		<span v-show="(variationIndex + 1) < productVariation.serials.length">, </span> 
+																	</li>	
+																</ol>
+
+																<span class="text-danger" v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length==0">
+																	No Serials Found
+																</span>
+															</label>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
 
 									<div class="tab-pane" id="product-store" role="tabpanel">
-
 										<div 
 											class="form-row" 
 											v-if="singleProductData.hasOwnProperty('addresses') && singleProductData.addresses.length"
@@ -1112,9 +1169,9 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Address Detail :
 											</label>
+
 											<div class="col-sm-12">
 												<div class="form-row">
-													
 													<div 
 														class="col-md-6 ml-auto" 
 														v-for="(productAddress, addressIndex) in singleProductData.addresses" 
@@ -1260,8 +1317,7 @@
 
 															</div>
 														</div>
-													</div> 
-
+													</div>
 												</div>
 											</div>
 										</div>
@@ -1276,12 +1332,8 @@
 												</p>
 											</div>
 										</div>
-
 									</div>
 								</div>
-
-								
-							
 							</div>
 						</div>
 					</div>
@@ -1705,7 +1757,8 @@
     		},
     		showContentDetails(object) {		
 				// this.singleProductData = { ...object };
-				this.singleProductData = Object.assign({}, this.singleProductData, object);
+				// this.singleProductData = Object.assign({}, this.singleProductData, object);
+				this.singleProductData = JSON.parse(JSON.stringify(object));
 				$('#product-view-modal').modal('show');
 			},
 			showContentCreateForm() {

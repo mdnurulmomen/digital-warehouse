@@ -19,7 +19,7 @@
 						</button>
 					</div>
 					<div class="modal-body text-center">
-						<h4 class="text-danger">Want to delete '{{ contentToDelete.user_name || contentToDelete.name | capitalize }}' ?</h4>
+						<h4 class="text-danger">Want to delete '{{ contentToDelete.user_name || contentToDelete.name || 'stock' | capitalize }}' ?</h4>
 						<h6 class="sub-heading text-secondary">{{ restorationMessage }}</h6>
 					</div>
 					<div class="modal-footer">
