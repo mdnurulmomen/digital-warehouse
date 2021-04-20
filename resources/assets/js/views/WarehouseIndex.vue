@@ -85,7 +85,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 					  	<h4 class="modal-title">
-					  		{{ createMode ? 'Create' : 'Edit' }} Warehouse
+					  		{{ createMode ? 'Create Warehouse' : 'Edit ' + singleWarehouseData.name }}
 					  	</h4>
 					  	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					    	<span aria-hidden="true">&times;</span>

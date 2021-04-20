@@ -162,7 +162,10 @@ Route::name('admin.')->group(function () {
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 		Route::fallback(function () {
-			return view('layouts.admin');
+			$access_token = Illuminate\Support\Str::random(60);
+        	$roles = \Auth::guard('admin')->user()->roles;
+        	$permissions = Auth::guard('admin')->user()->permissions;
+			return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
 		});
 
 	});
