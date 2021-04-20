@@ -257,28 +257,37 @@ class ProductStock extends Model
     {
         if ($container) {
 
-            foreach ($container->shelves as $containerShelf) {
+            if (count($container->shelves) === WarehouseContainerStatus::find($container->id)->containerShelfStatuses()->count()) {
                 
-                $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
+                $this->setProductContainers([$container], $product);
 
-                if (!empty($warehouseExpectedShelf) && $warehouseExpectedShelf->engaged==0.0) {
-                    
-                    $warehouseExpectedShelf->product()->create([
-                        'product_stock_id' => $this->id,
-                        'product_id' => $product,
-                    ]);
+            }
+            else {
 
-                    $warehouseExpectedShelf->update([
-                        'engaged' => 1
-                    ]);
+                foreach ($container->shelves as $containerShelf) {
                     
-                    $this->updateChildUnits($warehouseExpectedShelf, 1);
+                    $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
+
+                    if (!empty($warehouseExpectedShelf) && $warehouseExpectedShelf->engaged==0.0) {
+                        
+                        $warehouseExpectedShelf->product()->create([
+                            'product_stock_id' => $this->id,
+                            'product_id' => $product,
+                        ]);
+
+                        $warehouseExpectedShelf->update([
+                            'engaged' => 1
+                        ]);
+                        
+                        $this->updateChildUnits($warehouseExpectedShelf, 1);
+
+                    }
 
                 }
 
-            }
+                $this->updateParentContainer($warehouseExpectedShelf->parentContainer);
 
-            $this->updateParentContainer($warehouseExpectedShelf->parentContainer);
+            }
 
         }
     }
@@ -287,27 +296,38 @@ class ProductStock extends Model
     {
         if ($container) {
 
-            foreach ($container->shelf->units as $containerShelfUnit) {
+            if (count($container->shelf->units) === WarehouseContainerShelfStatus::find($container->shelf->id)->containerShelfUnitStatuses()->count()) {
                 
-                $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
+                $container->{"shelves"} = [ $container->shelf, ];
+                
+                $this->setProductShelves($container, $product);
 
-                if (!empty($warehouseExpectedShelfUnit) && $warehouseExpectedShelfUnit->engaged==0.0) {
+            }
+            else {
+
+                foreach ($container->shelf->units as $containerShelfUnit) {
                     
-                    $warehouseExpectedShelfUnit->product()->create([
-                        'product_stock_id' => $this->id,
-                        'product_id' => $product,
-                    ]);
+                    $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                    $warehouseExpectedShelfUnit->update([
-                        'engaged' => 1
-                    ]);
+                    if (!empty($warehouseExpectedShelfUnit) && $warehouseExpectedShelfUnit->engaged==0.0) {
+                        
+                        $warehouseExpectedShelfUnit->product()->create([
+                            'product_stock_id' => $this->id,
+                            'product_id' => $product,
+                        ]);
+
+                        $warehouseExpectedShelfUnit->update([
+                            'engaged' => 1
+                        ]);
+
+                    }
 
                 }
 
-            }
+                // Parent Shelf
+                $this->updateParentShelf($warehouseExpectedShelfUnit->parentShelf);
 
-            // Parent Shelf
-            $this->updateParentShelf($warehouseExpectedShelfUnit->parentShelf);
+            }
 
         }
     }

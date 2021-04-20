@@ -2356,10 +2356,12 @@
 								if (!productSpace.type) {
 									this.errors.stock.addresses[index].product_space_type = 'Space type is required';
 								}
+							/*
 								else if (this.singleStockData.addresses.filter((obj) => obj.type === productSpace.type).length > 1) {
 
 									this.errors.stock.addresses[index].product_space_type = 'Same type selected';
 								}
+							*/
 								else {
 									this.$delete(this.errors.stock.addresses[index], 'product_space_type');
 								}

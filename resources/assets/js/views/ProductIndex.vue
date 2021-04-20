@@ -1175,7 +1175,7 @@
 													<div 
 														class="col-md-6 ml-auto" 
 														v-for="(productAddress, addressIndex) in singleProductData.addresses" 
-														:key="'product-address-' + productAddress.type + addressIndex"
+														:key="'product-address-type-' + productAddress.type + '-index-' + addressIndex"
 													>
 														<div 
 															class="card" 
@@ -1246,7 +1246,7 @@
 																		<ul id="shelf-addresses">
 																			<li 
 																				v-for="shelfAddress in productAddress.container.shelves" 
-																				:key="'shelf-address-' + shelfAddress.id"
+																				:key="'container-shelf-address-' + shelfAddress.id + '-container-id-' + productAddress.container.id + '-container-name-' + productAddress.container.name"
 																			>
 
 																				{{ shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) }}
@@ -1304,7 +1304,7 @@
 																		<ul id="unit-addresses">
 																			<li 
 																				v-for="unitAddress in productAddress.container.shelf.units" 
-																				:key="'unit-address-' + unitAddress.id"
+																				:key="'container-shelf-unit-address-' + unitAddress.id + '-shelf-id-' + productAddress.container.shelf.id + '-shelf-name-' + productAddress.container.shelf.name + '-container-id-' + productAddress.container.id + '-container-name-' + productAddress.container.name"
 																			>
 
 																				{{ unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) }}
