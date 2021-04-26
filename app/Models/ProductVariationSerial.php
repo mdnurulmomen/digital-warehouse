@@ -17,4 +17,14 @@ class ProductVariationSerial extends Model
     public $timestamps = false;
 
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'has_dispatched' => 'boolean',
+        'has_requisitions' => 'boolean',
+    ];
+
+    public function required()
+    {
+        return $this->hasOne(RequiredProductVariationSerial::class, 'product_variation_serial_id', 'id');
+    }
 }

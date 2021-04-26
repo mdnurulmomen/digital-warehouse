@@ -22,7 +22,7 @@ class ProductVariationResource extends JsonResource
             'price' => $this->price,
             'variation_immutability' => $this->variation_immutability,
             'variation' => $this->variation,
-            'serials' => $this->when($this->product->has_serials, $this->stocks->loadMissing('serials')->pluck('serials')->collapse()->pluck('serial_no')),
+            'serials' => $this->when($this->product->has_serials && $this->product->has_variations, \Request::is('*/products') ? ProductVariationSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
         ];
     }
 }

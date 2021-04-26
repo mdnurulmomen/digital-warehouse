@@ -19,6 +19,8 @@ class RequiredProductVariationResource extends JsonResource
             'product_variation_id' => $this->product_variation_id,
             'variation_name' => $this->productVariation->variation->name,
             'quantity' => $this->quantity,
+            'has_serials' => $this->has_serials,
+            'serials' => $this->when($this->has_serials, $this->serials->loadMissing('serial')->pluck('serial')->pluck('serial_no')),
             'available_quantity' => $this->productVariation->latestStock->available_quantity,
         ];
     }

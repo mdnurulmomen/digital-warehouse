@@ -18,6 +18,7 @@ class CreateProductSerialsTable extends Migration
             $table->string('serial_no');
             $table->boolean('has_requisitions')->default(false);
             $table->boolean('has_dispatched')->default(false);
+            $table->unsignedInteger('product_id');
             $table->unsignedInteger('product_stock_id');
             $table->softDeletes();
         });

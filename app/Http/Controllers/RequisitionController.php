@@ -42,6 +42,37 @@ class RequisitionController extends Controller
             'status' => -1,
         ]);
 
+        foreach ($expectedRequisition->products as $requiredProduct) {
+                    
+            if ($requiredProduct->has_serials && ! $requiredProduct->has_variations) {
+                
+                foreach ($requiredProduct->serials as $requiredProductSerial) {
+                    
+                    $requiredProductSerial->serial()->update([
+                        'has_requisitions' => false,
+                    ]);
+
+                }
+
+            }
+            else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
+                
+                foreach ($requiredProduct->variations as $requiredProductVariation) {
+                    
+                    foreach ($requiredProductVariation->serials as $requiredProductVariationSerial) {
+                    
+                        $requiredProductVariationSerial->serial()->update([
+                            'has_requisitions' => false,
+                        ]);
+
+                    }
+
+                }
+
+            }
+
+        }  
+
         return $this->showAllRequisitions($perPage);
     }
 

@@ -1032,14 +1032,14 @@
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Serial :</label>
 											<label class="col-sm-6 form-control-plaintext">
-												<span :class="[singleProductData.has_serials ? 'badge-success' : 'badge-danger', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
+												<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
 											</label>
 										</div>
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
 											<label class="col-sm-6 form-control-plaintext">
-												<span :class="[singleProductData.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
+												<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
 											</label>
 										</div>
 
@@ -1118,7 +1118,13 @@
 													v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
 												>
 													<li v-for="(productSerial, productIndex) in singleProductData.serials">
-														{{ productSerial }}
+														{{ productSerial.serial_no }}
+														<span 
+															:class="[productSerial.has_dispatched ? 'badge-danger' : productSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
+															v-show="productSerial.has_dispatched || productSerial.has_requisitions"
+														>
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
 														<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -1145,7 +1151,9 @@
 																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
 																>
 																	<li v-for="(variationSerial, variationIndex) in productVariation.serials">
-																		{{ variationSerial }}
+
+																		{{ variationSerial.serial_no }}
+																		
 																		<span v-show="(variationIndex + 1) < productVariation.serials.length">, </span> 
 																	</li>	
 																</ol>

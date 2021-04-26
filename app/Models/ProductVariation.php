@@ -30,6 +30,11 @@ class ProductVariation extends Model
         return $this->hasMany(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
     }
 
+    public function serials()
+    {
+        return $this->hasMany(ProductVariationSerial::class, 'product_variation_id', 'id');
+    }
+
     public function latestStock()
     {
         return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');

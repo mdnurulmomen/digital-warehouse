@@ -23,4 +23,9 @@ class RequiredProduct extends Model
     {
         return $this->hasMany(RequiredProductVariation::class, 'required_product_id', 'id');
     }
+
+    public function serials()
+    {
+        return $this->hasMany(RequiredProductSerial::class, 'required_product_id', 'id');
+    }
 }

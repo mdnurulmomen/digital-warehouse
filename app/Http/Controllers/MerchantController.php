@@ -272,7 +272,7 @@ class MerchantController extends Controller
 
         $newRequisition->save();
 
-        $newRequisition->required_products = $request->products;
+        $newRequisition->required_products = json_decode(json_encode($request->products));
 
         if ($request->delivery_service) {
             

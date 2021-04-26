@@ -23,46 +23,10 @@ class Requisition extends Model
      * @param  string  $value
      * @return void
      */
-    public function setRequiredProductsAttribute($requiredProducts = [])
-    {
-    	if (count($requiredProducts)) {
-    		
-    		$requiredProducts = json_decode(json_encode($requiredProducts));
-
-    		foreach ($requiredProducts as $requiredProduct) {
-    			
-    			$requisitionedProduct = $this->products()->create([
-    				'product_id' => $requiredProduct->id,
-                    'quantity' => $requiredProduct->total_quantity,
-    				'has_variations' => $requiredProduct->product->has_variations ?? false,
-    			]);
-
-                if ($requiredProduct->product->has_variations) {
-                    
-                    foreach ($requiredProduct->product->variations as $requiredProductVariation) {
-                
-                        if (!empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0) {
-                           
-                            $requisitionedProduct->variations()->create([
-                                'product_variation_id' => $requiredProductVariation->id,
-                                'quantity' => $requiredProductVariation->required_quantity,
-                                // 'requisition_id' => $this->id,
-                            ]);
-
-                        }
-
-                    }
-
-                }
-
-    		}
-
-    	}
-    }
-
+    
     public function products()
     {
-    	return $this->hasMany(RequiredProduct::class, 'requisition_id', 'id');
+        return $this->hasMany(RequiredProduct::class, 'requisition_id', 'id');
     }
 
     public function delivery()
@@ -79,4 +43,117 @@ class Requisition extends Model
     {
         return $this->hasOne(Dispatch::class, 'requisition_id', 'id');
     }
+
+    public function setRequiredProductsAttribute($requiredProducts = [])
+    {
+    	if (count($requiredProducts)) {
+
+            // when updating requisition
+            if ($this->products()->count()) {
+                
+                foreach ($this->products as $requiredProduct) {
+                    
+                    if ($requiredProduct->has_serials && ! $requiredProduct->has_variations) {
+                        
+                        foreach ($requiredProduct->serials as $requiredProductSerial) {
+                    
+                            $requiredProductSerial->serial()->update([
+                                'has_requisitions' => false,
+                            ]);
+
+                        }
+
+                        $requiredProduct->serials()->delete();
+
+                        $requiredProduct->delete();
+
+                    }
+                    else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
+                        
+                        foreach ($requiredProduct->variations as $requiredProductVariation) {
+                            
+                            foreach ($requiredProductVariation->serials as $requiredProductVariationSerial) {
+                    
+                                $requiredProductVariationSerial->serial()->update([
+                                    'has_requisitions' => false,
+                                ]);
+
+                            }
+
+                            $requiredProductVariation->serials()->delete();
+                            
+                        }
+
+                        $requiredProduct->variations()->delete();
+
+                    }
+
+                }                    
+                
+            }                		
+
+            foreach ($requiredProducts as $requiredProduct) {
+    			
+    			$requisitionedProduct = $this->products()->create([
+    				'product_id' => $requiredProduct->id,
+                    'quantity' => $requiredProduct->total_quantity,
+    				'has_variations' => $requiredProduct->product->has_variations ?? false,
+                    'has_serials' => $requiredProduct->product->has_serials ?? false,
+    			]);
+
+                if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && count($requiredProduct->serials)) {
+
+                    foreach (ProductSerial::whereIn('serial_no', $requiredProduct->serials)->get() as $productSerial) {
+                        
+                        $requisitionedProduct->serials()->create([
+                            'product_serial_id' => $productSerial->id,
+                        ]);
+
+                        $productSerial->update([
+                            'has_requisitions' => true,
+                        ]);
+
+                    }
+
+                }
+
+                if ($requiredProduct->product->has_variations) {
+                    
+                    foreach ($requiredProduct->product->variations as $requiredProductVariation) {
+                
+                        if (! empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0) {
+                           
+                            $requisitionedProductVariation = $requisitionedProduct->variations()->create([
+                                'product_variation_id' => $requiredProductVariation->id,
+                                'quantity' => $requiredProductVariation->required_quantity,
+                                'has_serials' => $requiredProduct->product->has_serials,
+                            ]);
+
+                            if ($requiredProduct->product->has_serials && count($requiredProductVariation->required_serials)) {
+
+                                foreach (ProductVariationSerial::whereIn('serial_no', $requiredProductVariation->required_serials)->get() as $productVariationSerial) {
+                        
+                                    $requisitionedProductVariation->serials()->create([
+                                        'product_variation_serial_id' => $productVariationSerial->id,
+                                    ]);
+
+                                    $productVariationSerial->update([
+                                        'has_requisitions' => true,
+                                    ]);
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+    		}
+
+    	}
+    }
+
 }

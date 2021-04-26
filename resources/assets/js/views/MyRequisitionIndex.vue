@@ -333,18 +333,15 @@
 				                                  		:custom-label="objectNameWithCapitalized" 
 				                                  		:options="merchantAllProducts" 
 				                                  		:required="true" 
-				                                  		:allow-empty="false"
+				                                  		:allow-empty="false" 
+				                                  		class="form-control p-0" 
 				                                  		:class="!errors.products[productIndex].product_id ? 'is-valid' : 'is-invalid'" 
 				                                  		:disabled="singleRequisitionData.products.length > (productIndex+1)"
 				                                  		@input="setRequiredProduct(productIndex)"
 				                                  		@close="validateFormInput('product_id')" 
 				                              		>
 				                                	</multiselect>
-				                                	<div 
-					                                	class="invalid-feedback" 
-					                                	style="display: block;" 
-					                                	v-show="errors.products[productIndex].product_id"
-				                                	>
+				                                	<div class="invalid-feedback">
 												    	{{ errors.products[productIndex].product_id }}
 												    </div>
 												</div>
@@ -381,6 +378,7 @@
 															<label for="inputFirstName">Select Variation</label>
 															<multiselect 
 						                              			v-model="requiredProduct.product.variations[variationIndex]"
+						                              			class="form-control p-0 is-valid" 
 						                              			placeholder="Variation Name" 
 						                              			label="name" 
 						                                  		track-by="id" 
@@ -473,8 +471,152 @@
 
 								<div 
 									class="row" 
-									v-bind:key="'requisition-modal-step-' + 3" 
+									v-bind:key="'requisition-modal-step' + 3" 
 									v-show="!loading && step==3"
+								>
+									<h2 class="mx-auto mb-4 lead">Product Serials</h2>
+
+									<div 
+										class="col-md-12"  
+										v-if="singleRequisitionData.products.length"
+									>
+										<div 
+											class="card card-body" 
+											v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
+											:key="'required-product-' + productIndex + '-serials'"
+										>
+											<div 
+												class="form-row"
+												v-if="requiredProduct.product && requiredProduct.product.has_serials && ! requiredProduct.product.has_variations && requiredProduct.total_quantity > 0"
+											>
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">Selected Product</label>
+													
+													<multiselect 
+				                              			v-model="requiredProduct.product" 
+				                              			class="form-control p-0 is-valid" 
+				                              			placeholder="Product Name" 
+				                              			label="name" 
+				                                  		track-by="id" 
+				                                  		:options="[]" 
+				                                  		:required="true" 
+				                                  		:allow-empty="false"
+				                                  		:disabled="true"
+				                              		>
+				                                	</multiselect>
+												</div>
+
+												<div class="form-group col-md-8">
+													<label for="inputFirstName">Product Serials</label>
+													
+													<multiselect 
+				                              			v-model="requiredProduct.serials" 
+				                              			class="form-control p-0 is-valid" 
+				                              			placeholder="Product Serials" 
+				                              			:multiple="true" 
+				                              			:close-on-select="false" 
+				                              			:max="requiredProduct.total_quantity" 
+				                                  		:options="requiredProduct.product.serials" 
+				                              		>
+				                                	</multiselect>
+
+				                                	<!-- 
+				                                	<div 
+														class="invalid-feedback" 
+													>
+											        	{{ errors.products[productIndex].product_serials }}
+											  		</div> 
+											  		-->
+												</div>
+											</div>
+
+											<div 
+												class="form-row"
+												v-else-if="requiredProduct.product && requiredProduct.product.has_serials && requiredProduct.product.has_variations && requiredProduct.total_quantity > 0"
+											>
+												<div class="form-group col-md-12">
+													<div class="card">
+														<div class="card-header">
+															{{ requiredProduct.product.name | capitalize }} Serials
+														</div>
+
+														<div class="card-body">
+															<div 
+																class="form-row" 
+																v-for="(productVariation, variationIndex) in requiredProduct.product.variations" 
+																:key="'required-product-' + productIndex + '-variation-' + variationIndex + '-serials'" 
+																v-show="productVariation.required_quantity > 0"
+															>	
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">Selected Variation</label>
+																	
+																	<multiselect 
+								                              			v-model="productVariation.variation" 
+								                              			class="form-control p-0 is-valid" 
+								                              			placeholder="Variation Name" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:options="[]" 
+								                                  		:disabled="true"
+								                              		>
+								                                	</multiselect>
+																</div>
+
+																<div class="form-group col-md-8">
+																	<label for="inputFirstName">
+																		Variation Serials
+																	</label>
+
+																	<multiselect 
+								                              			v-model="requiredProduct.product.variations[variationIndex].required_serials" 
+								                              			class="form-control p-0 is-valid" 
+								                              			placeholder="Variation Serials" 
+								                              			:multiple="true" 
+								                              			:close-on-select="false" 
+								                              			:max="productVariation.required_quantity" 
+								                                  		:options="requiredProduct.product.variations[variationIndex].serials" 
+								                              		>
+								                                	</multiselect>
+
+																	<!-- 
+																	<div 
+																		class="invalid-feedback" 
+																	>
+															        	{{ errors.products[productIndex].variation_serials}}
+															  		</div> 
+															  		-->
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+								          	</div>
+								          	<div class="col-md-12">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+										</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'requisition-modal-step-' + 4" 
+									v-show="!loading && step==4"
 								>	
 									<h2 class="mx-auto mb-4 lead">Delivery Details</h2>
 
@@ -498,7 +640,8 @@
 											<div class="form-group col-md-12" v-show="merchantAllAgents.length">
 												<label for="inputFirstName">Select Previous Agent</label>
 												<multiselect 
-			                              			v-model="singleRequisitionData.agent"
+			                              			v-model="singleRequisitionData.agent" 
+			                              			class="form-control p-0 is-valid" 
 			                              			placeholder="Agent Name" 
 			                              			label="name" 
 			                                  		track-by="id" 
@@ -694,9 +837,9 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Product Detail :
 											</label>
+
 											<div class="col-sm-6">
 												<div class="form-row">
-													
 													<div 
 														class="col-md-12 ml-auto" 
 														v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
@@ -719,6 +862,23 @@
 																	</label>
 																	<label class="col-sm-6 col-form-label">
 																		{{ requiredProduct.quantity }}
+
+																		<span v-show="requiredProduct.has_serials && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+																			(Serials : 
+																		</span>
+
+																		<span 
+																			v-if="requiredProduct.has_serials && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length"
+																		>
+																			<span v-for="(productSerial, productIndex) in requiredProduct.serials">
+																				{{ productSerial }}
+																				<span v-show="(productIndex + 1) < requiredProduct.serials.length">, </span> 
+																			</span>	
+																		</span>
+
+																		<span v-show="requiredProduct.has_serials && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+																			)
+																		</span>
 																	</label>
 																</div>
 
@@ -744,6 +904,23 @@
 																			</label>
 																			<label class="col-sm-6 col-form-label">
 																				{{ productVariation.quantity }}
+
+																				<span v-show="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
+																					(Serials : 
+																				</span>
+
+																				<span 
+																					v-if="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
+																				>
+																					<span v-for="(productSerial, productIndex) in productVariation.serials">
+																						{{ productSerial }}
+																						<span v-show="(productIndex + 1) < productVariation.serials.length">, </span> 
+																					</span>	
+																				</span>
+
+																				<span v-show="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
+																					)
+																				</span>
 																			</label>
 																		</div>
 																	</div>

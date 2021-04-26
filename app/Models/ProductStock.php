@@ -161,7 +161,7 @@ class ProductStock extends Model
             foreach ($serials as $serial) {
                 
                 $this->serials()->withTrashed()->updateOrCreate(
-                    [ 'serial_no' => $serial ],
+                    [ 'serial_no' => $serial, 'product_id' => $this->product_id ],
                     [ 'deleted_at' => NULL ]
                 );
 
@@ -446,7 +446,7 @@ class ProductStock extends Model
             foreach ($serials as $serial) {
                 
                 $productVariationStock->serials()->withTrashed()->updateOrCreate(
-                    [ 'serial_no' => $serial ],
+                    [ 'serial_no' => $serial, 'product_variation_id' => $productVariationStock->product_variation_id ],
                     [ 'deleted_at' => NULL ]
                 );
 

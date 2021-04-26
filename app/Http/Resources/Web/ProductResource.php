@@ -15,8 +15,6 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
-
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -33,7 +31,7 @@ class ProductResource extends JsonResource
             'merchant_id' => $this->merchant_id,
             'category' => $this->category,
             'merchant' => $this->merchant,
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->stocks->loadMissing('serials')->pluck('serials')->collapse()->pluck('serial_no')),
+            'serials' => $this->when($this->has_serials && ! $this->has_variations, \Request::is('*/products') ? ProductSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
             'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->variationType->loadMissing('variations') : 'NA'),
             'variations' => $this->when($this->has_variations, ProductVariationResource::collection($this->variations->loadMissing('variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),

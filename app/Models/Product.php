@@ -47,6 +47,11 @@ class Product extends Model
         return $this->hasMany(ProductStock::class, 'product_id', 'id')->latest();
     }
 
+    public function serials()
+    {
+        return $this->hasMany(ProductSerial::class, 'product_id', 'id');
+    }
+
     public function latestStock()
     {
         return $this->hasOne(ProductStock::class, 'product_id', 'id')->latest();
