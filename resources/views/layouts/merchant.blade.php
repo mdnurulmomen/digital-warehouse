@@ -303,7 +303,6 @@
 
 	<!-- Scripts -->
 	<script type="text/javascript">
-		alert('Executed');
 		window.localStorage.setItem("roles", JSON.stringify(@json($roles)));
 		window.localStorage.setItem("permissions", JSON.stringify(@json($permissions)));
 		/*window.localStorage.setItem("access_token", JSON.stringify(@json($access_token)));*/

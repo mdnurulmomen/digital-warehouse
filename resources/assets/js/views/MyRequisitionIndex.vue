@@ -24,6 +24,7 @@
 										<div class="row">											
 
 											<div class="col-sm-12 sub-title">
+											  	<!-- 
 											  	<search-and-addition-option 
 											  		:query="query" 
 											  		:caller-page="'requisition'" 
@@ -32,6 +33,35 @@
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllRequisitions"
 											  	></search-and-addition-option>
+											  	 -->
+
+											  	<div class="row d-flex align-items-center text-center">		  	
+											  		<div class="col-sm-3 form-group">	
+															My Requisition List
+											  		</div>
+
+											  		<div class="col-sm-6 was-validated form-group">
+											  			<input 	type="text" 
+														  		v-model="query" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		class="form-control" 
+														  		placeholder="Search"
+													  	>
+													  	<div class="invalid-feedback">
+													  		Please search with releavant input
+													  	</div>
+											  		</div>
+
+											  		<div class="col-sm-3 form-group">
+											  			<button 
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="showContentCreateForm()"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Requisition
+											  			</button>
+											  		</div>
+											  	</div>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -111,9 +141,7 @@
 																				<i class="fa fa-user-secret "></i>
 																			</button>
  																			-->
-
 																		</td>
-																    
 																	</tr>
 																	<tr 
 																  		v-show="!requisitionsToShow.length"
@@ -951,6 +979,19 @@
 				return words.join(" ");
 			}
 		},
+
+		watch : {
+
+			query : function(val){
+				if (val==='') {
+					this.fetchAllContents();
+				}
+				else {
+					this.searchData();
+				}
+			},
+
+		},
 		
 		methods : {
 		
@@ -962,7 +1003,7 @@
 				this.allFetchedRequisitions = [];
 				
 				axios
-					.get('/api/requisitions/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-requisitions/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedRequisitions = response.data;
@@ -1002,7 +1043,7 @@
 				this.merchantAllProducts = [];
 				
 				axios
-					.get('/api/products/')
+					.get('/api/my-products/')
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllProducts = response.data.data;
@@ -1040,7 +1081,7 @@
 				this.merchantAllAgents = [];
 				
 				axios
-					.get('/api/agents/')
+					.get('/api/my-agents/')
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllAgents = Object.values(response.data);
@@ -1195,7 +1236,7 @@
 				
 				axios
 				.get(
-					"/api/search-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-my-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedRequisitions = response.data;

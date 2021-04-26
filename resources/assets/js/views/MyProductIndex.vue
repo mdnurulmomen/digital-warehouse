@@ -39,6 +39,7 @@
 											  		<div class="col-sm-3 text-left">	
 															Product List
 											  		</div>
+
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 
 														  		v-model="query" 
@@ -50,6 +51,7 @@
 													  		Please search with releavant input
 													  	</div>
 											  		</div>
+
 												<!-- 
 											  		<div class="col-sm-3 text-right">
 											  			<button 
@@ -66,7 +68,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-										  		
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['retail', 'bulk']" 
@@ -163,16 +164,13 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -368,6 +366,7 @@
 		</div>
 
 		<!-- Create Request Modal -->
+		<!-- 
 		<div class="modal fade" id="request-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -470,7 +469,8 @@
 					</form>
 				</div>
 			</div>
-		</div>
+		</div> 
+		-->
 
 	</div>
 
@@ -617,7 +617,7 @@
 				this.allFetchedProducts = [];
 				
 				axios
-					.get('/api/products/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-products/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedProducts = response.data;
@@ -654,38 +654,40 @@
 				this.singleProductData = Object.assign({}, this.singleProductData, object);
 				$('#product-view-modal').modal('show');
 			},
-			showRequestCreateForm() {
-				$('#request-createOrEdit-modal').modal('show');
-			},
-			submitRequest() {
+			/*
+				showRequestCreateForm() {
+					$('#request-createOrEdit-modal').modal('show');
+				},
+				submitRequest() {
 
-				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					return;
-				}
+					if (!this.verifyUserInput()) {
+						this.submitForm = false;
+						return;
+					}
 
-				axios
-					.post('/requests/' + this.perPage, this.singleRequestData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("New request has been stored", "Success");
-							// this.allFetchedProducts = response.data;
-							// this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-							$('#request-createOrEdit-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
+					axios
+						.post('/requests/' + this.perPage, this.singleRequestData)
+						.then(response => {
+							if (response.status == 200) {
+								this.$toastr.s("New request has been stored", "Success");
+								// this.allFetchedProducts = response.data;
+								// this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+								$('#request-createOrEdit-modal').modal('hide');
 							}
-				      	}
-					})
-					.finally(response => {
-						this.fetchAllContainers();
-					});
+						})
+						.catch(error => {
+							if (error.response.status == 422) {
+								for (var x in error.response.data.errors) {
+									this.$toastr.w(error.response.data.errors[x], "Warning");
+								}
+					      	}
+						})
+						.finally(response => {
+							this.fetchAllContainers();
+						});
 
-			},
+				},
+			*/
 			searchData() {
 
 				this.error = '';
@@ -693,7 +695,7 @@
 				this.pagination.current_page = 1;
 				
 				axios
-				.get('/search-products/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
+				.get('/search-my-products/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
 				.then(response => {
 					this.allFetchedProducts = response.data;
 					this.productsToShow = this.allFetchedProducts.all.data;

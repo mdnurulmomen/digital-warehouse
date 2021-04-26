@@ -220,7 +220,7 @@
 									<!-- 
 									<li :class="currentRouteName=='my-requisitions' ? 'active' : ''">
 										<router-link :to="{ name: 'my-requisitions' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">My Dispatches</span>
+											<span class="pcoded-mtext">My Requisitions</span>
 										</router-link>
 									</li>
 									-->
