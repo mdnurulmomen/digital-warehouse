@@ -11,6 +11,7 @@ class ProductStock extends Model
     protected $casts = [
         'has_serials' => 'boolean',
         'has_variations' => 'boolean',
+        'has_approved' => 'boolean',
     ];
 
     public function product()
@@ -161,7 +162,7 @@ class ProductStock extends Model
             foreach ($serials as $serial) {
                 
                 $this->serials()->withTrashed()->updateOrCreate(
-                    [ 'serial_no' => $serial, 'product_id' => $this->product_id ],
+                    [ 'serial_no' => $serial->serial_no, 'product_id' => $this->product_id ],
                     [ 'deleted_at' => NULL ]
                 );
 
@@ -446,7 +447,7 @@ class ProductStock extends Model
             foreach ($serials as $serial) {
                 
                 $productVariationStock->serials()->withTrashed()->updateOrCreate(
-                    [ 'serial_no' => $serial, 'product_variation_id' => $productVariationStock->product_variation_id ],
+                    [ 'serial_no' => $serial->serial_no, 'product_variation_id' => $productVariationStock->product_variation_id ],
                     [ 'deleted_at' => NULL ]
                 );
 

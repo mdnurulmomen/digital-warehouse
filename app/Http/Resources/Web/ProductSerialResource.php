@@ -18,6 +18,7 @@ class ProductSerialResource extends JsonResource
             'serial_no' => $this->serial_no,
             'has_requisitions' => $this->has_requisitions,
             'has_dispatched' => $this->has_dispatched,
+            'has_approved' => $this->stock->has_approved,
         ];
     }
 }

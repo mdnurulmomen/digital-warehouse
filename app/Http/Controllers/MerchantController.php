@@ -180,13 +180,23 @@ class MerchantController extends Controller
 
         }
 
+        /*
+            return ProductResource::collection(
+                Product::where('merchant_id', $currentMerchant->id)
+                    ->where(
+                        ProductStock::select('available_quantity')
+                            ->whereColumn('product_stocks.product_id', 'products.id')
+                            ->latest()
+                            ->take(1), '>', 0
+                    )
+                    ->get()
+            );
+        */
+       
         return ProductResource::collection(
-            Product::where('merchant_id', $currentMerchant->id)
-                ->where(ProductStock::select('available_quantity')
-                ->whereColumn('product_stocks.product_id', 'products.id')
-                ->latest()
-                ->take(1), '>', 0)
-                ->get()
+            Product::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
+                $query->where('available_quantity', '>', 0);
+            })->get()
         );
 
     }

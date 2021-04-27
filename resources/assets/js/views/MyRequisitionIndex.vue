@@ -1522,7 +1522,7 @@
 				}
 
 
-				if (!this.errors.subject && !this.errorInArray(this.errors.products)) {
+				if (!this.errors.subject && !this.errorInArray(this.errors.products) && this.step < 4) {
 					this.step += 1;
 					this.submitForm = true;
 				}

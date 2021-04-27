@@ -37,7 +37,9 @@ class ProductVariation extends Model
 
     public function latestStock()
     {
-        return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
+        return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->whereHas('productStock', function ($query) {
+            $query->where('has_approved', 1);
+        })->orderBy('id', 'desc');
     }
 
     public function getVariationImmutabilityAttribute()

@@ -66,6 +66,7 @@
 																		<th>Date</th>
 																		<th>Stock Qty</th>
 																		<th>Available Qty</th>
+																		<th>Approved</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -83,6 +84,12 @@
 																		<td>
 																			{{ stock.available_quantity }}
 																		</td>
+
+																		<td>
+																			<span :class="[stock.has_approved ? 'badge-success' : 'badge-danger', 'badge']">
+																				{{ stock.has_approved ? 'Approved' : 'NA' }}
+																			</span>
+																		</td>
 																		
 																		<td>
 																			<button 
@@ -95,9 +102,18 @@
 
 																			<button 
 																				type="button" 
+																				class="btn btn-grd-warning btn-icon"  
+																				@click="openStockEditForm(stock)" 
+																				v-if="! stock.has_approved && userHasPermissionTo('approve-product-stock')"
+																			>
+																				<i class="fas fa-check"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
 																				@click="openStockEditForm(stock)" 
-																				v-if="userHasPermissionTo('update-product-stock')"
+																				v-if="stock.has_approved && userHasPermissionTo('update-product-stock')"
 																			>
 																				<i class="fas fa-edit"></i>
 																			</button>
@@ -117,7 +133,7 @@
 																	<tr 
 																  		v-show="!allStocks.length"
 																  	>
-															    		<td colspan="4">
+															    		<td colspan="5">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -131,6 +147,8 @@
 																		<th>Stock Qty</th>
 
 																		<th>Available Qty</th>
+
+																		<th>Approved</th>
 
 																		<th>Actions</th>
 																	</tr>
@@ -200,8 +218,8 @@
 		></asset-create-or-edit-modal>
  	-->
 
- 		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="stock-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-stock') || userHasPermissionTo('update-product-stock')">
+ 		<!--Create, Edit or Approve Modal -->
+		<div class="modal fade" id="stock-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-stock') || userHasPermissionTo('approve-product-stock') || userHasPermissionTo('update-product-stock')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -453,11 +471,12 @@
 														<input 
 															type="text" 
 															class="form-control" 
-															v-model="stockedVariation.serials[productVariationStockIndex-1]" 
+															v-model="stockedVariation.serials[productVariationStockIndex-1].serial_no" 
 															placeholder="Variation Serial number" 
 															:class="!errors.stock.variations[stockedVariationIndex].product_variation_serials[productVariationStockIndex-1] ? 'is-valid' : 'is-invalid'" 
 															@change="validateFormInput('product_variation_serials')" 
 															required="true" 
+															:readonly="stockedVariation.serials[productVariationStockIndex-1].has_requisitions || stockedVariation.serials[productVariationStockIndex-1].has_dispatched"
 														>
 
 														<div class="invalid-feedback">
@@ -471,7 +490,7 @@
 
 									<div 
 										class="col-md-12"
-										v-else-if="product.has_serials && ! product.has_variations && singleStockData.stock_quantity > 0"
+										v-else-if="product.has_serials && ! product.has_variations && singleStockData.stock_quantity > 0 && step==2"
 									>
 										<div 
 											class="form-row" 
@@ -486,11 +505,12 @@
 												<input 
 													type="text" 
 													class="form-control" 
-													v-model="singleStockData.serials[stockedProductIndex-1]" 
+													v-model="singleStockData.serials[stockedProductIndex-1].serial_no" 
 													placeholder="Product Serial number" 
 													:class="!errors.stock.product_serials[stockedProductIndex-1] ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('product_serials')" 
 													required="true" 
+													:readonly="singleStockData.serials[stockedProductIndex-1].has_requisitions || singleStockData.serials[stockedProductIndex-1].has_dispatched"
 												>
 
 												<div class="invalid-feedback">
@@ -779,10 +799,10 @@
 							                  	</button>
 												<button 
 													type="submit" 
-													class="btn btn-primary float-right" 
+													:class="[singleStockData.has_approved ? 'btn-primary' : 'btn-warning', 'btn', 'float-right']" 
 													:disabled="!submitForm || formSubmitted"
 												>
-													{{ createMode ? 'Stock' : 'Update' }}
+													{{ createMode ? 'Stock' : singleStockData.has_approved ? 'Update' : 'Approve' }}
 												</button>
 											</div>
 										</div>
@@ -1066,6 +1086,18 @@
 												{{ singleStockData.created_at }}
 											</label>
 										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Approved :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												<span :class="[singleStockData.has_approved ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleStockData.has_approved ? 'Approved' : 'NA' }}
+												</span>
+											</label>
+										</div>
 									</div>
 
 									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleStockData.has_serials">
@@ -1078,7 +1110,7 @@
 													v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
 												>
 													<li v-for="(productSerial,productIndex) in singleStockData.serials">
-														{{ productSerial }}
+														{{ productSerial.serial_no }}
 														<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -1100,7 +1132,7 @@
 																	v-if="singleStockData.has_serials && stockVariation.serials.length"
 																>
 																	<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
-																		{{ variationSerial }}
+																		{{ variationSerial.serial_no }}
 																		<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
 																	</li>	
 																</ol>
@@ -1826,6 +1858,17 @@
 
 						if (this.product.has_serials) {
 
+							if (this.createMode) {
+
+								if (this.product.has_variations) {
+									this.setProductVariationSerialObjects();
+								}
+								else {
+									this.setProductSerialObjects();
+								}
+							
+							}
+
 							this.step += 1;
 
 						}
@@ -2254,7 +2297,36 @@
 					}
 				);
 			},
-		
+			setProductSerialObjects () {
+
+				if (this.singleStockData.stock_quantity > 0) {
+					
+					for (let i = 0; i < this.singleStockData.stock_quantity; i++) {
+				  		this.singleStockData.serials.push({});
+					}
+
+				}
+
+			},
+			setProductVariationSerialObjects () {
+
+				this.singleStockData.variations.forEach(
+					
+					(productVariation, index) => {
+
+						if (productVariation.stock_quantity > 0) {
+							
+							for (let i = 0; i < productVariation.stock_quantity; i++) {
+						  		productVariation.serials.push({});
+							}
+
+						}
+
+					}
+					
+				);
+
+			},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -2494,19 +2566,19 @@
 							
 							for (let i = 0; i < this.singleStockData.stock_quantity; i++) {
 								
-								if (! this.singleStockData.serials[i] || this.singleStockData.serials[i].length < 1) {
+								if (! this.singleStockData.serials[i] || Object.keys(this.singleStockData.serials[i]).length < 1 || ! this.singleStockData.serials[i].hasOwnProperty('serial_no')  || this.singleStockData.serials[i].serial_no.length < 1) {
 
 									// this.errors.stock.product_serials[i] = 'Serial number is required';
 									this.$set(this.errors.stock.product_serials, i, 'Serial number is required');
 								
 								}
-								else if (! this.singleStockData.serials[i].match(/^[a-zA-Z0-9-_]+$/)) {
+								else if (! this.singleStockData.serials[i].serial_no.match(/^[a-zA-Z0-9-_]+$/)) {
 
 									// this.errors.stock.product_serials[i] = 'Invalide serial number';
 									this.$set(this.errors.stock.product_serials, i, 'Invalide serial number');
 
 								}
-								else if (this.singleStockData.serials.filter((value) => value === this.singleStockData.serials[i]).length > 1) {
+								else if (this.singleStockData.serials.filter((value) => value.serial_no === this.singleStockData.serials[i].serial_no).length > 1) {
 
 									this.$set(this.errors.stock.product_serials, i, 'Duplicate serial number');
 
@@ -2549,21 +2621,21 @@
 
 									for (let i = 0; i < stockVariation.stock_quantity; i++) {
 										
-										if (! stockVariation.serials[i] || stockVariation.serials[i].length < 1) {
+										if (! stockVariation.serials[i] || Object.keys(stockVariation.serials[i]).length < 1 || ! stockVariation.serials[i].hasOwnProperty('serial_no') || stockVariation.serials[i].serial_no.length < 1) {
 
 											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = 'Serial number is required';
 
 											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Serial number is required');
 
 										}
-										else if (! stockVariation.serials[i].match(/^[a-zA-Z0-9-_]+$/)) {
+										else if (! stockVariation.serials[i].serial_no.match(/^[a-zA-Z0-9-_]+$/)) {
 
 											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = 'Invalide serial number';
 
 											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Invalide serial number');
 
 										}
-										else if (stockVariation.serials.filter((value) => value === stockVariation.serials[i]).length > 1) {
+										else if (stockVariation.serials.filter((value) => value.serial_no === stockVariation.serials[i].serial_no).length > 1) {
 
 											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Duplicate serial number');
 

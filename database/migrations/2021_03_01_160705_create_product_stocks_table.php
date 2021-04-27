@@ -19,8 +19,11 @@ class CreateProductStocksTable extends Migration
             $table->mediumInteger('available_quantity');
             $table->boolean('has_variations')->default(false);
             $table->boolean('has_serials')->default(false);
-            $table->string('user_type');        // stock keeper (admin, manager, warehouse, ...)
-            $table->unsignedInteger('user_id');
+            $table->string('keeper_type');        // stock keeper (admin, manager, warehouse, ...)
+            $table->unsignedInteger('keeper_id');
+            $table->boolean('has_approved')->default(false);
+            $table->string('approver_type')->nullable();        // stock confirmer (admin, manager, warehouse, ...)
+            $table->unsignedInteger('approver_id')->nullable();
             $table->unsignedInteger('product_id');
             $table->timestamps();
         });

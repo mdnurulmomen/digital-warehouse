@@ -27,4 +27,9 @@ class ProductVariationSerial extends Model
     {
         return $this->hasOne(RequiredProductVariationSerial::class, 'product_variation_serial_id', 'id');
     }
+
+    public function variationStock()
+    {
+        return $this->belongsTo(ProductVariationStock::class, 'product_variation_stock_id', 'id');
+    }
 }

@@ -247,6 +247,70 @@
 										<div class="form-group col-md-12">
 											<label for="inputUsername">Special Permissions</label>
 											<div class="row">
+												<!-- Approvable Models -->
+												<div 
+													class="col-md-6" 
+													v-for="model in modelCRUDableAndApproveable" 
+													:key="'approve-model-permission-name-' + model"
+												>
+													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+													<!-- create -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('create-' + model)" 
+															@change="insertPermission('create-' + model, $event)" 
+															:ref="'create-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('create-' + model) }}</label>
+													</div>
+
+													<!-- update -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('update-' + model)" 
+															@change="insertPermission('update-' + model, $event)" 
+															:ref="'update-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('update-' + model) }}</label>
+													</div>
+
+													<!-- delete -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('delete-' + model)" 
+															@change="insertPermission('delete-' + model, $event)" 
+															:ref="'delete-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('delete-' + model) }}</label>
+													</div>
+
+													<!-- view -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('view-' + model + '-index')" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
+															:ref="'view-' + model.toLowerCase() + '-index'"
+														>
+														<label>{{ modelName('view-' + model + '-list') }}</label>
+													</div>
+
+													<!-- approve -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('approve-' + model)" 
+															@change="insertPermission('approve-' + model, $event)" 
+															:ref="'approve-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('approve-' + model) }}</label>
+													</div>
+												</div>
+
 												<!-- CRUD Models -->
 												<div 
 													class="col-md-6" 
@@ -465,13 +529,16 @@
 					user : {},
 				},
 
+				modelCRUDableAndApproveable : [
+	                'Product-Stock',
+	            ],
+
 				modelsCRUDable : [
 	        		'Asset',
 	            	'Manager',
 	            	'Merchant',
 	            	'Product-Category',
 	            	'Product',
-	            	'Product-Stock',
 	            	'Role',
 	            	'Warehouse-Owner',
 	            	'Warehouse',

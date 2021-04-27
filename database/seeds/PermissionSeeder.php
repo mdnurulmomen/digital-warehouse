@@ -14,6 +14,10 @@ class PermissionSeeder extends Seeder
     {   
         if (Permission::all()->isEmpty()) {
             
+            $modelCRUDableAndApproveable = [
+                'Product-Stock',
+            ];
+
             $modelsCRUDable = [
             	'Asset',
             	'Manager',
@@ -23,7 +27,6 @@ class PermissionSeeder extends Seeder
             	// 'DeliveryCompany',
             	'Product-Category',
             	'Product',
-            	'Product-Stock',
             	'Role',
             	'Warehouse-Owner',
             	'Warehouse',
@@ -44,6 +47,20 @@ class PermissionSeeder extends Seeder
             $modelsViewable = [
                 'Permission',  // view
             ];
+
+            foreach ($modelCRUDableAndApproveable as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'create-'.strtolower($model) ],
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
+                    [ 'name' => 'update-'.strtolower($model) ],
+                    [ 'name' => 'delete-'.strtolower($model) ],
+                    [ 'name' => 'approve-'.strtolower($model) ]
+
+                ]);
+
+            }
 
             foreach ($modelsCRUDable as $model) {
             	

@@ -283,20 +283,20 @@ class ProductController extends Controller
                     return $product->has_serials && ! $product->has_variations;
                 })
             ],
-            'serials.*' => [
+            'serials.*.serial_no' => [
                 'string', 'distinct', 'min:4', 'unique:product_serials,serial_no', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_serials && ! $product->has_variations;
                 })
             ],
-            'variations.*.stock_quantity' => 'required_with:variations', 'numeric', 'min:1',
+            'variations.*.stock_quantity' => ['required_with:variations', 'numeric', 'min:1'],
             'variations.*.serials' => [
                 'array', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_variations && $product->has_serials;
                 })
             ],
-            'variations.*.serials.*' => [
+            'variations.*.serials.*.serial_no' => [
                 'string', 'distinct', 'min:4', 'unique:product_variation_serials,serial_no', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_variations && $product->has_serials;
@@ -317,7 +317,6 @@ class ProductController extends Controller
 
         if (empty($currentUser)) {
 
-            // return $this->showProductAllStocks($request->product_id, $perPage);
             return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
             
         }
@@ -327,8 +326,8 @@ class ProductController extends Controller
             'available_quantity' => $lastAvailableQuantity + $request->stock_quantity,
             'has_variations' => $product->has_variations,
             'has_serials' => $product->has_serials,
-            'user_type' => class_basename($currentUser),
-            'user_id' => $currentUser->id,
+            'keeper_type' => class_basename($currentUser), // who stores the stock
+            'keeper_id' => $currentUser->id,
         ]);
 
         if ($newStock->has_variations && ! empty($request->variations)) {
@@ -350,8 +349,6 @@ class ProductController extends Controller
 
     public function updateProductStock(Request $request, $stock, $perPage)
     {
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
-
         $stockToUpdate = ProductStock::findOrFail($stock);
 
         $request->validate([
@@ -369,7 +366,7 @@ class ProductController extends Controller
                     return $stockToUpdate->has_serials && ! $stockToUpdate->has_variations;
                 })
             ],
-            'serials.*' => [
+            'serials.*.serial_no' => [
                 'string', 'distinct', 'min:4', 
                 // 'unique:product_serials,serial_no,'.$request->input('serials.*').',serial_no',
                 // Rule::unique('product_serials', 'serial_no')->ignore(ProductSerial::where('serial_no', $request->input('serials.*'))->first()->id),
@@ -377,14 +374,14 @@ class ProductController extends Controller
                     return $stockToUpdate->has_serials && ! $stockToUpdate->has_variations;
                 })
             ],
-            'variations.*.stock_quantity' => 'required_with:variations', 'numeric', 'min:1',
+            'variations.*.stock_quantity' => ['required_with:variations', 'numeric', 'min:1'],
             'variations.*.serials' => [
                 'array', 
                 Rule::requiredIf(function () use ($stockToUpdate) {
                     return $stockToUpdate->has_variations && $stockToUpdate->has_serials;
                 })
             ],
-            'variations.*.serials.*' => [
+            'variations.*.serials.*.serial_no' => [
                 'string', 'distinct', 'min:4', 
                 // 'unique:product_variation_serials,serial_no,'.$request->input('variations.*.serials.*').',serial_no', 
                 // Rule::unique('product_variation_serials', 'serial_no')->ignore(ProductVariationSerial::where('serial_no', $request->input('variations.*.serials.*'))->first()->id),
@@ -416,52 +413,67 @@ class ProductController extends Controller
             
         }
 
-        if (!empty($currentUser)) {
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
+
+        if (empty($currentUser)) {
+
+            return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
             
-            if ($request->stock_quantity > $stockToUpdate->stock_quantity) {
+        }
+            
+        if ($request->stock_quantity > $stockToUpdate->stock_quantity) {
 
-                $difference = $request->stock_quantity - $stockToUpdate->stock_quantity;
+            $difference = $request->stock_quantity - $stockToUpdate->stock_quantity;
 
-                $stockToUpdate->update([
-                    'stock_quantity' => $request->stock_quantity,
-                    'available_quantity' => ($stockToUpdate->available_quantity + $difference),
-                    'user_type' => class_basename($currentUser),
-                    'user_id' => $currentUser->id,
-                ]);
+            $stockToUpdate->update([
+                'stock_quantity' => $request->stock_quantity,
+                'available_quantity' => ($stockToUpdate->available_quantity + $difference),
+                'has_approved' => true,
+                'approver_type' => class_basename($currentUser),
+                'approver_id' => $currentUser->id,
+            ]);
 
-                $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
-
-            }
-            else if ($request->stock_quantity < $stockToUpdate->stock_quantity) {
-
-                $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
-
-                $stockToUpdate->update([
-                    'stock_quantity' => $request->stock_quantity,
-                    'available_quantity' => ($stockToUpdate->available_quantity - $difference),
-                    'user_type' => class_basename($currentUser),
-                    'user_id' => $currentUser->id,
-                ]);
-
-                $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
-
-            }
-
-            if ($stockToUpdate->has_variations && !empty($request->variations)) {
-                
-                $stockToUpdate->stock_variations = json_decode(json_encode($request->variations));
-
-            }
-
-            if ($stockToUpdate->has_serials && ! $stockToUpdate->has_variations && ! empty($request->serials)) {
-                
-                $stockToUpdate->stock_serials = json_decode(json_encode($request->serials));
-
-            }
-
-            $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $stockToUpdate->product_id);
+            $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
 
         }
+        else if ($request->stock_quantity < $stockToUpdate->stock_quantity) {
+
+            $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
+
+            $stockToUpdate->update([
+                'stock_quantity' => $request->stock_quantity,
+                'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
+                'has_approved' => true,
+                'approver_type' => class_basename($currentUser),
+                'approver_id' => $currentUser->id,
+            ]);
+
+            $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
+
+        }
+        else if(! $stockToUpdate->has_approved) {
+
+            $stockToUpdate->update([
+                'has_approved' => true,
+                'approver_type' => class_basename($currentUser),
+                'approver_id' => $currentUser->id,
+            ]);
+
+        }
+
+        if ($stockToUpdate->has_variations && !empty($request->variations)) {
+            
+            $stockToUpdate->stock_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        if ($stockToUpdate->has_serials && ! $stockToUpdate->has_variations && ! empty($request->serials)) {
+            
+            $stockToUpdate->stock_serials = json_decode(json_encode($request->serials));
+
+        }
+
+        $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $stockToUpdate->product_id);
 
         return $this->showProductAllStocks($stockToUpdate->product_id, $perPage);
     }
@@ -470,7 +482,19 @@ class ProductController extends Controller
     {
         $stockToDelete = ProductStock::findOrFail($stock);
 
-        $productId = $stockToDelete->product_id;
+        if ($stockToDelete->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count() > 0) {
+            
+           return response()->json(['errors'=>["undeletableSerial" => "Product serial has requisition"]], 422);
+            
+        }
+
+        else if ($stockToDelete->variations()->whereHas('serials', function ($query) {
+            $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
+        })->count() > 0) {
+            
+            return response()->json(['errors'=>["undeletableSerial" => "Product variation serial has requisition"]], 422);
+
+        }
 
         $this->decreaseStockAvailableQuantity($stockToDelete, $stockToDelete->stock_quantity);
             
@@ -482,7 +506,7 @@ class ProductController extends Controller
 
         $stockToDelete->delete();
 
-        return $this->showProductAllStocks($productId, $perPage);
+        return $this->showProductAllStocks($stockToDelete->product_id, $perPage);
     }
 
     public function searchProductAllStocks($product, $search, $perPage)
@@ -523,7 +547,7 @@ class ProductController extends Controller
         {
             foreach ($productVariation['serials'] as $variationSerialKey => $productVariationSerial) {
                 
-                if (ProductVariationSerial::where('serial_no', $productVariationSerial)->count() > 1) {
+                if (ProductVariationSerial::where('serial_no', $productVariationSerial['serial_no'])->count() > 1) {
                     
                     // return true;
                     return $productVariationSerial;
@@ -540,7 +564,7 @@ class ProductController extends Controller
     {
         foreach($request->serials as $productSerial)
         {
-            if (ProductSerial::where('serial_no', $productSerial)->count() > 1) {
+            if (ProductSerial::where('serial_no', $productSerial['serial_no'])->count() > 1) {
                 
                 return $productSerial;
 
