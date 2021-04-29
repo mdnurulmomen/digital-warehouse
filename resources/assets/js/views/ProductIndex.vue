@@ -1671,7 +1671,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							// this.allVariationTypes = response.data;
-							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 1);
+							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 0);
 						}
 					})
 					.catch(error => {
