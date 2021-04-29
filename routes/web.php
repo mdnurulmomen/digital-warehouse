@@ -17,6 +17,19 @@ Route::get('/', function () {
     return view('welcome');
 })->name('website');
 
+Route::get('/clear-cache', function() {
+    
+    Artisan::call('event:clear');
+    // Artisan::call('cache:clear');
+    // Artisan::call('config:clear');
+    // Artisan::call('route:clear');
+    // Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+
+    return 'All cache has been flushed';
+
+});
+
 Auth::routes();
 
 Route::name('merchant.')->group(function () {
