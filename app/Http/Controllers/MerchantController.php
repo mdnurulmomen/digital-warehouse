@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 use App\Models\RequisitionAgent;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\BroadcastNewRequisition;
-use App\Http\Resources\Web\ProductResource;
-use App\Http\Resources\Web\ProductCollection;
+use App\Http\Resources\Web\MyProductResource;
+use App\Http\Resources\Web\MyProductCollection;
 use App\Http\Resources\Web\RequisitionCollection;
 use App\Jobs\BroadcastProductReceiveConfirmation;
 
@@ -165,10 +165,10 @@ class MerchantController extends Controller
             
             return [
 
-                'retail' => new ProductCollection(Product::where('product_category_id', '>', 0)
+                'retail' => new MyProductCollection(Product::where('product_category_id', '>', 0)
                                                          ->where('merchant_id', $currentMerchant->id)
                                                          ->paginate($perPage)),
-                'bulk' => new ProductCollection(Product::where(function ($query) {
+                'bulk' => new MyProductCollection(Product::where(function ($query) {
                                                             $query->whereNull('product_category_id')
                                                                   ->orWhere('product_category_id', 0);
                                                         })
@@ -181,7 +181,7 @@ class MerchantController extends Controller
         }
 
         /*
-            return ProductResource::collection(
+            return MyProductResource::collection(
                 Product::where('merchant_id', $currentMerchant->id)
                     ->where(
                         ProductStock::select('available_quantity')
@@ -193,7 +193,7 @@ class MerchantController extends Controller
             );
         */
        
-        return ProductResource::collection(
+        return MyProductResource::collection(
             Product::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
                 $query->where('available_quantity', '>', 0);
             })->get()
@@ -219,7 +219,7 @@ class MerchantController extends Controller
                 });
 
         return [
-            'all' => new ProductCollection($query->paginate($perPage)),  
+            'all' => new MyProductCollection($query->paginate($perPage)),  
         ];
     }
 

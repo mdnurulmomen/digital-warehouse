@@ -180,7 +180,7 @@
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Product Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">{{ singleProductData.name | capitalize }} Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -275,7 +275,7 @@
 
 								<div class="form-row" v-show="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Serials:
+										Available Serials:
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
 										<span 
@@ -364,7 +364,7 @@
 
 														<div class="form-row" v-show="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																Serials :
+																Available Serials :
 															</label>
 															<label class="col-sm-6 col-form-label text-left">
 																<span 
@@ -587,6 +587,26 @@
 			this.fetchAllProducts();
 			// this.getCurrentUser();
 		
+		},
+
+		filters: {
+			capitalize: function (value) {
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+			}
 		},
 
 		watch : {

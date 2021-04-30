@@ -19,6 +19,7 @@ class RequisitionResource extends JsonResource
             'subject' => $this->subject,
             'description' => $this->description,
             'status' => $this->status,
+            'updater' =>  $this->when($this->status, $this->updater),
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at->diffForHumans(),
             'products' => RequiredProductResource::collection($this->products),

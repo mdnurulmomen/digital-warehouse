@@ -33,15 +33,16 @@ class ProductResource extends JsonResource
             'category' => $this->category,
             'merchant' => $this->merchant,
             // 'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), 'products') ? ProductSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), '.products') ? 
-                ProductSerialResource::collection(
-                $this->serials()->where('has_requisitions', false)->whereHas('stock', function ($query) {
-                    $query->where('has_approved', 1);
-                })->get()) 
-                : 
-                $this->serials()->where('has_requisitions', false)->whereHas('stock', function ($query) {
-                    $query->where('has_approved', 1);
-                })->get()->pluck('serial_no')),
+            // 'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), '.products') ? 
+            //     ProductSerialResource::collection(
+            //     $this->serials()->where('has_requisitions', false)->whereHas('stock', function ($query) {
+            //         $query->where('has_approved', 1);
+            //     })->get()) 
+            //     : 
+            //     $this->serials()->where('has_requisitions', false)->whereHas('stock', function ($query) {
+            //         $query->where('has_approved', 1);
+            //     })->get()->pluck('serial_no')),
+            'serials' => $this->when($this->has_serials && ! $this->has_variations, ProductSerialResource::collection($this->serials)),
             'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->variationType->loadMissing('variations') : 'NA'),
             'variations' => $this->when($this->has_variations, ProductVariationResource::collection($this->variations->loadMissing('variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),
