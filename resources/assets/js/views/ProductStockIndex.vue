@@ -104,7 +104,7 @@
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
 																				@click="openStockEditForm(stock)" 
-																				v-if="! stock.has_approved && userHasPermissionTo('approve-product-stock')"
+																				v-if="! stock.has_approved && userHasPermissionTo('update-product-stock')"
 																			>
 																				<i class="fas fa-check"></i>
 																			</button>
@@ -224,7 +224,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create '+ product.name +' Stock' : 'Update '+ product.name +' Stock' }}
+							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approved ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>

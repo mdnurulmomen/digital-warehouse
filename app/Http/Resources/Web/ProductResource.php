@@ -33,7 +33,7 @@ class ProductResource extends JsonResource
             'category' => $this->category,
             'merchant' => $this->merchant,
             // 'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), 'products') ? ProductSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), '/products') ? 
+            'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), '.products') ? 
                 ProductSerialResource::collection(
                 $this->serials()->where('has_requisitions', false)->whereHas('stock', function ($query) {
                     $query->where('has_approved', 1);

@@ -10,7 +10,7 @@ class Permission extends Model
     protected $guarded = ['id'];
 
     /**
-     * The permissions that belong to the role.
+     * Get all of the roles that has this permission.
      */
     public function roles()
     {
@@ -26,7 +26,7 @@ class Permission extends Model
     }
 
     /**
-     * Get all of the owners that are assigned this role.
+     * Get all of the owners that are assigned this permission.
      */
     public function owners()
     {
@@ -34,7 +34,7 @@ class Permission extends Model
     }
 
     /**
-     * Get all of the warehouses that are assigned this role.
+     * Get all of the warehouses that are assigned this permission.
      */
     public function warehouses()
     {
@@ -42,7 +42,7 @@ class Permission extends Model
     }
 
     /**
-     * Get all of the merchants that are assigned this role.
+     * Get all of the merchants that are assigned this permission.
      */
     public function merchants()
     {

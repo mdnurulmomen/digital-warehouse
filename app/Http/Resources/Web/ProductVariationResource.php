@@ -25,7 +25,7 @@ class ProductVariationResource extends JsonResource
             'variation' => $this->variation,
             // 'serials' => $this->when($this->product->has_serials && $this->product->has_variations, str_ends_with(Route::currentRouteName(), 'products') ? ProductVariationSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
             'serials' => $this->when($this->product->has_serials && $this->product->has_variations, 
-                str_ends_with(Route::currentRouteName(), '/products') ? 
+                str_ends_with(Route::currentRouteName(), '.products') ? 
                 ProductVariationSerialResource::collection(
                     $this->serials()->where('has_requisitions', false)
                     ->whereHas('variationStock.productStock', function ($query) {

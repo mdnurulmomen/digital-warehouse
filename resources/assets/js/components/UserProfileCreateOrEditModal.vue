@@ -274,7 +274,7 @@
 															@change="insertPermission('update-' + model, $event)" 
 															:ref="'update-' + model.toLowerCase()"
 														>
-														<label>{{ modelName('update-' + model) }}</label>
+														<label>{{ modelName('update/approve-' + model) }}</label>
 													</div>
 
 													<!-- delete -->
@@ -300,6 +300,7 @@
 													</div>
 
 													<!-- approve -->
+													<!-- 
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -309,6 +310,7 @@
 														>
 														<label>{{ modelName('approve-' + model) }}</label>
 													</div>
+ 													-->
 												</div>
 
 												<!-- CRUD Models -->

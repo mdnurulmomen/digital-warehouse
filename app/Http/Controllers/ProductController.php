@@ -323,11 +323,14 @@ class ProductController extends Controller
 
         $newStock = $product->stocks()->create([
             'stock_quantity' => $request->stock_quantity,
-            'available_quantity' => $lastAvailableQuantity + $request->stock_quantity,
+            'available_quantity' => $currentUser->hasPermissionTo('update-product-stock') ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'has_variations' => $product->has_variations,
             'has_serials' => $product->has_serials,
             'keeper_type' => class_basename($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
+            'has_approved' => $currentUser->hasPermissionTo('update-product-stock') ? true : false, 
+            'approver_type' => $currentUser->hasPermissionTo('update-product-stock') ? class_basename($currentUser) : NULL,
+            'approver_id' => $currentUser->hasPermissionTo('update-product-stock') ? $currentUser->id : NULL,
         ]);
 
         if ($newStock->has_variations && ! empty($request->variations)) {
@@ -458,6 +461,8 @@ class ProductController extends Controller
                 'approver_type' => class_basename($currentUser),
                 'approver_id' => $currentUser->id,
             ]);
+
+            $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
 
         }
 
