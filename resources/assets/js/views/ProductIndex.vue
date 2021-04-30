@@ -230,7 +230,8 @@
 		                                  		:options="['bulk product', 'retail product']" 
 		                                  		:required="true" 
 		                                  		:allow-empty="false" 
-		                                  		@input="setProductMode"
+		                                  		@input="setProductMode" 
+		                                  		:disabled="singleProductData.product_immutability" 
 		                              		>
 		                                	</multiselect>
 							        	</div>

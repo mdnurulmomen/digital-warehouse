@@ -442,7 +442,7 @@
 								    v-bind:key="'product-modal-step-' + 2" 
 								    v-show="!loading && step==2"
 							    >
-							    	<h2 class="mx-auto mb-4 lead">Product Serials</h2>
+							    	<h2 class="mx-auto mb-4 lead">{{ product.name | capitalize }} Serials</h2>
 
 							    	<div 
 										class="col-md-12" 
@@ -461,11 +461,11 @@
 												<div class="card-body">
 													<div 
 														class="form-group" 
-														v-for="productVariationStockIndex in singleStockData.variations[stockedVariationIndex].stock_quantity" 
+														v-for="productVariationStockIndex in stockedVariation.stock_quantity" 
 														:key="'product-variation-' + stockedVariation.variation.name + '-serial-' + productVariationStockIndex"
 													>	
 														<label for="inputFirstName">
-															# {{ singleStockData.variations[stockedVariationIndex].variation.name + ' Serial ' + productVariationStockIndex | capitalize }}
+															# {{ stockedVariation.variation.name + ' Serial ' + productVariationStockIndex | capitalize }}
 														</label>
 
 														<input 
@@ -1861,10 +1861,14 @@
 							if (this.createMode) {
 
 								if (this.product.has_variations) {
+
 									this.setProductVariationSerialObjects();
+
 								}
 								else {
+
 									this.setProductSerialObjects();
+									
 								}
 							
 							}
@@ -2297,7 +2301,7 @@
 					}
 				);
 			},
-			setProductSerialObjects () {
+			setProductSerialObjects() {
 
 				if (this.singleStockData.stock_quantity > 0) {
 					
@@ -2308,7 +2312,7 @@
 				}
 
 			},
-			setProductVariationSerialObjects () {
+			setProductVariationSerialObjects() {
 
 				this.singleStockData.variations.forEach(
 					
