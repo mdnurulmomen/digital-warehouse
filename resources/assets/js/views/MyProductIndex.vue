@@ -273,6 +273,22 @@
 									</label>
 								</div>
 
+								<div class="form-row" v-show="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										Serials:
+									</label>
+									<label class="col-sm-6 col-form-label text-left">
+										<span 
+											v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
+										>
+											<span v-for="(productSerial, productIndex) in singleProductData.serials">
+												{{ productSerial }}
+												<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span> 
+											</span>	
+										</span>
+									</label>
+								</div>
+
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
 									<label class="col-sm-6 form-control-plaintext">
@@ -346,6 +362,21 @@
 															</label>
 														</div>
 
+														<div class="form-row" v-show="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
+															<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																Serials :
+															</label>
+															<label class="col-sm-6 col-form-label text-left">
+																<span 
+																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
+																>
+																	<span v-for="(productVariationSerial, productVariationIndex) in productVariation.serials">
+																		{{ productVariationSerial }}
+																		<span v-show="(productVariationIndex + 1) < productVariation.serials.length">, </span> 
+																	</span>	
+																</span>
+															</label>
+														</div>
 													</div>
 												</div>
 											</div>
@@ -650,8 +681,8 @@
 
 			},
     		showContentDetails(object) {		
-				// this.singleProductData = { ...object };
-				this.singleProductData = Object.assign({}, this.singleProductData, object);
+				this.singleProductData = { ...object };
+				// this.singleProductData = Object.assign({}, this.singleProductData, object);
 				$('#product-view-modal').modal('show');
 			},
 			/*
