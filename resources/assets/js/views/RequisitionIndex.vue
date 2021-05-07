@@ -73,15 +73,17 @@
 																	>
 																		<td>{{ content.subject | capitalize }}</td>
 																		<td>
-																			<span :class="[content.status==1 ? 'badge-success' : content.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
-																				{{ content.status==1 ? 'Dispatched' : content.status==0 ? 'Pending' : 'Cancelled' }}
+																			<span :class="[content.status==1 && content.dispatch.has_approval==1 ? 'badge-success' : content.status==1 && content.dispatch.has_approval==0 ? 'badge-warning' : content.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+																				
+																				{{ content.status==1 && content.dispatch.has_approval==1 ? 'Dispatched' : content.status==1 && content.dispatch.has_approval==0 ? 'Recommended' : content.status==0 ? 'Pending' : 'Cancelled' }}
+
 																			</span>
 																		</td>
 																		<td>
 																			<span 
-																			v-if="content.status==1 && content.dispatch"
+																			v-if="content.status==1 && content.dispatch.has_approval==1"
 																			:class="[!unconfirmed(content) ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Yet' }}
+																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Confirmed' }}
 																			</span>
 																			<span v-else 
 																			class="badge badge-secondary" 
@@ -104,15 +106,25 @@
 																				class="btn btn-grd-warning btn-icon"  
 																				@click="showProductDispatchForm(content)" 
 																				v-show="content.status==0" 
-																				v-if="userHasPermissionTo('make-dispatch')"
+																				v-if="userHasPermissionTo('recommend-dispatch')"
 																			>
 																				<i class="fas fa-truck"></i>
 																			</button>
 
 																			<button 
 																				type="button" 
+																				class="btn btn-grd-warning btn-icon"  
+																				@click="showProductDispatchForm(content)" 
+																				v-show="content.status==1 && content.dispatch.has_approval==0" 
+																				v-if="userHasPermissionTo('approve-dispatch')"
+																			>
+																				<i class="fas fa-check-circle"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
 																				class="btn btn-grd-danger btn-icon"  
-																				@click="openContentDeleteForm(content)" 
+																				@click="openRequisitionCancelForm(content)" 
 																				v-show="content.status==0" 
 																				v-if="userHasPermissionTo('update-requisition')"
 																			>
@@ -198,7 +210,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							Make Dispatch
+							{{ singleDispatchData.requisition.status==0 ? 'Make' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve' : '' }} Dispatch
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -344,7 +356,48 @@
 												</div>
 											</div>
 
-											<div class="card" v-if="requiredProduct.has_variations">
+											<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Product Serials
+													</label>
+												</div>
+
+												<div 
+													class="form-group col-md-8" 
+													v-for="(requiredProductSerial, productSerialIndex) in requiredProduct.serials" 
+														:key="'required-product-name-' + requiredProduct.product_name + '-serial-' + productSerialIndex"
+												>
+													<div class="form-row">
+														<div class="col-md-6">
+															<label for="inputFirstName">
+																Serial # {{ productSerialIndex + 1 }}
+															</label>
+															
+															<input 
+																type="text" 
+																class="form-control" 
+																v-model="requiredProductSerial.serial.serial_no" 
+																readonly="true"
+															>
+														</div>
+
+														<div class="col-md-6">
+															<label for="inputFirstName">
+																Status
+															</label>
+
+															<div class="form-control border-0">
+																<span :class="[requiredProductSerial.serial.has_dispatched ? 'badge-danger' : 'badge-success', 'badge']">
+																	{{ requiredProductSerial.serial.has_dispatched ? 'NA' : 'Available' }}
+																</span>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="card" v-if="requiredProduct.has_variations && requiredProduct.hasOwnProperty('variations') && requiredProduct.variations.length">
 												<div class="card-body">
 													<div 
 														class="form-row" 
@@ -381,12 +434,56 @@
 															<input 
 																type="number" 
 																class="form-control" 
-																v-model.number="requiredProduct.variations[variationIndex].available_quantity" 
+																v-model.number="productVariation.available_quantity" 
 																placeholder="Dispatched Quantity" 
 																readonly="true" 
 															>
 														</div>
+
+														<div class="col-sm-12">
+															<div class="form-row" v-if="productVariation.has_serials">
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		{{ productVariation.variation_name | capitalize }} Serials
+																	</label>
+																</div>
+
+																<div 
+																	class="form-group col-md-8" 
+																	v-for="(requiredProductVariationSerial, productVariationSerialIndex) in productVariation.serials" 
+																		:key="'required-product-name-' + requiredProduct.product_name + 'variation-name-' + productVariation.variation_name + '-serial-' + productVariationSerialIndex"
+																>
+																	<div class="form-row">
+																		<div class="col-md-6">
+																			<label for="inputFirstName">
+																				Serial # {{ productVariationSerialIndex + 1 }}
+																			</label>
+																			
+																			<input 
+																				type="text" 
+																				class="form-control" 
+																				v-model="requiredProductVariationSerial.serial.serial_no" 
+																				readonly="true"
+																			>
+																		</div>
+
+																		<div class="col-md-6">
+																			<label for="inputFirstName">
+																				Status
+																			</label>
+
+																			<div class="form-control border-0">
+																				<span :class="[requiredProductVariationSerial.serial.has_dispatched ? 'badge-danger' : 'badge-success', 'badge']">
+																					{{ requiredProductVariationSerial.serial.has_dispatched ? 'NA' : 'Available' }}
+																				</span>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
 													</div>
+
 													
 													<!-- 
 													<div 
@@ -403,7 +500,6 @@
 
 													</div>
 												 	-->
-
 												</div>
 											</div>
 										
@@ -460,7 +556,7 @@
 											:key="'required-product-index-' + productIndex"
 										>
 											<div class="card-header">
-												{{ requiredProduct.product_name }}
+												{{ requiredProduct.product_name | capitalize }}
 											</div>
 
 											<div 
@@ -646,7 +742,6 @@
 								          	</div>
 										</div>
 									</div>
-
 								</div>
 
 								<div 
@@ -806,14 +901,16 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12 d-flex justify-content-between">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="userHasPermissionTo('approve-dispatch') ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-							                  	<button type="button" class="btn btn-danger" @click="openContentDeleteForm(singleDispatchData.requisition)">
-													Cancel Requisition
+							                  	
+							                  	<button type="button" class="btn btn-danger btn-sm btn-round" @click="openRequisitionCancelForm(singleDispatchData.requisition)">
+													{{ singleDispatchData.requisition.status==0 ? 'Cancel Requisition' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Cancel Dispatch' : '' }} 
 												</button>
-												<button type="submit" class="btn btn-primary" :disabled="!submitForm">
-													Dispatch
+
+												<button type="submit" class="btn btn-primary btn-sm btn-round" :disabled="!submitForm || nondispatchable">
+													{{ singleDispatchData.requisition.status==0 ? 'Recommend Dispatch' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve Dispatch' : '' }}
 												</button>
 											</div>
 								    	</div>
@@ -884,8 +981,10 @@
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[singleRequisitionData.status==1 ? 'badge-success' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
-													{{ singleRequisitionData.status==1 ? 'Dispatched' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
+												<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+																				
+													{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
+
 												</span>
 											</label>
 										</div>
@@ -923,7 +1022,7 @@
 																		Product Name :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.product_name }}
+																		{{ requiredProduct.product_name | capitalize }}
 																	</label>
 																</div>
 
@@ -933,6 +1032,20 @@
 																	</label>
 																	<label class="col-sm-6 col-form-label">
 																		{{ requiredProduct.quantity }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Product Serials :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials" :key="'required-product-' + productIndex + '-product-serial-index-' + productSerialIndex + '-product-serial-' + productSerial.serial.serial_no">
+
+																			{{ productSerial.serial.serial_no }}
+
+																			<span v-show="(productSerialIndex+1) < requiredProduct.serials.length">, </span>
+																		</span>
 																	</label>
 																</div>
 
@@ -954,15 +1067,28 @@
 																	>
 																		<div class="form-row">
 																			<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																				 {{ productVariation.variation_name }} :
+																				 {{ productVariation.variation_name | capitalize }} :
 																			</label>
 																			<label class="col-sm-6 col-form-label">
 																				{{ productVariation.quantity }}
 																			</label>
 																		</div>
+
+																		<div class="form-row" v-if="productVariation.has_serials && productVariation.serials.length">
+																			<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																				{{ productVariation.variation_name | capitalize }} Serials :
+																			</label>
+																			<label class="col-sm-6 col-form-label">
+																				<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials" :key="'required-product-' + productIndex + '-variation-index-' + variationIndex + '-product-variation-serial-index-' + variationSerialIndex + '-product-variation-serial-' + variationSerial.serial.serial_no">
+
+																					{{ variationSerial.serial.serial_no }}
+
+																					<span v-show="(variationSerialIndex+1) < productVariation.serials.length">, </span>
+																				</span>
+																			</label>
+																		</div>
 																	</div>
 																</div>
-
 															</div>
 														</div>
 													</div>
@@ -1061,7 +1187,9 @@
 												Received :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Yet' }}</span>
+												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
+												</span>
 											</label>
 										</div>
 
@@ -1249,6 +1377,31 @@
 
 		},
 
+		computed: {
+			
+			// a computed getter
+			nondispatchable: function () {
+				
+				if (this.singleDispatchData.requisition.hasOwnProperty('products') && this.singleDispatchData.requisition.products.length) {
+
+					return this.singleDispatchData.requisition.products.some(
+						
+						requiredProduct => 
+
+							(requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.serials.some( productSerial => productSerial.serial.has_dispatched )) || (requiredProduct.has_serials && requiredProduct.has_variations && requiredProduct.variations.some(productVariation => productVariation.serials.some( variationSerial => variationSerial.serial.has_dispatched)))
+
+						
+						
+					);
+
+				}
+
+				return false;
+
+			}
+
+		},
+
 		watch : {
 
 			query : function(val){
@@ -1363,7 +1516,7 @@
 					});
 
 			},
-			openContentDeleteForm(object) {
+			openRequisitionCancelForm(object) {
 
 				this.singleRequisitionData = { ...object };
 				$('#cancel-confirmation-modal').modal('show');
@@ -1522,7 +1675,18 @@
 			},
 			unconfirmed(object) {
 
-				if (object.status==1 && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+				if (object.status==1 && object.dispatch.has_approval==1 && ((object.dispatch.hasOwnProperty('agent') && ! object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && ! object.dispatch.delivery.receiving_confirmation))) {
+
+					return true; 	// not confirmed
+
+				}
+
+				return false;  // confirmed
+				
+			},
+			unapproved(object) {
+
+				if (object.status==1 && object.dispatch.has_approval==0) {
 
 					return true; 	// not confirmed
 
@@ -1541,16 +1705,21 @@
 					
 					if (this.step==2) {
 
-						const productRemains = this.singleDispatchData.requisition.products.some(
-							requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0
-						);
-
-						if (productRemains) {
-							this.step += 1;
+						if (! this.userHasPermissionTo('approve-dispatch')) {
+							this.step += 2;
 						}
 						else {
-							this.setProductReleasedAddresses();
-							this.step += 2;
+							const productRemains = this.singleDispatchData.requisition.products.some(
+								requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0
+							);
+
+							if (productRemains) {
+								this.step += 1;
+							}
+							else {
+								this.setProductReleasedAddresses();
+								this.step += 2;
+							}
 						}
 
 					}

@@ -1090,7 +1090,7 @@
 															@change="insertPermission('update-' + model, $event)" 
 															:ref="'update-' + model.toLowerCase()"
 														>
-														<label>{{ modelName('update/approve-' + model) }}</label>
+														<label>{{ modelName('update/Approve-' + model) }}</label>
 													</div>
 
 													<!-- delete -->
@@ -1216,20 +1216,31 @@
 													<!-- Viewable and Makeable -->
 													<div 
 														class="col-md-6" 
-														v-for="model in modelsViewableAndMakeable" 
+														v-for="model in modelsViewableRecommendableAndApproveable" 
 														:key="'crud-model-permission-name-' + model"
 													>
 														<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-														<!-- make -->
+														<!-- recommend -->
 														<div class="form-check">
 															<input 
 																type="checkbox" 
-																:checked="permissionExists('make-' + model)" 
-																@change="insertPermission('make-' + model, $event)" 
-																:ref="'make-' + model.toLowerCase()"
+																:checked="permissionExists('recommend-' + model)" 
+																@change="insertPermission('recommend-' + model, $event)" 
+																:ref="'recommend-' + model.toLowerCase()"
 															>
-															<label>{{ modelName('make-' + model) }}</label>
+															<label>{{ modelName('recommend-' + model) }}</label>
+														</div>
+
+														<!-- update -->
+														<div class="form-check">
+															<input 
+																type="checkbox" 
+																:checked="permissionExists('approve-' + model)" 
+																@change="insertPermission('approve-' + model, $event)" 
+																:ref="'approve-' + model.toLowerCase()"
+															>
+															<label>{{ modelName('update/Approve-' + model) }}</label>
 														</div>
 														
 														<!-- view -->
@@ -1898,8 +1909,8 @@
                 	'Requisition', // view / update(cancel)
 	        	],
 
-	        	modelsViewableAndMakeable : [
-	        		'Dispatch',  // view / make
+	        	modelsViewableRecommendableAndApproveable : [
+	        		'Dispatch',  // view / recommend
 	        	],
 
 	        	modelsViewable : [
@@ -2807,14 +2818,32 @@
 				   		
 				   		this.singleWarehouseData.permissions.push(permission);
 						
-						if (permissionName.includes('create') || permissionName.includes('update') || permissionName.includes('delete') || permissionName.includes('make')) {
+						if (permissionName.includes('create') || permissionName.includes('update') || permissionName.includes('delete') || permissionName.includes('recommend')) {
 
-							let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
+							let viewPermission = permissionName.replace(/create|update|delete|recommend/, "view").toLowerCase();
 							
 							if (! this.$refs[viewPermission + '-index'][0].checked) {
 
 								// this.$refs[viewPermission + '-index'][0].disabled = false;
 								this.$refs[viewPermission + '-index'][0].click();
+
+							}
+
+						}
+
+						if (permissionName.includes('approve')) {
+
+							let viewPermission = permissionName.replace("approve", "recommend").toLowerCase();
+							
+							if (! this.$refs[viewPermission][0].checked) {
+
+								this.$refs[viewPermission][0].click();
+
+							}
+
+							if (! this.$refs['update-requisition'][0].checked) {
+
+								this.$refs['update-requisition'][0].click();
 
 							}
 
@@ -2836,11 +2865,11 @@
 					}
 
 					/*
-						let modelName = permissionName.replace(/create|update|delete|make/, "");
+						let modelName = permissionName.replace(/create|update|delete|recommend/, "");
 
-						if (! modelName.includes('view') && ! this.permissionExists('create' + modelName) && ! this.permissionExists('update' + modelName) && ! this.permissionExists('delete' + modelName) && ! this.permissionExists('make' + modelName)) {
+						if (! modelName.includes('view') && ! this.permissionExists('create' + modelName) && ! this.permissionExists('update' + modelName) && ! this.permissionExists('delete' + modelName) && ! this.permissionExists('recommend' + modelName)) {
 
-							let viewPermission = permissionName.replace(/create|update|delete|make/, "view").toLowerCase();
+							let viewPermission = permissionName.replace(/create|update|delete|recommend/, "view").toLowerCase();
 							this.$refs[viewPermission + '-index'][0].disabled = false;
 						
 						}

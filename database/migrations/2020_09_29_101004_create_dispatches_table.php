@@ -16,11 +16,12 @@ class CreateDispatchesTable extends Migration
         // history of all dispatches
         Schema::create('dispatches', function (Blueprint $table) {
             $table->increments('id');
-            // $table->string('receiver_type'); // product-delivery or product returns
-            // $table->unsignedMediumInteger('receiver_id'); // for details of taker
-            // $table->unsignedInteger('merchant_id');
-            $table->unsignedInteger('requisition_id');
             $table->timestamp('released_at')->useCurrent();
+            $table->tinyInteger('has_approval')->default(0);      // pending / approved / cancelled dispatch
+            $table->string('updater_type')->nullable();     // who cancelled / approved the dispatch
+            $table->unsignedInteger('updater_id')->nullable();
+            $table->timestamp('updated_at')->nullable();
+            $table->unsignedInteger('requisition_id');
         });
     }
 

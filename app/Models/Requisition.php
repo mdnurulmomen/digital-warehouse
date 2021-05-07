@@ -44,6 +44,14 @@ class Requisition extends Model
         return $this->hasOne(Dispatch::class, 'requisition_id', 'id');
     }
 
+    /**
+     * Get the model who dispatched the requisition.
+     */
+    public function updater()
+    {
+        return $this->morphTo(__FUNCTION__, 'updater_type', 'updater_id');
+    }
+
     public function setRequiredProductsAttribute($requiredProducts = [])
     {
     	if (count($requiredProducts)) {
@@ -65,8 +73,6 @@ class Requisition extends Model
 
                         $requiredProduct->serials()->delete();
 
-                        $requiredProduct->delete();
-
                     }
                     else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
                         
@@ -87,6 +93,8 @@ class Requisition extends Model
                         $requiredProduct->variations()->delete();
 
                     }
+
+                    $requiredProduct->delete();
 
                 }                    
                 
@@ -154,6 +162,40 @@ class Requisition extends Model
     		}
 
     	}
+    }
+
+    public function cancelProductRequisitions()
+    {
+        foreach ($this->products as $requiredProduct) {
+                        
+            if ($requiredProduct->has_serials && ! $requiredProduct->has_variations) {
+                
+                foreach ($requiredProduct->serials as $requiredProductSerial) {
+                    
+                    $requiredProductSerial->serial()->update([
+                        'has_requisitions' => false,
+                    ]);
+
+                }
+
+            }
+            else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
+                
+                foreach ($requiredProduct->variations as $requiredProductVariation) {
+                    
+                    foreach ($requiredProductVariation->serials as $requiredProductVariationSerial) {
+                    
+                        $requiredProductVariationSerial->serial()->update([
+                            'has_requisitions' => false,
+                        ]);
+
+                    }
+
+                }
+
+            }
+
+        }
     }
 
 }

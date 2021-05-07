@@ -9,6 +9,11 @@ class RequiredProduct extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'has_serials' => 'boolean',
+        'has_variations' => 'boolean',
+    ];
+
     public function requisition()
     {
     	return $this->belongsTo(Requisition::class, 'requisition_id', 'id');

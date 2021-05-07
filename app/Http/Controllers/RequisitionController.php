@@ -22,9 +22,9 @@ class RequisitionController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
@@ -36,42 +36,55 @@ class RequisitionController extends Controller
 
     public function cancelRequisition($requisition, $perPage)
     {
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
+
+        if (empty($currentUser)) {
+
+            return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
+            
+        }
+
         $expectedRequisition = Requisition::findOrFail($requisition);
 
-        $expectedRequisition->update([
-            'status' => -1,
-        ]);
+        if ($expectedRequisition->status == -1) {
+            
+            return response()->json(['errors'=>["cancelledRequisition" => "Cancelled requisition, please reload the page"]], 422);
 
-        foreach ($expectedRequisition->products as $requiredProduct) {
-                    
-            if ($requiredProduct->has_serials && ! $requiredProduct->has_variations) {
-                
-                foreach ($requiredProduct->serials as $requiredProductSerial) {
-                    
-                    $requiredProductSerial->serial()->update([
-                        'has_requisitions' => false,
-                    ]);
+        }
 
-                }
+        else if ($expectedRequisition->status == 1) {        // dispatched requisition
+            
+            $dispatchToUpdate = $expectedRequisition->dispatch;
+
+            if ($dispatchToUpdate->has_approval) { // 1 / -1
+               
+                return response()->json(['errors'=>["approvedOrCancelled" => "Already approved or cancelled dispatch"]], 422);
 
             }
-            else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
-                
-                foreach ($requiredProduct->variations as $requiredProductVariation) {
-                    
-                    foreach ($requiredProductVariation->serials as $requiredProductVariationSerial) {
-                    
-                        $requiredProductVariationSerial->serial()->update([
-                            'has_requisitions' => false,
-                        ]);
+       
+            $dispatchToUpdate->has_approval = -1;
+            $dispatchToUpdate->updater_type = get_class($currentUser);
+            $dispatchToUpdate->updater_id = $currentUser->id;
+            $dispatchToUpdate->updated_at = now();
+            $dispatchToUpdate->save();
 
-                    }
+            $dispatchToUpdate->delivery()->delete();
+            $dispatchToUpdate->return()->delete();
 
-                }
+        }
+        else if ($expectedRequisition->status == 0) {       // cancelling non dispatched requisition
+            
+            $expectedRequisition->update([
+                'status' => -1,
+                'updater_type' => get_class($currentUser),
+                'updater_id' => $currentUser->id,
+            ]);    
 
-            }
+        }
 
-        }  
+        $expectedRequisition->cancelProductRequisitions();
+
+        // BroadcastRequisitionDispatch::dispatch($dispatchToUpdate->requisition);
 
         return $this->showAllRequisitions($perPage);
     }

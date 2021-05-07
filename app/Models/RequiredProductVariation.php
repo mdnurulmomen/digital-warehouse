@@ -9,6 +9,10 @@ class RequiredProductVariation extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'has_serials' => 'boolean',
+    ];
+
     /*
     public function requisition()
     {

@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RequiredProductResource extends JsonResource
+class MyRequiredProductResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,7 +22,7 @@ class RequiredProductResource extends JsonResource
             'available_quantity' => $this->product->latestStock->available_quantity,
             'has_variations' => $this->has_variations,
             'has_serials' => $this->has_serials,
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials->loadMissing('serial')),
+            'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials->loadMissing('serial')->pluck('serial')->pluck('serial_no')),
             'requisition_id' => $this->requisition_id,
             'variations' => $this->when($this->has_variations, RequiredProductVariationResource::collection($this->variations)),
             'addresses' => new ProductAddressCollection($this->product->addresses),

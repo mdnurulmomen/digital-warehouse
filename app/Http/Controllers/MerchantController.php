@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Jobs\BroadcastNewRequisition;
 use App\Http\Resources\Web\MyProductResource;
 use App\Http\Resources\Web\MyProductCollection;
-use App\Http\Resources\Web\RequisitionCollection;
+use App\Http\Resources\Web\MyRequisitionCollection;
 use App\Jobs\BroadcastProductReceiveConfirmation;
 
 class MerchantController extends Controller
@@ -241,9 +241,9 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new MyRequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new MyRequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'cancelled' => new MyRequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
@@ -324,7 +324,7 @@ class MerchantController extends Controller
                                 });
 
         return [
-            'all' => new RequisitionCollection($query->paginate($perPage)),  
+            'all' => new MyRequisitionCollection($query->paginate($perPage)),  
         ];
     }
 

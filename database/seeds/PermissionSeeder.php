@@ -43,7 +43,7 @@ class PermissionSeeder extends Seeder
                 'Requisition', // view / update(cancel)
             ];
 
-            $modelsViewableAndMakeable = [
+            $modelsViewableRecommendableAndApproveable = [
                 'Dispatch',  // view / make
             ];
 
@@ -91,12 +91,13 @@ class PermissionSeeder extends Seeder
 
             }
 
-            foreach ($modelsViewableAndMakeable as $model) {
+            foreach ($modelsViewableRecommendableAndApproveable as $model) {
                 
                 Permission::insert([
                 
                     [ 'name' => 'view-'.strtolower($model).'-index' ],
-                    [ 'name' => 'make-'.strtolower($model) ],
+                    [ 'name' => 'recommend-'.strtolower($model) ],
+                    [ 'name' => 'approve-'.strtolower($model) ],
 
                 ]);
 

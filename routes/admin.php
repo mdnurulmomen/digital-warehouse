@@ -145,7 +145,7 @@ Route::name('admin.')->group(function () {
 
 		// dispatche
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
-		Route::post('/dispatches/{perPage}', 'DispatchController@makeNewDispatch')->name('dispatches');
+		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches');
 		Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
 		// roles
