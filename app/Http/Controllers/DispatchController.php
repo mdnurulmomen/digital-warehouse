@@ -163,7 +163,11 @@ class DispatchController extends Controller
 
         }
         
-        BroadcastRequisitionDispatch::dispatch($expectedRequisition);
+        if ($requisitionDispatch->has_approval == 1) {
+            
+            BroadcastRequisitionDispatch::dispatch($expectedRequisition);
+
+        }
 
         // return $this->showAllDispatches($perPage);
         return $this->showAllRequisitions($perPage);

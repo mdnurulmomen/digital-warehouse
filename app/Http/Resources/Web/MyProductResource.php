@@ -30,7 +30,7 @@ class MyProductResource extends JsonResource
             'merchant_id' => $this->merchant_id,
             'category' => $this->category,
             'merchant' => $this->merchant,
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials()->where('has_requisitions', false)->whereHas('stock', function ($query) {
+            'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials()->where('has_requisitions', false)->where('has_dispatched', false)->whereHas('stock', function ($query) {
                     $query->where('has_approved', 1);
                 })->get()->pluck('serial_no')),
             // 'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->variationType->loadMissing('variations') : 'NA'),

@@ -7,13 +7,14 @@ use App\Models\Merchant;
 use App\Models\Requisition;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\RequisitionAgent;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\BroadcastNewRequisition;
 use App\Http\Resources\Web\MyProductResource;
 use App\Http\Resources\Web\MyProductCollection;
-use App\Http\Resources\Web\MyRequisitionCollection;
 use App\Jobs\BroadcastProductReceiveConfirmation;
+use App\Http\Resources\Web\MyRequisitionCollection;
 
 class MerchantController extends Controller
 {
@@ -261,15 +262,32 @@ class MerchantController extends Controller
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|numeric|exists:products,id',
             'products.*.total_quantity' => 'required|numeric|min:1',
+            'products.*.product' => 'required',
 
-            'delivery_service' => 'nullable|boolean',
-            'agent' => 'required_if:delivery_service,0,',
-            'agent.name' => 'required_if:delivery_service,0,',
-            'agent.mobile' => 'required_if:delivery_service,0,',
-            'agent.code' => 'required_if:delivery_service,0,|string',
+            'products.*.serials' => 'exclude_if:products.*.product.has_variations,true|required_if:products.*.product.has_serials,true|array',
+            'products.*.serials.*' => [
+                    Rule::exists('product_serials', 'serial_no')->where(function ($query) {
+                        return $query->where('has_requisitions', false)->where('has_dispatched', false);
+                    }),
+            ],
+
+            'products.*.product.variations' => 'required_if:products.*.product.has_variations,true|array',
+            'products.*.product.variations.*.required_serials' => 'required_with:products.*.product.variations.*.serials|array',
+            'products.*.product.variations.*.required_serials.*' => [
+                    Rule::exists('product_variation_serials', 'serial_no')->where(function ($query) {
+                        return $query->where('has_requisitions', false)->where('has_dispatched', false);
+                    }),
+            ],
+
+            'delivery_service' => 'boolean',
+
+            'agent' => 'required_if:delivery_service,false,',
+            'agent.name' => 'required_if:delivery_service,false,',
+            'agent.mobile' => 'required_if:delivery_service,false,',
+            'agent.code' => 'required_if:delivery_service,false,|string',
             // 'agent.presence_confirmation' => 'nullable|boolean',
-            'delivery' => 'required_if:delivery_service,1',
-            'delivery.address' => 'required_if:delivery_service,1',
+            'delivery' => 'required_if:delivery_service,true',
+            'delivery.address' => 'required_if:delivery_service,true',
         ]);
 
         $currentMerchant = \Auth::user();

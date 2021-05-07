@@ -100,7 +100,7 @@
 																		</td>
 																		<td>
 																			<span 
-																			v-if="content.status==1 && content.dispatch"
+																			v-if="content.status==1 && content.dispatch.has_approval==1"
 																			:class="[!unconfirmed(content) ? 'badge-success' : 'badge-danger', 'badge']">
 																				{{ !unconfirmed(content) ? 'Confirmed' : 'Not Yet' }}
 																			</span>
@@ -629,13 +629,14 @@
 													:width=200 
 													:color="{checked: 'green', unchecked: 'blue'}"
 													:labels="{checked: 'Delivery Service', unchecked: 'Self Agent'}" 
+													@change="setRequisitionAgent"
 												/>
 											</div>
 										</div>
 
 										<div 
-										class="form-row" 
-										v-if="!singleRequisitionData.delivery_service && singleRequisitionData.agent"
+											class="form-row" 
+											v-if="! singleRequisitionData.delivery_service && singleRequisitionData.agent"
 										>	
 											<div class="form-group col-md-12" v-show="merchantAllAgents.length">
 												<label for="inputFirstName">Select Previous Agent</label>
@@ -647,6 +648,7 @@
 			                                  		track-by="id" 
 			                                  		:custom-label="objectNameWithCapitalized" 
 			                                  		:options="merchantAllAgents" 
+			                                  		@input="verifyUserInput()"
 			                              		>
 			                                	</multiselect>
 											</div>
@@ -708,7 +710,7 @@
 											-->
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.delivery_service">
+										<div class="form-row" v-else-if="singleRequisitionData.delivery_service">
 											<div class="form-group col-md-12">
 												<label for="inputFirstName">Address</label>
 												<ckeditor 
@@ -738,7 +740,7 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
@@ -862,23 +864,18 @@
 																	</label>
 																	<label class="col-sm-6 col-form-label">
 																		{{ requiredProduct.quantity }}
+																	</label>
+																</div>
 
-																		<span v-show="requiredProduct.has_serials && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
-																			(Serials : 
-																		</span>
-
-																		<span 
-																			v-if="requiredProduct.has_serials && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length"
-																		>
-																			<span v-for="(productSerial, productIndex) in requiredProduct.serials">
-																				{{ productSerial }}
-																				<span v-show="(productIndex + 1) < requiredProduct.serials.length">, </span> 
-																			</span>	
-																		</span>
-
-																		<span v-show="requiredProduct.has_serials && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
-																			)
-																		</span>
+																<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Product Serials :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials">
+																			{{ productSerial }}
+																			<span v-show="(productSerialIndex + 1) < requiredProduct.serials.length">, </span> 
+																		</span>	
 																	</label>
 																</div>
 
@@ -900,27 +897,22 @@
 																	>
 																		<div class="form-row">
 																			<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																				 {{ productVariation.variation_name }} :
+																				 {{ productVariation.variation_name | capitalize }} :
 																			</label>
 																			<label class="col-sm-6 col-form-label">
 																				{{ productVariation.quantity }}
+																			</label>
+																		</div>
 
-																				<span v-show="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
-																					(Serials : 
-																				</span>
-
-																				<span 
-																					v-if="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
-																				>
-																					<span v-for="(productSerial, productIndex) in productVariation.serials">
-																						{{ productSerial }}
-																						<span v-show="(productIndex + 1) < productVariation.serials.length">, </span> 
-																					</span>	
-																				</span>
-
-																				<span v-show="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
-																					)
-																				</span>
+																		<div class="form-row" v-if="productVariation.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
+																			<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																				{{ productVariation.variation_name | capitalize }} Serials :
+																			</label>
+																			<label class="col-sm-6 col-form-label">
+																				<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials">
+																					{{ variationSerial }}
+																					<span v-show="(variationSerialIndex + 1) < productVariation.serials.length">, </span> 
+																				</span>	
 																			</label>
 																		</div>
 																	</div>
@@ -954,7 +946,7 @@
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.delivery && singleRequisitionData.status==1 && singleRequisitionData.dispatch">
+										<div class="form-row" v-if="singleRequisitionData.delivery && singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Delivery Receipt :
 											</label>
@@ -1008,7 +1000,7 @@
 										</div>
 										-->
 										
-										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.dispatch">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Received :
 											</label>
@@ -1523,8 +1515,20 @@
 
 
 				if (!this.errors.subject && !this.errorInArray(this.errors.products) && this.step < 4) {
-					this.step += 1;
+					
+					if (this.step !=2 || this.requisitionHasSerialProduct()) {
+
+						this.step += 1;
+					
+					}
+					else {
+
+						this.step += 2;
+
+					}	
+
 					this.submitForm = true;
+				
 				}
 				else {
 					this.submitForm = false;
@@ -1580,9 +1584,14 @@
 					this.singleRequisitionData.products[index].id = this.singleRequisitionData.products[index].product.id;
 				}
 			},
+			setRequisitionAgent() {
+				if (! this.singleRequisitionData.delivery_service) {
+					this.singleRequisitionData.agent = {};
+				}
+			},
 			unconfirmed(object) {
 
-				if (object.status==1 && object.dispatch && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+				if (object.status==1 && object.dispatch.has_approval==1 && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
 
 					return true; 	// not confirmed
 
@@ -1590,6 +1599,13 @@
 
 				return false;  // confirmed
 				
+			},
+			requisitionHasSerialProduct() {
+
+				return this.singleRequisitionData.products.some(
+					currentProduct => currentProduct.product.has_serials
+				);
+
 			},
 			validateFormInput (formInputName) {
 

@@ -24,7 +24,7 @@ class MyRequiredProductResource extends JsonResource
             'has_serials' => $this->has_serials,
             'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials->loadMissing('serial')->pluck('serial')->pluck('serial_no')),
             'requisition_id' => $this->requisition_id,
-            'variations' => $this->when($this->has_variations, RequiredProductVariationResource::collection($this->variations)),
+            'variations' => $this->when($this->has_variations, MyRequiredProductVariationResource::collection($this->variations)),
             'addresses' => new ProductAddressCollection($this->product->addresses),
         ];
     }
