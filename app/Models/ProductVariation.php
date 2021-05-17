@@ -60,4 +60,11 @@ class ProductVariation extends Model
             $query->where('status', 0);
         });
     }
+
+    public function dispatchedRequests()
+    {
+        return $this->requests()->whereHas('requiredProduct.requisition', function ($query) {
+            $query->where('status', 1);
+        });
+    }
 }

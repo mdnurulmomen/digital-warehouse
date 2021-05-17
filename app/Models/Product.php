@@ -64,6 +64,13 @@ class Product extends Model
         });
     }
 
+    public function dispatchedRequests()
+    {
+        return $this->hasMany(RequiredProduct::class, 'product_id', 'id')->whereHas('requisition', function ($query) {
+            $query->where('status', 1);
+        });
+    }
+
     // immutable product
     public function getProductImmutabilityAttribute()
     {

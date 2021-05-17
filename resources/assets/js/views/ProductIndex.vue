@@ -1031,6 +1031,16 @@
 										</div>
 
 										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Dispatched Qty:
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleProductData.dispatched_quantity }}
+												{{ singleProductData.quantity_type }}
+											</label>
+										</div>
+
+										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Serial :</label>
 											<label class="col-sm-6 form-control-plaintext">
 												<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
@@ -1100,6 +1110,12 @@
 																	</label>
 																</div>
 
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Dispatched Qty :</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.dispatched_quantity }}
+																	</label>
+																</div>
 															</div>
 														</div>
 													</div>

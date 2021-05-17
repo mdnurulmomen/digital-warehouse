@@ -20,6 +20,7 @@ class ProductVariationResource extends JsonResource
             'sku' => $this->sku,
             'available_quantity' => $this->latestStock->available_quantity ?? 0,
             'requested_quantity' => $this->nonDispatchedRequests->sum('quantity'),
+            'dispatched_quantity' => $this->dispatchedRequests->sum('quantity'),
             'price' => $this->price,
             'variation_immutability' => $this->variation_immutability,
             'variation' => $this->variation,

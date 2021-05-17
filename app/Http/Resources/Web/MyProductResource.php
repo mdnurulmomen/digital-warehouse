@@ -22,6 +22,7 @@ class MyProductResource extends JsonResource
             'price' => $this->price,
             'available_quantity' => $this->latestStock->available_quantity ?? 0,
             'requested_quantity' => $this->nonDispatchedRequests->sum('quantity'),
+            'dispatched_quantity' => $this->dispatchedRequests->sum('quantity'),
             'quantity_type' => $this->quantity_type,
             'has_serials' => $this->has_serials,
             'has_variations' => $this->has_variations,
@@ -31,6 +32,9 @@ class MyProductResource extends JsonResource
             'category' => $this->category,
             'merchant' => $this->merchant,
             'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials()->where('has_requisitions', false)->where('has_dispatched', false)->whereHas('stock', function ($query) {
+                    $query->where('has_approved', 1);
+                })->get()->pluck('serial_no')),
+            'dispatched_serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials()->where('has_requisitions', true)->where('has_dispatched', true)->whereHas('stock', function ($query) {
                     $query->where('has_approved', 1);
                 })->get()->pluck('serial_no')),
             // 'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->variationType->loadMissing('variations') : 'NA'),

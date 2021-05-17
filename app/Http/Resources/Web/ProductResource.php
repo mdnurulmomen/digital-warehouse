@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'available_quantity' => $this->latestStock->available_quantity ?? 0,
             'requested_quantity' => $this->nonDispatchedRequests->sum('quantity'),
+            'dispatched_quantity' => $this->dispatchedRequests->sum('quantity'),
             'quantity_type' => $this->quantity_type,
             'has_serials' => $this->has_serials,
             'has_variations' => $this->has_variations,

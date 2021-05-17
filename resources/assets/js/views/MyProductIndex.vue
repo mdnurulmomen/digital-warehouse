@@ -93,7 +93,7 @@
 
 																	<tr v-for="content in productsToShow" :key="'content-' + content.id"
 																	>
-																		<td>{{ content.name }}</td>
+																		<td>{{ content.name | capitalize }}</td>
 																		<td>{{ content.sku }}</td>
 																		<!-- <td>{{ last requested at }}</td> -->
 																		
@@ -266,6 +266,15 @@
 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										Dispatched Qty:
+									</label>
+									<label class="col-sm-6 col-form-label text-left">
+										{{ singleProductData.dispatched_quantity + ' ' + singleProductData.quantity_type }}
+									</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">
 										Requested Qty:
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
@@ -284,6 +293,22 @@
 											<span v-for="(productSerial, productIndex) in singleProductData.serials">
 												{{ productSerial }}
 												<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span> 
+											</span>	
+										</span>
+									</label>
+								</div>
+
+								<div class="form-row" v-show="singleProductData.has_serials && singleProductData.hasOwnProperty('dispatched_serials') && singleProductData.dispatched_serials.length">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										Dispatched Serials:
+									</label>
+									<label class="col-sm-6 col-form-label text-left">
+										<span 
+											v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('dispatched_serials') && singleProductData.dispatched_serials.length"
+										>
+											<span v-for="(dispatchedProductSerial, dispatchedProductIndex) in singleProductData.dispatched_serials">
+												{{ dispatchedProductSerial }}
+												<span v-show="(dispatchedProductIndex + 1) < singleProductData.dispatched_serials.length">, </span> 
 											</span>	
 										</span>
 									</label>
@@ -356,6 +381,13 @@
 														</div>
 
 														<div class="form-row">
+															<label class="col-sm-6 col-form-label font-weight-bold text-right">Dispatched Qty :</label>
+															<label class="col-sm-6 col-form-label text-left">
+																{{ productVariation.dispatched_quantity + ' ' + singleProductData.quantity_type }}
+															</label>
+														</div>
+
+														<div class="form-row">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">Requested Qty :</label>
 															<label class="col-sm-6 col-form-label text-left">
 																{{ productVariation.requested_quantity + ' ' + singleProductData.quantity_type }}
@@ -373,6 +405,22 @@
 																	<span v-for="(productVariationSerial, productVariationIndex) in productVariation.serials">
 																		{{ productVariationSerial }}
 																		<span v-show="(productVariationIndex + 1) < productVariation.serials.length">, </span> 
+																	</span>	
+																</span>
+															</label>
+														</div>
+
+														<div class="form-row" v-show="singleProductData.has_serials && productVariation.hasOwnProperty('dispatched_serials') && productVariation.dispatched_serials.length">
+															<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																Dispatched Serials :
+															</label>
+															<label class="col-sm-6 col-form-label text-left">
+																<span 
+																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('dispatched_serials') && productVariation.dispatched_serials.length"
+																>
+																	<span v-for="(dispatchedProductVariationSerial, dispatchedProductVariationIndex) in productVariation.dispatched_serials">
+																		{{ dispatchedProductVariationSerial }}
+																		<span v-show="(dispatchedProductVariationIndex + 1) < productVariation.dispatched_serials.length">, </span> 
 																	</span>	
 																</span>
 															</label>
