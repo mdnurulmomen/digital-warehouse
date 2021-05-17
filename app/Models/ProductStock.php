@@ -34,6 +34,22 @@ class ProductStock extends Model
         return $this->hasMany(ProductSerial::class, 'product_stock_id', 'id');
     }
 
+    /**
+     * Get the model who kept the stock.
+     */
+    public function keeper()
+    {
+        return $this->morphTo(__FUNCTION__, 'keeper_type', 'keeper_id');
+    }
+
+    /**
+     * Get the model who approved the stock.
+     */
+    public function approver()
+    {
+        return $this->morphTo(__FUNCTION__, 'approver_type', 'approver_id');
+    }
+
     public function deleteStockVariations()
     {
         if ($this->variations()->count()) {

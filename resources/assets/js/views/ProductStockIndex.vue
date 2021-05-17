@@ -265,7 +265,7 @@
 												Merchant :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.merchant ? product.merchant.user_name : 'None' }}
+												{{ product.merchant ? product.merchant.user_name : 'None' | capitalize }}
 											</label>
 										</div>
 
@@ -1087,6 +1087,16 @@
 											</label>
 										</div>
 
+										<div class="form-row" v-if="singleStockData.hasOwnProperty('keeper')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stored By :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleStockData.keeper.user_name | capitalize }}
+											</label>
+										</div>
+
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Approved :
@@ -1096,6 +1106,16 @@
 												<span :class="[singleStockData.has_approved ? 'badge-success' : 'badge-danger', 'badge']">
 													{{ singleStockData.has_approved ? 'Approved' : 'NA' }}
 												</span>
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleStockData.has_approved==1">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Approved By :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleStockData.approver.user_name | capitalize }}
 											</label>
 										</div>
 									</div>
@@ -1858,19 +1878,15 @@
 
 						if (this.product.has_serials) {
 
-							if (this.createMode) {
+							if (this.product.has_variations) {
 
-								if (this.product.has_variations) {
+								this.setProductVariationSerialObjects();
 
-									this.setProductVariationSerialObjects();
+							}
+							else {
 
-								}
-								else {
-
-									this.setProductSerialObjects();
-									
-								}
-							
+								this.setProductSerialObjects();
+								
 							}
 
 							this.step += 1;
@@ -2303,9 +2319,11 @@
 			},
 			setProductSerialObjects() {
 
-				if (this.singleStockData.stock_quantity > 0) {
+				if (this.singleStockData.stock_quantity > 0 && this.singleStockData.serials.length < this.singleStockData.stock_quantity) {
 					
-					for (let i = 0; i < this.singleStockData.stock_quantity; i++) {
+					let difference = this.singleStockData.stock_quantity - this.singleStockData.serials.length;
+
+					for (let i = 0; i < difference; i++) {
 				  		this.singleStockData.serials.push({});
 					}
 
@@ -2318,9 +2336,11 @@
 					
 					(productVariation, index) => {
 
-						if (productVariation.stock_quantity > 0) {
+						if (productVariation.stock_quantity > 0 && productVariation.serials.length < productVariation.stock_quantity) {
 							
-							for (let i = 0; i < productVariation.stock_quantity; i++) {
+							let difference = productVariation.stock_quantity - productVariation.serials.length;
+
+							for (let i = 0; i < difference; i++) {
 						  		productVariation.serials.push({});
 							}
 
