@@ -24,7 +24,6 @@ Broadcast::channel('new-requisition', function ($user) {
 }, ['guards' => ['admin']]);
 
 Broadcast::channel('new-dispatch.{merchantId}', function ($user, $merchantId) {
-    // return true;
     return (int) $user->id === (int) $merchantId;
 }, ['guards' => ['merchant']]);
 

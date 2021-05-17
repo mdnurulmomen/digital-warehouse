@@ -101,7 +101,12 @@ class DispatchController extends Controller
 
         $expectedRequisition = Requisition::findOrFail($request->requisition['id']);
 
-        if ($expectedRequisition->status == 0) {        // to dispatch
+        if ($expectedRequisition->status==-1) {
+
+            return response()->json(['errors'=>["approvedOrCancelled" => "Cancelled requisition, please refresh"]], 422);
+
+        }
+        else if ($expectedRequisition->status == 0) {        // to dispatch
            
             $userHasApprovingPermission = $currentUser->hasPermissionTo('approve-dispatch');
 

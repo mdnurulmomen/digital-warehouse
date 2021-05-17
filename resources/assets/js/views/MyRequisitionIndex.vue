@@ -90,7 +90,7 @@
 																</thead>
 																<tbody>
 
-																	<tr v-for="content in requisitionsToShow" :key="'content-' + content.id"
+																	<tr v-for="(content, contentIndex) in requisitionsToShow" :key="'content-index-' + contentIndex + 'content-' + content.id"
 																	>
 																		<td>{{ content.subject | capitalize }}</td>
 																		<td>
@@ -498,6 +498,7 @@
 				                              			placeholder="Product Name" 
 				                              			label="name" 
 				                                  		track-by="id" 
+				                                  		:custom-label="objectNameWithCapitalized" 
 				                                  		:options="[]" 
 				                                  		:required="true" 
 				                                  		:allow-empty="false"
@@ -557,6 +558,7 @@
 								                              			label="name" 
 								                                  		track-by="id" 
 								                                  		:options="[]" 
+								                                  		:custom-label="objectNameWithCapitalized" 
 								                                  		:disabled="true"
 								                              		>
 								                                	</multiselect>
@@ -999,7 +1001,26 @@
 											</label>
 										</div>
 										-->
-										
+										<!-- 
+										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('updater')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Recommended By :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.updater.user_name | capitalize }}
+											</label>
+										</div>
+										 -->
+
+										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched ' : 'Cancelled ' }}  By :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
+											</label>
+										</div>
+
 										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Received :
@@ -1423,12 +1444,14 @@
 
 					let merchantId = this.requisitionsToShow[0]?.merchant_id ?? this.allFetchedRequisitions.pending.data[0]?.merchant_id ?? this.allFetchedRequisitions.dispatched.data[0]?.merchant_id;
 
+			        // console.log('merchant id is : '+ merchantId);
+					
 					Echo.private(`new-dispatch.` + merchantId)
 				    .listen('RequisitionDispatched', (e) => {
 				        
 				        // console.log(e);
 
-				        this.$toastr.i("Requisition has been dispatched", "Success");
+				        this.$toastr.i("Requisition has been dispatched", "Info");
 
 				    	let index = this.requisitionsToShow.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
 
@@ -1587,6 +1610,11 @@
 			setRequisitionAgent() {
 				if (! this.singleRequisitionData.delivery_service) {
 					this.singleRequisitionData.agent = {};
+					this.$delete(this.singleRequisitionData, 'delivery');
+				}
+				else {
+					this.singleRequisitionData.delivery = {};
+					this.$delete(this.singleRequisitionData, 'agent');
 				}
 			},
 			unconfirmed(object) {
