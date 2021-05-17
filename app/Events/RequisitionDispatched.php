@@ -57,7 +57,7 @@ class RequisitionDispatched implements ShouldBroadcast
             'subject' => $this->requisition->subject,
             'description' => $this->requisition->description,
             'status' => $this->requisition->status,
-            'updater' =>  $this->when($this->requisition->status, $this->requisition->updater),
+            'updater' =>  $this->requisition->status ? $this->requisition->updater : NULL,
             'merchant_id' => $this->requisition->merchant_id,
             'created_at' => $this->requisition->created_at->diffForHumans(),
             'products' => RequiredProductResource::collection($this->requisition->products),

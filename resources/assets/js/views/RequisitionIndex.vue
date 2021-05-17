@@ -92,7 +92,6 @@
 																			</span>
 																		</td>
 																		<td>
-																			
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon"  
@@ -114,7 +113,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
-																				@click="showProductDispatchForm(content)" 
+																				@click="showDispatchRecommendationForm(content)" 
 																				v-show="content.status==1 && content.dispatch.has_approval==0" 
 																				v-if="userHasPermissionTo('approve-dispatch')"
 																			>
@@ -130,9 +129,7 @@
 																			>
 																				<i class="fas fa-trash"></i>
 																			</button>
-
 																		</td>
-																    
 																	</tr>
 																	<tr 
 																  		v-show="!requisitionsToShow.length"
@@ -210,7 +207,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ singleDispatchData.requisition.status==0 ? 'Make' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve' : '' }} Dispatch
+							{{ singleDispatchData.requisition.status==0 ? 'Make' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve' : '' }} {{ singleDispatchData.requisition.subject | capitalize }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -833,7 +830,7 @@
 
 									<div 
 										class="col-sm-12" 
-										v-if="singleDispatchData.requisition.delivery && !singleDispatchData.requisition.agent"
+										v-if="singleDispatchData.requisition.delivery && ! singleDispatchData.requisition.hasOwnProperty('agent')"
 									>
 										<div class="form-row">
 											<div class="form-group col-md-12">
@@ -890,7 +887,6 @@
 											    </div>
 											</div>
 										</div>
-
 									</div>
 
 									<div class="col-md-12 card-footer">
@@ -1182,6 +1178,24 @@
 										</div>
 										-->
 
+										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('updater')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Recommended By :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.updater.user_name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
+											</label>
+										</div>
+
 										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch')">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Received :
@@ -1264,9 +1278,9 @@
 			{}
 		],
 
-		agent : {},
+		// agent : {},
 
-		delivery : {},
+		// delivery : {},
 				
     };
 
@@ -1274,7 +1288,7 @@
 
 		requisition : {},
 
-		delivery : {},
+		// delivery : {},
 
 		// agent : {}
 				
@@ -1319,7 +1333,7 @@
 
 		   		errors : {
 					// products : [],
-					delivery : {},
+					// delivery : {},
 					// agent : {}
 				},
 
@@ -1338,7 +1352,7 @@
 			Echo.private(`new-requisition`)
 		    .listen('NewRequisitionMade', (e) => {
 		        // console.log(e);
-		        this.$toastr.w("New requisition arrives", "Warning");
+		        this.$toastr.i("New requisition arrives", "Info");
 		        this.allFetchedRequisitions.pending?.data.push(e);
 		    });
 
@@ -1405,12 +1419,18 @@
 		watch : {
 
 			query : function(val){
+				
 				if (val==='') {
+
 					this.fetchAllRequisitions();
+
 				}
 				else {
+
 					this.searchData();
+
 				}
+
 			},
 
 		},
@@ -1418,6 +1438,7 @@
 		filters: {
 
 			capitalize: function (value) {
+
 				if (!value) return ''
 
 				const words = value.split(" ");
@@ -1433,6 +1454,7 @@
 				}
 
 				return words.join(" ");
+
 			}
 
 		},
@@ -1522,11 +1544,13 @@
 				$('#cancel-confirmation-modal').modal('show');
 
 			},
-			showProductDispatchForm(object) {
-
+			showDispatchRecommendationForm(object) {
+				// this.singleRequisitionData = { ...object };
+				
 				this.step = 1;
 	        	this.submitForm = true;
 	        	
+			/*
 				this.singleDispatchData = {
 
 					requisition : { ...object },
@@ -1542,6 +1566,86 @@
 					delivery : {},
 					// agent : {},
 				};
+			*/
+
+				this.singleDispatchData = {
+
+					requisition : { ...object },
+					
+					// delivery : {},
+
+					// agent : {}
+							
+			    };
+
+				this.errors = {
+					// products : [],
+					// delivery : {},
+					// agent : {},
+				};
+
+				if (object.hasOwnProperty('delivery') && ! object.hasOwnProperty('agent')) {
+
+					this.singleDispatchData.delivery = object.dispatch.delivery;
+					this.singleDispatchData.delivery.delivery_receipt = object.dispatch.delivery.receipt_preview;
+					this.$delete(this.singleDispatchData, 'agent');
+
+					this.errors.delivery = {};
+					this.$delete(this.errors, 'agent');
+
+				}
+				else if (! object.hasOwnProperty('delivery') && object.hasOwnProperty('agent')) {
+
+					// this.singleDispatchData.agent = {};
+					this.$delete(this.singleDispatchData, 'delivery');
+
+					// this.errors.agent = {};
+					this.$delete(this.errors, 'delivery');
+
+				}
+
+				$('#dispatch-createOrEdit-modal').modal('show');
+
+			},
+			showProductDispatchForm(object) {
+
+				this.step = 1;
+	        	this.submitForm = true;
+	        	
+				this.singleDispatchData = {
+
+					requisition : { ...object },
+
+					// delivery : {},
+
+					// agent : {}
+							
+			    };
+
+				this.errors = {
+					// products : [],
+					// delivery : {},
+					// agent : {},
+				};
+
+				if (object.hasOwnProperty('delivery') && ! object.hasOwnProperty('agent')) {
+
+					this.singleDispatchData.delivery = {};
+					this.$delete(this.singleDispatchData, 'agent');
+
+					this.errors.delivery = {};
+					this.$delete(this.errors, 'agent');
+
+				}
+				else if (! object.hasOwnProperty('delivery') && object.hasOwnProperty('agent')) {
+
+					// this.singleDispatchData.agent = {};
+					this.$delete(this.singleDispatchData, 'delivery');
+
+					// this.errors.agent = {};
+					this.$delete(this.errors, 'delivery');
+
+				}
 
 				$('#dispatch-createOrEdit-modal').modal('show');
 
@@ -1549,8 +1653,10 @@
 			makeDispatch() {
 				
 				if (!this.verifyUserInput()) {
+
 					this.submitForm = false;
 					return;
+
 				}
 
 				axios
@@ -1558,7 +1664,7 @@
 					.then(response => {
 						if (response.status == 200) {
 
-							this.$toastr.s("Requisition has been dispatched", "Success");
+							this.userHasPermissionTo('approve-dispatch') ? this.$toastr.s("Requisition has been dispatched", "Success") : this.$toastr.i("Requisition has been recommended", "Success");
 
 							this.allFetchedRequisitions = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
@@ -1612,7 +1718,7 @@
 				this.validateFormInput('delivery_receipt');
 				// this.validateFormInput('agent_receipt');
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 2 && Object.keys(this.errors.delivery).length == 0) {
+				if (this.errors.constructor === Object && (Object.keys(this.errors).length < 1 || Object.keys(this.errors.delivery).length == 0)) {
 
 					// console.log('verified');
 					return true;
@@ -1911,7 +2017,8 @@
 						else {
 
 							this.submitForm = true;
-							this.errors.delivery = {};
+							// this.errors.delivery = {};
+							this.$delete(this.errors, 'delivery');
 
 						}
 
@@ -1934,7 +2041,8 @@
 						else {
 
 							this.submitForm = true;
-							this.errors.delivery = {};
+							// this.errors.delivery = {};
+							this.$delete(this.errors, 'delivery');
 
 						}
 
