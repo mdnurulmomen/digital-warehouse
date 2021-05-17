@@ -27,7 +27,7 @@ class ProductStockResource extends JsonResource
             'variations' => $this->when($this->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('productVariation.variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),
             'keeper' => $this->keeper,
-            'approver' => $this->when($this->has_approved, $this->approver),
+            'approver' => $this->when($this->has_approved, $this->approver),    // -1 / 1
             'created_at' => $this->created_at->diffForHumans(),
         ];
     }

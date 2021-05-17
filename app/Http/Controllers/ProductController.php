@@ -445,6 +445,17 @@ class ProductController extends Controller
 
             $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
 
+            if ($difference > $stockToUpdate->product->latestStock->available_quantity) {
+
+                return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
+                
+            }
+            else if ($stockToUpdate->variations->count() && $this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $stockToUpdate)) {
+                
+                return response()->json(['errors'=>["invalidValue" => "Variation quantity is less than minimum"]], 422);
+
+            }
+
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity,
                 'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
@@ -469,7 +480,13 @@ class ProductController extends Controller
         }
 
         if ($stockToUpdate->has_variations && !empty($request->variations)) {
-            
+                
+            if ($this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $stockToUpdate)) {
+                
+                return response()->json(['errors'=>["invalidValue" => "Variation quantity is less than minimum"]], 422);
+
+            }
+
             $stockToUpdate->stock_variations = json_decode(json_encode($request->variations));
 
         }
@@ -528,6 +545,35 @@ class ProductController extends Controller
         return response()->json([
             'all' => new ProductStockCollection($query->paginate($perPage)),  
         ], 200);
+    }
+
+    protected function findVariationInvalidQuantity($stockVariaitonQuantities = [], ProductStock $productStock)
+    {
+        // update / old stock
+        if (count($stockVariaitonQuantities)) {
+            
+            foreach ($stockVariaitonQuantities as $stockVariation) {
+
+                $productStockVariation = $productStock->variations()->where('id', $stockVariation->id)->firstOrFail();
+
+                if ($productStockVariation->stock_quantity > $stockVariation->stock_quantity) {
+                    
+                    // decrease quantity
+                    $difference = $productStockVariation->stock_quantity - $stockVariation->stock_quantity;
+
+                    if ($difference > $productStockVariation->productVariation->latestStock->available_quantity) {
+                        
+                        return true;
+
+                    }
+
+                }
+
+            }
+
+            return false;
+
+        }
     }
 
     protected function increaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)

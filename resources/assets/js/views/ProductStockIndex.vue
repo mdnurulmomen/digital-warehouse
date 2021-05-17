@@ -21,8 +21,7 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">											
-
+										<div class="row">			
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-product-stock-index') || userHasPermissionTo('create-product-stock')"
@@ -320,6 +319,8 @@
 														:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
 														@change="validateFormInput('product_stock_quantity')" 
 														required="true" 
+														:readonly="! createMode && singleStockData.primary_quantity < allStocks[allStocks.length-1].available_quantity" 
+														:min="createMode ? 1 : singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity"
 													>
 													<div class="input-group-append">
 														<span class="input-group-text">
@@ -394,10 +395,12 @@
 														<input type="number" 
 															class="form-control" 
 															v-model.number="singleStockData.variations[variationIndex].stock_quantity" 
-															placeholder="Product Qty" 
+															placeholder="Variation Qty" 
 															:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 															@change="validateFormInput('product_variation_quantity')" 
 															required="true" 
+															:readonly="! createMode && stockVariation.primary_quantity < allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
+															:min="createMode ? 1 : stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity"
 														>
 
 														<div class="invalid-feedback">
@@ -1676,6 +1679,19 @@
 	        	this.formSubmitted = false;
 				
 				this.singleStockData = JSON.parse(JSON.stringify(object));
+
+				this.singleStockData.primary_quantity = this.singleStockData.stock_quantity;
+
+				if (this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
+
+					this.singleStockData.variations.forEach(
+						(stockVariation, stockVariationIndex) => {
+							stockVariation.primary_quantity = stockVariation.stock_quantity;
+						}
+					);
+
+				}
+
 				// this.singleStockData.product_id = this.product.id;
 
 				this.resetErrorObject();
@@ -2328,6 +2344,11 @@
 					}
 
 				}
+				else if (this.singleStockData.stock_quantity > 0 && this.singleStockData.serials.length > this.singleStockData.stock_quantity) {
+
+					this.singleStockData.serials.splice(this.singleStockData.stock_quantity, );
+
+				}
 
 			},
 			setProductVariationSerialObjects() {
@@ -2343,6 +2364,11 @@
 							for (let i = 0; i < difference; i++) {
 						  		productVariation.serials.push({});
 							}
+
+						}
+						else if (productVariation.stock_quantity > 0 && productVariation.serials.length > productVariation.stock_quantity) {
+
+							productVariation.serials.splice(productVariation.stock_quantity, );
 
 						}
 
@@ -2362,6 +2388,10 @@
 						if (!this.singleStockData.stock_quantity || this.singleStockData.stock_quantity < 1) {
 							this.errors.stock.product_stock_quantity = 'Stock quantity is required';
 						}
+						else if(! this.createMode && ((this.singleStockData.primary_quantity - this.singleStockData.stock_quantity) > this.allStocks[this.allStocks.length-1].available_quantity)){
+
+							this.errors.stock.product_stock_quantity = 'Stock quantity is less than minimum ' + (this.singleStockData.primary_quantity - this.allStocks[this.allStocks.length-1].available_quantity);
+						}
 						else{
 							this.submitForm = true;
 							this.$delete(this.errors.stock, 'product_stock_quantity');
@@ -2378,6 +2408,10 @@
 
 									if (productVariation.stock_quantity < 0) {
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is invalid';
+									}
+									else if(! this.createMode && ((productVariation.primary_quantity - productVariation.stock_quantity) > this.allStocks[this.allStocks.length-1].variations[index].available_quantity)){
+
+										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is less than minimum ' + (productVariation.primary_quantity-this.allStocks[this.allStocks.length-1].variations[index].available_quantity);
 									}
 									else {
 										this.$delete(this.errors.stock.variations[index], 'product_variation_quantity');
