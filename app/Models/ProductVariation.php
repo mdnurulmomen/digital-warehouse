@@ -38,7 +38,7 @@ class ProductVariation extends Model
     public function latestStock()
     {
         return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->whereHas('productStock', function ($query) {
-            $query->where('has_approved', 1);
+            $query->where('has_approval', 1);
         })->orderBy('id', 'desc');
     }
 

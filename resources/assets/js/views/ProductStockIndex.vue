@@ -85,8 +85,8 @@
 																		</td>
 
 																		<td>
-																			<span :class="[stock.has_approved ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ stock.has_approved ? 'Approved' : 'NA' }}
+																			<span :class="[stock.has_approval ? 'badge-success' : 'badge-danger', 'badge']">
+																				{{ stock.has_approval ? 'Approved' : 'NA' }}
 																			</span>
 																		</td>
 																		
@@ -103,7 +103,7 @@
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
 																				@click="openStockEditForm(stock)" 
-																				v-if="! stock.has_approved && userHasPermissionTo('update-product-stock')"
+																				v-if="! stock.has_approval && userHasPermissionTo('update-product-stock')"
 																			>
 																				<i class="fas fa-check"></i>
 																			</button>
@@ -112,7 +112,7 @@
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
 																				@click="openStockEditForm(stock)" 
-																				v-if="stock.has_approved && userHasPermissionTo('update-product-stock')"
+																				v-if="stock.has_approval && userHasPermissionTo('update-product-stock')"
 																			>
 																				<i class="fas fa-edit"></i>
 																			</button>
@@ -223,7 +223,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approved ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' }}
+							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approval ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -802,10 +802,10 @@
 							                  	</button>
 												<button 
 													type="submit" 
-													:class="[singleStockData.has_approved ? 'btn-primary' : 'btn-warning', 'btn', 'float-right']" 
+													:class="[singleStockData.has_approval ? 'btn-primary' : 'btn-warning', 'btn', 'float-right']" 
 													:disabled="!submitForm || formSubmitted"
 												>
-													{{ createMode ? 'Stock' : singleStockData.has_approved ? 'Update' : 'Approve' }}
+													{{ createMode ? 'Stock' : singleStockData.has_approval ? 'Update' : 'Approve' }}
 												</button>
 											</div>
 										</div>
@@ -1106,13 +1106,13 @@
 											</label>
 
 											<label class="col-sm-6 col-form-label text-left">
-												<span :class="[singleStockData.has_approved ? 'badge-success' : 'badge-danger', 'badge']">
-													{{ singleStockData.has_approved ? 'Approved' : 'NA' }}
+												<span :class="[singleStockData.has_approval ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleStockData.has_approval ? 'Approved' : 'NA' }}
 												</span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleStockData.has_approved==1">
+										<div class="form-row" v-if="singleStockData.has_approval==1">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Approved By :
 											</label>

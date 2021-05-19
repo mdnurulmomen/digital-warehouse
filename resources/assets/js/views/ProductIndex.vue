@@ -1137,17 +1137,17 @@
 													<li v-for="(productSerial, productSerialIndex) in singleProductData.serials">
 														{{ productSerial.serial_no }}
 														<span 
-															:class="[productSerial.has_dispatched ? 'badge-danger' : productSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
+															:class="[productSerial.has_dispatched ? 'badge-success' : productSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
 															v-show="productSerial.has_dispatched || productSerial.has_requisitions"
 														>
 															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
 														</span>
 
 														<span 
-															:class="[! productSerial.has_approved ? 'badge-danger' : '', 'badge']" 
-															v-show="! productSerial.has_approved"
+															:class="[! productSerial.has_approval ? 'badge-danger' : '', 'badge']" 
+															v-show="! productSerial.has_approval"
 														>
-															{{ ! productSerial.has_approved ? 'Not Approved' : '' }}
+															{{ ! productSerial.has_approval ? 'Not Approved' : '' }}
 														</span>
 
 														<span v-show="(productSerialIndex + 1) < singleProductData.serials.length">, </span> 
@@ -1180,17 +1180,17 @@
 																		{{ variationSerial.serial_no }}
 																		
 																		<span 
-																			:class="[variationSerial.has_dispatched ? 'badge-danger' : variationSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
+																			:class="[variationSerial.has_dispatched ? 'badge-success' : variationSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
 																			v-show="variationSerial.has_dispatched || variationSerial.has_requisitions"
 																		>
 																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
 																		</span>
 
 																		<span 
-																			:class="[! variationSerial.has_approved ? 'badge-danger' : '', 'badge']" 
-																			v-show="! variationSerial.has_approved"
+																			:class="[! variationSerial.has_approval ? 'badge-danger' : '', 'badge']" 
+																			v-show="! variationSerial.has_approval"
 																		>
-																			{{ ! variationSerial.has_approved ? 'Not Approved' : '' }}
+																			{{ ! variationSerial.has_approval ? 'Not Approved' : '' }}
 																		</span>
 
 																		<span v-show="(variationSerialIndex + 1) < productVariation.serials.length">, </span> 

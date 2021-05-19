@@ -330,7 +330,7 @@ class ProductController extends Controller
             'has_serials' => $product->has_serials,
             'keeper_type' => get_class($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
-            'has_approved' => $userHasUpdatingPermission ? true : false, 
+            'has_approval' => $userHasUpdatingPermission ? true : false, 
             'approver_type' => $userHasUpdatingPermission ? get_class($currentUser) : NULL,
             'approver_id' => $userHasUpdatingPermission ? $currentUser->id : NULL,
         ]);
@@ -433,7 +433,7 @@ class ProductController extends Controller
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity,
                 'available_quantity' => ($stockToUpdate->available_quantity + $difference),
-                'has_approved' => true,
+                'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
             ]);
@@ -459,7 +459,7 @@ class ProductController extends Controller
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity,
                 'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
-                'has_approved' => true,
+                'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
             ]);
@@ -467,10 +467,10 @@ class ProductController extends Controller
             $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
 
         }
-        else if(! $stockToUpdate->has_approved) {
+        else if(! $stockToUpdate->has_approval) {
 
             $stockToUpdate->update([
-                'has_approved' => true,
+                'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
             ]);

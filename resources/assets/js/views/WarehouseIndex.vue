@@ -986,7 +986,7 @@
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
 															@click="removeContainer" 
-															:disabled="singleWarehouseData.containers.length<=1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged"
+															:disabled="singleWarehouseData.containers.length<2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
 														>
 															Remove Container
 														</button>	

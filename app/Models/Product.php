@@ -54,7 +54,7 @@ class Product extends Model
 
     public function latestStock()
     {
-        return $this->hasOne(ProductStock::class, 'product_id', 'id')->where('has_approved', 1)->latest();
+        return $this->hasOne(ProductStock::class, 'product_id', 'id')->where('has_approval', 1)->latest();
     }
 
     public function nonDispatchedRequests()

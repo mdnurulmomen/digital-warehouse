@@ -21,13 +21,13 @@ class ProductStockResource extends JsonResource
             'available_quantity' => $this->available_quantity ?? 0,
             'has_serials' => $this->has_serials,
             'has_variations' => $this->has_variations,
-            'has_approved' => $this->has_approved,
+            'has_approval' => $this->has_approval,
             // 'quantity_type' => $this->product->quantity_type,
             'serials' => $this->when($this->has_serials && ! $this->has_variations, ProductSerialResource::collection($this->serials)),
             'variations' => $this->when($this->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('productVariation.variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),
             'keeper' => $this->keeper,
-            'approver' => $this->when($this->has_approved, $this->approver),    // -1 / 1
+            'approver' => $this->when($this->has_approval, $this->approver),    // -1 / 1
             'created_at' => $this->created_at->diffForHumans(),
         ];
     }
