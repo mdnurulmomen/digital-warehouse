@@ -1237,6 +1237,15 @@
 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Warehouse :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label text-left">
@@ -1264,6 +1273,15 @@
 
 																<h6>Shelves Address</h6>
 																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Warehouse :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productAddress.container.warehouse_container.warehouse.name | capitalize }}
+																	</label>
+																</div>
+
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container Type :
@@ -1314,6 +1332,15 @@
 															<div class="card-body">
 																
 																<h6>Units Address</h6>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Warehouse :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productAddress.container.warehouse_container.warehouse.name | capitalize }}
+																	</label>
+																</div>
 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
