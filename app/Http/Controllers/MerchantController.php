@@ -290,6 +290,30 @@ class MerchantController extends Controller
             'delivery.address' => 'required_if:delivery_service,true',
         ]);
 
+        foreach (json_decode(json_encode($request->products)) as $requiredProduct) {
+            
+            if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && (empty($requiredProduct->serials) || $requiredProduct->total_quantity != count($requiredProduct->serials))) {
+                
+                return response()->json(['errors'=>["productSerial" => "Product serial is required"]], 422);
+
+            }
+
+            else if ($requiredProduct->product->has_serials && $requiredProduct->product->has_variations) {
+                
+                foreach ($requiredProduct->product->variations as $requiredProductVariation) {
+                    
+                    if (empty($requiredProductVariation->required_serials) || $requiredProductVariation->required_quantity != count($requiredProductVariation->required_serials)) {
+                
+                        return response()->json(['errors'=>["variationSerial" => "Variation serial is required"]], 422);
+
+                    }
+
+                }
+
+            }
+
+        }
+
         $currentMerchant = \Auth::user();
 
         $newRequisition = new Requisition();

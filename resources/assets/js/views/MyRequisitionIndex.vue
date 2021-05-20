@@ -512,22 +512,23 @@
 													
 													<multiselect 
 				                              			v-model="requiredProduct.serials" 
-				                              			class="form-control p-0 is-valid" 
+				                              			class="form-control p-0" 
+				                              			:class="errors.products[productIndex].product_serials ? 'is-invalid' : 'is-valid'" 
 				                              			placeholder="Product Serials" 
 				                              			:multiple="true" 
 				                              			:close-on-select="false" 
 				                              			:max="requiredProduct.total_quantity" 
 				                                  		:options="requiredProduct.product.serials" 
+				                                  		@close="validateFormInput('product_serials')"
 				                              		>
 				                                	</multiselect>
 
-				                                	<!-- 
+				                                	 
 				                                	<div 
 														class="invalid-feedback" 
 													>
 											        	{{ errors.products[productIndex].product_serials }}
-											  		</div> 
-											  		-->
+											  		</div>
 												</div>
 											</div>
 
@@ -572,21 +573,22 @@
 																	<multiselect 
 								                              			v-model="requiredProduct.product.variations[variationIndex].required_serials" 
 								                              			class="form-control p-0 is-valid" 
+								                              			:class="errors.products[productIndex].variation_serials[variationIndex] ? 'is-invalid' : 'is-valid'"
 								                              			placeholder="Variation Serials" 
 								                              			:multiple="true" 
 								                              			:close-on-select="false" 
 								                              			:max="productVariation.required_quantity" 
 								                                  		:options="requiredProduct.product.variations[variationIndex].serials" 
+								                                  		@close="validateFormInput('product_serials')"
 								                              		>
 								                                	</multiselect>
 
-																	<!-- 
+																	 
 																	<div 
 																		class="invalid-feedback" 
 																	>
-															        	{{ errors.products[productIndex].variation_serials}}
-															  		</div> 
-															  		-->
+															        	{{ errors.products[productIndex].variation_serials[variationIndex]}}
+															  		</div>
 																</div>
 															</div>
 														</div>
@@ -1124,7 +1126,8 @@
 							// product_id : '',
 							// product_quantity : '',
 							// variations_total_quantity : ''
-							variation_quantities : []
+							variation_serials : [],
+							variation_quantities : [],
 						}
 
 					],
@@ -1343,6 +1346,7 @@
 							// product_id : '',
 							// product_quantity : '',
 							// variations_total_quantity : ''
+							variation_serials : [],
 							variation_quantities : []
 						}
 						
@@ -1517,7 +1521,7 @@
 				if (array.length) {
 
 					return array.some(
-						product => Object.keys(product).length > 1 || product.variation_quantities.some(productVariation => productVariation != null)
+						product => Object.keys(product).length > 2 || product.variation_quantities.some(productVariation => productVariation != null) || (product.variation_serials.some(productVariation => productVariation != null))
 					);
 
 				}
@@ -1534,6 +1538,9 @@
 					this.validateFormInput('product_id');
 					this.validateFormInput('product_quantity');
 					this.validateFormInput('variations_total_quantity');
+				}
+				else if (this.step == 3) {
+					this.validateFormInput('product_serials');
 				}
 
 
@@ -1575,6 +1582,7 @@
 
 					this.singleRequisitionData.products.push({});
 					this.errors.products.push({
+						variation_serials : [],
 						variation_quantities : []
 					});
 
@@ -1751,7 +1759,7 @@
 
 												if (productVariation.required_quantity < 0) {
 
-													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity cant be zero or negative';
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity cant be negative';
 
 												}
 												else if (productVariation.required_quantity > 0 && (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity))) {
@@ -1787,6 +1795,55 @@
 
 							}
 
+						);
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_serials' :
+
+						this.singleRequisitionData.products.forEach(
+							
+							(requiredProduct, productIndex) => {
+
+								if (requiredProduct.product.has_serials && ! requiredProduct.product.has_variations && requiredProduct.total_quantity > 0 && (! requiredProduct.hasOwnProperty('serials') || requiredProduct.serials.length != requiredProduct.total_quantity)) {
+
+									this.errors.products[productIndex].product_serials = 'Product serial is required';
+								}
+								else if (requiredProduct.product.has_serials &&  requiredProduct.product.has_variations && requiredProduct.total_quantity > 0) {
+									
+									this.$delete(this.errors.products[productIndex], 'product_serials');
+
+									this.$delete(this.singleRequisitionData.products[productIndex], 'serials');
+
+									requiredProduct.product.variations.forEach(
+										(requiredProductVariation, variationIndex) => {
+
+											if (! requiredProductVariation.hasOwnProperty('required_serials') || requiredProductVariation.required_serials.length != requiredProductVariation.required_quantity) {
+
+												this.errors.products[productIndex].variation_serials[variationIndex] = 'Variation serial is required';
+											}
+											else {
+												
+												// this.errors.products[productIndex].variation_serials[variationIndex] = null;
+
+												this.$set(this.errors.products[productIndex].variation_serials, variationIndex, null);
+											}
+
+										}
+									);
+
+								}
+								else{
+									this.errors.products[productIndex].variation_serials = [];
+									this.$delete(this.errors.products[productIndex], 'product_serials');
+								}
+
+							}
+							
 						);
 
 						if (!this.errorInArray(this.errors.products)) {
