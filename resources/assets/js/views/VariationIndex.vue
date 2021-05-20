@@ -139,6 +139,7 @@
                                   		:options="allVariationTypes" 
                                   		:custom-label="objectNameWithCapitalized" 
                                   		:required="true" 
+                                  		class="form-control p-0" 
                                   		:class="!errors.asset.variation_type  ? 'is-valid' : 'is-invalid'"
                                   		:allow-empty="false"
                                   		selectLabel = "Press/Click"

@@ -244,7 +244,8 @@
 			                                  		:custom-label="objectNameWithCapitalized" 
 			                                  		:options="availableRequisitions" 
 			                                  		:required="true" 
-			                                  		:allow-empty="false"
+			                                  		:allow-empty="false" 
+			                                  		class="form-control p-0" 
 			                                  		:class="!errors.requisition_id ? 'is-valid' : 'is-invalid'" 
 			                                  		@close="validateFormInput('requisition_id')" 
 			                              		>

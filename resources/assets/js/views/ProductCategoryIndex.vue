@@ -134,6 +134,7 @@
                               			placeholder="Parent Category" 
                                   		label="name" 
                                   		track-by="id" 
+                                  		class="form-control p-0 is-valid" 
                                   		:custom-label="objectNameWithCapitalized" 
                                   		:options="categoriesToShow" 
                                   		:required="true" 
