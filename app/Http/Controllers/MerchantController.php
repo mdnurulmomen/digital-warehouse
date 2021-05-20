@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
+use App\Models\Manager;
 use App\Models\Product;
 use App\Models\Merchant;
+use App\Models\Warehouse;
 use App\Models\Requisition;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
@@ -359,7 +362,14 @@ class MerchantController extends Controller
                                             ->orWhere('description', 'like', "%$search%")
                                             ->orWhereHas('products.product', function ($q) use ($search) {
                                                 $q->where('name', 'like', "%$search%");
-                                            });
+                                            })
+                                            ->orWhereHasMorph(
+                                                'updater',
+                                                [Admin::class, Manager::class, Warehouse::class],
+                                                function ($query) use ($search) {
+                                                    $query->where('user_name', 'like', "%$search%");
+                                                }
+                                            );
                                 })
                                 ->where(function ($query) use ($currentMerchant) {
                                     $query->where('merchant_id', $currentMerchant->id);

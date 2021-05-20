@@ -170,8 +170,6 @@ class ProfileController extends Controller
 
 	public function updateWarehouseProfile(Request $request)
 	{
-		$warehouse = Auth::guard('warehouse')->user();
-
 		$request->validate([
             'name' => 'nullable|string|max:100',
             'code' => 'required|string|max:100|unique:warehouses,code,'.$warehouse->id,
@@ -179,6 +177,8 @@ class ProfileController extends Controller
             'email' => 'required|string|max:100|unique:warehouses,email,'.$warehouse->id,
             'mobile' => 'required|string|max:50|unique:warehouses,mobile,'.$warehouse->id,
         ]);
+
+        $warehouse = Auth::guard('warehouse')->user();
 
 		$warehouse->name = strtolower($request->name);
 		$warehouse->code = strtolower($request->code);
@@ -194,15 +194,15 @@ class ProfileController extends Controller
 
 	public function updateWarehouseDeal(Request $request)
 	{
-		$warehouse = Auth::guard('warehouse')->user();
-
 		$request->validate([
            	'warehouse_owner_id' => 'required|numeric|exists:warehouse_owners,id',
         	'warehouse_deal' => 'required|string|max:255', 
         ]);
 
+        $warehouse = Auth::guard('warehouse')->user();
+
 		$warehouse->warehouse_owner_id = $request->warehouse_owner_id;
-		$warehouse->warehouse_deal = $request->warehouse_deal;
+		$warehouse->warehouse_deal = strtolower($request->warehouse_deal);
 
 		$warehouse->save();
 
@@ -211,12 +211,12 @@ class ProfileController extends Controller
 
 	public function updateWarehouseFeaturesAndPreviews(Request $request)
 	{
-		$warehouse = Auth::guard('warehouse')->user();
-
 		$request->validate([
             'feature.features' => 'required|string',
             'previews' => 'required|array',
         ]);
+
+        $warehouse = Auth::guard('warehouse')->user();
 
         $warehouse->feature()->updateOrCreate(
             [ 'warehouse_id' => $warehouse->id ],
@@ -236,14 +236,14 @@ class ProfileController extends Controller
 
 	public function updateWarehouseStorages(Request $request)
 	{
-		$warehouse = Auth::guard('warehouse')->user();
-
 		$request->validate([
             'storages' => 'required|array',
             'storages.*.feature.features' => 'required|string',
             'storages.*.previews' => 'required|array',
             'storages.*.storage_type' => 'required',
         ]);
+
+        $warehouse = Auth::guard('warehouse')->user();
 
         if (count($request->storages)) {
             
@@ -258,14 +258,14 @@ class ProfileController extends Controller
 
 	public function updateWarehouseContainers(Request $request)
 	{
-		$warehouse = Auth::guard('warehouse')->user();
-
 		$request->validate([
             'containers' => 'required|array',
             'containers.*.container.id' => 'required|exists:containers,id',
             'containers.*.quantity' => 'required|integer|min:0',
             'containers.*.rents' => 'required',
         ]);
+
+        $warehouse = Auth::guard('warehouse')->user();
 
         if (count($request->containers)) {
             

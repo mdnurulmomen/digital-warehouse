@@ -41,7 +41,9 @@ class RoleController extends Controller
     {
     	$request->validate([
             'name' => 'required|string|max:100|unique:roles,name',
-            'permissions' => 'required|array|min:1'
+            'permissions' => 'required|array|min:1',
+            'permissions.*.id' => 'required|exists:permissions,id',
+            'permissions.*.name' => 'required|exists:permissions,name',
         ]);
 
         $newRole = new Role();
@@ -59,7 +61,9 @@ class RoleController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:roles,name,'.$roleToUpdate->id,
-            'permissions' => 'required|array|min:1'
+            'permissions' => 'required|array|min:1',
+            'permissions.*.id' => 'required|exists:permissions,id',
+            'permissions.*.name' => 'required|exists:permissions,name',
         ]);
 
         $roleToUpdate->name = strtolower($request->name);
@@ -93,7 +97,9 @@ class RoleController extends Controller
     public function searchAllRoles($search, $perPage)
     {
         return response()->json([
-            'all' => Role::where('name', 'like', "%$search%")->paginate($perPage),    
+            'all' => Role::where('name', 'like', "%$search%")->orWhereHas('permissions', function ($query) use ($search) {
+                $query->where('name', 'like', "%search%");
+            })->paginate($perPage),    
         ], 200);
     }
 

@@ -13,9 +13,9 @@ class Requisition extends Model
      *
      * @var array
      */
-    protected $casts = [
+    // protected $casts = [
         // 'status' => 'boolean',
-    ];
+    // ];
 
     /**
      * Set the user's first name.

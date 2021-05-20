@@ -11,7 +11,7 @@ class ProductStock extends Model
     protected $casts = [
         'has_serials' => 'boolean',
         'has_variations' => 'boolean',
-        'has_approved' => 'boolean',
+        'has_approval' => 'boolean',
     ];
 
     public function product()
@@ -236,7 +236,7 @@ class ProductStock extends Model
 
     public function deleteStockSerials()
     {
-        if ($this->serials()->count() && $this->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count() < 1) {
+        if ($this->serials()->count() && $this->serials()->where('has_requisitions', true)->orWhere('has_dispatched', true)->count() < 1) {
             
             $this->serials()->forceDelete();
 
@@ -485,7 +485,7 @@ class ProductStock extends Model
 
     protected function deleteStockVariationSerials(ProductVariationStock $productVariationStock)
     {
-        if ($productVariationStock->serials()->count() && $productVariationStock->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count() < 1) {
+        if ($productVariationStock->serials()->count() && $productVariationStock->serials()->where('has_requisitions', true)->orWhere('has_dispatched', true)->count() < 1) {
             
             $productVariationStock->serials()->forceDelete();
 

@@ -506,14 +506,14 @@ class ProductController extends Controller
     {
         $stockToDelete = ProductStock::findOrFail($stock);
 
-        if ($stockToDelete->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count() > 0) {
+        if ($stockToDelete->serials()->where('has_requisitions', true)->orWhere('has_dispatched', true)->count() > 0) {
             
            return response()->json(['errors'=>["undeletableSerial" => "Product serial has requisition"]], 422);
             
         }
 
         else if ($stockToDelete->variations()->whereHas('serials', function ($query) {
-            $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
+            $query->where('has_requisitions', true)->orWhere('has_dispatched', true);
         })->count() > 0) {
             
             return response()->json(['errors'=>["undeletableSerial" => "Product variation serial has requisition"]], 422);

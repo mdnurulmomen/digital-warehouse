@@ -26,7 +26,9 @@ class DispatchController extends Controller
             return [
 
                 'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
+                        $query->where('has_approval', 1);
+                    })->paginate($perPage)),  
                 'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
             
             ];
@@ -286,7 +288,10 @@ class DispatchController extends Controller
                                 ->where('status', 1)
                                 ->where(function ($q) use ($search) {
                                     $q->where('subject', 'like', "%$search%")
-                                      ->orWhere('description', 'like', "%$search%");
+                                      ->orWhere('description', 'like', "%$search%")
+                                      ->orWhereHas('updater', function ($query) {
+                                            $query->where('user_name', 'like', "%$search%");
+                                        });
                                 });
 
         return [
