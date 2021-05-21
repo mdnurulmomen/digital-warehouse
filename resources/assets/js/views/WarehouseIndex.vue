@@ -2441,6 +2441,8 @@
 
 				this.resetAllPermissions();
 
+				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
+
 				$('#warehouse-createOrEdit-modal').modal('show');
 
 			},
@@ -2475,6 +2477,8 @@
 
 				this.resetAllPermissions();
 				this.disableExistingRolePermissions();
+
+				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
 
 				$('#warehouse-createOrEdit-modal').modal('show');
 				
@@ -2922,6 +2926,28 @@
 						}
 
 					);
+
+				}
+
+			},
+			insertDefaultPermissions(array = []) {
+				
+				if (array.length) {
+					
+					array.forEach(
+		        		permissionName => {
+							
+							let permission = this.getExpectedPermission(permissionName);
+
+							if (permission && ! this.singleWarehouseData.permissions.some(warehousePermission => warehousePermission.name == permission.name)) {
+
+					   			this.singleWarehouseData.permissions.push(permission);
+					   			this.$refs[permissionName][0].disabled = true;
+
+							}
+		        			
+		        		}
+		        	);
 
 				}
 
