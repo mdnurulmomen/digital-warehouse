@@ -8,11 +8,6 @@ use App\Http\Resources\Web\WarehouseCollection;
 
 class OwnerController extends Controller
 {
-    protected function currentOwner()
-    {
-        return \Auth::guard('owner')->user();
-    }
-
     // Warehouses
     public function showOwnerAllWarehouses($perPage)
     {
@@ -20,12 +15,17 @@ class OwnerController extends Controller
 
         return [
 
-            'approved' => new WarehouseCollection(Warehouse::where('active', 1)
+            'approved' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 1)
             											 ->where('warehouse_owner_id', $currentOwner->id)
             											 ->paginate($perPage)),
-            'pending' => new WarehouseCollection(Warehouse::where('active', 0)
+            
+            'pending' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 0)
             											->where('warehouse_owner_id', $currentOwner->id)
             											->paginate($perPage)),
+
+            'trashed' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->onlyTrashed()
+                                                        ->where('warehouse_owner_id', $currentOwner->id)
+                                                        ->paginate($perPage)),
 
         ];
     }
@@ -49,4 +49,10 @@ class OwnerController extends Controller
             'all' => new WarehouseCollection($query->paginate($perPage)),    
         ], 200);
     }
+
+    protected function currentOwner()
+    {
+        return \Auth::guard('owner')->user();
+    }
+    
 }

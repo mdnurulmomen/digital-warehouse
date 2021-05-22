@@ -23,12 +23,12 @@
 									<div class="card-block">
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
-											  	<div class="row d-flex align-items-center">
-											  		<div class="col-sm-3 text-left">	
-															Warehouses List
+											  	<div class="row d-flex align-items-center text-center">
+											  		<div class="col-sm-3 form-group">	
+															My Warehouses List
 											  		</div>
 
-											  		<div class="col-sm-6 was-validated text-center">
+											  		<div class="col-sm-9 was-validated form-group">
 											  			<input 	type="text" 
 														  		v-model="query" 
 														  		pattern="[^'!#$%^()\x22]+" 
@@ -39,89 +39,146 @@
 													  		Please search with releavant input
 													  	</div>
 											  		</div>
-
-											  		<div class="col-sm-3 text-right"></div>
 											  	</div>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['approved', 'pending']" 
+										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
 
 										  			@showApprovedContents="showApprovedContents" 
 										  			@showPendingContents="showPendingContents" 
+										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
+ 												
+										  		<!-- 
+										  		<table-with-soft-delete-option 
+										  			:query="query" 
+										  			:per-page="perPage"  
+										  			:column-names="['name', 'email', 'mobile', 'status']" 
+										  			:column-values-to-show="['name', 'email', 'mobile', 'status']" 
+										  			:contents-to-show = "contentsToShow" 
+										  			:pagination = "pagination" 
+										  			:required-permission="'warehouse'" 
 
+										  			@showContentDetails="showContentDetails($event)" 
+										  			@openContentEditForm="openContentEditForm($event)" 
+										  			@openContentDeleteForm="openContentDeleteForm($event)" 
+										  			@openContentRestoreForm="openContentRestoreForm($event)" 
+										  			@changeNumberContents="changeNumberContents($event)" 
+										  			@fetchAllContents="fetchAllWarehouses" 
+										  			@searchData="searchData" 
+										  		>	
+										  		</table-with-soft-delete-option>
+ 												-->
+										  		
 										  		<div class="tab-content card-block">
-													<div class="card">
-														<div class="table-responsive">
-															<table class="table table-striped table-bordered nowrap text-center">
-																<thead>
-																	<tr>
-																		<th>Name</th>
-																		<th>Email</th>
-																		<th>Mobile</th>
-																		<th>Status</th>
-																		<th>Actions</th>
-																	</tr>
-																</thead>
-																<tbody>
-
-																	<tr v-for="content in contentsToShow" :key="'content-' + content.id"
+													<div class="table-responsive">
+														<table class="table table-striped table-bordered nowrap text-center">
+															<thead>
+																<tr>
+																	<th 
+																		v-for="columnName in columnNames" 
+																		:key="columnName" 
 																	>
-																		<td>{{ content.name }}</td>
-																		<td>{{ content.email }}</td>
-																		<td>{{ content.mobile }}</td>
-																		<td>
-																			<span 
-																				:class="[content.active ? 'badge-success' : 'badge-danger', 'badge']"
-																			>
-																				{{ content.active ? 'Active' : 'Pending' }}
+																		<a href="javascript:void(0)" @click="changeContentsOrder(columnName)"> 
+																			{{ columnName | capitalize }}
+																			<span v-show="currentSorting.toUpperCase() === columnName.toUpperCase() && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
-																		</td>
-																		
-																		<td>
-																			<button 
-																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
-																				@click="showContentDetails(content)"
-																			>
-																				<i class="fas fa-eye"></i>
-																			</button>
-																		</td>
-																    
-																	</tr>
-																	<tr 
-																  		v-show="!contentsToShow.length"
-																  	>
-															    		<td colspan="5">
-																      		<div class="alert alert-danger" role="alert">
-																      			Sorry, No data found.
-																      		</div>
-																    	</td>
-																  	</tr>
+																			<span v-show="currentSorting.toUpperCase() === columnName.toUpperCase() && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting.toUpperCase() !== columnName.toUpperCase()">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+																	<th>
+																		Actions
+																	</th>
+																</tr>
+															</thead>
+															<tbody>
 
-																</tbody>
-																<tfoot>
-																	<tr>
-																		<th>Name</th>
-																		<th>Email</th>
-																		<th>Mobile</th>
-																		<th>Status</th>
-																		<th>Actions</th>
-																	</tr>
-																</tfoot>
-															</table>
-														</div>
+																<tr 
+																v-for="(warehouse, warehouseIndex) in contentsToShow" 
+																:key="'my-warehouses-index-' + warehouseIndex + '-warehouse-' + warehouse.id"
+																>
+																	<td>
+																		{{ warehouse.name }}
+																	</td>
+
+																	<td>
+																		{{ warehouse.email }}
+																	</td>
+
+																	<td>
+																		{{ warehouse.mobile }}
+																	</td>
+
+																	<td>
+																		<span :class="[warehouse.active ? 'badge-success' : 'badge-danger', 'badge']">
+																			{{ warehouse.active ? 'Active' : 'Pending' }}
+																		</span>
+																	</td>
+																	
+																	<td>
+																		<button type="button" 
+																				class="btn btn-grd-info btn-icon"  
+																				@click="showContentDetails(warehouse)" 
+																		>
+																			<i class="fas fa-eye"></i>
+																		</button>
+																	</td>
+															    
+																</tr>
+																<tr 
+															  		v-show="!contentsToShow.length"
+															  	>
+														    		<td :colspan="columnNames.length+1">
+															      		<div class="alert alert-danger" role="alert">
+															      			Sorry, No data found.
+															      		</div>
+															    	</td>
+															  	</tr>
+
+															</tbody>
+															<tfoot>
+																<tr>	
+																	<th 
+																		v-for="columnName in columnNames" 
+																		:key="'table-footer-' + columnName" 
+																	>
+																		<a href="javascript:void(0)" @click="changeContentsOrder(columnName)"> 
+																			{{ columnName | capitalize }}
+																			<span v-show="currentSorting.toUpperCase() === columnName.toUpperCase() && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting.toUpperCase() === columnName.toUpperCase() && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting.toUpperCase() !== columnName.toUpperCase()">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+																	<th>
+																		Actions
+																	</th>
+																</tr>
+															</tfoot>
+														</table>
 													</div>
-													<div class="row d-flex align-items-center align-content-center">
-														<div class="col-sm-2">
+													
+													<div class="row d-flex align-items-center">
+														<div class="col-sm-2 col-4">
 															<select 
 																class="form-control" 
 																v-model.number="perPage" 
-																@change="changeNumberContents"
+																@change="changeNumberContents(perPage)"
 															>
 																<option>10</option>
 																<option>20</option>
@@ -130,7 +187,7 @@
 																<option>50</option>
 															</select>
 														</div>
-														<div class="col-sm-2">
+														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
@@ -140,7 +197,7 @@
 																<i class="fas fa-sync"></i>
 															</button>
 														</div>
-														<div class="col-sm-8">
+														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
@@ -151,9 +208,7 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -419,7 +474,6 @@
 													</label>
 												</div>
 												
-									    		<!-- 
 									    		<div class="form-group form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
 														Rents:
@@ -454,7 +508,7 @@
 																:class="{'active': rentIndex === 0}"
 															>
 																<div class="d-flex">
-														    		// container 
+														    		<!-- container -->
 													    			<div class="mr-1 p-2 border w-100">
 													    				<div class="form-row">
 													    					<div class="sub-title">Container</div>
@@ -474,8 +528,7 @@
 															    			</div>
 															    		</div>
 													    			</div>
-													    			
-													    			// shelf
+													    			<!-- shelf -->
 													    			<div 
 													    				class="mr-1 p-2 border w-100" 
 													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve"
@@ -499,8 +552,7 @@
 															    			</div>
 															    		</div>
 													    			</div>
-													    			
-													    			// unit
+													    			<!-- unit -->
 													    			<div 
 													    				class="mr-1 p-2 border w-100" 
 													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
@@ -528,8 +580,7 @@
 															</div>
 														</div>
 													</div>
-												</div> 
-												-->
+												</div>
 									    	</div>
 									    </div>
 									</div>
@@ -597,12 +648,8 @@
 <script type="text/javascript">
 
 	import axios from 'axios';
-	// import Multiselect from 'vue-multiselect';
-	// import CKEditor from '@ckeditor/ckeditor5-vue';
-	// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
     let singleWarehouseData = {
-    	
     	owner : {},
     	previews : [],
     	
@@ -640,11 +687,9 @@
 					}, 
 				},
 
-				/*
-					rents : {
-			    		
-			    	}
-				*/
+		    	rents : {
+		    		
+		    	}
 
 			},
     	],
@@ -666,7 +711,11 @@
 	        	loading : false,
 	        	currentTab : 'approved',
 
-	        	// allRentPeriods : [],
+	        	ascending : false,
+	      		descending : false,
+	      		currentSorting : '',
+
+	        	allRentPeriods : [],
 
 	        	contentsToShow : [],
 	        	allFetchedWarehouses : [],
@@ -674,6 +723,8 @@
 	        	pagination: {
 		        	current_page: 1
 		      	},
+
+		      	columnNames : ['name', 'email', 'mobile', 'status'],
 
 		      	// currentOwner : {},
 
@@ -689,13 +740,14 @@
 
 			// this.getCurrentUser();
 			this.fetchAllWarehouses();
-			// this.fetchAllRentPeriods();
+			this.fetchAllRentPeriods();
 
 		},
 
 		filters: {
 
 			capitalize: function (value) {
+
 				if (!value) return ''
 
 				const words = value.split(/[\s-]/);
@@ -718,12 +770,18 @@
 		watch : {
 
 			query : function(val){
+
 				if (val==='') {
+
 					this.fetchAllWarehouses();
+
 				}
 				else {
+
 					this.searchData();
+
 				}
+
 			},
 
 		},
@@ -806,52 +864,50 @@
 					});
 
 			},
-			/*
-				fetchAllRentPeriods() {
+			fetchAllRentPeriods() {
 
-					if (! this.userHasPermissionTo('view-asset-index')) {
+				if (! this.userHasPermissionTo('view-asset-index')) {
 
-						this.error = 'You do not have permission to view rent-periods';
-						return;
-						
-					}
+					this.error = 'You do not have permission to view rent-periods';
+					return;
 					
-					this.error = '';
-					this.loading = true;
-					this.allRentPeriods = [];
-					
-					axios
-						.get('/api/rent-periods/')
-						.then(response => {
-							if (response.status == 200) {
-								this.allRentPeriods = response.data;
-							}
-						})
-						.catch(error => {
-							this.error = error.toString();
-							// Request made and server responded
-							if (error.response) {
-								console.log(error.response.data);
-								console.log(error.response.status);
-								console.log(error.response.headers);
-								console.log(error.response.data.errors[x]);
-							} 
-							// The request was made but no response was received
-							else if (error.request) {
-								console.log(error.request);
-							} 
-							// Something happened in setting up the request that triggered an Error
-							else {
-								console.log('Error', error.message);
-							}
+				}
+				
+				this.error = '';
+				this.loading = true;
+				this.allRentPeriods = [];
+				
+				axios
+					.get('/api/rent-periods/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allRentPeriods = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
 
-						})
-						.finally(response => {
-							this.loading = false;
-						});
+					})
+					.finally(response => {
+						this.loading = false;
+					});
 
-				},
-			*/
+			},
 			searchData() {
 
 				this.error = '';
@@ -859,7 +915,7 @@
 				this.pagination.current_page = 1;
 				
 				axios
-				.get('/search-warehouses/' + this.query + "/" +  this.perPage + "?page=" + this.pagination.current_page)
+				.get('/search-my-warehouses/' + this.query + "/" +  this.perPage + "?page=" + this.pagination.current_page)
 				.then(response => {
 					this.allFetchedWarehouses = response.data;
 					this.contentsToShow = this.allFetchedWarehouses.all.data;
@@ -894,6 +950,10 @@
 					this.contentsToShow = this.allFetchedWarehouses.pending.data;
 					this.pagination = this.allFetchedWarehouses.pending;
 				}
+				else if (this.currentTab=='trashed') {
+					this.contentsToShow = this.allFetchedWarehouses.trashed.data;
+					this.pagination = this.allFetchedWarehouses.trashed;
+				}
 
 			},
 			showApprovedContents() {
@@ -904,12 +964,149 @@
 				this.currentTab = 'pending';
 				this.showSelectedTabContents();
 			},
+			showTrashedContents() {
+				this.currentTab = 'trashed';
+				this.showSelectedTabContents();
+			},
 			getOwnerFullName(owner) {
+
 				if (!owner.first_name && !owner.last_name) {
 					return 'NA';
 				}
 
 				return owner.first_name || '' + ' ' + owner.last_name || '';
+
+			},
+			changeContentsOrder(columnName) {
+
+				this.currentSorting = columnName;
+
+				if (columnName.match(/name/gi)) {
+
+					const nameExists = (object) => object.hasOwnProperty('name');
+					const firstNameExists = (object) => object.hasOwnProperty('first_name');
+
+					if (this.ascending) {
+
+						this.ascending = false;
+						this.descending = true;
+
+						this.descendingAlphabets('name');
+
+					}
+					else if (this.descending) {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.ascendingAlphabets('name');
+
+					}
+					else {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.ascendingAlphabets('name');
+
+					}
+
+				}
+				else if (columnName.match(/email/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('email');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('email');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('email');
+					}
+
+				}
+				else if (columnName.match(/mobile/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('mobile');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('mobile');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('mobile');
+					}
+
+				}
+
+				else if (columnName.match(/status/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingNumeric('active');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('active');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('active');
+					}
+					
+				}
+				
+			},
+			ascendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x < y) {return -1;}
+						if (x > y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			descendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x > y) {return -1;}
+						if (x < y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			ascendingNumeric(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						return a.columnValue - b.columnValue;
+					}
+				);
+			},
+			descendingNumeric(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						return b.columnValue - a.columnValue;
+					}
+				);
 			},
             
 		}

@@ -36,7 +36,7 @@ Route::name('owner.')->group(function () {
 		// Route::get('/api/current-owner', 'OwnerController@currentOwner')->name('current-user');
 
 		Route::get('/my-warehouses/{perPage}', 'OwnerController@showOwnerAllWarehouses')->name('my-warehouses');
-		Route::get('/search-warehouses/{search}/{perPage}', 'OwnerController@searchOwnerAllWarehouses')->name('search-warehouses');
+		Route::get('/search-my-warehouses/{search}/{perPage}', 'OwnerController@searchOwnerAllWarehouses')->name('search-warehouses');
 
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');

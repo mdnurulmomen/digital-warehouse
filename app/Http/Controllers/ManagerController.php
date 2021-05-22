@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Manager;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\Web\WarehouseCollection;
 
 class ManagerController extends Controller
 {
@@ -141,4 +143,58 @@ class ManagerController extends Controller
             'all' => $query->paginate($perPage),    
         ], 200);
     }
+
+    // Warehouse
+    public function showManagerAllWarehouses($perPage)
+    {
+        $currentManager = \Auth::guard('manager')->user();
+
+        return [
+
+            'approved' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 1)->whereHas('managers', function ($query) use ($currentManager) {
+                $query->where('manager_id', $currentManager->id);
+            })->paginate($perPage)),
+            
+            'pending' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 0)->whereHas('managers', function ($query) use ($currentManager) {
+                $query->where('manager_id', $currentManager->id);
+            })->paginate($perPage)),
+            
+            'trashed' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->onlyTrashed()->whereHas('managers', function ($query) use ($currentManager) {
+                $query->where('manager_id', $currentManager->id);
+            })->paginate($perPage)),
+
+        ];
+    
+    }
+
+    public function searchManagerAllWarehouses($search, $perPage)
+    {
+        $currentManager = \Auth::guard('manager')->user();
+
+        $query = Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions']);
+
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%$search%")
+              ->orWhere('user_name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('mobile', 'like', "%$search%")
+              ->orWhere('warehouse_deal', 'like', "%$search%")
+              ->orWhereHas('owner', function($q2) use ($search) {
+                $q2->where('first_name', 'like', "%$search%")
+                  ->orWhere('last_name', 'like', "%$search%")
+                  ->orWhere('user_name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('mobile', 'like', "%$search%");
+                });
+        });
+
+        $query->whereHas('managers', function($q) use ($currentManager) {
+            $q->where('manager_id', $currentManager->id);
+        });
+
+        return response()->json([
+            'all' => new WarehouseCollection($query->paginate($perPage)),    
+        ], 200);
+    }
+    
 }

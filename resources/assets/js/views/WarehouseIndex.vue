@@ -53,7 +53,7 @@
 										  			:column-values-to-show="['name', 'email', 'mobile', 'status']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'warehouse-owner'" 
+										  			:required-permission="'warehouse'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
