@@ -32,7 +32,8 @@ class PermissionSeeder extends Seeder
             	'Product',
             	'Role',
             	'Warehouse-Owner',
-            	'Warehouse',
+                'Warehouse',
+            	'Warehouse-Manager',
             	// 'WarehouseDeliveryCompany'
             	// 'WarehouseManager'
             	// 'WarehouseProduct',

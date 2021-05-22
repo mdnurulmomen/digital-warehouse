@@ -16,15 +16,21 @@ class ManagerController extends Controller
         $this->middleware("permission:delete-manager")->only(['deleteManager', 'restoreManager']);
     }
 
-    public function showAllManagers($perPage)
+    public function showAllManagers($perPage = false)
     {
-    	return response()->json([
+    	if ($perPage) {
+            
+            return response()->json([
 
-    		'approved' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 1)->paginate($perPage),
-            'pending' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 0)->paginate($perPage),
-    		'trashed' => Manager::with(['warehouses', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage),
+        		'approved' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 1)->paginate($perPage),
+                'pending' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 0)->paginate($perPage),
+        		'trashed' => Manager::with(['warehouses', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage),
 
-    	], 200);
+        	], 200);
+
+        }
+
+        return Manager::where('active', 1)->get();
     }
 
     public function storeNewManager(Request $request, $perPage)

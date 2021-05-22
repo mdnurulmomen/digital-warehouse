@@ -1047,6 +1047,7 @@
 				                              		:options="allRoles" 
 				                              		:multiple="true" 
 				                              		:close-on-select="false" 
+				                              		class="form-control p-0 is-valid" 
 				                              		placeholder="Parent Category" 
 				                              		selectLabel = "Press/Click"
 				                              		deselect-label="Can't remove single value" 

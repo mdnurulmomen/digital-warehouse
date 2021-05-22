@@ -133,6 +133,12 @@
 											<span class="pcoded-mtext">Warehouses</span>
 										</router-link>
 									</li>
+
+									<li :class="currentRouteName=='warehouse-managers' ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-manager-index')">
+										<router-link :to="{ name: 'warehouse-managers' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Wr. Managers</span>
+										</router-link>
+									</li>
 								</ul>
 							</li>
 

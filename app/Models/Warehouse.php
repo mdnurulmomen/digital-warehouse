@@ -105,6 +105,14 @@ class Warehouse extends Authenticatable
     }
 
     /**
+     * The managers that belong to the warehouse.
+     */
+    public function managers()
+    {
+        return $this->belongsToMany(Manager::class, 'warehouse_managers', 'warehouse_id', 'manager_id');
+    }
+
+    /**
      * Set the user's first name.
      *
      * @param  string  $value
@@ -379,6 +387,16 @@ class Warehouse extends Authenticatable
         }
     }
 */
+
+    public function setManagersAttribute($managers = [])
+    {
+        if (count($managers)) {
+            
+            $this->managers()->detach();
+            $this->managers()->attach(Arr::pluck($managers, 'id'));
+
+        }
+    }
 
     protected function createContainerUpdatedRents($warehouseContainer, $inputedContainer)
     {          

@@ -65,7 +65,7 @@ Route::name('owner.')->group(function () {
 		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
 
 		// manager
-		Route::get('/api/managers/{perPage}', 'ManagerController@showAllManagers')->name('managers');
+		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
 		Route::post('/managers/{perPage}', 'ManagerController@storeNewManager')->name('managers');	
 		Route::put('/managers/{manager}/{perPage}', 'ManagerController@updateManager')->name('managers');	
 		Route::delete('/managers/{manager}/{perPage}', 'ManagerController@deleteManager')->name('managers');	
@@ -151,6 +151,13 @@ Route::name('owner.')->group(function () {
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeNewDispatch')->name('dispatches');
 		Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
+
+		// warehouse-managers
+		Route::get('/api/warehouse-managers/{perPage?}','WarehouseController@showAllWarehouseManagers')->name('warehouse-managers');
+		Route::post('/warehouse-managers/{perPage}','WarehouseController@storeNewWarehouseManager')->name('warehouse-managers');	
+		Route::put('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@updateWarehouseManager')->name('warehouse-managers');	
+		Route::delete('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@deleteWarehouseManager')->name('warehouse-managers');
+		Route::get('/api/search-warehouse-managers/{search}/{perPage}','WarehouseController@searchAllWarehouseManagers')->name('search-warehouse-managers');
 
 		// roles
 		Route::get('/api/roles/{perPage?}','RoleController@showAllRoles')->name('roles');

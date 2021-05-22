@@ -10,4 +10,9 @@ class WarehouseManager extends Model
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
+
+    public function manager()
+    {
+        return $this->belongsTo(Manager::class, 'manager_id', 'id');
+    }
 }
