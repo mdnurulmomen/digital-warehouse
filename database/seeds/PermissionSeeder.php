@@ -19,6 +19,10 @@ class PermissionSeeder extends Seeder
                     'Product-Stock',
                 ];
             */
+           
+            $modelRUDableOnly = [
+                'Warehouse-Manager',
+            ];
 
             $modelsCRUDable = [
             	'Asset',
@@ -33,7 +37,7 @@ class PermissionSeeder extends Seeder
             	'Role',
             	'Warehouse-Owner',
                 'Warehouse',
-            	'Warehouse-Manager',
+            	// 'Warehouse-Manager',
             	// 'WarehouseDeliveryCompany'
             	// 'WarehouseManager'
             	// 'WarehouseProduct',
@@ -68,9 +72,22 @@ class PermissionSeeder extends Seeder
                 }
             */
 
-            foreach ($modelsCRUDable as $model) {
+            foreach ($modelRUDableOnly as $model) {
             	
             	Permission::insert([
+                
+                    // [ 'name' => 'create-'.strtolower($model) ],
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
+                    [ 'name' => 'update-'.strtolower($model) ],
+                    [ 'name' => 'delete-'.strtolower($model) ]
+
+                ]);
+
+            }
+
+            foreach ($modelsCRUDable as $model) {
+                
+                Permission::insert([
                 
                     [ 'name' => 'create-'.strtolower($model) ],
                     [ 'name' => 'view-'.strtolower($model).'-index' ],

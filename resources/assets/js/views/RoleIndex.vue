@@ -278,6 +278,113 @@
 								</div>
 								<div class="col-md-12">
 									<div class="row">
+										<!-- Approvable Models -->
+										<div 
+											class="col-md-6" 
+											v-for="model in modelCRUDableAndApproveable" 
+											:key="'approve-model-permission-name-' + model"
+										>
+											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+											<!-- create -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('create-' + model)" 
+													@change="insertPermission('create-' + model, $event)" 
+													:ref="'create-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('create-' + model) }}</label>
+											</div>
+
+											<!-- update -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('update-' + model)" 
+													@change="insertPermission('update-' + model, $event)" 
+													:ref="'update-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('update/Approve-' + model) }}</label>
+											</div>
+
+											<!-- delete -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('delete-' + model)" 
+													@change="insertPermission('delete-' + model, $event)" 
+													:ref="'delete-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('delete-' + model) }}</label>
+											</div>
+
+											<!-- view -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('view-' + model + '-index')" 
+													@change="insertPermission('view-' + model + '-index', $event)" 
+													:ref="'view-' + model.toLowerCase() + '-index'"
+												>
+												<label>{{ modelName('view-' + model + '-list') }}</label>
+											</div>
+
+											<!-- approve -->
+											<!-- 
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('approve-' + model)" 
+													@change="insertPermission('approve-' + model, $event)" 
+													:ref="'approve-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('approve-' + model) }}</label>
+											</div>
+												-->
+										</div>
+
+										<!-- Only Updatable Models -->
+										<div 
+											class="col-md-6" 
+											v-for="model in modelRUDableOnly" 
+											:key="'updatable-model-permission-name-' + model"
+										>
+											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+											<!-- update -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('update-' + model)" 
+													@change="insertPermission('update-' + model, $event)" 
+													:ref="'update-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('update-' + model) }}</label>
+											</div>
+
+											<!-- delete -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('delete-' + model)" 
+													@change="insertPermission('delete-' + model, $event)" 
+													:ref="'delete-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('delete-' + model) }}</label>
+											</div>
+
+											<!-- view -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('view-' + model + '-index')" 
+													@change="insertPermission('view-' + model + '-index', $event)" 
+													:ref="'view-' + model.toLowerCase() + '-index'"
+												>
+												<label>{{ modelName('view-' + model + '-list') }}</label>
+											</div>
+										</div>
+
 										<!-- CRUD Models -->
 										<div 
 											class="col-md-6" 
@@ -521,6 +628,101 @@
 							</div>
 							<div class="col-md-12">
 								<div class="row">
+									<!-- Approvable Models -->
+									<div 
+										class="col-md-6" 
+										v-for="model in modelCRUDableAndApproveable" 
+										:key="'approve-model-permission-name-' + model"
+									>
+										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+										<!-- create -->
+										<p class="m-0">
+											<span v-show="permissionExists('create-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('create-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('create-' + model) }}
+										</p>
+
+										<!-- update -->
+										<p class="m-0">
+											<span v-show="permissionExists('update-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('update-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('update/Approve-' + model) }}
+										</p>
+
+										<!-- delete -->
+										<p class="m-0">
+											<span v-show="permissionExists('delete-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('delete-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('delete-' + model) }}
+										</p>
+
+										<!-- view -->
+										<p class="m-0">
+											<span v-show="permissionExists('view-' + model + '-index')" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('view-' + model + '-index')" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('view-' + model + '-list') }}
+										</p>
+									</div>
+
+									<!-- Only Updatable Models -->
+									<div 
+										class="col-md-6" 
+										v-for="model in modelRUDableOnly" 
+										:key="'updatable-model-permission-name-' + model"
+									>
+										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+										
+										<!-- update -->
+										<p class="m-0">
+											<span v-show="permissionExists('update-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('update-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('update-' + model) }}
+										</p>
+
+										<!-- delete -->
+										<p class="m-0">
+											<span v-show="permissionExists('delete-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('delete-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('delete-' + model) }}
+										</p>
+
+										<!-- view -->
+										<p class="m-0">
+											<span v-show="permissionExists('view-' + model + '-index')" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('view-' + model + '-index')" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('view-' + model + '-list') }}
+										</p>
+									</div>
+
 									<!-- CRUD Models -->
 									<div 
 										class="col-md-6" 
@@ -714,13 +916,21 @@
 
 	        	allPermissions : [],
 
+	        	modelCRUDableAndApproveable : [
+	                'Product-Stock',
+	            ],
+
+	            modelRUDableOnly : [
+	                'Warehouse-Manager',
+	            ],
+
 	        	modelsCRUDable : [
 	        		'Asset',
 	            	'Manager',
 	            	'Merchant',
 	            	'Product-Category',
 	            	'Product',
-	            	'Product-Stock',
+	            	// 'Product-Stock',
 	            	'Role',
 	            	'Warehouse-Owner',
 	            	'Warehouse',
