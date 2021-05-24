@@ -36,6 +36,9 @@ Route::name('manager.')->group(function () {
 		Route::get('/my-warehouses/{perPage}', 'ManagerController@showManagerAllWarehouses')->name('my-warehouses');
 		Route::get('/search-my-warehouses/{search}/{perPage}', 'ManagerController@searchManagerAllWarehouses')->name('search-my-warehouses');
 
+		Route::get('/my-products/{perPage}', 'ProductController@showManagerAllProducts')->name('my-products');
+		Route::get('/search-my-products/{search}/{perPage}', 'ProductController@searchManagerAllProducts')->name('search-my-products');
+
 		/* special routes */
 
 		// application setting

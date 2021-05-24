@@ -27,6 +27,12 @@ class WarehouseController extends Controller
         $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
         $this->middleware("permission:update-warehouse")->only('updateWarehouse');
         $this->middleware("permission:delete-warehouse")->only(['deleteWarehouse', 'restoreWarehouse']);
+
+        // Warehouse Managers
+        $this->middleware("permission:view-warehouse-manager-index")->only(['showAllWarehouseManagers', 'searchAllWarehouseManagers']);
+        // $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
+        $this->middleware("permission:update-warehouse-manager")->only('updateWarehouseManager');
+        $this->middleware("permission:delete-warehouse-manager")->only(['deleteWarehouseManager']);
     }
 
     // Warehouse Owner
@@ -157,15 +163,21 @@ class WarehouseController extends Controller
     }
 
     // Warehouse
-    public function showAllWarehouses($perPage)
+    public function showAllWarehouses($perPage = false)
     {
-        return [
+        if ($perPage) {
+            
+            return [
 
-            'approved' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 1)->paginate($perPage)),
-            'pending' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 0)->paginate($perPage)),
-            'trashed' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage)),
+                'approved' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 1)->paginate($perPage)),
+                'pending' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 0)->paginate($perPage)),
+                'trashed' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage)),
 
-        ];
+            ];
+
+        }
+
+        return Warehouse::where('active', true)->get();
     
         /*
             return response()->json([
@@ -352,19 +364,19 @@ class WarehouseController extends Controller
     }
 
     // warehouse-contaners
-    public function showAllWarehouseContainers($perPage = false) {
+    public function showAllWarehouseContainers($warehouse, $perPage = false) {
         
         // if ($perPage) {
             
-            $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) {
-                                        $query->where('active', 1);
+            $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
+                                        $query->where('id', $warehouse)->where('active', 1);
                                     })
                                     ->where('engaged', 0.0)
                                     ->get();
 
 
-            $emptyShelfContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) {
-                                        $query->where('active', 1);
+            $emptyShelfContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
+                                        $query->where('id', $warehouse)->where('active', 1);
                                     })
                                     ->whereHas('containerShelfStatuses', 
                                     function ($query) {
@@ -378,8 +390,8 @@ class WarehouseController extends Controller
                                     ])
                                     ->get();
 
-            $emptyUnitContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) {
-                                        $query->where('active', 1);
+            $emptyUnitContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
+                                        $query->where('id', $warehouse)->where('active', 1);
                                     })
                                     ->whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
                                     function ($query) {
@@ -621,6 +633,7 @@ class WarehouseController extends Controller
         return Warehouse::where('active', true)->with('managers')->get();
     }
 
+    /*
     public function storeNewWarehouseManager(Request $request, $perPage)
     {
         $request->validate([
@@ -634,6 +647,7 @@ class WarehouseController extends Controller
 
         return $this->showAllWarehouseManagers($perPage);
     }
+    */
 
     public function updateWarehouseManager(Request $request, $warehouse, $perPage)
     {

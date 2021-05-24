@@ -308,6 +308,30 @@
 
  										<div class="form-row form-group">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Select Warehouse :
+											</label>
+											<div class="col-sm-6">
+												<multiselect 
+			                              			v-model="singleStockData.warehouse"
+			                                  		:options="allWarehouses" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false" 
+			                                  		:disabled="! createMode"  
+			                              			placeholder="Select Warehouse" 
+			                              			class="form-control p-0" 
+			                                  		:class="!errors.stock.warehouse  ? 'is-valid' : 'is-invalid'"  
+			                                  		@close="validateFormInput('warehouse')"
+			                              		>
+			                                	</multiselect>
+			                                	<div class="invalid-feedback">
+											    	{{ errors.stock.warehouse }}
+											    </div>
+											</div>
+										</div>
+
+ 										<div class="form-row form-group">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Stock Qty :
 											</label>
 											<div class="col-sm-6">
@@ -847,7 +871,7 @@
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Product Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">{{ this.product.name }} Stock Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -1087,6 +1111,16 @@
 
 											<label class="col-sm-6 col-form-label text-left">
 												{{ singleStockData.created_at }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stocked at :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleStockData.hasOwnProperty('warehouse') ? singleStockData.warehouse.name : '' }}
 											</label>
 										</div>
 
@@ -1407,6 +1441,8 @@
 	        	submitForm : true,
 	        	formSubmitted : false,
 
+	        	allWarehouses : [],
+
 	        	allStocks : [],
 
 	        	allContainers : [],
@@ -1437,6 +1473,7 @@
 
 	        	errors : {
 					stock : {
+						// warehouse : {},
 						variations : [],
 						addresses : [],
 						product_serials : [],
@@ -1449,18 +1486,6 @@
 
 		},
 		
-		created() {
-			
-			this.fetchAllContainers();
-
-			this.fetchProductAllStocks();
-			
-			this.resetErrorObject();
-
-			// this.configureProductErrorsWithPropData();
-
-		},
-
 		filters: {
 
 			capitalize: function (value) {
@@ -1480,6 +1505,20 @@
 
 				return words.join(" ");
 			}
+
+		},
+
+		created() {
+			
+			this.fetchAllWarehouses();
+
+			// this.fetchWarehouseAllContainers();
+
+			this.fetchProductAllStocks();
+			
+			this.resetErrorObject();
+
+			// this.configureProductErrorsWithPropData();
 
 		},
 		
@@ -1524,7 +1563,7 @@
 					});
 
 			},
-			fetchAllContainers() {
+			fetchWarehouseAllContainers(warehouse) {
 				
 				this.query = '';
 				this.error = '';
@@ -1535,7 +1574,7 @@
 				this.emptyUnitContainers = [];
 
 				axios
-					.get('/api/warehouse-containers')
+					.get('/api/warehouse-containers/' + warehouse)
 					.then(response => {
 						if (response.status == 200) {
 							
@@ -1569,6 +1608,46 @@
 					})
 					.finally(response => {
 						// this.loading = false;
+					});
+
+			},
+			fetchAllWarehouses() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allWarehouses = [];
+
+				axios
+					.get('/api/warehouses')
+					.then(response => {
+						if (response.status == 200) {
+							
+							this.allWarehouses = response.data;
+					
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
 					});
 
 			},
@@ -1731,7 +1810,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.fetchAllContainers();
+						// this.fetchWarehouseAllContainers();
 					});
 
 			},
@@ -1762,7 +1841,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.fetchAllContainers();
+						// this.fetchWarehouseAllContainers();
 					});
 
 			},
@@ -1788,7 +1867,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.fetchAllContainers();
+						// this.fetchWarehouseAllContainers();
 					});
 
 			},
@@ -1881,6 +1960,7 @@
 				
 				if (this.step==1) {
 					
+					this.validateFormInput('warehouse');
 					this.validateFormInput('product_stock_quantity');
 
 					if (this.product.has_variations) {
@@ -1914,6 +1994,7 @@
 
 						}
 
+						this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
 						this.submitForm = true;
 					
 					}
@@ -2734,7 +2815,20 @@
 						
 						}
 
-						break;				
+						break;	
+
+					case 'warehouse' : 
+
+						if (! this.singleStockData.warehouse || ! Object.keys(this.singleStockData.warehouse).length) {
+							this.submitForm = false;
+							this.errors.stock.warehouse = 'Warehouse is required';
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'warehouse');
+						}
+
+						break;			
 
 				}
 	 

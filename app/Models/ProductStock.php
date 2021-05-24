@@ -19,6 +19,11 @@ class ProductStock extends Model
     	return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
+
     public function variations()
     {
         return $this->hasMany(ProductVariationStock::class, 'product_stock_id', 'id');

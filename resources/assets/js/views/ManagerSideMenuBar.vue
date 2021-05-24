@@ -179,13 +179,11 @@
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<!-- 
 									<li :class="currentRouteName=='my-products' ? 'active' : ''">
 										<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">My Products</span>
 										</router-link>
 									</li>
-									 -->
 									<li 
 										:class="currentRouteName=='product-categories' ? 'active' : ''" 
 										v-if="userHasPermissionTo('view-product-category-index')"

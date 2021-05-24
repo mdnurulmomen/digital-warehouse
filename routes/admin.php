@@ -50,7 +50,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-owners/{search}/{perPage}', 'WarehouseController@searchAllOwners')->name('search-warehouse-owners');
 
 		// warehouse
-		Route::get('/api/warehouses/{perPage}', 'WarehouseController@showAllWarehouses')->name('warehouses');
+		Route::get('/api/warehouses/{perPage?}', 'WarehouseController@showAllWarehouses')->name('warehouses');
 		Route::post('/warehouses/{perPage}', 'WarehouseController@storeNewWarehouse')->name('warehouses');	
 		Route::put('/warehouses/{warehouse}/{perPage}', 'WarehouseController@updateWarehouse')->name('warehouses');	
 		Route::delete('/warehouses/{warehouse}/{perPage}', 'WarehouseController@deleteWarehouse')->name('warehouses');	
@@ -58,7 +58,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
 		// warehouse container
-		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
@@ -150,7 +150,7 @@ Route::name('admin.')->group(function () {
 
 		// warehouse-managers
 		Route::get('/api/warehouse-managers/{perPage?}','WarehouseController@showAllWarehouseManagers')->name('warehouse-managers');
-		Route::post('/warehouse-managers/{perPage}','WarehouseController@storeNewWarehouseManager')->name('warehouse-managers');	
+		// Route::post('/warehouse-managers/{perPage}','WarehouseController@storeNewWarehouseManager')->name('warehouse-managers');	
 		Route::put('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@updateWarehouseManager')->name('warehouse-managers');	
 		Route::delete('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@deleteWarehouseManager')->name('warehouse-managers');
 		Route::get('/api/search-warehouse-managers/{search}/{perPage}','WarehouseController@searchAllWarehouseManagers')->name('search-warehouse-managers');
