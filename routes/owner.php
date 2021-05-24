@@ -170,6 +170,15 @@ Route::name('owner.')->group(function () {
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+
+		Route::fallback(function () {
+
+			$access_token = Illuminate\Support\Str::random(60);
+        	$roles = \Auth::guard('owner')->user()->roles;
+        	$permissions = Auth::guard('owner')->user()->permissions;
+			return view('layouts.owner', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+		    
+		});
 	
 	});
 

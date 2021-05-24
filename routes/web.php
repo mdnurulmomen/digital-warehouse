@@ -188,6 +188,15 @@ Route::name('merchant.')->group(function () {
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 
+		Route::fallback(function () {
+
+			$access_token = Illuminate\Support\Str::random(60);
+        	$roles = \Auth::guard('merchant')->user()->roles;
+        	$permissions = Auth::guard('merchant')->user()->permissions;
+			return view('layouts.merchant', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+		    
+		});
+
 	});
 
 });

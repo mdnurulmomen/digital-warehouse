@@ -144,15 +144,15 @@ class ProductController extends Controller
     public function storeNewProduct(Request $request, $perPage)
     {
         $request->validate([
-            'product_category_id' => 'nullable|numeric|exists:product_categories,id',
-            'merchant_id' => 'required|numeric|exists:merchants,id',
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:65535',
             'sku' => 'nullable|string|max:100|unique:products,sku',
-            'price' => 'nullable|numeric|min:0', // min 0 due to bulk products
+            'price' => 'numeric|min:0', // min 0 due to bulk products
             'quantity_type' => 'nullable|string|max:100',
-            'has_serials' => 'nullable|boolean',
-            'has_variations' => 'nullable|boolean',
+            'has_serials' => 'boolean',
+            'has_variations' => 'boolean',
+            'product_category_id' => 'numeric|exists:product_categories,id',
+            'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.price' => 'required_if:has_variations,1',
@@ -186,15 +186,15 @@ class ProductController extends Controller
         $productToUpdate = Product::findOrFail($product);
 
         $request->validate([
-            'product_category_id' => 'nullable|numeric|exists:product_categories,id',
-            'merchant_id' => 'required|numeric|exists:merchants,id',
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:65535',
             'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
             'price' => 'required|numeric|min:0', // min 0 due to bulk products
             'quantity_type' => 'nullable|string|max:100',
-            'has_serials' => 'nullable|boolean',
-            'has_variations' => 'nullable|boolean',
+            'has_serials' => 'boolean',
+            'has_variations' => 'boolean',
+            'product_category_id' => 'numeric|exists:product_categories,id',
+            'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.price' => 'required_if:has_variations,1',
@@ -274,6 +274,7 @@ class ProductController extends Controller
 
         $request->validate([
             'stock_quantity' => 'required|numeric|min:1',
+            'warehouse_id' => 'required|exists:warehouses,id',
             'product_id' => 'required|numeric|exists:products,id',
             'variations' => [
                 'array', 
@@ -622,6 +623,24 @@ class ProductController extends Controller
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
                         });
+
+                        /*
+                        ->whereHas('addresses', function ($query) use ($manager) {
+                            $query->whereHasMorph(
+                                'space',
+                                [WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class],
+                                function ($query1) use ($manager) {
+                                    $query1->whereHas('warehouseContainer', function ($query2) use ($manager) {
+                                        $query2->whereHas('warehouse', function ($query3) use ($manager) {
+                                            $query3->whereHas('managers', function ($query4) use ($manager) {
+                                                $query4->where('manager_id', $manager->id);
+                                            });
+                                        });
+                                    });
+                                }
+                            );
+                        })
+                         */
 
         return response()->json([
             'all' => new ProductCollection($query->paginate($perPage)),  

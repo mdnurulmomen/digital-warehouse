@@ -189,8 +189,11 @@ Route::name('warehouse.')->group(function () {
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 		Route::fallback(function () {
-		    
-			return view('layouts.warehouse');
+
+			$access_token = Illuminate\Support\Str::random(60);
+        	$roles = \Auth::guard('warehouse')->user()->roles;
+        	$permissions = Auth::guard('warehouse')->user()->permissions;
+			return view('layouts.warehouse', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
 		    
 		});
 	

@@ -174,6 +174,15 @@ Route::name('manager.')->group(function () {
 
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
+		Route::fallback(function () {
+
+			$access_token = Illuminate\Support\Str::random(60);
+        	$roles = \Auth::guard('manager')->user()->roles;
+        	$permissions = Auth::guard('manager')->user()->permissions;
+			return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+		    
+		});
+
 		/*
 			Route::get('/api/warehouses/{perPage}', 'WarehouseController@showAllWarehouses')->name('warehouses');
 			Route::post('/warehouses/{perPage}', 'WarehouseController@storeNewWarehouse')->name('warehouses');	

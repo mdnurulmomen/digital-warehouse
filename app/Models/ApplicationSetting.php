@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Exception\NotReadableException;
 
 class ApplicationSetting extends Model
 {
@@ -27,7 +28,17 @@ class ApplicationSetting extends Model
                 File::makeDirectory($imagePath, 0777, true, true);
             }
 
-            $img = Image::make($encodedImageFile)->resize(50, 50);
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            $img = $img->resize(50, 50);
             $img->save($imagePath.'application_logo.png', 100);
 
             $this->attributes['application_logo'] = $imagePath.'application_logo.png';
@@ -51,7 +62,17 @@ class ApplicationSetting extends Model
                 File::makeDirectory($imagePath, 0777, true, true);
             }
 
-            $img = Image::make($encodedImageFile)->resize(32, 32);
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            $img = $img->resize(32, 32);
             $img->save($imagePath.'application_favicon.png', 100);
 
             $this->attributes['application_favicon'] = $imagePath.'application_favicon.png';
