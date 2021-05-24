@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Exception\NotReadableException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable
@@ -67,7 +68,17 @@ class Admin extends Authenticatable
                 File::makeDirectory($imagePath, 0777, true, true);
             }
 
-            $img = Image::make($encodedImageFile)->resize(100, 100);
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            $img = $img->resize(100, 100);
             $img->save($imagePath.$this->id.'.jpg');
 
             $this->profilePreview()->updateOrCreate(

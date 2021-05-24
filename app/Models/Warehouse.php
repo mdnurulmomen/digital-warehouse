@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Exception\NotReadableException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Warehouse extends Authenticatable
@@ -128,7 +129,16 @@ class Warehouse extends Authenticatable
                 File::makeDirectory($imagePath, 0777, true, true);
             }
 
-            $img = Image::make($encodedImageFile);
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
             $img->save($imagePath.'w-'.$this->id.'-site-map.jpg');
 
             $this->attributes['site_map_preview'] = $imagePath.'w-'.$this->id.'-site-map.jpg';
@@ -155,7 +165,16 @@ class Warehouse extends Authenticatable
             // storing previews to the directory
             foreach ($encodedPreviews as $i => $warehousePreview) {
 
-                $img = Image::make($warehousePreview->preview);
+                try 
+                {
+                    $img = Image::make($warehousePreview->preview);
+                }
+                catch(NotReadableException $e)
+                {
+                    // If error, stop and return
+                    continue;
+                }
+
                 $img->save($imagePath.'w-'.$this->id.'-preview-'.($i+1).'.jpg');
 
             }
@@ -219,7 +238,16 @@ class Warehouse extends Authenticatable
                 // storing previews to the directory & database
                 foreach ($newStorage->previews as $newStoragePreviewIndex => $newStoragePreview) {
 
-                    $img = Image::make($newStoragePreview->preview);
+                    try 
+                    {
+                        $img = Image::make($newStoragePreview->preview);
+                    }
+                    catch(NotReadableException $e)
+                    {
+                        // If error, stop and return
+                        continue;
+                    }
+
                     $img->save($imagePath.'w-'.$this->id.'-st-'.$newStorage->storage_type->id.'-preview-'.($newStoragePreviewIndex+1).'.jpg');
 
                     $warehouseStorageNewPreview = $warehouseNewStorageType->previews()->firstOrCreate([
