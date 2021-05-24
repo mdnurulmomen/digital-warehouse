@@ -1037,6 +1037,7 @@
 											<label class="col-sm-6 col-form-label text-left">
 												{{ singleProductData.dispatched_quantity }}
 												{{ singleProductData.quantity_type }}
+												(including recommended)
 											</label>
 										</div>
 
@@ -1114,6 +1115,8 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Dispatched Qty :</label>
 																	<label class="col-sm-6 col-form-label text-left">
 																		{{ productVariation.dispatched_quantity }}
+																		{{ singleProductData.quantity_type }}
+																		(including recommended)
 																	</label>
 																</div>
 															</div>

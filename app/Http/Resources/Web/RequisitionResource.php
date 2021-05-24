@@ -22,10 +22,11 @@ class RequisitionResource extends JsonResource
             'updater' =>  $this->when($this->status, $this->updater),
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans(),
             'products' => RequiredProductResource::collection($this->products),
             'delivery' =>  $this->when($this->delivery, $this->delivery),
             'agent' => $this->when($this->agent, $this->agent),
-            'dispatch' => $this->when($this->status, new RequisitionDispatchResource($this->dispatch)),
+            'dispatch' => $this->when($this->status==1, new RequisitionDispatchResource($this->dispatch)),
         ];
     }
 }

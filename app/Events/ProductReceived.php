@@ -57,12 +57,14 @@ class ProductReceived implements ShouldBroadcast
             'subject' => $this->requisition->subject,
             'description' => $this->requisition->description,
             'status' => $this->requisition->status,
+            'updater' =>  $this->requisition->status ? $this->requisition->updater : NULL,
             'merchant_id' => $this->requisition->merchant_id,
             'created_at' => $this->requisition->created_at->diffForHumans(),
+            'updated_at' => $this->requisition->updated_at->diffForHumans(),
             'products' => RequiredProductResource::collection($this->requisition->products),
             'delivery' =>  $this->requisition->delivery ? $this->requisition->delivery : NULL,
             'agent' => $this->requisition->agent ? $this->requisition->agent : NULL,
-            'dispatch' => $this->requisition->status ? new RequisitionDispatchResource($this->requisition->dispatch) : NULL,
+            'dispatch' => $this->requisition->status==1 ? new RequisitionDispatchResource($this->requisition->dispatch) : NULL,
         ];
     }
 }

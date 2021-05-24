@@ -1096,16 +1096,6 @@
 									</div>
 
 									<div class="tab-pane" id="requisition-dispatch" role="tabpanel">
-
-										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.dispatch">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Dispatched on :
-											</label>
-											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.dispatch.released_at }}
-											</label>
-										</div>
-
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Service :
@@ -1179,16 +1169,34 @@
 										</div>
 										-->
 
-										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('updater')">
+										<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Recommended By :
+												{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} on :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.updated_at }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} By :
 											</label>
 											<label class="col-sm-6 col-form-label">
 												{{ singleRequisitionData.updater.user_name | capitalize }}
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  On :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.dispatch.updated_at }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
 											</label>
@@ -1197,7 +1205,7 @@
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch')">
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval==1">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Received :
 											</label>
@@ -1208,13 +1216,13 @@
 											</label>
 										</div>
 
-										<div class="form-row" v-else>
+										<!-- <div class="form-row" v-else>
 											<label class="col-sm-12 col-form-label text-center">
-												<span :class="[singleRequisitionData.status==1 ? 'badge-success' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
-													{{ singleRequisitionData.status==1 ? 'Dispatched' : singleRequisitionData.status==0 ? 'Not Dispatched Yet' : 'Cancelled' }}
+												<span :class="[singleRequisitionData.status==1 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
+													{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==0 ? 'Not Recommended Yet' : 'Cancelled' }}
 												</span>
 											</label>
-										</div>
+										</div> -->
 									</div>
 
 								</div>
@@ -1261,7 +1269,6 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 </template>
@@ -2003,7 +2010,7 @@
 
 					case 'delivery_price' :
 
-						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
+						if (this.singleDispatchData.requisition.hasOwnProperty('delivery') && this.singleDispatchData.requisition.delivery) {
 
 							if (Object.keys(this.singleDispatchData.delivery).length==0 || !this.singleDispatchData.delivery.delivery_price || this.singleDispatchData.delivery.delivery_price < 1) {
 								this.errors.delivery.delivery_price = 'Price is required';
@@ -2027,7 +2034,7 @@
 
 					case 'delivery_receipt' :
 
-						if (this.singleDispatchData.requisition.hasOwnProperty('delivery')) {
+						if (this.singleDispatchData.requisition.hasOwnProperty('delivery') && this.singleDispatchData.requisition.delivery) {
 
 							if (Object.keys(this.singleDispatchData.delivery).length==0 || !this.singleDispatchData.delivery.delivery_receipt) {
 								this.errors.delivery.delivery_receipt = 'Receipt is required';

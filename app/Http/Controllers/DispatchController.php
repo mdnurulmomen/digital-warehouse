@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Dispatch;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\RequiredProductSerial;
 use App\Jobs\BroadcastRequisitionDispatch;
+use App\Models\RequiredProductVariationSerial;
 use App\Http\Resources\Web\RequisitionCollection;
 
 class DispatchController extends Controller
@@ -110,6 +113,14 @@ class DispatchController extends Controller
         }
         else if ($expectedRequisition->status == 0) {        // to dispatch
            
+            $check = $this->validateDispatchingProducts(json_decode(json_encode($request->requisition['products'])));
+
+            if (! empty($check)) {
+                
+                return $check;
+
+            }
+
             $userHasApprovingPermission = $currentUser->hasPermissionTo('approve-dispatch');
 
             $requisitionDispatch = new Dispatch();
@@ -298,4 +309,87 @@ class DispatchController extends Controller
             'all' => new RequisitionCollection($query->paginate($perPage)),
         ];
     }
+
+    protected function validateDispatchingProducts($products = [])
+    {
+        foreach ($products as $productKey => $productToDispatch) {
+
+            $expectedProduct = Product::find($productToDispatch->product_id);
+
+            $productAvailableQuantity = $expectedProduct->latestStock->available_quantity ?? 0;
+
+            if ($productAvailableQuantity < $productToDispatch->quantity) {
+                
+                return response()->json(['errors'=>["productSerialError" => "Product quantity is more than available"]], 422);
+
+            }
+
+            else if ($expectedProduct->has_serials && ! $expectedProduct->has_variations && count($productToDispatch->serials)!=$productToDispatch->quantity) {
+                
+                return response()->json(['errors'=>["productSerialError" => "Product serial is more or less than required"]], 422);
+
+            }
+
+            else if ($expectedProduct->has_serials && ! $expectedProduct->has_variations && count($productToDispatch->serials)==$productToDispatch->quantity) {
+                                     
+                foreach ($productToDispatch->serials as $productSerialToDispatch) {
+                    
+                    $productSerial = RequiredProductSerial::where('id', $productSerialToDispatch->id)->whereHas('serial', function($q){
+                        $q->where('has_dispatched', false);
+                    })->first();
+
+                    if (! $productSerial) {
+                        
+                        return response()->json(['errors'=>["productSerialError" => "Product serial is not found"]], 422);
+
+                    }
+
+                }
+
+            }
+
+            if ($expectedProduct->has_variations && $productToDispatch->has_variations) {
+                
+                foreach ($productToDispatch->variations as $variationToDispatch) {
+            
+                    $productExpectedVariation = $expectedProduct->variations()->where('id', $variationToDispatch->product_variation_id)->first();
+
+                    $variationAvailableQuantity = $productExpectedVariation->latestStock->available_quantity ?? 0;
+
+                    if ($variationToDispatch->quantity > $variationAvailableQuantity) {
+                        
+                        return response()->json(['errors'=>["variationSerialError" => "Variation quantity is more than available"]], 422);
+
+                    }
+
+                    else if ($variationToDispatch->has_serials && count($variationToDispatch->serials)!=$variationToDispatch->quantity) {
+                        
+                        return response()->json(['errors'=>["variationSerialError" => "Variation serial is more or less than required"]], 422);
+
+                    }
+                    else if ($variationToDispatch->has_serials && count($variationToDispatch->serials)==$variationToDispatch->quantity) {
+                         
+                        foreach ($variationToDispatch->serials as $variationSerialToDispatch) {
+
+                            $productVariationSerial = RequiredProductVariationSerial::where('id', $variationSerialToDispatch->id)->whereHas('serial', function($q){
+                                $q->where('has_dispatched', false);
+                            })->first();
+
+                            if (! $productVariationSerial) {
+                                
+                                return response()->json(['errors'=>["variationSerialError" => "Variation serial is not found"]], 422);
+
+                            }
+
+                        }
+
+                    } 
+
+                }
+
+            }
+
+        }
+    }
+
 }
