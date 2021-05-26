@@ -155,6 +155,7 @@ class ProductController extends Controller
             'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
+            'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
             'variations.*.price' => 'required_if:has_variations,1',
         ]);
 
@@ -197,6 +198,7 @@ class ProductController extends Controller
             'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
+            'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
             'variations.*.price' => 'required_if:has_variations,1',
         ]);
 
@@ -274,7 +276,7 @@ class ProductController extends Controller
 
         $request->validate([
             'stock_quantity' => 'required|numeric|min:1',
-            'warehouse_id' => 'required|exists:warehouses,id',
+            'warehouse.id' => 'required|exists:warehouses,id',
             'product_id' => 'required|numeric|exists:products,id',
             'variations' => [
                 'array', 
@@ -364,6 +366,7 @@ class ProductController extends Controller
 
         $request->validate([
             'stock_quantity' => 'required|numeric|min:1',
+            'warehouse.id' => 'required|exists:warehouses,id',
             // 'product_id' => 'required|numeric|exists:products,id',
             'variations' => [
                 'array', 
@@ -442,6 +445,7 @@ class ProductController extends Controller
                 'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
+                'warehouse_id' => $request['warehouse']['id'],
             ]);
 
             $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -468,6 +472,7 @@ class ProductController extends Controller
                 'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
+                'warehouse_id' => $request['warehouse']['id'],
             ]);
 
             $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -479,9 +484,17 @@ class ProductController extends Controller
                 'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
+                'warehouse_id' => $request['warehouse']['id'],
             ]);
 
             $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
+
+        }
+        else {
+
+            $stockToUpdate->update([
+                'warehouse_id' => $request['warehouse']['id'],
+            ]);
 
         }
 

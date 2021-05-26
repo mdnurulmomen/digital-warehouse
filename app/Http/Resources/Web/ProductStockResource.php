@@ -30,6 +30,7 @@ class ProductStockResource extends JsonResource
             'keeper' => $this->keeper,
             'approver' => $this->when($this->has_approval, $this->approver),    // -1 / 1
             'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans(),
         ];
     }
 }
