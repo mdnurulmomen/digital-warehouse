@@ -120,9 +120,9 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				:disabled="formSubmitted"  
+																				:disabled="formSubmitted || stock.stock_quantity > stock.available_quantity || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
 																				@click="openStockDeleteForm(stock)" 
-																				v-if="userHasPermissionTo('delete-product-stock')"
+																				v-if="userHasPermissionTo('delete-product-stock')" 
 																			>
 																				<i class="fas fa-trash"></i>
 																			</button>
@@ -1484,7 +1484,7 @@
 	        		serials : [],
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
-					addresses : this.product.addresses ?? [
+					addresses : [
 						{},
 					],
 
@@ -1744,6 +1744,7 @@
 	        		serials : [],
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
+	        		warehouse : this.singleStockData.warehouse ?? {},
 					addresses : this.singleStockData.addresses,  // last address / initial address
 
 	        	};

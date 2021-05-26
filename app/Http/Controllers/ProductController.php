@@ -525,17 +525,29 @@ class ProductController extends Controller
     {
         $stockToDelete = ProductStock::findOrFail($stock);
 
-        if ($stockToDelete->serials()->where('has_requisitions', true)->orWhere('has_dispatched', true)->count() > 0) {
+        if ($stockToDelete->has_serials && ! $stockToDelete->has_variations && $stockToDelete->serials()->where(function($q) { $q->where('has_requisitions', true)->orWhere('has_dispatched', true); })->exists()) {
             
-           return response()->json(['errors'=>["undeletableSerial" => "Product serial has requisition"]], 422);
+           return response()->json(['errors'=>["undeletableSerial" => "Stock serial has requisition"]], 422);
             
         }
 
-        else if ($stockToDelete->variations()->whereHas('serials', function ($query) {
+        else if ($stockToDelete->has_serials && $stockToDelete->has_variations && $stockToDelete->variations()->whereHas('serials', function ($query) {
             $query->where('has_requisitions', true)->orWhere('has_dispatched', true);
-        })->count() > 0) {
+        })->exists()) {
             
-            return response()->json(['errors'=>["undeletableSerial" => "Product variation serial has requisition"]], 422);
+            return response()->json(['errors'=>["undeletableVariationSerial" => "Stock variation serial has requisition"]], 422);
+
+        }
+
+        else if ($stockToDelete->stock_quantity > $stockToDelete->available_quantity) {
+            
+            return response()->json(['errors'=>["undeletableStock" => "Stock available-quantity is less than stock-quantity"]], 422);
+
+        }
+
+        else if ($stockToDelete->has_variations && $stockToDelete->variations()->whereRaw('stock_quantity > available_quantity')->exists()) {
+            
+            return response()->json(['errors'=>["undeletableStockVariation" => "Stock variation available-quantity is less than stock-quantity"]], 422);
 
         }
 
