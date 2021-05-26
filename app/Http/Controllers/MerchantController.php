@@ -10,10 +10,12 @@ use App\Models\Warehouse;
 use App\Models\Requisition;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
+use App\Models\ProductSerial;
 use Illuminate\Validation\Rule;
 use App\Models\RequisitionAgent;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\BroadcastNewRequisition;
+use App\Models\ProductVariationSerial;
 use App\Http\Resources\Web\MyProductResource;
 use App\Http\Resources\Web\MyProductCollection;
 use App\Jobs\BroadcastProductReceiveConfirmation;
@@ -293,27 +295,11 @@ class MerchantController extends Controller
             'delivery.address' => 'required_if:delivery_service,true',
         ]);
 
-        foreach (json_decode(json_encode($request->products)) as $requiredProduct) {
-            
-            if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && (empty($requiredProduct->serials) || $requiredProduct->total_quantity != count($requiredProduct->serials))) {
-                
-                return response()->json(['errors'=>["productSerial" => "Product serial is required"]], 422);
+        $serialError = $this->validateProductSerials(json_decode(json_encode($request->products)));
 
-            }
+        if (! empty($serialError)) {
 
-            else if ($requiredProduct->product->has_serials && $requiredProduct->product->has_variations) {
-                
-                foreach ($requiredProduct->product->variations as $requiredProductVariation) {
-                    
-                    if (empty($requiredProductVariation->required_serials) || $requiredProductVariation->required_quantity != count($requiredProductVariation->required_serials)) {
-                
-                        return response()->json(['errors'=>["variationSerial" => "Variation serial is required"]], 422);
-
-                    }
-
-                }
-
-            }
+            return $serialError;
 
         }
 
@@ -406,6 +392,61 @@ class MerchantController extends Controller
         BroadcastProductReceiveConfirmation::dispatch($dispatchedRequisition);
 
         return $this->showMerchantAllRequisitions($perPage);
+    }
+
+    protected function validateProductSerials($products = [])
+    {
+        foreach ($products as $requiredProduct) {
+            
+            if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && (empty($requiredProduct->serials) || $requiredProduct->total_quantity != count($requiredProduct->serials))) {
+                
+                return response()->json(['errors'=>["productSerial" => "Product serial is required"]], 422);
+
+            }
+
+            else if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && count($requiredProduct->serials)) {
+                        
+                foreach ($requiredProduct->serials as $requiredProductSerialIndex => $requiredProductSerial) {
+                    
+                    if (! ProductSerial::where('serial_no', $requiredProductSerial)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
+                        
+                        return response()->json(['errors'=>["productSerial" => "Product serial has already requisition"]], 422);
+
+                    }
+
+                }
+
+            }
+
+            else if ($requiredProduct->product->has_serials && $requiredProduct->product->has_variations) {
+                
+                foreach ($requiredProduct->product->variations as $requiredProductVariation) {
+                    
+                    if (empty($requiredProductVariation->required_serials) || $requiredProductVariation->required_quantity != count($requiredProductVariation->required_serials)) {
+                
+                        return response()->json(['errors'=>["variationSerial" => "Variation serial is required"]], 422);
+
+                    }
+
+                    else if (count($requiredProductVariation->required_serials)) {
+                        
+                        foreach ($requiredProductVariation->required_serials as $requiredProductVariationSerialIndex => $requiredProductVariationSerial) {
+                            
+                            if (! ProductVariationSerial::where('serial_no', $requiredProductVariationSerial)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
+                                
+                                return response()->json(['errors'=>["variationSerial" => "Variation serial has already requisition"]], 422);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
     }
 
 }

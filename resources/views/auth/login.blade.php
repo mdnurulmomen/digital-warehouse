@@ -8,6 +8,17 @@
                 <div class="card-header">{{ isset($url) ? ucwords($url) : 'Merchant '}} {{ __('Login') }}</div>
 
                 <div class="card-body">
+
+                    @if ($errors->any())
+                        <div class="invalid-feedback" style="display: block;">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ isset($url) ? route("$url.login") : route('login') }}">
                         
                         @csrf
