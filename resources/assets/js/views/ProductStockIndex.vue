@@ -85,8 +85,8 @@
 																		</td>
 
 																		<td>
-																			<span :class="[stock.has_approval ? 'badge-success' : 'badge-danger', 'badge']">
-																				{{ stock.has_approval ? 'Approved' : 'NA' }}
+																			<span :class="[stock.has_approval==1 ? 'badge-success' : stock.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
+																				{{ stock.has_approval==1 ? 'Approved' : stock.has_approval==-1 ? 'Cancelled' : 'NA' }}
 																			</span>
 																		</td>
 																		
@@ -98,7 +98,7 @@
 																			>
 																				<i class="fas fa-eye"></i>
 																			</button>
-
+																			<!-- Approve -->
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
@@ -112,7 +112,7 @@
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
 																				@click="openStockEditForm(stock)" 
-																				v-if="stock.has_approval && userHasPermissionTo('update-product-stock')"
+																				v-if="stock.has_approval==1 && userHasPermissionTo('update-product-stock')"
 																			>
 																				<i class="fas fa-edit"></i>
 																			</button>
@@ -223,7 +223,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approval ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' }}
+							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approval==1 ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -317,11 +317,11 @@
 			                                  		:custom-label="objectNameWithCapitalized" 
 			                                  		:required="true" 
 			                                  		:allow-empty="false" 
-			                                  		:disabled="! createMode"  
 			                              			placeholder="Select Warehouse" 
 			                              			class="form-control p-0" 
 			                                  		:class="!errors.stock.warehouse  ? 'is-valid' : 'is-invalid'"  
-			                                  		@close="validateFormInput('warehouse')"
+			                                  		@close="validateFormInput('warehouse')" 
+			                                  		@input="singleStockData.addresses = [{}] " 
 			                              		>
 			                                	</multiselect>
 			                                	<div class="invalid-feedback">
@@ -423,7 +423,7 @@
 															:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 															@change="validateFormInput('product_variation_quantity')" 
 															required="true" 
-															:readonly="! createMode && stockVariation.primary_quantity < allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
+															:readonly="! createMode && allStocks.length && stockVariation.primary_quantity < allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
 															:min="createMode ? 1 : stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity"
 														>
 
@@ -829,7 +829,7 @@
 													:class="[singleStockData.has_approval ? 'btn-primary' : 'btn-warning', 'btn', 'float-right']" 
 													:disabled="!submitForm || formSubmitted"
 												>
-													{{ createMode ? 'Stock' : singleStockData.has_approval ? 'Update' : 'Approve' }}
+													{{ createMode ? 'Stock' : singleStockData.has_approval==1 ? 'Update' : 'Approve' }}
 												</button>
 											</div>
 										</div>
@@ -1136,23 +1136,33 @@
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Approved :
+												Approval :
 											</label>
 
 											<label class="col-sm-6 col-form-label text-left">
-												<span :class="[singleStockData.has_approval ? 'badge-success' : 'badge-danger', 'badge']">
-													{{ singleStockData.has_approval ? 'Approved' : 'NA' }}
+												<span :class="[singleStockData.has_approval==1 ? 'badge-success' : singleStockData.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
+													{{ singleStockData.has_approval==1 ? 'Approved' : singleStockData.has_approval==-1 ? 'Cancelled' : 'NA' }}
 												</span>
 											</label>
 										</div>
 
-										<div class="form-row" v-if="singleStockData.has_approval==1">
+										<div class="form-row" v-if="singleStockData.has_approval">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Approved By :
+												{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
 											</label>
 
 											<label class="col-sm-6 col-form-label text-left">
 												{{ singleStockData.approver.user_name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleStockData.has_approval">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleStockData.updated_at }}
 											</label>
 										</div>
 									</div>
@@ -1237,6 +1247,15 @@
 																:key="'container-address-' + containerAddress.id + 'address-index-' + addressIndex + '-stock-id-' + singleStockData.id"
 															>
 																<h6>Container Address</h6>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Warehouse :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
+																	</label>
+																</div>
 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1713,6 +1732,7 @@
 				$('#stock-view-modal').modal('show');
 			},
 			showStockCreateForm() {
+
 				this.step = 1;
 				this.createMode = true;
 	        	this.submitForm = true;
@@ -1724,7 +1744,7 @@
 	        		serials : [],
 	        		product_id : this.product.id,
 	        		variations : this.product.variations ?? [],
-					addresses : this.singleStockData.addresses.length ? this.singleStockData.addresses : this.product.addresses.length ? this.product.addresses : [ {}, ],
+					addresses : this.singleStockData.addresses,  // last address / initial address
 
 	        	};
 

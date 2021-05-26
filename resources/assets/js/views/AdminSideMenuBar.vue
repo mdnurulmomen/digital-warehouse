@@ -213,40 +213,6 @@
 									</span>
 								</router-link>
 							</li>
-							
-							<!-- 
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['dispatches', 'requisitions'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
-								v-if="userHasPermissionTo('view-dispatch-index') || userHasPermissionTo('view-requisition-index')"
-							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
-									<span class="pcoded-micon">
-										<i class="fa fa-truck"></i>
-									</span>
-									<span class="pcoded-mtext">Dispatch</span>
-								</a>
-								<ul class="pcoded-submenu">
-									<li 
-										:class="currentRouteName=='dispatches' ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-dispatch-index')"
-									>
-										<router-link :to="{ name: 'dispatches' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dispatches</span>
-										</router-link>
-									</li>
- 								
-									<li 
-										:class="currentRouteName=='requisitions' ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-requisition-index')"
-									>
-										<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Requisitions</span>
-										</router-link>
-									</li>
-								</ul>
-							</li>
-							 -->
 						</ul>
 					</div>
 

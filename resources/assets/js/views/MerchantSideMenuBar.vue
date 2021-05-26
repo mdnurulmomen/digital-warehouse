@@ -220,15 +220,6 @@
 											<span class="pcoded-mtext">All Requisitions</span>
 										</router-link>
 									</li>
-
-									<li 
-										:class="currentRouteName=='dispatches' ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-dispatch-index')"
-									>
-										<router-link :to="{ name: 'dispatches' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">All Dispatches</span>
-										</router-link>
-									</li>
 								</ul>
 							</li>
 							

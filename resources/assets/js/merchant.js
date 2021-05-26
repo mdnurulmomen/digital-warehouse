@@ -72,7 +72,7 @@ import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
 import ProductIndex from './views/ProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
-import DispatchIndex from './views/DispatchIndex'
+// import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
 import RoleIndex from './views/RoleIndex'
 
@@ -220,14 +220,16 @@ const router = new VueRouter({
                 requiredPermission: 'view-requisition-index' 
             }
         },
-        {
-            path: '/dispatches',
-            name: 'dispatches',
-            component: DispatchIndex,
-            meta: { 
-                requiredPermission: 'view-dispatch-index' 
-            }
-        },
+        /*
+            {
+                path: '/dispatches',
+                name: 'dispatches',
+                component: DispatchIndex,
+                meta: { 
+                    requiredPermission: 'view-dispatch-index' 
+                }
+            },
+        */
         {
             path: '/product-stocks/:productName',
             name: 'product-stocks',

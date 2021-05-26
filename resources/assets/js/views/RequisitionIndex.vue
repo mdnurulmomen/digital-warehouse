@@ -207,7 +207,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ singleDispatchData.requisition.status==0 ? 'Make' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve' : '' }} {{ singleDispatchData.requisition.subject | capitalize }}
+							{{ (singleDispatchData.requisition.status==0 && ! userHasPermissionTo('approve-dispatch')) ? 'Recommend' : 'Approve' }} {{ singleDispatchData.requisition.subject | capitalize }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -321,6 +321,7 @@
 				                              			placeholder="Product Name" 
 				                              			label="product_name" 
 				                                  		track-by="product_id" 
+				                                  		class="form-control p-0 is-valid" 
 				                                  		:custom-label="objectNameWithCapitalized" 
 				                                  		:options="singleDispatchData.requisition.products"
 				                                  		:disabled="true"
@@ -334,7 +335,7 @@
 													</label>
 													<input 
 														type="number" 
-														class="form-control" 
+														class="form-control is-valid" 
 														v-model.number="requiredProduct.quantity" 
 														placeholder="Product Total Quantity" 
 														readonly="true"
@@ -348,6 +349,7 @@
 													<input 
 														type="number" 
 														class="form-control" 
+														:class="requiredProduct.quantity > requiredProduct.available_quantity ? 'is-invalid' : 'is-valid'"
 														v-model.number="requiredProduct.available_quantity" 
 														readonly="true"
 													>
@@ -411,6 +413,7 @@
 						                              			placeholder="Variation Name" 
 						                              			label="variation_name" 
 						                                  		track-by="product_variation_id" 
+						                                  		class="form-control p-0 is-valid" 
 						                                  		:custom-label="objectNameWithCapitalized" 
 						                                  		:options="singleDispatchData.requisition.products"
 						                                  		:disabled="true"
@@ -568,7 +571,8 @@
 															Released Space Type {{ productAddressIndex + 1 }}
 														</label>
 														<multiselect 
-					                              			v-model="requiredProductAddress.type"
+					                              			v-model="requiredProductAddress.type" 
+					                              			class="form-control p-0 is-valid" 
 					                                  		:options="['containers', 'shelves', 'units']" 
 					                                  		:custom-label="nameWithCapitalized" 
 					                                  		:required="true" 
@@ -593,6 +597,7 @@
 					                              			placeholder="Select Contaners" 
 					                              			label="name" 
 					                                  		track-by="id" 
+					                                  		class="form-control p-0 is-valid" 
 					                                  		:options="requiredProduct.addresses[productAddressIndex].containers" 
 					                                  		:multiple="true" 
 					                                  		:close-on-select="false" 
@@ -613,8 +618,9 @@
 															Selected Container
 														</label>
 														<multiselect 
-					                              			v-model="requiredProduct.addresses[productAddressIndex].container"
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container" 
 					                              			placeholder="Parent Contaner" 
+					                              			class="form-control p-0 is-valid" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="[]" 
@@ -633,6 +639,7 @@
 														<multiselect 
 					                              			v-model="requiredProduct.addresses[productAddressIndex].container.released_shelves"
 					                              			placeholder="Select Shelves" 
+					                              			class="form-control p-0 is-valid" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="requiredProduct.addresses[productAddressIndex].container.shelves" 
@@ -654,6 +661,7 @@
 														<multiselect 
 					                              			v-model="requiredProduct.addresses[productAddressIndex].container"
 					                              			placeholder="Parent Contaner" 
+					                              			class="form-control p-0 is-valid" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="[]" 
@@ -672,6 +680,7 @@
 														<multiselect 
 					                              			v-model="requiredProduct.addresses[productAddressIndex].container.shelf"
 					                              			placeholder="Parent Shelf" 
+					                              			class="form-control p-0 is-valid" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="[]" 
@@ -690,6 +699,7 @@
 														<multiselect 
 					                              			v-model="requiredProduct.addresses[productAddressIndex].container.shelf.released_units"
 					                              			placeholder="Select Units" 
+					                              			class="form-control p-0 is-valid" 
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="requiredProduct.addresses[productAddressIndex].container.shelf.units" 
@@ -898,7 +908,7 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12 d-flex justify-content-between">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="userHasPermissionTo('approve-dispatch') ? step-=1 : step-=2">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="(userHasPermissionTo('approve-dispatch') && singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0 )) ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 							                  	
@@ -1251,7 +1261,7 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-header bg-danger">
-							<h5 class="modal-title" id="exampleModalLongTitle">Cancel Confirmation</h5>
+							<h5 class="modal-title" id="exampleModalLongTitle">Confirm Cancellation</h5>
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 							</button>
@@ -1262,7 +1272,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-danger">Cancel</button>
+							<button type="submit" class="btn btn-danger">Cancel Requisition</button>
 						</div>
 						
 					</form>
@@ -1410,10 +1420,8 @@
 						
 						requiredProduct => 
 
-							(requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.serials.some( productSerial => productSerial.serial.has_dispatched )) || (requiredProduct.has_serials && requiredProduct.has_variations && requiredProduct.variations.some(productVariation => productVariation.serials.some( variationSerial => variationSerial.serial.has_dispatched)))
-
-						
-						
+							this.singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity < requiredProduct.quantity ) || (requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.serials.some( productSerial => productSerial.serial.has_dispatched )) || (requiredProduct.has_serials && requiredProduct.has_variations && requiredProduct.variations.some(productVariation => productVariation.serials.some( variationSerial => variationSerial.serial.has_dispatched)))
+												
 					);
 
 				}
@@ -1705,6 +1713,7 @@
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
 							$('#cancel-confirmation-modal').modal('hide');
+							$('#dispatch-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
