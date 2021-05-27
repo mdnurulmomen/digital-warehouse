@@ -16,7 +16,7 @@ class CreatePackedDispatchesTable extends Migration
         Schema::create('packed_dispatches', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedSmallInteger('quantity')->default(10); // quantity of packages needed
-            $table->unsignedInteger('product_dispatch_id');
+            $table->unsignedInteger('required_product_id');
             $table->unsignedSmallInteger('packaging_package_id');
         });
     }
