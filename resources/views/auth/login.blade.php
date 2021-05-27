@@ -9,15 +9,11 @@
 
                 <div class="card-body">
 
-                    @if ($errors->any())
-                        <div class="invalid-feedback" style="display: block;">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                    @error('sessionExpired')
+                        <div class="alert alert-danger">
+                            {{ $message }}
                         </div>
-                    @endif
+                    @enderror
 
                     <form method="POST" action="{{ isset($url) ? route("$url.login") : route('login') }}">
                         
