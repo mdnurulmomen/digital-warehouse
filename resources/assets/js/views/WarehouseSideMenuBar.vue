@@ -154,35 +154,17 @@
 								</ul>
 							</li>
 
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['my-managers','managers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+							<li :class="currentRouteName=='managers' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-manager-index')"
 							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
+								<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-user"></i>
 									</span>
-									<span class="pcoded-mtext">Managers</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<!-- 
-									<li :class="currentRouteName=='my-managers' ? 'active' : ''">
-										<router-link :to="{ name: 'my-managers' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">My Managers</span>
-										</router-link>
-									</li>
-									 -->
-
-									<li 
-										:class="currentRouteName=='managers' ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-manager-index')"
-									>
-										<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">All Managers</span>
-										</router-link>
-									</li>
-								</ul>
+									<span class="pcoded-mtext">
+										Managers
+									</span>
+								</router-link>
 							</li>
 
 							<li 

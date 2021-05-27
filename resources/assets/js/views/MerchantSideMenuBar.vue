@@ -198,7 +198,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['my-requisitions', 'requisitions', 'dispatches'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['my-requisitions', 'requisitions'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
@@ -222,7 +222,6 @@
 									</li>
 								</ul>
 							</li>
-							
 						</ul>
 					</div>
 

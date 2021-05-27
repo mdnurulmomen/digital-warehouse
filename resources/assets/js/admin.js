@@ -73,7 +73,7 @@ import RequisitionIndex from './views/RequisitionIndex'
 // import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
 import RoleIndex from './views/RoleIndex'
-import WarehouseManagerIndex from './views/WarehouseManagerIndex'
+// import WarehouseManagerIndex from './views/WarehouseManagerIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -207,15 +207,17 @@ const router = new VueRouter({
                 requiredPermission: 'view-warehouse-index' 
             }
         },
-        {
-            path: '/warehouse-managers',
-            name: 'warehouse-managers',
-            component: WarehouseManagerIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-warehouse-manager-index' 
-            }
-        },
+        /*
+            {
+                path: '/warehouse-managers',
+                name: 'warehouse-managers',
+                component: WarehouseManagerIndex,
+                meta: {
+                    // authRequired: true,
+                    requiredPermission: 'view-warehouse-manager-index' 
+                }
+            },
+        */
         {
             path: '/product-categories',
             name: 'product-categories',

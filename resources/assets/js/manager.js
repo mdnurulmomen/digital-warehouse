@@ -56,8 +56,8 @@ import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
 import Dashboard3 from './views/Dashboard3'
 import Profile from './views/ProfileComponent'
-import MyWarehouseIndex from './views/MyWarehouseIndex'
-import ManagerProductIndex from './views/ManagerProductIndex'
+// import MyWarehouseIndex from './views/MyWarehouseIndex'
+// import ManagerProductIndex from './views/ManagerProductIndex'
 // special components
 import ApplicationSetting from './views/SettingComponent'
 import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
@@ -105,16 +105,20 @@ const router = new VueRouter({
             name: 'profile',
             component: Profile,
         },
-        {
-            path: '/my-warehouses',
-            name: 'my-warehouses',
-            component: MyWarehouseIndex,
-        },
-        {
-            path: '/my-products',
-            name: 'my-products',
-            component: ManagerProductIndex,
-        },
+        /*
+            {
+                path: '/my-warehouses',
+                name: 'my-warehouses',
+                component: MyWarehouseIndex,
+            },
+        
+            {
+                path: '/my-products',
+                name: 'my-products',
+                component: ManagerProductIndex,
+            },
+        */
+        
         // special routes
         {
             path: '/settings',

@@ -31,6 +31,7 @@ Route::name('warehouse.')->group(function () {
 	    
 		Route::get('/{any}', 'HomeController@warehouseHome')->name('home');	
 
+		// profile
 		Route::get('/api/profile', 'ProfileController@showWarehouseProfile')->name('profile');	
 		Route::put('/warehouse-profile', 'ProfileController@updateWarehouseProfile')->name('profile');
 		Route::put('/warehouse-deal', 'ProfileController@updateWarehouseDeal')->name('deal');
@@ -39,11 +40,13 @@ Route::name('warehouse.')->group(function () {
 		Route::put('/warehouse-containers', 'ProfileController@updateWarehouseContainers')->name('containers');
 		Route::post('/password', 'ProfileController@updateWarehousePassword')->name('password');
 
+		// complementary routes for fundaments (my-properties)
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
 		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');
 		Route::get('/api/storage-types/{perPage?}','AssetController@showAllStorageTypes')->name('storage-types');
 		Route::get('/api/container-types/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
 
+		// my-properties
 		Route::get('/api/my-containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('my-containers');
 		Route::get('/api/search-my-containers/{search}/{perPage}', 'WarehouseController@searchWarehouseAllContainers')->name('search-my-containers');
 
@@ -52,6 +55,10 @@ Route::name('warehouse.')->group(function () {
 
 		Route::get('/api/my-shelf-units/{shelf}/{perPage?}', 'WarehouseController@showShelfAllUnits')->name('my-shelf-units');
 		Route::get('/api/search-my-shelf-units/{shelf}/{search}/{perPage}', 'WarehouseController@searchShelfAllUnits')->name('search-my-shelf-units');
+
+		// my-products
+		Route::get('/my-products/{perPage}', 'ProductController@showManagerAllProducts')->name('my-products');
+		Route::get('/search-my-products/{search}/{perPage}', 'ProductController@searchManagerAllProducts')->name('search-my-products');
 
 		/* special routes */
 
@@ -71,7 +78,7 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/search-owners/{search}/{perPage}', 'WarehouseController@searchAllOwners')->name('search-warehouse-owners');
 
 		// warehouse
-		Route::get('/api/warehouses/{perPage}', 'WarehouseController@showAllWarehouses')->name('warehouses');
+		Route::get('/api/warehouses/{perPage?}', 'WarehouseController@showAllWarehouses')->name('warehouses');
 		Route::post('/warehouses/{perPage}', 'WarehouseController@storeNewWarehouse')->name('warehouses');	
 		Route::put('/warehouses/{warehouse}/{perPage}', 'WarehouseController@updateWarehouse')->name('warehouses');	
 		Route::delete('/warehouses/{warehouse}/{perPage}', 'WarehouseController@deleteWarehouse')->name('warehouses');	
@@ -79,7 +86,7 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
 		// warehouse container
-		Route::get('/api/warehouse-containers/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
@@ -106,7 +113,7 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/search-storage-types/{search}/{perPage}','AssetController@searchAllStorageTypes')->name('search-storage-types');
 
 		// container
-		Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('containers');
+		// Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('containers');
 		Route::post('/containers/{perPage}', 'AssetController@storeNewContainer')->name('containers');	
 		Route::put('/containers/{container}/{perPage}', 'AssetController@updateContainer')->name('containers');	
 		Route::delete('/containers/{container}/{perPage}', 'AssetController@deleteContainer')->name('containers');	
@@ -164,17 +171,19 @@ Route::name('warehouse.')->group(function () {
 		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions');
 		Route::get('/api/search-requisitions/{search}/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
 
-		// dispatche
+		// dispatch
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
-		Route::post('/dispatches/{perPage}', 'DispatchController@makeNewDispatch')->name('dispatches');
+		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches');
 		Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
 		// warehouse-managers
-		Route::get('/api/warehouse-managers/{perPage?}','WarehouseController@showAllWarehouseManagers')->name('warehouse-managers');
-		// Route::post('/warehouse-managers/{perPage}','WarehouseController@storeNewWarehouseManager')->name('warehouse-managers');	
-		Route::put('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@updateWarehouseManager')->name('warehouse-managers');	
-		Route::delete('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@deleteWarehouseManager')->name('warehouse-managers');
-		Route::get('/api/search-warehouse-managers/{search}/{perPage}','WarehouseController@searchAllWarehouseManagers')->name('search-warehouse-managers');
+		/*
+			Route::get('/api/warehouse-managers/{perPage?}','WarehouseController@showAllWarehouseManagers')->name('warehouse-managers');
+			// Route::post('/warehouse-managers/{perPage}','WarehouseController@storeNewWarehouseManager')->name('warehouse-managers');	
+			Route::put('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@updateWarehouseManager')->name('warehouse-managers');	
+			Route::delete('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@deleteWarehouseManager')->name('warehouse-managers');
+			Route::get('/api/search-warehouse-managers/{search}/{perPage}','WarehouseController@searchAllWarehouseManagers')->name('search-warehouse-managers');
+		*/
 
 		// roles
 		Route::get('/api/roles/{perPage?}','RoleController@showAllRoles')->name('roles');

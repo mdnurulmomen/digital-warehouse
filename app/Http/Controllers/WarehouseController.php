@@ -621,89 +621,80 @@ class WarehouseController extends Controller
 
     }
 
+    /*
     // warehouse-managers
-    public function showAllWarehouseManagers($perPage=false)
-    {
-        if ($perPage) {
-            
-            return new WarehouseManagerCollection(Warehouse::where('active', true)->with('managers')->paginate($perPage));
+        public function showAllWarehouseManagers($perPage=false)
+        {
+            if ($perPage) {
+                
+                return new WarehouseManagerCollection(Warehouse::where('active', true)->with('managers')->paginate($perPage));
 
+            }
+
+            return Warehouse::where('active', true)->with('managers')->get();
         }
 
-        return Warehouse::where('active', true)->with('managers')->get();
-    }
+        
+        // public function storeNewWarehouseManager(Request $request, $perPage)
+        // {
+        //     $request->validate([
+        //         'id' => 'required|exists:warehouses,id',
+        //         'managers' => 'required|array',
+        //         'managers.*.id' => 'required|exists:managers,id|distinct',
+        //     ]);
 
-    /*
-    public function storeNewWarehouseManager(Request $request, $perPage)
-    {
-        $request->validate([
-            'id' => 'required|exists:warehouses,id',
-            'managers' => 'required|array',
-            'managers.*.id' => 'required|exists:managers,id|distinct',
-        ]);
+        //     $warehouse = Warehouse::find($request->id);
+        //     $warehouse->managers = json_decode(json_encode($request->managers));
 
-        $warehouse = Warehouse::find($request->id);
-        $warehouse->managers = json_decode(json_encode($request->managers));
+        //     return $this->showAllWarehouseManagers($perPage);
+        // }
+        
 
-        return $this->showAllWarehouseManagers($perPage);
-    }
+        public function updateWarehouseManager(Request $request, $warehouse, $perPage)
+        {
+            $warehouseToUpdate = Warehouse::findOrFail($warehouse);
+
+            $request->validate([
+                'id' => 'required|exists:warehouses,id',
+                'managers' => 'required|array',
+                'managers.*.id' => 'required|exists:managers,id|distinct',
+            ]);
+
+            $warehouseToUpdate->managers = json_decode(json_encode($request->managers));
+
+            return $this->showAllWarehouseManagers($perPage);
+        }
+
+        public function deleteWarehouseManager($warehouse, $perPage)
+        {
+            $warehouseToDelete = Warehouse::findOrFail($warehouse);
+            $warehouseToDelete->managers()->detach();
+
+            return $this->showAllWarehouseManagers($perPage);
+        }
+
+        public function searchAllWarehouseManagers($search, $perPage)
+        {
+            $columnsToSearch = ['name', 'user_name', 'email', 'mobile', 'warehouse_deal'];
+
+            $query = Warehouse::where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                ->orWhere('user_name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%")
+                ->orWhere('mobile', 'like', "%$search%");
+            });
+
+            $query->orWhereHas('managers', function($q) use ($search){
+                $q->where('first_name', 'like', "%$search%")
+                  ->orWhere('last_name', 'like', "%$search%")
+                  ->orWhere('user_name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('mobile', 'like', "%$search%");
+            });
+
+            return response()->json([
+                'all' => new WarehouseManagerCollection($query->paginate($perPage)),    
+            ], 200);
+        }
     */
-
-    public function updateWarehouseManager(Request $request, $warehouse, $perPage)
-    {
-        $warehouseToUpdate = Warehouse::findOrFail($warehouse);
-
-        $request->validate([
-            'id' => 'required|exists:warehouses,id',
-            'managers' => 'required|array',
-            'managers.*.id' => 'required|exists:managers,id|distinct',
-        ]);
-
-        $warehouseToUpdate->managers = json_decode(json_encode($request->managers));
-
-        return $this->showAllWarehouseManagers($perPage);
-    }
-
-    public function deleteWarehouseManager($warehouse, $perPage)
-    {
-        $warehouseToDelete = Warehouse::findOrFail($warehouse);
-        $warehouseToDelete->managers()->detach();
-
-        return $this->showAllWarehouseManagers($perPage);
-    }
-
-/*
-    public function restoreRole($role, $perPage)
-    {
-        $roleToRestore = Role::withTrashed()->findOrFail($role);
-        // $roleToRestore->warehouses()->restore();
-        $roleToRestore->restore();
-
-        return $this->showAllRoles($perPage);
-    }
-*/
-
-    public function searchAllWarehouseManagers($search, $perPage)
-    {
-        $columnsToSearch = ['name', 'user_name', 'email', 'mobile', 'warehouse_deal'];
-
-        $query = Warehouse::where(function ($q) use ($search) {
-            $q->where('name', 'like', "%$search%")
-            ->orWhere('user_name', 'like', "%$search%")
-            ->orWhere('email', 'like', "%$search%")
-            ->orWhere('mobile', 'like', "%$search%");
-        });
-
-        $query->orWhereHas('managers', function($q) use ($search){
-            $q->where('first_name', 'like', "%$search%")
-              ->orWhere('last_name', 'like', "%$search%")
-              ->orWhere('user_name', 'like', "%$search%")
-              ->orWhere('email', 'like', "%$search%")
-              ->orWhere('mobile', 'like', "%$search%");
-        });
-
-        return response()->json([
-            'all' => new WarehouseManagerCollection($query->paginate($perPage)),    
-        ], 200);
-    }
 }

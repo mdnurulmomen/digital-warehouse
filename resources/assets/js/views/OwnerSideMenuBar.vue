@@ -210,35 +210,17 @@
 								</ul>
 							</li>
 
-							<li 
-								class="pcoded-hasmenu" 
-								:class="['my-warehouse-requisitions','requisitions'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+							<li :class="currentRouteName=='requisitions' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-requisition-index')"
 							>
-								<a href="javascript:void(0)" class="waves-effect waves-dark">
+								<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-truck"></i>
 									</span>
-									<span class="pcoded-mtext">Requisitions</span>
-									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
-								</a>
-								<ul class="pcoded-submenu">
-									<!--
-									<li :class="currentRouteName=='my-warehouse-requisitions' ? 'active' : ''">
-										<router-link :to="{ name: 'my-warehouse-requisitions' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">My Requisitions</span>
-										</router-link>
-									</li>
-									 -->
-
-									<li 
-										:class="currentRouteName=='requisitions' ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-requisition-index')"
-									>
-										<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">All Requisitions</span>
-										</router-link>
-									</li>
-								</ul>
+									<span class="pcoded-mtext">
+										Requisitions
+									</span>
+								</router-link>
 							</li>
 						</ul>
 					</div>
