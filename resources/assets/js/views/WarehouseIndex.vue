@@ -2487,8 +2487,6 @@
 
 				this.resetAllPermissions();
 
-				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
-
 				$('#warehouse-createOrEdit-modal').modal('show');
 
 			},
@@ -2524,8 +2522,6 @@
 				this.resetAllPermissions();
 				this.disableExistingRolePermissions();
 
-				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
-
 				$('#warehouse-createOrEdit-modal').modal('show');
 				
 			},
@@ -2538,6 +2534,8 @@
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeWarehouse() {
+
+				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
 
 				this.formSubmitted = true;
 
@@ -2566,6 +2564,8 @@
 
 			},
 			updateWarehouse() {
+
+				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
 
 				this.formSubmitted = true;
 				
@@ -2985,7 +2985,7 @@
 							
 							let permission = this.getExpectedPermission(permissionName);
 
-							if (permission && ! this.singleWarehouseData.permissions.some(warehousePermission => warehousePermission.name == permission.name)) {
+							if (permission && ! this.singleWarehouseData.roles.some(warehouseRole=>warehouseRole.permissions.some(rolePermission=>rolePermission.name == permission.name)) && ! this.singleWarehouseData.permissions.some(warehousePermission => warehousePermission.name == permission.name)) {
 
 					   			this.singleWarehouseData.permissions.push(permission);
 					   			this.$refs[permissionName][0].disabled = true;

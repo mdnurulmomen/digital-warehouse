@@ -120,7 +120,8 @@ class MerchantController extends Controller
     public function deleteMerchant($owner, $perPage)
     {
     	$userToDelete = Merchant::findOrFail($owner);
-        // $userToDelete->warehouses()->delete();
+        $userToDelete->permissions()->detach();
+        $userToDelete->roles()->detach();
         $userToDelete->delete();
 
         return $this->showAllMerchants($perPage);
@@ -129,7 +130,6 @@ class MerchantController extends Controller
     public function restoreMerchant($owner, $perPage)
     {
     	$userToRestore = Merchant::withTrashed()->findOrFail($owner);
-        // $userToRestore->warehouses()->restore();
         $userToRestore->restore();
 
         return $this->showAllMerchants($perPage);

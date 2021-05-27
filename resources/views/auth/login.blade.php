@@ -10,7 +10,7 @@
                 <div class="card-body">
 
                     @error('sessionExpired')
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger text-center">
                             {{ $message }}
                         </div>
                     @enderror

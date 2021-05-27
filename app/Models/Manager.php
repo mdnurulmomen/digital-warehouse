@@ -61,11 +61,6 @@ class Manager extends Authenticatable
         return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
     }
 
-    public function warehouses()
-    {
-        return $this->hasMany(WarehouseManager::class, 'manager_id', 'id');
-    }
-
     /**
      * Set the user's first name.
      *

@@ -24,9 +24,9 @@ class ManagerController extends Controller
             
             return response()->json([
 
-        		'approved' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 1)->paginate($perPage),
-                'pending' => Manager::with(['warehouses', 'roles', 'permissions'])->where('active', 0)->paginate($perPage),
-        		'trashed' => Manager::with(['warehouses', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage),
+        		'approved' => Manager::with(['roles', 'permissions'])->where('active', 1)->paginate($perPage),
+                'pending' => Manager::with(['roles', 'permissions'])->where('active', 0)->paginate($perPage),
+        		'trashed' => Manager::with(['roles', 'permissions'])->onlyTrashed()->paginate($perPage),
 
         	], 200);
 
@@ -107,7 +107,8 @@ class ManagerController extends Controller
     public function deleteManager($manager, $perPage)
     {
     	$userToDelete = Manager::findOrFail($manager);
-        // $userToDelete->warehouse()->delete();
+        $userToDelete->permissions()->detach();
+        $userToDelete->roles()->detach();
         $userToDelete->delete();
 
         return $this->showAllManagers($perPage);
@@ -116,7 +117,6 @@ class ManagerController extends Controller
     public function restoreManager($manager, $perPage)
     {
         $userToRestore = Manager::withTrashed()->findOrFail($manager);
-        // $userToRestore->warehouse()->restore();
         $userToRestore->restore();
 
         return $this->showAllManagers($perPage);
