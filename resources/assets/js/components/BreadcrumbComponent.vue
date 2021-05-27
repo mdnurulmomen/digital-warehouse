@@ -11,7 +11,7 @@
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="page-header-breadcrumb">
+				<div class="page-header-breadcrumb d-flex justify-content-center">
 					<ul class=" breadcrumb breadcrumb-title">
 						<li class="breadcrumb-item">
 							<router-link :to="{ name: 'home' }">
