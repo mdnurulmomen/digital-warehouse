@@ -98,6 +98,7 @@
 																	<tr>
 																		<th>Name</th>
 																		<th>Status</th>
+																		<th>Details</th>
 																	</tr>
 																</thead>
 																<tbody>
@@ -113,12 +114,29 @@
 
 																			</span>
 																		</td>
-																    
+																    	
+																    	<td>
+																    		<button type="button" 
+																					class="btn btn-grd-info btn-icon"  
+																					v-show="content.product" 
+																					@click="showUnitDetails(content)"
+																			>
+																				<i class="fas fa-info"></i>
+																			</button>
+
+																			<span 
+																			v-show="! content.product" 
+																			:class="[content.engaged==1 ? 'badge-danger' : content.engaged==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
+																				
+																				{{ content.engaged==1 ? 'Engaged' : content.engaged==0.5 ? 'Partially Engaged' : 'Empty' }}
+
+																			</span>
+																    	</td>
 																	</tr>
 																	<tr 
 																  		v-show="!contentsToShow.length"
 																  	>
-															    		<td colspan="2">
+															    		<td colspan="3">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -130,6 +148,7 @@
 																	<tr>
 																		<th>Name</th>
 																		<th>Status</th>
+																		<th>Details</th>
 																	</tr>
 																</tfoot>
 															</table>
@@ -170,20 +189,65 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
 
+		<!-- View Modal -->
+		<div class="modal fade" id="unit-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							Unit Details
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body text-center">	
+								
+						<div class="card">
+							<div class="card-body">
+								<!-- <h4 class="card-title">Container</h4> -->
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Unit Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleUnitData.name | capitalize }}</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Shelf Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ $route.params.name | capitalize }}</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleUnitData.product ? singleUnitData.product.product.name : 'No Product' | capitalize }}</label>
+								</div>
+
+								<div class="form-row" v-if="singleUnitData.product">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product SKU :</label>
+									<label class="col-sm-6 form-control-plaintext">{{  singleUnitData.product.product.sku }}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 </template>
@@ -212,6 +276,8 @@
 		        	current_page: 1
 		      	},
 
+		      	singleUnitData : {},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -236,6 +302,28 @@
 				}
 				
 			},
+
+		},
+
+		filters: {
+
+			capitalize: function (value) {
+				if (!value) return ''
+				
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+
+				}
+
+				return words.join(" ");
+			}
 
 		},
 		
@@ -299,6 +387,10 @@
 					this.error = e.toString();
 				});
 
+			},
+			showUnitDetails(object) {
+				this.singleUnitData = object;
+				$('#unit-view-modal').modal('show');
 			},
             changeNumberContents() {
 				this.pagination.current_page = 1;

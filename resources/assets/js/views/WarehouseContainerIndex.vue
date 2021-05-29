@@ -118,6 +118,14 @@
 																		<td>
 																			<button type="button" 
 																					class="btn btn-grd-info btn-icon"  
+																					v-show="content.product" 
+																					@click="showContainerDetails(content)"
+																			>
+																				<i class="fas fa-info"></i>
+																			</button>
+
+																			<button type="button" 
+																					class="btn btn-grd-info btn-icon"  
 																					v-show="content.container_shelf_statuses.length" 
 																					@click="showContainerShelfDetails(content)"
 																			>
@@ -127,7 +135,7 @@
 																			<span class="text-danger" 
 																				v-show="!content.container_shelf_statuses.length" 
 																			>
-																				No Shelf
+																				<span class="badge badge-danger">No Shelf</span>
 																			</span>
 																		</td>
 																    
@@ -197,11 +205,110 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
 
+		<!-- View Modal -->
+		<div class="modal fade" id="container-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							Container Details
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body text-center">	
+								
+						<div class="card">
+							<div class="card-body">
+								<!-- <h4 class="card-title">Container</h4> -->
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Container Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.name | capitalize }}</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.product ? singleContainerData.product.product.name : 'No Product' | capitalize }}</label>
+								</div>
+
+								<div class="form-row" v-if="singleContainerData.product">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product SKU :</label>
+									<label class="col-sm-6 form-control-plaintext">{{  singleContainerData.product.product.sku }}</label>
+								</div>
+
+								<!-- 
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.length }}</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Width :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.width }}</label>
+								</div>
+								
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.height }}</label>
+								</div>
+								-->
+
+								<div class="form-row" v-if="singleContainerData.hasOwnProperty('container_shelf_statuses')">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Shelf :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										<span :class="[singleContainerData.container_shelf_statuses.length ? 'badge-success' : 'badge-danger', 'badge']">{{ singleContainerData.container_shelf_statuses.length ? 'Available' : 'No Shelf' }}</span>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<!-- shelf -->
+						<!-- 
+						<div class="card" v-if="singleContainerData.has_shelve">
+							<div class="card-body">
+								<h4 class="card-title">Container Shelf</h4>
+								
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Shelves :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.shelf.quantity }}</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Units :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										<span :class="[singleContainerData.shelf.has_units ? 'badge-success' : 'badge-danger', 'badge']">{{ singleContainerData.shelf.has_units ? 'Available' : 'NA' }}</span>
+									</label>
+								</div>
+							</div>
+						</div>
+ 						-->
+						<!-- unit -->
+						<!-- 
+						<div class="card" v-if="singleContainerData.has_shelve && singleContainerData.shelf.has_units">
+							<div class="card-body">
+								<h4 class="card-title">Shelf Unit</h4>
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Units :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.shelf.unit.quantity }}</label>
+								</div>
+							</div>
+						</div>
+ 						-->
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 </template>
@@ -230,6 +337,8 @@
 		        	current_page: 1
 		      	},
 
+		      	singleContainerData : {},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -254,6 +363,28 @@
 				}
 				
 			},
+
+		},
+
+		filters: {
+
+			capitalize: function (value) {
+				if (!value) return ''
+				
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+
+				}
+
+				return words.join(" ");
+			}
 
 		},
 		
@@ -318,11 +449,15 @@
 				});
 
 			},
+			showContainerDetails(object) {
+				this.singleContainerData = object;
+				$('#container-view-modal').modal('show');
+			},
 			showContainerShelfDetails(object) {
 				const containerId = object.id;
 				const containerName = object.name;
 				// this.$router.push({ name: 'container-shelves', params: { containerId,  containerName} })
-				this.$router.push({ path: `/container-shelves/` + containerId + '/' + containerName });
+				this.$router.push({ path: `/my-container-shelves/` + containerId + '/' + containerName });
 			},
             changeNumberContents() {
 				this.pagination.current_page = 1;
