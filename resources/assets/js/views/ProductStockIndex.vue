@@ -343,7 +343,7 @@
 														:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
 														@change="validateFormInput('product_stock_quantity')" 
 														required="true" 
-														:readonly="! createMode && singleStockData.primary_quantity < allStocks[allStocks.length-1].available_quantity" 
+														:readonly="! createMode && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
 														:min="createMode ? 1 : singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity"
 													>
 													<div class="input-group-append">
@@ -423,7 +423,7 @@
 															:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 															@change="validateFormInput('product_variation_quantity')" 
 															required="true" 
-															:readonly="! createMode && allStocks.length && stockVariation.primary_quantity < allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
+															:readonly="! createMode && allStocks.length && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
 															:min="createMode ? 1 : stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity"
 														>
 
@@ -1950,12 +1950,12 @@
 			errorInVariationsArray(array = []) {
 
 				const variationSerialError = (serial) => {
-					return serial && serial.length > 0
+					return serial != null
 				};
 
 				const variationError = (variation) => {
 
-					return Object.keys(variation).length > 1 || variation.product_variation_serials.some(variationSerialError)
+					return (! this.product.has_serials && this.product.has_variations && Object.keys(variation).length > 0) || (this.product.has_serials && ! this.product.has_variations && Object.keys(variation).length > 0) || (this.product.has_serials && this.product.has_variations && Object.keys(variation).length > 1) || (variation.hasOwnProperty('product_variation_serials') && variation.product_variation_serials.length && variation.product_variation_serials.some(variationSerialError))
 
 				}; 
 
@@ -1991,7 +1991,7 @@
 
 					}
 
-					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && !this.errorInVariationsArray(this.errors.stock.variations)) {
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
 						if (this.product.has_serials) {
 
@@ -2133,25 +2133,21 @@
 				if (this.product.category && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
 	
 					this.product.variations.forEach(
-						(productVariation, index) => {
+
+						(productVariation, stockVariationIndex) => {
+
 							this.errors.stock.variations.push({});
-						}
-					);
 
-					if (this.product.has_serials) {
-
-						this.product.variations.forEach(
-						
-							(productVariation, stockVariationIndex) => {								
+							if (this.product.has_serials) {
 
 								// this.errors.stock.variations[stockVariationIndex].product_variation_serials = [];
 								this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serials', []);
 
 							}
 
-						);
+						}
 
-					}				
+					);				
 
 				}
 
@@ -2449,6 +2445,7 @@
 				else if (this.singleStockData.stock_quantity > 0 && this.singleStockData.serials.length > this.singleStockData.stock_quantity) {
 
 					this.singleStockData.serials.splice(this.singleStockData.stock_quantity, );
+					this.errors.stock.product_serials.splice(this.singleStockData.stock_quantity, );
 
 				}
 
@@ -2471,6 +2468,7 @@
 						else if (productVariation.stock_quantity > 0 && productVariation.serials.length > productVariation.stock_quantity) {
 
 							productVariation.serials.splice(productVariation.stock_quantity, );
+							this.errors.stock.variations[index].product_variation_serials.splice(productVariation.stock_quantity, );
 
 						}
 

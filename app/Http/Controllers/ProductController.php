@@ -296,9 +296,15 @@ class ProductController extends Controller
                     return $product->has_serials && ! $product->has_variations;
                 })
             ],
-            'variations.*.stock_quantity' => ['required_with:variations', 'numeric', 'min:1'],
+            'variations.*.stock_quantity' => [
+                'numeric', 'min:1', 
+                Rule::requiredIf(function () use ($product, $request) {
+                    return $product->has_variations && array_sum($request->input('variations.*.stock_quantity')) != $request->stock_quantity;
+                })
+            ],
             'variations.*.serials' => [
                 'array', 
+                'exclude_if:variations.*.stock_quantity,', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_variations && $product->has_serials;
                 })
@@ -320,7 +326,7 @@ class ProductController extends Controller
 
         $lastAvailableQuantity = $product->latestStock->available_quantity ?? 0;
 
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
 
         if (empty($currentUser)) {
 
@@ -388,9 +394,15 @@ class ProductController extends Controller
                     return $stockToUpdate->has_serials && ! $stockToUpdate->has_variations;
                 })
             ],
-            'variations.*.stock_quantity' => ['required_with:variations', 'numeric', 'min:1'],
+            'variations.*.stock_quantity' => [
+                'numeric', 'min:1', 
+                Rule::requiredIf(function () use ($stockToUpdate, $request) {
+                    return $stockToUpdate->has_variations && array_sum($request->input('variations.*.stock_quantity')) != $request->stock_quantity;
+                })
+            ],
             'variations.*.serials' => [
                 'array', 
+                'exclude_if:variations.*.stock_quantity,', 
                 Rule::requiredIf(function () use ($stockToUpdate) {
                     return $stockToUpdate->has_variations && $stockToUpdate->has_serials;
                 })

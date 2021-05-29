@@ -108,7 +108,11 @@ class ProductStock extends Model
 
                     }
 
-                    $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock);
+                    if ($variationExistingStock->has_serials) {
+                        
+                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock);
+
+                    }
 
                 }
 
@@ -124,13 +128,17 @@ class ProductStock extends Model
                         $variationNewStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity),
-                            'has_serials' => count($stockVariation->serials) > 0 ? true : false,
+                            'has_serials' => empty($stockVariation->serials) ? false : true,
                             'product_variation_id' => $stockVariation->id,
                             'product_stock_id' => $this->id,
                             'created_at' => now(),
                         ]);
 
-                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
+                        if ($variationNewStock->has_serials) {
+                        
+                            $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
+                            
+                        }
 
                     }
 
