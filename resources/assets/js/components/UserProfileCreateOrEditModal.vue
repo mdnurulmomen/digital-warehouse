@@ -959,6 +959,12 @@
 
 									this.$refs[ref][0].disabled = true;
 
+									if (this.singleUserDetails.permissions.some(userPermission=>userPermission.name == ref)) {
+
+										this.singleUserDetails.permissions.splice(this.singleUserDetails.permissions.findIndex(userPermission=>userPermission.name == ref), 1);
+
+									}
+
 								}
 
 							}

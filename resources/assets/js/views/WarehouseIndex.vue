@@ -2965,6 +2965,12 @@
 
 									this.$refs[ref][0].disabled = true;
 
+									if (this.singleWarehouseData.permissions.some(userPermission=>userPermission.name == ref)) {
+
+										this.singleWarehouseData.permissions.splice(this.singleWarehouseData.permissions.findIndex(userPermission=>userPermission.name == ref), 1);
+
+									}
+
 								}
 
 							}
