@@ -44,7 +44,7 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/rent-periods/{perPage?}', 'AssetController@showAllRentPeriods')->name('rent-periods');
 		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');
 		Route::get('/api/storage-types/{perPage?}','AssetController@showAllStorageTypes')->name('storage-types');
-		Route::get('/api/container-types/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
+		Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
 
 		// my-properties
 		Route::get('/api/my-containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('my-containers');

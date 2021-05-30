@@ -170,18 +170,18 @@ class ProfileController extends Controller
 
 	public function updateWarehouseProfile(Request $request)
 	{
+		$warehouse = Auth::guard('warehouse')->user();
+
 		$request->validate([
             'name' => 'nullable|string|max:100',
-            'code' => 'required|string|max:100|unique:warehouses,code,'.$warehouse->id,
+            // 'code' => 'required|string|max:100|unique:warehouses,code,'.$warehouse->id,
             'user_name' => 'required|string|max:100|unique:warehouses,user_name,'.$warehouse->id,
             'email' => 'required|string|max:100|unique:warehouses,email,'.$warehouse->id,
             'mobile' => 'required|string|max:50|unique:warehouses,mobile,'.$warehouse->id,
         ]);
 
-        $warehouse = Auth::guard('warehouse')->user();
-
 		$warehouse->name = strtolower($request->name);
-		$warehouse->code = strtolower($request->code);
+		// $warehouse->code = strtolower($request->code);
 		$warehouse->user_name = strtolower($request->user_name);
 		$warehouse->email = strtolower($request->email);
 		$warehouse->mobile = $request->mobile;
@@ -225,7 +225,7 @@ class ProfileController extends Controller
 
         if (count($request->previews)) {
             
-            $warehouse->warehouse_previews = $request->previews;
+            $warehouse->warehouse_previews = json_decode(json_encode($request->previews));
 
         }
 
@@ -247,7 +247,7 @@ class ProfileController extends Controller
 
         if (count($request->storages)) {
             
-            $warehouse->warehouse_storages = $request->storages;
+            $warehouse->warehouse_storages = json_decode(json_encode($request->storages));
 
         }
 
@@ -269,7 +269,7 @@ class ProfileController extends Controller
 
         if (count($request->containers)) {
             
-            $warehouse->warehouse_containers = $request->containers;
+            $warehouse->warehouse_containers = json_decode(json_encode($request->containers));
 
         }
 
