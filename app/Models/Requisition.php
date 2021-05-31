@@ -44,6 +44,11 @@ class Requisition extends Model
         return $this->hasOne(Dispatch::class, 'requisition_id', 'id');
     }
 
+    public function cancellation()
+    {
+        return $this->hasOne(RequisitionCancelationReason::class, 'requisition_id', 'id');
+    }
+
     /**
      * Get the model who dispatched the requisition.
      */

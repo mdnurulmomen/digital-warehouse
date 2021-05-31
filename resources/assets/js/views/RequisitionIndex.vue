@@ -1010,6 +1010,13 @@
 											</label>
 										</div>
 
+										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('cancellation_reason')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
+											<label class="col-sm-6 col-form-label">
+												<span v-html="singleRequisitionData.cancellation_reason"></span>
+											</label>
+										</div>
+
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Requested on :
@@ -1289,15 +1296,39 @@
 							<span aria-hidden="true">&times;</span>
 							</button>
 						</div>
+
 						<div class="modal-body text-center">
-							<h4 class="text-danger">Want to cancel {{ singleRequisitionData.subject }} ?</h4>
-							<h6 class="sub-heading text-secondary">Remember : You can not retrieve this action !</h6>
+							<h4 class="text-danger">
+								Want to cancel {{ singleRequisitionData.subject }} ?
+							</h4>
+
+							<h6 class="sub-heading text-secondary form-group">
+								Remember : You can not retrieve this action !
+							</h6>
+
+							<div 
+								class="form-group col-sm-12 text-left" 
+								v-if="errors.hasOwnProperty('cancellation')"
+							>
+								<label for="inputFirstName">Cancellation Reason</label>
+								<ckeditor 
+	                              	class="form-control" 
+	                              	:editor="editor" 
+	                              	v-model="singleRequisitionData.cancellation_reason" 
+                              		:class="!errors.cancellation.reason ? 'is-valid' : 'is-invalid'" 
+                              		@blur="validateFormInput('cancellation_reason')" 
+	                            >
+                              	</ckeditor>
+                              	<div class="invalid-feedback">
+							    	{{ errors.cancellation.reason }}
+							    </div>
+							</div>
 						</div>
+
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
 							<button type="submit" class="btn btn-danger">Cancel Requisition</button>
-						</div>
-						
+						</div>	
 					</form>
 				</div>
 			</div>
@@ -1580,6 +1611,11 @@
 			openRequisitionCancelForm(object) {
 
 				this.singleRequisitionData = { ...object };
+
+				this.errors.cancellation = {
+
+				};
+
 				$('#cancel-confirmation-modal').modal('show');
 
 			},
@@ -1725,8 +1761,20 @@
 			},
 			cancelRequisition() {
 
+				this.submitForm = true;
+
+				if (! this.singleRequisitionData.hasOwnProperty('cancellation_reason') || ! this.singleRequisitionData.cancellation_reason) {
+
+					this.submitForm = false;
+					this.errors.cancellation.reason = 'Cancellation reason is required';
+					return;
+
+				}
+
+				this.$delete(this.errors, 'cancellation');
+
 				axios
-					.put('/requisitions/' + this.singleRequisitionData.id + '/' + this.perPage)
+					.put('/requisitions/' + this.singleRequisitionData.id + '/' + this.perPage, this.singleRequisitionData)
 					.then(response => {
 						if (response.status == 200) {
 

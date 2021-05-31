@@ -19,6 +19,7 @@ class RequisitionResource extends JsonResource
             'subject' => $this->subject,
             'description' => $this->description,
             'status' => $this->status,
+            'cancellation_reason' =>  $this->when($this->cancellation, $this->cancellation ? $this->cancellation->reason : NULL),
             'updater' =>  $this->when($this->status, $this->updater),
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at->diffForHumans(),

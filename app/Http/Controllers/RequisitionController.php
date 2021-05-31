@@ -23,8 +23,8 @@ class RequisitionController extends Controller
             return [
 
                 'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
@@ -34,8 +34,12 @@ class RequisitionController extends Controller
 
     }
 
-    public function cancelRequisition($requisition, $perPage)
+    public function cancelRequisition(Request $request, $requisition, $perPage)
     {
+        $request->validate([
+            'cancellation_reason' => 'required|string', 
+        ]);
+
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
 
         if (empty($currentUser)) {
@@ -81,6 +85,11 @@ class RequisitionController extends Controller
             ]);    
 
         }
+
+        $expectedRequisition->cancellation()->updateOrCreate(
+            [ 'requisition_id' => $expectedRequisition->id ],
+            [ 'reason' => $request->cancellation_reason ]
+        );
 
         $expectedRequisition->cancelProductRequisitions();
 
