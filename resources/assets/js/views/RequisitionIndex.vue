@@ -103,7 +103,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
-																				@click="showProductDispatchForm(content)" 
+																				@click="showDispatchRecommendationForm(content)" 
 																				v-show="content.status==0" 
 																				v-if="userHasPermissionTo('recommend-dispatch')"
 																			>
@@ -113,7 +113,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
-																				@click="showDispatchRecommendationForm(content)" 
+																				@click="showDispatchApprovalForm(content)" 
 																				v-show="content.status==1 && content.dispatch.has_approval==0" 
 																				v-if="userHasPermissionTo('approve-dispatch')"
 																			>
@@ -760,7 +760,7 @@
 									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
 									
 									<div class="form-group col-md-12 text-center">
-										<span :class="[singleDispatchData.requisition.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+										<span :class="[singleDispatchData.requisition.delivery ? 'badge-primary' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
 									</div>
 
 									<div 
@@ -796,6 +796,21 @@
 													placeholder="Agent Code" 
 													readonly="true" 
 												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Collection Point</label>
+												<ckeditor 
+					                              	class="form-control" 
+					                              	:editor="editor" 
+					                              	v-model="singleDispatchData.agent.collection_point" 
+			                                  		:class="!errors.agent.collection_point ? 'is-valid' : 'is-invalid'" 
+			                                  		@blur="validateFormInput('collection_point')" 
+					                            >
+				                              	</ckeditor>
+				                              	<div class="invalid-feedback">
+											    	{{ errors.agent.collection_point }}
+											    </div>
 											</div>
 
 											<!-- 
@@ -841,7 +856,7 @@
 
 									<div 
 										class="col-sm-12" 
-										v-if="singleDispatchData.requisition.delivery && ! singleDispatchData.requisition.hasOwnProperty('agent')"
+										v-if="singleDispatchData.requisition.delivery && ! singleDispatchData.requisition.agent"
 									>
 										<div class="form-row">
 											<div class="form-group col-md-12">
@@ -965,7 +980,6 @@
 								</ul>
 
 								<div class="tab-content tabs card-block">
-									
 									<div class="tab-pane active" id="requisition-profile" role="tabpanel">	
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1223,6 +1237,15 @@
 												<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
 													{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
 												</span>
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('agent')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Collection Point :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span v-html="singleRequisitionData.dispatch.agent.collection_point"></span>
 											</label>
 										</div>
 
@@ -1561,6 +1584,49 @@
 
 			},
 			showDispatchRecommendationForm(object) {
+
+				this.step = 1;
+	        	this.submitForm = true;
+	        	
+				this.singleDispatchData = {
+
+					requisition : { ...object },
+
+					// delivery : {},
+
+					// agent : {}
+							
+			    };
+
+				this.errors = {
+					// products : [],
+					// delivery : {},
+					// agent : {},
+				};
+
+				if (object.delivery && ! object.agent) {
+
+					this.singleDispatchData.delivery = {};
+					this.$delete(this.singleDispatchData, 'agent');
+
+					this.errors.delivery = {};
+					this.$delete(this.errors, 'agent');
+
+				}
+				else if (! object.delivery && object.agent) {
+
+					this.singleDispatchData.agent = {};
+					this.$delete(this.singleDispatchData, 'delivery');
+
+					this.errors.agent = {};
+					this.$delete(this.errors, 'delivery');
+
+				}
+
+				$('#dispatch-createOrEdit-modal').modal('show');
+
+			},
+			showDispatchApprovalForm(object) {
 				// this.singleRequisitionData = { ...object };
 				
 				this.step = 1;
@@ -1600,7 +1666,7 @@
 					// agent : {},
 				};
 
-				if (object.hasOwnProperty('delivery') && ! object.hasOwnProperty('agent')) {
+				if (object.delivery && ! object.agent) {
 
 					this.singleDispatchData.delivery = object.dispatch.delivery;
 					this.singleDispatchData.delivery.delivery_receipt = object.dispatch.delivery.receipt_preview;
@@ -1610,55 +1676,12 @@
 					this.$delete(this.errors, 'agent');
 
 				}
-				else if (! object.hasOwnProperty('delivery') && object.hasOwnProperty('agent')) {
+				else if (! object.delivery && object.agent) {
 
-					// this.singleDispatchData.agent = {};
+					this.singleDispatchData.agent = object.dispatch.agent;
 					this.$delete(this.singleDispatchData, 'delivery');
 
-					// this.errors.agent = {};
-					this.$delete(this.errors, 'delivery');
-
-				}
-
-				$('#dispatch-createOrEdit-modal').modal('show');
-
-			},
-			showProductDispatchForm(object) {
-
-				this.step = 1;
-	        	this.submitForm = true;
-	        	
-				this.singleDispatchData = {
-
-					requisition : { ...object },
-
-					// delivery : {},
-
-					// agent : {}
-							
-			    };
-
-				this.errors = {
-					// products : [],
-					// delivery : {},
-					// agent : {},
-				};
-
-				if (object.hasOwnProperty('delivery') && ! object.hasOwnProperty('agent')) {
-
-					this.singleDispatchData.delivery = {};
-					this.$delete(this.singleDispatchData, 'agent');
-
-					this.errors.delivery = {};
-					this.$delete(this.errors, 'agent');
-
-				}
-				else if (! object.hasOwnProperty('delivery') && object.hasOwnProperty('agent')) {
-
-					// this.singleDispatchData.agent = {};
-					this.$delete(this.singleDispatchData, 'delivery');
-
-					// this.errors.agent = {};
+					this.errors.agent = {};
 					this.$delete(this.errors, 'delivery');
 
 				}
@@ -1733,9 +1756,10 @@
 				// this.validateFormInput('delivery_address');
 				this.validateFormInput('delivery_price');
 				this.validateFormInput('delivery_receipt');
+				this.validateFormInput('collection_point');
 				// this.validateFormInput('agent_receipt');
 
-				if (this.errors.constructor === Object && (Object.keys(this.errors).length < 1 || Object.keys(this.errors.delivery).length == 0)) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 2 && (! this.errors.hasOwnProperty('delivery') || Object.keys(this.errors.delivery).length == 0) && (! this.errors.hasOwnProperty('agent') || Object.keys(this.errors.agent).length == 0)) {
 
 					// console.log('verified');
 					return true;
@@ -2063,6 +2087,29 @@
 
 						}
 
+
+						break;
+
+					case 'collection_point' :
+
+						if (! this.singleDispatchData.requisition.delivery && this.singleDispatchData.requisition.agent) {
+
+							if (! this.singleDispatchData.hasOwnProperty('agent') || ! this.singleDispatchData.agent.hasOwnProperty('collection_point') || ! this.singleDispatchData.agent.collection_point) {
+								this.errors.agent.collection_point = 'Collection point is required';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.agent, 'collection_point');
+							}
+
+						}
+
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'agent');
+
+						}
 
 						break;
 

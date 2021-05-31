@@ -17,6 +17,8 @@ class CreateProductReturnsTable extends Migration
             $table->increments('id');
             // $table->unsignedInteger('product_dispatch_id');
             // $table->string('receipt_preview');
+            // $table->unsignedSmallInteger('collection_point'); // warehouse_id address
+            $table->string('collection_point'); // warehouse_id address
             $table->boolean('receiving_confirmation')->default(false);
             $table->unsignedInteger('dispatch_id');
         });

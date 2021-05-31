@@ -54,6 +54,8 @@ class DispatchController extends Controller
 
     public function makeDispatch(Request $request, $perPage)
     {
+        $expectedRequisition = Requisition::findOrFail($request->requisition['id']);
+
         $request->validate([
             
             'requisition' => 'required',
@@ -90,7 +92,16 @@ class DispatchController extends Controller
             // 'delivery.address' => 'required_if:agent,0,',
             'delivery.delivery_price' => 'required_if:requisition.agent,0,',
             'delivery.delivery_receipt' => 'required_if:requisition.agent,0,',
+
+            'agent' => 'required_if:requisition.delivery,0,',
+            'agent.collection_point' => [ 
+                // 'exists:warehouses,id', 
+                'string', 
+                Rule::requiredIf($expectedRequisition->agent && $expectedRequisition->status != -1) 
+            ],
+        
         ],
+        
         [
             'requisition.id.exists' => 'Dispatched requisition, please reload !',
         ]
@@ -103,8 +114,6 @@ class DispatchController extends Controller
             return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
             
         }
-
-        $expectedRequisition = Requisition::findOrFail($request->requisition['id']);
 
         if ($expectedRequisition->status==-1) {
 
@@ -175,7 +184,8 @@ class DispatchController extends Controller
             $requisitionDispatch->return()->updateOrCreate(
                 [ 'dispatch_id' => $requisitionDispatch->id ],
                 [
-                    'receiving_confirmation' => false,
+                    'collection_point' => $request->agent['collection_point'], 
+                    'receiving_confirmation' => false, 
                 ]
             );
 

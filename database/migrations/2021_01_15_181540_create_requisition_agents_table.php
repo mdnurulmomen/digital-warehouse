@@ -18,7 +18,6 @@ class CreateRequisitionAgentsTable extends Migration
             $table->string('name', 50);
             $table->string('mobile', 50);
             $table->string('code', 50);
-            $table->unsignedSmallInteger('collection_warehouse_point'); // warehouse_id address
             // $table->boolean('presence_confirmation')->default(false);
             $table->unsignedInteger('requisition_id');
         });
