@@ -1317,6 +1317,7 @@
 			},
 		*/
 			showContentCreateForm() {
+
 				this.step = 1;
 	        	this.submitForm = true;
 	        	
@@ -1359,6 +1360,7 @@
 				};
 
 				$('#requisition-createOrEdit-modal').modal('show');
+				
 			},
 			storeRequisition() {
 				

@@ -1417,49 +1417,9 @@
 		
 		created(){
 			
-			this.fetchAvailableRequisitions();
-
+			this.subscribeToChannels();
 			this.fetchAllRequisitions();
-			
-			Echo.private(`new-requisition`)
-		    .listen('NewRequisitionMade', (e) => {
-		        // console.log(e);
-		        this.$toastr.i("New requisition arrives", "Info");
-		        this.allFetchedRequisitions.pending?.data.push(e);
-		    });
-
-			
-			if (this.userHasPermissionTo('view-dispatch-index')) {
-
-			    Echo.private(`product-received`)
-			    .listen('ProductReceived', (e) => {
-			        
-			        // console.log(e);
-			        this.$toastr.s("Dispatched product has been received", "Success");
-			    	
-			    	let index = this.allFetchedRequisitions.dispatched?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
-
-			    	if (index > -1) {
-
-		    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
-			    	
-			    	}
-			    	else{
-
-			    		let index2 = this.allFetchedRequisitions.pending?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
-
-			    		if (index2 > -1) {
-
-			    			this.allFetchedRequisitions.pending.data.splice(index2, 1);
-			    			this.allFetchedRequisitions.dispatched.data.push(e);
-				    	
-				    	}
-
-			    	}
-
-			    });	    
-
-			}
+			this.fetchAvailableRequisitions();
 
 		},
 
@@ -2011,6 +1971,48 @@
 		      	}
 		      	else 
 		      		return ''
+		    },
+		    subscribeToChannels() {
+
+		    	Echo.private(`new-requisition`)
+			    .listen('NewRequisitionMade', (e) => {
+			        
+			        this.$toastr.i("New requisition arrives", "Info");
+			        this.allFetchedRequisitions.pending?.data.push(e);
+
+			    });
+
+			    if (this.userHasPermissionTo('view-dispatch-index')) {
+
+				    Echo.private(`product-received`)
+				    .listen('ProductReceived', (e) => {				        
+
+				        this.$toastr.s("Dispatched product has been received", "Success");
+				    	
+				    	let index = this.allFetchedRequisitions.dispatched?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
+
+				    	if (index > -1) {
+
+			    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
+				    	
+				    	}
+				    	else{
+
+				    		let index2 = this.allFetchedRequisitions.pending?.data.findIndex(requisition => requisition.id === e.id && requisition.merchant_id === e.merchant_id);
+
+				    		if (index2 > -1) {
+
+				    			this.allFetchedRequisitions.pending.data.splice(index2, 1);
+				    			this.allFetchedRequisitions.dispatched.data.push(e);
+					    	
+					    	}
+
+				    	}
+
+				    });	    
+
+				}
+
 		    },
 		    /*
 		    onAgentReceiptChange(evnt) {

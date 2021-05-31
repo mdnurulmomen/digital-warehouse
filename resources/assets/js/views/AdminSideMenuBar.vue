@@ -205,6 +205,12 @@
 									<span class="pcoded-mtext">
 										Requisitions
 									</span>
+									<span class="pcoded-badge label label-warning" v-show="currentRouteName!='requisitions' && newRequisition.length">
+										{{ newRequisition.length }}
+									</span>
+									<span class="pcoded-badge label label-success" v-show="currentRouteName!='requisitions' && newAcceptance.length">
+										{{ newAcceptance.length }}
+									</span>
 								</router-link>
 							</li>
 						</ul>
@@ -226,10 +232,79 @@
 
     export default {
 
+    	data() {
+
+	        return {
+
+	        	newAcceptance : [],
+	        	newRequisition : [],
+
+	        }
+
+		},
+
+    	created() {
+
+    		Echo.private(`new-requisition`)
+		    .listen('NewRequisitionMade', (e) => {
+		        
+		        if (this.currentRouteName!='requisitions') {
+
+			        this.newRequisition.push(e);
+
+		        }else {
+
+		        	this.newRequisition = [];
+
+		        }
+
+		    });
+			
+			if (this.userHasPermissionTo('view-dispatch-index')) {
+
+			    Echo.private(`product-received`)
+			    .listen('ProductReceived', (e) => {
+			        
+			        if (this.currentRouteName!='requisitions') {
+
+				        this.newAcceptance.push(e);
+
+			        }else {
+
+						this.newAcceptance = [];			        	
+
+			        }
+
+			    });	    
+
+			}
+
+    	},
+
     	computed: {
+
 		    currentRouteName() {
+
 		        return this.$route.name;
+		    
 		    }
+
+		},
+
+		watch: {
+
+			$route(to, from) {
+			  // react to route changes...
+			  
+			  if (to.name=='requisitions') {
+
+			  	this.newAcceptance = [];
+				this.newRequisition = [];
+
+			  }
+
+			}
+			
 		}
 
     }
