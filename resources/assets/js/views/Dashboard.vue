@@ -28,9 +28,7 @@
 			<div class="main-body">
 				<div class="page-wrapper">
 					<div class="page-body">
-
 						<div class="row">
-
 							<div class="col-md-12 col-xl-8">
 								<div class="card sale-card">
 									<div class="card-header">
@@ -41,6 +39,7 @@
 									</div>
 								</div>
 							</div>
+
 							<div class="col-md-12 col-xl-4">
 								<div class="card comp-card">
 									<div class="card-body">
@@ -48,7 +47,7 @@
 											<div class="col">
 												<h6 class="m-b-25">Pending Stocks</h6>
 												<h3 class="f-w-700 text-c-blue">
-													{{ dashboard.numberPendingProductStocks }}
+													{{ dashboard.numberPendingProductStocks || 0 }}
 												</h3>
 												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
 											</div>
@@ -60,13 +59,14 @@
 										</div>
 									</div>
 								</div>
+
 								<div class="card comp-card">
 									<div class="card-body">
 										<div class="row align-items-center">
 											<div class="col">
 												<h6 class="m-b-25">Pending Requisitions</h6>
 												<h3 class="f-w-700 text-c-green">
-													{{ dashboard.numberPendingRequistiions }}
+													{{ dashboard.numberPendingRequistiions || 0 }}
 												</h3>
 												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
 											</div>
@@ -78,19 +78,58 @@
 										</div>
 									</div>
 								</div>
+
 								<div class="card comp-card">
 									<div class="card-body">
 										<div class="row align-items-center">
 											<div class="col">
 												<h6 class="m-b-25">Pending Dispatches</h6>
 												<h3 class="f-w-700 text-c-yellow">
-													{{ dashboard.numberPendingDispatches }}
+													{{ dashboard.numberPendingDispatches || 0 }}
 												</h3>
 												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
 											</div>
 											<div class="col-auto">
 												<router-link :to="{ name: 'requisitions' }">
 													<i class="fas fa-hand-paper bg-c-yellow"></i>
+												</router-link>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="card comp-card">
+									<div class="card-body">
+										<div class="row align-items-center">
+											<div class="col">
+												<h6 class="m-b-25">Unreceived Dispatches</h6>
+												<h3 class="f-w-700 text-c-red">
+													{{ dashboard.numberUnreceivedDispatches || 0 }}
+												</h3>
+												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
+											</div>
+											<div class="col-auto">
+												<router-link :to="{ name: 'requisitions' }">
+													<i class="fas fa-thermometer-half bg-c-red"></i>
+												</router-link>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="card comp-card">
+									<div class="card-body">
+										<div class="row align-items-center">
+											<div class="col">
+												<h6 class="m-b-25">Cancelled Requisitions</h6>
+												<h3 class="f-w-700 text-c-orenge">
+													{{ dashboard.numberCancelledRequisitions || 0 }}
+												</h3>
+												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
+											</div>
+											<div class="col-auto">
+												<router-link :to="{ name: 'requisitions' }">
+													<i class="fas fa-trash bg-c-orenge"></i>
 												</router-link>
 											</div>
 										</div>
@@ -239,6 +278,8 @@
 		        	numberPendingRequistiions : 0,
 		        	numberPendingProductStocks : 0,
 		        	limitedStockProducts : [],
+		        	numberUnreceivedDispatches : 0,
+		        	numberCancelledRequisitions : 0,
 
 	        	}
 
