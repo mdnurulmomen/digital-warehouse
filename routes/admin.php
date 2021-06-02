@@ -167,6 +167,9 @@ Route::name('admin.')->group(function () {
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 
+		// first dashboard
+		Route::get('/api/dashboard-one','AdminController@getDashboardOneData')->name('dashboard-one');
+
 		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
