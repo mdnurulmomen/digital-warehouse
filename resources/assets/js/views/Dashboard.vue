@@ -1,4 +1,4 @@
-<template>
+<template v-if="userHasPermissionTo('view-dashboard-one-index')">
 	<div class="pcoded-content">
 		<div class="page-header card">
 			<div class="row align-items-end">
@@ -29,172 +29,158 @@
 				<div class="page-wrapper">
 					<div class="page-body">
 						<div class="row">
-							<div class="col-md-12 col-xl-8">
-								<div class="card sale-card">
-									<div class="card-header">
-										<h5>Basic Analytics</h5>
-									</div>
-									<div class="card-block">
-										<div id="sales-analytics" class="chart-shadow" style="height:380px"></div>
-									</div>
-								</div>
-							</div>
+							<div class="col-xl-3 col-md-6">
+                                <div class="card prod-p-card card-yellow">
+                                    <div class="card-body">
+                                        <div class="row align-items-center m-b-30">
+                                            <div class="col">
+                                                <h6 class="m-b-5 text-white">
+                                                	Pending Product-Stocks
+                                                </h6>
+                                                <h3 class="m-b-0 f-w-700 text-white">
+                                                	{{ dashboard.numberPendingProductStocks || 0 }}
+                                                </h3>
+                                            </div>
+                                            <div class="col-auto">
+                                            	<router-link :to="{ name: 'products' }">
+                                                	<i class="fas fa-eye text-c-yellow f-18"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                        <!-- 
+	                                        <p class="m-b-0 text-white">
+	                                        	<span class="label label-danger m-r-10">
+	                                        		+11%
+	                                        	</span>
+	                                        	From Previous Month
+	                                        </p> 
+	                                    -->
+                                    </div>
+                                </div>
+                            </div>
 
-							<div class="col-md-12 col-xl-4">
-								<div class="card comp-card">
-									<div class="card-body">
-										<div class="row align-items-center">
-											<div class="col">
-												<h6 class="m-b-25">Pending Stocks</h6>
-												<h3 class="f-w-700 text-c-blue">
-													{{ dashboard.numberPendingProductStocks || 0 }}
-												</h3>
-												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
-											</div>
-											<div class="col-auto">
-												<router-link :to="{ name: 'products' }">
-													<i class="fas fa-eye bg-c-blue"></i>
-												</router-link>
-											</div>
-										</div>
-									</div>
-								</div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card prod-p-card card-blue">
+                                    <div class="card-body">
+                                        <div class="row align-items-center m-b-30">
+                                            <div class="col">
+                                                <h6 class="m-b-5 text-white">
+                                                	Pending Requisitions
+                                                </h6>
+                                                <h3 class="m-b-0 f-w-700 text-white">
+                                                	{{ dashboard.numberPendingRequistiions || 0 }}
+                                                </h3>
+                                            </div>
+                                            <div class="col-auto">
+                                            	<router-link :to="{ name: 'requisitions' }">
+                                                	<i class="fas fa-bullseye text-c-blue f-18"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                        <!-- 
+	                                        <p class="m-b-0 text-white">
+	                                        	<span class="label label-danger m-r-10">
+	                                        		+11%
+	                                        	</span>
+	                                        	From Previous Month
+	                                        </p> 
+	                                    -->
+                                    </div>
+                                </div>
+                            </div>
 
-								<div class="card comp-card">
-									<div class="card-body">
-										<div class="row align-items-center">
-											<div class="col">
-												<h6 class="m-b-25">Pending Requisitions</h6>
-												<h3 class="f-w-700 text-c-green">
-													{{ dashboard.numberPendingRequistiions || 0 }}
-												</h3>
-												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
-											</div>
-											<div class="col-auto">
-												<router-link :to="{ name: 'requisitions' }">
-													<i class="fas fa-bullseye bg-c-green"></i>
-												</router-link>
-											</div>
-										</div>
-									</div>
-								</div>
+                            <!-- 
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card prod-p-card card-red">
+                                    <div class="card-body">
+                                        <div class="row align-items-center m-b-30">
+                                            <div class="col">
+                                                <h6 class="m-b-5 text-white">
+                                                	Pending Dispatches
+                                                </h6>
+                                                <h3 class="m-b-0 f-w-700 text-white">
+                                                	{{ dashboard.numberPendingDispatches || 0 }}
+                                                </h3>
+                                            </div>
+                                            <div class="col-auto">
+                                            	<router-link :to="{ name: 'requisitions' }">
+                                                	<i class="fas fa-eye text-c-blue f-18"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="m-b-0 text-white">
+                                        	<span class="label label-danger m-r-10">
+                                        		+11%
+                                        	</span>
+                                        	From Previous Month
+                                        </p> 
+                                    </div>
+                                </div>
+                            </div> 
+                        	-->
 
-								<div class="card comp-card">
-									<div class="card-body">
-										<div class="row align-items-center">
-											<div class="col">
-												<h6 class="m-b-25">Pending Dispatches</h6>
-												<h3 class="f-w-700 text-c-yellow">
-													{{ dashboard.numberPendingDispatches || 0 }}
-												</h3>
-												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
-											</div>
-											<div class="col-auto">
-												<router-link :to="{ name: 'requisitions' }">
-													<i class="fas fa-hand-paper bg-c-yellow"></i>
-												</router-link>
-											</div>
-										</div>
-									</div>
-								</div>
+                        	<div class="col-xl-3 col-md-6">
+                                <div class="card prod-p-card card-red">
+                                    <div class="card-body">
+                                        <div class="row align-items-center m-b-30">
+                                            <div class="col">
+                                                <h6 class="m-b-5 text-white">
+                                                	Unreceived Dispatches
+                                                </h6>
+                                                <h3 class="m-b-0 f-w-700 text-white">
+                                                	{{ dashboard.numberUnreceivedDispatches || 0 }}
+                                                </h3>
+                                            </div>
+                                            <div class="col-auto">
+                                            	<router-link :to="{ name: 'requisitions' }">
+                                                	<i class="fas fa-thermometer-half text-c-red f-18"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                        <!-- 
+	                                        <p class="m-b-0 text-white">
+	                                        	<span class="label label-danger m-r-10">
+	                                        		+11%
+	                                        	</span>
+	                                        	From Previous Month
+	                                        </p> 
+	                                    -->
+                                    </div>
+                                </div>
+                            </div>
 
-								<div class="card comp-card">
-									<div class="card-body">
-										<div class="row align-items-center">
-											<div class="col">
-												<h6 class="m-b-25">Unreceived Dispatches</h6>
-												<h3 class="f-w-700 text-c-red">
-													{{ dashboard.numberUnreceivedDispatches || 0 }}
-												</h3>
-												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
-											</div>
-											<div class="col-auto">
-												<router-link :to="{ name: 'requisitions' }">
-													<i class="fas fa-thermometer-half bg-c-red"></i>
-												</router-link>
-											</div>
-										</div>
-									</div>
-								</div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card prod-p-card card-default">
+                                    <div class="card-body">
+                                        <div class="row align-items-center m-b-30">
+                                            <div class="col">
+                                                <h6 class="m-b-5 text-white">
+                                                	Cancelled Requisitions
+                                                </h6>
+                                                <h3 class="m-b-0 f-w-700 text-white">
+                                                	{{ dashboard.numberCancelledRequisitions || 0 }}
+                                                </h3>
+                                            </div>
+                                            <div class="col-auto">
+                                            	<router-link :to="{ name: 'requisitions' }">
+                                                	<i class="fas fa-trash text-c-orenge f-18"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                        <!-- 
+	                                        <p class="m-b-0 text-white">
+	                                        	<span class="label label-danger m-r-10">
+	                                        		+11%
+	                                        	</span>
+	                                        	From Previous Month
+	                                        </p> 
+	                                    -->
+                                    </div>
+                                </div>
+                            </div>
 
-								<div class="card comp-card">
-									<div class="card-body">
-										<div class="row align-items-center">
-											<div class="col">
-												<h6 class="m-b-25">Cancelled Requisitions</h6>
-												<h3 class="f-w-700 text-c-orenge">
-													{{ dashboard.numberCancelledRequisitions || 0 }}
-												</h3>
-												<!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
-											</div>
-											<div class="col-auto">
-												<router-link :to="{ name: 'requisitions' }">
-													<i class="fas fa-trash bg-c-orenge"></i>
-												</router-link>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-xl-12">
-								<div class="card proj-progress-card">
-									<div class="card-block">
-										<div class="row">
-											<div class="col-xl-3 col-md-6">
-												<h6>Pending Managers</h6>
-												<h5 class="m-b-30 f-w-700">
-													{{ dashboard.numberPendingManagers }}
-													<!-- <span class="text-c-green m-l-10">+1.69%</span> -->
-												</h5>
-												<!-- 
-												<div class="progress">
-													<div class="progress-bar bg-c-red" style="width:25%"></div>
-												</div>
-												-->
-											</div>
-											<div class="col-xl-3 col-md-6">
-												<h6>Pending Merchants</h6>
-												<h5 class="m-b-30 f-w-700">
-													{{ dashboard.numberPendingMerchants }}
-													<!-- <span class="text-c-red m-l-10">-0.5%</span> -->
-												</h5>
-												<!-- 
-												<div class="progress">
-													<div class="progress-bar bg-c-blue" style="width:65%"></div>
-												</div> 
-												-->
-											</div>
-											<div class="col-xl-3 col-md-6">
-												<h6>Pending Owners</h6>
-												<h5 class="m-b-30 f-w-700">
-													{{ dashboard.numberPendingOwner }}
-													<!-- <span class="text-c-green m-l-10">+0.99%</span> -->
-												</h5>
-												<!-- 
-												<div class="progress">
-													<div class="progress-bar bg-c-green" style="width:85%"></div>
-												</div>
-												 -->
-											</div>
-											<div class="col-xl-3 col-md-6">
-												<h6>Pending Warehouses</h6>
-												<h5 class="m-b-30 f-w-700">
-													{{ dashboard.numberPendingWarehouses }}
-													<!-- <span class="text-c-green m-l-10">+0.35%</span> -->
-												</h5>
-												<!-- 
-												<div class="progress">
-													<div class="progress-bar bg-c-yellow" style="width:45%"></div>
-												</div>
-												-->
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-md-12">
+                            <div class="col-md-12">
 								<div class="card table-card">
 									<div class="card-header">
 										<h5>Limited Products</h5>
@@ -247,6 +233,90 @@
 									</div>
 								</div>
 							</div>
+
+							<div class="col-xl-3 col-md-6">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h6 class="m-b-25">Pending Managers</h6>
+                                                <h3 class="f-w-700 text-c-green">
+                                                	{{ dashboard.numberPendingManagers || 0 }}
+                                                </h3>
+                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
+                                            </div>
+                                            <div class="col-auto">
+                                                <router-link :to="{ name: 'managers' }">
+                                                	<i class="fas fa-users bg-c-green"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h6 class="m-b-25">Pending Merchants</h6>
+                                                <h3 class="f-w-700 text-c-blue">
+                                                	{{ dashboard.numberPendingMerchants || 0 }}
+                                                </h3>
+                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
+                                            </div>
+                                            <div class="col-auto">
+                                                <router-link :to="{ name: 'merchants' }">
+                                                	<i class="fas fa-industry bg-c-blue"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h6 class="m-b-25">Pending Owners</h6>
+                                                <h3 class="f-w-700 text-c-yellow">
+                                                	{{ dashboard.numberPendingOwner || 0 }}
+                                                </h3>
+                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
+                                            </div>
+                                            <div class="col-auto">
+                                                <router-link :to="{ name: 'owners' }">
+                                                	<i class="fas fa-user bg-c-yellow"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <h6 class="m-b-25">Pending Warehouses</h6>
+                                                <h3 class="f-w-700 text-c-orenge">
+                                                	{{ dashboard.numberPendingWarehouses || 0 }}
+                                                </h3>
+                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
+                                            </div>
+                                            <div class="col-auto">
+                                                <router-link :to="{ name: 'warehouses' }">
+                                                	<i class="fas fa-bullseye bg-c-orenge"></i>
+                                            	</router-link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 						</div>
 					</div>
 				</div>
@@ -325,7 +395,7 @@
 				this.dashboard = {};
 				
 				axios
-					.get('/api/dashboard-one')
+					.get('/api/general-dashboard-one')
 					.then(response => {
 						if (response.status == 200) {
 							this.dashboard = response.data;

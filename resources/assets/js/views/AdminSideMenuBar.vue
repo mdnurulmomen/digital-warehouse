@@ -34,11 +34,13 @@
 										</router-link>
 									</li>
 
+									<!-- 
 									<li :class="currentRouteName=='dashboar-3' ? 'active' : ''">
 										<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Dashboard 3</span>
 										</router-link>
 									</li>
+ 									-->
 								</ul>
 							</li>
 

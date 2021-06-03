@@ -54,7 +54,7 @@ import AdminSideMenuBar from './views/AdminSideMenuBar'
 
 import Dashboard from './views/Dashboard'
 import Dashboard2 from './views/Dashboard2'
-import Dashboard3 from './views/Dashboard3'
+// import Dashboard3 from './views/Dashboard3'
 import Profile from './views/ProfileComponent'
 // special components
 import ApplicationSetting from './views/SettingComponent'
@@ -90,6 +90,7 @@ const router = new VueRouter({
             component: Dashboard,
             meta: { 
                 // authRequired: true 
+                requiredPermission: 'view-dashboard-one-index' 
             },
         },
         {
@@ -98,8 +99,10 @@ const router = new VueRouter({
             component: Dashboard2,
             meta: { 
                 // authRequired: true 
+                requiredPermission: 'view-dashboard-two-index' 
             },
         },
+        /*
         {
             path: '/dashboard-3',
             name: 'dashboar-3',
@@ -108,6 +111,7 @@ const router = new VueRouter({
                 // authRequired: true 
             },
         },
+        */
         {
             path: '/profile',
             name: 'profile',

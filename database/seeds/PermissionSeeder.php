@@ -54,6 +54,8 @@ class PermissionSeeder extends Seeder
 
             $modelsViewable = [
                 'Permission',  // view
+                'Dashboard-One',  // view
+                'Dashboard-Two',  // view
             ];
 
             /*

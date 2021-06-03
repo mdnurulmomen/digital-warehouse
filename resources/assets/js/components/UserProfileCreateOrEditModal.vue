@@ -613,6 +613,8 @@
 
 	        	modelsViewable : [
 	        		'Permission',  // view
+	        		'Dashboard-One',  // view
+	        		'Dashboard-Two',  // view
 	        	],
 
 			}
