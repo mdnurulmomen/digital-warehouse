@@ -18,8 +18,8 @@ class AnalyticsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware("permission:view-dashboard-one-index")->only(['getGeneralDashboardOneData']);
-        $this->middleware("permission:view-dashboard-two-index")->only(['getGeneralDashboardTwoData']);
+        $this->middleware("permission:view-general-dashboard-one")->only(['getGeneralDashboardOneData']);
+        $this->middleware("permission:view-general-dashboard-two")->only(['getGeneralDashboardTwoData']);
     }
 
     public function getGeneralDashboardOneData()

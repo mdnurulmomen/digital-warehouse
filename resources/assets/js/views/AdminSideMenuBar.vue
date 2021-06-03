@@ -24,23 +24,15 @@
 								<ul class="pcoded-submenu">
 									<li :class="currentRouteName=='home' ? 'active' : ''">
 										<router-link :to="{ name: 'home' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard</span>
+											<span class="pcoded-mtext">Home</span>
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='dashboar-2' ? 'active' : ''">
-										<router-link :to="{ name: 'dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
+									<li :class="currentRouteName=='general-dashboar-2' ? 'active' : ''">
+										<router-link :to="{ name: 'general-dashboar-2' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Dashboard 1</span>
 										</router-link>
 									</li>
-
-									<!-- 
-									<li :class="currentRouteName=='dashboar-3' ? 'active' : ''">
-										<router-link :to="{ name: 'dashboar-3' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 3</span>
-										</router-link>
-									</li>
- 									-->
 								</ul>
 							</li>
 

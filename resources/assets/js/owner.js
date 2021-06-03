@@ -52,12 +52,13 @@ Vue.component('user-profile-create-or-edit-modal', require('./components/UserPro
 
 import OwnerSideMenuBar from './views/OwnerSideMenuBar'
 
-import Dashboard from './views/Dashboard'
-import Dashboard2 from './views/Dashboard2'
-import Dashboard3 from './views/Dashboard3'
+import OwnerHome from './views/Home'
 import Profile from './views/ProfileComponent'
 import MyWarehouseIndex from './views/MyWarehouseIndex'
+
 // special components
+import GeneralDashboardOne from './views/GeneralDashboard-1'
+import GeneralDashboardTwo from './views/GeneralDashboard-2'
 import ApplicationSetting from './views/SettingComponent'
 import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
 import ManagerIndex from './views/ManagerIndex'
@@ -87,17 +88,7 @@ const router = new VueRouter({
         {
             path: '/home',
             name: 'home',
-            component: Dashboard
-        },
-        {
-            path: '/dashboard-2',
-            name: 'dashboar-2',
-            component: Dashboard2,
-        },
-        {
-            path: '/dashboard-3',
-            name: 'dashboar-3',
-            component: Dashboard3,
+            component: OwnerHome
         },
         {
             path: '/profile',
@@ -109,7 +100,25 @@ const router = new VueRouter({
             name: 'my-warehouses',
             component: MyWarehouseIndex,
         },
+        
         // special routes
+        
+        {
+            path: '/general-dashboard-1',
+            name: 'general-dashboard-1',
+            component: GeneralDashboardOne,
+            meta: { 
+                requiredPermission: 'view-general-dashboard-one' 
+            },
+        },
+        {
+            path: '/general-dashboard-2',
+            name: 'general-dashboard-2',
+            component: GeneralDashboardTwo,
+            meta: { 
+                requiredPermission: 'view-general-dashboard-two' 
+            },
+        },
         {
             path: '/settings',
             name: 'settings',

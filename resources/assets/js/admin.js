@@ -52,10 +52,10 @@ Vue.component('user-profile-create-or-edit-modal', require('./components/UserPro
 
 import AdminSideMenuBar from './views/AdminSideMenuBar'
 
-import Dashboard from './views/Dashboard'
-import Dashboard2 from './views/Dashboard2'
-// import Dashboard3 from './views/Dashboard3'
+import GeneralDashboardOne from './views/GeneralDashboard-1'
+import GeneralDashboardTwo from './views/GeneralDashboard-2'
 import Profile from './views/ProfileComponent'
+
 // special components
 import ApplicationSetting from './views/SettingComponent'
 import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
@@ -87,31 +87,21 @@ const router = new VueRouter({
         {
             path: '/home',
             name: 'home',
-            component: Dashboard,
+            component: GeneralDashboardOne,
             meta: { 
                 // authRequired: true 
-                requiredPermission: 'view-dashboard-one-index' 
+                // requiredPermission: 'view-dashboard-one-index' // home for admin
             },
         },
         {
-            path: '/dashboard-2',
-            name: 'dashboar-2',
-            component: Dashboard2,
+            path: '/general-dashboard-2',
+            name: 'general-dashboar-2',
+            component: GeneralDashboardTwo,
             meta: { 
                 // authRequired: true 
-                requiredPermission: 'view-dashboard-two-index' 
+                // requiredPermission: 'view-general-dashboard-two'  // as Admin
             },
         },
-        /*
-        {
-            path: '/dashboard-3',
-            name: 'dashboar-3',
-            component: Dashboard3,
-            meta: { 
-                // authRequired: true 
-            },
-        },
-        */
         {
             path: '/profile',
             name: 'profile',
@@ -120,7 +110,9 @@ const router = new VueRouter({
                 // authRequired: true 
             },
         },
+        
         // special routes
+        
         {
             path: '/settings',
             name: 'settings',

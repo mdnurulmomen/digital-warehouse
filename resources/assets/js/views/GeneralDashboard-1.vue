@@ -1,4 +1,4 @@
-<template v-if="userHasPermissionTo('view-dashboard-one-index')">
+<template v-if="userHasPermissionTo('view-gereral-dashboard-one')">
 	<div class="pcoded-content">
 		<div class="page-header card">
 			<div class="row align-items-end">
@@ -12,7 +12,7 @@
 					</div>
 				</div>
 				<div class="col-lg-4">
-					<div class="page-header-breadcrumb">
+					<div class="page-header-breadcrumb d-flex justify-content-center">
 						<ul class=" breadcrumb breadcrumb-title">
 							<li class="breadcrumb-item">
 								<a href="index.html"><i class="feather icon-home"></i></a>

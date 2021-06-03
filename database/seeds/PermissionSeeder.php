@@ -54,8 +54,11 @@ class PermissionSeeder extends Seeder
 
             $modelsViewable = [
                 'Permission',  // view
-                'Dashboard-One',  // view
-                'Dashboard-Two',  // view
+            ];
+
+            $modelsViewable2 = [
+                'General-Dashboard-One',  // view
+                'General-Dashboard-Two',  // view
             ];
 
             /*
@@ -128,6 +131,16 @@ class PermissionSeeder extends Seeder
                 Permission::insert([
                 
                     [ 'name' => 'view-'.strtolower($model).'-index' ],
+
+                ]);
+
+            }
+
+            foreach ($modelsViewable2 as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'view-'.strtolower($model) ],
 
                 ]);
 

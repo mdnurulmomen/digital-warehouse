@@ -484,7 +484,7 @@
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewable" 
-													:key="'crud-model-permission-name-' + model"
+													:key="'view-model-permission-name-' + model"
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -497,6 +497,26 @@
 															:ref="'view-' + model.toLowerCase() + '-index'"
 														>
 														<label>{{ modelName('view-' + model + '-list') }}</label>
+													</div>
+												</div>
+
+												<!-- Viewable 2 -->
+												<div 
+													class="col-md-6" 
+													v-for="model in modelsViewable2" 
+													:key="'view-model-permission-name-' + model"
+												>
+													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+													<!-- view -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('view-' + model)" 
+															@change="insertPermission('view-' + model, $event)" 
+															:ref="'view-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('view-' + model) }}</label>
 													</div>
 												</div>
 											</div>
@@ -613,8 +633,11 @@
 
 	        	modelsViewable : [
 	        		'Permission',  // view
-	        		'Dashboard-One',  // view
-	        		'Dashboard-Two',  // view
+	        	],
+
+	        	modelsViewable2 : [
+	        		'General-Dashboard-One',  // view
+	        		'General-Dashboard-Two',  // view
 	        	],
 
 			}
