@@ -64,6 +64,111 @@ class AnalyticsController extends Controller
 
     public function getGeneralDashboardTwoData()
     {
+        // stock in
+        $stockIns = [
         
+            'labels' => [
+                // 'ProductName',
+            ],
+
+            'datasets' => [
+
+                0 => [
+
+                    "data" => [ 
+                        // 300, 
+                    ],
+
+                    "backgroundColor" => [
+                      // 'red',
+                    ],
+                    
+                    "hoverOffset" => 100
+
+                ],
+
+            ]
+        ];
+
+        $stockedProducts = Product::whereHas('stocks', function ($query) {
+            $query->where('created_at', '>=', now()->subDays(7));
+        })->get();
+
+        foreach ($stockedProducts as $product) {
+            
+            $stockIns['labels'][] = $product->name;
+            $stockIns['datasets'][0]['data'][] = $product->stocks->sum('stock_quantity');
+            $stockIns['datasets'][0]['backgroundColor'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+
+        }
+
+        $stockIns['datasets'][0]['hoverOffset'] = 10;
+
+
+        // stock out
+        $stockOuts = [
+        
+            'labels' => [
+                // 'ProductName',
+            ],
+
+            'datasets' => [
+
+                0 => [
+
+                    "data" => [ 
+                        // 300, 
+                    ],
+
+                    "backgroundColor" => [
+                      // 'red',
+                    ],
+                    
+                    "hoverOffset" => 100
+
+                ],
+
+            ]
+        ];
+
+        $dispatchedRequisitions = Requisition::where('status', 1)->where('created_at', '>=', now()->subDays(7))->get();
+
+        foreach ($dispatchedRequisitions as $dispatchedRequisition) {
+        
+            
+            foreach ($dispatchedRequisition->products as $requiredProduct) {
+                
+                if (! in_array($requiredProduct->product->name, $stockOuts['labels'])) {
+                    
+                    $stockOuts['labels'][] = $requiredProduct->product->name;
+
+                    $stockOuts['datasets'][0]['data'][] = Requisition::with(['products' => function ($query) use ($requiredProduct) {
+                                                            $query->where('product_id', $requiredProduct->product_id);
+                                                        }])
+                                                        ->where('status', 1)->where('created_at', '>=', now()->subDays(7))
+                                                        ->whereHas('products', function ($query) use ($requiredProduct) {
+                                                            $query->where('product_id', $requiredProduct->product_id);
+                                                        })
+                                                        ->get()->pluck('products')->collapse()
+                                                        ->sum('quantity');
+
+                    $stockOuts['datasets'][0]['backgroundColor'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+                
+                    $stockOuts['datasets'][0]['hoverOffset'] = 10;
+
+                }
+
+            
+            }
+
+        }
+
+        return response()->json([
+
+            'stockIns' => $stockIns,
+            'stockOuts' => $stockOuts,
+            
+        ]);
+
     }
 }

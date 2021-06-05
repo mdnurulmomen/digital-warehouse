@@ -169,6 +169,7 @@ Route::name('admin.')->group(function () {
 
 		// first dashboard
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one');
+		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two');
 
 		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');

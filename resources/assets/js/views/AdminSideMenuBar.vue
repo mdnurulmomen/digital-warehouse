@@ -12,7 +12,7 @@
 						<ul class="pcoded-item pcoded-left-item">
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['home', 'dashboar-2', 'dashboar-3'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['home', 'general-dashboar-2'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">

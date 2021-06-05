@@ -234,21 +234,21 @@
 								</div>
 							</div>
 
-							<div class="col-xl-3 col-md-6">
+                            <div class="col-xl-3 col-md-6">
                                 <div class="card comp-card">
                                     <div class="card-body">
                                         <div class="row align-items-center">
                                             <div class="col">
                                                 <h6 class="m-b-25">Pending Managers</h6>
                                                 <h3 class="f-w-700 text-c-green">
-                                                	{{ dashboard.numberPendingManagers || 0 }}
+                                                    {{ dashboard.numberPendingManagers || 0 }}
                                                 </h3>
                                                 <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'managers' }">
-                                                	<i class="fas fa-users bg-c-green"></i>
-                                            	</router-link>
+                                                    <i class="fas fa-users bg-c-green"></i>
+                                                </router-link>
                                             </div>
                                         </div>
                                     </div>
@@ -262,14 +262,14 @@
                                             <div class="col">
                                                 <h6 class="m-b-25">Pending Merchants</h6>
                                                 <h3 class="f-w-700 text-c-blue">
-                                                	{{ dashboard.numberPendingMerchants || 0 }}
+                                                    {{ dashboard.numberPendingMerchants || 0 }}
                                                 </h3>
                                                 <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'merchants' }">
-                                                	<i class="fas fa-industry bg-c-blue"></i>
-                                            	</router-link>
+                                                    <i class="fas fa-industry bg-c-blue"></i>
+                                                </router-link>
                                             </div>
                                         </div>
                                     </div>
@@ -283,14 +283,14 @@
                                             <div class="col">
                                                 <h6 class="m-b-25">Pending Owners</h6>
                                                 <h3 class="f-w-700 text-c-yellow">
-                                                	{{ dashboard.numberPendingOwner || 0 }}
+                                                    {{ dashboard.numberPendingOwner || 0 }}
                                                 </h3>
                                                 <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'owners' }">
-                                                	<i class="fas fa-user bg-c-yellow"></i>
-                                            	</router-link>
+                                                    <i class="fas fa-user bg-c-yellow"></i>
+                                                </router-link>
                                             </div>
                                         </div>
                                     </div>
@@ -304,14 +304,14 @@
                                             <div class="col">
                                                 <h6 class="m-b-25">Pending Warehouses</h6>
                                                 <h3 class="f-w-700 text-c-orenge">
-                                                	{{ dashboard.numberPendingWarehouses || 0 }}
+                                                    {{ dashboard.numberPendingWarehouses || 0 }}
                                                 </h3>
                                                 <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'warehouses' }">
-                                                	<i class="fas fa-bullseye bg-c-orenge"></i>
-                                            	</router-link>
+                                                    <i class="fas fa-bullseye bg-c-orenge"></i>
+                                                </router-link>
                                             </div>
                                         </div>
                                     </div>
@@ -335,7 +335,6 @@
 
 				query : '',
 	        	error : '',
-    			perPage : 10,
 	        	loading : false,
 
 	        	dashboard : {
@@ -366,6 +365,7 @@
 		filters: {
 
 			capitalize: function (value) {
+
 				if (!value) return ''
 
 				const words = value.split(" ");
@@ -381,6 +381,7 @@
 				}
 
 				return words.join(" ");
+                
 			}
 
 		},
