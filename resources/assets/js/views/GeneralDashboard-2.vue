@@ -29,33 +29,58 @@
 				<div class="page-wrapper">
 					<div class="page-body">
 						<div class="row">
-                            <div class="col-md-9 col-xl-9">
-                                <div class="card sale-card">
-                                    <div class="card-header">
-                                        <h5>Deals Analytics</h5>
+                            <div class="col-md-6 col-xl-6">
+                                <!-- Stock In Chart -->
+                                <div class="card" v-if="dashboard.hasOwnProperty('stockIns')">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            
+                                            <!-- 
+                                            <doughnut-chart :data="dashboard.stockIns" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+                                             -->
+
+                                            <bar-chart :data="dashboard.stockIns" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+
+                                        </div>
                                     </div>
-                                    <div class="card-block">
-                                        <!-- Pie Chart -->
-                                        
+                                    <div class="card-footer">
+                                    	<p class="text-center">Last week stock in's</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-3 col-xl-3">
-                                <!-- Stock In Chart -->
-                                <div class="card comp-card" v-if="dashboard.hasOwnProperty('stockIns')">
+                            <div class="col-md-6 col-xl-6">
+                                <!-- Stock Out Chart -->
+                                <div class="card" v-if="dashboard.hasOwnProperty('stockOuts')">
                                     <div class="card-body">
                                         <div class="row align-items-center">
-                                            <doughnut-chart :data="dashboard.stockIns" />
+											
+											<!-- 
+                                            <doughnut-chart :data="dashboard.stockOuts" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+                                             -->
+
+                                            <bar-chart :data="dashboard.stockOuts" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+
                                         </div>
                                     </div>
+                                    <div class="card-footer">
+                                    	<p class="text-center">Last week stock out's</p>
+                                    </div>
                                 </div>
+                            </div>
+						</div>
 
-                                <!-- Stock Out Chart -->
-                                <div class="card comp-card" v-if="dashboard.hasOwnProperty('stockOuts')">
-                                    <div class="card-body">
-                                        <div class="row align-items-center">
-                                            <doughnut-chart :data="dashboard.stockOuts" />
+						<div class="row" v-if="dashboard.hasOwnProperty('warehouses') && dashboard.warehouses.length">
+							<div class="col-xl-12">
+                                <div class="card proj-progress-card">
+                                    <div class="card-block">
+                                        <div class="row">
+                                            <div class="col-xl-3 col-md-6" v-for="(warehouse, warehouseIndex) in dashboard.warehouses" :key="'warehouse-unused-container-percentage-' + warehouseIndex + '-warehouse-' + warehouse.id">
+                                                <h6 class="text-center">{{ warehouse.name }} Unused Spaces (%)</h6>
+                                                <!-- Pie Chart -->
+		                                        <pie-chart :data="warehouse" :styles="{ height: '300px', width: '100%', position: 'relative' }" v-if="warehouse.hasOwnProperty('datasets') && warehouse.datasets[0].data && warehouse.datasets[0].data.every(item => item != 0)" />
+		                                        <p class="text-center text-success" v-else>NA</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -70,13 +95,15 @@
 
 <script>
 	
-	import DoughnutChart from '../components/DoughnutChart.vue'
+	import PieChart from '../components/PieChart.vue'
+	import BarChart from '../components/BarChart.vue'
 
 	export default {
 
 		components : {
 
-			DoughnutChart
+			PieChart,
+			BarChart,
 		
 		},
 
@@ -92,6 +119,7 @@
 
 	        		// stockIns : {},
 	        		// stockOuts : {}
+	        		// warehouses : [],
 
 	        	}
 

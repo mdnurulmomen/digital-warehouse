@@ -1,10 +1,10 @@
 <script type="text/javascript">
 	
-import { Doughnut } from 'vue-chartjs'
+import { Bar } from 'vue-chartjs'
  
 export default {
 
-	extends: Doughnut,
+	extends: Bar,
 
 	props: ['data'],
 
@@ -14,13 +14,6 @@ export default {
 
 	},
 
-	watch: {
-		data () {
-			this.$data._chart.update()
-		}
-	}
-
 }
-
 
 </script>

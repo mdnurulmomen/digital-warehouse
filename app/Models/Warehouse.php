@@ -105,6 +105,11 @@ class Warehouse extends Authenticatable
         return $this->hasMany(WarehouseContainer::class, 'warehouse_id')->withTrashed();
     }
 
+    public function containerStatuses()
+    {
+        return $this->hasManyThrough(WarehouseContainerStatus::class, WarehouseContainer::class, 'warehouse_id', 'warehouse_container_id');
+    }
+
     /**
      * The managers that belong to the warehouse.
      */

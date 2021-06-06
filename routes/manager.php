@@ -169,6 +169,11 @@ Route::name('manager.')->group(function () {
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 
+		// first dashboard
+		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one');
+		// second dashboard
+		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two');
+		
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 		Route::fallback(function () {

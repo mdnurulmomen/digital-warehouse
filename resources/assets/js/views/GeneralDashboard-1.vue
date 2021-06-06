@@ -28,7 +28,8 @@
 			<div class="main-body">
 				<div class="page-wrapper">
 					<div class="page-body">
-						<div class="row">
+						<!-- Pending Stocks and Requisitions -->
+                        <div class="row">
 							<div class="col-xl-3 col-md-6">
                                 <div class="card prod-p-card card-yellow">
                                     <div class="card-body">
@@ -179,61 +180,99 @@
                                     </div>
                                 </div>
                             </div>
+						</div>
 
+                        <!-- Limited Products -->
+                        <div class="row">
                             <div class="col-md-12">
-								<div class="card table-card">
-									<div class="card-header">
-										<h5>Limited Products</h5>
-										<div class="card-header-right">
-											<ul class="list-unstyled card-option">
-												<li class="first-opt"><i class="feather icon-chevron-left open-card-option"></i></li>
-												<li><i class="feather icon-maximize full-card"></i></li>
-												<li><i class="feather icon-minus minimize-card"></i></li>
-												<li><i class="feather icon-refresh-cw reload-card"></i></li>
-												<li><i class="feather icon-trash close-card"></i></li>
-												<li><i class="feather icon-chevron-left open-card-option"></i></li>
-											</ul>
-										</div>
-									</div>
-									<div class="card-block p-b-0">
-										<div class="table-responsive">
-											<table class="table table-hover m-b-0">
-												<thead>
-													<tr>
-														<th>Name</th>
-														<th>Product Code</th>
-														<th>Merchant</th>
-														<th>Status</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr v-for="product in dashboard.limitedStockProducts" :key="'product-' + product.id"
-													>
-														<td>{{ product.name | capitalize }}</td>
-														<td>{{ product.sku }}</td>
-														<td>{{ product.hasOwnProperty('merchant') ? product.merchant.user_name : 'NA' | capitalize }}</td>
-														<td>
-															<span :class="[! product.latest_stock || product.latest_stock.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']">
-																{{ ! product.latest_stock || product.latest_stock.available_quantity == 0 ? 'Stock Out' : product.latest_stock.available_quantity }}
-															</span>
-														</td>
-													</tr>
-													<tr 
-												  		v-show="! dashboard.hasOwnProperty('limitedStockProducts') || ! dashboard.limitedStockProducts.length"
-												  	>
-											    		<td colspan="4">
-												      		<div class="alert alert-danger" role="alert">
-												      			Sorry, No data found.
-												      		</div>
-												    	</td>
-												  	</tr>
-												</tbody>
-											</table>
-										</div>
-									</div>
-								</div>
-							</div>
+                                <div class="card table-card">
+                                    <div class="card-header">
+                                        <h5>Limited Products</h5>
+                                        <div class="card-header-right">
+                                            <ul class="list-unstyled card-option">
+                                                <li class="first-opt"><i class="feather icon-chevron-left open-card-option"></i></li>
+                                                <li><i class="feather icon-maximize full-card"></i></li>
+                                                <li><i class="feather icon-minus minimize-card"></i></li>
+                                                <li><i class="feather icon-refresh-cw reload-card"></i></li>
+                                                <li><i class="feather icon-trash close-card"></i></li>
+                                                <li><i class="feather icon-chevron-left open-card-option"></i></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="card-block p-b-0">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover m-b-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Product Code</th>
+                                                        <th>Merchant</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="product in dashboard.limitedStockProducts" :key="'product-' + product.id"
+                                                    >
+                                                        <td>{{ product.name | capitalize }}</td>
+                                                        <td>{{ product.sku }}</td>
+                                                        <td>{{ product.hasOwnProperty('merchant') ? product.merchant.user_name : 'NA' | capitalize }}</td>
+                                                        <td>
+                                                            <span :class="[! product.latest_stock || product.latest_stock.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']">
+                                                                {{ ! product.latest_stock || product.latest_stock.available_quantity == 0 ? 'Stock Out' : product.latest_stock.available_quantity }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr 
+                                                        v-show="! dashboard.hasOwnProperty('limitedStockProducts') || ! dashboard.limitedStockProducts.length"
+                                                    >
+                                                        <td colspan="4">
+                                                            <div class="alert alert-danger" role="alert">
+                                                                Sorry, No data found.
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Recent seven days stock-in and stock-out -->
+                        <!-- 
+                        <div class="row">
+                            <div class="col-md-6 col-xl-6">
+                                <div class="card" v-if="dashboard.hasOwnProperty('stockIns')">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <doughnut-chart :data="dashboard.stockIns" :styles="{height: '300px', width: '100%', position: 'relative' }" />
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <p class="text-center">Last week stock in's</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-xl-6">
+                                <div class="card" v-if="dashboard.hasOwnProperty('stockOuts')">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <doughnut-chart :data="dashboard.stockOuts" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <p class="text-center">Last week stock out's</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         -->
+
+                        <!-- Pending Users -->
+                        <!-- 
+                        <div class="row">
                             <div class="col-xl-3 col-md-6">
                                 <div class="card comp-card">
                                     <div class="card-body">
@@ -243,7 +282,6 @@
                                                 <h3 class="f-w-700 text-c-green">
                                                     {{ dashboard.numberPendingManagers || 0 }}
                                                 </h3>
-                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'managers' }">
@@ -264,7 +302,6 @@
                                                 <h3 class="f-w-700 text-c-blue">
                                                     {{ dashboard.numberPendingMerchants || 0 }}
                                                 </h3>
-                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'merchants' }">
@@ -285,7 +322,6 @@
                                                 <h3 class="f-w-700 text-c-yellow">
                                                     {{ dashboard.numberPendingOwner || 0 }}
                                                 </h3>
-                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'owners' }">
@@ -306,7 +342,6 @@
                                                 <h3 class="f-w-700 text-c-orenge">
                                                     {{ dashboard.numberPendingWarehouses || 0 }}
                                                 </h3>
-                                                <!-- <p class="m-b-0">May 23 - June 01 (2017)</p> -->
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'warehouses' }">
@@ -317,7 +352,73 @@
                                     </div>
                                 </div>
                             </div>
-						</div>
+                        </div>
+                        -->
+                        <!-- Pending Users (Chart) -->
+                        <div class="row">
+                            <div class="col-xl-3 col-md-6" v-if="dashboard.owners">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <doughnut-chart :data="dashboard.owners" :styles="{height: '300px', width: '100%', position: 'relative' }" />
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <p>Warehouse-Owners Status</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6" v-if="dashboard.warehouses">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <doughnut-chart :data="dashboard.warehouses" :styles="{height: '300px', width: '100%', position: 'relative' }" />
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <p>Warehouses Status</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6" v-if="dashboard.merchants">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <doughnut-chart :data="dashboard.merchants" :styles="{height: '300px', width: '100%', position: 'relative' }" />
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <p>Merchants Status</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6" v-if="dashboard.managers">
+                                <div class="card comp-card">
+                                    <div class="card-body">
+                                        <doughnut-chart :data="dashboard.managers" :styles="{height: '300px', width: '100%', position: 'relative' }" />
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <p>Managers Status</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Warehouse Unused Container Percentages -->
+                        <!-- 
+                        <div class="row" v-if="dashboard.hasOwnProperty('warehouses') && dashboard.warehouses.length">
+                            <div class="col-xl-12">
+                                <div class="card proj-progress-card">
+                                    <div class="card-block">
+                                        <div class="row">
+                                            <div class="col-xl-3 col-md-6" v-for="(warehouse, warehouseIndex) in dashboard.warehouses" :key="'warehouse-unused-container-percentage-' + warehouseIndex + '-warehouse-' + warehouse.id">
+                                                <h6>{{ warehouse.name }} Unused Spaces (%)</h6>
+                                                <pie-chart :data="warehouse" :styles="{ width: '100%', position: 'relative' }" v-if="warehouse.hasOwnProperty('datasets') && warehouse.datasets[0].data && warehouse.datasets[0].data.every(item => item != 0)" />
+                                                <p class="text-center text-success" v-else>NA</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         -->
 					</div>
 				</div>
 			</div>
@@ -327,9 +428,19 @@
 
 <script>
 	
+    import PieChart from '../components/PieChart.vue'
+    import DoughnutChart from '../components/DoughnutChart.vue'
+
 	export default {
 
-		data() {
+		components : {
+
+            PieChart,
+            DoughnutChart,
+        
+        },
+
+        data() {
 
 			return {
 
