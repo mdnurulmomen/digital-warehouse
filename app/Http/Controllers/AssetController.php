@@ -8,6 +8,7 @@ use App\Models\RentPeriod;
 use App\Models\StorageType;
 use Illuminate\Http\Request;
 use App\Models\VariationType;
+use App\Models\PackagingPackage;
 use Illuminate\Support\Facades\Auth;
 
 class AssetController extends Controller
@@ -518,6 +519,96 @@ class AssetController extends Controller
         $columnsToSearch = ['name'];
 
         $query = Variation::withTrashed();
+
+        foreach($columnsToSearch as $column){
+            $query->orWhere($column, 'like', "%$search%");
+        }
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
+    // packaging packages
+    public function showAllPackagingPackages($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => PackagingPackage::paginate($perPage),
+                'trashed' => PackagingPackage::onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return PackagingPackage::all();
+    }
+
+    public function storeNewPackagingPackage(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:packaging_packages,name',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $newAsset = new PackagingPackage();
+
+        $newAsset->name = strtolower($request->name);
+        $newAsset->price = $request->price;
+        $newAsset->package_preview = $request->preview;
+        $newAsset->description = strtolower($request->description);
+
+        $newAsset->save();
+
+        return $this->showAllPackagingPackages($perPage);
+    }
+
+    public function updatePackagingPackage(Request $request, $owner, $perPage)
+    {
+        $assetToUpdate = PackagingPackage::findOrFail($owner);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:packaging_packages,name,'.$assetToUpdate->id,
+            'price' => 'required|numeric',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $assetToUpdate->name = strtolower($request->name);
+        $assetToUpdate->price = $request->price;
+        $assetToUpdate->package_preview = $request->preview;
+        $assetToUpdate->description = strtolower($request->description);
+
+        $assetToUpdate->save();
+
+        return $this->showAllPackagingPackages($perPage);
+    }
+
+    public function deletePackagingPackage($package, $perPage)
+    {
+        $assetToDelete = PackagingPackage::findOrFail($package);
+        // $userToDelete->warehouses()->delete();
+        $assetToDelete->delete();
+
+        return $this->showAllPackagingPackages($perPage);
+    }
+
+    public function restorePackagingPackage($package, $perPage)
+    {
+        $userToRestore = PackagingPackage::withTrashed()->findOrFail($package);
+        // $userToRestore->warehouses()->restore();
+        $userToRestore->restore();
+
+        return $this->showAllPackagingPackages($perPage);
+    }
+
+    public function searchAllPackagingPackages($search, $perPage)
+    {
+        $columnsToSearch = ['name', 'price', 'description'];
+
+        $query = PackagingPackage::withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

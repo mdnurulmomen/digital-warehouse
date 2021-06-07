@@ -61,6 +61,12 @@
 										</router-link>
 									</li>
 
+									<li :class="currentRouteName=='packaging-packages' ? 'active' : ''">
+										<router-link :to="{ name: 'packaging-packages' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Packaging Packages</span>
+										</router-link>
+									</li>
+
 									<li :class="currentRouteName=='rent-periods' ? 'active' : ''">
 										<router-link :to="{ name: 'rent-periods' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Rent Periods</span>

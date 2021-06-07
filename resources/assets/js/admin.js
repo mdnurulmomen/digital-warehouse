@@ -75,6 +75,7 @@ import RequisitionIndex from './views/RequisitionIndex'
 // import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
 import RoleIndex from './views/RoleIndex'
+import PackagingPackageIndex from './views/PackagingPackageIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
 
 /**
@@ -271,6 +272,15 @@ const router = new VueRouter({
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-role-index' 
+            }
+        },
+        {
+            path: '/packaging-packages',
+            name: 'packaging-packages',
+            component: PackagingPackageIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-asset-index' 
             }
         },
 
