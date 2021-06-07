@@ -18,4 +18,9 @@ class ProductCategory extends Model
     {
     	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
     }
+
+    public function products()
+    {
+    	return $this->hasMany(Product::class, 'product_category_id', 'id');
+    }
 }

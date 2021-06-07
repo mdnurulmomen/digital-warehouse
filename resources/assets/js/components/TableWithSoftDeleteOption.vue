@@ -250,6 +250,9 @@
 				else if (columnValue.match(/owner_total_warehouses/gi)) {
 					return object.warehouses_count;
 				}
+				else if (columnValue.match(/products_count/gi)) {
+					return object.products_count;
+				}
 				else if (columnValue.match(/name/gi)) {
 					return this.$options.filters.capitalize(object.name);
 				}
@@ -355,17 +358,37 @@
 					if (this.ascending) {
 						this.ascending = false;
 						this.descending = true;
-						this.descendingArrayLength('warehouses');
+						this.descendingNumeric('warehouses_count');
 					}
 					else if (this.descending) {
 						this.ascending = true;
 						this.descending = false;
-						this.ascendingArrayLength('warehouses');
+						this.ascendingNumeric('warehouses_count');
 					}
 					else {
 						this.ascending = true;
 						this.descending = false;
-						this.ascendingArrayLength('warehouses');
+						this.ascendingNumeric('warehouses_count');
+					}
+					
+				}
+
+				else if (columnName.match(/#/gi) && columnName.match(/products/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingNumeric('products_count');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('products_count');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('products_count');
 					}
 					
 				}

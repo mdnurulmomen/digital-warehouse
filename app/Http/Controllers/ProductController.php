@@ -46,8 +46,8 @@ class ProductController extends Controller
             
             return response()->json([
 
-                'current' => ProductCategory::paginate($perPage),
-                'trashed' => ProductCategory::onlyTrashed()->paginate($perPage),
+                'current' => ProductCategory::withCount('products')->paginate($perPage),
+                'trashed' => ProductCategory::withCount('products')->onlyTrashed()->paginate($perPage),
 
             ], 200);
 

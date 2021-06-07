@@ -48,8 +48,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
+										  			:column-names="['name', '# products']" 
+										  			:column-values-to-show="['name', 'products_count']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission="'asset'" 
