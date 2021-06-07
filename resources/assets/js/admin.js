@@ -55,6 +55,8 @@ import AdminSideMenuBar from './views/AdminSideMenuBar'
 import GeneralDashboardOne from './views/GeneralDashboard-1'
 import GeneralDashboardTwo from './views/GeneralDashboard-2'
 import Profile from './views/ProfileComponent'
+import UnAuthorized from './views/403'
+import NotFound from './views/404'
 
 // special components
 import ApplicationSetting from './views/SettingComponent'
@@ -271,6 +273,27 @@ const router = new VueRouter({
                 requiredPermission: 'view-role-index' 
             }
         },
+
+        // UnAuthorized Page
+        {
+            path: '/403',
+            name: 'un-authorized',
+            component: UnAuthorized,
+            meta: {
+                // authRequired: true,
+            }
+        },
+
+        // Not Found Page
+        {
+            path: '/*',
+            name: 'not-found',
+            component: NotFound,
+            meta: {
+                // authRequired: true,
+            }
+        },
+        
     ],
 });
 

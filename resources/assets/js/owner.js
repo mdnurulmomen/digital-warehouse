@@ -55,6 +55,8 @@ import OwnerSideMenuBar from './views/OwnerSideMenuBar'
 import OwnerHome from './views/Home'
 import Profile from './views/ProfileComponent'
 import MyWarehouseIndex from './views/MyWarehouseIndex'
+import UnAuthorized from './views/403'
+import NotFound from './views/404'
 
 // special components
 import GeneralDashboardOne from './views/GeneralDashboard-1'
@@ -250,6 +252,27 @@ const router = new VueRouter({
                 requiredPermission: 'view-role-index' 
             }
         },
+
+        // UnAuthorized Page
+        {
+            path: '/403',
+            name: 'un-authorized',
+            component: UnAuthorized,
+            meta: {
+                // authRequired: true,
+            }
+        },
+
+        // Not Found Page
+        {
+            path: '/*',
+            name: 'not-found',
+            component: NotFound,
+            meta: {
+                // authRequired: true,
+            }
+        },
+
     ],
 });
 

@@ -57,6 +57,8 @@ import Profile from './views/WarehouseProfileComponent'
 import MyContainerIndex from './views/WarehouseContainerIndex'
 import ContainerShelfIndex from './views/ContainerShelfIndex'
 import ShelfUnitIndex from './views/ShelfUnitIndex'
+import UnAuthorized from './views/403'
+import NotFound from './views/404'
 
 // special components
 import GeneralDashboardOne from './views/GeneralDashboard-1'
@@ -235,6 +237,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-requisition-index' 
             }
         },
+        
         /*
             {
                 path: '/dispatches',
@@ -245,6 +248,7 @@ const router = new VueRouter({
                 }
             },
         */
+       
         {
             path: '/product-stocks/:productName',
             name: 'product-stocks',
@@ -260,6 +264,26 @@ const router = new VueRouter({
             component: RoleIndex,
             meta: { 
                 requiredPermission: 'view-role-index' 
+            }
+        },
+
+        // UnAuthorized Page
+        {
+            path: '/403',
+            name: 'un-authorized',
+            component: UnAuthorized,
+            meta: {
+                // authRequired: true,
+            }
+        },
+
+        // Not Found Page
+        {
+            path: '/*',
+            name: 'not-found',
+            component: NotFound,
+            meta: {
+                // authRequired: true,
             }
         },
 

@@ -54,6 +54,8 @@ import ManagerSideMenuBar from './views/ManagerSideMenuBar'
 
 import ManagerHome from './views/Home'
 import Profile from './views/ProfileComponent'
+import UnAuthorized from './views/403'
+import NotFound from './views/404'
 // import MyWarehouseIndex from './views/MyWarehouseIndex'
 // import ManagerProductIndex from './views/ManagerProductIndex'
 
@@ -259,6 +261,27 @@ const router = new VueRouter({
                 requiredPermission: 'view-role-index' 
             }
         },
+
+        // UnAuthorized Page
+        {
+            path: '/403',
+            name: 'un-authorized',
+            component: UnAuthorized,
+            meta: {
+                // authRequired: true,
+            }
+        },
+
+        // Not Found Page
+        {
+            path: '/*',
+            name: 'not-found',
+            component: NotFound,
+            meta: {
+                // authRequired: true,
+            }
+        },
+
     ],
 });
 

@@ -44,7 +44,8 @@ axios.interceptors.response.use(
                 window.location.href = "/login";
             }
             else if (error.response.status === 403) {
-                location.reload();
+                // location.reload();
+                window.location.href = "/403"
             }
 
         }
