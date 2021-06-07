@@ -28,7 +28,8 @@
 											  		v-if="userHasPermissionTo('view-role-index') || userHasPermissionTo('create-role')" 
 											  		:query="query" 
 											  		:caller-page="'role'" 
-											  		:required-permission = "'role'"
+											  		:required-permission = "'role'" 
+											  		:disable-add-button="allPermissions.length==0 ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 

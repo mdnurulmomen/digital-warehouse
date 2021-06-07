@@ -29,6 +29,7 @@
 											  		:query="query" 
 											  		:caller-page="'products'" 
 											  		:required-permission = "'product'" 
+											  		:disable-add-button="(allProductCategories.length==0 || allVariationTypes.length==0) ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -1490,16 +1491,16 @@
 	        	productsToShow : [],
 	        	allFetchedProducts : [],
 
-	        	allContainers : [],
+	        	// allContainers : [],
 	        	
-	        	emptyContainers : [],
-	        	emptyShelfContainers : [],
-	        	emptyUnitContainers : [],
+	        	// emptyContainers : [],
+	        	// emptyShelfContainers : [],
+	        	// emptyUnitContainers : [],
 
-	        	emptyShelves : [],
-	        	emptyUnitShelves : [],
+	        	// emptyShelves : [],
+	        	// emptyUnitShelves : [],
 
-	        	emptyUnits : [],
+	        	// emptyUnits : [],
 
 	        	pagination: {
 		        	current_page: 1

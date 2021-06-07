@@ -18,6 +18,7 @@
   		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
   			<button 
 	  			class="btn btn-success btn-outline-success btn-sm" 
+	  			:disabled="disableAddButton" 
 	  			@click="$emit('showContentCreateForm')"
   			>
   				<i class="fa fa-plus"></i>
@@ -46,6 +47,11 @@
 				type: String,
 				required: true
 			},
+			disableAddButton : {
+				type : Boolean,
+				required : false,
+				default : false
+			}
 		},
 
 		watch : {

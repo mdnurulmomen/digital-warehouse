@@ -28,6 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'warehouse'" 
 											  		:required-permission="'warehouse'" 
+											  		:disable-add-button="(allContainers.length==0 || allRentPeriods.length==0 || allStorageTypes.length==0 || allWarehouseOwners.length==0) ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 

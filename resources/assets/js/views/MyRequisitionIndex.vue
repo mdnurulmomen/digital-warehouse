@@ -55,6 +55,7 @@
 											  		<div class="col-sm-3 form-group">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			:disabled="merchantAllProducts.length==0" 
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
