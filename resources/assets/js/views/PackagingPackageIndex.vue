@@ -1,5 +1,5 @@
 
-<template v-if="userHasPermissionTo('view-asset-index')">
+<template>
 
 	<div class="pcoded-content">
 
@@ -24,16 +24,33 @@
 										<div class="row">											
 
 											<div class="col-sm-12 sub-title">
-											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
-											  		:query="query" 
-											  		:caller-page="'package'" 
-											  		:required-permission="'asset'"
+											  	<div class="row d-flex align-items-center text-center">
+											  		<div class="col-sm-3 form-group">	
+															Packaging Packages List
+											  		</div>
+
+											  		<div class="col-sm-6 was-validated form-group">
+											  			<input 	type="text" 
+														  		v-model="query" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		class="form-control" 
+														  		placeholder="Search"
+													  	>
+													  	<div class="invalid-feedback">
+													  		Please search with releavant input
+													  	</div>
+											  		</div>
 											  		
-											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
-											  	></search-and-addition-option>
+											  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-asset')">
+											  			<button 
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="showContentCreateForm()"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Package
+											  			</button>
+											  		</div>
+											  	</div>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -42,7 +59,7 @@
 										  			:tab-names="['current', 'trashed']" 
 										  			:current-tab="currentTab" 
 
-										  			@showcontentsToShow="showcontentsToShow" 
+										  			@showCurrentContents="showcontentsToShow" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
@@ -429,15 +446,6 @@
 
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
-
-	<!-- 
-		<asset-view-modal 
-			:caller-page="'storage type'" 
-			:asset-to-view="singleAssetData" 
-			:properties-to-show="['name']"
-		></asset-view-modal>
- 	-->
-
 	</div>
 
 </template>
@@ -504,6 +512,19 @@
 
 		},
 
+		watch : {
+
+			query : function(val){
+				if (val==='') {
+					this.fetchAllContents();
+				}
+				else {
+					this.searchData();
+				}
+			},
+
+		},
+
 		filters: {
 
 			capitalize: function (value) {
@@ -567,11 +588,7 @@
 					});
 
 			},
-			searchData(emitedValue=false) {
-
-				if (emitedValue) {
-					this.query=emitedValue;
-				}
+			searchData() {
 
 				this.error = '';
 				this.allFetchedContents = [];
@@ -657,7 +674,7 @@
 					.post('/packaging-packages/' + this.perPage, this.singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New storage type has been created", "Success");
+							this.$toastr.s("New package has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#asset-createOrEdit-modal').modal('hide');
@@ -678,7 +695,7 @@
 					.put('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been updated", "Success");
+							this.$toastr.s("Package has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#asset-createOrEdit-modal').modal('hide');
@@ -699,7 +716,7 @@
 					.delete('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been deleted", "Success");
+							this.$toastr.s("Package has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -720,7 +737,7 @@
 					.patch('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been restored", "Success");
+							this.$toastr.s("Package has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');

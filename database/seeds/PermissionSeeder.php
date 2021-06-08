@@ -20,10 +20,6 @@ class PermissionSeeder extends Seeder
                 ];
             */
            
-            $modelRUDableOnly = [
-                'Warehouse-Manager',
-            ];
-
             $modelsCRUDable = [
             	'Asset',
             	'Manager',
@@ -42,6 +38,12 @@ class PermissionSeeder extends Seeder
             	// 'WarehouseManager'
             	// 'WarehouseProduct',
             ];
+
+            /*
+                $modelsCreateableAndUpdatable = [
+                    'Packaging-Package'     // Asset
+                ];
+            */
 
             $modelsViewableAndUpdatable = [
                 'Application-Setting',  // view / update
@@ -77,19 +79,6 @@ class PermissionSeeder extends Seeder
                 }
             */
 
-            foreach ($modelRUDableOnly as $model) {
-            	
-            	Permission::insert([
-                
-                    // [ 'name' => 'create-'.strtolower($model) ],
-                    [ 'name' => 'view-'.strtolower($model).'-index' ],
-                    [ 'name' => 'update-'.strtolower($model) ],
-                    [ 'name' => 'delete-'.strtolower($model) ]
-
-                ]);
-
-            }
-
             foreach ($modelsCRUDable as $model) {
                 
                 Permission::insert([
@@ -102,6 +91,19 @@ class PermissionSeeder extends Seeder
                 ]);
 
             }
+
+            /*
+                foreach ($modelsCreateableAndUpdatable as $model) {
+                    
+                    Permission::insert([
+                    
+                        [ 'name' => 'create-'.strtolower($model) ],
+                        [ 'name' => 'update-'.strtolower($model) ],
+
+                    ]);
+
+                }
+            */
 
             foreach ($modelsViewableAndUpdatable as $model) {
                 

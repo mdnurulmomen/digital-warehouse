@@ -17,11 +17,11 @@ class AssetController extends Controller
     {
         $this->middleware("permission:view-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods', 'showAllVariationTypes', 'searchVariationTypes', 'showAllVariations', 'searchAllVariations']);
 
-        $this->middleware("permission:create-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod', 'storeVariationType', 'storeNewVariation']);
+        $this->middleware("permission:create-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod', 'storeVariationType', 'storeNewVariation', 'storeNewPackagingPackage']);
 
-        $this->middleware("permission:update-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod', 'updateVariationType', 'updateVariation']);
+        $this->middleware("permission:update-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod', 'updateVariationType', 'updateVariation', 'updatePackagingPackage']);
         
-        $this->middleware("permission:delete-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod', 'deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation']);
+        $this->middleware("permission:delete-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod', 'deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation', 'deletePackagingPackage', 'restorePackagingPackage']);
     }
 
     // storage types

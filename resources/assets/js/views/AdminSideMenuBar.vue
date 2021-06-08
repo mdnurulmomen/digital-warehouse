@@ -61,12 +61,6 @@
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='packaging-packages' ? 'active' : ''">
-										<router-link :to="{ name: 'packaging-packages' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Packaging Packages</span>
-										</router-link>
-									</li>
-
 									<li :class="currentRouteName=='rent-periods' ? 'active' : ''">
 										<router-link :to="{ name: 'rent-periods' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Rent Periods</span>
@@ -92,6 +86,25 @@
 												</router-link>
 											</li>
 										</ul>
+									</li>
+								</ul>
+							</li>
+
+							<li 
+								class="pcoded-hasmenu" 
+								:class="currentRouteName=='packaging-packages' ? 'active pcoded-trigger' : ''" 
+							>
+								<a href="javascript:void(0)" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="fa fa-gift" aria-hidden="true"></i>
+									</span>
+									<span class="pcoded-mtext">Packaging</span>
+								</a>
+								<ul class="pcoded-submenu">
+									<li :class="currentRouteName=='packaging-packages' ? 'active' : ''">
+										<router-link :to="{ name: 'packaging-packages' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Packages</span>
+										</router-link>
 									</li>
 								</ul>
 							</li>

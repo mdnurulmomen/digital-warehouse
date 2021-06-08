@@ -273,11 +273,9 @@
 								</div>
 							</div>
 							
-							<div class="form-row" v-show="allPermissions.length"> 
-							    <div class="col-md-6">
-									<label for="inputFirstName">Select Permissions </label>
-								</div>
-								<div class="col-md-12">
+							<div class="form-row" v-show="allPermissions.length">
+								<div class="form-group col-md-12">
+									<label for="inputUsername">Special Permissions</label>
 									<div class="row">
 										<!-- Approvable Models -->
 										<div 
@@ -345,47 +343,6 @@
 												-->
 										</div>
 
-										<!-- Only Updatable Models -->
-										<div 
-											class="col-md-6" 
-											v-for="model in modelRUDableOnly" 
-											:key="'updatable-model-permission-name-' + model"
-										>
-											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
-											<!-- update -->
-											<div class="form-check">
-												<input 
-													type="checkbox" 
-													:checked="permissionExists('update-' + model)" 
-													@change="insertPermission('update-' + model, $event)" 
-													:ref="'update-' + model.toLowerCase()"
-												>
-												<label>{{ modelName('update-' + model) }}</label>
-											</div>
-
-											<!-- delete -->
-											<div class="form-check">
-												<input 
-													type="checkbox" 
-													:checked="permissionExists('delete-' + model)" 
-													@change="insertPermission('delete-' + model, $event)" 
-													:ref="'delete-' + model.toLowerCase()"
-												>
-												<label>{{ modelName('delete-' + model) }}</label>
-											</div>
-
-											<!-- view -->
-											<div class="form-check">
-												<input 
-													type="checkbox" 
-													:checked="permissionExists('view-' + model + '-index')" 
-													@change="insertPermission('view-' + model + '-index', $event)" 
-													:ref="'view-' + model.toLowerCase() + '-index'"
-												>
-												<label>{{ modelName('view-' + model + '-list') }}</label>
-											</div>
-										</div>
-
 										<!-- CRUD Models -->
 										<div 
 											class="col-md-6" 
@@ -443,7 +400,7 @@
 										<div 
 											class="col-md-6" 
 											v-for="model in modelsViewableAndUpdatable" 
-											:key="'crud-model-permission-name-' + model"
+											:key="'view-update-model-permission-name-' + model"
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -474,7 +431,7 @@
 										<div 
 											class="col-md-6" 
 											v-for="model in modelsViewableRecommendableAndApproveable" 
-											:key="'crud-model-permission-name-' + model"
+											:key="'view-make-model-permission-name-' + model"
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -489,7 +446,7 @@
 												<label>{{ modelName('recommend-' + model) }}</label>
 											</div>
 
-											<!-- approve -->
+											<!-- update -->
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -497,7 +454,7 @@
 													@change="insertPermission('approve-' + model, $event)" 
 													:ref="'approve-' + model.toLowerCase()"
 												>
-												<label>{{ modelName('approve-' + model) }}</label>
+												<label>{{ modelName('update/Approve-' + model) }}</label>
 											</div>
 											
 											<!-- view -->
@@ -516,7 +473,7 @@
 										<div 
 											class="col-md-6" 
 											v-for="model in modelsViewable" 
-											:key="'crud-model-permission-name-' + model"
+											:key="'view-model-permission-name-' + model"
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -531,17 +488,25 @@
 												<label>{{ modelName('view-' + model + '-list') }}</label>
 											</div>
 										</div>
-									</div>
 
-									<div class="row">
-										<div class="col-sm-12 text-center">
-											<div 
-												class="invalid-feedback mt-1" 
-												style="display: block;" 
-												v-show="errors.permission"
-											>
-									        	{{ errors.permission }}
-									  		</div>
+										<!-- Viewable 2 -->
+										<div 
+											class="col-md-6" 
+											v-for="model in modelsViewable2" 
+											:key="'view2-model-permission-name-' + model"
+										>
+											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+											<!-- view -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('view-' + model)" 
+													@change="insertPermission('view-' + model, $event)" 
+													:ref="'view-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('view-' + model) }}</label>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -682,48 +647,6 @@
 										</p>
 									</div>
 
-									<!-- Only Updatable Models -->
-									<div 
-										class="col-md-6" 
-										v-for="model in modelRUDableOnly" 
-										:key="'updatable-model-permission-name-' + model"
-									>
-										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
-										
-										<!-- update -->
-										<p class="m-0">
-											<span v-show="permissionExists('update-' + model)" class="text-success">
-												<i class="fa fa-check" aria-hidden="true"></i>
-											</span>
-											<span v-show="!permissionExists('update-' + model)" class="text-danger">
-												<i class="fa fa-times" aria-hidden="true"></i>
-											</span>
-											{{ modelName('update-' + model) }}
-										</p>
-
-										<!-- delete -->
-										<p class="m-0">
-											<span v-show="permissionExists('delete-' + model)" class="text-success">
-												<i class="fa fa-check" aria-hidden="true"></i>
-											</span>
-											<span v-show="!permissionExists('delete-' + model)" class="text-danger">
-												<i class="fa fa-times" aria-hidden="true"></i>
-											</span>
-											{{ modelName('delete-' + model) }}
-										</p>
-
-										<!-- view -->
-										<p class="m-0">
-											<span v-show="permissionExists('view-' + model + '-index')" class="text-success">
-												<i class="fa fa-check" aria-hidden="true"></i>
-											</span>
-											<span v-show="!permissionExists('view-' + model + '-index')" class="text-danger">
-												<i class="fa fa-times" aria-hidden="true"></i>
-											</span>
-											{{ modelName('view-' + model + '-list') }}
-										</p>
-									</div>
-
 									<!-- CRUD Models -->
 									<div 
 										class="col-md-6" 
@@ -781,7 +704,7 @@
 									<div 
 										class="col-md-6" 
 										v-for="model in modelsViewableAndUpdatable" 
-										:key="'crud-model-permission-name-' + model"
+										:key="'view-update-model-permission-name-' + model"
 									>
 										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -812,7 +735,7 @@
 									<div 
 										class="col-md-6" 
 										v-for="model in modelsViewableRecommendableAndApproveable" 
-										:key="'crud-model-permission-name-' + model"
+										:key="'view-make-model-permission-name-' + model"
 									>
 										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -854,7 +777,7 @@
 									<div 
 										class="col-md-6" 
 										v-for="model in modelsViewable" 
-										:key="'crud-model-permission-name-' + model"
+										:key="'view-model-permission-name-' + model"
 									>
 										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -867,6 +790,26 @@
 												<i class="fa fa-times" aria-hidden="true"></i>
 											</span>
 											{{ modelName('view-' + model + '-list') }}
+										</p>
+									</div>
+
+									<!-- Viewable 2 -->
+									<div 
+										class="col-md-6" 
+										v-for="model in modelsViewable2" 
+										:key="'view2-model-permission-name-' + model"
+									>
+										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+										<!-- view -->
+										<p class="m-0">
+											<span v-show="permissionExists('view-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('view-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('view-' + model) }}
 										</p>
 									</div>
 								</div>
@@ -921,30 +864,33 @@
 	                'Product-Stock',
 	            ],
 
-	            modelRUDableOnly : [
-	                'Warehouse-Manager',
-	            ],
-
-	        	modelsCRUDable : [
+				modelsCRUDable : [
 	        		'Asset',
 	            	'Manager',
 	            	'Merchant',
 	            	'Product-Category',
 	            	'Product',
-	            	// 'Product-Stock',
 	            	'Role',
 	            	'Warehouse-Owner',
 	            	'Warehouse',
 	        	],
+
 	        	modelsViewableAndUpdatable : [
 	        		'Application-Setting',  // view / update
                 	'Requisition', // view / update(cancel)
 	        	],
+
 	        	modelsViewableRecommendableAndApproveable : [
 	        		'Dispatch',  // view / recommend
 	        	],
+
 	        	modelsViewable : [
 	        		'Permission',  // view
+	        	],
+
+	        	modelsViewable2 : [
+	        		'General-Dashboard-One',  // view
+	        		'General-Dashboard-Two',  // view
 	        	],
 
 	        	pagination: {
@@ -1377,7 +1323,7 @@
 
 							let viewPermission = permissionName.replace(/create|update|delete|recommend/, "view").toLowerCase();
 							
-							if (! this.$refs[viewPermission + '-index'][0].checked) {
+							if (this.getExpectedPermission(viewPermission + '-index') && ! this.$refs[viewPermission + '-index'][0].checked) {
 
 								// this.$refs[viewPermission + '-index'][0].disabled = false;
 								this.$refs[viewPermission + '-index'][0].click();

@@ -313,47 +313,6 @@
  													-->
 												</div>
 
-												<!-- Only Updatable Models -->
-												<div 
-													class="col-md-6" 
-													v-for="model in modelRUDableOnly" 
-													:key="'updatable-model-permission-name-' + model"
-												>
-													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
-													<!-- update -->
-													<div class="form-check">
-														<input 
-															type="checkbox" 
-															:checked="permissionExists('update-' + model)" 
-															@change="insertPermission('update-' + model, $event)" 
-															:ref="'update-' + model.toLowerCase()"
-														>
-														<label>{{ modelName('update-' + model) }}</label>
-													</div>
-
-													<!-- delete -->
-													<div class="form-check">
-														<input 
-															type="checkbox" 
-															:checked="permissionExists('delete-' + model)" 
-															@change="insertPermission('delete-' + model, $event)" 
-															:ref="'delete-' + model.toLowerCase()"
-														>
-														<label>{{ modelName('delete-' + model) }}</label>
-													</div>
-
-													<!-- view -->
-													<div class="form-check">
-														<input 
-															type="checkbox" 
-															:checked="permissionExists('view-' + model + '-index')" 
-															@change="insertPermission('view-' + model + '-index', $event)" 
-															:ref="'view-' + model.toLowerCase() + '-index'"
-														>
-														<label>{{ modelName('view-' + model + '-list') }}</label>
-													</div>
-												</div>
-
 												<!-- CRUD Models -->
 												<div 
 													class="col-md-6" 
@@ -411,7 +370,7 @@
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewableAndUpdatable" 
-													:key="'crud-model-permission-name-' + model"
+													:key="'view-update-model-permission-name-' + model"
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -442,7 +401,7 @@
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewableRecommendableAndApproveable" 
-													:key="'crud-model-permission-name-' + model"
+													:key="'view-make-model-permission-name-' + model"
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -504,7 +463,7 @@
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewable2" 
-													:key="'view-model-permission-name-' + model"
+													:key="'view2-model-permission-name-' + model"
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
@@ -605,10 +564,6 @@
 
 				modelCRUDableAndApproveable : [
 	                'Product-Stock',
-	            ],
-
-	            modelRUDableOnly : [
-	                'Warehouse-Manager',
 	            ],
 
 				modelsCRUDable : [
@@ -894,7 +849,7 @@
 
 							let viewPermission = permissionName.replace(/create|update|delete|recommend/, "view").toLowerCase();
 							
-							if (! this.$refs[viewPermission + '-index'][0].checked) {
+							if (this.getExpectedPermission(viewPermission + '-index') && ! this.$refs[viewPermission + '-index'][0].checked) {
 
 								// this.$refs[viewPermission + '-index'][0].disabled = false;
 								this.$refs[viewPermission + '-index'][0].click();

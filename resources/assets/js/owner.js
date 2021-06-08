@@ -77,6 +77,7 @@ import RequisitionIndex from './views/RequisitionIndex'
 // import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
 import RoleIndex from './views/RoleIndex'
+import PackagingPackageIndex from './views/PackagingPackageIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -250,6 +251,15 @@ const router = new VueRouter({
             component: RoleIndex,
             meta: { 
                 requiredPermission: 'view-role-index' 
+            }
+        },
+        {
+            path: '/packaging-packages',
+            name: 'packaging-packages',
+            component: PackagingPackageIndex,
+            meta: {
+                // authRequired: true,
+                // requiredPermission: 'view-asset-index' 
             }
         },
 

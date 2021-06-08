@@ -459,14 +459,14 @@
 			ascendingNumeric(columnValue) {
 				this.currentContents.sort(
 			 		function(a, b){
-						return a.columnValue - b.columnValue;
+						return a[columnValue] - b[columnValue];
 					}
 				);
 			},
 			descendingNumeric(columnValue) {
 				this.currentContents.sort(
 			 		function(a, b){
-						return b.columnValue - a.columnValue;
+						return b[columnValue] - a[columnValue];
 					}
 				);
 			},

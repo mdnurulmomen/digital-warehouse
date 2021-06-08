@@ -280,7 +280,7 @@ const router = new VueRouter({
             component: PackagingPackageIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-asset-index' 
+                // requiredPermission: 'view-asset-index' 
             }
         },
 

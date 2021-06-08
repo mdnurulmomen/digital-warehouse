@@ -166,6 +166,14 @@ Route::name('manager.')->group(function () {
 		Route::delete('/roles/{role}/{perPage}','RoleController@deleteRole')->name('roles');
 		Route::get('/api/search-roles/{search}/{perPage}','RoleController@searchAllRoles')->name('search-roles');
 
+		// packaging-packages
+		Route::get('/api/packaging-packages/{perPage?}','AssetController@showAllPackagingPackages')->name('packaging-packages');
+		Route::post('/packaging-packages/{perPage}','AssetController@storeNewPackagingPackage')->name('packaging-packages');	
+		Route::put('/packaging-packages/{package}/{perPage}','AssetController@updatePackagingPackage')->name('packaging-packages');	
+		Route::delete('/packaging-packages/{package}/{perPage}','AssetController@deletePackagingPackage')->name('packaging-packages');
+		Route::patch('/packaging-packages/{package}/{perPage}','AssetController@restorePackagingPackage')->name('packaging-packages');
+		Route::get('/api/search-packaging-packages/{search}/{perPage}','AssetController@searchAllPackagingPackages')->name('search-packaging-packages');
+
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 
