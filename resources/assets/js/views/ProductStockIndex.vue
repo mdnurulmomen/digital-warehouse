@@ -1484,7 +1484,7 @@
 
 	        		serials : [],
 	        		product_id : this.product.id,
-	        		variations : JSON.parse(JSON.stringify(this.product.variations)) ?? [],
+	        		variations : this.product.hasOwnProperty('variations') && this.product.variations.length ? JSON.parse(JSON.stringify(this.product.variations)) : [],
 					addresses : [
 						{},
 					],
@@ -1744,7 +1744,7 @@
 
 	        		serials : [],
 	        		product_id : this.product.id,
-	        		variations : JSON.parse(JSON.stringify(this.product.variations)) ?? [],
+	        		variations : this.product.hasOwnProperty('variations') && this.product.variations.length ? JSON.parse(JSON.stringify(this.product.variations)) : [],
 	        		warehouse : this.singleStockData.warehouse ?? {},  // last warehouse
 					addresses : this.singleStockData.addresses,  // last address / initial address
 

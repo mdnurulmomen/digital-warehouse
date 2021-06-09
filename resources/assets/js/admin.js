@@ -7,11 +7,13 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+window.toastr = require('vue-toastr');
 
 // importing plugin
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+// import mixin
 import HasPermission from './mixins/HasPermission';
 Vue.mixin(HasPermission);
 
@@ -21,8 +23,6 @@ Vue.component('ToggleButton', ToggleButton)
 
 // importing custom components
 import { routeNeedsPermission, userHasPermissionTo } from './public.js'
-
-window.toastr = require('vue-toastr');
 
 /**
  * The following block of code may be used to automatically register your
@@ -274,6 +274,8 @@ const router = new VueRouter({
                 requiredPermission: 'view-role-index' 
             }
         },
+        
+        // view packages is permissible for all
         {
             path: '/packaging-packages',
             name: 'packaging-packages',
@@ -319,7 +321,8 @@ router.beforeEach((to, from, next) => {
         next();
     }
     else {
-        next(false);  // not authorized
+        // next(false);  // not authorized
+        next('/403');
     }
 
 });

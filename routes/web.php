@@ -19,12 +19,12 @@ Route::get('/', function () {
 
 Route::get('/clear-cache', function() {
     
-    Artisan::call('event:clear');
-    // Artisan::call('cache:clear');
-    // Artisan::call('config:clear');
-    // Artisan::call('route:clear');
-    // Artisan::call('view:clear');
-    Artisan::call('optimize:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    // Artisan::call('event:clear');
+    // Artisan::call('optimize:clear');
 
     return 'All cache has been flushed';
 

@@ -29,7 +29,7 @@
 											  		:query="query" 
 											  		:caller-page="'products'" 
 											  		:required-permission = "'product'" 
-											  		:disable-add-button="(allProductCategories.length==0 || allVariationTypes.length==0) ? true : false" 
+											  		:disable-add-button="allProductCategories.length==0 ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -423,7 +423,7 @@
 													:sync="true"
 													:color="{checked: 'green', unchecked: 'blue'}"
 													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
-													:disabled="productMode=='bulk product' || singleProductData.product_immutability" 
+													:disabled="productMode=='bulk product' || singleProductData.product_immutability || allVariationTypes.length==0" 
 													@change="resetProductVariations()"
 												/>
 											</div>
@@ -1719,7 +1719,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							// this.allVariationTypes = response.data;
-							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 0);
+							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 1);
 						}
 					})
 					.catch(error => {

@@ -44,8 +44,8 @@ axios.interceptors.response.use(
                 window.location.href = "/login";
             }
             else if (error.response.status === 403) {
-                // location.reload();
-                window.location.href = "/403"
+                location.reload();
+                // window.location.href = "/403"
             }
 
         }
@@ -69,12 +69,12 @@ window.Pusher = require('pusher-js');
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: process.env.MIX_PUSHER_APP_KEY,
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+    // cluster: process.env.MIX_PUSHER_APP_CLUSTER, // ssl certificate
     forceTLS: false,
     wsHost: window.location.hostname,
     wsPort: 6001,
     wssPort: 6001,
     disableStats: true,
     enabledTransports: ['ws', 'wss'],
-    encrypted: false,
+    // encrypted: false,    // ssl certificate
 });
