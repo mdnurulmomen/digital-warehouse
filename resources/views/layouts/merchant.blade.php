@@ -37,7 +37,7 @@
 			<nav class="navbar header-navbar pcoded-header">
 				<div class="navbar-wrapper">
 					<div class="navbar-logo">
-						<a href="index.html">
+						<a href="{{ route('merchant.home', 'home') }}">
 							<img class="img-fluid" src="{{asset('uploads/application/application_logo.png')}}" alt="Theme-Logo" />
 						</a>
 						<a class="mobile-menu" id="mobile-collapse" href="#!">
