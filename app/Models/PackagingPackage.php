@@ -35,7 +35,7 @@ class PackagingPackage extends Model
                 return;
             }
 
-            $img = $img->resize(100, 100);
+            // $img = $img->resize(300, 300);
             $img->save($imagePath.$this->id.'.jpg');
 
             $this->attributes['preview'] = $imagePath.$this->id.'.jpg';

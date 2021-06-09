@@ -104,7 +104,7 @@
 																		</a>
 																	</th>
 
-																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
+																	<th>
 																		Actions
 																	</th>
 																</tr>
@@ -123,16 +123,14 @@
 																		{{ content.price }}
 																	</td>
 																	
-																	<td v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
-																		<!-- 
+																	<td> 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
-																				@click="$emit('showContentDetails', content)"
+																				@click="showContentDetails(content)"
 																		>
 																			<i class="fas fa-eye"></i>
 																		</button>
- 																		-->
-
+ 																		
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
@@ -166,7 +164,7 @@
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
-														    		<td :colspan="(userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')) ? 3 : 2">
+														    		<td colspan="3">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -212,7 +210,7 @@
 																		</a>
 																	</th>
 
-																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
+																	<th>
 																		Actions
 																	</th>
 																</tr>
@@ -427,6 +425,61 @@
 			</div>
 		</div>
 
+		<!-- View Modal -->
+		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">{{ singleAssetData.name | capitalize }} Details</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+
+						<div class="card">
+							<div class="card-body text-center">	
+								<img class="img-fluid" 
+									:src="singleAssetData.preview || ''"
+									alt="Package Picture" 
+								>
+							</div>
+						</div>
+
+						<div class="form-row"> 
+						    <div class="form-group col-md-6 text-right">
+								<label class="font-weight-bold">Name:</label>
+							</div>
+							<div class="form-group col-md-6 text-left">
+								{{ singleAssetData.name }}
+							</div>
+						</div>
+
+						<div class="form-row"> 
+						    <div class="form-group col-md-6 text-right">
+								<label class="font-weight-bold">Price:</label>
+							</div>
+							<div class="form-group col-md-6 text-left">
+								{{ singleAssetData.price }}
+							</div>
+						</div>
+
+						<div class="form-row"> 
+						    <div class="form-group col-md-6 text-right">
+								<label class="font-weight-bold">Description:</label>
+							</div>
+							<div class="form-group col-md-6 text-left">
+								<span v-html="singleAssetData.description"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-asset')" 
 			:csrf="csrf" 
@@ -608,12 +661,10 @@
 				});
 
 			},
-		/*
 			showContentDetails(object) {	
 				this.singleAssetData = object;
 				$('#asset-view-modal').modal('show');
 			},
-		*/
 			showContentCreateForm() {
 				this.createMode = true;
 				
