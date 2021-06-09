@@ -2008,7 +2008,7 @@
 		watch: {
 
 			ownerObject: function (object) {
-				if (Object.keys(object).length > 0) {
+				if (object && Object.keys(object).length > 0) {
 					this.singleWarehouseData.warehouse_owner_id = object.id;
 				}
 			},
@@ -3109,7 +3109,7 @@
 
 					case 'owner' :
 
-						if (Object.keys(this.ownerObject).length === 0 && !this.singleWarehouseData.warehouse_owner_id) {
+						if (! this.ownerObject || Object.keys(this.ownerObject).length === 0 || ! this.singleWarehouseData.warehouse_owner_id) {
 							this.errors.warehouse.owner = 'Owner is required';
 						}
 						else{
@@ -3269,7 +3269,7 @@
 							(container, containerIndex) => {
 
 								if (Object.keys(container.rents).length === 0) {
-									this.errors.warehouse.containers[containerIndex].container_price = 'One Price is required';
+									this.errors.warehouse.containers[containerIndex].container_price = 'One rent price is required';
 								}
 
 								else {
