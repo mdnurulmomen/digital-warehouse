@@ -75,6 +75,11 @@ class DispatchController extends Controller
             'requisition.products.*.quantity' => 'required|numeric|min:1',
             'requisition.products.*.available_quantity' => 'required|numeric|min:1',
 
+            'requisition.products.*.packaging_service' => 'required|boolean',
+            'requisition.products.*.dispatched_package' => 'required_if:requisition.products.*.packaging_service,1',
+            'requisition.products.*.dispatched_package.id' => 'required_if:requisition.products.*.packaging_service,1|exists:packaging_packages,id',
+            'requisition.products.*.dispatched_package_quantity' => 'required_if:requisition.products.*.packaging_service,1|numeric',
+
             // validate laterly
             'requisition.products.*.serials' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|array|min:1',
 

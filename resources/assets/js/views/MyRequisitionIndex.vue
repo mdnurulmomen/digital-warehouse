@@ -414,6 +414,41 @@
 												</div>
 											</div>
 
+											<div 
+												class="form-row" 
+												v-if="requiredProduct.product && requiredProduct.total_quantity"
+											>
+												<div class="form-group col-md-12 text-center">
+													<toggle-button 
+														v-model="requiredProduct.packaging_service" 
+														:value="false" 
+														:width=200 
+														:color="{checked: 'green', unchecked: 'red'}"
+														:labels="{checked: 'Want Packaging', unchecked: 'No Packaging'}" 
+														@change="setPackagingService(productIndex)"
+													/>
+												</div>
+
+												<div class="col-md-12" v-if="requiredProduct.packaging_service">
+													<div class="form-row">
+														<div class="col-md-3"></div>
+														<div class="col-md-6">
+															<multiselect 
+						                              			v-model="requiredProduct.preferred_package" 
+						                              			class="form-control p-0 is-valid" 
+						                              			placeholder="Choose Package" 
+						                              			label="name" 
+						                                  		track-by="id" 
+						                                  		:options="allPackagingPackages" 
+						                                  		:custom-label="customPackagingPackageName" 
+						                              		>
+						                                	</multiselect>
+														</div>
+														<div class="col-md-3"></div>
+													</div>
+												</div>
+											</div>
+
 											<div class="form-row">
 												<div class="form-group col-md-12 text-center">
 													<div 
@@ -923,10 +958,57 @@
 																	</div>
 																</div>
 
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Packaging Service :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
+																			{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
+																		</span>
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package') && requiredProduct.preferred_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Preferred Package :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.preferred_package.name | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-else-if="requiredProduct.hasOwnProperty('preferred_package') && !requiredProduct.preferred_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Preferred Package :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<span class="badge badge-info">
+																			NA
+																		</span>
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Dispatched Package :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.dispatched_package.name | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Package Quantity :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.dispatched_package.quantity }}
+																	</label>
+																</div>
 															</div>
 														</div>
 													</div>
-
 												</div>
 											</div>
 										</div>
@@ -1110,6 +1192,8 @@
 	        	merchantAllProducts : [],
 	        	merchantAllAgents : [],
 
+	        	allPackagingPackages : [],
+
 	        	pagination: {
 		        	current_page: 1
 		      	},
@@ -1151,6 +1235,7 @@
 			this.fetchAllRequisitions();
 			this.fetchMerchantAllAgents();
 			this.fetchMerchantAllProducts();
+			this.fetchAllPackagingPackages();
 			
 		},
 
@@ -1279,6 +1364,44 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllAgents = Object.values(response.data);
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllPackagingPackages() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allPackagingPackages = [];
+				
+				axios
+					.get('/api/packaging-packages/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allPackagingPackages = response.data;
 						}
 					})
 					.catch(error => {
@@ -1613,6 +1736,9 @@
 		      	else 
 		      		return ''
 		    },
+		    customPackagingPackageName ({ name, price, description, preview }) {
+		      	return name.charAt(0).toUpperCase() + name.slice(1) + ' - Each Price (BDT) ' + price 
+		    },
 			setRequiredProduct(index) {
 				if (this.singleRequisitionData.products[index].product && Object.keys(this.singleRequisitionData.products[index].product).length > 0) {
 					this.singleRequisitionData.products[index].id = this.singleRequisitionData.products[index].product.id;
@@ -1627,6 +1753,16 @@
 					this.singleRequisitionData.delivery = {};
 					this.$delete(this.singleRequisitionData, 'agent');
 				}
+			},
+			setPackagingService(productIndex) {
+				
+				if (this.singleRequisitionData.hasOwnProperty('products') && this.singleRequisitionData.products.length && ! this.singleRequisitionData.products[productIndex].packaging_service) {
+
+					this.singleRequisitionData.products[productIndex].preferred_package = {};
+
+
+				}
+
 			},
 			unconfirmed(object) {
 

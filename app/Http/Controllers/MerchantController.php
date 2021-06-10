@@ -267,6 +267,8 @@ class MerchantController extends Controller
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|numeric|exists:products,id',
             'products.*.total_quantity' => 'required|numeric|min:1',
+            'products.*.packaging_service' => 'boolean',
+            // 'products.*.package' => 'required_if:products.*.packaging_service,true',
             'products.*.product' => 'required',
 
             'products.*.serials' => 'exclude_if:products.*.product.has_variations,true|required_if:products.*.product.has_serials,true|array',

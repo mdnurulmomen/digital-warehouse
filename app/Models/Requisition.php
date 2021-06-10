@@ -13,9 +13,9 @@ class Requisition extends Model
      *
      * @var array
      */
-    // protected $casts = [
-        // 'status' => 'boolean',
-    // ];
+    protected $casts = [
+        'packaging_service' => 'boolean',
+    ];
 
     /**
      * Set the user's first name.
@@ -112,6 +112,7 @@ class Requisition extends Model
                     'quantity' => $requiredProduct->total_quantity,
     				'has_variations' => $requiredProduct->product->has_variations ?? false,
                     'has_serials' => $requiredProduct->product->has_serials ?? false,
+                    'packaging_service' => $requiredProduct->packaging_service ?? false,
     			]);
 
                 if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && count($requiredProduct->serials)) {
@@ -161,6 +162,15 @@ class Requisition extends Model
                         }
 
                     }
+
+                }
+
+                // when packaging package is chosen by merchant
+                if ($requisitionedProduct->packaging_service && ! empty($requiredProduct->preferred_package)) {
+                    
+                    $requisitionedProduct->preferredPackage()->create([
+                        'packaging_package_id' => $requiredProduct->preferred_package->id
+                    ]);
 
                 }
 

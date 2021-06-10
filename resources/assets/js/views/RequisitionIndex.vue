@@ -250,11 +250,7 @@
 			                                  		@close="validateFormInput('requisition_id')" 
 			                              		>
 			                                	</multiselect>
-			                                	<div 
-				                                	class="invalid-feedback" 
-				                                	style="display: block;" 
-				                                	v-show="errors.requisition_id"
-			                                	>
+			                                	<div class="invalid-feedback">
 											    	{{ errors.requisition_id }}
 											    </div>
 											</div>
@@ -518,6 +514,79 @@
 											</div>
 									 		-->
 
+									 		<div class="card">
+									 			<div class="card-body">
+											 		<div class="form-row" v-if="requiredProduct.packaging_service">
+														<div class="form-group col-md-12 text-center">
+															<toggle-button 
+																v-model="requiredProduct.packaging_service" 
+																:value="false" 
+																:width=200 
+																:color="{checked: 'green', unchecked: 'red'}"
+																:labels="{checked: 'Want Packaging', unchecked: 'No Packaging'}" 
+																:disabled="true"
+															/>
+														</div>
+
+														<div class="col-md-12">
+															<div class="form-row">
+																<div class="col-md-4">
+																	<label for="inputFirstName">
+																		Preferred Package
+																	</label>
+																	<multiselect 
+								                              			v-model="requiredProduct.preferred_package" 
+								                              			class="form-control p-0 is-valid" 
+								                              			:placeholder="requiredProduct.preferred_package ? 'Preferred Package' : 'No Preferred Package'" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:options="[]" 
+								                                  		:disabled="true"
+								                              		>
+								                                	</multiselect>
+																</div>
+
+																<div class="col-md-4">
+																	<label for="inputFirstName">
+																		Choose Package
+																	</label>
+																	<multiselect 
+								                              			v-model="requiredProduct.dispatched_package" 
+								                              			class="form-control p-0" 
+								                              			:class="!errors.products[productIndex].dispatched_package ? 'is-valid' : 'is-invalid'" 
+								                              			placeholder="Choose Package" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:options="allPackagingPackages" 
+								                                  		@input="validateFormInput('dispatched_package')"
+								                              		>
+								                                	</multiselect>
+								                                	<div class="invalid-feedback">
+																    	{{ errors.products[productIndex].dispatched_package }}
+																    </div>
+																</div>
+
+																<div class="col-md-4">
+																	<label for="inputFirstName">
+																		Package Quantity
+																	</label>
+																	<input 
+																		type="number" 
+																		v-model.number="requiredProduct.dispatched_package_quantity" 
+																		class="form-control" 
+																		:class="!errors.products[productIndex].dispatched_package_quantity ? 'is-valid' : 'is-invalid'" 
+																		placeholder="Package Total Quantity" 
+																		@change="validateFormInput('dispatched_package_quantity')"
+																	>
+																	<div class="invalid-feedback">
+																    	{{ errors.products[productIndex].dispatched_package_quantity }}
+																    </div>
+																</div>
+															</div>
+														</div>
+													</div>
+									 			</div>
+									 		</div>
 										</div>
 									</div>
 										
@@ -1117,6 +1186,55 @@
 																		</div>
 																	</div>
 																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Packaging Service :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
+																			{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
+																		</span>
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package') && requiredProduct.preferred_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Preferred Package :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.preferred_package.name | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-else-if="requiredProduct.hasOwnProperty('preferred_package') && !requiredProduct.preferred_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Preferred Package :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<span class="badge badge-info">
+																			NA
+																		</span>
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Dispatched Package :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.dispatched_package.name | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Package Quantity :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.dispatched_package.quantity }}
+																	</label>
+																</div>
 															</div>
 														</div>
 													</div>
@@ -1394,6 +1512,8 @@
 
 	        	availableRequisitions : [],
 	        	
+	        	allPackagingPackages : [],
+
 	        	// availableProducts : [],
 
 	        	pagination: {
@@ -1419,6 +1539,7 @@
 			
 			this.subscribeToChannels();
 			this.fetchAllRequisitions();
+			this.fetchAllPackagingPackages();
 			this.fetchAvailableRequisitions();
 
 		},
@@ -1568,6 +1689,44 @@
 					});
 
 			},
+			fetchAllPackagingPackages() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allPackagingPackages = [];
+				
+				axios
+					.get('/api/packaging-packages/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allPackagingPackages = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 			openRequisitionCancelForm(object) {
 
 				this.singleRequisitionData = { ...object };
@@ -1584,6 +1743,8 @@
 				this.step = 1;
 	        	this.submitForm = true;
 	        	
+				this.configureErrorObject(object);
+
 				this.singleDispatchData = {
 
 					requisition : { ...object },
@@ -1593,12 +1754,6 @@
 					// agent : {}
 							
 			    };
-
-				this.errors = {
-					// products : [],
-					// delivery : {},
-					// agent : {},
-				};
 
 				if (object.delivery && ! object.agent) {
 
@@ -1646,6 +1801,8 @@
 				};
 			*/
 
+				this.configureErrorObject(object);
+
 				this.singleDispatchData = {
 
 					requisition : { ...object },
@@ -1655,12 +1812,6 @@
 					// agent : {}
 							
 			    };
-
-				this.errors = {
-					// products : [],
-					// delivery : {},
-					// agent : {},
-				};
 
 				if (object.delivery && ! object.agent) {
 
@@ -1767,7 +1918,7 @@
 				this.validateFormInput('collection_point');
 				// this.validateFormInput('agent_receipt');
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 2 && (! this.errors.hasOwnProperty('delivery') || Object.keys(this.errors.delivery).length == 0) && (! this.errors.hasOwnProperty('agent') || Object.keys(this.errors.agent).length == 0)) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && (! this.errors.hasOwnProperty('delivery') || Object.keys(this.errors.delivery).length == 0) && (! this.errors.hasOwnProperty('agent') || Object.keys(this.errors.agent).length == 0)) {
 
 					// console.log('verified');
 					return true;
@@ -1794,6 +1945,31 @@
 				.catch(e => {
 					this.error = e.toString();
 				});
+
+			},
+			configureErrorObject(object) {
+
+				this.errors = {
+					
+					products : [],
+					
+					// agent : {},
+					// delivery : {},
+					// cancellation : {}
+				
+				};
+
+				object.products.forEach(
+				
+					(requiredProduct, requiredProductIndex) => {
+
+						// if (requiredProduct.packaging_service) {
+							this.errors.products.push({});
+						// }
+
+					}
+					
+				);
 
 			},
 			changeNumberContents() {
@@ -1859,6 +2035,15 @@
 				if (!this.errors.requisition_id && this.step < 4) {
 					
 					if (this.step==2) {
+
+						this.validateFormInput('dispatched_package');
+						this.validateFormInput('dispatched_package_quantity');
+
+						if (this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 0)) {
+
+							this.submitForm = false;
+							return;
+						}
 
 						if (! this.userHasPermissionTo('approve-dispatch')) {
 							this.step += 2;
@@ -2158,6 +2343,86 @@
 
 							this.submitForm = true;
 							this.$delete(this.errors, 'agent');
+
+						}
+
+						break;
+
+					case 'dispatched_package' :
+
+						if (this.singleDispatchData.hasOwnProperty('requisition') && this.singleDispatchData.requisition.hasOwnProperty('products') && this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+				
+								(requiredProduct, requiredProductIndex) => {
+
+									if (requiredProduct.packaging_service && (! requiredProduct.hasOwnProperty('dispatched_package') || ! requiredProduct.dispatched_package || Object.keys(requiredProduct.dispatched_package).length==0)) {
+
+										this.errors.products[requiredProductIndex].dispatched_package = 'Package name is required';
+
+									}
+									else {
+
+										this.$delete(this.errors.products[requiredProductIndex], 'dispatched_package');
+
+									}
+
+								}
+								
+							);
+
+							if (! this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 0)) {
+
+								this.submitForm = true;
+								
+							}
+
+						}
+
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'products');
+
+						}
+
+						break;
+
+					case 'dispatched_package_quantity' :
+
+						if (this.singleDispatchData.hasOwnProperty('requisition') && this.singleDispatchData.requisition.hasOwnProperty('products') && this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+				
+								(requiredProduct, requiredProductIndex) => {
+
+									if (requiredProduct.packaging_service && (! requiredProduct.hasOwnProperty('dispatched_package_quantity') || requiredProduct.dispatched_package_quantity < 1)) {
+
+										this.errors.products[requiredProductIndex].dispatched_package_quantity = 'Package quantity is required';
+
+									}
+									else {
+
+										this.$delete(this.errors.products[requiredProductIndex], 'dispatched_package_quantity');
+
+									}
+
+								}
+								
+							);
+
+							if (! this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 0)) {
+
+								this.submitForm = true;
+								
+							}
+
+						}
+
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'products');
 
 						}
 

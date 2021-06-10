@@ -22,10 +22,13 @@ class MyRequiredProductResource extends JsonResource
             'available_quantity' => $this->product->latestStock->available_quantity ?? 0,
             'has_variations' => $this->has_variations,
             'has_serials' => $this->has_serials,
+            'packaging_service' => $this->packaging_service,
+            'preferred_package' => $this->when($this->packaging_service, $this->preferredPackage ? new PackagingPackageResource($this->preferredPackage->loadMissing('package')) : NULL),
+            'dispatched_package' => $this->when($this->packaging_service, $this->dispatchedPackage ? new PackagingPackageResource($this->dispatchedPackage->loadMissing('package')) : NULL),
             'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials->loadMissing('serial')->pluck('serial')->pluck('serial_no')),
-            'requisition_id' => $this->requisition_id,
             'variations' => $this->when($this->has_variations, MyRequiredProductVariationResource::collection($this->variations)),
-            'addresses' => new ProductAddressCollection($this->product->addresses),
+            'requisition_id' => $this->requisition_id,
+            // 'addresses' => new ProductAddressCollection($this->product->addresses),
         ];
     }
 }

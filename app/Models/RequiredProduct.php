@@ -12,6 +12,7 @@ class RequiredProduct extends Model
     protected $casts = [
         'has_serials' => 'boolean',
         'has_variations' => 'boolean',
+        'packaging_service' => 'boolean',
     ];
 
     public function requisition()
@@ -32,5 +33,15 @@ class RequiredProduct extends Model
     public function serials()
     {
         return $this->hasMany(RequiredProductSerial::class, 'required_product_id', 'id');
+    }
+
+    public function preferredPackage()
+    {
+        return $this->hasOne(RequiredProductPackage::class, 'required_product_id', 'id');
+    }
+
+    public function dispatchedPackage()
+    {
+        return $this->hasOne(PackedDispatch::class, 'required_product_id', 'id');
     }
 }

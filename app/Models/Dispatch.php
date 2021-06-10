@@ -162,6 +162,19 @@ class Dispatch extends Model
 
                 }
 
+                $expectedRequiredProduct = RequiredProduct::find($productToDispatch->id);
+
+                if ($expectedRequiredProduct->packaging_service) {
+                   
+                    $expectedRequiredProduct->dispatchedPackage()->create([
+
+                        'quantity' => $productToDispatch->dispatched_package_quantity,
+                        'packaging_package_id' => $productToDispatch->dispatched_package->id,
+                        
+                    ]);
+
+                }
+
             }
 
         }

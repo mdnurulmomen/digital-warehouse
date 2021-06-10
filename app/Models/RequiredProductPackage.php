@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PackedDispatch extends Model
+class RequiredProductPackage extends Model
 {
     public $timestamps = false;
     protected $guarded = ['id'];
