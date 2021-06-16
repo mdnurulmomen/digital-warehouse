@@ -15,11 +15,10 @@ class CreateRequiredProductVariationsTable extends Migration
     {
         Schema::create('required_product_variations', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedMediumInteger('product_variation_id');
+            $table->unsignedMediumInteger('merchant_product_variation_id');
             $table->unsignedMediumInteger('quantity');
-            $table->boolean('has_serials')->default(false);
+            // $table->boolean('has_serials')->default(false);
             $table->unsignedInteger('required_product_id');
-            
         });
     }
 

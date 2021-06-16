@@ -17,8 +17,8 @@ class CreateProductVariationStocksTable extends Migration
             $table->increments('id');
             $table->mediumInteger('stock_quantity');
             $table->mediumInteger('available_quantity');
-            $table->boolean('has_serials')->default(false);
-            $table->unsignedMediumInteger('product_variation_id'); // stationary / garments
+            // $table->boolean('has_serials')->default(false);
+            $table->unsignedMediumInteger('merchant_product_variation_id'); // stationary / garments
             $table->unsignedInteger('product_stock_id');
         });
     }

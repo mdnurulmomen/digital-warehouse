@@ -146,30 +146,30 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:65535',
-            'sku' => 'nullable|string|max:100|unique:products,sku',
-            'price' => 'numeric|min:0', // min 0 due to bulk products
+            // 'sku' => 'nullable|string|max:100|unique:products,sku',
+            // 'price' => 'numeric|min:0', // min 0 due to bulk products
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
             'product_category_id' => 'numeric|exists:product_categories,id',
-            'merchant_id' => 'required|numeric|exists:merchants,id',
+            // 'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
-            'variations.*.price' => 'required_if:has_variations,1',
+            // 'variations.*.price' => 'required_if:has_variations,1',
         ]);
 
         $newProduct = new Product();
 
         $newProduct->name = strtolower($request->name);
         $newProduct->description = strtolower($request->description);
-        $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
-        $newProduct->price = $request->price ?? 0;
+        // $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
+        // $newProduct->price = $request->price ?? 0;
         $newProduct->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
         $newProduct->has_serials = $request->has_serials ?? false;
         $newProduct->has_variations = $request->has_variations ?? false;
         $newProduct->product_category_id = $request->product_category_id;
-        $newProduct->merchant_id = $request->merchant_id;
+        // $newProduct->merchant_id = $request->merchant_id;
 
         $newProduct->save();
 
@@ -189,23 +189,23 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:65535',
-            'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
-            'price' => 'required|numeric|min:0', // min 0 due to bulk products
+            // 'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
+            // 'price' => 'required|numeric|min:0', // min 0 due to bulk products
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
             'product_category_id' => 'numeric|exists:product_categories,id',
-            'merchant_id' => 'required|numeric|exists:merchants,id',
+            // 'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
-            'variations.*.price' => 'required_if:has_variations,1',
+            // 'variations.*.price' => 'required_if:has_variations,1',
         ]);
 
         $productToUpdate->name = strtolower($request->name);
         $productToUpdate->description = strtolower($request->description);
-        $productToUpdate->sku = $request->sku ?? $this->generateProductSKU($request);
-        $productToUpdate->price = $request->price ?? 0;
+        // $productToUpdate->sku = $request->sku ?? $this->generateProductSKU($request);
+        // $productToUpdate->price = $request->price ?? 0;
         $productToUpdate->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
         
         if (! $productToUpdate->product_immutability) {
@@ -216,7 +216,7 @@ class ProductController extends Controller
         }
         
         $productToUpdate->product_category_id = $request->product_category_id ?? NULL;
-        $productToUpdate->merchant_id = $request->merchant_id;
+        // $productToUpdate->merchant_id = $request->merchant_id;
 
         $productToUpdate->save();
 
@@ -253,7 +253,7 @@ class ProductController extends Controller
     {
         $query = Product::where('name', 'like', "%$search%")
                         ->orWhere('sku', 'like', "%$search%")
-                        ->orWhere('price', 'like', "%$search%")
+                        // ->orWhere('price', 'like', "%$search%")
                         ->orWhere('quantity_type', 'like', "%$search%")
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
@@ -726,9 +726,9 @@ class ProductController extends Controller
     protected function generateProductSKU(Request $request)
     {
         if ($request->product_category_id) {
-            return 'MR'.$request->merchant_id.'CT'.$request->product_category_id;
+            return 'MR'.$request->merchant_id.'PR'.$request->product_id.'CT'.$request->product_category_id;
         }
-        return 'MR'.$request->merchant_id.'BX'.$request->name;
+        return 'MR'.$request->merchant_id.'PR'.$request->product_id.'BX'.$request->name;
     }
 
     protected function checkVariationSerialDuplicacy(Request $request)

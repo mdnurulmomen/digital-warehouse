@@ -20,51 +20,20 @@ class ProductVariation extends Model
     	return $this->belongsTo(Variation::class, 'variation_id', 'id');
     }
 
-    public function requests()
+    /**
+     * Get all of the merchant-products who has this variation.
+     */
+    public function merchantProducts()
     {
-        return $this->hasMany(RequiredProductVariation::class, 'product_variation_id', 'id');
-    }
-
-    public function stocks()
-    {
-        return $this->hasMany(ProductVariationStock::class, 'product_variation_id', 'id')->orderBy('id', 'desc');
-    }
-
-    public function serials()
-    {
-        return $this->hasMany(ProductVariationSerial::class, 'product_variation_id', 'id');
-    }
-
-    public function latestStock()
-    {
-        return $this->hasOne(ProductVariationStock::class, 'product_variation_id', 'id')->whereHas('productStock', function ($query) {
-            $query->where('has_approval', 1);
-        })->orderBy('id', 'desc');
+        return $this->hasMany(MerchantProductVariation::class, 'product_variation_id', 'id');
     }
 
     public function getVariationImmutabilityAttribute()
     {
-        if ($this->requests()->count()) {
+        if ($this->merchantProducts()->count()) {
             return true;   
-        }
-        else if ($this->stocks()->count()) {
-             return true;
         }
 
         return false;
-    }
-
-    public function nonDispatchedRequests()
-    {
-        return $this->requests()->whereHas('requiredProduct.requisition', function ($query) {
-            $query->where('status', 0);
-        });
-    }
-
-    public function dispatchedRequests()
-    {
-        return $this->requests()->whereHas('requiredProduct.requisition', function ($query) {
-            $query->where('status', 1);
-        });
     }
 }
