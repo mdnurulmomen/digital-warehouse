@@ -26,6 +26,7 @@ class MyRequisitionResource extends JsonResource
             'delivery' =>  $this->when($this->delivery, $this->delivery),
             'agent' => $this->when($this->agent, $this->agent),
             'dispatch' => $this->when($this->status, new RequisitionDispatchResource($this->dispatch)),
+            'cancellation_reason' => $this->when($this->status==-1, $this->cancellation)
         ];
     }
 }

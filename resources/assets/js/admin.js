@@ -50,7 +50,7 @@ Vue.component('restore-confirmation-modal', require('./components/RestoreConfirm
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
 
-import AdminSideMenuBar from './views/AdminSideMenuBar'
+import AdminSideMenuBar from './AdminSideMenuBar'
 
 import GeneralDashboardOne from './views/GeneralDashboard-1'
 import GeneralDashboardTwo from './views/GeneralDashboard-2'

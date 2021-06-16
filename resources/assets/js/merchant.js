@@ -50,7 +50,7 @@ Vue.component('restore-confirmation-modal', require('./components/RestoreConfirm
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
 
-import MerchantSideMenuBar from './views/MerchantSideMenuBar'
+import MerchantSideMenuBar from './MerchantSideMenuBar'
 
 import MerchantHome from './views/Home'
 import Profile from './views/ProfileComponent'

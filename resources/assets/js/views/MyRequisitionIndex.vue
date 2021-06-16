@@ -1097,12 +1097,21 @@
 										</div>
 										 -->
 
-										<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+										<div class="form-row" v-if="singleRequisitionData.status==-1 || (singleRequisitionData.status==1 && singleRequisitionData.dispatch && singleRequisitionData.dispatch.has_approval==1)">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												{{ singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched ' : 'Cancelled ' }}  By :
+												{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched ' : 'Cancelled ' }}  By :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
+												{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch && singleRequisitionData.dispatch.has_approval==1 ? singleRequisitionData.dispatch.updater.user_name : singleRequisitionData.updater.user_name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.status==-1 && singleRequisitionData.hasOwnProperty('cancellation_reason') && singleRequisitionData.cancellation_reason">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Cancellation Reason :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span v-html="singleRequisitionData.cancellation_reason.reason"></span>
 											</label>
 										</div>
 
