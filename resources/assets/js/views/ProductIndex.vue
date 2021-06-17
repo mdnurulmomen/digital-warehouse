@@ -104,11 +104,11 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
+																				class="btn btn-grd-dark btn-icon"  
 																				@click="goProductMerchants(content)" 
 																				v-if="userHasPermissionTo('view-merchant-product-index')"
 																			>
-																				<i class="feather icon-command"></i>
+																				<i class="fa fa-users" aria-hidden="true"></i>
 																			</button>
 																		</td>
 																	</tr>
@@ -220,7 +220,7 @@
 							<!-- <transition-group name="fade"> -->
 
 							        <div class="form-row">
-							        	<div class="form-group col-sm-6">
+							        	<div class="form-group col-md-6">
 							        		<label for="inputUsername">Product Type</label>
 								        	<multiselect 
 		                              			v-model="productMode" 
@@ -397,15 +397,36 @@
 									  		</div>
 										</div>
 										-->
-										
-										<div class="form-group col-md-12">
-											<label for="inputFirstName">Description</label>
-											<ckeditor 
-				                              	class="form-control" 
-				                              	:editor="editor" 
-				                              	v-model="singleProductData.description"
-				                            >
-			                              	</ckeditor>
+									</div>
+
+									<div class="form-row">
+										<div class="col-md-12">
+											<div class="card">
+										    	<div class="card-body">
+										    		<div class="form-row d-flex align-items-center text-center">
+														<div class="form-group col-md-6">
+															<img class="img-fluid" 
+																:src="singleProductData.preview || ''"
+																alt="Product Picture" 
+															>
+														</div>
+														<div class="form-group col-md-6">
+															<div class="custom-file">
+															    <input type="file" 
+															    	class="form-control custom-file-input" 
+																	:class="!errors.product.preview  ? 'is-valid' : 'is-invalid'" 
+														    	 	@change="onProductPreviewChange" 
+														    	 	accept="image/*"
+															    >
+															    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+															    <div class="invalid-feedback">
+															    	{{ errors.product.preview }}
+															    </div>
+														  	</div>
+														</div>
+													</div>
+										    	</div>
+										  	</div>
 										</div>
 									</div>
 
@@ -469,93 +490,121 @@
 												class="form-group col-md-8" 
 												v-if="singleProductData.variations && singleProductData.variations.length"
 											>
-
 												<div 
-													class="form-row" 
+													class="card" 
 													v-for="(productVariation, index) in singleProductData.variations" 
 													:key="'product-variation-index' + index + 'A'"
-												>	
-													<div 
-														class="form-group col-md-12" 
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">Variaiton</label>
-														<multiselect 
-					                              			v-model="singleProductData.variations[index].variation"
-					                              			placeholder="Select Variation" 
-					                                  		label="name" 
-					                                  		track-by="id" 
-					                                  		:custom-label="objectNameWithCapitalized" 
-					                                  		:options="availableVariations" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		selectLabel = "Press/Click"
-					                                  		deselect-label="Can't remove single value" 
-					                                  		:disabled="singleProductData.variations[index].variation_immutability" 
-					                                  		class="form-control p-0" 
-					                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
-					                                  		@close="validateFormInput('product_variation_id')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div class="invalid-feedback">
-													    	{{ errors.product.variations[index].product_variation_id }}
-													    </div>
-													</div>
-
-												<!-- 
-													<div 
-														class="form-group col-md-3"
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">Qty</label>
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singleProductData.variations[index].initial_quantity" 
-															:min="singleProductData.variations[index].requested_quantity"
-															:max="singleProductData.initial_quantity" 
-															placeholder="Product Qty" 
-															:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('product_variation_quantity')" 
-															required="true" 
+												>
+													<div class="card-body">
+														<div 
+															class="form-row" 
+															v-if="singleProductData.variations.length == errors.product.variations.length"
 														>
+															<div class="form-group col-md-12">
+																<label for="inputFirstName">Variaiton</label>
+																<multiselect 
+							                              			v-model="singleProductData.variations[index].variation"
+							                              			placeholder="Select Variation" 
+							                                  		label="name" 
+							                                  		track-by="id" 
+							                                  		:custom-label="objectNameWithCapitalized" 
+							                                  		:options="availableVariations" 
+							                                  		:required="true" 
+							                                  		:allow-empty="false"
+							                                  		selectLabel = "Press/Click"
+							                                  		deselect-label="Can't remove single value" 
+							                                  		:disabled="singleProductData.variations[index].variation_immutability" 
+							                                  		class="form-control p-0" 
+							                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
+							                                  		@close="validateFormInput('product_variation_id')" 
+							                              		>
+							                                	</multiselect>
+							                                	<div class="invalid-feedback">
+															    	{{ errors.product.variations[index].product_variation_id }}
+															    </div>
+															</div>
 
-														<div class="invalid-feedback">
-												        	{{ errors.product.variations[index].product_variation_quantity }}
-												  		</div>
-													</div>
-													-->
-													<!-- 
-													<div 
-														class="form-group col-md-4"
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">Price</label>
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singleProductData.variations[index].price" 
-															placeholder="Product Price" 
-															:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('product_variation_price')" 
-															required="true" 
-														>
+															<div class="form-group col-md-12">
+													    		<div class="form-row text-center">
+																	<div class="col-md-6">
+																		<img class="img-fluid" 
+																			:src="singleProductData.variations[index].preview || ''"
+																			alt="Variation Picture" 
+																		>
+																	</div>
+																	<div class="col-md-6">
+																		<div class="custom-file">
+																		    <input type="file" 
+																		    	class="form-control custom-file-input" 
+																				:class="!errors.product.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
+																	    	 	@change="onVariationPreviewChange($event, index)" 
+																	    	 	accept="image/*"
+																		    >
+																		    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+																		    <div class="invalid-feedback">
+																		    	{{ errors.product.variations[index].preview }}
+																		    </div>
+																	  	</div>
+																	</div>
+																</div>
+															</div>
 
-														<div class="invalid-feedback">
-												        	{{ errors.product.variations[index].product_variation_price }}
-												  		</div>
-													</div>
+															<!-- 
+															<div 
+																class="form-group col-md-3"
+																v-if="singleProductData.variations[index] && errors.product.variations[index]"
+															>
+																<label for="inputFirstName">Qty</label>
+																<input type="number" 
+																	class="form-control" 
+																	v-model.number="singleProductData.variations[index].initial_quantity" 
+																	:min="singleProductData.variations[index].requested_quantity"
+																	:max="singleProductData.initial_quantity" 
+																	placeholder="Product Qty" 
+																	:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+																	@change="validateFormInput('product_variation_quantity')" 
+																	required="true" 
+																>
 
-													<div 
-														class="form-group col-md-4"
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">SKU</label>
-														<input type="text" 
-															class="form-control is-valid" 
-															v-model="singleProductData.variations[index].sku" 
-															placeholder="Unique SKU" 
-														>
+																<div class="invalid-feedback">
+														        	{{ errors.product.variations[index].product_variation_quantity }}
+														  		</div>
+															</div>
+															-->
+															<!-- 
+															<div 
+																class="form-group col-md-4"
+																v-if="singleProductData.variations[index] && errors.product.variations[index]"
+															>
+																<label for="inputFirstName">Price</label>
+																<input type="number" 
+																	class="form-control" 
+																	v-model.number="singleProductData.variations[index].price" 
+																	placeholder="Product Price" 
+																	:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																	@change="validateFormInput('product_variation_price')" 
+																	required="true" 
+																>
+
+																<div class="invalid-feedback">
+														        	{{ errors.product.variations[index].product_variation_price }}
+														  		</div>
+															</div>
+
+															<div 
+																class="form-group col-md-4"
+																v-if="singleProductData.variations[index] && errors.product.variations[index]"
+															>
+																<label for="inputFirstName">SKU</label>
+																<input type="text" 
+																	class="form-control is-valid" 
+																	v-model="singleProductData.variations[index].sku" 
+																	placeholder="Unique SKU" 
+																>
+															</div>
+															 -->									
+														</div>
 													</div>
-													 -->									
 												</div>
 
 												<div class="form-row">
@@ -938,59 +987,86 @@
 					</div>
 
 					<div class="modal-body">
-						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
-								Type :
-							</label>
-							<label class="col-sm-6 col-form-label text-left">
-								{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' }}
-							</label>
-						</div>
+						<div class="form-row d-flex">
+							<div class="col-md-4 align-self-center text-center">
+								<img :src="singleProductData.preview" class="img-fluid" alt="Product Preview" width="150px">
+							</div>
 
-						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
-								Name :
-							</label>
-							<label class="col-sm-6 col-form-label text-left">
-								{{ singleProductData.name | capitalize }}
-							</label>
-						</div>
+							<div class="col-md-8">
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Type :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' }}
+									</label>
+								</div>
 
-						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
-								Description :
-							</label>
-							<label class="col-sm-6 col-form-label text-left">
-								<span v-html="singleProductData.description"></span>
-							</label>
-						</div>
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Name :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.name | capitalize }}
+									</label>
+								</div>
 
-						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Serial :</label>
-							<label class="col-sm-6 form-control-plaintext">
-								<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
-							</label>
-						</div>
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Quantity Type :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.quantity_type | capitalize }}
+									</label>
+								</div>
 
-						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
-							<label class="col-sm-6 form-control-plaintext">
-								<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
-							</label>
-						</div>
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Description :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										<span v-html="singleProductData.description"></span>
+									</label>
+								</div>
 
-						<div class="form-row" v-if="singleProductData.has_variations && singleProductData.variations.length">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
-								Variations :
-							</label>
-							<div class="col-sm-6 col-form-label">
-								<label 
-									v-for="(productVariation, variationIndex) in singleProductData.variations" 
-									:key="'product-variation-' + variationIndex"
-								>
-									{{ productVariation.variation ? productVariation.variation.name : 'NA' }}
-									<span v-show="singleProductData.variations.length > variationIndex+1">, </span>
-								</label>
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">Has Serial :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
+									</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">Has Variation :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
+									</label>
+								</div>
+
+								<div class="form-row" v-if="singleProductData.has_variations && singleProductData.variations.length">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Variations :
+									</label>
+									<div class="col-sm-6 col-form-label">
+										<div 
+											class="form-group text-center" 
+											v-for="(productVariation, variationIndex) in singleProductData.variations" 
+											:key="'product-variation-' + variationIndex"
+										>
+											<img class="img-fluid" 
+												:src="productVariation.preview || ''"
+												:alt="productVariation.variation ? productVariation.variation.name : 'NA' + 'Picture'" 
+												width="100px"
+											>
+
+											<p>
+												{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }}
+											</p>
+
+											<!-- <span v-show="singleProductData.variations.length > variationIndex+1">, </span> -->
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -1010,8 +1086,6 @@
 
 	import axios from 'axios';
 	import Multiselect from 'vue-multiselect';
-	import CKEditor from '@ckeditor/ckeditor5-vue';
-	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
     let singleProductData = {
     	// name : null,
@@ -1023,6 +1097,7 @@
     	// quantity_type : null,
     	// has_variations : null,
     	
+    	preview : null,
     	variations : [],
 		
 		/*
@@ -1041,7 +1116,6 @@
 
 	    components: { 
 			multiselect : Multiselect,
-			ckeditor: CKEditor.component,
 		},
 
 	    data() {
@@ -1056,8 +1130,6 @@
 	        	
 	        	currentTab : 'retail',
 	        	productMode : 'retail product',
-
-	        	editor: ClassicEditor,
 
 	        	createMode : true,
 	        	submitForm : true,
@@ -1109,11 +1181,11 @@
 
 			this.fetchAllProducts();
 
-			if (this.userHasPermissionTo('view-merchant-index')) {
+			// if (this.userHasPermissionTo('view-merchant-index')) {
 
-				this.fetchAllMerchants();
+			// 	this.fetchAllMerchants();
 
-			}
+			// }
 
 			// this.fetchAllContainers();
 			
@@ -1234,51 +1306,53 @@
 					});
 
 			},
-			fetchAllMerchants() {
-				
-				if (! this.userHasPermissionTo('view-merchant-index')) {
+			/*
+				fetchAllMerchants() {
+					
+					if (! this.userHasPermissionTo('view-merchant-index')) {
 
-					this.error = 'You do not have permission to view merchants';
-					return;
+						this.error = 'You do not have permission to view merchants';
+						return;
 
-				}
+					}
 
-				this.query = '';
-				this.error = '';
-				this.loading = true;
-				this.allMerchants = [];
-				
-				axios
-					.get('/api/merchants/')
-					.then(response => {
-						if (response.status == 200) {
-							this.allMerchants = response.data;
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
-						}
+					this.query = '';
+					this.error = '';
+					this.loading = true;
+					this.allMerchants = [];
+					
+					axios
+						.get('/api/merchants/')
+						.then(response => {
+							if (response.status == 200) {
+								this.allMerchants = response.data;
+							}
+						})
+						.catch(error => {
+							this.error = error.toString();
+							// Request made and server responded
+							if (error.response) {
+								console.log(error.response.data);
+								console.log(error.response.status);
+								console.log(error.response.headers);
+								console.log(error.response.data.errors[x]);
+							} 
+							// The request was made but no response was received
+							else if (error.request) {
+								console.log(error.request);
+							} 
+							// Something happened in setting up the request that triggered an Error
+							else {
+								console.log('Error', error.message);
+							}
 
-					})
-					.finally(response => {
-						this.loading = false;
-					});
+						})
+						.finally(response => {
+							this.loading = false;
+						});
 
-			},
+				},
+			*/
 			fetchAllVariationTypes() {
 
 				if (! this.userHasPermissionTo('view-asset-index')) {
@@ -1326,56 +1400,56 @@
 
 			},
 			/*
-			fetchAllContainers() {
-				
-				this.query = '';
-				this.error = '';
-				// this.loading = true;
-				this.allContainers = [];
-				this.emptyContainers = [];
-				this.emptyShelfContainers = [];
-				this.emptyUnitContainers = [];
-
-				axios
-					.get('/api/warehouse-containers')
-					.then(response => {
-						if (response.status == 200) {
-							
-							this.allContainers = response.data;
-							this.setAvailableSpaces();
-							
-							
-							// this.emptyContainers = response.data.emptyContainers;
-							// this.emptyShelfContainers = response.data.emptyShelfContainers;
-							// this.emptyUnitContainers = response.data.emptyUnitContainers;
-							
+				fetchAllContainers() {
 					
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
-						}
+					this.query = '';
+					this.error = '';
+					// this.loading = true;
+					this.allContainers = [];
+					this.emptyContainers = [];
+					this.emptyShelfContainers = [];
+					this.emptyUnitContainers = [];
 
-					})
-					.finally(response => {
-						// this.loading = false;
-					});
+					axios
+						.get('/api/warehouse-containers')
+						.then(response => {
+							if (response.status == 200) {
+								
+								this.allContainers = response.data;
+								this.setAvailableSpaces();
+								
+								
+								// this.emptyContainers = response.data.emptyContainers;
+								// this.emptyShelfContainers = response.data.emptyShelfContainers;
+								// this.emptyUnitContainers = response.data.emptyUnitContainers;
+								
+						
+							}
+						})
+						.catch(error => {
+							this.error = error.toString();
+							// Request made and server responded
+							if (error.response) {
+								console.log(error.response.data);
+								console.log(error.response.status);
+								console.log(error.response.headers);
+								console.log(error.response.data.errors[x]);
+							} 
+							// The request was made but no response was received
+							else if (error.request) {
+								console.log(error.request);
+							} 
+							// Something happened in setting up the request that triggered an Error
+							else {
+								console.log('Error', error.message);
+							}
 
-			},
+						})
+						.finally(response => {
+							// this.loading = false;
+						});
+
+				},
 			*/
 			searchData(emitedValue=false) {
 
@@ -1424,11 +1498,15 @@
 	        	this.submitForm = true;
 	        	
 				this.singleProductData = {
+					
+					preview : null,
+					
 					variations : [],
+					
 					/*
-					addresses : [
-						{},
-					],
+						addresses : [
+							{},
+						],
 					*/
 				};
 
@@ -1456,7 +1534,7 @@
 				this.errors = {
 					product : {
 						variations : [],
-						/*addresses : [],*/
+						/* addresses : [], */
 					},
 				};
 
@@ -1555,10 +1633,18 @@
 					});
 
 			},
-			goProductStore(object) {
+			/*
+				goProductStore(object) {
+
+					// console.log(object);
+					this.$router.push({ name: 'product-stocks', params: { product: object, productName: object.name }});
+
+				},
+			*/
+			goProductMerchants(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: object, productName: object.name }});
+				this.$router.push({ name: 'product-merchants', params: { product: object, productName: object.name }});
 
 			},
 			showSelectedTabProducts() {
@@ -2089,6 +2175,60 @@
 				);
 			},
 		*/
+			onProductPreviewChange(evnt) {
+				
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	
+		      		let reader = new FileReader();
+	                reader.onload = (evnt) => {
+
+	                    this.singleProductData.preview = evnt.target.result;
+	                    
+	                };
+	                reader.readAsDataURL(files[0]);
+
+                	this.$delete(this.errors.product, 'preview');
+		      	}
+		      	else{
+
+		      		this.errors.product.preview = 'File should be image';
+
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+
+			},
+			onVariationPreviewChange(evnt, index) {
+				
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	
+		      		let reader = new FileReader();
+	                reader.onload = (evnt) => {
+
+	                    this.singleProductData.variations[index].preview = evnt.target.result;
+	                    
+	                };
+	                reader.readAsDataURL(files[0]);
+
+                	this.$delete(this.errors.product.variations[index], 'preview');
+		      	}
+		      	else{
+
+		      		this.errors.product.variations[index].preview = 'File should be image';
+
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+
+			},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;

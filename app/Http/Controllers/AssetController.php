@@ -558,9 +558,11 @@ class AssetController extends Controller
 
         $newAsset->name = strtolower($request->name);
         $newAsset->price = $request->price;
-        $newAsset->package_preview = $request->preview;
         $newAsset->description = strtolower($request->description);
 
+        $newAsset->save();
+
+        $newAsset->package_preview = $request->preview;
         $newAsset->save();
 
         return $this->showAllPackagingPackages($perPage);

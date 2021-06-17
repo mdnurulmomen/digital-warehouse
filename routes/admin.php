@@ -173,6 +173,13 @@ Route::name('admin.')->group(function () {
 		Route::patch('/packaging-packages/{package}/{perPage}','AssetController@restorePackagingPackage')->name('packaging-packages');
 		Route::get('/api/search-packaging-packages/{search}/{perPage}','AssetController@searchAllPackagingPackages')->name('search-packaging-packages');
 
+		// product-merchants
+		Route::get('/api/product-merchants/{product}/{perPage}', 'ProductController@showProductAllMerchants')->name('product-merchants');
+		Route::post('/product-merchants/{perPage}', 'ProductController@storeProductNewMerchant')->name('product-merchants');	
+		Route::put('/product-merchants/{productMerchant}/{perPage}', 'ProductController@updateProductMerchant')->name('product-merchants');
+		Route::delete('/product-merchants/{productMerchant}/{perPage}', 'ProductController@deleteProductMerchant')->name('product-merchants');
+		Route::get('/api/search-product-merchants/{product}/{search}/{perPage}', 'ProductController@searchProductAllMerchants')->name('search-product-merchants');
+
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 

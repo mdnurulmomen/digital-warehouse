@@ -18,7 +18,7 @@ class ProductVariationSerialResource extends JsonResource
             'serial_no' => $this->serial_no,
             'has_requisitions' => $this->has_requisitions,
             'has_dispatched' => $this->has_dispatched,
-            'has_approval' => $this->variationStock->productStock->has_approval,
+            'has_approval' => $this->variationStock->productStock->stock->has_approval,
         ];
     }
 }

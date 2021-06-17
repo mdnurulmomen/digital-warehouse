@@ -6,8 +6,10 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductSerial;
+use App\Models\MerchantProduct;
 use App\Models\ProductCategory;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\File; 
 use App\Models\ProductVariationSerial;
 use App\Models\WarehouseContainerStatus;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +18,7 @@ use App\Http\Resources\Web\ProductCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Http\Resources\Web\ProductStockCollection;
 use App\Http\Resources\Web\ManagerProductCollection;
+use App\Http\Resources\Web\MerchantProductCollection;
 
 class ProductController extends Controller
 {
@@ -37,6 +40,12 @@ class ProductController extends Controller
         $this->middleware("permission:create-product-stock")->only('storeProductStock');
         $this->middleware("permission:update-product-stock")->only('updateProductStock');
         $this->middleware("permission:delete-product-stock")->only('deleteProductStock');
+
+        // Product-Merchant
+        $this->middleware("permission:view-merchant-product-index")->only(['showProductAllMerchants', 'searchProductAllMerchants']);
+        $this->middleware("permission:create-merchant-product")->only('storeProductNewMerchant');
+        $this->middleware("permission:update-merchant-product")->only('updateProductMerchant');
+        $this->middleware("permission:delete-merchant-product")->only('deleteProductMerchant');        
     }
 
     // Product-Categories
@@ -145,7 +154,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:65535',
+            // 'description' => 'nullable|string|max:65535',
             // 'sku' => 'nullable|string|max:100|unique:products,sku',
             // 'price' => 'numeric|min:0', // min 0 due to bulk products
             'quantity_type' => 'nullable|string|max:100',
@@ -162,7 +171,7 @@ class ProductController extends Controller
         $newProduct = new Product();
 
         $newProduct->name = strtolower($request->name);
-        $newProduct->description = strtolower($request->description);
+        // $newProduct->description = strtolower($request->description);
         // $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
         // $newProduct->price = $request->price ?? 0;
         $newProduct->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
@@ -171,6 +180,9 @@ class ProductController extends Controller
         $newProduct->product_category_id = $request->product_category_id;
         // $newProduct->merchant_id = $request->merchant_id;
 
+        $newProduct->save();
+
+        $newProduct->product_preview = $request->preview;
         $newProduct->save();
 
         if ($newProduct->has_variations && !empty($request->variations)) {
@@ -188,7 +200,7 @@ class ProductController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:65535',
+            // 'description' => 'nullable|string|max:65535',
             // 'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
             // 'price' => 'required|numeric|min:0', // min 0 due to bulk products
             'quantity_type' => 'nullable|string|max:100',
@@ -203,7 +215,8 @@ class ProductController extends Controller
         ]);
 
         $productToUpdate->name = strtolower($request->name);
-        $productToUpdate->description = strtolower($request->description);
+        $productToUpdate->product_preview = $request->preview;
+        // $productToUpdate->description = strtolower($request->description);
         // $productToUpdate->sku = $request->sku ?? $this->generateProductSKU($request);
         // $productToUpdate->price = $request->price ?? 0;
         $productToUpdate->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
@@ -684,6 +697,217 @@ class ProductController extends Controller
         ], 200);
     }
 
+    // Product-Merchants
+    public function showProductAllMerchants($product, $perPage)
+    {
+        return new MerchantProductCollection(MerchantProduct::where('product_id', $product)->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])->paginate($perPage));
+    }
+
+    public function storeProductNewMerchant(Request $request, $perPage)
+    {
+        $product = Product::findOrFail($request->product_id);
+
+        $request->validate([
+            // 'product' => 'required',
+            // 'product.id' => 'required|numeric|exists:products,id',
+            // 'merchant' => 'required',
+            // 'merchant.id' => 'required|numeric|exists:merchants,id',
+            'product_id' => 'required|numeric|exists:products,id',
+            'merchant_id' => 'required|numeric|exists:merchants,id',
+            'sku' => 'required|string',
+            'selling_price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'warning_quantity' => 'numeric',
+            'variations' => [
+                'array', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
+                })
+            ],
+            'variations.*.variation' => 'required_with:variations',
+            'variations.*.variation.id' => [
+                'required_with:variations', 'exists:variations,id', 
+                Rule::exists('product_variations', 'variation_id')->where(function ($query) use ($product) {
+                    return $query->where('product_id', $product->id);
+                })
+            ],
+            'variations.*.selling_price' => 'required_with:variations|numeric',
+            'variations.*.sku' => 'string',
+        ],
+        [
+            'product_id' => 'Product is required',
+            'merchant_id' => 'Merchant is required',
+            'selling_price' => 'Product selling price is required',
+            'warning_quantity' => 'Warning quantity should be numeric',
+            'variations.*.variation' => 'Invalid variations, please reload',
+            'variations.*.variation.id' => 'Invalid variations, please reload',
+            'variations.*.selling_price' => 'Variation selling price is required',
+            'variations.*.sku' => 'Invalid variation SKU',
+        ]);
+
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+
+        if (empty($currentUser)) {
+
+            return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
+            
+        }
+
+        $productNewMerchant = MerchantProduct::create([
+
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id), 
+            // 'merchant_product_preview' => $request->preview, 
+            'description' => strtolower($request->description), 
+            'warning_quantity' => $request->warning_quantity ?? 100,
+            'selling_price' => $request->selling_price,
+            'product_id' => $request->product_id,
+            'merchant_id' => $request->merchant_id,
+            'created_at' => now()
+
+        ]);
+
+        $productNewMerchant->merchant_product_preview = $request->preview;
+        $productNewMerchant->save();
+
+        if ($product->has_variations) {
+            
+            $productNewMerchant->merchant_product_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        return $this->showProductAllMerchants($request->product_id, $perPage);
+    }
+
+    public function updateProductMerchant(Request $request, $productMerchant, $perPage)
+    {
+        $product = Product::findOrFail($request->product_id);
+
+        $request->validate([
+            // 'product' => 'required',
+            // 'product.id' => 'required|numeric|exists:products,id',
+            // 'merchant' => 'required',
+            // 'merchant.id' => 'required|numeric|exists:merchants,id',
+            'product_id' => 'required|numeric|exists:products,id',
+            'merchant_id' => 'required|numeric|exists:merchants,id',
+            'sku' => 'required|string',
+            'selling_price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'warning_quantity' => 'numeric',
+            'variations' => [
+                'array', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
+                })
+            ],
+            'variations.*.variation' => 'required_with:variations',
+            'variations.*.variation.id' => [
+                'required_with:variations', 'exists:variations,id', 
+                Rule::exists('product_variations', 'variation_id')->where(function ($query) use ($product) {
+                    return $query->where('product_id', $product->id);
+                })
+            ],
+            'variations.*.selling_price' => 'required_with:variations|numeric',
+            'variations.*.sku' => 'string',
+        ],
+        [
+            'product_id' => 'Product is required',
+            'merchant_id' => 'Merchant is required',
+            'selling_price' => 'Product selling price is required',
+            'warning_quantity' => 'Warning quantity should be numeric',
+            'variations.*.variation' => 'Invalid variations, please reload',
+            'variations.*.variation.id' => 'Invalid variations, please reload',
+            'variations.*.selling_price' => 'Variation selling price is required',
+            'variations.*.sku' => 'Invalid variation SKU',
+        ]);
+
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+
+        if (empty($currentUser)) {
+
+            return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
+            
+        }
+
+        $productMerchantToUpdate = MerchantProduct::findOrFail($productMerchant);
+
+        $productMerchantToUpdate->update([
+
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id), 
+            // 'merchant_product_preview' => $request->preview, 
+            'description' => strtolower($request->description), 
+            'warning_quantity' => $request->warning_quantity ?? 100,
+            'selling_price' => $request->selling_price,
+            'product_id' => $request->product_id,
+            'merchant_id' => $request->merchant_id,
+            'created_at' => now()
+
+        ]);
+
+        $productMerchantToUpdate->merchant_product_preview = $request->preview;
+        $productMerchantToUpdate->save();
+
+        if ($product->has_variations) {
+            
+            $productMerchantToUpdate->merchant_product_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        return $this->showProductAllMerchants($request->product_id, $perPage);
+    }
+
+    public function deleteProductMerchant($productMerchant, $perPage)
+    {
+        $productMerchantToDelete = MerchantProduct::findOrFail($productMerchant);
+
+        if ($productMerchantToDelete->product_immutability) {
+            
+           return response()->json(['errors'=>["undeletableMerchant" => "Merchant has stock or requisition"]], 422); 
+
+        }
+            
+        // $productMerchantToDelete->stocks()->delete();
+        // $productMerchantToDelete->requests()->delete();
+        // $productMerchantToDelete->deleteOldAddresses();
+        
+        File::delete($productMerchantToDelete->preview);
+
+        foreach ($productMerchantToDelete->variations as $key => $merchantProductVariationToDelete) {
+            
+            File::delete($merchantProductVariationToDelete->preview);
+            
+        }
+
+        return;
+
+        $productMerchantToDelete->variations()->delete();
+        $productMerchantToDelete->delete();
+
+        return $this->showProductAllMerchants($productMerchantToDelete->product_id, $perPage);
+    }
+
+    public function searchProductAllMerchants($product, $search, $perPage)
+    {
+        $query = MerchantProduct::where(function($query) use ($search) {
+                $query->where('sku', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhere('warning_quantity', 'like', "%$search%")
+                    ->orWhere('selling_price', 'like', "%$search%")
+                    ->orWhereHas('merchant', function ($q) use ($search) {
+                        $q->where('first_name', 'like', "%$search%")
+                        ->orWhere('last_name', 'like', "%$search%")
+                        ->orWhere('user_name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('mobile', 'like', "%$search%");
+                });
+        })
+        ->where('product_id', $product)
+        ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests']);
+
+        return response()->json([
+            'all' => new MerchantProductCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
     protected function findVariationInvalidQuantity($stockVariaitonQuantities = [], ProductStock $productStock)
     {
         // update / old stock
@@ -723,12 +947,12 @@ class ProductController extends Controller
         ProductStock::where('product_id', $stockToUpdate->product_id)->where('created_at', '>', $stockToUpdate->created_at)->decrement('available_quantity', $amount);
     }
 
-    protected function generateProductSKU(Request $request)
+    protected function generateProductSKU($merchant, $productCategory, $product)
     {
-        if ($request->product_category_id) {
-            return 'MR'.$request->merchant_id.'PR'.$request->product_id.'CT'.$request->product_category_id;
+        if ($productCategory) {
+            return 'MR'.$merchant.'CT'.$productCategory.'PR'.$product;
         }
-        return 'MR'.$request->merchant_id.'PR'.$request->product_id.'BX'.$request->name;
+        return 'MR'.$merchant.'BX'.'PR'.$product;
     }
 
     protected function checkVariationSerialDuplicacy(Request $request)

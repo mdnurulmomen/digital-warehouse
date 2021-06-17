@@ -74,6 +74,7 @@ import ProductIndex from './views/ProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
 // import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
+import ProductMerchantIndex from './views/ProductMerchantIndex'
 import RoleIndex from './views/RoleIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
@@ -263,6 +264,32 @@ const router = new VueRouter({
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-product-stock-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.product) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/products');
+                }
+            }
+        },
+        {
+            path: '/product-merchants/:productName',
+            name: 'product-merchants',
+            component: ProductMerchantIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-product-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.product) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/products');
+                }
             }
         },
         {

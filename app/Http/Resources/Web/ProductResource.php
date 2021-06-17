@@ -19,7 +19,8 @@ class ProductResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'description' => $this->description,
+            'preview' => $this->preview,
+            // 'description' => $this->description,
             // 'sku' => $this->sku,
             // 'price' => $this->price,
             // 'available_quantity' => $this->latestStock->available_quantity ?? 0,
@@ -34,7 +35,8 @@ class ProductResource extends JsonResource
             'product_category_id' => $this->product_category_id,
             // 'merchant_id' => $this->merchant_id,
             'category' => $this->category,
-            'merchants' => $this->merchants,
+            
+            // 'merchants' => $this->merchants,
             
             // 'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), 'products') ? ProductSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
             // 'serials' => $this->when($this->has_serials && ! $this->has_variations, str_ends_with(Route::currentRouteName(), '.products') ? 

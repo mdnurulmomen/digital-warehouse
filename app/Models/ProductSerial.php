@@ -28,7 +28,7 @@ class ProductSerial extends Model
         return $this->hasOne(RequiredProductSerial::class, 'product_serial_id', 'id');
     }
 
-    public function stock()
+    public function productStock()
     {
         return $this->belongsTo(ProductStock::class, 'product_stock_id', 'id');
     }

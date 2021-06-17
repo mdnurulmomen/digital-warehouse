@@ -8,20 +8,14 @@ class ProductStock extends Model
 {
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'has_serials' => 'boolean',
-        'has_variations' => 'boolean',
-        'has_approval' => 'boolean',
-    ];
-
-    public function product()
+    public function stock()
     {
-    	return $this->belongsTo(Product::class, 'product_id', 'id');
+    	return $this->belongsTo(Stock::class, 'stock_id', 'id');
     }
 
-    public function warehouse()
+    public function merchantProduct()
     {
-        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+        return $this->belongsTo(Product::class, 'merchant_product_id', 'id');
     }
 
     public function variations()
@@ -37,22 +31,6 @@ class ProductStock extends Model
     public function serials()
     {
         return $this->hasMany(ProductSerial::class, 'product_stock_id', 'id');
-    }
-
-    /**
-     * Get the model who kept the stock.
-     */
-    public function keeper()
-    {
-        return $this->morphTo(__FUNCTION__, 'keeper_type', 'keeper_id');
-    }
-
-    /**
-     * Get the model who approved the stock.
-     */
-    public function approver()
-    {
-        return $this->morphTo(__FUNCTION__, 'approver_type', 'approver_id');
     }
 
     public function deleteStockVariations()

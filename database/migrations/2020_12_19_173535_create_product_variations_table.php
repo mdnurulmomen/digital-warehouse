@@ -15,6 +15,7 @@ class CreateProductVariationsTable extends Migration
     {
         Schema::create('product_variations', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('preview')->nullable();
             $table->unsignedSmallInteger('variation_id'); // stationary / garments
             $table->unsignedInteger('product_id'); // stationary / garments
         });

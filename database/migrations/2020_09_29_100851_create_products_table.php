@@ -16,7 +16,7 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name'); // polo t-shirt / fair n lovely
-            $table->string('description')->nullable(); // short description about what has been stored (may be hints for identification / bulk products)
+            $table->string('preview')->nullable();
             $table->string('quantity_type')->default('box');  // kg / meter / pc's
             $table->boolean('has_variations')->default(false);
             $table->boolean('has_serials')->default(false);

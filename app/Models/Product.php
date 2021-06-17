@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
+use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Exception\NotReadableException;
 
 class Product extends Model
 {
@@ -39,7 +42,9 @@ class Product extends Model
     public function getProductImmutabilityAttribute()
     {
         if ($this->merchants()->count()) {
-            return true;   
+
+            return true;
+             
         }
 
         return false;
@@ -72,10 +77,12 @@ class Product extends Model
 
             foreach ($productNewVariations as $productNewVariation) {
 
-                $productVariation = $this->variations()->firstOrCreate(
+                $previewPath = $this->saveProductVariationPreview($productNewVariation->preview, $productNewVariation->variation);
+
+                $productVariation = $this->variations()->updateOrCreate(
                     
                     [ 'variation_id' => $productNewVariation->variation->id ],
-                    [ 'variation_id' => $productNewVariation->variation->id ]
+                    [ 'preview' => $previewPath ]
 
                 );
 
@@ -125,6 +132,64 @@ class Product extends Model
 
             }
         }
+    }
+
+    public function setProductPreviewAttribute($encodedImageFile)
+    {
+        if ($encodedImageFile) {
+            
+            $imagePath = 'uploads/products/';
+
+            if(!File::isDirectory($imagePath)){
+                File::makeDirectory($imagePath, 0777, true, true);
+            }
+
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            // $img = $img->resize(300, 300);
+            $img->save($imagePath.str_replace(' ', '_', strtolower($this->name)).'.jpg');
+
+            $this->attributes['preview'] = $imagePath.str_replace(' ', '_', strtolower($this->name)).'.jpg';
+
+        }
+    }
+
+    protected function saveProductVariationPreview($encodedImageFile, $variation)
+    {
+        if ($encodedImageFile) {
+            
+            $imagePath = 'uploads/products/';
+
+            if(!File::isDirectory($imagePath)){
+                File::makeDirectory($imagePath, 0777, true, true);
+            }
+
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            // $img = $img->resize(300, 300);
+            $img->save($imagePath.str_replace(' ', '_', strtolower($this->name.'_'.$variation->name)).'.jpg');
+
+            return $imagePath.str_replace(' ', '_', strtolower($this->name.'_'.$variation->name)).'.jpg';
+
+        }
+
+        return;
     }
     
 }

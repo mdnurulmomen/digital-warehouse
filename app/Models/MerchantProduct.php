@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
+use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Exception\NotReadableException;
 
 class MerchantProduct extends Model
 {
@@ -10,6 +13,21 @@ class MerchantProduct extends Model
     
     protected $guarded = ['id'];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
+    }
+
+    public function variations()
+    {
+        return $this->hasMany(MerchantProductVariation::class, 'merchant_product_id', 'id');
+    }
+    
     public function requests()
     {
         return $this->hasMany(RequiredProduct::class, 'merchant_product_id', 'id');
@@ -18,6 +36,24 @@ class MerchantProduct extends Model
     public function addresses()
     {
         return $this->hasMany(WarehouseProduct::class, 'merchant_product_id', 'id');
+    }
+
+    public function stocks()
+    {
+        return $this->hasMany(ProductStock::class, 'merchant_product_id', 'id')->orderBy('id', 'desc');
+    }
+
+    public function serials()
+    {
+        return $this->hasMany(ProductSerial::class, 'merchant_product_id', 'id');
+    }
+
+    public function latestStock()
+    {
+        return $this->hasOne(ProductStock::class, 'merchant_product_id', 'id')
+        ->whereHas('stock', function ($q) {
+            $q->where('has_approval', 1);
+        })->orderBy('id', 'desc');
     }
 
     // immutable product
@@ -31,21 +67,6 @@ class MerchantProduct extends Model
         }
 
         return false;
-    }
-
-    public function stocks()
-    {
-        return $this->hasMany(ProductStock::class, 'merchant_product_id', 'id')->latest();
-    }
-
-    public function serials()
-    {
-        return $this->hasMany(ProductSerial::class, 'merchant_product_id', 'id');
-    }
-
-    public function latestStock()
-    {
-        return $this->hasOne(ProductStock::class, 'merchant_product_id', 'id')->where('has_approval', 1)->latest();
     }
 
     public function nonDispatchedRequests()
@@ -131,29 +152,107 @@ class MerchantProduct extends Model
 
             }
 
-        /*
-            $this->deleteOldAddresses();
+            /*
+                $this->deleteOldAddresses();
 
-            foreach ($spaces as $space) {
-                
-                if ($space->type == "containers" && !empty($space->containers)) {
-                
-                    $this->setProductContainers($space->containers);
+                foreach ($spaces as $space) {
+                    
+                    if ($space->type == "containers" && !empty($space->containers)) {
+                    
+                        $this->setProductContainers($space->containers);
+
+                    }
+                    else if ($space->type == "shelves" && !empty($space->container->shelves)) {
+                        
+                        $this->setProductShelves($space->container);
+                        
+                    }
+                    else if ($space->type == "units" && !empty($space->container->shelf->units)) {
+                        
+                        $this->setProductUnits($space->container);
+                        
+                    }
 
                 }
-                else if ($space->type == "shelves" && !empty($space->container->shelves)) {
+            */
+
+        }
+    }
+
+    public function setMerchantProductVariationsAttribute($merchantProductNewVariations = array())
+    {
+        if (count($merchantProductNewVariations)) {
+
+            if ($this->getProductImmutabilityAttribute()) {
+                
+                foreach ($this->variations as $merchantProductVariation) {
                     
-                    $this->setProductShelves($space->container);
-                    
-                }
-                else if ($space->type == "units" && !empty($space->container->shelf->units)) {
-                    
-                    $this->setProductUnits($space->container);
-                    
+                    if (! $merchantProductVariation->variation_immutability) {
+
+                        $merchantProductVariation->delete();
+
+                    }
+
                 }
 
             }
-        */
+            else {
+
+                $this->variations()->delete();
+
+            }
+
+            foreach ($merchantProductNewVariations as $merchantProductNewVariation) {
+
+                $previewPath = $this->saveProductVariationPreview($merchantProductNewVariation->preview, $this->merchant->user_name, $this->product->name, $merchantProductNewVariation->variation);
+
+                $merchantProductVariation = $this->variations()->updateOrCreate(
+                    
+                    [ 'product_variation_id' => $merchantProductNewVariation->variation->id ],
+                    [ 
+                        'sku' => $merchantProductNewVariation->sku ?? $this->generateProductVariationSKU($this->merchant_id, $this->product->category->id, $this->product_id, $merchantProductNewVariation->variation->id), 
+                        'preview' => $previewPath,
+                        'selling_price' => $merchantProductNewVariation->selling_price, 
+                    ]
+
+                );
+
+            }
+            
+        }
+    }
+
+    /**
+     * Set the user's first name.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setMerchantProductPreviewAttribute($encodedImageFile)
+    {
+        if ($encodedImageFile) {
+            
+            $imagePath = '/uploads/merchant-products/';
+
+            if(!File::isDirectory($imagePath)){
+                File::makeDirectory($imagePath, 0777, true, true);
+            }
+
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            // $img = $img->resize(100, 100);
+            
+            $img->save($imagePath.'merchant-'.$this->merchant_id.'-product-'.$this->product_id.'.jpg');
+
+            $this->attributes['preview'] = $imagePath.'merchant-'.$this->merchant_id.'-product-'.$this->product_id.'.jpg';
 
         }
     }
@@ -390,10 +489,43 @@ class MerchantProduct extends Model
         }
     }
     */
-
-    protected function generateProductVariationSKU($productSKU, $variationId)
+   
+    protected function saveProductVariationPreview($encodedImageFile, $merchantName, $productName, $variation)
     {
-        return $productSKU.'VR'.$variationId;
+        if ($encodedImageFile) {
+            
+            $imagePath = '/uploads/merchant-products/';
+
+            if(!File::isDirectory($imagePath)){
+                File::makeDirectory($imagePath, 0777, true, true);
+            }
+
+            try 
+            {
+                $img = Image::make($encodedImageFile);
+            }
+            catch(NotReadableException $e)
+            {
+                // If error, stop and return
+                return;
+            }
+
+            // $img = $img->resize(300, 300);
+            
+            $variationName = $variation->name ?? $variation->variation->name;
+
+            $img->save($imagePath.str_replace(' ', '_', strtolower($merchantName.'_'.$productName.'_'.$variationName)).'.jpg');
+
+            return $imagePath.str_replace(' ', '_', strtolower($merchantName.'_'.$productName.'_'.$variationName)).'.jpg';
+
+        }
+
+        return;
+    }
+
+    protected function generateProductVariationSKU($merchant, $productCategory, $product, $variation)
+    {
+        return 'MR'.$merchant.'CT'.$productCategory.'PR'.$product.'VR'.$variation;
     }
 
 }

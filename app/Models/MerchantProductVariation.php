@@ -2,10 +2,25 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Model;
 
 class MerchantProductVariation extends Model
 {
+    public $timestamps = false;
+    
+    protected $guarded = ['id'];
+
+    public function merchantProduct()
+    {
+        return $this->belongsTo(MerchantProduct::class, 'merchant_product_id', 'id');
+    }
+
+    public function productVariation()
+    {
+        return $this->belongsTo(ProductVariation::class, 'product_variation_id', 'id');
+    }
+
     public function requests()
     {
         return $this->hasMany(RequiredProductVariation::class, 'merchant_product_variation_id', 'id');
@@ -23,8 +38,11 @@ class MerchantProductVariation extends Model
 
     public function latestStock()
     {
-        return $this->hasOne(ProductVariationStock::class, 'merchant_product_variation_id', 'id')->whereHas('productStock', function ($query) {
-            $query->where('has_approval', 1);
+        return $this->hasOne(ProductVariationStock::class, 'merchant_product_variation_id', 'id')
+            ->whereHas('productStock', function ($query) {
+                $query->whereHas('stock', function ($q) {
+                    $q->where('has_approval', 1);
+                });
         })->orderBy('id', 'desc');
     }
 
@@ -53,4 +71,5 @@ class MerchantProductVariation extends Model
 
         return false;
     }
+
 }

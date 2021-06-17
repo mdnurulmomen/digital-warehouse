@@ -9,7 +9,6 @@
 					v-on:submit.prevent="$emit(submitMethodName, contentToDelete)" 
 					autocomplete="off"
 				>
-					
 					<input type="hidden" name="_token" :value="csrf">
 
 					<div class="modal-header bg-danger">
@@ -18,15 +17,16 @@
 						<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
+
 					<div class="modal-body text-center">
-						<h4 class="text-danger">Want to delete '{{ contentToDelete.user_name || contentToDelete.name || 'stock' | capitalize }}' ?</h4>
+						<h4 class="text-danger">Want to delete '{{ contentToDelete.user_name || contentToDelete.name || contentToDelete.merchant ? contentToDelete.merchant.user_name : '' || 'stock' | capitalize }}' ?</h4>
 						<h6 class="sub-heading text-secondary">{{ restorationMessage }}</h6>
 					</div>
+
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
 						<button type="submit" class="btn btn-danger">Delete</button>
 					</div>
-					
 				</form>
 			</div>
 		</div>

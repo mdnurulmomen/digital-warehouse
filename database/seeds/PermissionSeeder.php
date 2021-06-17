@@ -37,6 +37,11 @@ class PermissionSeeder extends Seeder
             	// 'WarehouseDeliveryCompany'
             	// 'WarehouseManager'
             	// 'WarehouseProduct',
+                
+                // to add at vue components
+                'Merchant-Deal',
+                'Delivery-Company',
+                'Merchant-Product',
             ];
 
             /*
