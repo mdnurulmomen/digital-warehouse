@@ -726,10 +726,8 @@ class ProductController extends Controller
             ],
             'variations.*.variation' => 'required_with:variations',
             'variations.*.variation.id' => [
-                'required_with:variations', 'exists:variations,id', 
-                Rule::exists('product_variations', 'variation_id')->where(function ($query) use ($product) {
-                    return $query->where('product_id', $product->id);
-                })
+                'required_with:variations', 
+                Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
             'variations.*.selling_price' => 'required_with:variations|numeric',
             'variations.*.sku' => 'string',
@@ -739,8 +737,8 @@ class ProductController extends Controller
             'merchant_id' => 'Merchant is required',
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
-            'variations.*.variation' => 'Invalid variations, please reload',
-            'variations.*.variation.id' => 'Invalid variations, please reload',
+            'variations.*.variation' => 'Variation name is required',
+            'variations.*.variation.id.*' => 'Invalid variations, please reload',
             'variations.*.selling_price' => 'Variation selling price is required',
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
@@ -799,12 +797,10 @@ class ProductController extends Controller
                     return $product->has_variations;
                 })
             ],
-            'variations.*.variation' => 'required_with:variations',
-            'variations.*.variation.id' => [
-                'required_with:variations', 'exists:variations,id', 
-                Rule::exists('product_variations', 'variation_id')->where(function ($query) use ($product) {
-                    return $query->where('product_id', $product->id);
-                })
+            'variations.*.variation.id' => 'required_without:variations.*.product_variation_id',
+            'variations.*.product_variation_id' => [
+                'required_without:variations.*.variation.id',
+                Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
             'variations.*.selling_price' => 'required_with:variations|numeric',
             'variations.*.sku' => 'string',
@@ -814,8 +810,8 @@ class ProductController extends Controller
             'merchant_id' => 'Merchant is required',
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
-            'variations.*.variation' => 'Invalid variations, please reload',
-            'variations.*.variation.id' => 'Invalid variations, please reload',
+            'variations.*.variation' => 'Variation name is required',
+            'variations.*.variation.id.*' => 'Invalid variations, please reload',
             'variations.*.selling_price' => 'Variation selling price is required',
             'variations.*.sku' => 'Invalid variation SKU',
         ]);

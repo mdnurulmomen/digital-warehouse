@@ -179,49 +179,6 @@ class MerchantProduct extends Model
         }
     }
 
-    public function setMerchantProductVariationsAttribute($merchantProductNewVariations = array())
-    {
-        if (count($merchantProductNewVariations)) {
-
-            if ($this->getProductImmutabilityAttribute()) {
-                
-                foreach ($this->variations as $merchantProductVariation) {
-                    
-                    if (! $merchantProductVariation->variation_immutability) {
-
-                        $merchantProductVariation->delete();
-
-                    }
-
-                }
-
-            }
-            else {
-
-                $this->variations()->delete();
-
-            }
-
-            foreach ($merchantProductNewVariations as $merchantProductNewVariation) {
-
-                $previewPath = $this->saveProductVariationPreview($merchantProductNewVariation->preview, $this->merchant->user_name, $this->product->name, $merchantProductNewVariation->variation);
-
-                $merchantProductVariation = $this->variations()->updateOrCreate(
-                    
-                    [ 'product_variation_id' => $merchantProductNewVariation->variation->id ],
-                    [ 
-                        'sku' => $merchantProductNewVariation->sku ?? $this->generateProductVariationSKU($this->merchant_id, $this->product->category->id, $this->product_id, $merchantProductNewVariation->variation->id), 
-                        'preview' => $previewPath,
-                        'selling_price' => $merchantProductNewVariation->selling_price, 
-                    ]
-
-                );
-
-            }
-            
-        }
-    }
-
     /**
      * Set the user's first name.
      *
@@ -254,6 +211,66 @@ class MerchantProduct extends Model
 
             $this->attributes['preview'] = $imagePath.'merchant-'.$this->merchant_id.'-product-'.$this->product_id.'.jpg';
 
+        }
+    }
+
+    public function setMerchantProductVariationsAttribute($merchantProductNewVariations = array())
+    {
+        if (count($merchantProductNewVariations)) {
+
+            // updation
+            if ($this->variations()->count()) {
+                
+                // deducting variations
+                if ($this->variations()->count() > count($merchantProductNewVariations)) {
+                    
+                    for ($i=$this->variations()->count(); $i>count($merchantProductNewVariations); $i--) { 
+                        
+                        File::delete($this->variations->get($i-1)->preview);
+
+                    }
+
+                }
+                
+                if ($this->getProductImmutabilityAttribute()) {
+                    
+                    foreach ($this->variations as $merchantProductVariation) {
+                        
+                        if (! $merchantProductVariation->variation_immutability) {
+
+                            $merchantProductVariation->delete();
+
+                        }
+
+                    }
+
+                }
+                else {
+
+                    $this->variations()->delete();
+
+                }
+
+            }
+
+
+            foreach ($merchantProductNewVariations as $merchantProductNewVariation) {
+
+                $previewPath = $this->saveProductVariationPreview($merchantProductNewVariation->preview, $this->merchant->user_name, $this->product->name, $merchantProductNewVariation->variation);
+
+                $merchantProductVariation = $this->variations()->updateOrCreate(
+                    
+                    [ 'product_variation_id' => $merchantProductNewVariation->product_variation_id ?? $merchantProductNewVariation->variation->id ],
+                    [ 
+                        'sku' => $merchantProductNewVariation->sku ?? $this->generateProductVariationSKU($this->merchant_id, $this->product->category->id, $this->product_id, $merchantProductNewVariation->variation->id), 
+                        'preview' => $previewPath,
+                        'selling_price' => $merchantProductNewVariation->selling_price, 
+                    ]
+
+                );
+
+            }
+            
         }
     }
 

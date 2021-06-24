@@ -280,7 +280,8 @@
 														<div class="form-group col-md-6">
 															<img 
 																class="img-fluid" 
-																:src="singleMerchantProductData.preview || ''"
+																ref="merchantProductPreview" 
+																:src="'/' + singleMerchantProductData.preview || ''"
 																alt="Product Preview" 
 															>
 														</div>
@@ -427,7 +428,7 @@
 															<div class="col-md-6 form-group">
 																<img 
 																	class="img-fluid" 
-																	:src="singleMerchantProductData.variations[index].preview || ''"
+																	:src="'/' + singleMerchantProductData.variations[index].preview || ''"
 																	alt="Variation Preview" 
 																>
 															</div>
@@ -435,6 +436,7 @@
 																<div class="custom-file">
 																    <input type="file" 
 																    	class="form-control custom-file-input" 
+																    	:ref="'merchantProductVariationPreview-' + index" 
 																		:class="!errors.product.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
 															    	 	@change="onVariationPreviewChange($event, index)" 
 															    	 	accept="image/*"
@@ -845,7 +847,7 @@
 										<div class="form-row d-flex">
 											<div class="col-md-4 align-self-center text-center">
 												<img 
-													:src="singleMerchantProductData.preview" 
+													:src="'/' + singleMerchantProductData.preview" 
 													class="img-fluid" 
 													alt="Product Preview" 
 													width="150px"
@@ -931,7 +933,7 @@
 																			<div class="col-sm-12 text-center">
 																				<img 
 																					class="img-fluid" 
-																					:src="merchantProductVariation.preview || ''"
+																					:src="'/' + merchantProductVariation.preview || ''"
 																					:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
 																					width="100px"
 																				>
@@ -1255,7 +1257,7 @@
     	// quantity_type : null,
     	// has_variations : null,
     	
-    	product : {},
+    	// product : {},
     	// variations : [],
 		
 		/*
@@ -1350,6 +1352,7 @@
 		created(){
 
 			this.fetchAllMerchants();
+			this.setProductVariation();
 			// this.fetchAllContainers();
 			this.fetchProductAllMerchants();
 
@@ -2278,7 +2281,8 @@
 		      		let reader = new FileReader();
 	                reader.onload = (evnt) => {
 
-	                    this.singleMerchantProductData.preview = evnt.target.result;
+	                    this.singleMerchantProductData.preview = evnt.target.result; 
+	                    this.$refs.merchantProductPreview.src = this.singleMerchantProductData.preview;
 	                    
 	                };
 	                reader.readAsDataURL(files[0]);
@@ -2306,6 +2310,7 @@
 	                reader.onload = (evnt) => {
 
 	                    this.singleMerchantProductData.variations[index].preview = evnt.target.result;
+	                    this.$refs['merchantProductVariationPreview-' + index].src = this.singleMerchantProductData.variations[index].preview;
 	                    
 	                };
 	                reader.readAsDataURL(files[0]);
@@ -2321,6 +2326,12 @@
 		      	evnt.target.value = '';
 		      	return;
 
+			},
+			getProductPreview(imagePath) {
+				return imagePath;
+			},
+			getProductVariationPreview(imagePath) {
+				return imagePath;
 			},
 			validateFormInput (formInputName) {
 
