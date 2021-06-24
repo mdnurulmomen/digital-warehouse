@@ -740,7 +740,7 @@ class ProductController extends Controller
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Invalid variations, please reload',
-            'variations.*.variation.id' => 'Invalid variations, please reload',
+            'variations.*.variation.id.*' => 'Invalid variations, please reload',
             'variations.*.selling_price' => 'Variation selling price is required',
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
@@ -815,7 +815,7 @@ class ProductController extends Controller
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Invalid variations, please reload',
-            'variations.*.variation.id' => 'Invalid variations, please reload',
+            'variations.*.variation.id.*' => 'Invalid variations, please reload',
             'variations.*.selling_price' => 'Variation selling price is required',
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
