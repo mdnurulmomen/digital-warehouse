@@ -232,7 +232,7 @@ class MerchantProduct extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = '/uploads/merchant-products/';
+            $imagePath = 'storage/merchant-products/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
@@ -494,7 +494,7 @@ class MerchantProduct extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = '/uploads/merchant-products/';
+            $imagePath = 'storage/merchant-products/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

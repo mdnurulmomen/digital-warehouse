@@ -76,7 +76,7 @@ class WarehouseOwner extends Authenticatable
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/owner/';
+            $imagePath = 'storage/owner/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

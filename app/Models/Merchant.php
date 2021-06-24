@@ -78,7 +78,7 @@ class Merchant extends Authenticatable
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/merchant/';
+            $imagePath = 'storage/merchant/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

@@ -877,8 +877,6 @@ class ProductController extends Controller
             
         }
 
-        return;
-
         $productMerchantToDelete->variations()->delete();
         $productMerchantToDelete->delete();
 

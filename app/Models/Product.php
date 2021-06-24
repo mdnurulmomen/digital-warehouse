@@ -138,7 +138,7 @@ class Product extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/products/';
+            $imagePath = 'storage/products/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
@@ -166,7 +166,7 @@ class Product extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/products/';
+            $imagePath = 'storage/products/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
