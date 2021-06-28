@@ -77,7 +77,7 @@ class Product extends Model
 
             foreach ($productNewVariations as $productNewVariation) {
 
-                $previewPath = $this->saveProductVariationPreview($productNewVariation->preview, $productNewVariation->variation);
+                $previewPath = $this->saveProductVariationPreview($productNewVariation->preview ?? NULL, $productNewVariation->variation);
 
                 $productVariation = $this->variations()->updateOrCreate(
                     

@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'products'" 
-			:message="'All our products'"
+			:title="'merchants'" 
+			:message="'All our merchants of ' + product.name | capitalize"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -280,7 +280,8 @@
 														<div class="form-group col-md-6">
 															<img 
 																class="img-fluid" 
-																:src="singleMerchantProductData.preview || ''"
+																ref="merchantProductPreview" 
+																:src="showPreview(singleMerchantProductData.preview)"
 																alt="Product Preview" 
 															>
 														</div>
@@ -427,8 +428,9 @@
 															<div class="col-md-6 form-group">
 																<img 
 																	class="img-fluid" 
-																	:src="singleMerchantProductData.variations[index].preview || ''"
+																	:src="showPreview(singleMerchantProductData.variations[index].preview)"
 																	alt="Variation Preview" 
+																	:ref="'merchantProductVariationPreview-' + index" 
 																>
 															</div>
 															<div class="col-md-6 form-group align-self-center">
@@ -845,7 +847,7 @@
 										<div class="form-row d-flex">
 											<div class="col-md-4 align-self-center text-center">
 												<img 
-													:src="singleMerchantProductData.preview" 
+													:src="'/' + singleMerchantProductData.preview" 
 													class="img-fluid" 
 													alt="Product Preview" 
 													width="150px"
@@ -931,7 +933,7 @@
 																			<div class="col-sm-12 text-center">
 																				<img 
 																					class="img-fluid" 
-																					:src="merchantProductVariation.preview || ''"
+																					:src="'/' + merchantProductVariation.preview || ''"
 																					:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
 																					width="100px"
 																				>
@@ -1226,6 +1228,7 @@
 			</div>
 		</div>
 
+		<!-- 		
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-merchant-product')" 
 			:csrf="csrf" 
@@ -1234,7 +1237,40 @@
 			:restoration-message="'Warning : You can not restore this item !'" 
 			
 			@deleteProductMerchant="deleteProductMerchant($event)" 
-		></delete-confirmation-modal>
+		></delete-confirmation-modal> 
+		-->
+
+		<!-- Delete Modal -->
+		<div class="modal fade" id="delete-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<form 
+						class="form-horizontal" 
+						v-on:submit.prevent="deleteProductMerchant" 
+						autocomplete="off"
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-header bg-danger">
+							<h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+
+						<div class="modal-body text-center">
+							<h4 class="text-danger">Want to delete '{{ singleMerchantProductData.hasOwnProperty('merchant') ? singleMerchantProductData.merchant.user_name : '' | capitalize }}' ?</h4>
+							<h6 class="sub-heading text-secondary">Warning : You can not restore this item !</h6>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-danger">Delete</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -1255,7 +1291,7 @@
     	// quantity_type : null,
     	// has_variations : null,
     	
-    	product : {},
+    	// product : {},
     	// variations : [],
 		
 		/*
@@ -1350,6 +1386,7 @@
 		created(){
 
 			this.fetchAllMerchants();
+			this.setProductVariation();
 			// this.fetchAllContainers();
 			this.fetchProductAllMerchants();
 
@@ -2278,12 +2315,16 @@
 		      		let reader = new FileReader();
 	                reader.onload = (evnt) => {
 
-	                    this.singleMerchantProductData.preview = evnt.target.result;
+	                    this.singleMerchantProductData.preview = evnt.target.result; 
+                    	// this.$refs.merchantProductPreview.attributes[1]['value'] = evnt.target.result;
+						// console.log(this.$refs.merchantProductPreview);
 	                    
 	                };
-	                reader.readAsDataURL(files[0]);
+	                
+	                reader.readAsDataURL(files[0]);                    
 
                 	this.$delete(this.errors.product, 'preview');
+
 		      	}
 		      	else{
 
@@ -2303,14 +2344,19 @@
 		      	if (files.length && files[0].type.match('image.*')) {
                 	
 		      		let reader = new FileReader();
+	                
 	                reader.onload = (evnt) => {
 
 	                    this.singleMerchantProductData.variations[index].preview = evnt.target.result;
-	                    
-	                };
-	                reader.readAsDataURL(files[0]);
+                    	// this.$refs['merchantProductVariationPreview-' + index][0]['attributes'][1]['value'] = evnt.target.result;
+						// console.log(this.$refs['merchantProductVariationPreview-' + index][0]);
 
+	                };
+
+	                reader.readAsDataURL(files[0]);
+                	
                 	this.$delete(this.errors.product.variations[index], 'preview');
+
 		      	}
 		      	else{
 
@@ -2320,6 +2366,18 @@
 
 		      	evnt.target.value = '';
 		      	return;
+
+			},
+			showPreview(imagePath='default') {
+				
+				if (imagePath.startsWith('data:')) {
+					return imagePath;
+				}
+				else {
+					return '/' + imagePath || '';
+				}
+
+				return;
 
 			},
 			validateFormInput (formInputName) {

@@ -1021,15 +1021,6 @@
 								</div>
 
 								<div class="form-row">
-									<label class="col-sm-4 col-form-label font-weight-bold text-right">
-										Description :
-									</label>
-									<label class="col-sm-8 col-form-label">
-										<span v-html="singleProductData.description"></span>
-									</label>
-								</div>
-
-								<div class="form-row">
 									<label class="col-sm-4 col-form-label font-weight-bold text-right">Has Serial :</label>
 									<label class="col-sm-6 form-control-plaintext">
 										<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>

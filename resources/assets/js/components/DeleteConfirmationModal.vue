@@ -1,5 +1,4 @@
 <template>
-	
 	<!-- Delete Modal -->
 	<div class="modal fade" id="delete-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -19,7 +18,7 @@
 					</div>
 
 					<div class="modal-body text-center">
-						<h4 class="text-danger">Want to delete '{{ contentToDelete.user_name || contentToDelete.name || contentToDelete.merchant ? contentToDelete.merchant.user_name : '' || 'stock' | capitalize }}' ?</h4>
+						<h4 class="text-danger">Want to delete '{{ contentToDelete.user_name || contentToDelete.name || 'stock' | capitalize }}' ?</h4>
 						<h6 class="sub-heading text-secondary">{{ restorationMessage }}</h6>
 					</div>
 
@@ -31,7 +30,6 @@
 			</div>
 		</div>
 	</div>
-
 </template>
 
 <script type="text/javascript">

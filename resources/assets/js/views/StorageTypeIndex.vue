@@ -68,13 +68,14 @@
 																			</span>
 																		</a>
 																	</th>
+																	
 																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		Actions
 																	</th>
 																</tr>
 															</thead>
-															<tbody>
 
+															<tbody>
 																<tr 
 																	v-for="content in contentsToShow" 
 																	:key="'content-key-' + content.id" 
@@ -120,8 +121,8 @@
 																			<i class="fas fa-undo"></i>
 																		</button>
 																	</td>
-															    
 																</tr>
+
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
@@ -131,8 +132,8 @@
 															      		</div>
 															    	</td>
 															  	</tr>
-
 															</tbody>
+
 															<tfoot>
 																<tr>	
 																	<th>
@@ -152,6 +153,7 @@
 																			</span>
 																		</a>
 																	</th>
+																	
 																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
 																		Actions
 																	</th>
@@ -174,6 +176,7 @@
 																<option>50</option>
 															</select>
 														</div>
+
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
@@ -184,6 +187,7 @@
 																<i class="fas fa-sync"></i>
 															</button>
 														</div>
+														
 														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
