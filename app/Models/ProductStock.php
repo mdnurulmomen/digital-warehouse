@@ -15,7 +15,7 @@ class ProductStock extends Model
 
     public function merchantProduct()
     {
-        return $this->belongsTo(Product::class, 'merchant_product_id', 'id');
+        return $this->belongsTo(MerchantProduct::class, 'merchant_product_id', 'id');
     }
 
     public function variations()

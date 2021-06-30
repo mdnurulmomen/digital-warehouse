@@ -14,6 +14,11 @@ class WarehouseContainerShelfUnitStatus extends Model
         return $this->morphOne(WarehouseProduct::class, 'space');
     }
 
+    public function deal()
+    {
+        return $this->morphOne(DealtSpace::class, 'space');
+    }
+
     public function parentShelf()
     {
     	return $this->belongsTo(WarehouseContainerShelfStatus::class, 'warehouse_container_shelf_status_id', 'id');

@@ -278,9 +278,9 @@ class ProductController extends Controller
     }
 
     // Product-Stock
-    public function showProductAllStocks($product, $perPage)
+    public function showProductAllStocks($productMerchant, $perPage)
     {
-        return new ProductStockCollection(ProductStock::with(['addresses', 'variations', 'serials'])->where('product_id', $product)->paginate($perPage));
+        return new ProductStockCollection(ProductStock::with(['addresses', 'variations', 'serials'])->where('merchant_product_id', $productMerchant)->paginate($perPage));
     }
 
     public function storeProductStock(Request $request, $perPage)

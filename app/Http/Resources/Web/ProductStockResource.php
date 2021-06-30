@@ -18,19 +18,19 @@ class ProductStockResource extends JsonResource
             'id' => $this->id,
             // 'name' => $this->product->name,
             'stock_quantity' => $this->stock_quantity ?? 0,
-            'warehouse' => $this->warehouse,
+            // 'warehouse' => $this->warehouse,
             'available_quantity' => $this->available_quantity ?? 0,
-            'has_serials' => $this->has_serials,
-            'has_variations' => $this->has_variations,
-            'has_approval' => $this->has_approval,
+            'has_serials' => $this->merchantProduct->product->has_serials,
+            'has_variations' => $this->merchantProduct->product->has_variations,
+            'has_approval' => $this->stock->has_approval,
             // 'quantity_type' => $this->product->quantity_type,
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, ProductSerialResource::collection($this->serials)),
-            'variations' => $this->when($this->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('productVariation.variation'))),
+            'serials' => $this->when($this->merchantProduct->product->has_serials && ! $this->merchantProduct->product->has_variations, ProductSerialResource::collection($this->serials)),
+            'variations' => $this->when($this->merchantProduct->product->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('productVariation.variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),
-            'keeper' => $this->keeper,
-            'approver' => $this->when($this->has_approval, $this->approver),    // -1 / 1
-            'created_at' => $this->created_at->diffForHumans(),
-            'updated_at' => $this->updated_at->diffForHumans(),
+            'keeper' => $this->stock->keeper,
+            'approver' => $this->when($this->stock->has_approval, $this->stock->approver),    // -1 / 1
+            // 'created_at' => $this->created_at->diffForHumans(),
+            // 'updated_at' => $this->updated_at->diffForHumans(),
         ];
     }
 }

@@ -363,8 +363,29 @@ class WarehouseController extends Controller
         ], 200);
     }
 
+    // merchant-warehouses
+    public function showMerchantAllWarehouses($merchant, $perPage = false)
+    {
+        if ($perPage) {
+            
+            return [
+
+                
+
+            ];
+
+        }
+
+        return Warehouse::where('active', true)->whereHas('deals', function ($query) use ($merchant) {
+            $query->whereHas('merchantDeal', function ($query1) use ($merchant) {
+                $query1->where('expired_at', '>', now())->where('merchant_id', $merchant);
+            });
+        })->get();
+    
+    }
+
     // warehouse-contaners
-    public function showAllWarehouseContainers($warehouse, $perPage = false) {
+    public function showWarehouseAllContainers($warehouse, $perPage = false) {
         
         // if ($perPage) {
             
@@ -421,8 +442,8 @@ class WarehouseController extends Controller
                                 
     }
 
-    // containers of specific warehouse
-    public function showWarehouseAllContainers($perPage = false) {
+    // my containers
+    public function showMyContainers($perPage = false) {
         
         if ($perPage) {
             

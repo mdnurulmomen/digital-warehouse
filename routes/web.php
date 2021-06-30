@@ -82,8 +82,11 @@ Route::name('merchant.')->group(function () {
 		Route::patch('/warehouses/{warehouse}/{perPage}', 'WarehouseController@restoreWarehouse')->name('warehouses');
 		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
+		// merchant-warehouses
+		Route::get('/api/merchant-warehouses/{merchant}/{perPage?}', 'WarehouseController@showMerchantAllWarehouses')->name('merchant-warehouses');
+
 		// warehouse container
-		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('warehouse-containers');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');

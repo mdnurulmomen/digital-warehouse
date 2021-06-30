@@ -47,7 +47,7 @@ Route::name('warehouse.')->group(function () {
 		Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('container-types');
 
 		// my-properties
-		Route::get('/api/my-containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('my-containers');
+		Route::get('/api/my-containers/{perPage?}', 'WarehouseController@showMyContainers')->name('my-containers');
 		Route::get('/api/search-my-containers/{search}/{perPage}', 'WarehouseController@searchWarehouseAllContainers')->name('search-my-containers');
 
 		Route::get('/api/my-container-shelves/{container}/{perPage?}', 'WarehouseController@showContainerAllShelves')->name('my-container-shelves');
@@ -85,8 +85,11 @@ Route::name('warehouse.')->group(function () {
 		Route::patch('/warehouses/{warehouse}/{perPage}', 'WarehouseController@restoreWarehouse')->name('warehouses');
 		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
+		// merchant-warehouses
+		Route::get('/api/merchant-warehouses/{merchant}/{perPage?}', 'WarehouseController@showMerchantAllWarehouses')->name('merchant-warehouses');
+
 		// warehouse container
-		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showAllWarehouseContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('warehouse-containers');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');

@@ -257,7 +257,7 @@ const router = new VueRouter({
             },
         */
         {
-            path: '/product-stocks/:productName',
+            path: '/product-stocks/:merchantName',
             name: 'product-stocks',
             component: ProductStockIndex,
             props: true,
@@ -266,7 +266,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-product-stock-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.product) {
+                if (to.params.product && to.params.productMerchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {

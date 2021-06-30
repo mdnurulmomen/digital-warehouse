@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="product.name + ' stocks'" 
-			:message="'All stocks for ' + product.name"
+			:message="'All' + product.name + 'stocks for ' + productMerchant.merchant ? productMerchant.merchant.name : ''"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -28,7 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'stocks'" 
 											  		:required-permission="'product-stock'" 
-											  		:disable-add-button="allWarehouses.length==0 ? true : false" 									  
+											  		:disable-add-button="availableWarehouses.length==0 ? true : false" 									  
 											  		@showContentCreateForm="showStockCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchProductAllStocks"
@@ -265,7 +265,7 @@
 												Merchant :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.merchant ? product.merchant.user_name : 'None' | capitalize }}
+												{{ productMerchant.merchant ? productMerchant.merchant.user_name : 'None' | capitalize }}
 											</label>
 										</div>
 
@@ -283,7 +283,7 @@
 												SKU Code :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.sku }}
+												{{ productMerchant.sku }}
 											</label>
 										</div>
 
@@ -292,7 +292,7 @@
 												Price :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.price || 'NA' }}
+												{{ productMerchant.price || 'NA' }}
 											</label>
 										</div>
 
@@ -314,7 +314,7 @@
 											<div class="col-sm-6">
 												<multiselect 
 			                              			v-model="singleStockData.warehouse"
-			                                  		:options="allWarehouses" 
+			                                  		:options="availableWarehouses" 
 			                                  		:custom-label="objectNameWithCapitalized" 
 			                                  		:required="true" 
 			                                  		:allow-empty="false" 
@@ -1440,7 +1440,11 @@
 				type: Object,
 				required: true,
 			},
-			productName:{
+			productMerchant:{
+				type: Object,
+				required: true,
+			},
+			merchantName:{
 				type: String,
 				required: true,
 			},
@@ -1461,7 +1465,7 @@
 	        	submitForm : true,
 	        	formSubmitted : false,
 
-	        	allWarehouses : [],
+	        	availableWarehouses : [],
 
 	        	allStocks : [],
 
@@ -1530,7 +1534,7 @@
 
 		created() {
 			
-			this.fetchAllWarehouses();
+			this.fetchMerchantAllWarehouses();
 
 			// this.fetchWarehouseAllContainers();
 
@@ -1552,7 +1556,7 @@
 				this.allStocks = [];
 				
 				axios
-					.get('/api/product-stocks/' + this.product.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/product-stocks/' + this.productMerchant.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// console.log(response);
@@ -1631,19 +1635,19 @@
 					});
 
 			},
-			fetchAllWarehouses() {
+			fetchMerchantAllWarehouses() {
 				
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.allWarehouses = [];
+				this.availableWarehouses = [];
 
 				axios
-					.get('/api/warehouses')
+					.get('/api/merchant-warehouses/' + this.productMerchant.merchant.id)
 					.then(response => {
 						if (response.status == 200) {
 							
-							this.allWarehouses = response.data;
+							this.availableWarehouses = response.data;
 					
 						}
 					})

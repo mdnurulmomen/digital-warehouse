@@ -17,7 +17,7 @@ class CreateWarehouseContainerStatusesTable extends Migration
             $table->increments('id');
             $table->string('name');
             // $table->boolean('hired')->default(false);
-            $table->unsignedDecimal('engaged', $precision = 2, $scale = 1)->default(0);  // 1 for full engaged, .5 for partial engaged
+            $table->float('engaged', $precision = 2, $scale = 1)->default(0);  // 1 for full engaged, .5 for partial engaged
             $table->unsignedInteger('warehouse_container_id');
         });
     }

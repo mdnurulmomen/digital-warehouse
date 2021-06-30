@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="'merchants'" 
-			:message="'All our merchants of ' + product.name | capitalize"
+			:message="'All our merchants for ' + product.name | capitalize"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -1760,7 +1760,7 @@
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: object, productName: object.name }});
+				this.$router.push({ name: 'product-stocks', params: { product: this.product, merchantName: object.marchant ? object.marchant.user_name : 'NA', productMerchant: object }});
 
 			},
 			verifyUserInput() {
