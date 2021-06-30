@@ -11,6 +11,7 @@ use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\WarehouseCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Http\Resources\Web\WarehouseManagerCollection;
+use App\Http\Resources\Web\WarehouseEmptySpaceResource;
 
 class WarehouseController extends Controller
 {
@@ -364,6 +365,7 @@ class WarehouseController extends Controller
     }
 
     // merchant-warehouses
+    /*
     public function showMerchantAllWarehouses($merchant, $perPage = false)
     {
         if ($perPage) {
@@ -383,54 +385,54 @@ class WarehouseController extends Controller
         })->get();
     
     }
+    */
 
     // warehouse-contaners
-    public function showWarehouseAllContainers($warehouse, $perPage = false) {
-        
-        // if ($perPage) {
+    public function showWarehouseContainers($warehouse = false) {
             
-            $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
-                                        $query->where('id', $warehouse)->where('active', 1);
-                                    })
-                                    ->where('engaged', 0.0)
-                                    ->get();
+        if($warehouse){
 
+            $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
+                $query->where('id', $warehouse)->where('active', 1);
+            })
+            ->where('engaged', 0.0)
+            ->get();
 
             $emptyShelfContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
-                                        $query->where('id', $warehouse)->where('active', 1);
-                                    })
-                                    ->whereHas('containerShelfStatuses', 
-                                    function ($query) {
-                                        $query->where('engaged', 0.0);
-                                    })
-                                    ->with([
-                                        'containerShelfStatuses' => 
-                                            function ($query) {
-                                                $query->where('engaged', 0.0);
-                                            }
-                                    ])
-                                    ->get();
+                $query->where('id', $warehouse)->where('active', 1);
+            })
+            ->whereHas('containerShelfStatuses', 
+            function ($query) {
+                $query->where('engaged', 0.0);
+            })
+            ->with([
+                'containerShelfStatuses' => 
+                    function ($query) {
+                        $query->where('engaged', 0.0);
+                    }
+            ])
+            ->get();
 
             $emptyUnitContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
-                                        $query->where('id', $warehouse)->where('active', 1);
-                                    })
-                                    ->whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
-                                    function ($query) {
-                                        $query->where('engaged', 0.0);
-                                    })
-                                    ->with([
-                                        'containerShelfStatuses' => 
-                                            function ($query) {
-                                                $query->where('engaged', 0.0)
-                                                      ->orWhere('engaged', 0.5);
-                                            },
+                $query->where('id', $warehouse)->where('active', 1);
+            })
+            ->whereHas('containerShelfStatuses.containerShelfUnitStatuses', 
+            function ($query) {
+                $query->where('engaged', 0.0);
+            })
+            ->with([
+                'containerShelfStatuses' => 
+                    function ($query) {
+                        $query->where('engaged', 0.0)
+                                ->orWhere('engaged', 0.5);
+                    },
 
-                                        'containerShelfStatuses.containerShelfUnitStatuses' => 
-                                            function ($query) {
-                                                $query->where('engaged', 0.0);
-                                            },
-                                    ])
-                                    ->get();
+                'containerShelfStatuses.containerShelfUnitStatuses' => 
+                    function ($query) {
+                        $query->where('engaged', 0.0);
+                    },
+            ])
+            ->get();
 
             return [
                 'emptyContainers' => $emptyContainers, 
@@ -438,7 +440,12 @@ class WarehouseController extends Controller
                 'emptyUnitContainers' => $emptyUnitContainers, 
             ];
 
-        // }
+        }
+        else {
+
+            return WarehouseEmptySpaceResource::collection(Warehouse::where('active', true)->get());
+
+        }
                                 
     }
 

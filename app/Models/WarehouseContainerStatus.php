@@ -24,13 +24,113 @@ class WarehouseContainerStatus extends Model
         return $this->morphOne(WarehouseProduct::class, 'space');
     }
 
-    public function deal()
+    public function deals()
     {
-        return $this->morphOne(DealtSpace::class, 'space');
+        return $this->morphMany(DealtSpace::class, 'space');
     }
 
     public function warehouseContainer()
     {
         return $this->belongsTo(WarehouseContainer::class, 'warehouse_container_id', 'id');
     }
+
+    public function updateContainerStatus($newValue)
+    {
+        $this->updateChildShelves($newValue);
+    }
+
+    protected function updateChildShelves($newValue)
+    {
+        if ($this->containerShelfStatuses->count()) {
+            
+            foreach ($this->containerShelfStatuses as $containerShelf) {
+               
+                $containerShelf->update([
+                    'engaged' => $newValue
+                ]);
+
+                $this->updateChildUnits($containerShelf, $newValue);
+
+            }
+
+        }
+    }
+
+    protected function updateChildUnits(WarehouseContainerShelfStatus $shelf, $newValue)
+    {
+        if ($shelf->containerShelfUnitStatuses->count()) {
+            
+            $shelf->containerShelfUnitStatuses()->update([
+                'engaged' => $newValue
+            ]);
+
+        }
+    }
+
+    protected function updateParentContainer(WarehouseContainerStatus $warehouseExpectedContainer)
+    {
+        // $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
+
+        // all shelves are engaged
+        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1.0)->count()) {
+            
+            $warehouseExpectedContainer->update([
+                'engaged' => 1
+            ]); 
+
+        }
+        // no shelf is engaged
+        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 0.0)->count()) {
+            
+            $warehouseExpectedContainer->update([
+                'engaged' => 0
+            ]); 
+
+        }
+        else {
+
+            // partially engaged
+            $warehouseExpectedContainer->update([
+                'engaged' => 0.5
+            ]);
+
+        }
+
+    }
+
+    protected function updateParentShelf(WarehouseContainerShelfStatus $warehouseExpectedShelf)
+    {
+        // Related Shelf
+        // $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
+
+        // all units are engaged
+        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1.0)->count()) {
+            
+            $warehouseExpectedShelf->update([
+                'engaged' => 1
+            ]);
+
+        }
+        // no unit is engaged
+        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 0.0)->count()) {
+            
+            $warehouseExpectedShelf->update([
+                'engaged' => 0
+            ]);
+
+        }
+        else {
+
+            // partially engaged
+            $warehouseExpectedShelf->update([
+                'engaged' => 0.5
+            ]);
+
+        }
+
+        // parent Container
+        $this->updateParentContainer($warehouseExpectedShelf->parentContainer);
+
+    }
+
 }

@@ -115,6 +115,16 @@ class Warehouse extends Authenticatable
         return $this->hasManyThrough(WarehouseContainerStatus::class, WarehouseContainer::class, 'warehouse_id', 'warehouse_container_id');
     }
 
+    public function containerShelfStatuses()
+    {
+        return $this->hasManyThrough(WarehouseContainerShelfStatus::class, WarehouseContainer::class, 'warehouse_id', 'warehouse_container_id');
+    }
+
+    public function containerShelfUnitStatuses()
+    {
+        return $this->hasManyThrough(WarehouseContainerShelfUnitStatus::class, WarehouseContainer::class, 'warehouse_id', 'warehouse_container_id');
+    }
+
     /**
      * The managers that belong to the warehouse.
      */

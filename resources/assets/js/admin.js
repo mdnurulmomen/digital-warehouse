@@ -77,6 +77,7 @@ import ProductStockIndex from './views/ProductStockIndex'
 import ProductMerchantIndex from './views/ProductMerchantIndex'
 import RoleIndex from './views/RoleIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
+import MerchantDealIndex from './views/MerchantDealIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
 
 /**
@@ -299,6 +300,24 @@ const router = new VueRouter({
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-role-index' 
+            }
+        },
+        {
+            path: '/merchant-deals/:merchantName',
+            name: 'merchant-deals',
+            component: MerchantDealIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-deal-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.merchant) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/merchants');
+                }
             }
         },
         

@@ -1,0 +1,3457 @@
+
+<template v-if="userHasPermissionTo('view-merchant-deal-index')">
+
+	<div class="pcoded-content">
+
+		<breadcrumb 
+			:title="'All merchant deals'" 
+			:message="'All our deals with all merchants'"
+		></breadcrumb>			
+
+		<div class="pcoded-inner-content">
+			<div class="main-body">
+				<div class="page-wrapper">	
+					<div class="page-body">
+
+						<loading v-show="loading"></loading>
+
+						<alert v-show="error" :error="error"></alert>
+				
+					  	<div class="row" v-show="!loading">
+							<div class="col-sm-12">
+							  	<div class="card">
+									<div class="card-block">
+										<div class="row">			
+											<div class="col-sm-12 sub-title">
+											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-merchant-deal-index') || userHasPermissionTo('create-merchant-deal')"
+											  		:query="query" 
+											  		:caller-page="'deals'" 
+											  		:required-permission="'merchant-deal'" 
+											  		:disable-add-button="allAvailableWarehouseAndSpaces.length==0 ? true : false" 									  
+											  		@showContentCreateForm="showDealCreateForm" 
+											  		@searchData="searchData($event)" 
+											  		@fetchAllContents="fetchAllMerchantDeals"
+											  	></search-and-addition-option>
+											</div>
+											
+											<div class="col-sm-12 col-lg-12">
+ 												<div class="tab-content card-block">
+													<div class="card">
+														<div class="table-responsive">
+															<table class="table table-striped table-bordered nowrap text-center">
+																<thead>
+																	<tr>
+																		<th>E-cmmrc support</th>
+																		<th>Paid Amount</th>
+																		<th>Due Amount</th>
+																		<th>Actions</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	<tr v-for="merchantDeal in merchantAllDeals" :key="'merchant-deal-' + merchantDeal.id"
+																	>
+																		<td>
+																			{{ merchantDeal.e_commerce_fulfillment }}
+																		</td>
+
+																		<td>
+																			{{ merchantDeal.paid_amount }}
+																		</td>
+
+																		<td>
+																			{{ merchantDeal.issued_amount - merchantDeal.paid_amount }}
+																		</td>
+																		
+																		<td>
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-info btn-icon"  
+																				@click="showDealDetails(merchantDeal)"
+																			>
+																				<i class="fas fa-eye"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-primary btn-icon"  
+																				@click="openDealEditForm(merchantDeal)" 
+																				v-if="userHasPermissionTo('update-merchant-deal')"
+																			>
+																				<i class="fas fa-edit"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-danger btn-icon" 
+																				:disabled="formSubmitted || merchantDeal.spaces.some(dealSpace=>dealSpace.engaged != 0)"  
+																				@click="openDealDeleteForm(merchantDeal)" 
+																				v-if="userHasPermissionTo('delete-merchant-deal')" 
+																			>
+																				<i class="fas fa-trash"></i>
+																			</button>
+																		</td>
+																	</tr>
+
+																	<tr 
+																  		v-show="!merchantAllDeals.length"
+																  	>
+															    		<td colspan="4">
+																      		<div class="alert alert-danger" role="alert">
+																      			Sorry, No data found.
+																      		</div>
+																    	</td>
+																  	</tr>
+																</tbody>
+																<tfoot>
+																	<tr>	
+																		<th>E-cmmrc support</th>
+																		<th>Paid Amount</th>
+																		<th>Due Amount</th>
+																		<th>Actions</th>
+																	</tr>
+																</tfoot>
+															</table>
+														</div>
+													</div>
+													<div class="row d-flex align-items-center align-content-center">
+														<div class="col-sm-2 col-4">
+															<select 
+																class="form-control" 
+																v-model.number="perPage" 
+																@change="changeNumberContents"
+															>
+																<option>10</option>
+
+																<option>20</option>
+
+																<option>30</option>
+
+																<option>40</option>
+
+																<option>50</option>
+															</select>
+														</div>
+														<div class="col-sm-2 col-8">
+															<button 
+																type="button" 
+																class="btn btn-primary btn-sm" 
+																@click="query === '' ? fetchAllMerchantDeals() : searchData()"
+															>
+																Reload
+																<i class="fas fa-sync"></i>
+															</button>
+														</div>
+														<div class="col-sm-8 col-12 text-right form-group">
+															<pagination
+																v-if="pagination.last_page > 1"
+																:pagination="pagination"
+																:offset="5"
+																@paginate="query === '' ? fetchAllMerchantDeals() : searchData()"
+															>
+															</pagination>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div> 
+				</div>
+			</div>
+		</div>
+
+ 		<!--Create, Edit or Approve Modal -->
+		<div class="modal fade" id="merchantDeal-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-deal') || userHasPermissionTo('update-merchant-deal')">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							{{ createMode ? 'Create New ' : 'Update ' }} Deal
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+						
+					<form 	
+						class="form-horizontal" 
+						v-on:submit.prevent="createMode ? createMerchantDeal() : updateMerchantDeal()" 
+						autocomplete="off" 
+						novalidate="true" 
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-body">
+							<transition-group name="fade">		
+								<div 
+									class="row" 
+									v-bind:key="'merchant-deal-modal-step-' + 1" 
+									v-show="!loading && step==1"
+								>
+									<h2 class="mx-auto mb-4 lead">Deal Profile</h2>
+
+									<div class="col-md-12">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant Name :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ merchant ? merchant.first_name + ' ' + merchant.last_name : 'NA' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												E-Commerce Fullfillment :
+											</label>
+											<toggle-button 
+												v-model="singleMerchantDealData.e_commerce_fulfillment" 
+												:width=150 
+												:sync="true"
+												:color="{checked: 'green', unchecked: 'blue'}"
+												:labels="{checked: 'Enabled', unchecked: 'Disabled'}"  
+											/>
+										</div>
+										
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Auto Renewal :
+											</label>
+											<div class="col-sm-6">
+												<toggle-button 
+													v-model="singleMerchantDealData.auto_renewal" 
+													:width=150 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'blue'}"
+													:labels="{checked: 'Auto Renew', unchecked: 'No Renew'}"  
+												/>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Status :
+											</label>
+											<div class="col-sm-6">
+												<toggle-button 
+													v-model="singleMerchantDealData.active" 
+													:width=150 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'red'}"
+													:labels="{checked: 'Active', unchecked: 'Deactive'}"  
+												/>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Percentage :
+											</label>
+											<div class="form-group col-sm-6">
+									        	<input type="number" 
+													class="form-control" 
+													v-model.number="singleMerchantDealData.sale_percentage" 
+													placeholder="Sale Percentage" 
+													:class="!errors.sale_percentage ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('sale_percentage')" 
+													required="true" 
+													:disabled="! singleMerchantDealData.e_commerce_fulfillment"
+												>
+												<div class="invalid-feedback">
+											    	{{ errors.sale_percentage }}
+											    </div>
+								        	</div>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+										<div class="form-row">
+									    	<div class="form-group col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+								    	</div>
+									</div>
+							    </div>
+						     
+							    <div 
+									class="row" 
+									v-bind:key="'merchant-deal-modal-step-' + 2" 
+									v-show="!loading && step==2" 
+								>
+									<h2 class="mx-auto mb-4 lead">Rent Space</h2>
+
+									<div 
+										class="col-md-12"
+										v-for="(merchantWarehouse, merchantWarehouseIndex) in singleMerchantDealData.warehouses" 
+										:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id"
+									>
+										<div 
+											class="card"
+											v-if="merchantWarehouse && errors.warehouses[merchantWarehouseIndex]"
+										>
+											<div class="card-body">
+												<div class="form-row ml-3 mr-3">
+													<div class="form-group col-md-12 text-center">
+														<label for="inputUsername">Select Warehouse</label>
+
+														<multiselect 
+															v-model="singleMerchantDealData.warehouses[merchantWarehouseIndex]"
+															:options="allAvailableWarehouseAndSpaces" 
+															:custom-label="objectNameWithCapitalized" 
+															:required="true" 
+															:allow-empty="false" 
+															placeholder="Select Warehouse" 
+															class="form-control p-0" 
+															:class="! errors.warehouses[merchantWarehouseIndex].warehouse ? 'is-valid' : 'is-invalid'"  
+															@close="validateFormInput('warehouse')" 
+															@input="resetWarehouseSpaces(merchantWarehouseIndex)"
+														>
+														</multiselect>
+
+														<div class="invalid-feedback">
+															{{ errors.warehouses[merchantWarehouseIndex].warehouse }}
+														</div>
+													</div>
+												</div>
+
+												<div 
+													class="form-row ml-5 mr-5"
+													v-if="merchantWarehouse && merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length"
+												>
+													<div 
+														class="col-md-12" 
+														v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
+														:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex"
+													>
+														<div class="form-row mb-3">
+															<div 
+																class="col-md-12 text-center mb-2"
+															>
+																<label for="inputFirstName">
+																	Required Space Type {{ warehouseSpaceIndex + 1 }}
+																</label>
+
+																<multiselect 
+																	v-model="warehouseSpace.type"
+																	:options="['containers', 'shelves', 'units']" 
+																	:custom-label="nameWithCapitalized" 
+																	:required="true" 
+																	:allow-empty="false"
+																	placeholder="Containers / Shelves / Units" 
+																	class="form-control p-0" 
+																	:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_type  ? 'is-valid' : 'is-invalid'" 
+																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1)" 
+																	@input="setWarehouseSpaces(merchantWarehouseIndex, warehouseSpaceIndex)" 
+																	@close="validateFormInput('space_type')"
+																>
+																</multiselect>
+																
+																<div class="invalid-feedback">
+																	{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_type }}
+																</div>														
+															</div>
+
+															<div class="col-md-12">
+																<div 
+																	class="form-row" 
+																	v-show="warehouseSpace.type=='containers'"
+																>
+																	<div 
+																		class="col-md-12" 
+																		v-if="warehouseSpace.containers && Array.isArray(warehouseSpace.containers) && warehouseSpace.containers.length"
+																	>
+																		<div 
+																			class="form-row" 
+																			v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers"
+																			:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-container-id-' + warehouseContainer.id"
+																		>
+																			<div class="form-group col-md-6 mb-1">
+																				<label for="inputFirstName">Container {{ warehouseContainerIndex + 1 }}</label>
+
+																				<multiselect 
+																					v-model="warehouseSpace.containers[warehouseContainerIndex]"
+																					placeholder="Select Container" 
+																					label="name" 
+																					track-by="id" 
+																					:options="emptyContainers" 
+																					:clear-on-select="false" 
+																					:preserve-search="true" 
+																					:required="true" 
+																					:allow-empty="false" 
+																					class="form-control p-0" 
+																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																					@close="validateFormInput('containers')" 
+																				>
+																				</multiselect>
+
+																				<div class="invalid-feedback">
+																					{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers }}
+																				</div>
+																			</div>
+
+																			<div class="form-group col-md-6 mb-1" v-if="warehouseContainer && Array.isArray(warehouseContainer.rents)">
+																				<label for="inputFirstName">Rent Package</label>
+
+																				<multiselect 
+																					v-model="warehouseSpace.containers[warehouseContainerIndex].selected_rent"
+																					placeholder="Select Rent Periods" 
+																					label="name" 
+																					track-by="id" 
+																					:options="warehouseContainer.rents" 
+																					:custom-label="objectNameWithCapitalized" 
+																					:clear-on-select="false" 
+																					:preserve-search="true" 
+																					:required="true" 
+																					:allow-empty="false" 
+																					class="form-control p-0" 
+																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex+1)"
+																					@close="validateFormInput('rent_period')" 
+																				>
+																				</multiselect>
+																				
+																				<div class="invalid-feedback">
+																					{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period }}
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<div class="col-md-12" v-else>
+																		<!-- 																		
+																			<div 
+																				class="form-row" 
+																				:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + 1 + '-container-' + 1 + '-container-id-'"
+																			>
+																				<div class="form-group col-md-6 mb-1">
+																					<label for="inputFirstName">Container 1</label>
+
+																					<multiselect 
+																						v-model="warehouseSpace.containers[0]"
+																						placeholder="Select Container" 
+																						label="name" 
+																						track-by="id" 
+																						:options="emptyContainers" 
+																						:close-on-select="false" 
+																						:clear-on-select="false" 
+																						:preserve-search="true" 
+																						:required="true" 
+																						:allow-empty="false" 
+																						class="form-control p-0" 
+																						:class="! errors.warehouses[merchantWarehouseIndex].spaces[0].containers ? 'is-valid' : 'is-invalid'" 
+																						:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > 1"
+																						@close="validateFormInput('containers')" 
+																					>
+																					</multiselect>
+
+																					<div class="invalid-feedback">
+																						{{ errors.warehouses[merchantWarehouseIndex].spaces[0].containers }}
+																					</div>
+																				</div>
+
+																				<div class="form-group col-md-6 mb-1" v-if="warehouseSpace.containers[0] && Array.isArray(warehouseSpace.containers[0].rents)">
+																					<label for="inputFirstName">Rent Package</label>
+
+																					<multiselect 
+																						v-model="warehouseSpace.containers[0].selected_rent"
+																						placeholder="Select Rent Periods" 
+																						label="name" 
+																						track-by="id" 
+																						:options="warehouseSpace.containers[0].rents" 
+																						:clear-on-select="false" 
+																						:preserve-search="true" 
+																						:required="true" 
+																						:allow-empty="false" 
+																						class="form-control p-0" 
+																						:class="! errors.warehouses[merchantWarehouseIndex].spaces[0].rent_period  ? 'is-valid' : 'is-invalid'" 
+																						:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > 1"
+																						@close="validateFormInput('rent_period')" 
+																					>
+																					</multiselect>
+																					
+																					<div class="invalid-feedback">
+																						{{ errors.warehouses[merchantWarehouseIndex].spaces[0].rent_period }}
+																					</div>
+																				</div>
+																			</div> 
+																		-->
+																		<p class="text-danger text center">No Containers Available</p>
+																	</div>
+
+																	<div class="col-md-12 mt-2">
+																		<div class="form-row text-center">
+																			<div class="col-md-6 text-success">
+																				<i class="fa fa-plus" aria-hidden="true" @click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"></i>
+																			</div>
+																			<div class="col-md-6 text-danger">
+																				<i class="fa fa-minus" aria-hidden="true" @click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"></i>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+
+															<div class="col-md-12">
+																<div 
+																	class="form-row" 
+																	v-show="warehouseSpace.type=='shelves'"
+																>
+																	<div class="form-group col-md-4">
+																		<label for="inputFirstName">Parent Container</label>
+
+																		<multiselect 
+																			v-model="warehouseSpace.container"
+																			placeholder="Parent Container" 
+																			label="name" 
+																			track-by="id" 
+																			:options="emptyShelfContainers" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@input="setContainerAvailableShelves(merchantWarehouseIndex, warehouseSpaceIndex)"
+																			@close="validateFormInput('parent_container')" 
+																		>
+																		</multiselect>
+
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container }}
+																		</div>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-4" 
+																		v-if="warehouseSpace.container"
+																	>
+																		<label for="inputFirstName">Select Shelves</label>
+
+																		<multiselect 
+																			v-model="warehouseSpace.container.shelves"
+																			placeholder="Select Shelves" 
+																			label="name" 
+																			track-by="id" 
+																			:options="emptyShelves" 
+																			:multiple="true" 
+																			:close-on-select="false" 
+																			:clear-on-select="false" 
+																			:preserve-search="true" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].shelves ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@close="validateFormInput('shelves')" 
+																		>
+																		</multiselect>
+
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].shelves }}
+																		</div>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-4" 
+																		v-else
+																	>
+																		<label for="inputFirstName">Select Shelves</label>
+																		<p class="text-danger">No Container Selected</p>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-4" 
+																		v-if="warehouseSpace.container && Array.isArray(warehouseSpace.container.rents)"
+																	>
+																		<label for="inputFirstName">Rent Package</label>
+
+																		<multiselect 
+																			v-model="warehouseSpace.container.selected_rent"
+																			placeholder="Select Rent Periods" 
+																			label="name" 
+																			track-by="id" 
+																			:options="warehouseSpace.container.rents" 
+																			:custom-label="objectNameWithCapitalized" 
+																			:clear-on-select="false" 
+																			:preserve-search="true" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@close="validateFormInput('rent_period')" 
+																		>
+																		</multiselect>
+
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period }}
+																		</div>
+																	</div>
+																</div>
+															</div>
+
+															<div class="col-md-12">
+																<div class="form-row" v-show="warehouseSpace.type=='units'">
+																	<div class="form-group col-md-3">
+																		<label for="inputFirstName">Parent Container</label>
+
+																		<multiselect 
+																			v-model="warehouseSpace.container"
+																			placeholder="Parent Container" 
+																			label="name" 
+																			track-by="id" 
+																			:options="emptyUnitContainers" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container  ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@input="setContainerAvailableUnitShelves(merchantWarehouseIndex, warehouseSpaceIndex)" 
+																			@close="validateFormInput('parent_container')" 
+																		>
+																		</multiselect>
+
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container }}
+																		</div>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-3" 
+																		v-if="warehouseSpace.container"
+																	>
+																		<label for="inputFirstName">Parent Shelf</label>
+
+																		<multiselect 
+																			v-model="warehouseSpace.container.shelf"
+																			placeholder="Parent Shelf" 
+																			label="name" 
+																			track-by="id" 
+																			:options="emptyUnitShelves" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_shelf  ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@input="setContainerShelfAvailableUnits(merchantWarehouseIndex, warehouseSpaceIndex)" 
+																			@close="validateFormInput('parent_shelf')" 
+																		>
+																		</multiselect>
+
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_shelf }}
+																		</div>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-3" 
+																		v-if="warehouseSpace.container && warehouseSpace.container.shelf"
+																	>
+																		<label for="inputFirstName">Select Units</label>
+																		
+																		<multiselect 
+																			v-model="warehouseSpace.container.shelf.units"
+																			placeholder="Select Units" 
+																			label="name" 
+																			track-by="id" 
+																			:options="emptyUnits" 
+																			:multiple="true" 
+																			:close-on-select="false" 
+																			:clear-on-select="false" 
+																			:preserve-search="true" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@close="validateFormInput('units')" 
+																		>
+																		</multiselect>
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units }}
+																		</div>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-3" 
+																		v-else
+																	>
+																		<label for="inputFirstName">Select Units</label>
+																		<p class="text-danger">No container or shelf selected</p>
+																	</div>
+
+																	<div 
+																		class="form-group col-md-3" 
+																		v-if="warehouseSpace.container && Array.isArray(warehouseSpace.container.rents)"
+																	>
+																		<label for="inputFirstName">Rent Package</label>
+																		<multiselect 
+																			v-model="warehouseSpace.container.selected_rent"
+																			placeholder="Select Rent Periods" 
+																			label="name" 
+																			track-by="id" 
+																			:options="warehouseSpace.container.rents" 
+																			:custom-label="objectNameWithCapitalized" 
+																			:clear-on-select="false" 
+																			:preserve-search="true" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)"
+																			@close="validateFormInput('rent_period')" 
+																		>
+																		</multiselect>
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period }}
+																		</div>
+																	</div>
+																</div>
+															</div>	
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div 
+										class="col-md-12 text-center" 
+										v-show="! singleMerchantDealData.warehouses.length"
+									>
+										<p class="text-danger">
+											No Warehouse Found.
+										</p>
+									</div>
+
+									<div class="col-md-12">
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													:disabled="singleMerchantDealData.warehouses.length >= allAvailableWarehouseAndSpaces.length" 
+													@click="addMoreWarehouse()"
+												>
+													Add Warehouse
+												</button>
+											</div>
+
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													:disabled="singleMerchantDealData.warehouses.length < 2" 
+													@click="removeWarehouse()"
+												>
+													Remove Warehouse
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round float-right" 
+													v-on:click="nextPage"
+												>
+													<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div 
+									class="row" 
+									v-bind:key="'merchant-deal-modal-step-' + 3" 
+									v-show="!loading && step==3" 
+								>
+									<h2 class="mx-auto mb-4 lead">Payment {{ createMode ? '' : '(most recent)' }}</h2>
+									<!-- last payment -->
+									<div class="col-md-12">
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Total Rent</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].total_rent" 
+													placeholder="Total Rent" 
+													:disabled="true"
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Discount</label>
+												<div class="input-group mb-1">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].discount" 
+														placeholder="Discount" 
+														:min="0" 
+														:max="100" 
+														:class="! errors.payment.discount ? 'is-valid' : 'is-invalid'" 
+														@change="resetTotalRent()"
+													>
+													<div class="input-group-append">
+														<span class="input-group-text"> % </span>
+													</div>
+												</div>
+												<div class="invalid-feedback" style="display:block" v-show="errors.payment.discount">
+											    	{{ errors.payment.discount }}
+											    </div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Last Due</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].previous_due" 
+													placeholder="Previous Due" 
+													:disabled="true"
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Net Payable</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].net_payable" 
+													placeholder="Net Payable" 
+													:disabled="true"
+												>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Paid Amount</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].paid_amount" 
+													placeholder="Paid Amount" 
+													:class="! errors.payment.paid_amount ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('paid_amount')" 
+													required="true" 
+												>
+												<div class="invalid-feedback">
+											    	{{ errors.payment.paid_amount }}
+											    </div>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Current Due</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													:value="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].net_payable - singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].paid_amount" 
+													placeholder="Previous Dues" 
+													:disabled="true"
+												>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+												<button 
+													type="submit" 
+													class="btn btn-primary float-right" 
+													:disabled="!submitForm || formSubmitted"
+												>
+													{{ createMode ? 'Make ' : 'Update ' }} Deal
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</transition-group>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-merchant-deal')" 
+			:csrf="csrf" 
+			:submit-method-name="'deleteDeal'" 
+			:content-to-delete="singleMerchantDealData"
+			:restoration-message="'You can not restore this item again !'" 
+			
+			@deleteStock="deleteDeal($event)" 
+		></delete-confirmation-modal>
+
+	<!-- 
+		<restore-confirmation-modal 
+			:csrf="csrf" 
+			:submit-method-name="'restoreAsset'" 
+			:content-to-restore="singleMerchantDealData"
+			:restoration-message="'This will restore all related items !'" 
+
+			@restoreAsset="restoreAsset($event)" 
+		></restore-confirmation-modal>
+ 	-->
+
+ 		<!-- View Modal -->
+		<div class="modal fade" id="merchantDeal-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">{{ merchant.name }} Deal ({{ singleMerchantDealData.created_at }}) Details</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<div class="card">
+							<div class="card-body">
+								
+								<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
+									<li class="nav-item">
+										<a class="nav-link active" data-toggle="tab" href="#merchant-deal-profile" role="tab">
+											Deal
+										</a>
+									</li>
+
+									<li class="nav-item">
+										<a class="nav-link" data-toggle="tab" href="#merchant-deal-payments-and-spaces" role="tab">
+											Payments & Spaces
+										</a>
+									</li>
+								</ul>
+
+								<div class="tab-content tabs card-block">
+									<!-- 
+									<div class="tab-pane active" id="product-profile" role="tabpanel">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Type :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.category ? product.category.name : 'Bulk Product' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.merchant ? product.merchant.user_name : 'None' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Name :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.name }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												SKU Code :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.sku }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Price :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.price || 'NA' }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Description :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												<span v-html="product.description"></span>
+											</label>
+										</div>
+
+										
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Available Qty:
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ product.available_quantity }}
+												{{ product.quantity_type }}
+											</label>
+										</div>
+ 										
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
+											<label class="col-sm-6 form-control-plaintext">
+												<span :class="[product.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ product.has_variations ? 'Available' : 'NA' }}</span>
+											</label>
+										</div>
+
+										<div class="form-row" v-if="product.has_variations && product.variations.length">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Variations :
+											</label>
+											<div class="col-sm-12">
+												<div class="form-row">
+													
+													<div 
+														class="col-md-6 ml-auto" 
+														v-for="(productVariation, variationIndex) in product.variations" 
+														:key="'product-variation-' + variationIndex"
+													>
+														<div class="card">
+															<div class="card-body">
+																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Name :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.variation ? productVariation.variation.name : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		SKU :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.sku }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Price :</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.price }}
+																	</label>
+																</div>
+
+																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ productVariation.available_quantity }}
+																	</label>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+ 									-->
+
+ 									<div class="tab-pane active" id="merchant-deal-profile" role="tabpanel">
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant Name :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ merchant.name | capitalize }}
+											</label>
+										</div>
+										
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												E-Commerce Fullfillment :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												<span :class="[singleMerchantDealData.e_commerce_fulfillment ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleMerchantDealData.e_commerce_fulfillment ? 'Enabled' : 'Disabled' }}
+												</span>
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Status :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												<span :class="[singleMerchantDealData.active ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleMerchantDealData.active ? 'Active' : 'Deactive' }}
+												</span>
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Created On :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.created_at }}
+											</label>
+										</div>									
+
+										<!-- 
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Payable :
+											</label>
+											
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.payable_amount }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Paid :
+											</label>
+											
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.paid_amount }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleMerchantDealData.payable_amount - singleMerchantDealData.paid_amount > 0">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Due :
+											</label>
+											
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.payable_amount - singleMerchantDealData.paid_amount }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Issued at :
+											</label>
+											
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.issued_at }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Expired at :
+											</label>
+											
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.expired_at }}
+											</label>
+										</div>
+										 -->
+
+										<!-- 
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stocked on :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.created_at }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleMerchantDealData.hasOwnProperty('keeper')">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stored By :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.keeper.user_name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Approval :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												<span :class="[singleMerchantDealData.has_approval==1 ? 'badge-success' : singleMerchantDealData.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
+													{{ singleMerchantDealData.has_approval==1 ? 'Approved' : singleMerchantDealData.has_approval==-1 ? 'Cancelled' : 'NA' }}
+												</span>
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleMerchantDealData.has_approval">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleMerchantDealData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.approver.user_name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row" v-if="singleMerchantDealData.has_approval">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												{{ singleMerchantDealData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
+											</label>
+
+											<label class="col-sm-6 col-form-label text-left">
+												{{ singleMerchantDealData.updated_at }}
+											</label>
+										</div>
+										 -->
+									</div>
+
+									<div class="tab-pane" id="dealt-spaces" role="tabpanel">
+										<div 
+											class="form-row" 
+											v-if="singleMerchantDealData.hasOwnProperty('warehouses') && Array.isArray(singleMerchantDealData.warehouses) && singleMerchantDealData.warehouses.length"
+										>
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Spaces Detail :
+											</label>
+											<div class="col-sm-12">
+												<div 
+													class="form-row" 
+													v-for="(merchantWarehouse, merchantWarehouseIndex) in singleMerchantDealData.warehouses" 
+													:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-view'"
+												>
+													<div class="col-md-12">
+														<div class="card">
+															<div class="card-title">
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Warehouse :
+																	</label>
+																	<label class="col-sm-6 col-form-label text-left">
+																		{{ merchantWarehouse.name ? $options.filters.capitalize(merchantWarehouse.name) : 'NA' }}
+																	</label>
+																</div>
+															</div>
+																
+															<div class="card-body">
+																<div class="form-row" v-if="merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length">
+																	<div 
+																		class="col-md-6 ml-auto" 
+																		v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
+																		:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-view'"
+																	>
+																		<div 
+																			class="card" 
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('containers')"
+																		>
+																			<div 
+																				class="card-body" 
+																				v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
+																				:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
+																			>
+																				<h6>Container Address</h6>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Type :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseContainer.container ? $options.filters.capitalize(warehouseContainer.container.name) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container # :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.indexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																			</div>
+																		</div>
+
+																		<div 
+																			class="card" 
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') &&  warehouseSpace.container.hasOwnProperty('warehouse_container')"
+																		>
+																			<div class="card-body">
+																				<h6>Shelves Address</h6>
+																				
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Type :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container # :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div 
+																					class="form-row"
+																				>
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Shelf # :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						<ul id="shelf-addresses">
+																							<li 
+																								v-for="shelfAddress in warehouseSpace.container.shelves" 
+																								:key="'shelf-address-' + shelfAddress.id"
+																							>
+
+																								{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																								
+																							</li>
+																						</ul>
+																					</label>
+																				</div>
+																			</div>
+																		</div>
+
+																		<div 
+																			class="card" 
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
+																		>
+																			<div class="card-body">
+																				<h6>Units Address</h6>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Type :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container # :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Shelf # :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						{{ warehouseSpace.container.shelf.name ? warehouseSpace.container.shelf.name.substring(warehouseSpace.container.shelf.name.lastIndexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Unit # :
+																					</label>
+																					<label class="col-sm-6 col-form-label text-left">
+																						<ul id="unit-addresses">
+																							<li 
+																								v-for="unitAddress in warehouseSpace.container.shelf.units" 
+																								:key="'unit-address-' + unitAddress.id"
+																							>
+
+																								{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																								
+																							</li>
+																						</ul>
+																					</label>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																</div>		
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-row" v-else>
+											<div 
+												class="col-md-12 text-center" 
+												v-show="!singleMerchantDealData.hasOwnProperty('warehouses') || !singleMerchantDealData.warehouses.length"
+											>
+												<p class="text-danger">
+													No Space Found.
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								 
+							
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</template>
+
+<script type="text/javascript">
+
+	import axios from 'axios';
+	import Multiselect from 'vue-multiselect';
+
+	export default {
+
+	    components: { 
+			multiselect : Multiselect,
+		},
+
+	    props: {
+
+			merchant:{
+				type: Object,
+				required: true,
+			},
+			merchantName:{
+				type: String,
+				required: true,
+			},
+
+		},
+
+	    data() {
+
+	        return {
+
+	        	step : 1,
+	        	query : '',
+	        	error : '',
+    			perPage : 10,
+	        	loading : false,
+
+	        	createMode : true,
+	        	submitForm : true,
+	        	formSubmitted : false,
+
+	        	// allContainers : [],
+	        	allAvailableWarehouseAndSpaces : [
+	        		{
+						// warehouse
+						id:1,
+						name: null,
+
+						emptyContainers : [
+							/*
+								{
+									id : 1,
+									name : null,  // cnt-1 / cnt-2
+									rents:[
+										{
+											id: null,
+											name : null, // daily / monthly
+											storing_price : 1,
+											selling_price :1
+										}
+									]
+								}
+							*/
+						],
+						emptyContainerShelve : [
+							/*
+								{
+									container:{
+										id:null,
+										name:null,  // cnt-1 / cnt-2
+										shelves:[
+											{
+												id:null,
+												name : null  // cnt-1-shl-1 / cnt-2-shl-2
+											}
+										]
+									},
+									rents:[
+										{
+											id:null,
+											name:null,   // daily / monthly
+											storing_price:null,
+											selling_price:null
+										}
+									]
+								}
+							*/
+						],
+						emptyContainerShefUnits : [
+							/*
+								{
+									container:{
+										id:null,
+										name:null,
+										shelf:{
+											id:null,
+											name:null,		// cnt-1-shl-1 / cnt-2-shl-2
+											units : [
+												{
+													id : null,
+													name : null		// cnt-1-shl-1-unt-1 / cnt-2-shl-2unt-1
+												}
+											]
+										}
+									},
+									rents:[
+										{
+											id : null,
+											name : null,	   // daily / monthly
+											storing_price : null,
+											selling_price : null
+										}
+									]
+								}
+							*/
+						]
+					}
+	        	],
+
+	        	emptyContainers : [],
+	        	emptyShelfContainers : [],
+	        	emptyUnitContainers : [],
+
+	        	emptyShelves : [],
+	        	emptyUnitShelves : [],
+
+	        	emptyUnits : [],
+
+	        	merchantAllDeals : [],
+	        	
+	        	pagination: {
+		        	current_page: 1
+		      	},
+
+	        	singleMerchantDealData : {
+
+	        		active : false,
+	        		auto_renewal : false,
+	        		e_commerce_fulfillment : false,
+	        		sale_percentage : null,
+					merchant_id : null,
+					// created_at : null,
+
+					warehouses : [
+						{							
+							id : null,
+							name : null,
+							
+							/*
+								emptyContainers : [
+										{
+											id : 1,
+											name : null,  // cnt-1 / cnt-2
+											rents:[
+												{
+													id: null,
+													name : null, // daily / monthly
+													storing_price : 1,
+													selling_price :1
+												}
+											]
+										},
+								],
+							
+								emptyContainerShelve : [
+										{
+											container:{
+												id:null,
+												name:null,  // cnt-1 / cnt-2
+												shelves:[
+													{
+														id:null,
+														name : null  // cnt-1-shl-1 / cnt-2-shl-2
+													}
+												]
+											},
+											rents:[
+												{
+													id:null,
+													name:null,   // daily / monthly
+													storing_price:null,
+													selling_price:null
+												}
+											]
+										},
+								],
+							
+								emptyContainerShefUnits : [
+										{
+											container:{
+												id:null,
+												name:null,
+												shelf:{
+													id:null,
+													name:null,		// cnt-1-shl-1 / cnt-2-shl-2
+													units : [
+														{
+															id : null,
+															name : null		// cnt-1-shl-1-unt-1 / cnt-2-shl-2unt-1
+														}
+													]
+												}
+											},
+											rents:[
+												{
+													id : null,
+													name : null,	   // daily / monthly
+													storing_price : null,
+													selling_price : null
+												}
+											]
+										}
+								],
+							*/
+
+							spaces : [
+								/*
+									{
+										type:'containers',
+										containers : [
+											{
+												id : null,
+												name:null,
+												rents:[
+													{
+														id : null,
+														name : null,
+														storing_price : null,
+														selling_price : null
+													},
+												],
+												selected_rent:{
+													id : null,
+													name : null,
+													storing_price : null,
+													selling_price : null
+												},
+												rent_period_id : null,
+											},
+										]
+									},
+									{
+										type : 'shelves',
+										container : {
+											id : null,
+											name : null,
+											shelves : [
+												{
+													id : null,
+													name : null
+												}
+											],
+											rents:[
+												{
+													id : null,
+													name : null,
+													storing_price : null,
+													selling_price : null
+												}
+											],
+											selected_rent:{
+												id : null,
+												name : null,
+												storing_price : null,
+												selling_price : null
+											},
+											rent_period_id : null
+										},
+									},
+									{
+										type : 'units',
+										container:{
+											id:1,
+											name:Name,
+											shelf:{
+												id:1,
+												name:Name,
+												units:[
+													{
+														id:1,
+														name:name
+													}
+												]
+											},
+											rents:[
+												{
+													id:null,
+													name:null,
+													storing_price:null,
+													selling_price :null
+												}
+											],
+											selected_rent : {
+												id:null,
+												name:null,
+												storing_price:null,
+												selling_price:null
+											},
+											rent_period_id : 1
+										},
+									}
+								*/
+							],
+						},
+					],
+
+					payments : [
+						{
+							previous_due : 0,
+							total_rent : 0, // generated from selected spaces
+							discount : 0,	// percentage 
+							net_payable : 0,
+							paid_amount : 0,
+							current_due : 0,
+							merchant_deal_id : null,
+							paid_at : null,
+							rents : [
+								{
+									issued_from : null,
+									expired_at : null,
+									rent : 0,
+									dealt_space_id : null,
+									merchant_payment_id : null
+								},
+							]
+						},
+					]
+	        	},
+
+	        	errors : {
+	
+					// sale_percentage : null,
+					
+					warehouses : [
+						{
+							// warehouse : null,
+							
+							spaces : [
+								{
+									// type : null,
+									
+									// containers : null,
+									
+									// parent_container : null,
+									// shelves : null,
+									
+									// unit_shelf : null,
+									// units : null,
+									
+									// rent : null,
+								}
+							]
+						}
+					],
+
+					payment : {
+						// discount : 'Discount cant be negative',
+						// paid_amount : 'Paid amount is required'
+					}
+					
+				},
+
+	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+
+	        }
+
+		},
+		
+		filters: {
+
+			capitalize: function (value) {
+
+				if (!value) return ''
+
+				const words = value.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    
+					if (words[i]) {
+
+				    	words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+
+					}
+				    
+				}
+
+				return words.join(" ");
+				
+			}
+
+		},
+
+		created() {
+			
+			this.fetchAllWarehouseContainers();
+
+			// this.fetchWarehouseAllContainers();
+
+			this.fetchAllMerchantDeals();
+			
+			// this.resetErrorObject();
+
+			// this.configureProductErrorsWithPropData();
+
+		},
+		
+		methods: {
+
+			fetchAllWarehouseContainers() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allAvailableWarehouseAndSpaces = [];
+
+				axios
+					.get('/api/warehouse-containers/')
+					.then(response => {
+						if (response.status == 200) {
+							
+							this.allAvailableWarehouseAndSpaces = response.data.data;
+					
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllMerchantDeals() {
+
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.merchantAllDeals = [];
+				
+				axios
+					.get('/api/merchant-deals/' + this.merchant.id + '/' +  + this.perPage + "?page=" + this.pagination.current_page)
+					.then(response => {
+						if (response.status == 200) {
+							// console.log(response);
+							this.setMerchantDealsPagination(response);
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			/*
+				fetchWarehouseAllContainers(warehouse) {
+					
+					this.query = '';
+					this.error = '';
+					// this.loading = true;
+					this.allContainers = [];
+					this.emptyContainers = [];
+					this.emptyShelfContainers = [];
+					this.emptyUnitContainers = [];
+
+					axios
+						.get('/api/warehouse-containers/' + warehouse)
+						.then(response => {
+							if (response.status == 200) {
+								
+								this.allContainers = response.data;
+								this.setAvailableSpaces();
+								
+								// this.emptyContainers = response.data.emptyContainers;
+								// this.emptyShelfContainers = response.data.emptyShelfContainers;
+								// this.emptyUnitContainers = response.data.emptyUnitContainers;
+						
+							}
+						})
+						.catch(error => {
+							this.error = error.toString();
+							// Request made and server responded
+							if (error.response) {
+								console.log(error.response.data);
+								console.log(error.response.status);
+								console.log(error.response.headers);
+								console.log(error.response.data.errors[x]);
+							} 
+							// The request was made but no response was received
+							else if (error.request) {
+								console.log(error.request);
+							} 
+							// Something happened in setting up the request that triggered an Error
+							else {
+								console.log('Error', error.message);
+							}
+
+						})
+						.finally(response => {
+							// this.loading = false;
+						});
+
+				},
+			*/
+				
+			/*
+				configureProductErrorsWithPropData() {
+
+					// new error configuration
+					this.errors = {
+						merchantDeal : {
+							variations : [],
+							warehouses : [],
+							product_serials : [],
+						},
+					};
+
+					if (this.singleMerchantDealData.warehouses.length) {
+
+						// if (this.singleMerchantDealData.warehouses.length) {
+
+							this.singleMerchantDealData.warehouses.forEach(
+								(productAddress, index) => {
+									this.errors.warehouses.push({});
+								}
+							);
+
+						// }
+						
+							else {
+
+								this.product.warehouses.forEach(
+									(productAddress, index) => {
+										this.errors.warehouses.push({});
+									}
+								);
+
+							}
+						
+
+					}
+					else {
+
+						this.errors.warehouses = [
+							{},
+						];
+
+					}
+
+					if (this.product.category && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+							
+						this.product.variations.forEach(
+							(productVariation, index) => {
+								this.errors.variations.push({});
+							}
+						);
+
+					}
+
+				},
+			*/	
+    		showDealDetails(object) {		
+				// this.singleMerchantDealData = { ...object };
+				this.singleMerchantDealData = Object.assign({}, this.singleMerchantDealData, object);
+				$('#merchantDeal-view-modal').modal('show');
+			},
+			showDealCreateForm() {
+
+				this.step = 1;
+				this.createMode = true;
+	        	this.submitForm = true;
+	        	this.formSubmitted = false;
+
+				// singleMerchantDealData configuration
+				this.singleMerchantDealData = {
+
+	        		active : false,
+	        		auto_renewal : false,
+	        		e_commerce_fulfillment : false,
+	        		sale_percentage : null,
+					merchant_id : this.merchant.id,
+					// created_at : null,
+
+					warehouses : [
+						{							
+							// id : null,
+							// name : null,
+							
+							/*
+								emptyContainers : [
+										{
+											id : 1,
+											name : null,  // cnt-1 / cnt-2
+											rents:[
+												{
+													id: null,
+													name : null, // daily / monthly
+													storing_price : 1,
+													selling_price :1
+												}
+											]
+										},
+								],
+							
+								emptyContainerShelve : [
+										{
+											container:{
+												id:null,
+												name:null,  // cnt-1 / cnt-2
+												shelves:[
+													{
+														id:null,
+														name : null  // cnt-1-shl-1 / cnt-2-shl-2
+													}
+												]
+											},
+											rents:[
+												{
+													id:null,
+													name:null,   // daily / monthly
+													storing_price:null,
+													selling_price:null
+												}
+											]
+										},
+								],
+							
+								emptyContainerShefUnits : [
+										{
+											container:{
+												id:null,
+												name:null,
+												shelf:{
+													id:null,
+													name:null,		// cnt-1-shl-1 / cnt-2-shl-2
+													units : [
+														{
+															id : null,
+															name : null		// cnt-1-shl-1-unt-1 / cnt-2-shl-2unt-1
+														}
+													]
+												}
+											},
+											rents:[
+												{
+													id : null,
+													name : null,	   // daily / monthly
+													storing_price : null,
+													selling_price : null
+												}
+											]
+										}
+								],
+							*/
+
+							// spaces : [
+								/*
+									{
+										type:'containers',
+										containers : [
+											{
+												id : null,
+												name:null,
+												rents:[
+													{
+														id : null,
+														name : null,
+														storing_price : null,
+														selling_price : null
+													},
+												],
+												selected_rent:{
+													id : null,
+													name : null,
+													storing_price : null,
+													selling_price : null
+												},
+												rent_period_id : null,
+											},
+										]
+									},
+									{
+										type : 'shelves',
+										container : {
+											id : null,
+											name : null,
+											shelves : [
+												{
+													id : null,
+													name : null
+												}
+											],
+											rents:[
+												{
+													id : null,
+													name : null,
+													storing_price : null,
+													selling_price : null
+												}
+											],
+											selected_rent:{
+												id : null,
+												name : null,
+												storing_price : null,
+												selling_price : null
+											},
+											rent_period_id : null
+										},
+									},
+									{
+										type : 'units',
+										container:{
+											id:1,
+											name:Name,
+											shelf:{
+												id:1,
+												name:Name,
+												units:[
+													{
+														id:1,
+														name:name
+													}
+												]
+											},
+											rents:[
+												{
+													id:null,
+													name:null,
+													storing_price:null,
+													selling_price :null
+												}
+											],
+											selected_rent : {
+												id:null,
+												name:null,
+												storing_price:null,
+												selling_price:null
+											},
+											rent_period_id : 1
+										},
+									}
+								*/
+							// ],
+						},
+					],
+
+					payments : [
+						{
+							previous_due : 0,	// as new deal
+							total_rent : 0, // generated from selected spaces
+							discount : 0,	// percentage 
+							net_payable : 0,
+							paid_amount : 0,
+							current_due : 0,
+							// merchant_deal_id : null,
+							// paid_at : null,
+							rents : [
+								{
+									issued_from : null,
+									expired_at : null,
+									rent : 0,
+									// dealt_space_id : null,
+									// merchant_payment_id : null
+								},
+							]
+						},
+					]
+	        	};
+
+	        	this.errors = {
+	
+					// sale_percentage : null,
+					
+					warehouses : [
+						{
+							// warehouse : null,
+							
+							spaces : [
+								{
+									// type : null,
+									
+									// containers : null,
+									
+									// parent_container : null,
+									// shelves : null,
+									
+									// unit_shelf : null,
+									// units : null,
+									
+									// rent : null,
+								}
+							]
+						},
+					],
+
+					payment : {
+						// discount : 'Discount cant be negative',
+						// paid_amount : 'Paid amount is required'
+					}
+					
+				};
+
+				// new errors configuration
+				// this.resetErrorObject();
+
+				$('#merchantDeal-createOrEdit-modal').modal('show');
+			},
+			openDealEditForm(object) {
+
+				this.step = 1;
+				this.createMode = false;
+	        	this.submitForm = true;
+	        	this.formSubmitted = false;
+				
+				this.singleMerchantDealData = JSON.parse(JSON.stringify(object));
+
+				this.resetErrorObject();
+
+				this.setAvailableShelvesAndUnits();
+
+				$('#merchantDeal-createOrEdit-modal').modal('show');
+			},
+			openDealDeleteForm(object) {
+				this.singleMerchantDealData = object;
+				$('#delete-confirmation-modal').modal('show');
+			},
+			createMerchantDeal() {
+				
+				if (!this.verifyUserInput()) {
+					this.submitForm = false;
+					return;
+				}
+
+				this.formSubmitted = true;
+
+				axios
+					.post('/merchant-deals/' + this.perPage, this.singleMerchantDealData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New deal has been stored", "Success");
+							this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							$('#merchantDeal-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchWarehouseAllContainers();
+					});
+
+			},
+			updateMerchantDeal() {
+				
+				if (!this.verifyUserInput()) {
+					this.submitForm = false;
+					return;
+				}
+
+				this.formSubmitted = true;
+
+				axios
+					.put('/merchant-deals/' + this.singleMerchantDealData.id + '/' + this.perPage, this.singleMerchantDealData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Deal has been updated", "Success");
+							this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							$('#merchantDeal-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchWarehouseAllContainers();
+					});
+
+			},
+			deleteDeal(singleAssetData) {
+				
+				this.formSubmitted = true;
+
+				axios
+					.delete('/product-stocks/' + this.singleMerchantDealData.id + '/' + this.perPage, this.singleMerchantDealData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Deal has been deleted", "Success");
+							this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							$('#delete-confirmation-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchWarehouseAllContainers();
+					});
+
+			},
+			searchData(emittedValue) {
+
+				if (emittedValue) {
+					this.query = emittedValue;
+				}
+
+				this.error = '';
+				this.merchantAllDeals = [];
+				this.pagination.current_page = 1;
+				
+				axios
+				.get(
+					"/api/search-product-stocks/" + this.product.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+				)
+				.then(response => {
+					this.merchantAllDeals = response.data.all.data;
+					this.pagination = response.data.all;
+				})
+				.catch(e => {
+					this.error = e.toString();
+				});
+
+			},
+			verifyUserInput() {
+
+				this.validateFormInput('discount');
+				this.validateFormInput('paid_amount');
+
+				if (this.errors.constructor === Object && Object.keys(this.errors.payment).length < 1) {
+
+					return true;
+				
+				}
+
+				return false;
+		
+			},
+			errorInWarehouseSpacesArray(array = []) {
+
+				const warehouseSpaceError = (warehouseSpace) => {
+					return Object.keys(warehouseSpace).length > 0
+				};
+
+				if (array.length) {
+					return array.some(warehouseSpaceError);
+				}
+
+				return false;
+
+			},
+			errorInWarehousesArray(array = []) {
+
+				const warehouseError = (warehouse) => {
+	        							return Object.keys(warehouse).length > 1 || this.errorInWarehouseSpacesArray(warehouse.spaces)
+	        						}; 
+
+				if (array.length) {
+					return array.some(warehouseError);
+				}
+
+				return false;
+
+			},
+			nextPage() {
+				
+				if (this.step > 2) {
+					return;
+				}
+
+				else if (this.step == 1) {
+
+					this.validateFormInput('sale_percentage');
+
+					if (this.errors.constructor === Object && Object.keys(this.errors).length < 3) {
+
+						this.step++;
+						this.submitForm = true;
+					
+					}
+					else {
+					
+						this.submitForm = false;
+					
+					}
+
+				}
+
+				else if (this.step == 2) {
+
+					this.validateFormInput('warehouse');
+
+					if (this.singleMerchantDealData.warehouses.length && this.singleMerchantDealData.warehouses.some(merchantWarehouse => merchantWarehouse.spaces && merchantWarehouse.spaces.length)) {
+						
+						this.validateFormInput('space_type');
+						this.validateFormInput('containers');
+						this.validateFormInput('parent_container');
+						this.validateFormInput('parent_shelf');
+						this.validateFormInput('shelves');
+						this.validateFormInput('units');
+						this.validateFormInput('rent_period');
+
+					}
+
+					if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && ! this.errorInWarehousesArray(this.errors.warehouses)) {
+
+						this.setTotalRent();
+						this.setNetPayable();
+
+						// console.log('Step 2');
+
+						this.step += 1;
+						this.submitForm = true;
+
+					}
+					else {
+
+						this.submitForm = false;
+						
+					}
+
+				}
+
+				else {
+
+					this.submitForm = true;
+				}
+
+			},
+			addWarehouseContainers(selectedWarehouseIndex, selectedSpaceIndex) {
+				
+				if(this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex && this.errors.warehouses.length > selectedWarehouseIndex) {
+
+					if(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex){
+
+
+						if (this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].hasOwnProperty('containers') && this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].containers.length < this.emptyContainers.length) {
+							
+							this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].containers.push({});
+
+						} else {
+							
+						}
+						
+						this.$delete(this.errors.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex], 'containers');
+
+					}
+
+				}
+
+			},
+			removeWarehouseContainers(selectedWarehouseIndex, selectedSpaceIndex) {
+				
+				if(this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex && this.errors.warehouses.length > selectedWarehouseIndex){
+
+					if(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex){
+
+						this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].containers.pop();
+						// this.$delete(this.errors.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex], 'containers');
+						this.validateFormInput('containers');
+
+					}
+				
+				}
+
+			},
+			addMoreWarehouse() {
+				if (this.singleMerchantDealData.warehouses.length < this.allAvailableWarehouseAndSpaces.length) {
+
+					this.singleMerchantDealData.warehouses.push({});
+					this.errors.warehouses.push({ spaces : [ {} ] });
+
+				}
+			},
+			removeWarehouse() {
+					
+				if (this.createMode && this.singleMerchantDealData.warehouses.length > 1) {
+
+					this.singleMerchantDealData.warehouses.pop();
+					this.errors.warehouses.pop();
+				
+				}
+
+				// if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+				// 	this.submitForm = true;
+				// }
+				
+			},
+			resetWarehouseSpaces(selectedWarehouseIndex){
+				
+				if(this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex){
+
+					this.$set(this.singleMerchantDealData.warehouses[selectedWarehouseIndex], 'spaces', [ {} ]);
+
+					/*
+						this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces =  [
+							{
+								type:'containers',
+								containers : [
+									
+										{
+											id : null,
+											name:null,
+											rents:[
+												{
+													id : null,
+													name : null,
+													storing_price : null,
+													selling_price : null
+												}
+											],
+											selected_rent:{
+												id : null,
+												name : null,
+												storing_price : null,
+												selling_price : null
+											},
+											rent_period_id : null,
+										},
+									
+								]
+							},
+						];
+					*/
+
+				}
+
+				// Reset Error Object
+				if (this.errors.warehouses.length > selectedWarehouseIndex) {
+
+					this.errors.warehouses[selectedWarehouseIndex].spaces = [ {} ];
+					this.$delete(this.errors.warehouses[selectedWarehouseIndex], 'warehouse');
+
+				}
+				
+
+			},
+			/*
+				resetErrorObject() {
+
+					// new errors initialization
+					this.errors = {
+						merchantDeal : {
+							variations : [],
+							warehouses : [],
+							product_serials : [],
+						},
+					};
+
+					if (this.singleMerchantDealData.warehouses.length) {
+
+						// if (this.singleMerchantDealData.warehouses.length) {
+
+							this.singleMerchantDealData.warehouses.forEach(
+								(productAddress, index) => {
+									this.errors.warehouses.push({});
+								}
+							);
+
+						// }
+						
+							else {
+
+								this.product.warehouses.forEach(
+									(productAddress, index) => {
+										this.errors.warehouses.push({});
+									}
+								);
+
+							}
+						
+						
+					}
+					else {
+
+						this.errors.warehouses = [
+							{},
+						];
+
+					}
+
+					if (this.product.category && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+		
+						this.product.variations.forEach(
+
+							(productVariation, stockVariationIndex) => {
+
+								this.errors.variations.push({});
+
+								if (this.product.has_serials) {
+
+									// this.errors.variations[stockVariationIndex].product_variation_serials = [];
+									this.$set(this.errors.variations[stockVariationIndex], 'product_variation_serials', []);
+
+								}
+
+							}
+
+						);				
+
+					}
+
+				},
+			*/
+			changeNumberContents() {
+				
+				this.pagination.current_page = 1;
+
+				if (this.query === '') {
+					this.fetchAllMerchantDeals();
+				}
+				else {
+					this.searchData();
+				}
+    		},
+    		objectNameWithCapitalized ({ name }) {
+		      	if (name) {
+				    name = name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else 
+		      		return ''
+		    },
+			nameWithCapitalized (name) {
+				
+				if (!name) return ''
+
+				const words = name.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+				}
+
+				return words.join(" ");
+
+		    },
+			/*
+				setAvailableShelvesAndUnits() {
+
+					this.singleMerchantDealData.warehouses.forEach(
+						space => {
+
+							if (space.type=='containers') {
+
+							}
+							else if (space.type=='shelves') {
+
+								let searchedContainer = this.emptyShelfContainers.find(
+									container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
+								)
+
+								if (searchedContainer) {
+
+									this.emptyShelves = searchedContainer.container_shelf_statuses;
+								}
+								
+							}
+							else if (space.type=='units') {
+
+								const containerExists = container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id;
+
+								if (this.emptyUnitContainers.some(containerExists)) {
+
+									let searchedContainer = this.emptyUnitContainers.find(
+										container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
+									);
+
+									if (searchedContainer) {
+
+										this.emptyUnitShelves = searchedContainer.container_shelf_statuses;
+
+										let searchedShelf = searchedContainer.container_shelf_statuses.find(
+											shelf => shelf.id==space.container.shelf.id && shelf.name==space.container.shelf.name && shelf.warehouse_container_id==space.container.shelf.warehouse_container_id &&  shelf.warehouse_container_status_id==space.container.shelf.warehouse_container_status_id 
+										);
+
+										if (searchedShelf) {
+
+											this.emptyUnits = searchedShelf.container_shelf_unit_statuses;
+
+										}
+
+									}
+
+								}
+
+							}
+
+						}
+					);
+
+				},
+			*/	
+			setMerchantDealsPagination(response) {
+				this.pagination = response.data;
+				this.merchantAllDeals = response.data.data;
+			},
+			setContainerAvailableShelves(selectedWarehouseIndex, selectedSpaceIndex) {
+				// console.log('container if has been triggered');
+				if (this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex && this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex) {
+					this.$delete(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container, 'shelves');
+					this.emptyShelves = this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container.container_shelf_statuses;
+				}
+				else {
+					this.emptyShelves = [];
+				}
+			},
+			setContainerAvailableUnitShelves(selectedWarehouseIndex, selectedSpaceIndex) {
+				// console.log('container if has been triggered');
+				if(this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex && this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex){
+					if (this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container && Object.keys(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container).length > 0) {
+						this.$delete(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container, 'shelf');
+						this.emptyUnitShelves = this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container.container_shelf_statuses;
+					}
+				}
+			},
+			setContainerShelfAvailableUnits(selectedWarehouseIndex, selectedSpaceIndex) {
+				// console.log('shelf if has been triggered');
+				if (this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex && this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces.length > selectedSpaceIndex) {
+					if (this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container && Object.keys(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container).length > 0 && Object.keys(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container.shelf).length > 0) {
+						this.$delete(this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container.shelf, 'units');
+						this.emptyUnits = this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces[selectedSpaceIndex].container.shelf.container_shelf_unit_statuses;
+					}	
+				}
+			},
+			setWarehouseSpaces(warehouseIndex, warehouseSpaceIndex) {
+				
+				if(this.singleMerchantDealData.warehouses.length > warehouseIndex && this.singleMerchantDealData.warehouses[warehouseIndex].spaces.length > warehouseSpaceIndex) {
+
+					// resetting
+					this.$delete(this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex], 'container');
+					this.$delete(this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex], 'containers');
+
+					if (this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex].type=='containers') {
+						
+						// this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex].containers = [ {} ];
+						this.$set(this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex], 'containers', [ {} ]);
+
+					} else {
+
+						// this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex].containers = {} ;
+						this.$set(this.singleMerchantDealData.warehouses[warehouseIndex].spaces[warehouseSpaceIndex], 'container', {});
+						
+					}
+
+				}
+
+				if(this.errors.warehouses.length > warehouseIndex && this.errors.warehouses[warehouseIndex].spaces.length > warehouseSpaceIndex){
+
+					this.errors.warehouses[warehouseIndex].spaces[warehouseSpaceIndex] = {};
+
+				}
+
+				this.resetAvailableSpaces(warehouseIndex);
+		
+			},
+			setAvailableSpaces(selectedWarehouseIndex) {
+				
+				let expectedWarehouseIndex = this.allAvailableWarehouseAndSpaces.findIndex(
+					(warehouse) => (warehouse.id == this.singleMerchantDealData.warehouses[selectedWarehouseIndex].id && warehouse.name == this.singleMerchantDealData.warehouses[selectedWarehouseIndex].name)
+				);
+
+				if (expectedWarehouseIndex > -1) {
+
+					this.emptyContainers = JSON.parse( JSON.stringify( this.allAvailableWarehouseAndSpaces[expectedWarehouseIndex].emptyContainers ) );
+					this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allAvailableWarehouseAndSpaces[expectedWarehouseIndex].emptyShelfContainers ) );
+					this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allAvailableWarehouseAndSpaces[expectedWarehouseIndex].emptyUnitContainers ) );
+
+				}
+
+				else {
+
+					this.emptyContainers = [];
+					this.emptyShelfContainers = [];
+					this.emptyUnitContainers = [];
+
+				}
+
+			},
+			resetAvailableSpaces(selectedWarehouseIndex) {
+
+				this.setAvailableSpaces(selectedWarehouseIndex);
+
+				if(this.singleMerchantDealData.warehouses.length > selectedWarehouseIndex){
+
+					this.singleMerchantDealData.warehouses[selectedWarehouseIndex].spaces.forEach(
+
+						(warehouseSpace, warehouseSpaceIndex) => {
+							
+							if (warehouseSpace.type=='containers' && warehouseSpace.containers && warehouseSpace.containers.length) {
+
+								// for every selected container
+								warehouseSpace.containers.forEach(
+
+									(selectedContainer) => {
+
+										// containers with empty shelves
+										var selectedContainerIndex = this.emptyShelfContainers.findIndex(
+											(currentContainer) => 
+												currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+											
+										);
+
+										// console.log('Container Index in emptyShelfContainers : ' + selectedContainerIndex);
+
+										if (selectedContainerIndex > -1) {
+
+											this.emptyShelfContainers.splice(selectedContainerIndex, 1);
+										
+										}
+
+
+										// containers with empty units
+										var selectedContainerIndex = this.emptyUnitContainers.findIndex(
+											(currentContainer) => 
+												currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+											
+										);
+
+										// console.log('Container Index in emptyUnitContainers : ' + selectedContainerIndex);
+
+										if (selectedContainerIndex > -1) {
+
+											this.emptyUnitContainers.splice(selectedContainerIndex, 1);
+
+										}
+
+									}
+
+								);
+
+							}
+							else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length) {
+
+								// downward
+
+								// for every container-shelves with empty units
+								this.emptyUnitContainers.forEach(
+
+									(emptyUnitContainer) => {
+
+										if (emptyUnitContainer.id==warehouseSpace.container.id && emptyUnitContainer.name==warehouseSpace.container.name && emptyUnitContainer.warehouse_container_id==warehouseSpace.container.warehouse_container_id) {
+
+											
+											// for every selected shelves
+											warehouseSpace.container.shelves.forEach(
+
+												(selectedShelf) => {
+
+													// unit
+													var selectedShelfIndex = emptyUnitContainer.container_shelf_statuses.findIndex(
+														(containerShelf) => 
+															containerShelf.id == selectedShelf.id && containerShelf.name == selectedShelf.name && containerShelf.warehouse_container_status_id == selectedShelf.warehouse_container_status_id
+													);
+
+													if (selectedShelfIndex > -1) {
+
+														emptyUnitContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
+													}
+
+												}
+
+											);
+
+										}
+
+									}
+
+								);
+
+								// upward
+								// for every empty containers
+								var selectedContainerIndex = this.emptyContainers.findIndex(
+									(currentContainer) => 
+										currentContainer.id == warehouseSpace.container.id && currentContainer.name == warehouseSpace.container.name && currentContainer.warehouse_container_id == warehouseSpace.container.warehouse_container_id
+								);
+
+								if (selectedContainerIndex > -1) {
+
+									this.emptyContainers.splice(selectedContainerIndex, 1);
+
+								}
+
+							}
+							else if (warehouseSpace.type=='units' && warehouseSpace.container && warehouseSpace.container.shelf && warehouseSpace.container.shelf.units && warehouseSpace.container.shelf.units.length) {
+
+								// upward
+								// for every empty containers
+								var selectedContainerIndex = this.emptyContainers.findIndex(
+									(currentContainer) => 
+										currentContainer.id == warehouseSpace.container.id && currentContainer.name == warehouseSpace.container.name && currentContainer.warehouse_container_id == warehouseSpace.container.warehouse_container_id
+								);
+
+								if (selectedContainerIndex > -1) {
+
+									this.emptyContainers.splice(selectedContainerIndex, 1);
+
+								}
+
+								// upward
+								// for containers with empty shelves
+								this.emptyShelfContainers.forEach(
+
+									(emptyShelfContainer) => {
+
+										if (emptyShelfContainer.id == warehouseSpace.container.id && emptyShelfContainer.name == warehouseSpace.container.name && emptyShelfContainer.warehouse_container_id == warehouseSpace.container.warehouse_container_id) {
+
+
+											var selectedShelfIndex = emptyShelfContainer.container_shelf_statuses.findIndex(
+												(currentShelf) => currentShelf.id == warehouseSpace.container.shelf.id && currentShelf.name == warehouseSpace.container.shelf.name && currentShelf.warehouse_container_id == warehouseSpace.container.shelf.warehouse_container_id
+											)
+
+											if (selectedShelfIndex > -1) {
+
+												emptyShelfContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
+
+											}
+
+										}
+
+									}
+									
+								);
+
+							}
+						}
+					);
+
+				}
+
+			},
+			setTotalRent() {
+
+				let totalRent = 0;
+
+				if(this.singleMerchantDealData.warehouses.length > 0) {
+
+					this.singleMerchantDealData.warehouses.forEach(
+
+						(merchantWarehouse, merchantWarehouseIndex) => {
+							
+							if (merchantWarehouse.spaces.length > 0) {
+								
+								merchantWarehouse.spaces.forEach(
+
+									(warehouseSpace, warehouseSpaceIndex) => {
+										
+										if (warehouseSpace.type=='containers' && warehouseSpace.containers && warehouseSpace.containers.length) {
+
+											// for every selected container
+											warehouseSpace.containers.forEach(
+
+												(selectedContainer) => {
+
+													totalRent += selectedContainer.selected_rent.storing_price ?? 0;
+													// console.log('Containers index : ' + warehouseSpaceIndex + ' rent : ' + totalRent);
+
+												}
+
+											);
+
+										}
+										else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length) {
+
+											// for every selected shelves
+											totalRent += warehouseSpace.container.shelves.length * warehouseSpace.container.selected_rent.storing_price ?? 0
+											// console.log('Shelves : ' + totalRent);
+
+										}
+										else if (warehouseSpace.type=='units' && warehouseSpace.container && warehouseSpace.container.shelf && warehouseSpace.container.shelf.units && warehouseSpace.container.shelf.units.length) {
+
+											// for every selected shelves
+											totalRent += warehouseSpace.container.shelf.units.length * warehouseSpace.container.selected_rent.storing_price ?? 0
+											// console.log('Units : ' + totalRent);
+
+										}
+										else {
+											// console.log('Out of type');
+										}
+									}
+								);
+
+							}
+							else {
+								// console.log('Out of spaces length');
+							}
+
+						}
+
+					);
+
+				}
+
+				// console.log('Out of warehouses length');
+
+				this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].total_rent = totalRent - (totalRent * this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount / 100);
+
+			},
+			setNetPayable() {
+
+				this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].net_payable = this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].previous_due + this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].total_rent;
+
+			},
+			resetTotalRent() {
+				
+				this.validateFormInput('discount');
+				
+				if (! this.errors.payment.discount) {
+
+					this.setTotalRent();
+					this.setNetPayable();	
+
+				}
+				
+			},
+			/*
+				setProductSerialObjects() {
+
+					if (this.singleMerchantDealData.stock_quantity > 0 && this.singleMerchantDealData.serials.length < this.singleMerchantDealData.stock_quantity) {
+						
+						let difference = this.singleMerchantDealData.stock_quantity - this.singleMerchantDealData.serials.length;
+
+						for (let i = 0; i < difference; i++) {
+							this.singleMerchantDealData.serials.push({});
+						}
+
+					}
+					else if (this.singleMerchantDealData.stock_quantity > 0 && this.singleMerchantDealData.serials.length > this.singleMerchantDealData.stock_quantity) {
+
+						this.singleMerchantDealData.serials.splice(this.singleMerchantDealData.stock_quantity, );
+						this.errors.product_serials.splice(this.singleMerchantDealData.stock_quantity, );
+
+					}
+
+				},
+				setProductVariationSerialObjects() {
+
+					this.singleMerchantDealData.variations.forEach(
+						
+						(productVariation, index) => {
+
+							if (productVariation.stock_quantity > 0 && productVariation.serials.length < productVariation.stock_quantity) {
+								
+								let difference = productVariation.stock_quantity - productVariation.serials.length;
+
+								for (let i = 0; i < difference; i++) {
+									productVariation.serials.push({});
+								}
+
+							}
+							else if (productVariation.stock_quantity > 0 && productVariation.serials.length > productVariation.stock_quantity) {
+
+								productVariation.serials.splice(productVariation.stock_quantity, );
+								this.errors.variations[index].product_variation_serials.splice(productVariation.stock_quantity, );
+
+							}
+
+						}
+						
+					);
+
+				},
+			*/	
+			validateFormInput (formInputName) {
+
+				this.submitForm = false;
+
+				switch(formInputName) {
+
+					case 'sale_percentage' :
+
+						if(this.singleMerchantDealData.e_commerce_fulfillment && this.singleMerchantDealData.sale_percentage < 0){
+
+							this.errors.sale_percentage = 'Percentage should be positive';
+						}
+						else {
+							
+							this.submitForm = true;
+							this.$delete(this.errors, 'sale_percentage');
+							
+						}
+
+						break;
+
+					case 'warehouse' :
+
+						if(this.singleMerchantDealData.warehouses.length < 1 || this.singleMerchantDealData.warehouses.some(merchantWarehouse => ! merchantWarehouse || Object.keys(merchantWarehouse).length === 0)){
+
+							this.errors.warehouses[this.errors.warehouses.length-1].warehouse = 'Warehouse is required';
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors.warehouses[this.errors.warehouses.length-1], 'warehouse');
+						
+						}
+
+						break;
+					
+					case 'space_type' :
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if (! warehouseSpace.type) {
+
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_type = 'Space type is required';
+
+										}
+									
+										else {
+
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'space_type');
+
+										}
+
+									}
+
+								);
+
+							}
+
+						);
+						
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'containers' :
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if (warehouseSpace.type=='containers' && (! warehouseSpace.containers || warehouseSpace.containers.length == 0 || warehouseSpace.containers.some(warehouseContainer => ! warehouseContainer || Object.keys(warehouseContainer).length==0))) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers = 'Container is required';
+										}
+										else{
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers');
+										}
+
+									}
+								);
+
+							}
+
+						);
+
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'parent_container' :
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if ((warehouseSpace.type=='shelves' || warehouseSpace.type=='units') && (! warehouseSpace.container || Object.keys(warehouseSpace.container).length==0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container = 'Container is required';
+										}
+										else{
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'parent_container');
+										}
+
+									}
+								);
+
+							}
+
+						);
+
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'shelves' : 
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if (warehouseSpace.type=='shelves' && (! warehouseSpace.container || ! warehouseSpace.container.shelves || warehouseSpace.container.shelves.length == 0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].shelves = 'Shelf is required';
+										}
+										else{
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'shelves');
+										}
+
+									}
+								);
+
+							}
+
+						);
+
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'parent_shelf' :
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if (warehouseSpace.type=='units' && (! warehouseSpace.container || ! warehouseSpace.container.shelf || Object.keys(warehouseSpace.container.shelf).length==0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_shelf = 'Shelf is required';
+										}
+										else{
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'parent_shelf');
+										}
+
+									}
+								);
+
+							}
+
+						);
+
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'units' : 
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if (warehouseSpace.type=='units' && (! warehouseSpace.container || ! warehouseSpace.container.shelf || ! warehouseSpace.container.shelf.units || warehouseSpace.container.shelf.units.length == 0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units = 'Unit is required';
+										}
+										else{
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'units');
+										}
+
+									}
+								);
+
+							}
+
+						);
+
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+						
+					case 'rent_period' : 
+
+						this.singleMerchantDealData.warehouses.forEach(
+							
+							(merchantWarehouse, merchantWarehouseIndex) => {
+
+								merchantWarehouse.spaces.forEach(
+
+									(warehouseSpace, warehouseSpaceIndex) => {
+
+										if (warehouseSpace.type=='containers' && warehouseSpace.containers && warehouseSpace.containers.length && warehouseSpace.containers.some(warehouseContainer => ! warehouseContainer.selected_rent || Object.keys(warehouseContainer.selected_rent).length==0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period = 'Rent package is required';
+										}
+										else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length && (! warehouseSpace.container.selected_rent || Object.keys(warehouseSpace.container.selected_rent).length==0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period = 'Rent package is required';
+										}
+										else if (warehouseSpace.type=='units' && warehouseSpace.container && warehouseSpace.container.shelf && warehouseSpace.container.shelf.units && warehouseSpace.container.shelf.units.length && (! warehouseSpace.container.selected_rent || Object.keys(warehouseSpace.container.selected_rent).length==0)) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period = 'Rent package is required';
+										}
+										else{
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'rent_period');
+										}
+
+									}
+									
+								);
+
+							}
+
+						);
+
+						if (!this.errorInWarehousesArray(this.errors.warehouses)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'paid_amount' : 
+						
+						if(! this.singleMerchantDealData.payments || ! this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].paid_amount || this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].paid_amount < 1){
+							
+							this.errors.payment.paid_amount = 'Paid amount is required';
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors.payment, 'paid_amount');
+
+						}
+
+						break;
+
+					case 'discount' : 
+						
+						if(this.singleMerchantDealData.payments && this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount && (this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount < 0 || this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount > 100)){
+
+							this.errors.payment.discount = 'Rate should be between 0 to 100';
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors.payment, 'discount');
+
+						}
+
+						break;
+
+				}
+	 
+			},
+            
+		}
+  	}
+
+</script>
+
+<style scoped>
+	@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
+	.fade-enter-active {
+  		transition: all .3s ease;
+	}
+	.fade-leave-active {
+  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	}
+	.fade-enter, .fade-leave-to {
+  		transform: translateX(10px);
+  		opacity: 0;
+	}
+</style>

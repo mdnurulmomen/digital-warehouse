@@ -18,11 +18,13 @@ class CreateDealtSpacesTable extends Migration
         // should release related spaces when merchant_deal is expired
         Schema::create('dealt_spaces', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedTinyInteger('rent_period_id');
             $table->string('space_type', 100);  // warehouse_container_shelf_units / warehouse_container_shelfs / warehouse_container_shelf_units
             $table->unsignedInteger('space_id');
-            $table->unsignedSmallInteger('warehouse_id');
             $table->float('engaged', $precision = 2, $scale = 1)->default(0);  // 1 for full engaged, .5 for partial engaged
+            $table->unsignedSmallInteger('warehouse_id');
             $table->unsignedInteger('merchant_deal_id');
+            // $table->unsignedInteger('merchant_payment_id');
         });
     }
 

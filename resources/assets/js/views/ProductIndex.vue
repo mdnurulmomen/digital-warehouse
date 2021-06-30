@@ -148,6 +148,7 @@
 																<option>50</option>
 															</select>
 														</div>
+														
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
@@ -158,6 +159,7 @@
 																<i class="fas fa-sync"></i>
 															</button>
 														</div>
+
 														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
@@ -169,9 +171,7 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -998,7 +998,7 @@
 										Type :
 									</label>
 									<label class="col-sm-8 col-form-label">
-										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' }}
+										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' | capitalize }}
 									</label>
 								</div>
 
@@ -1844,14 +1844,20 @@
 
 				}
 
+				this.setProductVariation();
+
 			},
 			setProductVariation() {
 				if (this.singleProductData.has_variations && this.singleProductData.variation_type && Object.keys(this.singleProductData.variation_type).length > 0) {
 					// this.singleProductData.variation_type_id = this.singleProductData.variation_type.id;
-					this.singleProductData.variations = [
-						{}, {}
-					];
+					// this.singleProductData.variations = [
+					// 	{}, {}
+					// ];
 					this.availableVariations = this.singleProductData.variation_type.variations;
+				}
+				else {
+					// this.singleProductData.variations = [];
+					this.availableVariations = [];
 				}
 			},
 			setProductMode() {

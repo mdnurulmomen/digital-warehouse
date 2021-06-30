@@ -58,10 +58,10 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
 		// merchant-warehouses
-		Route::get('/api/merchant-warehouses/{merchant}/{perPage?}', 'WarehouseController@showMerchantAllWarehouses')->name('merchant-warehouses');
+		// Route::get('/api/merchant-warehouses/{merchant}/{perPage?}', 'WarehouseController@showMerchantAllWarehouses')->name('merchant-warehouses');
 
 		// warehouse container
-		Route::get('/api/warehouse-containers/{warehouse}/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{warehouse?}', 'WarehouseController@showWarehouseContainers')->name('warehouse-containers');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
@@ -182,6 +182,13 @@ Route::name('admin.')->group(function () {
 		Route::put('/product-merchants/{productMerchant}/{perPage}', 'ProductController@updateProductMerchant')->name('product-merchants');
 		Route::delete('/product-merchants/{productMerchant}/{perPage}', 'ProductController@deleteProductMerchant')->name('product-merchants');
 		Route::get('/api/search-product-merchants/{product}/{search}/{perPage}', 'ProductController@searchProductAllMerchants')->name('search-product-merchants');
+
+		// merchant-deals
+		Route::get('/api/merchant-deals/{merchant}/{perPage?}','DealController@showMerchantAllDeals')->name('merchant-deals');
+		Route::post('/merchant-deals/{perPage}','DealController@storeMerchantDeal')->name('merchant-deals');	
+		Route::put('/merchant-deals/{deal}/{perPage}','DealController@updateMerchantDeal')->name('merchant-deals');	
+		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals');
+		Route::get('/api/search-merchant-deals/{search}/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');

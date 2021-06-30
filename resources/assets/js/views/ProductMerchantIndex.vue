@@ -116,6 +116,7 @@
 															</table>
 														</div>
 													</div>
+
 													<div class="row d-flex align-items-center">
 														<div class="col-sm-2 col-4">
 															<select 
@@ -179,7 +180,7 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="createMode ? storeProduct() : updateAsset()" 
+						v-on:submit.prevent="createMode ? storeProductMerchant() : updateProductMerchant()" 
 						autocomplete="off" 
 						novalidate="true" 
 					>
@@ -285,6 +286,7 @@
 																alt="Product Preview" 
 															>
 														</div>
+														
 														<div class="form-group col-md-6">
 															<div class="custom-file">
 															    <input type="file" 
@@ -860,7 +862,7 @@
 														Merchant Name :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' }}
+														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
 													</label>
 												</div>
 
@@ -1598,7 +1600,7 @@
 
 				$('#product-createOrEdit-modal').modal('show');
 			},
-			storeProduct() {
+			storeProductMerchant() {
 				
 				if (!this.verifyUserInput()) {
 					this.submitForm = false;
@@ -1642,7 +1644,7 @@
 					});
 
 			},
-			updateAsset() {
+			updateProductMerchant() {
 				
 				if (!this.verifyUserInput()) {
 					this.submitForm = false;
@@ -1659,7 +1661,7 @@
 
 						if (response.status == 200) {
 
-							this.$toastr.s("New merchant has been updated", "Success");
+							this.$toastr.s("Merchant has been updated", "Success");
 							this.productAllMerchants = response.data.data;
 
 							if (this.query) {

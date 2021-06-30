@@ -70,8 +70,16 @@
 							>
 								<i class="fas fa-undo"></i>
 							</button>
+
+							<button type="button" 
+									class="btn btn-grd-black btn-icon" 
+									v-show="! content.deleted_at" 
+									@click="$emit('goMerchantDeals', content)" 
+									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
+							>
+								<i aria-hidden="true" class="fa fa-handshake"></i>
+							</button>
 						</td>
-				    
 					</tr>
 					<tr 
 				  		v-show="!currentContents.length"
