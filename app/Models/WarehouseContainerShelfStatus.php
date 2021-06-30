@@ -19,9 +19,9 @@ class WarehouseContainerShelfStatus extends Model
         return $this->morphOne(WarehouseProduct::class, 'space');
     }
 
-    public function deal()
+    public function deals()
     {
-        return $this->morphOne(DealtSpace::class, 'space');
+        return $this->morphMany(DealtSpace::class, 'space');
     }
 
     public function warehouseContainer()

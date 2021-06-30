@@ -22,7 +22,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-merchant-index') || userHasPermissionTo('create-merchant')" 
@@ -37,7 +36,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
@@ -61,21 +59,19 @@
 										  			@openContentEditForm="openContentEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
+										  			@goMerchantDeals="goMerchantDeals($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -116,7 +112,6 @@
 			:profile-to-view="singleUserDetails" 
 			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'special permissions']"
 		></user-profile-view-modal>
-
 	</div>
 
 </template>
@@ -230,6 +225,12 @@
 				.catch(e => {
 					this.error = e.toString();
 				});
+
+			},
+			goMerchantDeals(object) {
+
+				// console.log(object);
+				this.$router.push({ name: 'merchant-deals', params: { merchant: object, merchantName: object.user_name }});
 
 			},
 			showContentDetails(object) {	
