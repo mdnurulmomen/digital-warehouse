@@ -13,4 +13,9 @@ class Rent extends Model
     {
         return $this->belongsTo(RentPeriod::class, 'rent_period_id', 'id');
     }
+
+    public function rent()
+    {
+        return $this->hasMany(DealtSpace::class, 'rent_id', 'id');
+    }
 }

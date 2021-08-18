@@ -20,7 +20,7 @@ class DealPaymentDetailResource extends JsonResource
             'expired_at' => $this->expired_at,
             'rent' => $this->rent,
             'dealt_space_id' => $this->dealt_space_id,
-            'dealt_space' => $this->space
+            'dealt_space' => $this->space->space
         ];
     }
 }

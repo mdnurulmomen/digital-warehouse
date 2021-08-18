@@ -26,7 +26,11 @@ class DealResource extends JsonResource
             'warehouses' => DealtWarehouseResource::collection(
                 Warehouse::whereHas('deals', function ($query) {
                     $query->where('merchant_deal_id', $this->id);
-                })->get()
+                })
+                ->with(['deals' => function ($query) {
+                    $query->where('merchant_deal_id', $this->id);
+                }])
+                ->get()
             ),
             'payments' => DealPaymentResource::collection($this->payments)
         ];

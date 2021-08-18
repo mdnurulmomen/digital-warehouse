@@ -39,7 +39,7 @@ class WarehouseContainerStatus extends Model
         $this->updateChildShelves($newValue);
     }
 
-    protected function updateChildShelves($newValue)
+    public function updateChildShelves($newValue)
     {
         if ($this->containerShelfStatuses->count()) {
             
@@ -56,7 +56,7 @@ class WarehouseContainerStatus extends Model
         }
     }
 
-    protected function updateChildUnits(WarehouseContainerShelfStatus $shelf, $newValue)
+    public function updateChildUnits(WarehouseContainerShelfStatus $shelf, $newValue)
     {
         if ($shelf->containerShelfUnitStatuses->count()) {
             
@@ -67,7 +67,7 @@ class WarehouseContainerStatus extends Model
         }
     }
 
-    protected function updateParentContainer(WarehouseContainerStatus $warehouseExpectedContainer)
+    public function updateParentContainer(WarehouseContainerStatus $warehouseExpectedContainer)
     {
         // $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
 
@@ -98,7 +98,7 @@ class WarehouseContainerStatus extends Model
 
     }
 
-    protected function updateParentShelf(WarehouseContainerShelfStatus $warehouseExpectedShelf)
+    public function updateParentShelf(WarehouseContainerShelfStatus $warehouseExpectedShelf)
     {
         // Related Shelf
         // $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);

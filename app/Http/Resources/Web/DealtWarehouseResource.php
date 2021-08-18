@@ -17,7 +17,7 @@ class DealtWarehouseResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'spaces' => DealtSpaceResource::collection($this->deals)
+            'spaces' => new DealtSpaceCollection($this->deals)
         ];
     }
 }

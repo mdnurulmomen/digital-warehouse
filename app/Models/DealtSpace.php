@@ -18,18 +18,18 @@ class DealtSpace extends Model
         return $this->morphTo();
     }
 
-    public function merchantPayment()
-    {
-    	return $this->belongsTo(MerchantPayment::class, 'merchant_payment_id', 'id');
-    }
-
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
 
-    public function storerRent()
+    public function rent()
     {
         return $this->belongsTo(Rent::class, 'rent_id', 'id');
+    }
+
+    public function deal()
+    {
+        return $this->belongsTo(MerchantDeal::class, 'merchant_deal_id', 'id');
     }
 }

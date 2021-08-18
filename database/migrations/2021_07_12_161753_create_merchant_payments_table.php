@@ -16,7 +16,7 @@ class CreateMerchantPaymentsTable extends Migration
         Schema::create('merchant_payments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('invoice_no');
-            $table->unsignedMediumInteger('previous_due')->default(0); // past due amount
+            $table->mediumInteger('previous_due')->default(0); // past due amount
             $table->unsignedMediumInteger('total_rent')->default(0); // total rent to warehouse authority
             $table->unsignedTinyInteger('discount')->default(0); // discount percentage to total rent
             $table->unsignedMediumInteger('net_payable')->default(0); // total rent minus discount plus dues
