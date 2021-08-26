@@ -121,7 +121,7 @@
 																					v-show="content.product" 
 																					@click="showContainerDetails(content)"
 																			>
-																				<i class="fas fa-info"></i>
+																				<i class="fa fa-info"></i>
 																			</button>
 
 																			<button type="button" 
@@ -129,7 +129,7 @@
 																					v-show="content.container_shelf_statuses.length" 
 																					@click="showContainerShelfDetails(content)"
 																			>
-																				<i class="fas fa-eye"></i>
+																				<i class="fa fa-eye"></i>
 																			</button>
 
 																			<span class="text-danger" 
@@ -182,7 +182,7 @@
 																@click="query === '' ? fetchAllContainers() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8">

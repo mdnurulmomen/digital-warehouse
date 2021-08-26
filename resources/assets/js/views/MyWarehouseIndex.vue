@@ -130,7 +130,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showContentDetails(warehouse)" 
 																		>
-																			<i class="fas fa-eye"></i>
+																			<i class="fa fa-eye"></i>
 																		</button>
 																	</td>
 															    
@@ -194,7 +194,7 @@
 																@click="query === '' ? fetchAllWarehouses() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8 col-12 text-right form-group">

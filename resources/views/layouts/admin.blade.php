@@ -18,7 +18,8 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/waves.min.css')}}" type="text/css" media="all">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{asset('css/font-awesome-n.min.css')}}">
+	{{-- <link rel="stylesheet" type="text/css" href="{{asset('css/font-awesome-n.min.css')}}"> --}}
+	<link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/widget.css')}}">
 	{{-- <link rel="stylesheet" type="text/css" href="{{asset('css/app.css')}}"> --}}
@@ -317,7 +318,7 @@
 	<script src="{{asset('js/pcoded.min.js')}}" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script>
 	<script src="{{asset('js/vertical-layout.min.js')}}" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script>
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/script.min.js')}}"></script>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script>
+	{{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script> --}}
 	<script src="{{asset('js/rocket-loader.min.js')}}" data-cf-settings="d2d1d6e2f87cbebdf4013b26-|49" defer=""></script>
 
 </body>

@@ -85,7 +85,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showDealDetails(merchantDeal)"
 																			>
-																				<i class="fas fa-eye"></i>
+																				<i class="fa fa-eye"></i>
 																			</button>
 
 																			<button 
@@ -95,7 +95,7 @@
 																				v-if="userHasPermissionTo('update-merchant-deal')" 
 																				:disabled="formSubmitted"  
 																			>
-																				<i class="fas fa-edit"></i>
+																				<i class="fa fa-edit"></i>
 																			</button>
 
 																			<button 
@@ -105,7 +105,16 @@
 																				@click="openDealDeleteForm(merchantDeal)" 
 																				v-if="userHasPermissionTo('delete-merchant-deal')" 
 																			>
-																				<i class="fas fa-trash"></i>
+																				<i class="fa fa-trash"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-warning btn-icon" 
+																				@click="goToDealPayments(merchantDeal)" 
+																				v-if="userHasPermissionTo('view-merchant-payment-index')" 
+																			>
+																				<i class="fa fa-money" aria-hidden="true"></i>
 																			</button>
 																		</td>
 																	</tr>
@@ -158,7 +167,7 @@
 																@click="query === '' ? fetchAllMerchantDeals() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8 col-12 text-right form-group">
@@ -2253,6 +2262,12 @@
 				}
 
 				$('#delete-confirmation-modal').modal('show');
+			},
+			goToDealPayments(object) {
+
+				// console.log(object);
+				this.$router.push({ name: 'deal-payments', params: { merchantName : this.merchant.user_name, dealDate : object.created_at.replace(/\s+/g, '-'), deal : object }});
+
 			},
 			createMerchantDeal() {
 				

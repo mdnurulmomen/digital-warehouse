@@ -121,7 +121,7 @@
 																					v-show="content.product" 
 																					@click="showUnitDetails(content)"
 																			>
-																				<i class="fas fa-info"></i>
+																				<i class="fa fa-info"></i>
 																			</button>
 
 																			<span 
@@ -175,7 +175,7 @@
 																@click="query === '' ? fetchShelfAllUnits() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8">

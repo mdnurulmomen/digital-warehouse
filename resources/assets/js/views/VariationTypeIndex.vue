@@ -90,7 +90,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="$emit('showContentDetails', content)"
 																		>
-																			<i class="fas fa-eye"></i>
+																			<i class="fa fa-eye"></i>
 																		</button>
  																		-->
 
@@ -100,7 +100,7 @@
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-asset')"
 																		>
-																			<i class="fas fa-edit"></i>
+																			<i class="fa fa-edit"></i>
 																		</button>
 
 																		<button type="button" 
@@ -109,7 +109,7 @@
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-asset')"
 																		>
-																			<i class="fas fa-trash"></i>
+																			<i class="fa fa-trash"></i>
 																		</button>
 
 																		<button type="button" 
@@ -118,7 +118,7 @@
 																				@click="openContentRestoreForm(content)" 
 																				v-if="userHasPermissionTo('delete-asset')"
 																		>
-																			<i class="fas fa-undo"></i>
+																			<i class="fa fa-undo"></i>
 																		</button>
 																	</td>
 															    
@@ -182,7 +182,7 @@
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8 col-12 text-right form-group">

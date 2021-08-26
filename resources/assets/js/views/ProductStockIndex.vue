@@ -97,7 +97,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showStockDetails(stock)"
 																			>
-																				<i class="fas fa-eye"></i>
+																				<i class="fa fa-eye"></i>
 																			</button>
 																			<!-- Approve -->
 																			<button 
@@ -106,7 +106,7 @@
 																				@click="openStockEditForm(stock)" 
 																				v-if="! stock.has_approval && userHasPermissionTo('update-product-stock')"
 																			>
-																				<i class="fas fa-check"></i>
+																				<i class="fa fa-check"></i>
 																			</button>
 
 																			<button 
@@ -115,7 +115,7 @@
 																				@click="openStockEditForm(stock)" 
 																				v-if="stock.has_approval==1 && userHasPermissionTo('update-product-stock')"
 																			>
-																				<i class="fas fa-edit"></i>
+																				<i class="fa fa-edit"></i>
 																			</button>
 
 																			<button 
@@ -125,7 +125,7 @@
 																				@click="openStockDeleteForm(stock)" 
 																				v-if="userHasPermissionTo('delete-product-stock')" 
 																			>
-																				<i class="fas fa-trash"></i>
+																				<i class="fa fa-trash"></i>
 																			</button>
 																		</td>
 																	</tr>
@@ -181,7 +181,7 @@
 																@click="query === '' ? fetchProductAllStocks() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8 col-12 text-right form-group">

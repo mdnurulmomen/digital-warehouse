@@ -41,7 +41,7 @@
 									@click="$emit('showContentDetails', content)" 
 								 	v-if="userHasPermissionTo('view-' + requiredPermission + '-index')"
 							>
-								<i class="fas fa-eye"></i>
+								<i class="fa fa-eye"></i>
 							</button>
 
 							<button type="button" 
@@ -50,7 +50,7 @@
 									@click="$emit('openContentEditForm', content)" 
 									v-if="userHasPermissionTo('update-' + requiredPermission)"
 							>
-								<i class="fas fa-edit"></i>
+								<i class="fa fa-edit"></i>
 							</button>
 
 							<button type="button" 
@@ -59,7 +59,7 @@
 									@click="$emit('openContentDeleteForm', content)" 
 									v-if="userHasPermissionTo('delete-' + requiredPermission)"
 							>
-								<i class="fas fa-trash"></i>
+								<i class="fa fa-trash"></i>
 							</button>
 
 							<button type="button" 
@@ -68,16 +68,16 @@
 									@click="$emit('openContentRestoreForm', content)" 
 									v-if="userHasPermissionTo('delete-' + requiredPermission)"
 							>
-								<i class="fas fa-undo"></i>
+								<i class="fa fa-undo"></i>
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-black btn-icon" 
+									class="btn btn-grd-secondary btn-icon" 
 									v-show="! content.deleted_at" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
 							>
-								<i aria-hidden="true" class="fa fa-handshake"></i>
+								<i aria-hidden="true" class="fa fa-handshake-o"></i>
 							</button>
 						</td>
 					</tr>
@@ -140,7 +140,7 @@
 					@click="query === '' ? $emit('fetchAllContents') : $emit('searchData')"
 				>
 					Reload
-					<i class="fas fa-sync"></i>
+					<i class="fa fa-sync"></i>
 				</button>
 			</div>
 			<div class="col-sm-8 col-12 text-right form-group">

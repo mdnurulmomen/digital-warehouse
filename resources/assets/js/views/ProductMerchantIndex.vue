@@ -62,7 +62,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showProductMerchantDetails(productMerchant)"
 																			>
-																				<i class="fas fa-eye"></i>
+																				<i class="fa fa-eye"></i>
 																			</button>
 
 																			<button 
@@ -71,7 +71,7 @@
 																				@click="openProductMerchantEditForm(productMerchant)" 
 																				v-if="userHasPermissionTo('update-merchant-product')"
 																			>
-																				<i class="fas fa-edit"></i>
+																				<i class="fa fa-edit"></i>
 																			</button>
 
 																			<button 
@@ -81,7 +81,7 @@
 																				v-if="userHasPermissionTo('delete-merchant-product')" 
 																				:disabled="productMerchant.product_immutability"
 																			>
-																				<i class="fas fa-trash"></i>
+																				<i class="fa fa-trash"></i>
 																			</button>
 
 																			<button 
@@ -139,7 +139,7 @@
 																@click="query === '' ? fetchProductAllMerchants() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 

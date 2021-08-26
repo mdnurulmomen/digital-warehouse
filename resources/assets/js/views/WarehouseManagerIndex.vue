@@ -104,7 +104,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showContentDetails(warehouse)" 
 																		>
-																			<i class="fas fa-eye"></i>
+																			<i class="fa fa-eye"></i>
 																		</button>
  																		
 
@@ -113,7 +113,7 @@
 																				@click="openContentEditForm(warehouse)" 
 																				v-if="userHasPermissionTo('update-warehouse-manager')"
 																		>
-																			<i class="fas fa-edit"></i>
+																			<i class="fa fa-edit"></i>
 																		</button>
 
 																		<button type="button" 
@@ -122,7 +122,7 @@
 																				@click="openContentDeleteForm(warehouse)" 
 																				v-if="userHasPermissionTo('delete-warehouse-manager')"
 																		>
-																			<i class="fas fa-trash"></i>
+																			<i class="fa fa-trash"></i>
 																		</button>
 																	</td>
 															    
@@ -191,7 +191,7 @@
 																@click="query === '' ? fetchAllWarehouseManagers() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8 col-12 text-right form-group">

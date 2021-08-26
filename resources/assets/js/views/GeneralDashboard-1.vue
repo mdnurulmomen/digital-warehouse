@@ -44,7 +44,7 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'products' }">
-                                                	<i class="fas fa-eye text-c-yellow f-18"></i>
+                                                	<i class="fa fa-eye text-c-yellow f-18"></i>
                                             	</router-link>
                                             </div>
                                         </div>
@@ -74,7 +74,7 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'requisitions' }">
-                                                	<i class="fas fa-bullseye text-c-blue f-18"></i>
+                                                	<i class="fa fa-bullseye text-c-blue f-18"></i>
                                             	</router-link>
                                             </div>
                                         </div>
@@ -105,7 +105,7 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'requisitions' }">
-                                                	<i class="fas fa-eye text-c-blue f-18"></i>
+                                                	<i class="fa fa-eye text-c-blue f-18"></i>
                                             	</router-link>
                                             </div>
                                         </div>
@@ -135,7 +135,7 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'requisitions' }">
-                                                	<i class="fas fa-thermometer-half text-c-red f-18"></i>
+                                                	<i class="fa fa-thermometer-half text-c-red f-18"></i>
                                             	</router-link>
                                             </div>
                                         </div>
@@ -165,7 +165,7 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'requisitions' }">
-                                                	<i class="fas fa-trash text-c-orenge f-18"></i>
+                                                	<i class="fa fa-trash text-c-orenge f-18"></i>
                                             	</router-link>
                                             </div>
                                         </div>
@@ -285,7 +285,7 @@
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'managers' }">
-                                                    <i class="fas fa-users bg-c-green"></i>
+                                                    <i class="fa fa-users bg-c-green"></i>
                                                 </router-link>
                                             </div>
                                         </div>
@@ -305,7 +305,7 @@
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'merchants' }">
-                                                    <i class="fas fa-industry bg-c-blue"></i>
+                                                    <i class="fa fa-industry bg-c-blue"></i>
                                                 </router-link>
                                             </div>
                                         </div>
@@ -325,7 +325,7 @@
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'owners' }">
-                                                    <i class="fas fa-user bg-c-yellow"></i>
+                                                    <i class="fa fa-user bg-c-yellow"></i>
                                                 </router-link>
                                             </div>
                                         </div>
@@ -345,7 +345,7 @@
                                             </div>
                                             <div class="col-auto">
                                                 <router-link :to="{ name: 'warehouses' }">
-                                                    <i class="fas fa-bullseye bg-c-orenge"></i>
+                                                    <i class="fa fa-bullseye bg-c-orenge"></i>
                                                 </router-link>
                                             </div>
                                         </div>

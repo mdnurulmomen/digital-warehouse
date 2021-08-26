@@ -104,7 +104,7 @@
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showDispatchDetails(dispatchedReq)"
 																			>
-																				<i class="fas fa-eye"></i>
+																				<i class="fa fa-eye"></i>
 																			</button>
 																		</td>
 																	</tr>
@@ -151,7 +151,7 @@
 																@click="query === '' ? fetchAllDispatches() : searchData()"
 															>
 																Reload
-																<i class="fas fa-sync"></i>
+																<i class="fa fa-sync"></i>
 															</button>
 														</div>
 														<div class="col-sm-8 col-12 text-right form-group">
