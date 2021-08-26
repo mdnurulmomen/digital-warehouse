@@ -1104,6 +1104,16 @@
 																					</label>
 																				</div>
 
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Status :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						<span :class="[warehouseContainer.engaged==1 ? 'badge-danger' : warehouseContainer.engaged==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																							{{ warehouseContainer.engaged==1 ? 'Packed' : warehouseContainer.engaged==0.5 ? 'Packed Partially' : 'Empty' }}
+																						</span>
+																					</label>
+																				</div>
 																			</div>
 																		</div>
 
@@ -1142,13 +1152,16 @@
 																					<label class="col-sm-6 col-form-label">
 																						<ul id="shelf-addresses">
 																							<li 
-																								v-for="shelfAddress in warehouseSpace.container.shelves" 
-																								:key="'shelf-address-' + shelfAddress.id"
+																								v-for="shelf in warehouseSpace.container.shelves" 
+																								:key="'shelf-address-' + shelf.id"
 																							>
 
-																								{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																								{{ shelf.name ? shelf.name.substring(shelf.name.lastIndexOf("-")+1) : 'NA' }}
 																								
-																							</li>
+																								<span :class="[shelf.engaged==1 ? 'badge-danger' : shelf.engaged==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																									{{ shelf.engaged==1 ? 'Packed' : shelf.engaged==0.5 ? 'Packed Partially' : 'Empty' }}
+																								</span>	
+																							</li>	
 																						</ul>
 																					</label>
 																				</div>
@@ -1196,12 +1209,15 @@
 																					<label class="col-sm-6 col-form-label">
 																						<ul id="unit-addresses">
 																							<li 
-																								v-for="unitAddress in warehouseSpace.container.shelf.units" 
-																								:key="'unit-address-' + unitAddress.id"
+																								v-for="unit in warehouseSpace.container.shelf.units" 
+																								:key="'unit-address-' + unit.id"
 																							>
 
-																								{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																								{{ unit.name ? unit.name.substring(unit.name.lastIndexOf("-")+1) : 'NA' }}
 																								
+																								<span :class="[unit.engaged==1 ? 'badge-danger' : unit.engaged==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																									{{ unit.engaged==1 ? 'Packed' : unit.engaged==0.5 ? 'Packed Partially' : 'Empty' }}
+																								</span>
 																							</li>
 																						</ul>
 																					</label>
@@ -1240,7 +1256,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.invoice_no }}
+														{{ dealPayment.invoice_no | capitalize }}
 													</label>
 												</div>
 
@@ -2266,7 +2282,7 @@
 			goToDealPayments(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'deal-payments', params: { merchantName : this.merchant.user_name, dealDate : object.created_at.replace(/\s+/g, '-'), deal : object }});
+				this.$router.push({ name: 'deal-payments', params: { merchantName:this.merchant.user_name, dealDate:object.created_at.replace(/\s+/g, '-'), deal:object }});
 
 			},
 			createMerchantDeal() {
@@ -2591,7 +2607,7 @@
 
 				const warehouseIsEngaged = (merchantWarehouse) => {
 					return merchantWarehouse.spaces.some(
-						dealSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealSpace.containers.some(dealtContainer => dealtContainer.engaged != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.engaged != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.engaged != 0))
+						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealSpace.containers.some(dealtContainer => dealtContainer.engaged != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.engaged != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.engaged != 0))
 					)
 				};
 

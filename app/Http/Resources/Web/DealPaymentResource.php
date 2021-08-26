@@ -24,7 +24,8 @@ class DealPaymentResource extends JsonResource
             'paid_amount' => $this->paid_amount,
             'current_due' => $this->current_due,
             'rents' => DealPaymentDetailResource::collection($this->rents),
-            'paid_at' => $this->paid_at
+            'merchant_deal_id' => $this->merchant_deal_id,
+            'paid_at' => $this->paid_at,
         ];
     }
 }

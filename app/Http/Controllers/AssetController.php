@@ -295,7 +295,7 @@ class AssetController extends Controller
     public function storeNewRentPeriod(Request $request, $perPage)
     {
         $request->validate([
-            'name' => 'required|string|max:100|unique:rent_periods,name',
+            'name' => 'required|string|max:100|unique:rent_periods,name|in:daily,weekly,monthly,yearly',
             // 'code' => 'required|string|max:100|unique:storage_types,code',
         ]);
 
@@ -314,7 +314,7 @@ class AssetController extends Controller
         $assetToUpdate = RentPeriod::findOrFail($owner);
 
         $request->validate([
-            'name' => 'required|string|max:100|unique:rent_periods,name,'.$assetToUpdate->id,
+            'name' => 'required|string|max:100|in:daily,weekly,monthly,yearly|unique:rent_periods,name,'.$assetToUpdate->id,
             // 'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
         ]);
 

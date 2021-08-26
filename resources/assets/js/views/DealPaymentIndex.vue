@@ -25,7 +25,7 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-merchant-payment-index') || userHasPermissionTo('create-merchant-payment')" 
+											  		v-if="userHasPermissionTo('create-merchant-payment')" 
 											  		:query="query" 
 											  		:caller-page="'payment'" 
 											  		:required-permission="'merchant-payment'"
@@ -217,7 +217,7 @@
 																<tr 
 															  		v-show="! contentsToShow.length"
 															  	>
-														    		<td colspan="6">
+														    		<td colspan="7">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -387,30 +387,389 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
 
-		<!-- 
-			<asset-create-or-edit-modal 
-				v-if="userHasPermissionTo('create-merchant-payment') || userHasPermissionTo('update-merchant-payment')" 
-				:create-mode="createMode" 
-				:caller-page="'storage type'" 
-				:single-asset-data="singlePaymentData" 
-				:csrf="csrf"
+	 	<!--Create, Edit or Approve Modal -->
+		<div class="modal fade" id="merchant-payment-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-payment') || userHasPermissionTo('update-merchant-payment')">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							{{ createMode ? 'Create New ' : 'Update ' }} Payment {{ createMode ? '' : (singlePaymentData.invoice_no) }}
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+						
+					<form 	
+						class="form-horizontal" 
+						v-on:submit.prevent="createMode ? createDealPayment() : updateDealPayment()" 
+						autocomplete="off" 
+						novalidate="true" 
+					>
+						<input type="hidden" name="_token" :value="csrf">
 
-				@storeAsset="storeAsset($event)" 
-				@updateAsset="updateAsset($event)" 
-			></asset-create-or-edit-modal>
-	 	-->
+						<div class="modal-body">
+							<transition-group name="fade">	
+								<div 
+									class="row" 
+									v-bind:key="'merchant-deal-modal-step-' + 1" 
+									v-show="! loading && step==1" 
+								>
+									<h2 class="mx-auto mb-4 lead">Dealt Spaces</h2>
+
+									<div class="col-md-12">
+										<div 
+											class="form-row" 
+											v-if="deal.hasOwnProperty('warehouses') && Array.isArray(deal.warehouses) && deal.warehouses.length"
+										>
+											<div class="col-sm-12">
+												<div 
+													class="form-row" 
+													v-for="(merchantWarehouse, merchantWarehouseIndex) in deal.warehouses" 
+													:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-create-or-edit'"
+												>
+													<div class="col-md-12">
+														<div class="card">
+															<div class="card-title">
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Warehouse :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ merchantWarehouse.name ? $options.filters.capitalize(merchantWarehouse.name) : 'NA' }}
+																	</label>
+																</div>
+															</div>
+																
+															<div class="card-body pt-0">
+																<div class="form-row" v-if="merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length">
+																	<div 
+																		class="col-md-6 ml-auto" 
+																		v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
+																		:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-view'"
+																	>
+																		<div 
+																			class="card" 
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length"
+																		>
+																			<div 
+																				class="card-body" 
+																				v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
+																				:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
+																			>
+																				<h6 class="text-center">Containers</h6>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Type :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseContainer.hasOwnProperty('warehouse_container') && warehouseContainer.warehouse_container.hasOwnProperty('container') ? $options.filters.capitalize(warehouseContainer.warehouse_container.container.name) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container # :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.indexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+																				 
+																				<div class="form-row" v-show="createMode">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Current Rent :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 'NA' }}
+																					</label>
+																				</div>
+																			</div>
+																		</div>
+
+																		<div 
+																			class="card" 
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') &&  warehouseSpace.container.hasOwnProperty('warehouse_container')"
+																		>
+																			<div class="card-body">
+																				<h6 class="text-center">Shelves</h6>
+																				
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Type :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container # :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div 
+																					class="form-row" 
+																					v-if="warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length"
+																				>
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Shelf # :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						<ul id="shelf-addresses">
+																							<li 
+																								v-for="shelfAddress in warehouseSpace.container.shelves" 
+																								:key="'shelf-address-' + shelfAddress.id"
+																							>
+
+																								{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																								
+																							</li>
+																						</ul>
+																					</label>
+																				</div>
+																				 
+																				<div class="form-row" v-show="createMode">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Current Rent :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
+																					</label>
+																				</div>
+																			</div>
+																		</div>
+
+																		<div 
+																			class="card" 
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
+																		>
+																			<div class="card-body">
+																				<h6 class="text-center">Units</h6>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Type :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container # :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Shelf # :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.shelf.name ? warehouseSpace.container.shelf.name.substring(warehouseSpace.container.shelf.name.lastIndexOf("-")+1) : 'NA' }}
+																					</label>
+																				</div>
+
+																				<div class="form-row" v-if="warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Unit # :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						<ul id="unit-addresses">
+																							<li 
+																								v-for="unitAddress in warehouseSpace.container.shelf.units" 
+																								:key="'unit-address-' + unitAddress.id"
+																							>
+
+																								{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																								
+																							</li>
+																						</ul>
+																					</label>
+																				</div>
+																				 
+																				<div class="form-row" v-show="createMode">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Current Rent :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
+																					</label>
+																				</div> 
+																			</div>
+																		</div>
+																	</div>
+																</div>		
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-row" v-else>
+											<div 
+												class="col-md-12 text-center" 
+											>
+												<p class="text-danger">
+													No Space Found.
+												</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer pb-0">
+										<div class="form-row">
+									    	<div class="form-group col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+								    	</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'merchant-deal-modal-step-' + 2" 
+									v-show="!loading && step==2" 
+								>
+									<!-- payment -->
+									<div class="col-md-12">
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Total Rent</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singlePaymentData.total_rent" 
+													placeholder="Total Rent" 
+													:disabled="true"
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Discount</label>
+												<div class="input-group mb-1">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singlePaymentData.discount" 
+														placeholder="Discount" 
+														:min="0" 
+														:max="100" 
+														:class="! errors.discount ? 'is-valid' : 'is-invalid'" 
+														@change="resetTotalRent()"
+													>
+													<div class="input-group-append">
+														<span class="input-group-text"> % </span>
+													</div>
+												</div>
+												<div class="invalid-feedback" style="display:block" v-show="errors.discount">
+											    	{{ errors.discount }}
+											    </div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Last Due</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singlePaymentData.previous_due" 
+													placeholder="Previous Due" 
+													:disabled="true"
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Net Payable</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singlePaymentData.net_payable" 
+													placeholder="Net Payable" 
+													:disabled="true"
+												>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Paid Amount</label>
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singlePaymentData.paid_amount" 
+													placeholder="Paid Amount" 
+													:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('paid_amount')" 
+													required="true" 
+												>
+												<div class="invalid-feedback">
+											    	{{ errors.paid_amount }}
+											    </div>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Current Due</label>
+												<input type="number" 
+													class="form-control is-valid" 
+													:value="singlePaymentData.net_payable - singlePaymentData.paid_amount" 
+													placeholder="Previous Dues" 
+													:disabled="true"
+												>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+												<button 
+													type="submit" 
+													class="btn btn-primary float-right" 
+													:disabled="!submitForm || formSubmitted"
+												>
+													{{ createMode ? 'Make ' : 'Update ' }} Payment
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</transition-group>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 
 		<!-- View Modal -->
 		<div class="modal fade" id="merchant-payment-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Deal ({{ dealDate }}) payment ({{ singlePaymentData.invoice_no }}) Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">Payment ({{ singlePaymentData.invoice_no }}) Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -497,59 +856,277 @@
 							</label>
 						</div>
 
-						<div class="form-row" v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length">
-							<div class="col-md-6" v-for="(rent, rentIndex) in singlePaymentData.rents" :key="'rent-index-' + rentIndex + '-rent-' + rent.id">
+						<div 
+							class="form-row" 
+							v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length"
+						>
+							<div 
+								class="col-md-6" 
+								v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
+								:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
+							>
 								<div class="card card-body">
+									<div class="form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Space Type :
+										</label>
+
+										<label class="col-sm-6 col-form-label">
+											{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shef' : 'Unit')) : 'NA' }}
+										</label>	
+									</div>
+
 									<div class="form-row">
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">
 											Space Name :
 										</label>
 
 										<label class="col-sm-6 col-form-label">
-											{{ rent.dealt_space ? rent.dealt_space.name : 'NA' | capitalize }}
-										</label>
+											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' }}
+										</label>	
 									</div>
-
-									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
-											Issued From :
-										</label>
-
-										<label class="col-sm-6 col-form-label">
-											{{ rent.issued_from }}
-										</label>
-									</div>
-
-									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
-											Expired At :
-										</label>
-
-										<label class="col-sm-6 col-form-label">
-											{{ rent.expired_at }}
-										</label>
-									</div>
-
+								
 									<div class="form-row">
 										<label class="col-sm-6 col-form-label font-weight-bold text-right">
 											Rent :
 										</label>
 
 										<label class="col-sm-6 col-form-label">
-											{{ rent.rent }}
+											{{ paymentRent.rent }}
+										</label>	
+									</div>
+								
+									<div class="form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Issued from :
 										</label>
-									</div>	
+
+										<label class="col-sm-6 col-form-label">
+											{{ paymentRent.issued_from }}
+										</label>	
+									</div>
+								
+									<div class="form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											Expired At :
+										</label>
+
+										<label class="col-sm-6 col-form-label">
+											{{ paymentRent.expired_at }}
+										</label>	
+									</div>
 								</div>
 							</div>
 						</div>
 
-						<div class="form-row" v-else>
-							<div 
-								class="col-md-12 text-center" 
-							>
-								<p class="text-danger">
-									No Payment Found.
-								</p>
+						<div class="form-row">
+							<div class="col-md-12 text-center">
+								<label class="font-weight-bold">
+									Spaces Details :
+								</label>
+							</div>
+						</div>
+
+						<div 
+							class="form-row" 
+							v-if="deal.hasOwnProperty('warehouses') && Array.isArray(deal.warehouses) && deal.warehouses.length"
+						>
+							<div class="col-sm-12">
+								<div 
+									class="form-row" 
+									v-for="(merchantWarehouse, merchantWarehouseIndex) in deal.warehouses" 
+									:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-create-or-edit'"
+								>
+									<div class="col-md-12">
+										<div class="card">
+											<div class="card-title">
+												<div class="form-row">
+													<div class="col-md-12 pl-3">
+														<label class="font-weight-bold col-form-label">
+															{{ merchantWarehouse.name ? $options.filters.capitalize(merchantWarehouse.name) : 'NA' }}
+														</label>
+													</div>
+												</div>
+											</div>
+												
+											<div class="card-body pt-0">
+												<div class="form-row" v-if="merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length">
+													<div 
+														class="col-md-6 ml-auto" 
+														v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
+														:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-view'"
+													>
+														<div 
+															class="card" 
+															v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length"
+														>
+															<div 
+																class="card-body" 
+																v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
+																:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
+															>
+																<h6 class="text-center">Containers Details</h6>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container Type :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseContainer.hasOwnProperty('warehouse_container') && warehouseContainer.warehouse_container.hasOwnProperty('container') ? $options.filters.capitalize(warehouseContainer.warehouse_container.container.name) : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container # :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.indexOf("-")+1) : 'NA' }}
+																	</label>
+																</div>
+
+																<!-- 
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Current Rent :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 'NA' }}
+																	</label>
+																</div>
+																 -->
+															</div>
+														</div>
+
+														<div 
+															class="card" 
+															v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') &&  warehouseSpace.container.hasOwnProperty('warehouse_container')"
+														>
+															<div class="card-body">
+																<h6 class="text-center">Shelves Details</h6>
+																
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container Type :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container # :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																	</label>
+																</div>
+
+																<div 
+																	class="form-row" 
+																	v-if="warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length"
+																>
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Shelf # :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<ul id="shelf-addresses">
+																			<li 
+																				v-for="shelfAddress in warehouseSpace.container.shelves" 
+																				:key="'shelf-address-' + shelfAddress.id"
+																			>
+
+																				{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																				
+																			</li>
+																		</ul>
+																	</label>
+																</div>
+																 
+																<!-- 
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Current Rent :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
+																	</label>
+																</div> 
+																-->
+															</div>
+														</div>
+
+														<div 
+															class="card" 
+															v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
+														>
+															<div class="card-body">
+																<h6 class="text-center">Units Details</h6>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container Type :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Container # :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Shelf # :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.shelf.name ? warehouseSpace.container.shelf.name.substring(warehouseSpace.container.shelf.name.lastIndexOf("-")+1) : 'NA' }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-if="warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Unit # :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		<ul id="unit-addresses">
+																			<li 
+																				v-for="unitAddress in warehouseSpace.container.shelf.units" 
+																				:key="'unit-address-' + unitAddress.id"
+																			>
+
+																				{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																				
+																			</li>
+																		</ul>
+																	</label>
+																</div>
+
+																<!-- 
+																<div class="form-row">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Current Rent :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
+																	</label>
+																</div> 
+																-->
+															</div>
+														</div>
+													</div>
+												</div>		
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>	
 					</div>
@@ -572,7 +1149,6 @@
 			
 			@deleteAsset="deleteAsset($event)" 
 		></delete-confirmation-modal>
-
 	</div>
 
 </template>
@@ -583,12 +1159,12 @@
 
     let singlePaymentData = {
     	
-    	// previous_due : 0,
-		// total_rent : 0, // generated from selected spaces
-		// discount : 0,	// percentage 
-		// net_payable : 0,
-		// paid_amount : 0,
-		// current_due : 0,
+    	previous_due : 0,
+		total_rent : 0, // generated from selected spaces
+		discount : 0,	// percentage 
+		net_payable : 0,
+		paid_amount : 0,
+		current_due : 0,
 		// merchant_deal_id : null,
 		// paid_at : null,
 		rents : [
@@ -626,10 +1202,13 @@
 
 	        return {
 
+	        	step : 1,
 	        	query : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
+	        	submitForm : true,
+	        	formSubmitted : false,
 	        	// currentTab : 'current',
 
 	        	ascending : false,
@@ -644,7 +1223,13 @@
 		        	current_page: 1
 		      	},
 
+		      	errors : {
+
+		      	},
+
 	        	singlePaymentData : singlePaymentData,
+
+	        	dealTotalCurrentRent : 0,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -658,9 +1243,16 @@
 
 		},
 
+		mounted(){
+
+			this.setDealTotalPayments();
+
+		},
+
 		filters: {
 
 			capitalize: function (value) {
+
 				if (!value) return ''
 
 				const words = value.split(" ");
@@ -676,6 +1268,7 @@
 				}
 
 				return words.join(" ");
+
 			}
 
 		},
@@ -722,6 +1315,47 @@
 					});
 
 			},
+			setDealTotalPayments() {
+
+				this.dealTotalCurrentRent = 0;
+				
+				if (this.deal.warehouses.length > 0) {
+
+					this.deal.warehouses.forEach(
+						(merchantWarehouse, merchantWarehouseIndex) => {
+							merchantWarehouse.spaces.forEach(
+								(warehouseSpace, warehouseSpaceIndex) => {
+									if (warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length) {
+
+										warehouseSpace.containers.forEach(
+											(warehouseContainer, warehouseContainerIndex) => {
+												
+												this.dealTotalCurrentRent += warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 0;
+
+											}
+										);
+
+									}
+
+									else if (warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length) {
+
+										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.storing_price : 0;
+
+									}
+
+									else if (warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length) {
+
+										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.storing_price : 0;
+
+									}
+								}
+							);
+						}
+					);	
+
+				}
+
+			},
 			searchData(emitedValue=false) {
 
 				if (emitedValue) {
@@ -753,47 +1387,60 @@
 			},
 			showContentCreateForm() {
 
+				this.step = 1;
 				this.createMode = true;
 
 				this.singlePaymentData = {
-					// previous_due : 0,
-					// total_rent : 0, // generated from selected spaces
-					// discount : 0,	// percentage 
-					// net_payable : 0,
-					// paid_amount : 0,
-					// current_due : 0,
-					// merchant_deal_id : null,
-					// paid_at : null,
-					rents : [
-						{
-							// issued_from : null,
-							// expired_at : null,
-							// rent : 0,
-							// dealt_space_id : null,
-							// merchant_payment_id : null
-						},
-					]
+					
+					previous_due : this.contentsToShow[this.contentsToShow.length-1].current_due,
+					total_rent : this.dealTotalCurrentRent, // generated from selected spaces
+					discount : 0,	// percentage 
+					net_payable : this.contentsToShow[this.contentsToShow.length-1].current_due + this.dealTotalCurrentRent,
+					paid_amount : 0,
+					current_due : 0,
+					merchant_deal_id : this.deal.id,
+
+					// rents : this.contentsToShow[this.contentsToShow.length-1].rents,
+
 				};
+
+				this.errors = {
+		      		
+		      	};
 
 				$('#merchant-payment-createOrEdit-modal').modal('show');
 
 			},
 			openContentEditForm(object) {
+				
+				this.step = 1;
 				this.createMode = false;
+
 				this.singlePaymentData = object;
+
 				$('#merchant-payment-createOrEdit-modal').modal('show');
+				
 			},
 			openContentDeleteForm(object) {	
 				this.singlePaymentData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
-			storeAsset(singlePaymentData) {
+			createDealPayment() {
 				
+				if (! this.verifyUserInput()) {
+					
+					this.submitForm = false;
+					return;
+
+				}
+
+				this.formSubmitted = true;
+
 				axios
-					.post('/deal-payments/' + this.perPage, singlePaymentData)
+					.post('/deal-payments/' + this.perPage, this.singlePaymentData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New storage type has been created", "Success");
+							this.$toastr.s("New payment has been added", "Success");
 							// this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.setContentPagination(response);
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
@@ -805,16 +1452,28 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
-			updateAsset(singlePaymentData) {
+			updateDealPayment() {
 				
+				if (! this.verifyUserInput()) {
+					
+					this.submitForm = false;
+					return;
+
+				}
+
+				this.formSubmitted = true;
+
 				axios
-					.put('/deal-payments/' + singlePaymentData.id + '/' + this.perPage, singlePaymentData)
+					.put('/deal-payments/' + this.singlePaymentData.id + '/' + this.perPage, this.singlePaymentData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been updated", "Success");
+							this.$toastr.s("Payment has been updated", "Success");
 							// this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.setContentPagination(response);
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
@@ -826,6 +1485,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -850,7 +1512,22 @@
 					});
 
 			},
+			verifyUserInput() {
+
+				this.validateFormInput('discount');
+				this.validateFormInput('paid_amount');
+
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 1) {
+
+					return true;
+				
+				}
+
+				return false;
+		
+			},
             changeNumberContents() {
+
 				this.pagination.current_page = 1;
 				// this.perPage = expectedContentsPerPage;
 
@@ -860,12 +1537,35 @@
 				else {
 					this.searchData();
 				}
+				
     		},
     		setContentPagination(response) {
 
     			this.contentsToShow = response.data.data;
 				this.pagination = response.data;
 
+			},
+			nextPage() {
+
+				if (this.step > 1) {
+					return;
+				}
+
+				this.step++;
+
+			},
+			resetTotalRent() {
+				
+				this.validateFormInput('discount');
+				
+				if (! this.errors.discount) {
+
+					this.singlePaymentData.total_rent = this.dealTotalCurrentRent - (this.dealTotalCurrentRent * this.singlePaymentData.discount / 100);
+
+					this.singlePaymentData.net_payable = this.singlePaymentData.previous_due + this.singlePaymentData.total_rent;
+
+				}
+				
 			},
 			changeNamesOrder() {
 
@@ -967,8 +1667,63 @@
 				);
 
 			},
+			validateFormInput(formInputName) {
+
+				this.submitForm = false;
+
+				switch(formInputName) {
+
+					case 'paid_amount' : 
+						
+						if(! this.singlePaymentData.paid_amount || this.singlePaymentData.paid_amount < 1){
+							
+							this.errors.paid_amount = 'Paid amount is required';
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'paid_amount');
+
+						}
+
+						break;
+
+					case 'discount' : 
+						
+						if(this.singlePaymentData.discount && (this.singlePaymentData.discount < 0 || this.singlePaymentData.discount > 100)){
+
+							this.errors.discount = 'Discount should be between 0 to 100';
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'discount');
+
+						}
+
+						break;
+
+				}
+
+			}
             
 		}
   	}
 
 </script>
+
+<style scoped>
+	@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
+	.fade-enter-active {
+  		transition: all .3s ease;
+	}
+	.fade-leave-active {
+  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	}
+	.fade-enter, .fade-leave-to {
+  		transform: translateX(10px);
+  		opacity: 0;
+	}
+</style>

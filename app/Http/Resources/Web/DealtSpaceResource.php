@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources\Web;
 
+use App\Models\WarehouseContainerStatus;
+use App\Models\WarehouseContainerShelfStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DealPaymentDetailResource extends JsonResource
+class DealtSpaceResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +18,10 @@ class DealPaymentDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'issued_from' => $this->issued_from,
-            'expired_at' => $this->expired_at,
-            'rent' => $this->rent,
-            'dealt_space_id' => $this->dealt_space_id,
-            'dealt_space' => new DealtSpaceResource($this->space->space),
+            'name' => $this->name,
+            'type' => get_class($this->resource),
+            // 'engaged' => $this->engaged,
+            // 'warehouse_container_id' => $this->warehouse_container_id,
         ];
     }
 }

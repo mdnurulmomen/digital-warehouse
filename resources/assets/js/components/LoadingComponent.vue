@@ -1,9 +1,9 @@
 <template>
 	<div class="row justify-content-center">
-		<div class="card p-5">
+		<div class="card p-1">
 			<div class="card-block">
 			  	<div class="overlay dark">
-			    	<i class="fas fa-3x fa-sync-alt fa-spin"></i>
+			    	<i class="fa fa-cog fa-spin fa-5x"></i>
 			  	</div>
 			</div>
 		</div>

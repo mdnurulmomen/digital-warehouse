@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\RentPeriod;
 use App\Models\MerchantDeal;
 use Illuminate\Http\Request;
 use App\Models\MerchantPayment;
+use App\Models\MerchantPaymentDetail;
 use App\Models\WarehouseContainerStatus;
 use App\Http\Resources\Web\DealCollection;
-use App\Models\RentPeriod;
 use App\Models\WarehouseContainerShelfStatus;
+use App\Http\Resources\Web\DealPaymentCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
 
 class DealController extends Controller
@@ -20,7 +22,13 @@ class DealController extends Controller
         $this->middleware("permission:view-merchant-deal-index")->only(['showMerchantAllDeals', 'searchMerchantAllDeals']);
         $this->middleware("permission:create-merchant-deal")->only('storeMerchantDeal');
         $this->middleware("permission:update-merchant-deal")->only('updateMerchantDeal');
-        $this->middleware("permission:delete-merchant-deal")->only('deleteMerchantDeal');      
+        $this->middleware("permission:delete-merchant-deal")->only('deleteMerchantDeal');
+
+        // Deal-Payment
+        $this->middleware("permission:view-merchant-payment-index")->only(['showDealAllPayments', 'searchDealAllPayments']);
+        $this->middleware("permission:create-merchant-payment")->only('storeDealNewPayment');
+        $this->middleware("permission:update-merchant-payment")->only('updateDealPayment');
+        $this->middleware("permission:delete-merchant-payment")->only('deleteDealPayment');       
     }
 
     // Product-Stock
@@ -354,6 +362,156 @@ class DealController extends Controller
         ], 200);
     }
 
+    public function showDealAllPayments($deal, $perPage = false)
+    {
+        if ($perPage) {
+            
+            return new DealPaymentCollection(
+                MerchantPayment::with(['rents'])->whereHas('deal', function ($query) use ($deal) {
+                    $query->where('merchant_deal_id', $deal);
+                })->paginate($perPage)
+            );
+
+        }
+    }
+
+    public function storeDealNewPayment(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_deal_id' => 'required|exists:merchant_deals,id',
+            'current_due' => 'required|numeric',
+            'discount' => 'required|numeric|between:0,100',
+            'net_payable' => 'required|numeric',
+            'paid_amount' => 'required|numeric',
+            'previous_due' => 'required|numeric',
+            'total_rent' => 'required|numeric'
+        ],
+
+        [
+            // 'payments.*.current_due' => 'Stock quantity is required !',
+            'merchant_deal_id.*' => 'Payment deal is required',
+            'discount' => 'Discount rate should be between 0 to 100',
+            'net_payable' => 'Net payable is invalid',
+            'paid_amount' => 'Paid amount is invalid',
+            'previous_due' => 'Previous due is invalid',
+            'total_rent' => 'Total rent is invalid',
+        ]);
+
+        $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
+
+        $dealRecentPayment = $paymentDeal->payments()->has('rents')->latest('id')->first();
+
+        $dealNewPayment = $paymentDeal->payments()->create([
+            'invoice_no' => 'inv-'.$paymentDeal->id.'-#-'.($paymentDeal->payments->count() + 1),
+            'previous_due' => $dealRecentPayment->current_due,
+            'total_rent' => $request->total_rent,
+            'discount' => $request->discount,
+            'net_payable' => $request->net_payable,
+            'paid_amount' => $request->paid_amount,
+            'current_due' => ($request->net_payable - $request->paid_amount),
+        ]);
+
+        foreach ($paymentDeal->spaces as $dealSpaceIndex => $dealSpace) {
+            
+            $rentPeriod = RentPeriod::find($dealSpace->rent->rent_period_id);
+            $dealRecentPaymentExpectedRent = $dealRecentPayment->rents()->where('dealt_space_id', $dealSpace->id)->first();
+
+            $payementNewRent = $dealNewPayment->rents()->create([
+                'issued_from' => $dealRecentPaymentExpectedRent->expired_at,
+                'expired_at' => $this->getRentExpiredDate(NULL, $rentPeriod->name, $dealRecentPaymentExpectedRent),
+                'rent' => $dealSpace->rent->storing_price,
+                'dealt_space_id' => $dealSpace->id
+            ]);
+
+        }
+
+        return $this->showDealAllPayments($request->merchant_deal_id, $perPage);
+    }
+
+    public function updateDealPayment(Request $request, $payment, $perPage)
+    {
+        $request->validate([
+            'merchant_deal_id' => 'required|exists:merchant_deals,id',
+            'current_due' => 'required|numeric',
+            'discount' => 'required|numeric|between:0,100',
+            'net_payable' => 'required|numeric',
+            'paid_amount' => 'required|numeric',
+            'previous_due' => 'required|numeric',
+            'total_rent' => 'required|numeric'
+        ],
+
+        [
+            // 'payments.*.current_due' => 'Stock quantity is required !',
+            'merchant_deal_id.*' => 'Payment deal is required',
+            'discount' => 'Discount rate should be between 0 to 100',
+            'net_payable' => 'Net payable is invalid',
+            'paid_amount' => 'Paid amount is invalid',
+            'previous_due' => 'Previous due is invalid',
+            'total_rent' => 'Total rent is invalid',
+        ]);
+
+        $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
+        $paymentToUpdate = $paymentDeal->payments()->where('id', $payment)->firstOrFail();
+
+        if (($paymentToUpdate->discount < $request->discount) || ($paymentToUpdate->net_payable > $request->net_payable) || ($paymentToUpdate->paid_amount < $request->paid_amount)) {
+            
+            $this->decreaseNextPaymentDues($paymentToUpdate->current_due - ($request->net_payable - $request->paid_amount), $paymentToUpdate->paid_at);
+
+        }
+        else if (($paymentToUpdate->discount > $request->discount) || ($paymentToUpdate->net_payable < $request->net_payable) || ($paymentToUpdate->paid_amount > $request->paid_amount)) {
+            
+            $this->increaseNextPaymentDues(($request->net_payable - $request->paid_amount) - $paymentToUpdate->current_due, $paymentToUpdate->paid_at);
+
+        }
+
+        $dealNewPayment = $paymentToUpdate->update([
+            'total_rent' => $request->total_rent,
+            'discount' => $request->discount,
+            'net_payable' => $request->net_payable,
+            'paid_amount' => $request->paid_amount,
+            'current_due' => ($request->net_payable - $request->paid_amount),
+        ]);
+
+        return $this->showDealAllPayments($request->merchant_deal_id, $perPage);
+    }
+
+    public function deleteDealPayment($payment, $perPage)
+    {
+        $dealPaymentToDelete = MerchantPayment::findOrFail($payment);
+        $paymentDeal = $dealPaymentToDelete->deal;
+
+        $this->decreaseNextPaymentDues($dealPaymentToDelete->current_due, $dealPaymentToDelete->paid_at);
+        $dealPaymentToDelete->rents()->delete();
+        $dealPaymentToDelete->delete();
+
+        return $this->showDealAllPayments($paymentDeal->id, $perPage);
+    }
+
+    public function searchDealAllPayments($deal, $search, $perPage)
+    {
+        $query = MerchantPayment::with(['rents'])->whereHas('deal', function ($query1) use ($deal) {
+            $query1->where('merchant_deal_id', $deal);
+        })
+        ->where(function($query2) use ($search) {
+            $query2->where('invoice_no', 'like', "%$search%")
+            ->orWhere('previous_due', 'like', "%$search%")
+            ->orWhere('total_rent', 'like', "%$search%")
+            ->orWhere('discount', 'like', "%$search%")
+            ->orWhere('net_payable', 'like', "%$search%")
+            ->orWhere('paid_amount', 'like', "%$search%")
+            ->orWhere('current_due', 'like', "%$search%")
+            ->orWhereHas('rents', function ($query3) use ($search) {
+                $query3->where('issued_from', 'like', "%$search%")
+                ->orWhere('expired_at', 'like', "%$search%")
+                ->orWhere('rent', 'like', "%$search%");
+            });
+        });
+
+        return response()->json([
+            'all' => new DealPaymentCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
     protected function retrieveDealtSpaces(MerchantDeal $deal, MerchantPayment $payment)
     {
         // containers
@@ -649,25 +807,57 @@ class DealController extends Controller
 
     }
 
-    protected function getRentExpiredDate(MerchantDeal $deal, $rentName) 
+    protected function decreaseNextPaymentDues($dueAmount, $date)
+    {
+        $nextPaymentsToUpdate = MerchantPayment::where('paid_at', '>', $date)->get();
+
+        foreach ($nextPaymentsToUpdate as $merchantPaymentKey => $nextPaymentToUpdate) {
+            
+            $nextPaymentToUpdate->update([
+                'previous_due' => $nextPaymentToUpdate->previous_due - $dueAmount,
+                'net_payable' => $nextPaymentToUpdate->net_payable - $dueAmount,
+                'current_due' => $nextPaymentToUpdate->current_due - $dueAmount,
+            ]);
+
+        }
+
+    }
+
+    protected function increaseNextPaymentDues($dueAmount, $date)
+    {
+        $nextPaymentsToUpdate = MerchantPayment::where('paid_at', '>', $date)->get();
+
+        foreach ($nextPaymentsToUpdate as $merchantPaymentKey => $nextPaymentToUpdate) {
+            
+            $nextPaymentToUpdate->update([
+                'previous_due' => $nextPaymentToUpdate->previous_due + $dueAmount,
+                'net_payable' => $nextPaymentToUpdate->net_payable + $dueAmount,
+                'current_due' => $nextPaymentToUpdate->current_due + $dueAmount,
+            ]);
+
+        }
+
+    }
+
+    protected function getRentExpiredDate(MerchantDeal $deal = NULL, $rentName, MerchantPaymentDetail $paymentRent = NULL) 
     {   
-        $dealIssueDate = Carbon::parse($deal->created_at);
+        $dateToStart = $deal ? Carbon::parse($deal->created_at) : Carbon::parse($paymentRent->expired_at);
 
         if (strpos($rentName,"daily") !== false) {
             
-            return $dealIssueDate->addDay();
+            return $dateToStart->addDay();
         }
         else if (strpos($rentName,"week") !== false) {
             
-            return $dealIssueDate->addDays(7);
+            return $dateToStart->addDays(7);
         }
         else if (strpos($rentName,"month") !== false) {
             
-            return $dealIssueDate->addDays(30);
+            return $dateToStart->addDays(30);
         }
         else if (strpos($rentName,"year") !== false) {
             
-            return $dealIssueDate->addYear();
+            return $dateToStart->addYear();
         }
         else {
             return now();

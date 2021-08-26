@@ -14,7 +14,7 @@ class MerchantPayment extends Model
     	return $this->hasMany(MerchantPaymentDetail::class, 'merchant_payment_id', 'id');
     }
 
-    public function merchantDeal()
+    public function deal()
     {
         return $this->belongsTo(MerchantDeal::class, 'merchant_deal_id', 'id');
     }

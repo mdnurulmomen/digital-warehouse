@@ -42,6 +42,7 @@ class PermissionSeeder extends Seeder
                 'Merchant-Deal',
                 'Delivery-Company',
                 'Merchant-Product',
+                'Merchant-Payment',
             ];
 
             /*

@@ -190,6 +190,13 @@ Route::name('admin.')->group(function () {
 		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals');
 		Route::get('/api/search-merchant-deals/{merchant}/{search}/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
 
+		// deal-payments
+		Route::get('/api/deal-payments/{deal}/{perPage?}', 'DealController@showDealAllPayments')->name('deal-payments');
+		Route::post('/deal-payments/{perPage}', 'DealController@storeDealNewPayment')->name('deal-payments');	
+		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments');	
+		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments');
+		Route::get('/api/search-deal-payments/{deal}/{search}/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
 

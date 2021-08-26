@@ -441,6 +441,7 @@ class WarehouseController extends Controller
             ];
 
         }
+        // containers of all active warehouses
         else {
 
             return WarehouseEmptySpaceResource::collection(Warehouse::where('active', true)->get());

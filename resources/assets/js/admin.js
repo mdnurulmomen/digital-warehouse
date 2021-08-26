@@ -78,6 +78,7 @@ import ProductMerchantIndex from './views/ProductMerchantIndex'
 import RoleIndex from './views/RoleIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 import MerchantDealIndex from './views/MerchantDealIndex'
+import DealPaymentIndex from './views/DealPaymentIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
 
 /**
@@ -317,6 +318,24 @@ const router = new VueRouter({
                 }
                 else {
                     next('/merchants');
+                }
+            }
+        },
+        {
+            path: '/deal-payments/:merchantName/:dealDate',
+            name: 'deal-payments',
+            component: DealPaymentIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-payment-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.merchantName && to.params.dealDate && to.params.deal) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next({ name : 'merchant-deals', params: { merchantName: to.params.merchantName }});
                 }
             }
         },
