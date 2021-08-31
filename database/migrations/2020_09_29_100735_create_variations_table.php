@@ -17,6 +17,7 @@ class CreateVariationsTable extends Migration
             $table->smallIncrements('id');
             $table->string('name', 100);    // small, medium, long in length type,
             $table->unsignedSmallInteger('variation_type_id');      // length, color
+            $table->unsignedSmallInteger('variation_parent_id')->nullable();      // length, color
             $table->softDeletes();
         });
     }

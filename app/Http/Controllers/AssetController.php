@@ -467,12 +467,14 @@ class AssetController extends Controller
         $request->validate([
             'name' => 'required|string|max:100|unique:variations,name',
             'variation_type_id' => 'required|numeric|exists:variation_types,id',
+            'variation_parent_id' => 'numeric|exists:variations,id',
         ]);
 
         $newAsset = new Variation();
 
         $newAsset->name = strtolower($request->name);
         $newAsset->variation_type_id = $request->variation_type_id;
+        $newAsset->variation_parent_id = $request->variation_parent_id;
 
         $newAsset->save();
 
@@ -486,10 +488,12 @@ class AssetController extends Controller
         $request->validate([
             'name' => 'required|string|max:100|unique:variations,name,'.$assetToUpdate->id,
             'variation_type_id' => 'required|numeric|exists:variation_types,id',
+            'variation_parent_id' => 'numeric|exists:variations,id',
         ]);
 
         $assetToUpdate->name = strtolower($request->name);
         $assetToUpdate->variation_type_id = $request->variation_type_id;
+        $assetToUpdate->variation_parent_id = $request->variation_parent_id;
 
         $assetToUpdate->save();
 

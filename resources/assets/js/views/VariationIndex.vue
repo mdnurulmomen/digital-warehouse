@@ -112,24 +112,6 @@
 						<div class="modal-body">
 							<div class="form-row">
 								<div class="form-group col-md-12">
-									<label for="inputFirstName">Name</label>
-									<input type="text" 
-										class="form-control" 
-										v-model="singleAssetData.name" 
-										placeholder="Name should be unique" 
-										:class="!errors.asset.name  ? 'is-valid' : 'is-invalid'" 
-										@change="validateFormInput('name')" 
-										required="true" 
-									>
-
-									<div class="invalid-feedback">
-							        	{{ errors.asset.name }}
-							  		</div>
-								</div>
-							</div>
-							
-							<div class="form-row">
-								<div class="form-group col-md-12">
 									<label for="inputUsername">Variation Type</label>
 									<multiselect 
                               			v-model="singleAssetData.variation_type"
@@ -155,6 +137,43 @@
 									>
 							        	{{ errors.asset.variation_type }}
 							  		</div>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group col-md-12">
+									<label for="inputFirstName">Name</label>
+									<input type="text" 
+										class="form-control" 
+										v-model="singleAssetData.name" 
+										placeholder="Name should be unique" 
+										:class="!errors.asset.name  ? 'is-valid' : 'is-invalid'" 
+										@change="validateFormInput('name')" 
+										required="true" 
+									>
+
+									<div class="invalid-feedback">
+							        	{{ errors.asset.name }}
+							  		</div>
+								</div>
+							</div>
+
+							<div class="form-row" v-if="allFetchedContents.hasOwnProperty('current') && allFetchedContents.current.hasOwnProperty('data') && allFetchedContents.current.data.length">
+								<div class="form-group col-md-12">
+									<label for="inputUsername">Parent Variation</label>
+									<multiselect 
+                              			v-model="singleAssetData.variation_parent"
+                              			placeholder="Parent Variation" 
+                                  		label="name" 
+                                  		track-by="id" 
+                                  		:options="allFetchedContents.current.data" 
+                                  		:custom-label="objectNameWithCapitalized" 
+                                  		:required="true" 
+                                  		class="form-control p-0 is-valid" 
+                                  		selectLabel = "Press/Click"
+                                  		deselect-label="Press/Click to"
+                              		>
+                                	</multiselect>
 								</div>
 							</div>
 						</div>
@@ -225,6 +244,15 @@
 							</div>
 							<div class="form-group col-md-6 text-left">
 								{{ singleAssetData.name | capitalize }}
+							</div>
+						</div>
+
+						<div class="form-row"> 
+						    <div class="form-group col-md-6 text-right">
+								<label class="font-weight-bold">Parent Variation: </label>
+							</div>
+							<div class="form-group col-md-6 text-left">
+								{{ singleAssetData.variation_parent ? $options.filters.capitalize(singleAssetData.variation_parent.name) : 'NA' }}
 							</div>
 						</div>
 
@@ -330,6 +358,11 @@
 			'singleAssetData.variation_type': function (object) {
 				if (object && Object.keys(object).length > 0) {
 					this.singleAssetData.variation_type_id = object.id;
+				}
+			},
+			'singleAssetData.variation_parent': function (object) {
+				if (object && Object.keys(object).length > 0) {
+					this.singleAssetData.variation_parent_id = object.id;
 				}
 			},
 		},
