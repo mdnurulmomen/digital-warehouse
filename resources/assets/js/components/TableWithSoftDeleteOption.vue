@@ -72,7 +72,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-secondary btn-icon" 
+									class="btn btn-grd-warning btn-icon" 
 									v-show="! content.deleted_at" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"

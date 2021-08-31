@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'All merchant deals'" 
-			:message="'All our deals with all merchants'"
+			:title="merchant.first_name + ' ' + merchant.last_name + ' deals'" 
+			:message="'All our deals with ' + merchant.first_name + ' ' + merchant.last_name"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-merchant-deal-index') || userHasPermissionTo('create-merchant-deal')"
 											  		:query="query" 
-											  		:caller-page="'deals'" 
+											  		:caller-page="merchant.first_name + ' ' + merchant.last_name + ' deals'" 
 											  		:required-permission="'merchant-deal'" 
 											  		:disable-add-button="allAvailableWarehouseAndSpaces.length==0 ? true : false" 									  
 											  		@showContentCreateForm="showDealCreateForm" 

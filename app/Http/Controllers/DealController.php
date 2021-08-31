@@ -317,6 +317,11 @@ class DealController extends Controller
            return response()->json(['errors'=>["undeletableDeal" => "Deal has multiple payments"]], 422);
             
         }
+        else if ($dealToDelete->spaces()->where('engaged', '!=', 0.0)->exists()) {
+            
+           return response()->json(['errors'=>["undeletableDeal" => "Dealt space is engaged"]], 422);
+            
+        }
         else {
             
             $dealRecentPayment = $dealToDelete->payments()->latest('id')->first();
