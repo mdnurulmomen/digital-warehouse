@@ -104,7 +104,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-dark btn-icon"  
+																				class="btn btn-grd-success btn-icon"  
 																				@click="goProductMerchants(content)" 
 																				v-if="userHasPermissionTo('view-merchant-product-index')"
 																			>

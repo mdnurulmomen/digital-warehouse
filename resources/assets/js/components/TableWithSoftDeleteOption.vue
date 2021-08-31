@@ -57,7 +57,8 @@
 									class="btn btn-grd-danger btn-icon" 
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentDeleteForm', content)" 
-									v-if="userHasPermissionTo('delete-' + requiredPermission)"
+									v-if="userHasPermissionTo('delete-' + requiredPermission)" 
+									:disabled="$route.name=='warehouses' && immuteableWarehouse(content)"
 							>
 								<i class="fa fa-trash"></i>
 							</button>
@@ -268,6 +269,19 @@
 					return this.$options.filters.capitalize(object.code);
 				}
 
+			},
+			immuteableWarehouse(warehouse) {
+
+				if (warehouse.containers.length) {
+
+					return warehouse.containers.some(
+						warehouseContainer => warehouseContainer.engaged_quantity != 0 || warehouseContainer.partially_engaged != 0
+					);
+
+				}
+
+				return false;
+				
 			},
 			changeContentsOrder(columnName) {
 

@@ -26,7 +26,7 @@
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-merchant-deal-index') || userHasPermissionTo('create-merchant-deal')"
 											  		:query="query" 
-											  		:caller-page="merchant.first_name + ' ' + merchant.last_name + ' deals'" 
+											  		:caller-page="'deals'" 
 											  		:required-permission="'merchant-deal'" 
 											  		:disable-add-button="allAvailableWarehouseAndSpaces.length==0 ? true : false" 									  
 											  		@showContentCreateForm="showDealCreateForm" 

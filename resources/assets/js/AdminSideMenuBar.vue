@@ -162,7 +162,7 @@
 								</router-link>
 							</li>
 
-							<li :class="currentRouteName=='merchants' ? 'active' : ''" 
+							<li :class="['merchants', 'merchant-deals', 'deal-payments'].includes(currentRouteName) ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-merchant-index')"
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
