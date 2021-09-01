@@ -31,9 +31,9 @@ class ProductController extends Controller
         $this->middleware("permission:delete-product-category")->only(['deleteProductCategory', 'restoreProductCategory']);
 
         // Product
-        $this->middleware("permission:view-product-index")->only(['showAllProducts', 'searchAllProducts']);
-        $this->middleware("permission:create-product")->only('storeNewProduct');
-        $this->middleware("permission:update-product")->only('updateProduct');
+        $this->middleware("permission:view-product-index")->only(['showAllProducts', 'searchAllProducts', 'showCategoryAllProducts', 'searchCategoryAllProducts']);
+        $this->middleware("permission:create-product")->only(['storeNewProduct', 'storeCategoryNewProduct']);
+        $this->middleware("permission:update-product")->only(['updateProduct', 'updateCategoryProduct']);
         
         // Product-Stock
         $this->middleware("permission:view-product-stock-index")->only(['showProductAllStocks', 'searchProductAllStocks']);
@@ -271,6 +271,121 @@ class ProductController extends Controller
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
                         });
+
+        return response()->json([
+            'all' => new ProductCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
+    // Category-Products
+    public function showCategoryAllProducts($category, $perPage=false)
+    {
+        if ($perPage) {
+
+            return new ProductCollection(Product::where('product_category_id', $category)->paginate($perPage));
+
+        }
+    }
+
+    public function storeCategoryNewProduct(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            // 'description' => 'nullable|string|max:65535',
+            // 'sku' => 'nullable|string|max:100|unique:products,sku',
+            // 'price' => 'numeric|min:0', // min 0 due to bulk products
+            'quantity_type' => 'nullable|string|max:100',
+            'has_serials' => 'boolean',
+            'has_variations' => 'boolean',
+            'product_category_id' => 'numeric|exists:product_categories,id',
+            // 'merchant_id' => 'required|numeric|exists:merchants,id',
+            'variations' => 'required_if:has_variations,1|array',
+            'variations.*.variation' => 'required_if:has_variations,1',
+            'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
+            // 'variations.*.price' => 'required_if:has_variations,1',
+        ]);
+
+        $newProduct = new Product();
+
+        $newProduct->name = strtolower($request->name);
+        // $newProduct->description = strtolower($request->description);
+        // $newProduct->sku = $request->sku ?? $this->generateProductSKU($request);
+        // $newProduct->price = $request->price ?? 0;
+        $newProduct->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
+        $newProduct->has_serials = $request->has_serials ?? false;
+        $newProduct->has_variations = $request->has_variations ?? false;
+        $newProduct->product_category_id = $request->product_category_id;
+        // $newProduct->merchant_id = $request->merchant_id;
+
+        $newProduct->save();
+
+        $newProduct->product_preview = $request->preview;
+        $newProduct->save();
+
+        if ($newProduct->has_variations && !empty($request->variations)) {
+
+            $newProduct->product_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        return $this->showCategoryAllProducts($newProduct->product_category_id, $perPage);
+    }
+
+    public function updateCategoryProduct(Request $request, $product, $perPage)
+    {
+        $productToUpdate = Product::findOrFail($product);
+
+        $request->validate([
+            'name' => 'required|string|max:100',
+            // 'description' => 'nullable|string|max:65535',
+            // 'sku' => 'nullable|string|max:100|unique:products,sku,'.$productToUpdate->id,
+            // 'price' => 'required|numeric|min:0', // min 0 due to bulk products
+            'quantity_type' => 'nullable|string|max:100',
+            'has_serials' => 'boolean',
+            'has_variations' => 'boolean',
+            'product_category_id' => 'numeric|exists:product_categories,id',
+            // 'merchant_id' => 'required|numeric|exists:merchants,id',
+            'variations' => 'required_if:has_variations,1|array',
+            'variations.*.variation' => 'required_if:has_variations,1',
+            'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
+            // 'variations.*.price' => 'required_if:has_variations,1',
+        ]);
+
+        $productToUpdate->name = strtolower($request->name);
+        $productToUpdate->product_preview = $request->preview;
+        // $productToUpdate->description = strtolower($request->description);
+        // $productToUpdate->sku = $request->sku ?? $this->generateProductSKU($request);
+        // $productToUpdate->price = $request->price ?? 0;
+        $productToUpdate->quantity_type = strtolower($request->quantity_type) ?? ApplicationSetting::first()->default_measure_unit ?? 'kg';
+        
+        if (! $productToUpdate->product_immutability) {
+            
+            $productToUpdate->has_serials = $request->has_serials ?? false;
+            $productToUpdate->has_variations = $request->has_variations ?? false;
+            
+        }
+        
+        $productToUpdate->product_category_id = $request->product_category_id ?? NULL;
+        // $productToUpdate->merchant_id = $request->merchant_id;
+
+        $productToUpdate->save();
+
+        if ($productToUpdate->has_variations && !empty($request->variations)) {
+
+            $productToUpdate->product_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        return $this->showCategoryAllProducts($productToUpdate->product_category_id, $perPage);
+    }
+
+    public function searchCategoryAllProducts($category, $search, $perPage)
+    {
+        $query = Product::where('product_category_id', $category)
+        ->where(function($query2) use ($search) {
+            $query2->where('name', 'like', "%$search%")
+            ->orWhere('quantity_type', 'like', "%$search%");
+        });
 
         return response()->json([
             'all' => new ProductCollection($query->paginate($perPage)),  

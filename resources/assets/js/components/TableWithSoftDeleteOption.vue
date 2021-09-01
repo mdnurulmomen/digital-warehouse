@@ -75,11 +75,18 @@
 
 							<button type="button" 
 									class="btn btn-grd-warning btn-icon" 
-									v-show="! content.deleted_at" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
 							>
 								<i aria-hidden="true" class="fa fa-handshake-o"></i>
+							</button>
+
+							<button type="button" 
+									class="btn btn-grd-warning btn-icon" 
+									@click="$emit('goCategoryProducts', content)" 
+									v-if="$route.name=='product-categories' && userHasPermissionTo('view-product-index')"
+							>
+								<i class="fa fa-product-hunt"></i>
 							</button>
 						</td>
 					</tr>

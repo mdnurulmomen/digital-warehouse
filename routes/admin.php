@@ -127,6 +127,12 @@ Route::name('admin.')->group(function () {
 		Route::patch('/product-categories/{asset}/{perPage}', 'ProductController@restoreProductCategory')->name('product-categories');
 		Route::get('/api/search-product-categories/{search}/{perPage}', 'ProductController@searchProductAllCategories')->name('search-product-categories');
 
+		// category-products
+		Route::get('/api/category-products/{category}/{perPage?}', 'ProductController@showCategoryAllProducts')->name('category-products');
+		Route::post('/category-products/{perPage}', 'ProductController@storeCategoryNewProduct')->name('category-products');	
+		Route::put('/category-products/{product}/{perPage}', 'ProductController@updateCategoryProduct')->name('category-products');
+		Route::get('/api/search-category-products/{category}/{search}/{perPage?}', 'ProductController@searchCategoryAllProducts')->name('search-category-products');
+
 		// product
 		Route::get('/api/products/{perPage}', 'ProductController@showAllProducts')->name('products');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	

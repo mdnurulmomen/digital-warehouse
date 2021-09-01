@@ -61,6 +61,7 @@
 										  			@changeNumberContents="changeNumberContents($event)" 
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
+										  			@goCategoryProducts="goCategoryProducts($event)" 
 										  		>	
 										  		</table-with-soft-delete-option>
 											</div>
@@ -583,6 +584,10 @@
 						this.fetchProductAllCategories();
 					});
 
+			},
+			goCategoryProducts(productCategory) {
+				// console.log(object);
+				this.$router.push({ name: 'category-products', params: { category: productCategory, categoryName: productCategory.name }});
 			},
             changeNumberContents(expectedContentsPerPage) {
 				this.pagination.current_page = 1;

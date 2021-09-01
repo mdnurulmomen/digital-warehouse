@@ -71,6 +71,7 @@ import VariationTypeIndex from './views/VariationTypeIndex'
 import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
 import ProductIndex from './views/ProductIndex'
+import CategoryProductIndex from './views/CategoryProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
 // import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
@@ -227,6 +228,24 @@ const router = new VueRouter({
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-product-category-index' 
+            }
+        },
+        {
+            path: '/product-categories/:categoryName',
+            name: 'category-products',
+            component: CategoryProductIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.category && to.params.categoryName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/product-categories');
+                }
             }
         },
         {
