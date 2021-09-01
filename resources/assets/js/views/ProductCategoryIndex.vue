@@ -587,7 +587,7 @@
 			},
 			goCategoryProducts(productCategory) {
 				// console.log(object);
-				this.$router.push({ name: 'category-products', params: { category: productCategory, categoryName: productCategory.name }});
+				this.$router.push({ name: 'category-products', params: { category: productCategory, categoryName: productCategory.name.replace(/ /g,"-") }});
 			},
             changeNumberContents(expectedContentsPerPage) {
 				this.pagination.current_page = 1;

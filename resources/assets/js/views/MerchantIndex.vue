@@ -230,7 +230,7 @@
 			goMerchantDeals(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'merchant-deals', params: { merchant: object, merchantName: object.user_name }});
+				this.$router.push({ name: 'merchant-deals', params: { merchant: object, merchantName: object.user_name.replace(/ /g,"-") }});
 
 			},
 			showContentDetails(object) {	

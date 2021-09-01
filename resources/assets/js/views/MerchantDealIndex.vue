@@ -2282,7 +2282,7 @@
 			goToDealPayments(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'deal-payments', params: { merchantName:this.merchant.user_name, dealDate:object.created_at.replace(/\s+/g, '-'), deal:object }});
+				this.$router.push({ name: 'deal-payments', params: { merchantName:this.merchant.user_name.replace(/ /g,"-"), dealDate:object.created_at.replace(/\s+/g, '-'), deal:object }});
 
 			},
 			createMerchantDeal() {

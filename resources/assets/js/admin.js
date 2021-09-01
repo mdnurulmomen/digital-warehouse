@@ -287,7 +287,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-product-stock-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.product && to.params.productMerchant) {
+                if (to.params.product && to.params.merchantName && to.params.productMerchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -332,7 +332,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-deal-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchant) {
+                if (to.params.merchant && to.params.merchantName) {
                     next(); // <-- everything good, proceed
                 }
                 else {

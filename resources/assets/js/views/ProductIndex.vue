@@ -1668,7 +1668,7 @@
 			goProductMerchants(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-merchants', params: { product: object, productName: object.name }});
+				this.$router.push({ name: 'product-merchants', params: { product: object, productName: object.name.replace(/ /g,"-") }});
 
 			},
 			showSelectedTabProducts() {
