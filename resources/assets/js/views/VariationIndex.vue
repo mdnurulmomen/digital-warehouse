@@ -49,8 +49,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
+										  			:column-names="['name', 'type', 'parent']" 
+										  			:column-values-to-show="['name', 'variation_type_name', 'variation_parent_name']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission = "'asset'" 
@@ -158,7 +158,7 @@
 								</div>
 							</div>
 
-							<div class="form-row" v-if="allFetchedContents.hasOwnProperty('current') && allFetchedContents.current.hasOwnProperty('data') && allFetchedContents.current.data.length">
+							<div class="form-row" v-if="singleAssetData.variation_type && singleAssetData.variation_type.hasOwnProperty('variations') && singleAssetData.variation_type.variations.length">
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Parent Variation</label>
 									<multiselect 
@@ -166,7 +166,7 @@
                               			placeholder="Parent Variation" 
                                   		label="name" 
                                   		track-by="id" 
-                                  		:options="allFetchedContents.current.data" 
+                                  		:options="singleAssetData.variation_type.variations" 
                                   		:custom-label="objectNameWithCapitalized" 
                                   		:required="true" 
                                   		class="form-control p-0 is-valid" 

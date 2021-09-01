@@ -8,6 +8,7 @@ use App\Models\RentPeriod;
 use App\Models\StorageType;
 use Illuminate\Http\Request;
 use App\Models\VariationType;
+use Illuminate\Validation\Rule;
 use App\Models\PackagingPackage;
 use Illuminate\Support\Facades\Auth;
 
@@ -374,7 +375,11 @@ class AssetController extends Controller
 
         }
 
-        return VariationType::with('variations')->get();
+        return VariationType::with(['variations' => function ($query) {
+            $query->whereNull('variation_parent_id');
+        }, 'variations.variationChilds'])->get();
+        
+        // return VariationType::with('variations')->get();
     }
 
     public function storeVariationType(Request $request, $perPage)
@@ -452,8 +457,8 @@ class AssetController extends Controller
             
             return response()->json([
 
-                'current' => Variation::paginate($perPage),
-                'trashed' => Variation::onlyTrashed()->paginate($perPage),
+                'current' => Variation::with(['variationType.variations', 'variationParent'])->paginate($perPage),
+                'trashed' => Variation::with(['variationType.variations', 'variationParent'])->onlyTrashed()->paginate($perPage),
 
             ], 200);
 
@@ -465,9 +470,17 @@ class AssetController extends Controller
     public function storeNewVariation(Request $request, $perPage)
     {
         $request->validate([
-            'name' => 'required|string|max:100|unique:variations,name',
+            'name'  => [
+                'required', 'string', 'max:100',
+                Rule::unique('variations')->where(function ($query) use ($request) {
+                    return $query
+                        ->whereName($request->name)
+                        ->where('variation_type_id', $request->variation_type_id)
+                        ->where('variation_parent_id', $request->variation_parent_id);
+                }),
+            ],
             'variation_type_id' => 'required|numeric|exists:variation_types,id',
-            'variation_parent_id' => 'numeric|exists:variations,id',
+            'variation_parent_id' => 'nullable|numeric|exists:variations,id',
         ]);
 
         $newAsset = new Variation();
@@ -486,9 +499,18 @@ class AssetController extends Controller
         $assetToUpdate = Variation::findOrFail($asset);
 
         $request->validate([
-            'name' => 'required|string|max:100|unique:variations,name,'.$assetToUpdate->id,
+            'name'  => [
+                'required', 'string', 'max:100', 
+                Rule::unique('variations')->where(function ($query) use ($request, $assetToUpdate) {
+                    return $query
+                        ->whereName($request->name)
+                        ->where('variation_type_id', $request->variation_type_id)
+                        ->where('variation_parent_id', $request->variation_parent_id)
+                        ->whereNotIn('id', [$assetToUpdate->id]);
+                }),
+            ],
             'variation_type_id' => 'required|numeric|exists:variation_types,id',
-            'variation_parent_id' => 'numeric|exists:variations,id',
+            'variation_parent_id' => 'nullable|numeric|exists:variations,id',
         ]);
 
         $assetToUpdate->name = strtolower($request->name);
@@ -522,7 +544,7 @@ class AssetController extends Controller
     {
         $columnsToSearch = ['name'];
 
-        $query = Variation::withTrashed();
+        $query = Variation::with(['variationType.variations', 'variationParent'])->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

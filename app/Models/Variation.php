@@ -12,7 +12,7 @@ class Variation extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    protected $with = ['variationType', 'variationParent'];
+    // protected $with = ['variationType'];
 
     public function variationType()
     {
@@ -24,7 +24,22 @@ class Variation extends Model
     	return $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
     }
 
-    public function childs()
+    /*
+    public function variationGrandParent()
+    {
+        $currentAncestor = $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+
+        while ($currentAncestor->variation_parent_id !== NULL) {
+            
+            $currentAncestor = $currentAncestor->variationParent;
+
+        }
+
+        return $currentAncestor;
+    }
+    */
+
+    public function variationChilds()
     {
     	return $this->hasMany(Variation::class, 'variation_parent_id', 'id');
     }

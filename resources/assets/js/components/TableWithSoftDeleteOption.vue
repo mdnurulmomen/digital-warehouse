@@ -39,7 +39,8 @@
 							<button type="button" 
 									class="btn btn-grd-info btn-icon"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-if="userHasPermissionTo('view-' + requiredPermission + '-index')"
+								 	v-if="userHasPermissionTo('view-' + requiredPermission + '-index')" 
+								 	v-show="$route.name!='variations'"
 							>
 								<i class="fa fa-eye"></i>
 							</button>
@@ -261,6 +262,12 @@
 				}
 				else if (columnValue.match(/products_count/gi)) {
 					return object.products_count;
+				}
+				else if (columnValue.match(/variation_type_name/gi)) {
+					return object.variation_type ? this.$options.filters.capitalize(object.variation_type.name) : '';
+				}
+				else if (columnValue.match(/variation_parent_name/gi)) {
+					return object.variation_parent ? this.$options.filters.capitalize(object.variation_parent.name) : '';
 				}
 				else if (columnValue.match(/name/gi)) {
 					return this.$options.filters.capitalize(object.name);
