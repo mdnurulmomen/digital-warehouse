@@ -501,9 +501,9 @@
 															v-if="singleProductData.variations.length == errors.product.variations.length"
 														>
 															<div class="form-group col-md-12">
-																<label for="inputFirstName">Variaiton</label>
+																<label for="inputFirstName">Variation</label>
 																<multiselect 
-							                              			v-model="singleProductData.variations[index].variation"
+							                              			v-model="productVariation.variation"
 							                              			placeholder="Select Variation" 
 							                                  		label="name" 
 							                                  		track-by="id" 
@@ -513,7 +513,7 @@
 							                                  		:allow-empty="false"
 							                                  		selectLabel = "Press/Click"
 							                                  		deselect-label="Can't remove single value" 
-							                                  		:disabled="singleProductData.variations[index].variation_immutability" 
+							                                  		:disabled="productVariation.variation_immutability" 
 							                                  		class="form-control p-0" 
 							                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
 							                                  		@close="validateFormInput('product_variation_id')" 
@@ -524,11 +524,35 @@
 															    </div>
 															</div>
 
+															<div 
+																class="form-group col-md-12" 
+																v-if="productVariation.variation && productVariation.variation.hasOwnProperty('variation_childs') && productVariation.variation.variation_childs.length"
+															>
+																<div class="form-row ml-3 mr-3">
+																	<div class="form-group col-md-12">
+																		<label for="inputFirstName">Sub-Variation</label>
+																		<multiselect 
+									                              			v-model="productVariation.variation.sub_variation"
+									                              			placeholder="Select Sub-Variation" 
+									                                  		label="name" 
+									                                  		track-by="id" 
+									                                  		:custom-label="objectNameWithCapitalized" 
+									                                  		:options="productVariation.variation.variation_childs" 
+									                                  		selectLabel = "Press to select"
+									                                  		deselect-label="Press to remove" 
+									                                  		:disabled="productVariation.variation_immutability" 
+									                                  		class="form-control is-valid p-0" 
+									                              		>
+									                                	</multiselect>
+																	</div>
+																</div> 
+															</div>
+
 															<div class="form-group col-md-12">
 													    		<div class="form-row text-center">
 																	<div class="col-md-6">
 																		<img class="img-fluid" 
-																			:src="singleProductData.variations[index].preview || ''"
+																			:src="productVariation.preview || ''"
 																			alt="Variation Picture" 
 																		>
 																	</div>
@@ -1051,8 +1075,17 @@
 											>
 
 											<p>
+												
 												{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }}
+												
+												<span v-show="productVariation.variation && productVariation.variation.sub_variation">
+													(
+														{{ (productVariation.variation && productVariation.variation.sub_variation) ? productVariation.variation.sub_variation.name : 'NA'  }}
+													)
+												</span>
+
 											</p>
+
 
 											<!-- <span v-show="singleProductData.variations.length > variationIndex+1">, </span> -->
 										</div>

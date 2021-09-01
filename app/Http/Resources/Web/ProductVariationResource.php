@@ -24,7 +24,7 @@ class ProductVariationResource extends JsonResource
             // 'dispatched_quantity' => $this->dispatchedRequests->sum('quantity'),
             // 'price' => $this->price,
             'variation_immutability' => $this->variation_immutability,
-            'variation' => $this->variation,
+            'variation' => $this->variation->variationParent ? (new ProductVariationParentResource($this->variation->variationParent))->subVariation($this->variation) : new ProductVariationParentResource($this->variation),
             // 'serials' => $this->when($this->product->has_serials && $this->product->has_variations, str_ends_with(Route::currentRouteName(), 'products') ? ProductVariationSerialResource::collection($this->serials) : $this->serials()->where('has_requisitions', false)->get()->pluck('serial_no')),
             // 'serials' => $this->when($this->product->has_serials && $this->product->has_variations, 
             //     str_ends_with(Route::currentRouteName(), '.products') ? 

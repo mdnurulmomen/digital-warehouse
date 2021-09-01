@@ -81,7 +81,7 @@ class Product extends Model
 
                 $productVariation = $this->variations()->updateOrCreate(
                     
-                    [ 'variation_id' => $productNewVariation->variation->id ],
+                    [ 'variation_id' => $productNewVariation->variation->sub_variation->id ?? $productNewVariation->variation->id ],
                     [ 'preview' => $previewPath ]
 
                 );
