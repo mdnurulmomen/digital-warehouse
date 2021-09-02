@@ -810,7 +810,7 @@
 		></restore-confirmation-modal>
  		-->
 
- 		<!-- Modal -->
+ 		<!-- View Modal -->
 		<div class="modal fade" id="merchant-product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
@@ -1603,8 +1603,8 @@
 			storeProductMerchant() {
 				
 				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					this.formSubmitted = false;
+					// this.submitForm = false;
+					// this.formSubmitted = false;
 					return;
 				}
 
@@ -1647,8 +1647,8 @@
 			updateProductMerchant() {
 				
 				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					this.formSubmitted = false;
+					// this.submitForm = false;
+					// this.formSubmitted = false;
 					return;
 				}
 
@@ -1762,7 +1762,7 @@
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: this.product, merchantName: object.marchant ? object.marchant.user_name : 'NA', productMerchant: object }});
+				this.$router.push({ name: 'product-stocks', params: { product: this.product, merchantName: object.marchant ? object.marchant.user_name.replace(/ /g,"-") : 'NA', productMerchant: object }});
 
 			},
 			verifyUserInput() {
@@ -2370,7 +2370,7 @@
 		      	return;
 
 			},
-			showPreview(imagePath='default') {
+			showPreview(imagePath = 'default') {
 				
 				if (imagePath.startsWith('data:')) {
 					return imagePath;
@@ -2379,7 +2379,7 @@
 					return '/' + imagePath || '';
 				}
 
-				return;
+				// return '';
 
 			},
 			validateFormInput (formInputName) {

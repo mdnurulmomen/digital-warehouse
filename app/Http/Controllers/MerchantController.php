@@ -163,6 +163,7 @@ class MerchantController extends Controller
         }
     }
 
+    // Merchant-Products (web.php) 
     public function showMerchantAllProducts($perPage=false)
     {
         $currentMerchant = \Auth::user();
@@ -186,18 +187,18 @@ class MerchantController extends Controller
 
         }
 
-        /*
-            return MyProductResource::collection(
-                Product::where('merchant_id', $currentMerchant->id)
-                    ->where(
-                        ProductStock::select('available_quantity')
-                            ->whereColumn('product_stocks.product_id', 'products.id')
-                            ->latest()
-                            ->take(1), '>', 0
-                    )
-                    ->get()
-            );
-        */
+        
+        // return MyProductResource::collection(
+        //     Product::where('merchant_id', $currentMerchant->id)
+        //         ->where(
+        //             ProductStock::select('available_quantity')
+        //                 ->whereColumn('product_stocks.product_id', 'products.id')
+        //                 ->latest()
+        //                 ->take(1), '>', 0
+        //         )
+        //         ->get()
+        // );
+        
        
         return MyProductResource::collection(
             Product::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
@@ -228,7 +229,8 @@ class MerchantController extends Controller
             'all' => new MyProductCollection($query->paginate($perPage)),  
         ];
     }
-
+    
+    // Merchant-Agents (web.php)
     public function showMerchantAllAgents()
     {
         $currentMerchant = \Auth::user();

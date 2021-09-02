@@ -232,10 +232,9 @@
 							        	<div class="form-group col-md-12">
 											<label for="inputUsername">Product Category</label>
 											<multiselect 
-		                              			v-model="singleProductData.category" 
-		                              			class="form-control p-0" 
+		                              			v-model="category" 
+		                              			class="form-control p-0 is-valid" 
 		                              			placeholder="Product Category" 
-		                              			:class="!errors.product.product_category ? 'is-valid' : 'is-invalid'" 
 		                                  		label="name" 
 		                                  		track-by="id" 
 		                                  		:custom-label="objectNameWithCapitalized" 
@@ -244,13 +243,9 @@
 		                                  		:allow-empty="false"
 		                                  		selectLabel = "Press/Click"
 		                                  		deselect-label="Can't remove single value" 
-		                                  		:disabled="productMode=='bulk product'" 
-		                                  		@input="setProductCategory"
+		                                  		:disabled="true" 
 		                              		>
 		                                	</multiselect>
-		                                	<div class="invalid-feedback">
-										    	{{ errors.product.product_category }}
-										    </div>
 										</div>
 							        </div>
 							        	
@@ -399,7 +394,7 @@
 										    		<div class="form-row d-flex align-items-center text-center">
 														<div class="form-group col-md-6">
 															<img class="img-fluid" 
-																:src="singleProductData.preview || ''"
+																:src="showPreview(singleProductData.preview)"
 																alt="Product Picture" 
 															>
 														</div>
@@ -545,7 +540,7 @@
 													    		<div class="form-row text-center">
 																	<div class="col-md-6">
 																		<img class="img-fluid" 
-																			:src="productVariation.preview || ''"
+																			:src="showPreview(productVariation.preview)"
 																			alt="Variation Picture" 
 																		>
 																	</div>
@@ -660,7 +655,7 @@
 						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm|| formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -992,7 +987,7 @@
 		></restore-confirmation-modal>
  	-->
 
- 		<!-- Modal -->
+ 		<!-- View Modal -->
 		<div class="modal fade" id="product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
@@ -1006,7 +1001,7 @@
 					<div class="modal-body">
 						<div class="form-row d-flex">
 							<div class="col-md-4 align-self-center text-center">
-								<img :src="singleProductData.preview" class="img-fluid" alt="Product Preview" width="150px">
+								<img :src="'/' + singleProductData.preview" class="img-fluid" alt="Product Preview" width="150px">
 							</div>
 
 							<div class="col-md-8">
@@ -1015,7 +1010,7 @@
 										Type :
 									</label>
 									<label class="col-sm-8 col-form-label">
-										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' | capitalize }}
+										{{ category.name ? category.name : 'Bulk Product' | capitalize }}
 									</label>
 								</div>
 
@@ -1062,7 +1057,7 @@
 											:key="'product-variation-' + variationIndex"
 										>
 											<img class="img-fluid" 
-												:src="productVariation.preview || ''"
+												:src="'/' + productVariation.preview || ''"
 												:alt="productVariation.variation ? productVariation.variation.name : 'NA' + 'Picture'" 
 												width="100px"
 											>
@@ -1163,6 +1158,7 @@
 
 	        	createMode : true,
 	        	submitForm : true,
+	        	formSubmitted : false,
 
 	        	// allMerchants : [],
 	        	allVariationTypes : [],
@@ -1496,6 +1492,7 @@
 				// this.step = 1;
 				this.createMode = true;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	
 				this.singleProductData = {
 					
@@ -1530,6 +1527,8 @@
 				// this.step = 1;
 				this.createMode = false;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
+
 				
 				this.errors = {
 					product : {
@@ -1546,23 +1545,23 @@
 				);
 				*/
 
-				if (object.hasOwnProperty('category') && object.category) {
+				// if (object.hasOwnProperty('category') && object.category) {
 
 					// this.productMode = 'retail product';
 
-					if (object.has_variations) {
-						
-						object.variations.forEach(
-							(productVariation, index) => {
-								this.errors.product.variations.push({});
-							}
-						);
-						
-						this.availableVariations = object.variation_type.variations ?? [];
+				if (object.has_variations) {
 					
-					}
-
+					object.variations.forEach(
+						(productVariation, index) => {
+							this.errors.product.variations.push({});
+						}
+					);
+					
+					this.availableVariations = object.variation_type.variations ?? [];
+				
 				}
+
+				// }
 				/*
 				else {
 
@@ -1580,9 +1579,13 @@
 			storeProduct() {
 				
 				if (!this.verifyUserInput()) {
-					this.submitForm = false;
+					// this.submitForm = false;
+					// this.formSubmitted = false;
 					return;
 				}
+
+				this.formSubmitted = true;
+				this.singleProductData.product_category_id = this.category.id;
 
 				axios
 					.post('/category-products/' + this.perPage, this.singleProductData)
@@ -1602,6 +1605,7 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllContainers();
 					});
 
@@ -1609,9 +1613,13 @@
 			updateAsset() {
 				
 				if (!this.verifyUserInput()) {
-					this.submitForm = false;
+					// this.submitForm = false;
+					// this.formSubmitted = false;
 					return;
 				}
+
+				this.formSubmitted = true;
+				this.singleProductData.product_category_id = this.category.id;
 
 				axios
 					.put('/category-products/' + this.singleProductData.id + '/' + this.perPage, this.singleProductData)
@@ -1631,6 +1639,7 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllContainers();
 					});
 
@@ -1646,7 +1655,7 @@
 			goProductMerchants(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-merchants', params: { product: object, productName: object.name }});
+				this.$router.push({ name: 'product-merchants', params: { product: object, productName: object.name.replace(/ /g,"-") }});
 
 			},
 			/*
@@ -1667,7 +1676,7 @@
 				
 				// this.validateFormInput('product_merchant_id');
 				this.validateFormInput('product_name');
-				this.validateFormInput('product_category');
+				// this.validateFormInput('product_category');
 				// this.validateFormInput('product_sku');
 				// this.validateFormInput('product_price');
 				// this.validateFormInput('product_initial_quantity');
@@ -1728,7 +1737,7 @@
 					
 					// this.validateFormInput('product_merchant_id');
 					this.validateFormInput('product_name');
-					this.validateFormInput('product_category');
+					// this.validateFormInput('product_category');
 					// this.validateFormInput('product_sku');
 					// this.validateFormInput('product_price');
 					// this.validateFormInput('product_initial_quantity');
@@ -1826,12 +1835,14 @@
 				return words.join(" ");
 
 		    },
+			/*
 			setProductCategory() {
 				// console.log('category has been triggered');
 				if (this.singleProductData.category && Object.keys(this.singleProductData.category).length > 0) {
 					this.singleProductData.product_category_id = this.singleProductData.category.id;
 				}
 			},
+			*/
 			setProductMerchant() {
 				// console.log('merchant has been triggered');
 				if (this.singleProductData.merchant && Object.keys(this.singleProductData.merchant).length > 0) {
@@ -2187,6 +2198,18 @@
 				);
 			},
 		*/
+			showPreview(imagePath = 'default') {
+				
+				if (imagePath && imagePath.startsWith('data:')) {
+					return imagePath;
+				}
+				else {
+					return '/' + imagePath || '';
+				}
+
+				// return '';
+
+			},
 			onProductPreviewChange(evnt) {
 				
 				let files = evnt.target.files || evnt.dataTransfer.files;
@@ -2259,7 +2282,6 @@
 						}
 
 						break;
-					*/
 				
 					case 'product_category' : 
 						
@@ -2275,6 +2297,7 @@
 						}
 
 						break;
+					*/
 
 					case 'product_name' :
 
