@@ -28,7 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'stocks'" 
 											  		:required-permission="'product-stock'" 
-											  		:disable-add-button="availableWarehouses.length==0 ? true : false" 									  
+											  		:disable-add-button="allDealtEmptyWarehouses.length==0 ? true : false" 									  
 											  		@showContentCreateForm="showStockCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchProductAllStocks"
@@ -292,7 +292,7 @@
 												Price :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ productMerchant.price || 'NA' }}
+												{{ productMerchant.selling_price || 'NA' }}
 											</label>
 										</div>
 
@@ -314,15 +314,17 @@
 											<div class="col-sm-6">
 												<multiselect 
 			                              			v-model="singleStockData.warehouse"
-			                                  		:options="availableWarehouses" 
+			                                  		:options="allDealtEmptyWarehouses" 
 			                                  		:custom-label="objectNameWithCapitalized" 
 			                                  		:required="true" 
 			                                  		:allow-empty="false" 
+			                                  		label="name" 
+			                                  		track-by="id" 
 			                              			placeholder="Select Warehouse" 
 			                              			class="form-control p-0" 
 			                                  		:class="!errors.stock.warehouse  ? 'is-valid' : 'is-invalid'"  
 			                                  		@close="validateFormInput('warehouse')" 
-			                                  		@input="singleStockData.addresses = [{}] " 
+			                                  		@input="singleStockData.addresses = [ {} ]" 
 			                              		>
 			                                	</multiselect>
 			                                	<div class="invalid-feedback">
@@ -437,7 +439,7 @@
 													<div class="form-group col-md-3">
 														<label for="inputFirstName">Price</label>
 														<label class="col-form-label text-left">
-															{{ productVariation.price }}
+															{{ productVariation.selling_price }}
 														</label>
 													</div>
 
@@ -581,7 +583,7 @@
 									>
 										<div 
 											class="card"
-											v-if="singleStockData.addresses[spaceIndex] && errors.stock.addresses[spaceIndex]"
+											v-if="stockSpace && errors.stock.addresses[spaceIndex]"
 										>
 											<div class="card-body">
 
@@ -591,7 +593,7 @@
 															Required Space Type {{ spaceIndex + 1 }}
 														</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].type"
+					                              			v-model="stockSpace.type"
 					                                  		:options="['containers', 'shelves', 'units']" 
 					                                  		:custom-label="nameWithCapitalized" 
 					                                  		:required="true" 
@@ -612,12 +614,12 @@
 
 												<div 
 													class="form-row" 
-													v-show="singleStockData.addresses[spaceIndex].type=='containers'"
+													v-show="stockSpace.type=='containers'"
 												>
 													<div class="form-group col-md-12">
 														<label for="inputFirstName">Select Containers</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].containers"
+					                              			v-model="stockSpace.containers"
 					                              			placeholder="Select Containers" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -642,12 +644,12 @@
 
 												<div 
 													class="form-row" 
-													v-show="singleStockData.addresses[spaceIndex].type=='shelves'"
+													v-show="stockSpace.type=='shelves'"
 												>
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Select Parent Container</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].container"
+					                              			v-model="stockSpace.container"
 					                              			placeholder="Parent Container" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -668,11 +670,11 @@
 
 													<div 
 														class="form-group col-md-6" 
-														v-if="singleStockData.addresses[spaceIndex].container"
+														v-if="stockSpace.container"
 													>
 														<label for="inputFirstName">Select Shelves</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].container.shelves"
+					                              			v-model="stockSpace.container.shelves"
 					                              			placeholder="Select Shelves" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -695,11 +697,11 @@
 													</div>
 												</div>
 
-												<div class="form-row" v-show="singleStockData.addresses[spaceIndex].type=='units'">
+												<div class="form-row" v-show="stockSpace.type=='units'">
 													<div class="form-group col-md-4">
 														<label for="inputFirstName">Select Parent Container</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].container"
+					                              			v-model="stockSpace.container"
 					                              			placeholder="Parent Container" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -720,11 +722,11 @@
 
 													<div 
 														class="form-group col-md-4" 
-														v-if="singleStockData.addresses[spaceIndex].container"
+														v-if="stockSpace.container"
 													>
 														<label for="inputFirstName">Select Parent Shelf</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].container.shelf"
+					                              			v-model="stockSpace.container.shelf"
 					                              			placeholder="Parent Shelf" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -745,11 +747,11 @@
 
 													<div 
 														class="form-group col-md-4" 
-														v-if="singleStockData.addresses[spaceIndex].container && singleStockData.addresses[spaceIndex].container.shelf"
+														v-if="stockSpace.container && stockSpace.container.shelf"
 													>
 														<label for="inputFirstName">Select Units</label>
 														<multiselect 
-					                              			v-model="singleStockData.addresses[spaceIndex].container.shelf.units"
+					                              			v-model="stockSpace.container.shelf.units"
 					                              			placeholder="Select Units" 
 					                              			label="name" 
 					                                  		track-by="id" 
@@ -1465,11 +1467,11 @@
 	        	submitForm : true,
 	        	formSubmitted : false,
 
-	        	availableWarehouses : [],
+	        	allDealtEmptyWarehouses : [],
 
 	        	allStocks : [],
 
-	        	allContainers : [],
+	        	// allContainers : [],
 	        	
 	        	emptyContainers : [],
 	        	emptyShelfContainers : [],
@@ -1587,6 +1589,7 @@
 					});
 
 			},
+			/*
 			fetchWarehouseAllContainers(warehouse) {
 				
 				this.query = '';
@@ -1603,7 +1606,7 @@
 						if (response.status == 200) {
 							
 							this.allContainers = response.data;
-							this.setAvailableSpaces();
+							this.resetWarehouseSpaces();
 							
 							// this.emptyContainers = response.data.emptyContainers;
 							// this.emptyShelfContainers = response.data.emptyShelfContainers;
@@ -1635,19 +1638,20 @@
 					});
 
 			},
+			*/
 			fetchMerchantAllWarehouses() {
 				
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.availableWarehouses = [];
+				this.allDealtEmptyWarehouses = [];
 
 				axios
-					.get('/api/merchant-warehouses/' + this.productMerchant.merchant.id)
+					.get('/api/dealt-warehouses/' + this.productMerchant.merchant.id)
 					.then(response => {
 						if (response.status == 200) {
 							
-							this.availableWarehouses = response.data;
+							this.allDealtEmptyWarehouses = response.data.data;
 					
 						}
 					})
@@ -1779,8 +1783,8 @@
 			openStockEditForm(object) {
 
 				this.step = 1;
-				this.createMode = false;
 	        	this.submitForm = true;
+				this.createMode = false;
 	        	this.formSubmitted = false;
 				
 				this.singleStockData = JSON.parse(JSON.stringify(object));
@@ -2020,8 +2024,9 @@
 
 						}
 
-						this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
 						this.submitForm = true;
+						this.resetWarehouseSpaces();
+						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
 					
 					}
 					else {
@@ -2157,38 +2162,6 @@
 				}
 
 			},
-			changeNumberContents() {
-				
-				this.pagination.current_page = 1;
-
-				if (this.query === '') {
-					this.fetchProductAllStocks();
-				}
-				else {
-					this.searchData();
-				}
-    		},
-    		objectNameWithCapitalized ({ name }) {
-		      	if (name) {
-				    name = name.toString()
-				    return name.charAt(0).toUpperCase() + name.slice(1)
-		      	}
-		      	else 
-		      		return ''
-		    },
-			nameWithCapitalized (name) {
-				
-				if (!name) return ''
-
-				const words = name.split(" ");
-
-				for (let i = 0; i < words.length; i++) {
-				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
-				}
-
-				return words.join(" ");
-
-		    },
 			setAvailableShelvesAndUnits() {
 
 				this.singleStockData.addresses.forEach(
@@ -2278,20 +2251,44 @@
 				this.resetAvailableSpaces();
 		
 			},
-			setAvailableSpaces() {
+			resetWarehouseSpaces() {
 				
-				// this.emptyContainers = [ ...this.allContainers.emptyContainers ];
-				// this.emptyShelfContainers = [ ...this.allContainers.emptyShelfContainers ];
-				// this.emptyUnitContainers = [ ...this.allContainers.emptyUnitContainers ];
+				/*
+					this.emptyContainers = [ ...this.allContainers.emptyContainers ];
+					this.emptyShelfContainers = [ ...this.allContainers.emptyShelfContainers ];
+					this.emptyUnitContainers = [ ...this.allContainers.emptyUnitContainers ];
+				*/
 
-				this.emptyContainers = JSON.parse( JSON.stringify( this.allContainers.emptyContainers ) );
-				this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allContainers.emptyShelfContainers ) );
-				this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allContainers.emptyUnitContainers ) );
+				/*
+					this.emptyContainers = JSON.parse( JSON.stringify( this.allContainers.emptyContainers ) );
+					this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allContainers.emptyShelfContainers ) );
+					this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allContainers.emptyUnitContainers ) );
+				*/
+			
+				this.emptyContainers = [];
+				this.emptyShelfContainers = [];
+				this.emptyUnitContainers = [];
+			
+				if (this.singleStockData.warehouse && Object.keys(this.singleStockData.warehouse).length && this.allDealtEmptyWarehouses.length) {
+
+					let selectedWarehouse = this.allDealtEmptyWarehouses.findIndex(
+						dealtWarehouse => dealtWarehouse.id==this.singleStockData.warehouse.id && dealtWarehouse.name==this.singleStockData.warehouse.name
+					);
+
+					if (selectedWarehouse > -1) {
+
+						this.emptyContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyContainers ) );
+						this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyShelfContainers ) );
+						this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyUnitContainers ) );
+
+					}
+
+				}
 
 			},
 			resetAvailableSpaces() {
 
-				this.setAvailableSpaces();
+				this.resetWarehouseSpaces();
 
 				this.singleStockData.addresses.forEach(
 
@@ -2482,6 +2479,47 @@
 				);
 
 			},
+			changeNumberContents() {
+				
+				this.pagination.current_page = 1;
+
+				if (this.query === '') {
+					this.fetchProductAllStocks();
+				}
+				else {
+					this.searchData();
+				}
+    		},
+    		objectNameWithCapitalized ({ name }) {
+		      	
+		      	if (name) {
+				    name = name.toString()
+				    
+				    const words = name.split(" ");
+
+					for (let i = 0; i < words.length; i++) {
+					    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+					}
+
+					return words.join(" ");
+		      	}
+		      	else 
+		      		return ''
+		      	
+		    },
+			nameWithCapitalized (name) {
+				
+				if (!name) return ''
+
+				const words = name.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+				}
+
+				return words.join(" ");
+
+		    },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;

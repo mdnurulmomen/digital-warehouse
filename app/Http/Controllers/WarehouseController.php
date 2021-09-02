@@ -10,8 +10,9 @@ use App\Models\WarehouseContainerStatus;
 use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\WarehouseCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
-use App\Http\Resources\Web\WarehouseManagerCollection;
+use App\Http\Resources\Web\MerchantWarehouseResource;
 use App\Http\Resources\Web\WarehouseEmptySpaceResource;
+// use App\Http\Resources\Web\WarehouseManagerCollection;
 
 class WarehouseController extends Controller
 {
@@ -365,27 +366,33 @@ class WarehouseController extends Controller
     }
 
     // merchant-warehouses
-    /*
-    public function showMerchantAllWarehouses($merchant, $perPage = false)
+    public function showMerchantWarehouses($merchant, $warehouse = false, $perPage = false)
     {
+        
         if ($perPage) {
-            
-            return [
-
-                
-
-            ];
-
+            return;
         }
 
-        return Warehouse::where('active', true)->whereHas('deals', function ($query) use ($merchant) {
-            $query->whereHas('merchantDeal', function ($query1) use ($merchant) {
-                $query1->where('expired_at', '>', now())->where('merchant_id', $merchant);
-            });
-        })->get();
+        else if ($warehouse) {
+            return;   
+        }
+
+        return MerchantWarehouseResource::collection(
+
+            Warehouse::where('active', true)->whereHas('deals', function ($query) use ($merchant) {
+                $query->whereHas('deal', function ($query1) use ($merchant) {
+                    $query1->where('merchant_id', $merchant);
+                })
+                ->whereHas('validities', function ($query2) {
+                    $query2->where('expired_at', '>', now());
+                });
+            })
+            ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
+            ->get()
+
+        );
     
     }
-    */
 
     // warehouse-contaners
     public function showWarehouseContainers($warehouse = false) {

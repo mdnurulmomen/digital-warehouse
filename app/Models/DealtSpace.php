@@ -32,4 +32,9 @@ class DealtSpace extends Model
     {
         return $this->belongsTo(MerchantDeal::class, 'merchant_deal_id', 'id');
     }
+
+    public function validities()
+    {
+        return $this->hasMany(MerchantPaymentDetail::class, 'dealt_space_id', 'id');
+    }
 }

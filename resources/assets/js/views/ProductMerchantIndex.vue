@@ -1762,7 +1762,7 @@
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: this.product, merchantName: object.marchant ? object.marchant.user_name.replace(/ /g,"-") : 'NA', productMerchant: object }});
+				this.$router.push({ name: 'product-stocks', params: { product: this.product, merchantName: object.merchant ? object.merchant.user_name.replace(/ /g,"-") : 'NA', productMerchant: object }});
 
 			},
 			verifyUserInput() {
