@@ -389,8 +389,11 @@
 													:key="'merchant-product-variation-index-' + index + 'A'"
 												>
 													<div class="card-body">
-														<div class="form-row">	
-															<div class="form-group col-md-4">
+														<div 
+															class="form-row" 
+															v-if="singleMerchantProductData.variations.length == errors.product.variations.length"
+														>	
+															<div class="form-group col-md-12">
 																<label for="inputFirstName">Variaiton</label>
 
 																<multiselect 
@@ -412,59 +415,91 @@
 							                                	<div class="invalid-feedback">
 															    	{{ errors.product.variations[index].product_variation_id }}
 															    </div>
-															</div>
+															</div> 
+
+															<!-- 
+															<div 
+																class="form-group col-md-12" 
+																v-if="merchantProductVariation.variation && merchantProductVariation.variation.hasOwnProperty('sub_variation')"
+															>
+																<div class="form-row ml-3 mr-3">
+																	<div class="form-group col-md-12">
+																		<label for="inputFirstName">Sub-Variation</label>
+																		<multiselect 
+									                              			v-model="merchantProductVariation.variation.sub_variation"
+									                              			placeholder="Select Sub-Variation" 
+									                                  		label="name" 
+									                                  		track-by="id" 
+									                                  		:custom-label="objectNameWithCapitalized" 
+									                                  		:options="[]" 
+									                                  		selectLabel = "Press to select"
+									                                  		deselect-label="Press to remove" 
+									                                  		:disabled="true" 
+									                                  		class="form-control is-valid p-0" 
+									                              		>
+									                                	</multiselect>
+																	</div>
+																</div> 
+															</div> 
+															-->
 															
-															<div class="form-group col-md-4">
-																<label for="inputFirstName">Selling Price</label>
+															<div class="form-group col-md-12">
+																<div class="form-row">
+																	<div class="form-group col-md-6">
+																		<label for="inputFirstName">Selling Price</label>
 
-																<input type="number" 
-																	class="form-control" 
-																	v-model.number="merchantProductVariation.selling_price" 
-																	placeholder="Variation Selling Price" 
-																	:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-																	@change="validateFormInput('product_variation_price')" 
-																	required="true" 
-																>
+																		<input type="number" 
+																			class="form-control" 
+																			v-model.number="merchantProductVariation.selling_price" 
+																			placeholder="Variation Selling Price" 
+																			:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																			@change="validateFormInput('product_variation_price')" 
+																			required="true" 
+																		>
 
-																<div class="invalid-feedback">
-														        	{{ errors.product.variations[index].product_variation_price }}
-														  		</div>
-															</div>
+																		<div class="invalid-feedback">
+																        	{{ errors.product.variations[index].product_variation_price }}
+																  		</div>	
+																	</div>
 
-															<div class="form-group col-md-4">
-																<label for="inputFirstName">Variation SKU</label>
+																	<div class="form-group col-md-6">
+																		<label for="inputFirstName">Variation SKU</label>
 																
-																<input type="text" 
-																	class="form-control is-valid" 
-																	v-model="merchantProductVariation.sku" 
-																	placeholder="Variation Unique SKU" 
-																>
-															</div>									
-														</div>
+																		<input type="text" 
+																			class="form-control is-valid" 
+																			v-model="merchantProductVariation.sku" 
+																			placeholder="Variation Unique SKU" 
+																		>
+																	</div>
+																</div>
+															</div>
 
-														<div class="form-row text-center d-flex">
-															<div class="col-md-6 form-group">
-																<img 
-																	class="img-fluid" 
-																	:src="showPreview(singleMerchantProductData.variations[index].preview)"
-																	alt="Variation Preview" 
-																	:ref="'merchantProductVariationPreview-' + index" 
-																>
-															</div>
-															<div class="col-md-6 form-group align-self-center">
-																<div class="custom-file">
-																    <input type="file" 
-																    	class="form-control custom-file-input" 
-																		:class="!errors.product.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
-															    	 	@change="onVariationPreviewChange($event, index)" 
-															    	 	accept="image/*"
-																    >
-																    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
-																    <div class="invalid-feedback">
-																    	{{ errors.product.variations[index].preview }}
-																    </div>
-															  	</div>
-															</div>
+															<div class="form-group col-md-12">
+																<div class="form-row text-center d-flex">
+																	<div class="col-md-6 form-group">
+																		<img 
+																			class="img-fluid" 
+																			:src="showPreview(singleMerchantProductData.variations[index].preview)"
+																			alt="Variation Preview" 
+																			:ref="'merchantProductVariationPreview-' + index" 
+																		>
+																	</div>
+																	<div class="col-md-6 form-group align-self-center">
+																		<div class="custom-file">
+																		    <input type="file" 
+																		    	class="form-control custom-file-input" 
+																				:class="!errors.product.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
+																	    	 	@change="onVariationPreviewChange($event, index)" 
+																	    	 	accept="image/*"
+																		    >
+																		    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+																		    <div class="invalid-feedback">
+																		    	{{ errors.product.variations[index].preview }}
+																		    </div>
+																	  	</div>
+																	</div>
+																</div>
+															</div>							
 														</div>
 													</div>
 												</div>
@@ -1911,7 +1946,14 @@
 				    return user_name.charAt(0).toUpperCase() + user_name.slice(1)
 		      	}
 		      	else if (variation) {
-		      		let variation_name = variation.name.toString()
+		      		var variation_name = variation.name.toString();
+		      		
+		      		if (variation.hasOwnProperty('sub_variation') && variation.sub_variation.hasOwnProperty('name')) {
+
+		      			variation_name = variation_name + '-' + variation.sub_variation.name
+
+		      		}
+
 				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
 		      	}
 		      	else 

@@ -377,7 +377,7 @@ class WarehouseController extends Controller
             return;   
         }
 
-        return MerchantWarehouseResource::collection(
+        return MerchantWarehouseResource::customCollection(
 
             Warehouse::where('active', true)->whereHas('deals', function ($query) use ($merchant) {
                 $query->whereHas('deal', function ($query1) use ($merchant) {
@@ -388,7 +388,9 @@ class WarehouseController extends Controller
                 });
             })
             ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
-            ->get()
+            ->get() ,
+
+            $merchant
 
         );
     

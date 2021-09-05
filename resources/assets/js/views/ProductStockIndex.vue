@@ -280,6 +280,15 @@
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Manufacturer :
+											</label>
+											<label class="col-sm-6 col-form-label text-left">
+												{{ productMerchant.manufacturer_name ? productMerchant.manufacturer_name : 'Own Product' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												SKU Code :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
