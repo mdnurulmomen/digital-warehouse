@@ -19,6 +19,7 @@ class MerchantProductResource extends JsonResource
             'sku' => $this->sku,
             'preview' => $this->preview,
             'description' => $this->description,
+            'manufacturer_name' => $this->manufacturer_name,
             'warning_quantity' => $this->warning_quantity,
             'selling_price' => $this->selling_price,
             'product_id' => $this->product_id,

@@ -827,11 +827,27 @@ class ProductController extends Controller
             // 'product.id' => 'required|numeric|exists:products,id',
             // 'merchant' => 'required',
             // 'merchant.id' => 'required|numeric|exists:merchants,id',
-            'product_id' => 'required|numeric|exists:products,id',
-            'merchant_id' => 'required|numeric|exists:merchants,id',
-            'sku' => 'required|string',
+            'product_id' => [
+                'required', 'numeric', 'exists:products,id', 
+                Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
+                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                }),
+            ],
+            'merchant_id' => [
+                'required', 'numeric', 'exists:merchants,id', 
+                Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                }),
+            ],
+            'sku' => [
+                'required', 'string', 
+                Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                }),
+            ],
+            'manufacturer_name' => 'nullable|string|max:255',
             'selling_price' => 'required|numeric',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:255',
             'warning_quantity' => 'numeric',
             'variations' => [
                 'array', 
@@ -848,8 +864,19 @@ class ProductController extends Controller
             'variations.*.sku' => 'string',
         ],
         [
-            'product_id' => 'Product is required',
-            'merchant_id' => 'Merchant is required',
+            'product_id.required' => 'Product is required',
+            'product_id.unique' => 'Product already exists',
+            'product_id.*' => 'Product is invalid',
+
+            'merchant_id.required' => 'Merchant is required',
+            'merchant_id.unique' => 'Merchant already exists',
+            'merchant_id.*' => 'Merchant is invalid', 
+
+            'sku.required' => 'SKU is required',
+            'sku.unique' => 'SKU already exists',
+            'sku.*' => 'SKU is invalid', 
+
+            'manufacturer_name' => 'Manufacturer name should be string', 
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Variation name is required',
@@ -868,9 +895,10 @@ class ProductController extends Controller
 
         $productNewMerchant = MerchantProduct::create([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id), 
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, strtolower(substr(trim($request->manufacturer_name), 0, 3)) ?? 'own'), 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
+            'manufacturer_name' => strtolower(trim($request->manufacturer_name)), 
             'warning_quantity' => $request->warning_quantity ?? 100,
             'selling_price' => $request->selling_price,
             'product_id' => $request->product_id,
@@ -900,11 +928,27 @@ class ProductController extends Controller
             // 'product.id' => 'required|numeric|exists:products,id',
             // 'merchant' => 'required',
             // 'merchant.id' => 'required|numeric|exists:merchants,id',
-            'product_id' => 'required|numeric|exists:products,id',
-            'merchant_id' => 'required|numeric|exists:merchants,id',
-            'sku' => 'required|string',
+            'product_id' => [
+                'required', 'numeric', 'exists:products,id', 
+                Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
+                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                })->ignore($productMerchant),
+            ],
+            'merchant_id' => [
+                'required', 'numeric', 'exists:merchants,id', 
+                Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                })->ignore($productMerchant),
+            ],
+            'sku' => [
+                'required', 'string', 
+                Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                })->ignore($productMerchant),
+            ], 
+            'manufacturer_name' => 'nullable|string|max:255',
             'selling_price' => 'required|numeric',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:255',
             'warning_quantity' => 'numeric',
             'variations' => [
                 'array', 
@@ -921,8 +965,19 @@ class ProductController extends Controller
             'variations.*.sku' => 'string',
         ],
         [
-            'product_id' => 'Product is required',
-            'merchant_id' => 'Merchant is required',
+            'product_id.required' => 'Product is required',
+            'product_id.unique' => 'Product already exists',
+            'product_id.*' => 'Product is invalid',
+
+            'merchant_id.required' => 'Merchant is required',
+            'merchant_id.unique' => 'Merchant already exists',
+            'merchant_id.*' => 'Merchant is invalid', 
+
+            'sku.required' => 'SKU is required',
+            'sku.unique' => 'SKU already exists',
+            'sku.*' => 'SKU is invalid', 
+
+            'manufacturer_name' => 'Manufacturer name should be string', 
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Variation name is required',
@@ -943,7 +998,8 @@ class ProductController extends Controller
 
         $productMerchantToUpdate->update([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id), 
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, strtolower(substr(trim($request->manufacturer_name), 0, 3)) ?? 'own'), 
+            'manufacturer_name' => strtolower(trim($request->manufacturer_name)), 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'warning_quantity' => $request->warning_quantity ?? 100,
@@ -1056,12 +1112,12 @@ class ProductController extends Controller
         ProductStock::where('product_id', $stockToUpdate->product_id)->where('created_at', '>', $stockToUpdate->created_at)->decrement('available_quantity', $amount);
     }
 
-    protected function generateProductSKU($merchant, $productCategory, $product)
+    protected function generateProductSKU($merchant, $productCategory, $product, $menufacturer)
     {
         if ($productCategory) {
-            return 'MR'.$merchant.'CT'.$productCategory.'PR'.$product;
+            return 'MR'.$merchant.'CT'.$productCategory.'PR'.$product.'MF'.$menufacturer;
         }
-        return 'MR'.$merchant.'BX'.'PR'.$product;
+        return 'MR'.$merchant.'BX'.'PR'.$product.'MF'.$menufacturer;
     }
 
     protected function checkVariationSerialDuplicacy(Request $request)

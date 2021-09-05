@@ -43,8 +43,9 @@
 															<table class="table table-striped table-bordered nowrap text-center">
 																<thead>
 																	<tr>
-																		<th>Name</th>
-																		<!-- <th>SKU</th> -->
+																		<th>Merchant</th>
+																		<th>Manufacturer/Brand</th>
+																		<th>SKU</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -52,9 +53,14 @@
 																<tbody>
 																	<tr v-for="productMerchant in productAllMerchants" :key="'product-id' + product.id + '-product-merchant-id-' + productMerchant.id"
 																	>
-																		<td>{{ productMerchant.merchant.first_name + ' ' + productMerchant.merchant.last_name + ' ( ' + productMerchant.merchant.user_name + ' )' | capitalize }}</td>
+																		<td>
+																			{{ productMerchant.merchant.first_name + ' ' + productMerchant.merchant.last_name + ' ( ' + productMerchant.merchant.user_name + ' )' | capitalize }}
+																		</td>
 																		
-																		<!-- <td>{{ merchant.sku }}</td> -->
+																		<td>
+																			{{ productMerchant.manufacturer_name ? productMerchant.manufacturer_name : 'Own Product' | capitalize }}
+																		</td>
+																		<td>{{ productMerchant.sku }}</td>
 																		
 																		<td>
 																			<button 
@@ -98,7 +104,7 @@
 																	<tr 
 																  		v-show="! productAllMerchants.length"
 																  	>
-															    		<td colspan="3">
+															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -108,8 +114,9 @@
 
 																<tfoot>
 																	<tr>	
-																		<th>Name</th>
-																		<!-- <th>SKU</th> -->
+																		<th>Merchant</th>
+																		<th>Manufacturer/Brand</th>
+																		<th>SKU</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -188,7 +195,7 @@
 
 						<div class="modal-body">
 									<div class="form-row">
-										<div class="form-group col-sm-12">
+										<div class="form-group col-sm-6">
 							        		<label for="inputUsername">Selected Product</label>
 								        	<multiselect 
 		                              			v-model="product" 
@@ -201,9 +208,7 @@
 		                              		>
 		                                	</multiselect>
 							        	</div>
-									</div>
 
-							        <div class="form-row">
 							        	<div class="form-group col-md-6">
 											<label for="inputUsername">Merchant</label>
 											<multiselect 
@@ -227,6 +232,17 @@
 		                                	<div class="invalid-feedback">
 										    	{{ errors.product.product_merchant_id }}
 										    </div>
+										</div>
+									</div>
+
+							        <div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="inputUsername">Manufacturer/Brand Name</label>
+											<input type="text" 
+												class="form-control is-valid" 
+												v-model="singleMerchantProductData.manufacturer_name" 
+												placeholder="Product Manufacturer" 
+											>
 										</div>
 
 										<div class="form-group col-md-6">
@@ -863,6 +879,15 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Manufacturer Name :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.manufacturer_name ? singleMerchantProductData.manufacturer_name : 'own product' | capitalize }}
 													</label>
 												</div>
 
@@ -1917,6 +1942,7 @@
 				// console.log('merchant has been triggered');
 				if (this.singleMerchantProductData.merchant && Object.keys(this.singleMerchantProductData.merchant).length > 0) {
 					this.singleMerchantProductData.merchant_id = this.singleMerchantProductData.merchant.id;
+					this.singleMerchantProductData.manufacturer_name = this.singleMerchantProductData.merchant.first_name + ' ' + this.singleMerchantProductData.merchant.last_name;
 				}
 			},
 			resetErrorProductVariations(object) {

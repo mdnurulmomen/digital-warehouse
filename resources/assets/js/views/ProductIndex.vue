@@ -263,6 +263,7 @@
 							        	
 									<div class="form-row">
 										<div class="form-group col-md-6">
+											<!-- Product Name with Model, ex : Samsung Guru Music -->
 											<label for="inputFirstName">Name</label>
 											<input type="text" 
 												class="form-control" 
