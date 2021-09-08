@@ -178,7 +178,6 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -475,7 +474,7 @@
 													>
 														<label for="inputFirstName">Variaiton</label>
 														<multiselect 
-					                              			v-model="singleProductData.variations[index].variation"
+					                              			v-model="productVariation.variation"
 					                              			placeholder="Select Variation" 
 					                                  		label="name" 
 					                                  		track-by="id" 
@@ -485,7 +484,7 @@
 					                                  		:allow-empty="false"
 					                                  		selectLabel = "Press/Click"
 					                                  		deselect-label="Can't remove single value" 
-					                                  		:disabled="singleProductData.variations[index].variation_immutability" 
+					                                  		:disabled="productVariation.variation_immutability" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
 					                                  		@close="validateFormInput('product_variation_id')" 
