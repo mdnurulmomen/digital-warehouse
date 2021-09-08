@@ -6,13 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class Stock extends Model
 {
+    protected $guarded = ['id'];
+
     protected $casts = [
         'has_approval' => 'boolean',
     ];
 
+    public function stocks()
+    {
+        return $this->hasMany(ProductStock::class, 'stock_id', 'id');
+    }
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
+
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
     }
 
     /**

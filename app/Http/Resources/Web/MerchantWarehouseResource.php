@@ -16,6 +16,14 @@ class MerchantWarehouseResource extends JsonResource
         return parent::collection($resource);
     }
 
+    //I made custom function that returns resource type
+    public function customResource($merchant)
+    {
+        //you can add as many params as you want.
+        self::$merchant = $merchant;
+        return $this;
+    }
+
     /**
      * Transform the resource into an array.
      *

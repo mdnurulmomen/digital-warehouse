@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductStock extends Model
 {
+    public $timestamps = false;
+
     protected $guarded = ['id'];
 
     public function stock()
@@ -57,9 +59,9 @@ class ProductStock extends Model
                 
                 foreach ($variations as $stockVariation) {
                     
-                    $variationExistingStock = $this->variations()->where('id', $stockVariation->id)->firstOrFail();
+                    $variationExistingStock = $this->variations()->where('merchant_product_variation_id', $stockVariation->merchant_product_variation_id)->first();
 
-                    if ($variationExistingStock->stock_quantity > $stockVariation->stock_quantity) {
+                    if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity > $stockVariation->stock_quantity) {
                         
                         // decrease quantity
                         $difference = $variationExistingStock->stock_quantity - $stockVariation->stock_quantity;
@@ -67,28 +69,39 @@ class ProductStock extends Model
                         $variationExistingStock->update([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationExistingStock->available_quantity - $difference),
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
                         ]);
 
                         $this->decreaseSuccessorStockVariations($variationExistingStock, $difference);
 
                     }
-                    else if ($variationExistingStock->stock_quantity < $stockVariation->stock_quantity) {
+                    else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity < $stockVariation->stock_quantity) {
                         
                         // increase quantity
                         $difference = $stockVariation->stock_quantity - $variationExistingStock->stock_quantity;
                         
                         $variationExistingStock->update([
                             'stock_quantity' => $stockVariation->stock_quantity,
-                            'available_quantity' => ($variationExistingStock->available_quantity + $difference),
+                            'available_quantity' => ($variationExistingStock->available_quantity + $difference), 
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
                         ]);
 
                         $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
 
                     }
+                    else {
 
-                    if ($variationExistingStock->has_serials) {
+                        $productVariationStock = $this->variations()->create([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => $stockVariation->stock_quantity, 
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
+                        ]);
+
+                    }
+
+                    if (! empty($variationExistingStock) && $variationExistingStock->serials->count()) {
                         
-                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock);
+                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock ?? $productVariationStock);
 
                     }
 
@@ -101,18 +114,18 @@ class ProductStock extends Model
                
                     if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
                         
-                        $variationLastAvailableValue = ProductVariation::findOrFail($stockVariation->id)->latestStock->available_quantity ?? 0;
+                        $variationLastAvailableValue = MerchantProductVariation::findOrFail($stockVariation->id)->latestStock->available_quantity ?? 0;
 
                         $variationNewStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity),
-                            'has_serials' => empty($stockVariation->serials) ? false : true,
-                            'product_variation_id' => $stockVariation->id,
-                            'product_stock_id' => $this->id,
-                            'created_at' => now(),
+                            // 'has_serials' => empty($stockVariation->serials) ? false : true,
+                            'merchant_product_variation_id' => $stockVariation->id,
+                            // 'product_stock_id' => $this->id,
+                            // 'created_at' => now(),
                         ]);
 
-                        if ($variationNewStock->has_serials) {
+                        if ($this->merchantProduct->product->has_serials) {
                         
                             $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
                             
@@ -128,7 +141,7 @@ class ProductStock extends Model
 
     }
 
-    public function setStockAddresses($spaces = [], $product)
+    public function setStockAddresses($spaces = [], $merchantProduct)
     {
         if (count($spaces)) {
             
@@ -140,17 +153,17 @@ class ProductStock extends Model
                 
                 if ($space->type == "containers" && !empty($space->containers)) {
                 
-                    $this->setProductContainers($space->containers, $product);
+                    $this->setProductContainers($space->containers, $merchantProduct);
 
                 }
                 else if ($space->type == "shelves" && !empty($space->container->shelves)) {
                     
-                    $this->setProductShelves($space->container, $product);
+                    $this->setProductShelves($space->container, $merchantProduct);
                     
                 }
                 else if ($space->type == "units" && !empty($space->container->shelf->units)) {
                     
-                    $this->setProductUnits($space->container, $product);
+                    $this->setProductUnits($space->container, $merchantProduct);
                     
                 }
 
@@ -169,7 +182,7 @@ class ProductStock extends Model
             foreach ($serials as $serial) {
                 
                 $this->serials()->withTrashed()->updateOrCreate(
-                    [ 'serial_no' => $serial->serial_no, 'product_id' => $this->product_id ],
+                    [ 'serial_no' => $serial->serial_no, 'merchant_product_id' => $this->merchant_product_id ],
                     [ 'deleted_at' => NULL ]
                 );
 
@@ -196,7 +209,7 @@ class ProductStock extends Model
             foreach ($this->addresses as $stockAddress) {
                 
                 $stockAddress->space->update([
-                    'engaged' => 0
+                    'occupied' => 0
                 ]);
 
                 if ($stockAddress->space instanceof WarehouseContainerStatus) {
@@ -227,14 +240,14 @@ class ProductStock extends Model
 
     public function deleteStockSerials()
     {
-        if ($this->serials()->count() && ! $this->serials()->where(function($q) { $q->where('has_requisitions', true)->orWhere('has_dispatched', true); })->exists()) {
+        if ($this->serials()->count() && ! $this->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
             
             $this->serials()->forceDelete();
 
         }
     }
 
-    protected function setProductContainers($containers = array(), $product)
+    protected function setProductContainers($containers = array(), $merchantProduct)
     {
         if (count($containers)) {
 
@@ -242,15 +255,15 @@ class ProductStock extends Model
                 
                 $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
-                if (!empty($warehouseExpectedContainer) && $warehouseExpectedContainer->engaged==0.0) {
+                if (!empty($warehouseExpectedContainer) && $warehouseExpectedContainer->occupied==0.0) {
                     
                     $warehouseExpectedContainer->product()->create([
                         'product_stock_id' => $this->id,
-                        'product_id' => $product,
+                        'merchant_product_id' => $merchantProduct,
                     ]);
 
                     $warehouseExpectedContainer->update([
-                        'engaged' => 1
+                        'occupied' => 1
                     ]);
 
                     $this->updateChildShelves($warehouseExpectedContainer, 1);
@@ -261,13 +274,13 @@ class ProductStock extends Model
         }
     }
 
-    protected function setProductShelves($container = NULL, $product)
+    protected function setProductShelves($container = NULL, $merchantProduct)
     {
         if ($container) {
 
             if (count($container->shelves) === WarehouseContainerStatus::find($container->id)->containerShelfStatuses()->count()) {
                 
-                $this->setProductContainers([$container], $product);
+                $this->setProductContainers([ $container ], $merchantProduct);
 
             }
             else {
@@ -276,15 +289,15 @@ class ProductStock extends Model
                     
                     $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
-                    if (!empty($warehouseExpectedShelf) && $warehouseExpectedShelf->engaged==0.0) {
+                    if (!empty($warehouseExpectedShelf) && $warehouseExpectedShelf->occupied==0.0) {
                         
                         $warehouseExpectedShelf->product()->create([
                             'product_stock_id' => $this->id,
-                            'product_id' => $product,
+                            'merchant_product_id' => $merchantProduct,
                         ]);
 
                         $warehouseExpectedShelf->update([
-                            'engaged' => 1
+                            'occupied' => 1
                         ]);
                         
                         $this->updateChildUnits($warehouseExpectedShelf, 1);
@@ -300,7 +313,7 @@ class ProductStock extends Model
         }
     }
 
-    protected function setProductUnits($container = NULL, $product)
+    protected function setProductUnits($container = NULL, $merchantProduct)
     {
         if ($container) {
 
@@ -308,7 +321,7 @@ class ProductStock extends Model
                 
                 $container->{"shelves"} = [ $container->shelf, ];
                 
-                $this->setProductShelves($container, $product);
+                $this->setProductShelves($container, $merchantProduct);
 
             }
             else {
@@ -317,15 +330,15 @@ class ProductStock extends Model
                     
                     $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                    if (!empty($warehouseExpectedShelfUnit) && $warehouseExpectedShelfUnit->engaged==0.0) {
+                    if (!empty($warehouseExpectedShelfUnit) && $warehouseExpectedShelfUnit->occupied==0.0) {
                         
                         $warehouseExpectedShelfUnit->product()->create([
                             'product_stock_id' => $this->id,
-                            'product_id' => $product,
+                            'merchant_product_id' => $merchantProduct,
                         ]);
 
                         $warehouseExpectedShelfUnit->update([
-                            'engaged' => 1
+                            'occupied' => 1
                         ]);
 
                     }
@@ -344,27 +357,27 @@ class ProductStock extends Model
     {
         // $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
 
-        // all shelves are engaged
-        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1.0)->count()) {
+        // all shelves are occupied
+        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('occupied', 1.0)->count()) {
             
             $warehouseExpectedContainer->update([
-                'engaged' => 1
+                'occupied' => 1
             ]); 
 
         }
-        // no shelf is engaged
-        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 0.0)->count()) {
+        // no shelf is occupied
+        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('occupied', 0.0)->count()) {
             
             $warehouseExpectedContainer->update([
-                'engaged' => 0
+                'occupied' => 0
             ]); 
 
         }
         else {
 
-            // partially engaged
+            // partially occupied
             $warehouseExpectedContainer->update([
-                'engaged' => 0.5
+                'occupied' => 0.5
             ]);
 
         }
@@ -376,27 +389,27 @@ class ProductStock extends Model
         // Related Shelf
         // $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
 
-        // all units are engaged
-        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1.0)->count()) {
+        // all units are occupied
+        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('occupied', 1.0)->count()) {
             
             $warehouseExpectedShelf->update([
-                'engaged' => 1
+                'occupied' => 1
             ]);
 
         }
-        // no unit is engaged
-        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 0.0)->count()) {
+        // no unit is occupied
+        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('occupied', 0.0)->count()) {
             
             $warehouseExpectedShelf->update([
-                'engaged' => 0
+                'occupied' => 0
             ]);
 
         }
         else {
 
-            // partially engaged
+            // partially occupied
             $warehouseExpectedShelf->update([
-                'engaged' => 0.5
+                'occupied' => 0.5
             ]);
 
         }
@@ -413,7 +426,7 @@ class ProductStock extends Model
             foreach ($container->containerShelfStatuses as $containerShelf) {
                
                 $containerShelf->update([
-                    'engaged' => $newValue
+                    'occupied' => $newValue
                 ]);
 
                 $this->updateChildUnits($containerShelf, $newValue);
@@ -428,7 +441,7 @@ class ProductStock extends Model
         if ($shelf->containerShelfUnitStatuses->count()) {
             
             $shelf->containerShelfUnitStatuses()->update([
-                'engaged' => $newValue
+                'occupied' => $newValue
             ]);
 
         }
@@ -436,12 +449,12 @@ class ProductStock extends Model
 
     protected function increaseSuccessorStockVariations(ProductVariationStock $variationToUpdate, $amount)
     {
-        ProductVariationStock::where('product_variation_id', $variationToUpdate->product_variation_id)->where('id', '>', $variationToUpdate->id)->increment('available_quantity', $amount);
+        ProductVariationStock::where('merchant_product_variation_id', $variationToUpdate->merchant_product_variation_id)->where('id', '>', $variationToUpdate->id)->increment('available_quantity', $amount);
     }
 
     protected function decreaseSuccessorStockVariations(ProductVariationStock $variationToUpdate, $amount)
     {
-        ProductVariationStock::where('product_variation_id', $variationToUpdate->product_variation_id)->where('id', '>', $variationToUpdate->id)->decrement('available_quantity', $amount);
+        ProductVariationStock::where('merchant_product_variation_id', $variationToUpdate->merchant_product_variation_id)->where('id', '>', $variationToUpdate->id)->decrement('available_quantity', $amount);
     }
 
     protected function setProductVariationSerialNumbers($serials, ProductVariationStock $productVariationStock) 
@@ -454,7 +467,7 @@ class ProductStock extends Model
             foreach ($serials as $serial) {
                 
                 $productVariationStock->serials()->withTrashed()->updateOrCreate(
-                    [ 'serial_no' => $serial->serial_no, 'product_variation_id' => $productVariationStock->product_variation_id ],
+                    [ 'serial_no' => $serial->serial_no, 'merchant_product_variation_id' => $productVariationStock->merchant_product_variation_id ],
                     [ 'deleted_at' => NULL ]
                 );
 
@@ -476,7 +489,7 @@ class ProductStock extends Model
 
     protected function deleteStockVariationSerials(ProductVariationStock $productVariationStock)
     {
-        if ($productVariationStock->serials()->count() && ! $productVariationStock->serials()->where(function($q) { $q->where('has_requisitions', true)->orWhere('has_dispatched', true); })->exists()) {
+        if ($productVariationStock->serials()->count() && ! $productVariationStock->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
             
             $productVariationStock->serials()->forceDelete();
 

@@ -19,9 +19,9 @@ class ProductVariationStock extends Model
         'has_serials' => 'boolean',
     ];
 
-    public function productVariation()
+    public function merchantProductVariation()
     {
-    	return $this->belongsTo(ProductVariation::class, 'product_variation_id', 'id');
+    	return $this->belongsTo(MerchantProductVariation::class, 'merchant_product_variation_id', 'id');
     }
 
     public function productStock()

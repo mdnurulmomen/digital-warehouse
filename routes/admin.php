@@ -61,7 +61,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/dealt-warehouses/{merchant}/{warehouse?}/{perPage?}', 'WarehouseController@showMerchantWarehouses')->name('merchant-warehouses');
 
 		// warehouse container
-		Route::get('/api/warehouse-containers/{warehouse?}', 'WarehouseController@showWarehouseContainers')->name('warehouse-containers');
+		Route::get('/api/warehouse-containers/{warehouse?}', 'WarehouseController@showAllWarehouseEmptySpaces')->name('warehouse-containers');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
@@ -141,11 +141,11 @@ Route::name('admin.')->group(function () {
 
 		// product-stock
 		Route::get('/api/product-stocks/{productMerchant}/{perPage?}', 'ProductController@showProductAllStocks')->name('product-stocks');
-		Route::post('/product-stocks/{perPage?}', 'ProductController@storeProductStock')->name('product-stocks');
-		Route::put('/product-stocks/{stock}/{perPage?}', 'ProductController@updateProductStock')->name('product-stocks');
-		Route::delete('/product-stocks/{stock}/{perPage?}', 'ProductController@deleteProductStock')->name('product-stocks');
-		Route::patch('/product-stocks/{stock}/{perPage?}', 'ProductController@restoreProductStock')->name('product-stocks');
-		Route::get('/api/search-product-stocks/{productMerchant}/{search}/{perPage?}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
+		Route::post('/product-stocks/{perPage}', 'ProductController@storeProductStock')->name('product-stocks');
+		Route::put('/product-stocks/{stock}/{perPage}', 'ProductController@updateProductStock')->name('product-stocks');
+		Route::delete('/product-stocks/{stock}/{perPage}', 'ProductController@deleteProductStock')->name('product-stocks');
+		Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
+		Route::get('/api/search-product-stocks/{productMerchant}/{search}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
 
 		// requisition
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');

@@ -90,6 +90,7 @@ class MerchantProduct extends Model
     }
     */
 
+    /*
     public function deleteOldAddresses()
     {
         if (count($this->addresses)) {
@@ -97,7 +98,7 @@ class MerchantProduct extends Model
             foreach ($this->addresses as $productAddress) {
                 
                 $productAddress->space->update([
-                    'engaged' => 0
+                    'occupied' => 0
                 ]);
 
                 if ($productAddress->space instanceof WarehouseContainerStatus) {
@@ -125,6 +126,7 @@ class MerchantProduct extends Model
 
         // $this->addresses()->delete();
     }
+    */
 
     public function setProductAddressAttribute($addresses = [])
     {
@@ -285,7 +287,7 @@ class MerchantProduct extends Model
                 $warehouseExpectedContainer->product()->delete();
 
                 $warehouseExpectedContainer->update([
-                    'engaged' => 0
+                    'occupied' => 0
                 ]);
 
                 $this->updateChildShelves($warehouseExpectedContainer, 0);
@@ -305,7 +307,7 @@ class MerchantProduct extends Model
                 $warehouseExpectedShelf->product()->delete();
 
                 $warehouseExpectedShelf->update([
-                    'engaged' => 0
+                    'occupied' => 0
                 ]);
 
                 $this->updateChildUnits($warehouseExpectedShelf, 0);
@@ -328,7 +330,7 @@ class MerchantProduct extends Model
                 $warehouseExpectedShelfUnit->product()->delete();
 
                 $warehouseExpectedShelfUnit->update([
-                    'engaged' => 0
+                    'occupied' => 0
                 ]);
 
             }
@@ -343,27 +345,27 @@ class MerchantProduct extends Model
     {
         // $warehouseExpectedContainer = WarehouseContainerStatus::find($containerId);
 
-        // all shelves are engaged
-        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 1)->count()) {
+        // all shelves are occupied
+        if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('occupied', 1)->count()) {
             
             $warehouseExpectedContainer->update([
-                'engaged' => 1
+                'occupied' => 1
             ]); 
 
         }
-        // no shelf is engaged
-        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('engaged', 0)->count()) {
+        // no shelf is occupied
+        else if ($warehouseExpectedContainer->containerShelfStatuses->count()===$warehouseExpectedContainer->containerShelfStatuses()->where('occupied', 0.0)->count()) {
             
             $warehouseExpectedContainer->update([
-                'engaged' => 0
+                'occupied' => 0
             ]); 
 
         }
         else {
 
-            // partially engaged
+            // partially occupied
             $warehouseExpectedContainer->update([
-                'engaged' => 0.5
+                'occupied' => 0.5
             ]);
 
         }
@@ -375,27 +377,27 @@ class MerchantProduct extends Model
         // Related Shelf
         // $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($container->shelf->id);
 
-        // all units are engaged
-        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 1)->count()) {
+        // all units are occupied
+        if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('occupied', 1)->count()) {
             
             $warehouseExpectedShelf->update([
-                'engaged' => 1
+                'occupied' => 1
             ]);
 
         }
-        // no unit is engaged
-        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('engaged', 0)->count()) {
+        // no unit is occupied
+        else if ($warehouseExpectedShelf->containerShelfUnitStatuses->count()===$warehouseExpectedShelf->containerShelfUnitStatuses()->where('occupied', 0.0)->count()) {
             
             $warehouseExpectedShelf->update([
-                'engaged' => 0
+                'occupied' => 0
             ]);
 
         }
         else {
 
-            // partially engaged
+            // partially occupied
             $warehouseExpectedShelf->update([
-                'engaged' => 0.5
+                'occupied' => 0.5
             ]);
 
         }
@@ -412,7 +414,7 @@ class MerchantProduct extends Model
             foreach ($container->containerShelfStatuses as $containerShelf) {
                
                 $containerShelf->update([
-                    'engaged' => $newValue
+                    'occupied' => $newValue
                 ]);
 
                 $this->updateChildUnits($containerShelf, $newValue);
@@ -427,7 +429,7 @@ class MerchantProduct extends Model
         if ($shelf->containerShelfUnitStatuses->count()) {
             
             $shelf->containerShelfUnitStatuses()->update([
-                'engaged' => $newValue
+                'occupied' => $newValue
             ]);
 
         }
@@ -448,7 +450,7 @@ class MerchantProduct extends Model
                 ]);
 
                 $warehouseExpectedContainer->update([
-                    'engaged' => 1
+                    'occupied' => 1
                 ]);
 
                 $this->updateChildShelves($warehouseExpectedContainer, 1);
@@ -470,7 +472,7 @@ class MerchantProduct extends Model
                 ]);
 
                 $warehouseExpectedShelf->update([
-                    'engaged' => 1
+                    'occupied' => 1
                 ]);
 
                 $this->updateChildUnits($warehouseExpectedShelf, 1);
@@ -495,7 +497,7 @@ class MerchantProduct extends Model
                 ]);
 
                 $warehouseExpectedShelfUnit->update([
-                    'engaged' => 1
+                    'occupied' => 1
                 ]);
 
             }

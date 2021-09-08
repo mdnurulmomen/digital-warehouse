@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="product.name + ' stocks'" 
-			:message="'All' + product.name + 'stocks for ' + productMerchant.merchant ? productMerchant.merchant.name : ''"
+			:message="'All ' + product.name + ' stocks for ' + productMerchant.merchant ? productMerchant.merchant.name : ''"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -71,7 +71,7 @@
 																	</tr>
 																</thead>
 																<tbody>
-																	<tr v-for="stock in allStocks" :key="'stock-' + stock.id"
+																	<tr v-for="stock in allStocks" :key="'merchant-product-stock-' + stock.id"
 																	>
 																		<td>
 																			{{ stock.created_at }}
@@ -131,7 +131,7 @@
 																	</tr>
 
 																	<tr 
-																  		v-show="!allStocks.length"
+																  		v-show="! allStocks.length"
 																  	>
 															    		<td colspan="5">
 																      		<div class="alert alert-danger" role="alert">
@@ -256,7 +256,7 @@
 												Product Category :
 											</label>
 											<label class="col-sm-6 col-form-label text-left">
-												{{ product.category ? product.category.name : 'Bulk Product' }}
+												{{ product.category ? product.category.name : 'bulk product' | capitalize }}
 											</label>
 										</div>
 
@@ -388,7 +388,7 @@
 										<div class="form-row mt-2">
 											<div class="form-group col-md-12 text-center">
 												<toggle-button 
-													v-model="product.has_variations" 
+													v-model="productMerchant.has_variations" 
 													:width=150 
 													:sync="true"
 													:color="{checked: 'green', unchecked: 'blue'}"
@@ -398,7 +398,7 @@
 											</div>
 										</div>
 
-										<div class="form-row" v-if="product.has_variations">
+										<div class="form-row" v-if="productMerchant.has_variations">
 											<div 
 												class="form-group col-md-12" 
 												v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length"
@@ -485,7 +485,7 @@
 
 							    	<div 
 										class="col-md-12" 
-										v-if="product.has_serials && product.has_variations && singleStockData.variations.length && step==2"
+										v-if="productMerchant.has_serials && productMerchant.has_variations && singleStockData.variations.length && step==2"
 									>
 										<div 
 											class="form-row" 
@@ -529,7 +529,7 @@
 
 									<div 
 										class="col-md-12"
-										v-else-if="product.has_serials && ! product.has_variations && singleStockData.stock_quantity > 0 && step==2"
+										v-else-if="productMerchant.has_serials && ! productMerchant.has_variations && singleStockData.stock_quantity > 0 && step==2"
 									>
 										<div 
 											class="form-row" 
@@ -806,7 +806,6 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-													:disabled="singleStockData.addresses.length > 2" 
 													@click="addMoreSpace()"
 												>
 													Add Space
@@ -833,7 +832,7 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="product.has_serials ? step-=1 : step-=2">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="productMerchant.has_serials ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 												<button 
@@ -883,7 +882,7 @@
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">{{ this.product.name }} Stock Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">{{ product.name }} Stock Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -908,7 +907,7 @@
 										</a>
 									</li>
 
-									<li class="nav-item" v-show="product.has_serials">
+									<li class="nav-item" v-show="productMerchant.has_serials">
 										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
 											Serials
 										</a>
@@ -1498,8 +1497,9 @@
 	        	singleStockData : {
 
 	        		serials : [],
-	        		product_id : this.product.id,
-	        		variations : this.product.hasOwnProperty('variations') && this.product.variations.length ? JSON.parse(JSON.stringify(this.product.variations)) : [],
+	        		// product_id : this.product.id,
+	        		merchant_product_id : this.productMerchant.id,
+	        		variations : this.productMerchant.hasOwnProperty('variations') && this.productMerchant.variations.length ? JSON.parse(JSON.stringify(this.productMerchant.variations)) : [],
 					addresses : [
 						{},
 					],
@@ -1760,18 +1760,20 @@
 				this.singleStockData = {
 
 	        		serials : [],
-	        		product_id : this.product.id,
-	        		variations : this.product.hasOwnProperty('variations') && this.product.variations.length ? JSON.parse(JSON.stringify(this.product.variations)) : [],
+	        		// product_id : this.product.id,
+	        		merchant_id : this.productMerchant.merchant_id,
+	        		merchant_product_id : this.productMerchant.id,
+	        		variations : this.productMerchant.hasOwnProperty('variations') && this.productMerchant.variations.length ? JSON.parse(JSON.stringify(this.productMerchant.variations)) : [],
 	        		warehouse : this.singleStockData.warehouse ?? {},  // last warehouse
 					addresses : this.singleStockData.addresses,  // last address / initial address
 
 	        	};
 
-	        	if (this.product.has_serials && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+	        	if (this.productMerchant.has_serials && this.productMerchant.has_variations && this.productMerchant.hasOwnProperty('variations') && this.productMerchant.variations.length) {
 
 					this.$delete(this.singleStockData, 'serials');
 
-					this.product.variations.forEach(
+					this.productMerchant.variations.forEach(
 					
 						(stockVariation, stockVariationIndex) => {								
 
@@ -1849,6 +1851,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
+						this.fetchMerchantAllWarehouses();
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -1880,6 +1883,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
+						this.fetchMerchantAllWarehouses();
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -1906,6 +1910,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
+						this.fetchMerchantAllWarehouses();
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -1922,7 +1927,7 @@
 				
 				axios
 				.get(
-					"/api/search-product-stocks/" + this.product.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-product-stocks/" + this.productMerchant.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allStocks = response.data.all.data;
@@ -1973,7 +1978,7 @@
 
 				const variationError = (variation) => {
 
-					return (! this.product.has_serials && this.product.has_variations && Object.keys(variation).length > 0) || (this.product.has_serials && ! this.product.has_variations && Object.keys(variation).length > 0) || (this.product.has_serials && this.product.has_variations && Object.keys(variation).length > 1) || (variation.hasOwnProperty('product_variation_serials') && variation.product_variation_serials.length && variation.product_variation_serials.some(variationSerialError))
+					return (! this.productMerchant.has_serials && this.productMerchant.has_variations && Object.keys(variation).length > 0) || (this.productMerchant.has_serials && ! this.productMerchant.has_variations && Object.keys(variation).length > 0) || (this.productMerchant.has_serials && this.productMerchant.has_variations && Object.keys(variation).length > 1) || (variation.hasOwnProperty('product_variation_serials') && variation.product_variation_serials.length && variation.product_variation_serials.some(variationSerialError))
 
 				}; 
 
@@ -2002,7 +2007,7 @@
 					this.validateFormInput('warehouse');
 					this.validateFormInput('product_stock_quantity');
 
-					if (this.product.has_variations) {
+					if (this.productMerchant.has_variations) {
 						
 						this.validateFormInput('product_variation_quantity');
 						this.validateFormInput('product_variation_total_quantity');
@@ -2011,9 +2016,9 @@
 
 					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
-						if (this.product.has_serials) {
+						if (this.productMerchant.has_serials) {
 
-							if (this.product.has_variations) {
+							if (this.productMerchant.has_variations) {
 
 								this.setProductVariationSerialObjects();
 
@@ -2048,9 +2053,9 @@
 
 				else if (this.step == 2) {
 
-					if (this.product.has_serials) {
+					if (this.productMerchant.has_serials) {
 
-						if (this.product.has_variations) {
+						if (this.productMerchant.has_variations) {
 							
 							this.validateFormInput('product_variation_serials');
 
@@ -2149,15 +2154,15 @@
 
 				}
 
-				if (this.product.category && this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
+				if (this.productMerchant.has_variations && this.productMerchant.hasOwnProperty('variations') && this.productMerchant.variations.length) {
 	
-					this.product.variations.forEach(
+					this.productMerchant.variations.forEach(
 
 						(productVariation, stockVariationIndex) => {
 
 							this.errors.stock.variations.push({});
 
-							if (this.product.has_serials) {
+							if (this.productMerchant.has_serials) {
 
 								// this.errors.stock.variations[stockVariationIndex].product_variation_serials = [];
 								this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serials', []);
@@ -2172,6 +2177,8 @@
 
 			},
 			setAvailableShelvesAndUnits() {
+
+				this.resetWarehouseSpaces();
 
 				this.singleStockData.addresses.forEach(
 					space => {
@@ -2310,6 +2317,21 @@
 
 								(selectedContainer) => {
 
+									// same division
+									// emptyContainers
+									var selectedContainerIndex = this.emptyContainers.findIndex(
+										(currentContainer) => 
+											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+										
+									);
+
+									if (selectedContainerIndex > -1) {
+
+										this.emptyContainers.splice(selectedContainerIndex, 1);
+									
+									}
+
+									// downward
 									// containers with empty shelves
 									var selectedContainerIndex = this.emptyShelfContainers.findIndex(
 										(currentContainer) => 
@@ -2326,6 +2348,7 @@
 									}
 
 
+									// downward
 									// containers with empty units
 									var selectedContainerIndex = this.emptyUnitContainers.findIndex(
 										(currentContainer) => 
@@ -2348,9 +2371,41 @@
 						}
 						else if (productAddress.type=='shelves' && productAddress.container && productAddress.container.shelves && productAddress.container.shelves.length) {
 
-							// downward
+							// same division
+							// emptyShelfContainers
+							this.emptyShelfContainers.forEach(
 
-							// for every container-shelves with empty units
+								(emptyShelfContainer) => {
+
+									if (emptyShelfContainer.id == productAddress.container.id && emptyShelfContainer.name == productAddress.container.name && emptyShelfContainer.warehouse_container_id == productAddress.container.warehouse_container_id) {
+										
+										// for every selected shelves
+										productAddress.container.shelves.forEach(
+
+											(selectedShelf) => {
+
+												var selectedShelfIndex = emptyShelfContainer.container_shelf_statuses.findIndex(
+													(containerShelf) => 
+														containerShelf.id == selectedShelf.id && containerShelf.name == selectedShelf.name && containerShelf.warehouse_container_status_id == selectedShelf.warehouse_container_status_id
+												);
+
+												if (selectedShelfIndex > -1) {
+
+													emptyShelfContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
+												}
+
+											}
+
+										);
+
+									}
+
+								}
+								
+							);
+
+							// downward
+							// for every emptyUnitContainers
 							this.emptyUnitContainers.forEach(
 
 								(emptyUnitContainer) => {
@@ -2399,6 +2454,49 @@
 
 						}
 						else if (productAddress.type=='units' && productAddress.container && productAddress.container.shelf && productAddress.container.shelf.units && productAddress.container.shelf.units.length) {
+
+							// same division
+							// emptyUnitContainers
+							this.emptyUnitContainers.forEach(
+
+								(emptyUnitContainer) => {
+
+									if (emptyUnitContainer.id==productAddress.container.id && emptyUnitContainer.name==productAddress.container.name && emptyUnitContainer.warehouse_container_id==productAddress.container.warehouse_container_id) {
+
+										var selectedShelfIndex = emptyUnitContainer.container_shelf_statuses.findIndex(
+											(containerShelf) => 
+												containerShelf.id == productAddress.container.shelf.id && containerShelf.name == productAddress.container.shelf.name && containerShelf.warehouse_container_status_id == productAddress.container.shelf.warehouse_container_status_id
+										);
+
+										if(selectedShelfIndex > -1) {
+											
+											// for every selected units
+											productAddress.container.shelf.units.forEach(
+
+												(selectedUnit) => {
+
+													// unit
+													var selectedUnitIndex = emptyUnitContainer.container_shelf_statuses[selectedShelfIndex].container_shelf_unit_statuses.findIndex(
+														(shelfUnit) => 
+															shelfUnit.id == selectedUnit.id && shelfUnit.name == selectedUnit.name && shelfUnit.warehouse_container_shelf_status_id == selectedUnit.warehouse_container_shelf_status_id
+													);
+
+													if (selectedUnitIndex > -1) {
+
+														emptyUnitContainer.container_shelf_statuses[selectedShelfIndex].container_shelf_unit_statuses.splice(selectedUnitIndex, 1);
+													}
+
+												}
+
+											);
+
+										}
+
+									}
+
+								}
+
+							);
 
 							// upward
 							// for every empty containers
@@ -2499,7 +2597,7 @@
 					this.searchData();
 				}
     		},
-    		objectNameWithCapitalized ({ name }) {
+    		objectNameWithCapitalized ({ name, variation }) {
 		      	
 		      	if (name) {
 				    name = name.toString()
@@ -2511,6 +2609,17 @@
 					}
 
 					return words.join(" ");
+		      	}
+		      	else if (variation) {
+		      		var variation_name = variation.name.toString();
+		      		
+		      		if (variation.hasOwnProperty('sub_variation') && variation.sub_variation.hasOwnProperty('name')) {
+
+		      			variation_name = variation_name + '-' + variation.sub_variation.name
+
+		      		}
+
+				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
 		      	}
 		      	else 
 		      		return ''
@@ -2553,7 +2662,7 @@
 
 					case 'product_variation_quantity' :
 
-						if (this.product.has_variations) {
+						if (this.productMerchant.has_variations) {
 
 							this.singleStockData.variations.forEach(
 								(productVariation, index) => {
@@ -2588,7 +2697,7 @@
 					
 					case 'product_variation_total_quantity' :
 
-						if (this.product.has_variations) {
+						if (this.productMerchant.has_variations) {
 
 							if (!this.errorInVariationsArray(this.errors.stock.variations)) {
 
@@ -2772,7 +2881,7 @@
 
 					case 'product_serials' :
 
-						if (this.product.has_serials && ! this.product.has_variations) {
+						if (this.productMerchant.has_serials && ! this.productMerchant.has_variations) {
 							
 							for (let i = 0; i < this.singleStockData.stock_quantity; i++) {
 								
@@ -2821,7 +2930,7 @@
 					case 'product_variation_serials' :
 
 
-						if (this.product.has_serials && this.product.has_variations && this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
+						if (this.productMerchant.has_serials && this.productMerchant.has_variations && this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
 							
 							this.singleStockData.variations.forEach(
 							

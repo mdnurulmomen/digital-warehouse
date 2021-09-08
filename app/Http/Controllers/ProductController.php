@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Stock;
 use App\Models\Product;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
@@ -400,18 +401,14 @@ class ProductController extends Controller
 
     public function storeProductStock(Request $request, $perPage)
     {
-        $product = Product::findOrFail($request->product_id);
+        $merchantProduct = MerchantProduct::findOrFail($request->merchant_product_id);
+        $product = $merchantProduct->product;
 
         $request->validate([
+            'merchant_id' => 'required|exists:merchants,id',
             'stock_quantity' => 'required|numeric|min:1',
             'warehouse.id' => 'required|exists:warehouses,id',
-            'product_id' => 'required|numeric|exists:products,id',
-            'variations' => [
-                'array', 
-                Rule::requiredIf(function () use ($product) {
-                    return $product->has_variations;
-                })
-            ],
+            // 'product_id' => 'required|numeric|exists:products,id',
             'serials' => [
                 'array', 
                 Rule::requiredIf(function () use ($product) {
@@ -422,6 +419,18 @@ class ProductController extends Controller
                 'string', 'distinct', 'min:4', 'unique:product_serials,serial_no', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_serials && ! $product->has_variations;
+                })
+            ],
+            'variations' => [
+                'array', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
+                })
+            ],
+            'variations.*.id' => [
+                'numeric', 'exists:merchant_product_variations,id', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
                 })
             ],
             'variations.*.stock_quantity' => [
@@ -446,13 +455,35 @@ class ProductController extends Controller
         ],
         [
             'stock_quantity.*' => 'Stock quantity is required !',
-            'product_id.*' => 'Product id is missing !',
+            'warehouse.id.exists' => 'Warehouse is invalid !',
+            'warehouse.id.*' => 'Warehouse is required !',
             'serials.required' => 'Product serial is required !',
+            
+            'serials.*.serial_no' => [
+                'distinct' => 'Duplicate product-serial is invalid',
+                'unique' => 'Product serial exists',
+                '*' => 'Product serial is required',
+            ],
+            
+            // 'product_id.*' => 'Product id is missing !',
             // 'serials.*.unique' => ':attribute serial must be unique !',
-            'variations.*.stock_quantity.required' => 'Variation quantity is required !'
+            
+            'variations.*.id.*' => 'Variation id is required !',
+            'variations.*.stock_quantity' => [
+                'required' => 'Variation quantity should be equal to product quantity',
+                '*' => 'Variation quantity is required !',
+            ],
+
+            'variations.*.serials.*' => 'Variation serial is required',
+
+            'variations.*.serials.*.serial_no' => [
+                'distinct' => 'Variation duplicate serial is invalid',
+                'unique' => 'Variation serial exists',
+                '*' => 'Variation serial is required',
+            ]
         ]);
 
-        $lastAvailableQuantity = $product->latestStock->available_quantity ?? 0;
+        $lastAvailableQuantity = $merchantProduct->latestStock->available_quantity ?? 0;
 
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
 
@@ -464,106 +495,171 @@ class ProductController extends Controller
 
         $userHasUpdatingPermission = $currentUser->hasPermissionTo('update-product-stock');
 
-        $newStock = $product->stocks()->create([
-            'stock_quantity' => $request->stock_quantity,
-            'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
-            'has_variations' => $product->has_variations,
-            'has_serials' => $product->has_serials,
+        $newStock = Stock::create([
             'keeper_type' => get_class($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
             'has_approval' => $userHasUpdatingPermission ? true : false, 
             'approver_type' => $userHasUpdatingPermission ? get_class($currentUser) : NULL,
             'approver_id' => $userHasUpdatingPermission ? $currentUser->id : NULL,
             'warehouse_id' => $request['warehouse']['id'],
+            'merchant_id' => $request->merchant_id,
         ]);
 
-        if ($newStock->has_variations && ! empty($request->variations)) {
+        $productNewStock = $newStock->stocks()->create([
+            'stock_quantity' => $request->stock_quantity,
+            'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
+            'merchant_product_id' => $merchantProduct->id
+        ]);       
+
+        if ($product->has_variations && ! empty($request->variations)) {
             
-            $newStock->stock_variations = json_decode(json_encode($request->variations));
+            $productNewStock->stock_variations = json_decode(json_encode($request->variations));
 
         }
 
-        if ($newStock->has_serials && ! $newStock->has_variations && ! empty($request->serials)) {
+        if ($product->has_serials && ! $product->has_variations && ! empty($request->serials)) {
             
-            $newStock->stock_serials = json_decode(json_encode($request->serials));
+            $productNewStock->stock_serials = json_decode(json_encode($request->serials));
 
         }
 
-        $newStock->setStockAddresses(json_decode(json_encode($request->addresses)), $product->id);
+        $productNewStock->setStockAddresses(json_decode(json_encode($request->addresses)), $merchantProduct->id);
 
-        return $this->showProductAllStocks($request->product_id, $perPage);
+        return $this->showProductAllStocks($request->merchant_product_id, $perPage);
     }
 
     public function updateProductStock(Request $request, $stock, $perPage)
     {
         $stockToUpdate = ProductStock::findOrFail($stock);
+        $product = $stockToUpdate->merchantProduct->product;
 
         $request->validate([
             'stock_quantity' => 'required|numeric|min:1',
             'warehouse.id' => 'required|exists:warehouses,id',
             // 'product_id' => 'required|numeric|exists:products,id',
-            'variations' => [
-                'array', 
-                Rule::requiredIf(function () use ($stockToUpdate) {
-                    return $stockToUpdate->has_variations;
-                })
-            ],
             'serials' => [
                 'array', 
-                Rule::requiredIf(function () use ($stockToUpdate) {
-                    return $stockToUpdate->has_serials && ! $stockToUpdate->has_variations;
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_serials && ! $product->has_variations;
                 })
             ],
             'serials.*.serial_no' => [
                 'string', 'distinct', 'min:4', 
                 // 'unique:product_serials,serial_no,'.$request->input('serials.*').',serial_no',
                 // Rule::unique('product_serials', 'serial_no')->ignore(ProductSerial::where('serial_no', $request->input('serials.*'))->first()->id),
-                Rule::requiredIf(function () use ($stockToUpdate) {
-                    return $stockToUpdate->has_serials && ! $stockToUpdate->has_variations;
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_serials && ! $product->has_variations;
+                })
+            ],
+            'variations' => [
+                'array', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
+                })
+            ],
+            'variations.*.merchant_product_variation_id' => [
+                'numeric', 'exists:merchant_product_variations,id', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
                 })
             ],
             'variations.*.stock_quantity' => [
                 'numeric', 'min:1', 
-                Rule::requiredIf(function () use ($stockToUpdate, $request) {
-                    return $stockToUpdate->has_variations && array_sum($request->input('variations.*.stock_quantity')) != $request->stock_quantity;
+                Rule::requiredIf(function () use ($product, $request) {
+                    return $product->has_variations && array_sum($request->input('variations.*.stock_quantity')) != $request->stock_quantity;
                 })
             ],
             'variations.*.serials' => [
                 'array', 
                 'exclude_if:variations.*.stock_quantity,', 
-                Rule::requiredIf(function () use ($stockToUpdate) {
-                    return $stockToUpdate->has_variations && $stockToUpdate->has_serials;
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations && $product->has_serials;
                 })
             ],
             'variations.*.serials.*.serial_no' => [
                 'string', 'distinct', 'min:4', 
                 // 'unique:product_variation_serials,serial_no,'.$request->input('variations.*.serials.*').',serial_no', 
                 // Rule::unique('product_variation_serials', 'serial_no')->ignore(ProductVariationSerial::where('serial_no', $request->input('variations.*.serials.*'))->first()->id),
-                Rule::requiredIf(function () use ($stockToUpdate) {
-                    return $stockToUpdate->has_variations && $stockToUpdate->has_serials;
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations && $product->has_serials;
                 })
             ]
         ],
         [
             'stock_quantity.*' => 'Stock quantity is required !',
-            // 'product_id.*' => 'Product id is missing !',
+            'warehouse.id.exists' => 'Warehouse is invalid !',
+            'warehouse.id.*' => 'Warehouse is required !',
             'serials.required' => 'Product serial is required !',
+            
+            'serials.*.serial_no' => [
+                'distinct' => 'Duplicate product-serial is invalid',
+                'unique' => 'Product serial exists',
+                '*' => 'Product serial is required',
+            ],
+            
+            // 'product_id.*' => 'Product id is missing !',
             // 'serials.*.unique' => ':attribute serial must be unique !',
-            'variations.*.stock_quantity.required' => 'Variation quantity is required !'
+            
+            'variations.*.merchant_product_variation_id.*' => 'Merchant product variation id is required !',
+            'variations.*.stock_quantity' => [
+                'required' => 'Variation quantity should be equal to product quantity',
+                '*' => 'Variation quantity is required !',
+            ],
+
+            'variations.*.serials.*' => 'Variation serial is required',
+
+            'variations.*.serials.*.serial_no' => [
+                'distinct' => 'Variation duplicate serial is invalid',
+                'unique' => 'Variation serial exists',
+                '*' => 'Variation serial is required',
+            ]
         ]);
 
+        if (! $product->has_variations && $stockToUpdate->stock_quantity > $request->stock_quantity) {
+            
+            $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
 
-        if ($stockToUpdate->has_serials && ! $stockToUpdate->has_variations && $this->checkProductSerialDuplicacy($request)) {
+            if ($difference > $stockToUpdate->merchantProduct->latestStock->available_quantity) {
 
-            $duplicateValue = $this->checkProductSerialDuplicacy($request);
-            return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+                return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
+                
+            }
+
+        }else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $stockToUpdate)) {
+
+            return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
 
         }
 
-        else if ($stockToUpdate->has_serials && $stockToUpdate->has_variations && $this->checkVariationSerialDuplicacy($request)) {
+        if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($request->serials))) || $this->checkProductSerialDuplicacy($request))) {
+
+            if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($request->serials)))) {
+                
+                $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($request->serials)));
+                return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
+
+            }
+            else {
+
+                $duplicateValue = $this->checkProductSerialDuplicacy($request);
+                return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+
+            }
+
+        }else if ($product->has_serials && $product->has_variations && ($this->checkVariationSerialInvalidity($stockToUpdate, json_decode(json_encode($request->serials))) || $this->checkVariationSerialDuplicacy($request))) {
             
-            $duplicateValue = $this->checkVariationSerialDuplicacy($request);
-            return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+            if ($this->checkVariationSerialInvalidity($stockToUpdate, json_decode(json_encode($request->serials)))) {
+                
+                $serialNotFound = $this->checkVariationSerialInvalidity($stockToUpdate, json_decode(json_encode($request->serials)));
+                return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
+
+            }
+            else {
+
+                $duplicateValue = $this->checkVariationSerialDuplicacy($request);
+                return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+
+            }
             
         }
 
@@ -582,6 +678,9 @@ class ProductController extends Controller
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity,
                 'available_quantity' => ($stockToUpdate->available_quantity + $difference),
+            ]);
+
+            $stockToUpdate->stock()->update([
                 'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
@@ -595,20 +694,12 @@ class ProductController extends Controller
 
             $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
 
-            if ($difference > $stockToUpdate->product->latestStock->available_quantity) {
-
-                return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
-                
-            }
-            else if ($stockToUpdate->variations->count() && $this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $stockToUpdate)) {
-                
-                return response()->json(['errors'=>["invalidValue" => "Variation quantity is less than minimum"]], 422);
-
-            }
-
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity,
                 'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
+            ]);
+
+            $stockToUpdate->stock()->update([
                 'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
@@ -618,9 +709,9 @@ class ProductController extends Controller
             $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
 
         }
-        else if(! $stockToUpdate->has_approval) {
+        else if($request->stock_quantity == $stockToUpdate->stock_quantity && ! $stockToUpdate->stock->has_approval) {
 
-            $stockToUpdate->update([
+            $stockToUpdate->stock()->update([
                 'has_approval' => true,
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
@@ -630,21 +721,18 @@ class ProductController extends Controller
             $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
 
         }
-        else {
+        else if($request->stock_quantity == $stockToUpdate->stock_quantity && $stockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
 
-            $stockToUpdate->update([
+            $stockToUpdate->stock()->update([
+                'has_approval' => true,
+                'approver_type' => get_class($currentUser),
+                'approver_id' => $currentUser->id,
                 'warehouse_id' => $request['warehouse']['id'],
             ]);
 
         }
 
-        if ($stockToUpdate->has_variations && !empty($request->variations)) {
-                
-            if ($this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $stockToUpdate)) {
-                
-                return response()->json(['errors'=>["invalidValue" => "Variation quantity is less than minimum"]], 422);
-
-            }
+        if ($product->has_variations && ! empty($request->variations)) {
 
             $stockToUpdate->stock_variations = json_decode(json_encode($request->variations));
 
@@ -656,36 +744,38 @@ class ProductController extends Controller
 
         }
 
-        $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $stockToUpdate->product_id);
+        $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $stockToUpdate->merchant_product_id);
 
-        return $this->showProductAllStocks($stockToUpdate->product_id, $perPage);
+        return $this->showProductAllStocks($stockToUpdate->merchant_product_id, $perPage);
     }
 
     public function deleteProductStock($stock, $perPage)
     {
         $stockToDelete = ProductStock::findOrFail($stock);
+        $merchantProduct = $stockToDelete->merchantProduct;
+        $product = $merchantProduct->product;
 
-        if ($stockToDelete->has_serials && ! $stockToDelete->has_variations && $stockToDelete->serials()->where(function($q) { $q->where('has_requisitions', true)->orWhere('has_dispatched', true); })->exists()) {
+        if ($product->has_serials && ! $product->has_variations && $stockToDelete->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
             
            return response()->json(['errors'=>["undeletableSerial" => "Stock serial has requisition"]], 422);
             
         }
 
-        else if ($stockToDelete->has_serials && $stockToDelete->has_variations && $stockToDelete->variations()->whereHas('serials', function ($query) {
-            $query->where('has_requisitions', true)->orWhere('has_dispatched', true);
+        else if ($product->has_serials && $product->has_variations && $stockToDelete->variations()->whereHas('serials', function ($query) {
+            $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
         })->exists()) {
             
             return response()->json(['errors'=>["undeletableVariationSerial" => "Stock variation serial has requisition"]], 422);
 
         }
 
-        else if ($stockToDelete->stock_quantity > $stockToDelete->available_quantity) {
+        else if ($stockToDelete->stock_quantity > $stockToDelete->available_quantity || $stockToDelete->stock_quantity > $merchantProduct->latestStock->available_quantity) {
             
             return response()->json(['errors'=>["undeletableStock" => "Stock available-quantity is less than stock-quantity"]], 422);
 
         }
 
-        else if ($stockToDelete->has_variations && $stockToDelete->variations()->whereRaw('stock_quantity > available_quantity')->exists()) {
+        else if ($product->has_variations && $stockToDelete->variations()->whereRaw('stock_quantity > available_quantity')->exists()) {
             
             return response()->json(['errors'=>["undeletableStockVariation" => "Stock variation available-quantity is less than stock-quantity"]], 422);
 
@@ -701,13 +791,13 @@ class ProductController extends Controller
 
         $stockToDelete->delete();
 
-        return $this->showProductAllStocks($stockToDelete->product_id, $perPage);
+        return $this->showProductAllStocks($stockToDelete->merchant_product_id, $perPage);
     }
 
-    public function searchProductAllStocks($product, $search, $perPage)
+    public function searchProductAllStocks($merchantProduct, $search, $perPage)
     {
-        $query = ProductStock::with(['addresses', 'variations'])
-                        ->where('product_id', $product)
+        $query = ProductStock::with(['addresses', 'variations', 'serials'])
+                        ->where('merchant_product_id', $merchantProduct)
                         ->where(function($q) use ($search) {
                             $q->where('stock_quantity', 'like', "%$search%")
                             ->orWhere('available_quantity', 'like', "%$search%");
@@ -1026,6 +1116,7 @@ class ProductController extends Controller
     {
         $productMerchantToDelete = MerchantProduct::findOrFail($productMerchant);
 
+        // if any related stock / requisition exists
         if ($productMerchantToDelete->product_immutability) {
             
            return response()->json(['errors'=>["undeletableMerchant" => "Merchant has stock or requisition"]], 422); 
@@ -1073,25 +1164,57 @@ class ProductController extends Controller
         ], 200);
     }
 
-    protected function findVariationInvalidQuantity($stockVariaitonQuantities = [], ProductStock $productStock)
+    protected function findVariationInvalidQuantity($stockVariaitons = [], ProductStock $productStock)
     {
-        // update / old stock
-        if (count($stockVariaitonQuantities)) {
+        if (count($stockVariaitons) && $productStock->variations->count()) {
             
-            foreach ($stockVariaitonQuantities as $stockVariation) {
+            $stockVariationCollection = collect($stockVariaitons);
 
-                $productStockVariation = $productStock->variations()->where('id', $stockVariation->id)->firstOrFail();
+            foreach ($productStock->variations as $productVariationStockKey => $productVariationExistingStock) {
+                
+                $expectedVariationInputedStock = $stockVariationCollection->first(function ($object, $key) use ($productVariationExistingStock) {
+                    return $object->merchant_product_variation_id == $productVariationExistingStock->merchant_product_variation_id;
+                });
 
-                if ($productStockVariation->stock_quantity > $stockVariation->stock_quantity) {
-                    
-                    // decrease quantity
-                    $difference = $productStockVariation->stock_quantity - $stockVariation->stock_quantity;
+                $merchantProductVariation = $productVariationExistingStock->merchantProductVariation;
+                $expectedVariationeLatestStock = $merchantProductVariation->latestStock;
 
-                    if ($difference > $productStockVariation->productVariation->latestStock->available_quantity) {
+                // replaced variation-stock
+                if (empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $expectedVariationeLatestStock->available_quantity < $productVariationExistingStock->stock_quantity) {
+
+                    // MerchantProductVariation which has only stock but already dispatched, cant be replaced
+                    if ($merchantProductVariation->stocks->count() < 2 && $merchantProductVariation->dispatchedRequests->count()) {
                         
                         return true;
 
                     }
+                    // have multiple stocks, but next available quantities are gonna have negative value 
+                    else if ($merchantProductVariation->stocks()->where('id', '>', $productVariationExistingStock->id)->where('available_quantity', '<', $productVariationExistingStock->stock_quantity)->exists()) {
+                        
+                        return true;
+
+                    }
+                    
+                    return false;
+
+                }
+                // decreased
+                else if (! empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $productVariationExistingStock->stock_quantity > $expectedVariationInputedStock->stock_quantity) {
+
+                    // only stock but deducted quantity is less than dispatched
+                    if ($merchantProductVariation->stocks->count() < 2 && $merchantProductVariation->dispatchedRequests->count() > ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) {
+                        
+                        return true;
+
+                    }
+                    // has multiple stocks, but deducted quantity is gonna affect next stocks
+                    else if (($expectedVariationeLatestStock->available_quantity < ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) || $merchantProductVariation->stocks()->where('id', '>', $expectedVariationInputedStock->id)->where('available_quantity', '<', $expectedVariationInputedStock->stock_quantity)->exists()) {
+                        
+                        return true;
+
+                    }
+
+                    return false;
 
                 }
 
@@ -1100,16 +1223,18 @@ class ProductController extends Controller
             return false;
 
         }
+
+        return true;
     }
 
     protected function increaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
     {
-        ProductStock::where('product_id', $stockToUpdate->product_id)->where('created_at', '>', $stockToUpdate->created_at)->increment('available_quantity', $amount);
+        ProductStock::where('merchant_product_id', $stockToUpdate->merchant_product_id)->where('id', '>', $stockToUpdate->id)->increment('available_quantity', $amount);
     }
 
     protected function decreaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
     {
-        ProductStock::where('product_id', $stockToUpdate->product_id)->where('created_at', '>', $stockToUpdate->created_at)->decrement('available_quantity', $amount);
+        ProductStock::where('merchant_product_id', $stockToUpdate->merchant_product_id)->where('id', '>', $stockToUpdate->id)->decrement('available_quantity', $amount);
     }
 
     protected function generateProductSKU($merchant, $productCategory, $product, $menufacturer)
@@ -1129,11 +1254,45 @@ class ProductController extends Controller
                 if (ProductVariationSerial::where('serial_no', $productVariationSerial['serial_no'])->count() > 1) {
                     
                     // return true;
-                    return $productVariationSerial;
+                    return $productVariationSerial['serial_no'];
 
                 }
                 
             }
+        }
+
+        return false;
+    }
+
+    protected function checkVariationSerialInvalidity(ProductStock $productStock, $productVariationSerials)
+    {
+        if ($productStock->variations()->whereHas('serials', function ($query) {
+            $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
+        })->exists()) {
+
+            $productVariationSerialCollection = collect($productVariationSerials);
+            
+            foreach ($productStock->variations()->whereHas('serials', function ($query) {
+                $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
+            })->exists() as $productStockVariationKey => $productStockVariation) {
+                
+                foreach ($productStockVariation->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
+                    
+                    $productVariationSerialExists = $productVariationSerialCollection->first(function ($object, $key) use ($productStockVariationSerial) {
+                        return $object->serial_no == $productStockVariationSerial->serial_no;
+                    });
+
+                    if (empty($productVariationSerialExists)) {
+                        
+                        // return true;
+                        return $productStockVariationSerial->serial_no;
+
+                    }
+
+                }
+
+            }
+
         }
 
         return false;
@@ -1145,10 +1304,38 @@ class ProductController extends Controller
         {
             if (ProductSerial::where('serial_no', $productSerial['serial_no'])->count() > 1) {
                 
-                return $productSerial;
+                return $productSerial['serial_no'];
 
             }
         }
+
+        return false;
+    }
+
+    protected function checkProductSerialInValidity(ProductStock $productStock, $productSerials)
+    {
+        if ($productStock->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->exists()) {
+            
+            $productSerialCollection = collect($productSerials);
+
+            foreach ($productStock->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productSerialKey => $productSerial) {
+                
+                $productSerialExists = $productSerialCollection->first(function ($object, $key) use ($productSerial) {
+                    return $object->serial_no == $productSerial->serial_no;
+                });
+
+                if (empty($productSerialExists)) {
+                    
+                    // return true;
+                    return $productSerial->serial_no;
+
+                }
+
+            }
+
+        }
+
+        return false;
     }
 
 }

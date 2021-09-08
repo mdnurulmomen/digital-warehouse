@@ -96,7 +96,7 @@
 																				@click="goProductStore(productMerchant)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
-																				<i class="feather icon-command"></i>
+																				<i class='fas fa-store-alt'></i>
 																			</button>
 																		</td>
 																	</tr>
@@ -1448,7 +1448,7 @@
 		created(){
 
 			this.fetchAllMerchants();
-			this.setProductVariation();
+			// this.setProductVariation();
 			// this.fetchAllContainers();
 			this.fetchProductAllMerchants();
 
@@ -1655,6 +1655,7 @@
 	        	this.formSubmitted = false;
 				
 				this.resetErrorProductVariations(object);
+				this.allVariations = this.product.variations;
 
 				this.singleMerchantProductData = JSON.parse(JSON.stringify(object));
 
@@ -2568,36 +2569,42 @@
 						
 						if (this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
 							
-							if (! this.singleMerchantProductData.hasOwnProperty('variations') || ! this.singleMerchantProductData.variations.length) {
+							// if (! this.singleMerchantProductData.hasOwnProperty('variations') || ! this.singleMerchantProductData.variations.length) {
 
 
 
-							}
+							// }
 
-							else {
+							// else {
 
-								this.singleMerchantProductData.variations.forEach(
+							this.singleMerchantProductData.variations.forEach(
+								
+								(merchantProductVariation, index) => {
 									
-									(merchantProductVariation, index) => {
+									if (! merchantProductVariation.hasOwnProperty('variation') || ! merchantProductVariation.variation || Object.keys(merchantProductVariation.variation).length == 0) {
 										
-										if (! merchantProductVariation.hasOwnProperty('variation') || ! merchantProductVariation.variation || Object.keys(merchantProductVariation.variation).length == 0) {
-											
-											this.errors.product.variations[index].product_variation_id = 'Variation is required';
+										this.errors.product.variations[index].product_variation_id = 'Variation is required';
 
-										}
-										else if (this.singleMerchantProductData.variations.filter((obj) => (obj.hasOwnProperty('variation') && obj.variation.id) === merchantProductVariation.variation.id).length > 1) {
-
-											this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
-										}
-										else {
-											this.$delete(this.errors.product.variations[index], 'product_variation_id');
-										}
-										
 									}
+									else if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
 
-								);								
+										 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 
-							}
+									}
+									else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
+
+										 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+
+									}
+									else {
+										this.$delete(this.errors.product.variations[index], 'product_variation_id');
+									}
+									
+								}
+
+							);								
+
+							// }
 
 							
 							if (!this.errorInArray(this.errors.product.variations)) {

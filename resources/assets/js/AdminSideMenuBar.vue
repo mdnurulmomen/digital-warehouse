@@ -182,7 +182,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-product-hunt"></i>
+										<i class="fab fa-product-hunt"></i>
 									</span>
 									<span class="pcoded-mtext">Product</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->

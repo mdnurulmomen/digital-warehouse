@@ -17,7 +17,8 @@ class CreateWarehouseContainerShelfUnitStatusesTable extends Migration
             $table->increments('id');
             $table->string('name');
             // $table->boolean('hired')->default(false);
-            $table->unsignedDecimal('engaged', $precision = 2, $scale = 1)->default(0); // 1 for full engaged, .5 for partial engaged
+            $table->float('engaged', $precision = 2, $scale = 1)->default(0); // 1 for full engaged, .5 for partial engaged
+            $table->float('occupied', $precision = 2, $scale = 1)->default(0); // 1 for full, .5 for partial
             $table->unsignedInteger('warehouse_container_id');
             $table->unsignedInteger('warehouse_container_shelf_status_id');
         });

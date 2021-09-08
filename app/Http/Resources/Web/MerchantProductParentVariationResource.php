@@ -23,7 +23,8 @@ class MerchantProductParentVariationResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
+            // 'id' => $this->id,
+            // 'name' => $this->name,
             'name' => isset($this->selectedChildVariation) ? $this->name.'-'.$this->selectedChildVariation->name : $this->name,
             // 'sub_variation' => isset($this->selectedChildVariation) ? $this->selectedChildVariation : NULL,
             // 'variation_childs' => $this->when($this->variationChilds->count(), $this->variationChilds),

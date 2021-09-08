@@ -21,6 +21,7 @@ class CreateStocksTable extends Migration
             $table->string('approver_type')->nullable();        // stock confirmer (admin, manager, warehouse, ...)
             $table->unsignedInteger('approver_id')->nullable();
             $table->unsignedSmallInteger('warehouse_id');
+            $table->unsignedInteger('merchant_id');
             $table->timestamps();
         });
     }
