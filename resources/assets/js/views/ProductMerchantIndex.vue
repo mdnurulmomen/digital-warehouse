@@ -264,14 +264,14 @@
 
 									<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Selling Price</label>
+											<label for="inputFirstName">Selling Price (unit)</label>
 											<input type="number" 
 												class="form-control" 
 												v-model.number="singleMerchantProductData.selling_price" 
 												placeholder="Product Selling Price" 
 												:class="!errors.product.product_price  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_price')" 
-												required="true" 
+												:disabled="product.category ? false : true"
 											>
 
 											<div class="invalid-feedback">
@@ -446,7 +446,7 @@
 															<div class="form-group col-md-12">
 																<div class="form-row">
 																	<div class="form-group col-md-6">
-																		<label for="inputFirstName">Selling Price</label>
+																		<label for="inputFirstName">Selling Price (unit)</label>
 
 																		<input type="number" 
 																			class="form-control" 
@@ -955,7 +955,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Selling Price :
+														Selling Price (unit) :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.selling_price }}
@@ -1026,7 +1026,7 @@
 
 																		<div class="form-row">
 																			<label class="col-sm-4 col-form-label font-weight-bold">
-																				Selling Price :
+																				Selling Price (unit) :
 																			</label>
 																			<label class="col-sm-8 col-form-label">
 																				{{ merchantProductVariation.selling_price }}
@@ -2486,7 +2486,7 @@
 
 					case 'product_price' :
 
-						if (!this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0) {
+						if (this.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)) {
 							this.errors.product.product_price = 'Price is required';
 						}
 						else{

@@ -284,8 +284,8 @@
 											<input type="text" 
 												class="form-control" 
 												v-model="singleProductData.quantity_type" 
-												placeholder="Kg / Meter / Box" 
-												:class="!errors.product.product_quantity_type  ? 'is-valid' : 'is-invalid'" 
+												:placeholder="productMode=='bulk product' ? 'Box / Cartoon' : 'Kg / Meter'" 
+												:class="! errors.product.product_quantity_type ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_quantity_type')" 
 												required="true" 
 											>

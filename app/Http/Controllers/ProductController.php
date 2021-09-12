@@ -161,7 +161,7 @@ class ProductController extends Controller
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
-            'product_category_id' => 'numeric|exists:product_categories,id',
+            'product_category_id' => 'nullable|numeric|exists:product_categories,id',
             // 'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
@@ -207,7 +207,7 @@ class ProductController extends Controller
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
-            'product_category_id' => 'numeric|exists:product_categories,id',
+            'product_category_id' => 'nullable|numeric|exists:product_categories,id',
             // 'merchant_id' => 'required|numeric|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
@@ -936,7 +936,12 @@ class ProductController extends Controller
                 }),
             ],
             'manufacturer_name' => 'nullable|string|max:255',
-            'selling_price' => 'required|numeric',
+            // 'selling_price' => 'required|numeric',
+            'selling_price' => [ 'nullable', 'numeric', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->product_category_id != NULL;
+                }),
+            ],
             'description' => 'nullable|string|max:255',
             'warning_quantity' => 'numeric',
             'variations' => [
@@ -990,7 +995,7 @@ class ProductController extends Controller
             'description' => strtolower($request->description), 
             'manufacturer_name' => strtolower(trim($request->manufacturer_name)), 
             'warning_quantity' => $request->warning_quantity ?? 100,
-            'selling_price' => $request->selling_price,
+            'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()
@@ -1037,7 +1042,12 @@ class ProductController extends Controller
                 })->ignore($productMerchant),
             ], 
             'manufacturer_name' => 'nullable|string|max:255',
-            'selling_price' => 'required|numeric',
+            // 'selling_price' => 'required|numeric',
+            'selling_price' => [ 'nullable', 'numeric', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->product_category_id != NULL;
+                }),
+            ],
             'description' => 'nullable|string|max:255',
             'warning_quantity' => 'numeric',
             'variations' => [
@@ -1093,7 +1103,7 @@ class ProductController extends Controller
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'warning_quantity' => $request->warning_quantity ?? 100,
-            'selling_price' => $request->selling_price,
+            'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()
