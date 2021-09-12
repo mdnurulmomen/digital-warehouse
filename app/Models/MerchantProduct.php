@@ -23,6 +23,11 @@ class MerchantProduct extends Model
         return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
     }
 
+    public function manufacturer()
+    {
+        return $this->belongsTo(ProductManufacturer::class, 'manufacturer_id', 'id');
+    }
+
     public function variations()
     {
         return $this->hasMany(MerchantProductVariation::class, 'merchant_product_id', 'id');

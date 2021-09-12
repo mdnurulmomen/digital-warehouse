@@ -120,6 +120,14 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-variations/{search}/{perPage}', 'AssetController@searchAllVariations')->name('search-variations');
 
 		// product-category
+		Route::get('/api/manufacturers/{perPage?}', 'ProductController@showAllManufacturers')->name('manufacturers');
+		Route::post('/manufacturers/{perPage}', 'ProductController@storeNewManufacturer')->name('manufacturers');	
+		Route::put('/manufacturers/{asset}/{perPage}', 'ProductController@updateManufacturer')->name('manufacturers');	
+		Route::delete('/manufacturers/{asset}/{perPage}', 'ProductController@deleteManufacturer')->name('manufacturers');	
+		Route::patch('/manufacturers/{asset}/{perPage}', 'ProductController@restoreManufacturer')->name('manufacturers');
+		Route::get('/api/search-manufacturers/{search}/{perPage}', 'ProductController@searchAllManufacturers')->name('search-manufacturers');
+
+		// product-category
 		Route::get('/api/product-categories/{perPage?}', 'ProductController@showProductAllCategories')->name('product-categories');
 		Route::post('/product-categories/{perPage}', 'ProductController@storeProductNewCategory')->name('product-categories');	
 		Route::put('/product-categories/{asset}/{perPage}', 'ProductController@updateProductCategory')->name('product-categories');	

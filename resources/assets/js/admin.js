@@ -70,6 +70,7 @@ import RentPeriodIndex from './views/RentPeriodIndex'
 import VariationTypeIndex from './views/VariationTypeIndex'
 import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
+import ProductManufacturerIndex from './views/ProductManufacturerIndex'
 import ProductIndex from './views/ProductIndex'
 import CategoryProductIndex from './views/CategoryProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
@@ -228,6 +229,15 @@ const router = new VueRouter({
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-product-category-index' 
+            }
+        },
+        {
+            path: '/product-manufacturers',
+            name: 'product-manufacturers',
+            component: ProductManufacturerIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-manufacturer-index' 
             }
         },
         {

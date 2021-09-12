@@ -58,7 +58,7 @@
 																		</td>
 																		
 																		<td>
-																			{{ productMerchant.manufacturer_name ? productMerchant.manufacturer_name : 'Own Product' | capitalize }}
+																			{{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Own Product' | capitalize }}
 																		</td>
 																		<td>{{ productMerchant.sku }}</td>
 																		
@@ -237,12 +237,21 @@
 										</div>
 
 										<div class="form-group col-md-6">
-											<label for="inputUsername">Manufacturer/Brand Name</label>
-											<input type="text" 
-												class="form-control is-valid" 
-												v-model="singleMerchantProductData.manufacturer_name" 
-												placeholder="Product Manufacturer" 
-											>
+											<label for="inputUsername">Manufacturer/Brand/Supplier Name</label>
+
+											<multiselect 
+		                              			v-model="singleMerchantProductData.manufacturer"
+		                              			placeholder="Manufacturer" 
+		                                  		label="name" 
+		                                  		track-by="id" 
+		                                  		:custom-label="objectNameWithCapitalized" 
+		                                  		:options="allManufacturers" 
+		                                  		selectLabel = "Press/Click"
+		                                  		deselect-label="Press/Click To Remove" 
+		                                  		class="form-control p-0 is-valid" 
+		                                  		@input="setProductManufacturer"
+		                              		>
+		                                	</multiselect>
 										</div>
 							        </div>
 
@@ -948,10 +957,10 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Manufacturer Name :
+														Manufacturer/Brand/Supplier Name :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.manufacturer_name ? singleMerchantProductData.manufacturer_name : 'own product' | capitalize }}
+														{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
 													</label>
 												</div>
 
@@ -1446,6 +1455,7 @@
 	        	
 	        	allMerchants : [],
 	        	allVariations : [],
+	        	allManufacturers : [],
 	        	productAllMerchants : [],
 
 	        	// allContainers : [],
@@ -1486,6 +1496,7 @@
 		created(){
 
 			this.fetchAllMerchants();
+			this.fetchAllManufacturers();
 			// this.setProductVariation();
 			// this.fetchAllContainers();
 			this.fetchProductAllMerchants();
@@ -1575,6 +1586,51 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.allMerchants = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllManufacturers() {
+				
+				if (! this.userHasPermissionTo('view-product-manufacturer-index')) {
+
+					this.error = 'You do not have permission to view manufacturers';
+					return;
+
+				}
+
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allManufacturers = [];
+				
+				axios
+					.get('/api/manufacturers/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allManufacturers = response.data;
 						}
 					})
 					.catch(error => {
@@ -2022,11 +2078,27 @@
 				},
 			*/
 			setProductMerchant() {
-				// console.log('merchant has been triggered');
+				
 				if (this.singleMerchantProductData.merchant && Object.keys(this.singleMerchantProductData.merchant).length > 0) {
+					
 					this.singleMerchantProductData.merchant_id = this.singleMerchantProductData.merchant.id;
-					this.singleMerchantProductData.manufacturer_name = this.singleMerchantProductData.merchant.first_name + ' ' + this.singleMerchantProductData.merchant.last_name;
+					
 				}
+
+			},
+			setProductManufacturer() {
+				
+				if (this.singleMerchantProductData.manufacturer && Object.keys(this.singleMerchantProductData.manufacturer).length > 0) {
+					
+					this.singleMerchantProductData.manufacturer_id = this.singleMerchantProductData.manufacturer.id;
+					
+				}
+				else {
+
+					this.$delete(this.singleMerchantProductData, 'manufacturer_id');
+
+				}
+
 			},
 			resetErrorProductVariations(object) {
 

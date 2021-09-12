@@ -10,6 +10,7 @@ use App\Models\ProductSerial;
 use App\Models\MerchantProduct;
 use App\Models\ProductCategory;
 use Illuminate\Validation\Rule;
+use App\Models\ProductManufacturer;
 use Illuminate\Support\Facades\File; 
 use App\Models\ProductVariationSerial;
 use App\Models\WarehouseContainerStatus;
@@ -25,6 +26,12 @@ class ProductController extends Controller
 {
     public function __construct()
     {
+        // Manufacturers
+        $this->middleware("permission:view-product-manufacturer-index")->only(['showAllManufacturers', 'searchAllManufacturers']);
+        $this->middleware("permission:create-product-manufacturer")->only('storeNewManufacturer');
+        $this->middleware("permission:update-product-manufacturer")->only('updateManufacturer');
+        $this->middleware("permission:delete-product-manufacturer")->only(['deleteManufacturer', 'restoreManufacturer']);
+
         // Product-Category
         $this->middleware("permission:view-product-category-index")->only(['showProductAllCategories', 'searchProductAllCategories']);
         $this->middleware("permission:create-product-category")->only('storeProductNewCategory');
@@ -47,6 +54,80 @@ class ProductController extends Controller
         $this->middleware("permission:create-merchant-product")->only('storeProductNewMerchant');
         $this->middleware("permission:update-merchant-product")->only('updateProductMerchant');
         $this->middleware("permission:delete-merchant-product")->only('deleteProductMerchant');        
+    }
+
+    // Manufacturers
+    public function showAllManufacturers($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => ProductManufacturer::paginate($perPage),
+                'trashed' => ProductManufacturer::onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return ProductManufacturer::all();
+    }
+
+    public function storeNewManufacturer(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:product_manufacturers,name',
+        ]);
+
+        $newAsset = new ProductManufacturer();
+
+        $newAsset->name = strtolower($request->name);
+
+        $newAsset->save();
+
+        return $this->showAllManufacturers($perPage);
+    }
+
+    public function updateManufacturer(Request $request, $asset, $perPage)
+    {
+        $assetToUpdate = ProductManufacturer::findOrFail($asset);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:product_manufacturers,name,'.$assetToUpdate->id,
+        ]);
+
+        $assetToUpdate->name = strtolower($request->name);
+
+        $assetToUpdate->save();
+
+        return $this->showAllManufacturers($perPage);
+    }
+
+    public function deleteManufacturer($asset, $perPage)
+    {
+        $assetToDelete = ProductManufacturer::findOrFail($asset);
+
+        $assetToDelete->delete();
+
+        return $this->showAllManufacturers($perPage);
+    }
+
+    public function restoreManufacturer($asset, $perPage)
+    {
+        $assetToRestore = ProductManufacturer::withTrashed()->findOrFail($asset);
+        
+        $assetToRestore->restore();
+
+        return $this->showAllManufacturers($perPage);
+    }
+
+    public function searchAllManufacturers($search, $perPage)
+    {
+        $query = ProductManufacturer::withTrashed()->where('name', 'like', "%$search%");
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
     }
 
     // Product-Categories
@@ -132,7 +213,6 @@ class ProductController extends Controller
             'all' => $query->paginate($perPage),    
         ], 200);
     }
-
 
     // Products
     public function showAllProducts($perPage=false)
@@ -920,22 +1000,22 @@ class ProductController extends Controller
             'product_id' => [
                 'required', 'numeric', 'exists:products,id', 
                 Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
-                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
             ],
             'merchant_id' => [
                 'required', 'numeric', 'exists:merchants,id', 
                 Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
-                    return $query->where('product_id', $request->product_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                    return $query->where('product_id', $request->product_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
             ],
             'sku' => [
                 'required', 'string', 
                 Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
-                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
             ],
-            'manufacturer_name' => 'nullable|string|max:255',
+            'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
             'selling_price' => [ 'nullable', 'numeric', 
                 Rule::requiredIf(function () use ($product) {
@@ -972,7 +1052,7 @@ class ProductController extends Controller
             'sku.unique' => 'SKU already exists',
             'sku.*' => 'SKU is invalid', 
 
-            'manufacturer_name' => 'Manufacturer name should be string', 
+            'manufacturer_id' => 'Manufacturer is invalid', 
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Variation name is required',
@@ -991,10 +1071,10 @@ class ProductController extends Controller
 
         $productNewMerchant = MerchantProduct::create([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, strtolower(substr(trim($request->manufacturer_name), 0, 3)) ?? 'own'), 
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, $request->manufacturer_id), 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
-            'manufacturer_name' => strtolower(trim($request->manufacturer_name)), 
+            'manufacturer_id' => $request->manufacturer_id, 
             'warning_quantity' => $request->warning_quantity ?? 100,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
             'discount' => $product->product_category_id ? $request->discount : NULL,
@@ -1028,22 +1108,22 @@ class ProductController extends Controller
             'product_id' => [
                 'required', 'numeric', 'exists:products,id', 
                 Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
-                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
             ],
             'merchant_id' => [
                 'required', 'numeric', 'exists:merchants,id', 
                 Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
-                    return $query->where('product_id', $request->product_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                    return $query->where('product_id', $request->product_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
             ],
             'sku' => [
                 'required', 'string', 
                 Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
-                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_name', strtolower(trim($request->manufacturer_name)));
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
             ], 
-            'manufacturer_name' => 'nullable|string|max:255',
+            'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
             'selling_price' => [ 'nullable', 'numeric', 
                 Rule::requiredIf(function () use ($product) {
@@ -1080,7 +1160,7 @@ class ProductController extends Controller
             'sku.unique' => 'SKU already exists',
             'sku.*' => 'SKU is invalid', 
 
-            'manufacturer_name' => 'Manufacturer name should be string', 
+            'manufacturer_id' => 'Manufacturer is invalid', 
             'selling_price' => 'Product selling price is required',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Variation name is required',
@@ -1101,8 +1181,8 @@ class ProductController extends Controller
 
         $productMerchantToUpdate->update([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, strtolower(substr(trim($request->manufacturer_name), 0, 3)) ?? 'own'), 
-            'manufacturer_name' => strtolower(trim($request->manufacturer_name)), 
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, $request->manufacturer_id), 
+            'manufacturer_id' => $request->manufacturer_id, 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'warning_quantity' => $request->warning_quantity ?? 100,
@@ -1162,6 +1242,9 @@ class ProductController extends Controller
                     ->orWhere('description', 'like', "%$search%")
                     ->orWhere('warning_quantity', 'like', "%$search%")
                     ->orWhere('selling_price', 'like', "%$search%")
+                    ->orWhereHas('manufacturer', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%");
+                    })
                     ->orWhereHas('merchant', function ($q) use ($search) {
                         $q->where('first_name', 'like', "%$search%")
                         ->orWhere('last_name', 'like', "%$search%")

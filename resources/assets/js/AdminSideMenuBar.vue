@@ -177,7 +177,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['products', 'product-categories', 'category-products', 'product-merchants', 'product-stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['products', 'product-categories', 'category-products', 'product-merchants', 'product-stocks', 'product-manufacturers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('view-product-category-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -203,6 +203,15 @@
 									>
 										<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Categories</span>
+										</router-link>
+									</li>
+
+									<li 
+										:class="['product-manufacturers'].includes(currentRouteName) ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-product-manufacturer-index')"
+									>
+										<router-link :to="{ name: 'product-manufacturers' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Manufacturers</span>
 										</router-link>
 									</li>
 								</ul>
