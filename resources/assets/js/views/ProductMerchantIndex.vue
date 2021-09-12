@@ -195,7 +195,7 @@
 
 						<div class="modal-body">
 									<div class="form-row">
-										<div class="form-group col-sm-6">
+										<div class="form-group col-sm-12">
 							        		<label for="inputUsername">Selected Product</label>
 								        	<multiselect 
 		                              			v-model="product" 
@@ -208,7 +208,9 @@
 		                              		>
 		                                	</multiselect>
 							        	</div>
+									</div>
 
+							        <div class="form-row">
 							        	<div class="form-group col-md-6">
 											<label for="inputUsername">Merchant</label>
 											<multiselect 
@@ -233,9 +235,7 @@
 										    	{{ errors.product.product_merchant_id }}
 										    </div>
 										</div>
-									</div>
 
-							        <div class="form-row">
 										<div class="form-group col-md-6">
 											<label for="inputUsername">Manufacturer/Brand Name</label>
 											<input type="text" 
@@ -244,7 +244,9 @@
 												placeholder="Product Manufacturer" 
 											>
 										</div>
+							        </div>
 
+									<div class="form-row">
 										<div class="form-group col-md-6">
 											<label for="inputFirstName">Stock Keeping Unit (SKU)</label>
 											<input type="text" 
@@ -260,9 +262,7 @@
 									        	{{ errors.product.product_sku }}
 									  		</div>
 										</div>
-							        </div>
 
-									<div class="form-row">
 										<div class="form-group col-md-6">
 											<label for="inputFirstName">Selling Price (unit)</label>
 											<input type="number" 
@@ -276,6 +276,35 @@
 
 											<div class="invalid-feedback">
 									        	{{ errors.product.product_price }}
+									  		</div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="inputFirstName">Discount</label>
+
+											<div class="input-group mb-0">
+											    <input 
+											    	type="number" 
+											    	class="form-control" 
+													v-model.number="singleMerchantProductData.discount" 
+													placeholder="Product Discount" 
+													:class="!errors.product.discount ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('discount')" 
+													:disabled="product.category ? false : true"
+											    >
+											    <div class="input-group-append">
+											      	<span class="input-group-text">%</span>
+											    </div>
+											</div>
+
+											<div 
+												class="invalid-feedback" 
+												style="display: block;" 
+												v-show="errors.product.discount"
+											>
+									        	{{ errors.product.discount }}
 									  		</div>
 										</div>
 
@@ -959,6 +988,15 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.selling_price }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Discount :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.discount || 0 }} %
 													</label>
 												</div>
 
@@ -1830,6 +1868,7 @@
 				
 				this.validateFormInput('product_sku');
 				this.validateFormInput('product_price');
+				this.validateFormInput('discount');
 				this.validateFormInput('product_merchant_id');
 				
 				// this.validateFormInput('product_initial_quantity');
@@ -1890,6 +1929,7 @@
 					
 					this.validateFormInput('product_sku');
 					this.validateFormInput('product_price');
+					this.validateFormInput('discount');
 					this.validateFormInput('product_merchant_id');
 
 					// this.validateFormInput('product_initial_quantity');
@@ -2492,6 +2532,18 @@
 						else{
 							this.submitForm = true;
 							this.$delete(this.errors.product, 'product_price');
+						}
+
+						break;
+
+					case 'discount' :
+
+						if (this.product.category && (this.singleMerchantProductData.discount > 100 || this.singleMerchantProductData.discount < 0)) {
+							this.errors.product.discount = 'Discount should be between 0 to 100';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.product, 'discount');
 						}
 
 						break;

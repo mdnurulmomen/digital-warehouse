@@ -22,6 +22,7 @@ class MerchantProductResource extends JsonResource
             'manufacturer_name' => $this->manufacturer_name,
             'warning_quantity' => $this->warning_quantity,
             'selling_price' => $this->selling_price,
+            'discount' => $this->discount,
             'product_id' => $this->product_id,
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at,

@@ -942,6 +942,7 @@ class ProductController extends Controller
                     return $product->product_category_id != NULL;
                 }),
             ],
+            'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:255',
             'warning_quantity' => 'numeric',
             'variations' => [
@@ -996,6 +997,7 @@ class ProductController extends Controller
             'manufacturer_name' => strtolower(trim($request->manufacturer_name)), 
             'warning_quantity' => $request->warning_quantity ?? 100,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
+            'discount' => $product->product_category_id ? $request->discount : NULL,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()
@@ -1048,6 +1050,7 @@ class ProductController extends Controller
                     return $product->product_category_id != NULL;
                 }),
             ],
+            'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:255',
             'warning_quantity' => 'numeric',
             'variations' => [
@@ -1104,6 +1107,7 @@ class ProductController extends Controller
             'description' => strtolower($request->description), 
             'warning_quantity' => $request->warning_quantity ?? 100,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
+            'discount' => $product->product_category_id ? $request->discount : NULL,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()
