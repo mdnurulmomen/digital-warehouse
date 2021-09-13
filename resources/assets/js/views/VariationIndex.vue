@@ -45,7 +45,7 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
-										  		 
+										  		<!-- 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
@@ -64,14 +64,244 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
+										  		-->
+
+										  		<div class="tab-content card-block">
+													<div class="table-responsive">
+														<table class="table table-striped table-bordered nowrap text-center">
+															<thead>
+																<tr>
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeContentsOrder('variation')"
+																		> 
+																			Variation
+																			<span v-show="currentSorting==='variation' && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting==='variation' && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting!=='variation'">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeContentsOrder('type')"
+																		> 
+																			Type
+																			<span v-show="currentSorting==='type' && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting==='type' && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting!=='type'">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeContentsOrder('parent')"
+																		> 
+																			Parent
+																			<span v-show="currentSorting==='parent' && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting==='parent' && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting!=='parent'">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>Ancestors Path</th>
+
+																	<th>Actions</th>
+																</tr>
+															</thead>
+
+															<tbody>
+																<tr 
+																	v-for="(content, contentIndex) in contentsToShow" 
+																	:key="'variation-index-' + contentIndex + 'variation-id-' + content.id"
+																>
+																	<td>{{ content.name | capitalize }}</td>
+
+																	<td>
+																		{{ content.type ? content.type.name : 'NA' }}
+																	</td>
+
+																	<td>
+																		{{ content.parent ? content.parent.name : 'NA' }}
+																	</td>
+																		
+																	<td>
+																		<ul>
+																			<tree-item
+																				class=""
+																				:item="content"
+																			></tree-item>
+																		</ul>
+																	</td>
+																	
+																	<td>
+																		<button type="button" 
+																				class="btn btn-grd-primary btn-icon" 
+																				v-show="! content.deleted_at" 
+																				@click="openContentEditForm(content)" 
+																				v-if="userHasPermissionTo('update-asset')"
+																		>
+																			<i class="fa fa-edit"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-danger btn-icon" 
+																				v-show="! content.deleted_at" 
+																				@click="openContentDeleteForm(content)" 
+																				v-if="userHasPermissionTo('delete-asset')"
+																		>
+																			<i class="fa fa-trash"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-warning btn-icon" 
+																				v-show="content.deleted_at" 
+																				@click="openContentRestoreForm(content)" 
+																				v-if="userHasPermissionTo('delete-asset')"
+																		>
+																			<i class="fa fa-undo"></i>
+																		</button>
+																	</td>
+																</tr>
+
+																<tr 
+															  		v-show="! contentsToShow.length"
+															  	>
+														    		<td colspan="5">
+															      		<div class="alert alert-danger" role="alert">
+															      			Sorry, No data found.
+															      		</div>
+															    	</td>
+															  	</tr>
+															</tbody>
+
+															<tfoot>
+																<tr>
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeContentsOrder('variation')"
+																		> 
+																			Variation
+																			<span v-show="currentSorting==='variation' && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting==='variation' && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting!=='variation'">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeContentsOrder('type')"
+																		> 
+																			Type
+																			<span v-show="currentSorting==='type' && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting==='type' && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting!=='type'">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeContentsOrder('parent')"
+																		> 
+																			Parent
+																			<span v-show="currentSorting==='parent' && ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting==='parent' && descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="currentSorting!=='parent'">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>Ancestors Path</th>
+
+																	<th>Actions</th>
+																</tr>
+															</tfoot>
+														</table>
+													</div>
+													
+													<div class="row d-flex align-items-center">
+														<div class="col-sm-2 col-4">
+															<select 
+																class="form-control" 
+																v-model.number="perPage" 
+																@change="changeNumberContents()"
+															>
+																<option>10</option>
+																<option>20</option>
+																<option>30</option>
+																<option>40</option>
+																<option>50</option>
+															</select>
+														</div>
+														<div class="col-sm-2 col-8">
+															<button 
+																type="button" 
+																class="btn btn-primary btn-sm" 
+																@click="query === '' ? fetchAllContents() : searchData()"
+															>
+																Reload
+																<i class="fa fa-sync"></i>
+															</button>
+														</div>
+														<div class="col-sm-8 col-12 text-right form-group">
+															<pagination
+																v-if="pagination.last_page > 1"
+																:pagination="pagination"
+																:offset="5"
+																@paginate="query === '' ? fetchAllContents() : searchData()"
+															>
+															</pagination>
+														</div>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div> 
-				
+					</div>
 				</div>
 			</div>
 		</div>
@@ -114,7 +344,7 @@
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Variation Type</label>
 									<multiselect 
-                              			v-model="singleAssetData.variation_type"
+                              			v-model="singleAssetData.type"
                               			placeholder="Variation Type" 
                                   		label="name" 
                                   		track-by="id" 
@@ -158,22 +388,31 @@
 								</div>
 							</div>
 
-							<div class="form-row" v-if="singleAssetData.variation_type && singleAssetData.variation_type.hasOwnProperty('variations') && singleAssetData.variation_type.variations.length">
+							<div class="form-row" v-if="singleAssetData.type && singleAssetData.type.hasOwnProperty('variations') && singleAssetData.type.variations.length">
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Parent Variation</label>
 									<multiselect 
-                              			v-model="singleAssetData.variation_parent"
+                              			v-model="singleAssetData.parent"
                               			placeholder="Parent Variation" 
                                   		label="name" 
                                   		track-by="id" 
-                                  		:options="singleAssetData.variation_type.variations" 
+                                  		:options="singleAssetData.type.variations" 
                                   		:custom-label="objectNameWithCapitalized" 
                                   		:required="true" 
                                   		class="form-control p-0 is-valid" 
                                   		selectLabel = "Press/Click"
-                                  		deselect-label="Press/Click to"
+                                  		deselect-label="Press/Click to remove" 
+                                  		@change="validateFormInput('variation_parent_id')" 
                               		>
                                 	</multiselect>
+
+                                	<div 
+										class="invalid-feedback" 
+										style="display: block;" 
+										v-show="errors.asset.variation_parent_id"
+									>
+							        	{{ errors.asset.variation_parent_id }}
+							  		</div>
 								</div>
 							</div>
 						</div>
@@ -252,7 +491,7 @@
 								<label class="font-weight-bold">Parent Variation: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.variation_parent ? $options.filters.capitalize(singleAssetData.variation_parent.name) : 'NA' }}
+								{{ singleAssetData.parent ? $options.filters.capitalize(singleAssetData.parent.name) : 'NA' }}
 							</div>
 						</div>
 
@@ -261,7 +500,7 @@
 								<label class="font-weight-bold">Variation Type: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.variation_type ? $options.filters.capitalize(singleAssetData.variation_type.name) : 'NA' }}
+								{{ singleAssetData.type ? $options.filters.capitalize(singleAssetData.type.name) : 'NA' }}
 							</div>
 						</div>
 
@@ -286,6 +525,23 @@
     	variation : {},
     };
 
+    // demo data
+    let variationData = {
+    	name: "Rip Mango",
+    	parent: {
+    		name: "Mango",
+    		parent: {
+    			name: "Fruits",
+    			parent: { 
+    				name: "Healthy Foods", 
+    				parent : null,
+    			}, 		
+			},
+    		
+    	}
+    	
+    };
+
 	export default {
 
 	    components: { 
@@ -300,19 +556,24 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
+	        	currentSorting : '',
 	        	currentTab : 'current',
 
 	        	createMode : true,
 	        	submitForm : true,
 
+	        	ascending : false,
+	      		descending : false,
+
+	        	contentsToShow : [],
 	        	allVariationTypes : [],
 	        	allFetchedContents : [],
-	        	contentsToShow : [],
 
 	        	pagination: {
 		        	current_page: 1
 		      	},
 
+		      	variationData : variationData,
 	        	singleAssetData : singleAssetData,
 
 	        	errors : {
@@ -355,14 +616,25 @@
 		},
 
 		watch: {
-			'singleAssetData.variation_type': function (object) {
+			'singleAssetData.type': function (object) {
 				if (object && Object.keys(object).length > 0) {
 					this.singleAssetData.variation_type_id = object.id;
 				}
 			},
-			'singleAssetData.variation_parent': function (object) {
+			'singleAssetData.parent': function (object) {
 				if (object && Object.keys(object).length > 0) {
-					this.singleAssetData.variation_parent_id = object.id;
+					if (object.id != this.singleAssetData.id) {
+						this.submitForm = true;
+						this.singleAssetData.variation_parent_id = object.id;
+						this.$delete(this.errors.asset, 'variation_parent_id');
+					}
+					else {
+						this.submitForm = false;
+						this.errors.asset.variation_parent_id = 'Same type is invalid';
+					}
+				}
+				else {
+					this.$delete(this.singleAssetData, 'variation_parent_id');
 				}
 			},
 		},
@@ -419,7 +691,7 @@
 					.get('/api/variation-types/')
 					.then(response => {
 						if (response.status == 200) {
-							this.allVariationTypes = response.data;
+							this.allVariationTypes = response.data.data;
 						}
 					})
 					.catch(error => {
@@ -602,9 +874,8 @@
 					});
 
 			},
-            changeNumberContents(expectedContentsPerPage) {
+            changeNumberContents() {
 				this.pagination.current_page = 1;
-				this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
 					this.fetchAllContents();
@@ -636,6 +907,7 @@
 			verifyUserInput() {
 				this.validateFormInput('name');
 				this.validateFormInput('variation_type');
+				this.validateFormInput('variation_parent_id');
 
 				if (this.errors.asset.constructor === Object && Object.keys(this.errors.asset).length == 0) {
 					return true;
@@ -663,6 +935,65 @@
 		      	else 
 		      		return ''
 		    },
+		    changeContentsOrder(columnName) {
+
+				this.currentSorting = columnName;
+
+				if (columnName.match(/name/gi)) {
+
+					const nameExists = (object) => object.hasOwnProperty('name');
+					const firstNameExists = (object) => object.hasOwnProperty('first_name');
+
+					if (this.ascending) {
+
+						this.ascending = false;
+						this.descending = true;
+
+						this.contentsToShow.some(nameExists) ? this.descendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.descendingAlphabets('first_name') : this.descendingAlphabets('last_name');
+
+					}
+					else if (this.descending) {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.contentsToShow.some(nameExists) ? this.ascendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+
+					}
+					else {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.contentsToShow.some(nameExists) ? this.ascendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+
+					}
+
+				}
+				
+			},
+			ascendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x < y) {return -1;}
+						if (x > y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			descendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x > y) {return -1;}
+						if (x < y) {return 1;}
+						return 0;
+					}
+				);
+			},
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
@@ -683,12 +1014,24 @@
 
 					case 'variation_type' :
 
-						if (!this.singleAssetData.variation_type || Object.keys(this.singleAssetData.variation_type).length == 0) {
+						if (!this.singleAssetData.type || Object.keys(this.singleAssetData.type).length == 0) {
 							this.errors.asset.variation_type = 'Type is required';
 						}
 						else{
 							this.submitForm = true;
 							this.$delete(this.errors.asset, 'variation_type');
+						}
+
+						break;
+
+					case 'variation_parent_id' :
+
+						if (this.singleAssetData.parent && Object.keys(this.singleAssetData.parent).length && this.singleAssetData.parent.id == this.singleAssetData.id) {
+							this.errors.asset.variation_parent_id = 'Same type is invalid';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.asset, 'variation_parent_id');
 						}
 
 						break;

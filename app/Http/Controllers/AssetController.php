@@ -11,6 +11,8 @@ use App\Models\VariationType;
 use Illuminate\Validation\Rule;
 use App\Models\PackagingPackage;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\Web\VariationCollection;
+use App\Http\Resources\Web\VariationTypeResource;
 
 class AssetController extends Controller
 {
@@ -375,9 +377,13 @@ class AssetController extends Controller
 
         }
 
-        return VariationType::with(['variations' => function ($query) {
-            $query->whereNull('variation_parent_id');
-        }, 'variations.variationChilds'])->get();
+        return VariationTypeResource::collection(
+            VariationType::with([
+                'variations' => function ($query) {
+                    $query->whereNull('variation_parent_id');
+                }, 
+            ])->get()
+        );
         
         // return VariationType::with('variations')->get();
     }
@@ -457,8 +463,8 @@ class AssetController extends Controller
             
             return response()->json([
 
-                'current' => Variation::with(['variationType.variations', 'variationParent'])->paginate($perPage),
-                'trashed' => Variation::with(['variationType.variations', 'variationParent'])->onlyTrashed()->paginate($perPage),
+                'current' => new VariationCollection(Variation::with(['type.variations', 'parent'])->paginate($perPage)),
+                'trashed' => new VariationCollection(Variation::with(['type.variations', 'parent'])->onlyTrashed()->paginate($perPage)),
 
             ], 200);
 
@@ -472,7 +478,7 @@ class AssetController extends Controller
         $request->validate([
             'name'  => [
                 'required', 'string', 'max:100',
-                Rule::unique('variations')->where(function ($query) use ($request) {
+                Rule::unique('variations', 'name')->where(function ($query) use ($request) {
                     return $query
                         ->whereName($request->name)
                         ->where('variation_type_id', $request->variation_type_id)
@@ -501,16 +507,20 @@ class AssetController extends Controller
         $request->validate([
             'name'  => [
                 'required', 'string', 'max:100', 
-                Rule::unique('variations')->where(function ($query) use ($request, $assetToUpdate) {
+                Rule::unique('variations', 'name')->where(function ($query) use ($request, $assetToUpdate) {
                     return $query
                         ->whereName($request->name)
                         ->where('variation_type_id', $request->variation_type_id)
                         ->where('variation_parent_id', $request->variation_parent_id)
-                        ->whereNotIn('id', [$assetToUpdate->id]);
+                        ->whereNotIn('id', [ $assetToUpdate->id ]);
                 }),
             ],
             'variation_type_id' => 'required|numeric|exists:variation_types,id',
-            'variation_parent_id' => 'nullable|numeric|exists:variations,id',
+            // 'variation_parent_id' => 'nullable|numeric|exists:variations,id',
+            'variation_parent_id' => [
+                'nullable', 'numeric', 'exists:variations,id', 
+                Rule::notIn([ $asset ]),
+            ],
         ]);
 
         $assetToUpdate->name = strtolower($request->name);

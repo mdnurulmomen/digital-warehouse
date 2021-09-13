@@ -525,29 +525,31 @@
 															    </div>
 															</div>
 
-															<div 
-																class="form-group col-md-12" 
-																v-if="productVariation.variation && productVariation.variation.hasOwnProperty('variation_childs') && productVariation.variation.variation_childs.length"
-															>
-																<div class="form-row ml-3 mr-3">
-																	<div class="form-group col-md-12">
-																		<label for="inputFirstName">Sub-Variation</label>
-																		<multiselect 
-									                              			v-model="productVariation.variation.sub_variation"
-									                              			placeholder="Select Sub-Variation" 
-									                                  		label="name" 
-									                                  		track-by="id" 
-									                                  		:custom-label="objectNameWithCapitalized" 
-									                                  		:options="productVariation.variation.variation_childs" 
-									                                  		selectLabel = "Press to select"
-									                                  		deselect-label="Press to remove" 
-									                                  		:disabled="productVariation.variation_immutability" 
-									                                  		class="form-control is-valid p-0" 
-									                              		>
-									                                	</multiselect>
-																	</div>
-																</div> 
-															</div>
+															<!-- 
+																<div 
+																	class="form-group col-md-12" 
+																	v-if="productVariation.variation && productVariation.variation.hasOwnProperty('variation_childs') && productVariation.variation.variation_childs.length"
+																>
+																	<div class="form-row ml-3 mr-3">
+																		<div class="form-group col-md-12">
+																			<label for="inputFirstName">Sub-Variation</label>
+																			<multiselect 
+										                              			v-model="productVariation.variation.sub_variation"
+										                              			placeholder="Select Sub-Variation" 
+										                                  		label="name" 
+										                                  		track-by="id" 
+										                                  		:custom-label="objectNameWithCapitalized" 
+										                                  		:options="productVariation.variation.variation_childs" 
+										                                  		selectLabel = "Press to select"
+										                                  		deselect-label="Press to remove" 
+										                                  		:disabled="productVariation.variation_immutability" 
+										                                  		class="form-control is-valid p-0" 
+										                              		>
+										                                	</multiselect>
+																		</div>
+																	</div> 
+																</div>
+															 -->
 
 															<div class="form-group col-md-12">
 													    		<div class="form-row text-center">
@@ -1079,11 +1081,13 @@
 												
 												{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }}
 												
-												<span v-show="productVariation.variation && productVariation.variation.sub_variation">
-													(
-														{{ (productVariation.variation && productVariation.variation.sub_variation) ? productVariation.variation.sub_variation.name : 'NA'  }}
-													)
-												</span>
+												<!-- 
+													<span v-show="productVariation.variation && productVariation.variation.sub_variation">
+														(
+															{{ (productVariation.variation && productVariation.variation.sub_variation) ? productVariation.variation.sub_variation.name : 'NA'  }}
+														)
+													</span>
+												-->
 
 											</p>
 
@@ -2394,7 +2398,7 @@
 							
 							this.singleProductData.variations.forEach(
 								(productVariation, index) => {
-									if (!productVariation.hasOwnProperty('variation') || Object.keys(productVariation.variation).length == 0) {
+									if (! productVariation.hasOwnProperty('variation') || Object.keys(productVariation.variation).length == 0) {
 										
 										this.errors.product.variations[index].product_variation_id = 'Variation is required';
 
