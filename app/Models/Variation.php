@@ -14,33 +14,61 @@ class Variation extends Model
 
     // protected $with = ['variationType'];
 
-    public function variationType()
+    /*
+        public function variationType()
+        {
+        	return $this->belongsTo(VariationType::class, 'variation_type_id', 'id')->withTrashed();
+        }
+    */
+   
+    public function type()
     {
-    	return $this->belongsTo(VariationType::class, 'variation_type_id', 'id')->withTrashed();
+        return $this->belongsTo(VariationType::class, 'variation_type_id', 'id')->withTrashed();
     }
 
-    public function variationParent()
+
+    /*
+        public function variationParent()
+        {
+        	return $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+        }
+    */
+    
+    public function parent()
     {
-    	return $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+        return $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
     }
 
     /*
-    public function variationGrandParent()
-    {
-        $currentAncestor = $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
-
-        while ($currentAncestor->variation_parent_id !== NULL) {
-            
-            $currentAncestor = $currentAncestor->variationParent;
-
+        public function variationChilds()
+        {
+        	return $this->hasMany(Variation::class, 'variation_parent_id', 'id');
         }
-
-        return $currentAncestor;
-    }
     */
-
-    public function variationChilds()
+   
+    public function childs()
     {
-    	return $this->hasMany(Variation::class, 'variation_parent_id', 'id');
+        return $this->hasMany(Variation::class, 'variation_parent_id', 'id');
     }
+
+    public function nestedChilds()
+    {
+        return $this->hasMany(Variation::class, 'variation_parent_id', 'id')->with('childs');
+    }
+
+
+    /*
+        public function variationGrandParent()
+        {
+            $currentAncestor = $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+
+            while ($currentAncestor->variation_parent_id !== NULL) {
+                
+                $currentAncestor = $currentAncestor->variationParent;
+
+            }
+
+            return $currentAncestor;
+        }
+    */
 }

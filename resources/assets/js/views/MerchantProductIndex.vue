@@ -2641,7 +2641,7 @@
 							
 							this.singleProductData.variations.forEach(
 								(productVariation, index) => {
-									if (!productVariation.hasOwnProperty('variation') || Object.keys(productVariation.variation).length == 0) {
+									if (! productVariation.hasOwnProperty('variation') || Object.keys(productVariation.variation).length == 0) {
 										
 										this.errors.product.variations[index].product_variation_id = 'Variation is required';
 

@@ -12,11 +12,21 @@ class ProductCategory extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    protected $with = ['category'];
+    protected $with = ['parent'];
 
-    public function category()
+    /*public function category()
     {
     	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
+    }*/
+
+    public function parent()
+    {
+        return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
+    }
+
+    public function childs()
+    {
+        return $this->hasMany(ProductCategory::class, 'parent_category_id', 'id');
     }
 
     public function products()
