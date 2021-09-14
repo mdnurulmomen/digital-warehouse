@@ -377,7 +377,7 @@
 										class="form-control" 
 										v-model="singleAssetData.name" 
 										placeholder="Name should be unique" 
-										:class="!errors.asset.name  ? 'is-valid' : 'is-invalid'" 
+										:class="!errors.asset.name ? 'is-valid' : 'is-invalid'" 
 										@change="validateFormInput('name')" 
 										required="true" 
 									>
@@ -522,7 +522,7 @@
 	import Multiselect from 'vue-multiselect';
 
     let singleAssetData = {
-    	variation : {},
+    	type : {},
     };
 
     // demo data
@@ -755,7 +755,7 @@
 				};
 
 				this.singleAssetData = {
-					variation : {}
+					type : {}
 				};
 
 				$('#asset-createOrEdit-modal').modal('show');
@@ -1026,7 +1026,7 @@
 
 					case 'variation_parent_id' :
 
-						if (this.singleAssetData.parent && Object.keys(this.singleAssetData.parent).length && this.singleAssetData.parent.id == this.singleAssetData.id) {
+						if (this.singleAssetData.parent && Object.keys(this.singleAssetData.parent).length && (this.singleAssetData.parent.id == this.singleAssetData.id || this.singleAssetData.parent.name.toLowerCase() == this.singleAssetData.name.toLowerCase())) {
 							this.errors.asset.variation_parent_id = 'Same type is invalid';
 						}
 						else{

@@ -45,25 +45,25 @@
 										  			@showBulkContents="showBulkContents" 
 										  		></tab>
 
-									  		<!-- 
-										  		<table-with-soft-delete-option 
-										  			:query="query" 
-										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
-										  			:contents-to-show = "productsToShow" 
-										  			:pagination = "pagination"
+												<!-- 
+													<table-with-soft-delete-option 
+														:query="query" 
+														:per-page="perPage"  
+														:column-names="['name']" 
+														:column-values-to-show="['name']" 
+														:contents-to-show = "productsToShow" 
+														:pagination = "pagination"
 
-										  			@showContentDetails="showContentDetails($event)" 
-										  			@openContentEditForm="openContentEditForm($event)" 
-										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@openContentRestoreForm="openContentRestoreForm($event)" 
-										  			@changeNumberContents="changeNumberContents($event)" 
-										  			@fetchAllProducts="fetchAllProducts" 
-										  			@searchData="searchData" 
-										  		>	
-										  		</table-with-soft-delete-option>
- 											-->
+														@showContentDetails="showContentDetails($event)" 
+														@openContentEditForm="openContentEditForm($event)" 
+														@openContentDeleteForm="openContentDeleteForm($event)" 
+														@openContentRestoreForm="openContentRestoreForm($event)" 
+														@changeNumberContents="changeNumberContents($event)" 
+														@fetchAllProducts="fetchAllProducts" 
+														@searchData="searchData" 
+													>	
+													</table-with-soft-delete-option>
+												-->
 
  												<div class="tab-content card-block">
 													<div class="card">
@@ -1401,7 +1401,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							// this.allVariationTypes = response.data;
-							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 1);
+							this.allVariationTypes = response.data.data.filter(variationType=>variationType.variations.length > 1) ?? [];
 						}
 					})
 					.catch(error => {
