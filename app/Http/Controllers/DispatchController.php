@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Dispatch;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
 use App\Models\RequiredProductSerial;
 use App\Jobs\BroadcastRequisitionDispatch;
@@ -28,17 +28,17 @@ class DispatchController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
                         $query->where('has_approval', 1);
                     })->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
+        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
 
     }
 
@@ -63,14 +63,14 @@ class DispatchController extends Controller
             'requisition.id' => [
                 'required', 'exists:requisitions,id'
                 /*
-                Rule::exists('requisitions', 'id')->where(function ($query) {
-                    return $query->where('status', 0);
-                }),
+                    Rule::exists('requisitions', 'id')->where(function ($query) {
+                        return $query->where('status', 0);
+                    }),
                 */
             ],
 
             'requisition.products' => 'required|array|min:1',
-            'requisition.products.*.product_id' => 'required|exists:products,id',
+            'requisition.products.*.merchant_product_id' => 'required|exists:merchant_products,id',
 
             'requisition.products.*.quantity' => 'required|numeric|min:1',
             'requisition.products.*.available_quantity' => 'required|numeric|min:1',
@@ -329,23 +329,23 @@ class DispatchController extends Controller
     {
         foreach ($products as $productKey => $productToDispatch) {
 
-            $expectedProduct = Product::find($productToDispatch->product_id);
+            $expectedMerchantProduct = MerchantProduct::find($productToDispatch->merchant_product_id);
 
-            $productAvailableQuantity = $expectedProduct->latestStock->available_quantity ?? 0;
+            $productAvailableQuantity = $expectedMerchantProduct->latestStock->available_quantity ?? 0;
 
             if ($productAvailableQuantity < $productToDispatch->quantity) {
                 
-                return response()->json(['errors'=>["productSerialError" => ucfirst($expectedProduct->name)." quantity is more than available"]], 422);
+                return response()->json(['errors'=>["productSerialError" => ucfirst($expectedMerchantProduct->product->name)." quantity is more than available"]], 422);
 
             }
 
-            else if ($expectedProduct->has_serials && ! $expectedProduct->has_variations && count($productToDispatch->serials)!=$productToDispatch->quantity) {
+            else if ($expectedMerchantProduct->product->has_serials && ! $expectedMerchantProduct->product->has_variations && count($productToDispatch->serials) != $productToDispatch->quantity) {
                 
-                return response()->json(['errors'=>["productSerialError" => ucfirst($expectedProduct->name)." serial is more or less than required"]], 422);
+                return response()->json(['errors'=>["productSerialError" => ucfirst($expectedMerchantProduct->product->name)." serial is more or less than required"]], 422);
 
             }
 
-            else if ($expectedProduct->has_serials && ! $expectedProduct->has_variations && count($productToDispatch->serials)==$productToDispatch->quantity) {
+            else if ($expectedMerchantProduct->product->has_serials && ! $expectedMerchantProduct->product->has_variations && count($productToDispatch->serials) == $productToDispatch->quantity) {
                                      
                 foreach ($productToDispatch->serials as $productSerialToDispatch) {
                     
@@ -355,7 +355,7 @@ class DispatchController extends Controller
 
                     if (! $productSerial) {
                         
-                        return response()->json(['errors'=>["productSerialError" => ucfirst($expectedProduct->name)." serial is already dispatched or not found"]], 422);
+                        return response()->json(['errors'=>["productSerialError" => ucfirst($expectedMerchantProduct->product->name)." serial is already dispatched or not found"]], 422);
 
                     }
 
@@ -363,13 +363,13 @@ class DispatchController extends Controller
 
             }
 
-            if ($expectedProduct->has_variations && $productToDispatch->has_variations) {
+            if ($expectedMerchantProduct->product->has_variations && $productToDispatch->has_variations) {
                 
                 foreach ($productToDispatch->variations as $variationToDispatch) {
             
-                    $productExpectedVariation = $expectedProduct->variations()->where('id', $variationToDispatch->product_variation_id)->first();
+                    $merchantProductExpectedVariation = $expectedMerchantProduct->variations()->where('id', $variationToDispatch->merchant_product_variation_id)->first();
 
-                    $variationAvailableQuantity = $productExpectedVariation->latestStock->available_quantity ?? 0;
+                    $variationAvailableQuantity = $merchantProductExpectedVariation->latestStock->available_quantity ?? 0;
 
                     if ($variationToDispatch->quantity > $variationAvailableQuantity) {
                         
@@ -377,7 +377,7 @@ class DispatchController extends Controller
 
                     }
 
-                    else if ($variationToDispatch->has_serials && count($variationToDispatch->serials)!=$variationToDispatch->quantity) {
+                    else if ($variationToDispatch->has_serials && count($variationToDispatch->serials) != $variationToDispatch->quantity) {
                         
                         return response()->json(['errors'=>["variationSerialError" => ucfirst($variationToDispatch->variation_name)." serial is more or less than required"]], 422);
 

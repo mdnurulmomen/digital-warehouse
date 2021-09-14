@@ -15,7 +15,7 @@ class RequisitionController extends Controller
         $this->middleware("permission:update-requisition")->only('cancelRequisition');
     }
 
-    // Requisition (Admin)
+    // Requisition (Admin RequisitionIndex)
     public function showAllRequisitions($perPage = false)
     {       
         if ($perPage) {

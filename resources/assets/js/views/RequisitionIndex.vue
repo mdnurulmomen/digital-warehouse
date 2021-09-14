@@ -255,22 +255,6 @@
 											    </div>
 											</div>
 										</div>
-
-										<div 
-											class="form-row" 
-											v-if="Object.keys(singleDispatchData.requisition).length > 0"
-										>
-											<div class="form-group col-md-12">
-												<label for="inputFirstName">Description</label>
-												<ckeditor 
-					                              	class="form-control" 
-					                              	:editor="editor" 
-					                              	v-model="singleDispatchData.requisition.description" 
-					                              	:disabled="true"
-					                            >
-				                              	</ckeditor>
-											</div>
-										</div>
 									</div>
 
 									<div class="col-md-12 card-footer">
@@ -316,7 +300,7 @@
 				                              			v-model="singleDispatchData.requisition.products[productIndex]"
 				                              			placeholder="Product Name" 
 				                              			label="product_name" 
-				                                  		track-by="product_id" 
+				                                  		track-by="merchant_product_id" 
 				                                  		class="form-control p-0 is-valid" 
 				                                  		:custom-label="objectNameWithCapitalized" 
 				                                  		:options="singleDispatchData.requisition.products"
@@ -588,6 +572,20 @@
 									 			</div>
 									 		</div>
 										</div>
+									</div>
+
+									<div 
+										class="form-group col-md-12" 
+										v-if="Object.keys(singleDispatchData.requisition).length > 0"
+									>
+										<label for="inputFirstName">Description</label>
+										<ckeditor 
+			                              	class="form-control" 
+			                              	:editor="editor" 
+			                              	v-model="singleDispatchData.requisition.description" 
+			                              	:disabled="true"
+			                            >
+		                              	</ckeditor>
 									</div>
 										
 									<div class="col-md-12 card-footer">

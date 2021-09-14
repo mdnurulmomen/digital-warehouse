@@ -94,8 +94,7 @@ class MerchantProduct extends Model
         return $this->hasMany(ProductDispatch::class, 'merchant_product_id', 'id');
     }
     */
-
-    /*
+    
     public function deleteOldAddresses()
     {
         if (count($this->addresses)) {
@@ -131,7 +130,6 @@ class MerchantProduct extends Model
 
         // $this->addresses()->delete();
     }
-    */
 
     public function setProductAddressAttribute($addresses = [])
     {

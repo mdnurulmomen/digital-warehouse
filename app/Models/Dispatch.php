@@ -61,25 +61,25 @@ class Dispatch extends Model
 
             foreach ($dispatchingProducts as $productToDispatch) {
                 
-                $expectedProduct = Product::find($productToDispatch->product_id);
+                $merchantExpectedProduct = MerchantProduct::find($productToDispatch->merchant_product_id);
 
-                $productAvailableQuantity = $expectedProduct->latestStock->available_quantity ?? 0;
+                $productAvailableQuantity = $merchantExpectedProduct->latestStock->available_quantity ?? 0;
 
                 if ($productAvailableQuantity >= $productToDispatch->quantity) {
                     
                     /*
-                        $dispatchedProduct = $expectedProduct->dispatches()->create([
+                        $dispatchedProduct = $merchantExpectedProduct->dispatches()->create([
                             'quantity' => $productToDispatch->quantity,
                             'has_variations' => $productToDispatch->has_variations ?? false,
                             'dispatch_id' => $this->id,
                         ]);
                     */
 
-                    $expectedProduct->latestStock->update([
+                    $merchantExpectedProduct->latestStock->update([
                         'available_quantity' => $productAvailableQuantity - $productToDispatch->quantity 
                     ]);
 
-                    if ($expectedProduct->has_serials && ! $expectedProduct->has_variations && count($productToDispatch->serials)==$productToDispatch->quantity) {
+                    if ($merchantExpectedProduct->product->has_serials && ! $merchantExpectedProduct->product->has_variations && count($productToDispatch->serials)==$productToDispatch->quantity) {
                                      
                         foreach ($productToDispatch->serials as $productSerialToDispatch) {
                             
@@ -99,14 +99,13 @@ class Dispatch extends Model
 
                     }
 
-                    if ($expectedProduct->has_variations && $productToDispatch->has_variations) {
+                    if ($merchantExpectedProduct->product->has_variations && $productToDispatch->has_variations) {
                         
                         foreach ($productToDispatch->variations as $variationToDispatch) {
                     
-                            $productExpectedVariation = $expectedProduct->variations()->where('id', $variationToDispatch->product_variation_id)->first();
+                            $productExpectedVariation = $merchantExpectedProduct->variations()->where('id', $variationToDispatch->merchant_product_variation_id)->first();
 
                             $variationAvailableQuantity = $productExpectedVariation->latestStock->available_quantity ?? 0;
-
 
                             if ($variationToDispatch->quantity <= $variationAvailableQuantity) {
 
@@ -150,13 +149,13 @@ class Dispatch extends Model
                     // Updating Product Addresses
                     if ($productAvailableQuantity==0) {  // No more products available
                         
-                        $expectedProduct->deleteOldAddresses();
-                        // $expectedProduct->variations()->delete();
+                        $merchantExpectedProduct->deleteOldAddresses();
+                        // $merchantExpectedProduct->variations()->delete();
 
                     }
                     else if ($productAvailableQuantity > 0) {
                         
-                        $expectedProduct->product_address = json_decode(json_encode($productToDispatch->addresses));
+                        $merchantExpectedProduct->product_address = json_decode(json_encode($productToDispatch->addresses));
 
                     }
 
