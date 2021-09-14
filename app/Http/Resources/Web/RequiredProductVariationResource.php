@@ -16,12 +16,12 @@ class RequiredProductVariationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'product_variation_id' => $this->product_variation_id,
-            'variation_name' => $this->productVariation->variation->name,
+            'merchant_product_variation_id' => $this->merchant_product_variation_id,
+            'variation_name' => $this->merchantProductVariation->productVariation->variation->name,
             'quantity' => $this->quantity,
-            'has_serials' => $this->has_serials,
-            'serials' => $this->when($this->has_serials, $this->serials->loadMissing('serial')),
-            'available_quantity' => $this->productVariation->latestStock->available_quantity,
+            'has_serials' => $this->requiredProduct->merchantProduct->product->has_serials,
+            'serials' => $this->when($this->requiredProduct->merchantProduct->product->has_serials, $this->serials->loadMissing('serial')),
+            'available_quantity' => $this->merchantProductVariation->latestStock->available_quantity,
         ];
     }
 }

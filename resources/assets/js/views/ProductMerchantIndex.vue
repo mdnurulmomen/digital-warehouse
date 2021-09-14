@@ -237,7 +237,7 @@
 										</div>
 
 										<div class="form-group col-md-6">
-											<label for="inputUsername">Manufacturer/Brand/Supplier Name</label>
+											<label for="inputUsername">Manufacturer/Brand Name</label>
 
 											<multiselect 
 		                              			v-model="singleMerchantProductData.manufacturer"
@@ -257,7 +257,7 @@
 
 									<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Stock Keeping Unit (SKU)</label>
+											<label for="inputFirstName">Product Code/SKU</label>
 											<input type="text" 
 												class="form-control" 
 												v-model="singleMerchantProductData.sku" 
@@ -957,7 +957,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Manufacturer/Brand/Supplier Name :
+														Manufacturer/Brand Name :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
@@ -966,7 +966,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Stock Keeping Unit (SKU) :
+														Product Code/SKU :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.sku }}

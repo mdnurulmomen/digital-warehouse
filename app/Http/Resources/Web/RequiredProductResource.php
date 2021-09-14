@@ -16,18 +16,18 @@ class RequiredProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'product_id' => $this->product_id,
-            'product_name' => $this->product->name,
+            'merchant_product_id' => $this->merchant_product_id,
+            'product_name' => $this->merchantProduct->product->name,
             'quantity' => $this->quantity,
-            'available_quantity' => $this->product->latestStock->available_quantity ?? 0,
-            'has_variations' => $this->has_variations,
-            'has_serials' => $this->has_serials,
+            'available_quantity' => $this->merchantProduct->latestStock->available_quantity ?? 0,
+            'has_variations' => $this->merchantProduct->product->has_variations,
+            'has_serials' => $this->merchantProduct->product->has_serials,
             'packaging_service' => $this->packaging_service,
             'preferred_package' => $this->when($this->packaging_service, $this->preferredPackage ? new PackagingPackageResource($this->preferredPackage->loadMissing('package')) : NULL),
             'dispatched_package' => $this->when($this->packaging_service, $this->dispatchedPackage ? new PackagingPackageResource($this->dispatchedPackage->loadMissing('package')) : NULL),
-            'serials' => $this->when($this->has_serials && ! $this->has_variations, $this->serials->loadMissing('serial')),
-            'variations' => $this->when($this->has_variations, RequiredProductVariationResource::collection($this->variations)),
-            'addresses' => new ProductAddressCollection($this->product->addresses),
+            'serials' => $this->when($this->merchantProduct->product->has_serials && ! $this->merchantProduct->product->has_variations, $this->serials->loadMissing('serial')),
+            'variations' => $this->when($this->merchantProduct->product->has_variations, RequiredProductVariationResource::collection($this->variations)),
+            'addresses' => new ProductAddressCollection($this->merchantProduct->addresses),
             'requisition_id' => $this->requisition_id,
         ];
     }

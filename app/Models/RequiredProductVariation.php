@@ -20,9 +20,9 @@ class RequiredProductVariation extends Model
     }
     */
 
-    public function productVariation()
+    public function merchantProductVariation()
     {
-    	return $this->belongsTo(ProductVariation::class, 'product_variation_id', 'id');
+    	return $this->belongsTo(MerchantProductVariation::class, 'merchant_product_variation_id', 'id');
     }
 
     public function requiredProduct()

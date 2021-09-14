@@ -22,15 +22,15 @@ class RequisitionController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.product', 'products.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
+        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
 
     }
 

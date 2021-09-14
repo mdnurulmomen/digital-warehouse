@@ -195,7 +195,7 @@
 										Type :
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Products' }}
+										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Products'  | capitalize}}
 									</label>
 								</div>
 
@@ -204,7 +204,7 @@
 										Merchant :
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.merchant ? singleProductData.merchant.user_name : 'None' }}
+										{{ singleProductData.merchant ? singleProductData.merchant.user_name : 'None' | capitalize }}
 									</label>
 								</div>
 
@@ -213,7 +213,7 @@
 										Name :
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.name }}
+										{{ singleProductData.name | capitalize }}
 									</label>
 								</div>
 
@@ -344,7 +344,7 @@
 																Name :
 															</label>
 															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.variation ? productVariation.variation.name : 'NA' }}
+																{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }}
 															</label>
 														</div>
 

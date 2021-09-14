@@ -11,6 +11,7 @@ use App\Models\Requisition;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductSerial;
+use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
 use App\Models\RequisitionAgent;
 use Illuminate\Support\Facades\Hash;
@@ -172,15 +173,16 @@ class MerchantController extends Controller
             
             return [
 
-                'retail' => new MyProductCollection(Product::where('product_category_id', '>', 0)
-                                                         ->where('merchant_id', $currentMerchant->id)
-                                                         ->paginate($perPage)),
-                'bulk' => new MyProductCollection(Product::where(function ($query) {
-                                                            $query->whereNull('product_category_id')
-                                                                  ->orWhere('product_category_id', 0);
+                'retail' => new MyProductCollection(MerchantProduct::where('merchant_id', $currentMerchant->id)
+                                                        ->whereHas('product', function ($query) {
+                                                            $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->where(function ($query) use ($currentMerchant) {
-                                                            $query->where('merchant_id', $currentMerchant->id);
+                                                        ->paginate($perPage)),
+                
+                'bulk' => new MyProductCollection(MerchantProduct::where('merchant_id', $currentMerchant->id)
+                                                        ->whereHas('product', function ($query) {
+                                                            $query->whereNull('product_category_id')
+                                                                ->orWhere('product_category_id', 0);
                                                         })
                                                        ->paginate($perPage)),
             ];
@@ -201,7 +203,7 @@ class MerchantController extends Controller
         
        
         return MyProductResource::collection(
-            Product::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
+            MerchantProduct::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
                 $query->where('available_quantity', '>', 0);
             })->get()
         );
@@ -212,17 +214,22 @@ class MerchantController extends Controller
     {
         $currentMerchant = \Auth::user();
 
-        $query = $query = Product::where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%$search%")
-                            ->orWhere('sku', 'like', "%$search%")
-                            ->orWhere('price', 'like', "%$search%")
+        $query = MerchantProduct::where('merchant_id', $currentMerchant->id)
+                ->where(function ($query1) use ($search) {
+                    $query1->where('sku', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhere('warning_quantity', 'like', "%$search%")
+                    ->orWhere('selling_price', 'like', "%$search%")
+                    ->orWhereHas('manufacturer', function ($query2) use ($search) {
+                        $query2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('product', function ($query3) use ($search) {
+                        $query3->where('name', 'like', "%$search%")
                             ->orWhere('quantity_type', 'like', "%$search%")
                             ->orWhereHas('category', function ($q) use ($search) {
                                 $q->where('name', 'like', "%$search%");
                             });
-                })
-                ->where(function ($query) use ($currentMerchant) {
-                    $query->where('merchant_id', $currentMerchant->id);
+                    });
                 });
 
         return [
@@ -249,15 +256,15 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new MyRequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'dispatched' => new MyRequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'cancelled' => new MyRequisitionCollection(Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'cancelled' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
         }
 
-        return Requisition::with('products.product')->where('merchant_id', $currentMerchant->id)->get();
+        return Requisition::with('products.merchantProduct')->where('merchant_id', $currentMerchant->id)->get();
 
     }
 

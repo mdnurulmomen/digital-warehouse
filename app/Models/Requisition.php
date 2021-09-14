@@ -66,7 +66,7 @@ class Requisition extends Model
                 
                 foreach ($this->products as $requiredProduct) {
                     
-                    if ($requiredProduct->has_serials && ! $requiredProduct->has_variations) {
+                    if ($requiredProduct->merchantProduct->product->has_serials && ! $requiredProduct->merchantProduct->product->has_variations) {
                         
                         foreach ($requiredProduct->serials as $requiredProductSerial) {
                     
@@ -79,7 +79,7 @@ class Requisition extends Model
                         $requiredProduct->serials()->delete();
 
                     }
-                    else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
+                    else if ($requiredProduct->merchantProduct->product->has_serials && $requiredProduct->merchantProduct->product->has_variations) {
                         
                         foreach ($requiredProduct->variations as $requiredProductVariation) {
                             
@@ -105,13 +105,14 @@ class Requisition extends Model
                 
             }                		
 
+            // new / usual
             foreach ($requiredProducts as $requiredProduct) {
     			
     			$requisitionedProduct = $this->products()->create([
-    				'product_id' => $requiredProduct->id,
+    				'merchant_product_id' => $requiredProduct->id,
                     'quantity' => $requiredProduct->total_quantity,
-    				'has_variations' => $requiredProduct->product->has_variations ?? false,
-                    'has_serials' => $requiredProduct->product->has_serials ?? false,
+    				// 'has_variations' => $requiredProduct->product->has_variations ?? false,
+                    // 'has_serials' => $requiredProduct->product->has_serials ?? false,
                     'packaging_service' => $requiredProduct->packaging_service ?? false,
     			]);
 
@@ -138,9 +139,9 @@ class Requisition extends Model
                         if (! empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0) {
                            
                             $requisitionedProductVariation = $requisitionedProduct->variations()->create([
-                                'product_variation_id' => $requiredProductVariation->id,
+                                'merchant_product_variation_id' => $requiredProductVariation->id,
                                 'quantity' => $requiredProductVariation->required_quantity,
-                                'has_serials' => $requiredProduct->product->has_serials,
+                                // 'has_serials' => $requiredProduct->product->has_serials,
                             ]);
 
                             if ($requiredProduct->product->has_serials && count($requiredProductVariation->required_serials)) {

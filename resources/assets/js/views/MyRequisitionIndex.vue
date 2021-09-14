@@ -33,7 +33,7 @@
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllRequisitions"
 											  	></search-and-addition-option>
-											  	 -->
+											  	-->
 
 											  	<div class="row d-flex align-items-center text-center">		  	
 											  		<div class="col-sm-3 form-group">	
@@ -65,8 +65,7 @@
 											  	</div>
 											</div>
 											
-											<div class="col-sm-12 col-lg-12">
-										  		
+											<div class="col-sm-12 col-lg-12">	
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
@@ -94,11 +93,13 @@
 																	<tr v-for="(content, contentIndex) in requisitionsToShow" :key="'content-index-' + contentIndex + 'content-' + content.id"
 																	>
 																		<td>{{ content.subject | capitalize }}</td>
+																		
 																		<td>
 																			<span :class="[content.status==1 ? 'badge-success' : content.status==0 ? 'badge-danger' : 'badge-secondary', 'badge']">
 																				{{ content.status==1 ? 'Dispatched' : content.status==0 ? 'Pending' : 'Cancelled' }}
 																			</span>
 																		</td>
+																		
 																		<td>
 																			<span 
 																			v-if="content.status==1 && content.dispatch.has_approval==1"
@@ -111,6 +112,7 @@
 																				NA
 																			</span>
 																		</td>
+																		
 																		<td>
 																			
 																			<button 
@@ -144,6 +146,7 @@
  																			-->
 																		</td>
 																	</tr>
+
 																	<tr 
 																  		v-show="!requisitionsToShow.length"
 																  	>
@@ -153,7 +156,6 @@
 																      		</div>
 																    	</td>
 																  	</tr>
-
 																</tbody>
 																<tfoot>
 																	<tr>	
@@ -201,16 +203,13 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div> 
-				
+					</div>	
 				</div>
 			</div>
 		</div>
@@ -251,6 +250,7 @@
 										<div class="form-row">
 											<div class="form-group col-md-12">
 												<label for="inputFirstName">Subject</label>
+												
 												<input type="text" 
 													class="form-control" 
 													v-model="singleRequisitionData.subject" 
@@ -265,28 +265,6 @@
 										  		</div>
 											</div>
 										</div>
-
-										<div class="form-row">
-											<div class="form-group col-md-12">
-												<label for="inputFirstName">Description</label>
-												<ckeditor 
-					                              	class="form-control" 
-					                              	:editor="editor" 
-					                              	v-model="singleRequisitionData.description"
-					                            >
-				                              	</ckeditor>
-
-				                            <!-- 
-				                              	<div 
-					                              	class="invalid-feedback" 
-					                              	style="display : block" 
-					                              	v-show="errors.description"
-				                              	>
-										        	{{ errors.description }}
-										  		</div>
- 											-->
-											</div>
-										</div>
 							        </div>
 
 							        <div class="col-md-12 card-footer">
@@ -295,6 +273,7 @@
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
+
 									          	<button 
 									          	type="button" 
 									          	class="btn btn-outline-secondary btn-sm btn-round" 
@@ -315,17 +294,18 @@
 									<h2 class="mx-auto mb-4 lead">Required Products</h2>
 
 									<div 
-										class="col-md-12" 
+										class="card col-md-12" 
 										v-if="singleRequisitionData.products.length && singleRequisitionData.products.length==errors.products.length"
 									>
 										<div 
-											class="card card-body" 
+											class="card-body" 
 											v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
 											:key="'required-product-' + productIndex"
 										>
 											<div class="form-row">
 												<div class="form-group col-md-6">
 													<label for="inputFirstName">Select Product</label>
+													
 													<multiselect 
 				                              			v-model="requiredProduct.product"
 				                              			placeholder="Product Name" 
@@ -342,6 +322,7 @@
 				                                  		@close="validateFormInput('product_id')" 
 				                              		>
 				                                	</multiselect>
+				                                	
 				                                	<div class="invalid-feedback">
 												    	{{ errors.products[productIndex].product_id }}
 												    </div>
@@ -484,6 +465,16 @@
 												</button>
 											</div>
 										</div>
+									</div>
+
+									<div class="form-group col-md-12">
+										<label for="inputFirstName">Short Note</label>
+										<ckeditor 
+			                              	class="form-control" 
+			                              	:editor="editor" 
+			                              	v-model="singleRequisitionData.description"
+			                            >
+		                              	</ckeditor>
 									</div>
 
 									<div class="col-md-12 card-footer">
@@ -1716,6 +1707,7 @@
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
 					this.singleRequisitionData.products.push({});
+					
 					this.errors.products.push({
 						variation_serials : [],
 						variation_quantities : []

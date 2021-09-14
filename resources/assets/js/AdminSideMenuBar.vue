@@ -53,7 +53,7 @@
 							<li 
 								class="pcoded-hasmenu" 
 								:class="['owners', 'warehouses', 'storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
-								v-if="userHasPermissionTo('view-owner-index') || userHasPermissionTo('view-warehouse-index')"
+								v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('view-warehouse-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
