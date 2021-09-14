@@ -86,7 +86,7 @@
 									@click="$emit('goCategoryProducts', content)" 
 									v-if="$route.name=='product-categories' && userHasPermissionTo('view-product-index')"
 							>
-								<i class="fa fa-product-hunt"></i>
+								<i class="fab fa-product-hunt"></i>
 							</button>
 						</td>
 					</tr>

@@ -30,7 +30,7 @@ class ProductStockResource extends JsonResource
             'addresses' => new ProductAddressCollection($this->addresses),
             'keeper' => $this->stock->keeper,
             'approver' => $this->when($this->stock->has_approval, $this->stock->approver),    // -1 / 1
-            'created_at' => $this->stock->created_at,
+            'created_at' => $this->stock->created_at->format('Y.m.d H:i:s'),
             // 'updated_at' => $this->updated_at->diffForHumans(),
         ];
     }

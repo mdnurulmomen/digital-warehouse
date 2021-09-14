@@ -1024,7 +1024,7 @@ class ProductController extends Controller
             ],
             'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:255',
-            'warning_quantity' => 'numeric',
+            'warning_quantity' => 'nullable|numeric',
             'variations' => [
                 'array', 
                 Rule::requiredIf(function () use ($product) {
@@ -1075,7 +1075,7 @@ class ProductController extends Controller
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'manufacturer_id' => $request->manufacturer_id, 
-            'warning_quantity' => $request->warning_quantity ?? 100,
+            'warning_quantity' => $request->warning_quantity ?? 0,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
             'discount' => $product->product_category_id ? $request->discount : NULL,
             'product_id' => $request->product_id,
@@ -1132,7 +1132,7 @@ class ProductController extends Controller
             ],
             'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:255',
-            'warning_quantity' => 'numeric',
+            'warning_quantity' => 'nullable|numeric',
             'variations' => [
                 'array', 
                 Rule::requiredIf(function () use ($product) {
@@ -1185,7 +1185,7 @@ class ProductController extends Controller
             'manufacturer_id' => $request->manufacturer_id, 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
-            'warning_quantity' => $request->warning_quantity ?? 100,
+            'warning_quantity' => $request->warning_quantity ?? 0,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
             'discount' => $product->product_category_id ? $request->discount : NULL,
             'product_id' => $request->product_id,
