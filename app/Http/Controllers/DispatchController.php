@@ -28,17 +28,17 @@ class DispatchController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
                         $query->where('has_approval', 1);
                     })->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
+        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent'])->where('status', 0)->get());
 
     }
 
@@ -69,11 +69,13 @@ class DispatchController extends Controller
                 */
             ],
 
-            'requisition.products' => 'required|array|min:1',
+            'requisition.products' => 'required|array|min:'.$expectedRequisition->products->count(),
             'requisition.products.*.merchant_product_id' => 'required|exists:merchant_products,id',
 
             'requisition.products.*.quantity' => 'required|numeric|min:1',
-            'requisition.products.*.available_quantity' => 'required|numeric|min:1',
+            'requisition.products.*.has_variations' => 'required|boolean',
+            'requisition.products.*.has_serials' => 'required|boolean',
+            // 'requisition.products.*.available_quantity' => 'required|numeric|min:1',
 
             'requisition.products.*.packaging_service' => 'required|boolean',
             'requisition.products.*.dispatched_package' => 'required_if:requisition.products.*.packaging_service,1',
@@ -82,16 +84,22 @@ class DispatchController extends Controller
 
             // validate laterly
             'requisition.products.*.serials' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|array|min:1',
+            'requisition.products.*.serials.*.id' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|numeric|exists:required_product_serials,id',
 
             // 'agent' => 'required_if:delivery,0,',
             // 'agent.agent_receipt' => 'required_if:delivery,0,',
             
             'requisition.products.*.variations' => 'required_if:requisition.products.*.has_variations,1|array|min:1',
 
+            'requisition.products.*.variations.*.merchant_product_variation_id' => 'required_with:requisition.products.*.variations|numeric|exists:merchant_product_variations,id',
             'requisition.products.*.variations.*.quantity' => 'required_with:requisition.products.*.variations|numeric|min:1',
-            'requisition.products.*.variations.*.available_quantity' => 'required_with:requisition.products.*.variations|numeric|min:1',
+            'requisition.products.*.variations.*.variation_name' => 'required_with:requisition.products.*.variations|string',
+            'requisition.products.*.variations.*.has_serials' => 'required_with:requisition.products.*.variations|boolean',
+            
+            // 'requisition.products.*.variations.*.available_quantity' => 'required_with:requisition.products.*.variations|numeric|min:1',
 
             'requisition.products.*.variations.*.serials' => 'required_if:requisition.products.*.variations.*.has_serials,1|array|min:1',
+            'requisition.products.*.variations.*.serials.*.id' => 'required_if:requisition.products.*.variations.*.has_serials,1|numeric|exists:required_product_variation_serials,id',
 
             'delivery' => 'required_if:requisition.agent,0,',
             // 'delivery.address' => 'required_if:agent,0,',
@@ -100,7 +108,6 @@ class DispatchController extends Controller
 
             'agent' => 'required_if:requisition.delivery,0,',
             'agent.collection_point' => [ 
-                // 'exists:warehouses,id', 
                 'string', 
                 Rule::requiredIf($expectedRequisition->agent && $expectedRequisition->status != -1) 
             ],
@@ -120,7 +127,7 @@ class DispatchController extends Controller
             
         }
 
-        if ($expectedRequisition->status==-1) {
+        if ($expectedRequisition->status == -1) {
 
             return response()->json(['errors'=>["approvedOrCancelled" => "Cancelled requisition, please refresh"]], 422);
 
@@ -137,57 +144,57 @@ class DispatchController extends Controller
 
             $userHasApprovingPermission = $currentUser->hasPermissionTo('approve-dispatch');
 
-            $requisitionDispatch = new Dispatch();
-            // $requisitionDispatch->released_at = now();
-            $requisitionDispatch->has_approval = $userHasApprovingPermission ? 1 : 0;
-            $requisitionDispatch->updater_type = $userHasApprovingPermission ? get_class($currentUser) : NULL;
-            $requisitionDispatch->updater_id = $userHasApprovingPermission ? $currentUser->id : NULL;
-            $requisitionDispatch->updated_at = $userHasApprovingPermission ? now() : NULL;
-            $requisitionDispatch->requisition_id = $request->requisition['id'];
-            $requisitionDispatch->save();
+            $newDispatch = new Dispatch();
+            // $newDispatch->released_at = now();
+            $newDispatch->has_approval = $userHasApprovingPermission ? 1 : 0;
+            $newDispatch->updater_type = $userHasApprovingPermission ? get_class($currentUser) : NULL;
+            $newDispatch->updater_id = $userHasApprovingPermission ? $currentUser->id : NULL;
+            $newDispatch->updated_at = $userHasApprovingPermission ? now() : NULL;
+            $newDispatch->requisition_id = $request->requisition['id'];
+            $newDispatch->save();
 
-            $requisitionDispatch->requisition()->update([
+            $newDispatch->requisition()->update([
                 'status' => true,
                 'updater_type' => get_class($currentUser),
                 'updater_id' => $currentUser->id,
             ]);
 
-            if ($requisitionDispatch->has_approval == 1) {
+            if ($newDispatch->has_approval == 1) {
            
-                $requisitionDispatch->dispatch_products = json_decode(json_encode($request->requisition['products']));
+                $newDispatch->dispatch_products = json_decode(json_encode($request->requisition['products']));
 
             }
 
         }
         else if ($expectedRequisition->status == 1) {   // to approve
             
-            $requisitionDispatch = $expectedRequisition->dispatch;
+            $newDispatch = $expectedRequisition->dispatch;
 
-            if ($requisitionDispatch->has_approval) { // 1 / -1
+            if ($newDispatch->has_approval) { // 1 / -1
                
                 return response()->json(['errors'=>["approvedOrCancelled" => "Approved/Cancelled dispatch, please refresh"]], 422);
 
             }
        
-            $requisitionDispatch->has_approval = 1;
-            $requisitionDispatch->updater_type = get_class($currentUser);
-            $requisitionDispatch->updater_id = $currentUser->id;
-            $requisitionDispatch->updated_at = now();
-            $requisitionDispatch->save();
+            $newDispatch->has_approval = 1;
+            $newDispatch->updater_type = get_class($currentUser);
+            $newDispatch->updater_id = $currentUser->id;
+            $newDispatch->updated_at = now();
+            $newDispatch->save();
 
-            $requisitionDispatch->dispatch_products = json_decode(json_encode($request->requisition['products']));
+            $newDispatch->dispatch_products = json_decode(json_encode($request->requisition['products']));
 
         }
 
         if (!empty($request->delivery) && !empty($request->delivery['delivery_price']) && !empty($request->delivery['delivery_receipt'])) {
                 
-            $requisitionDispatch->deliver_requisition = json_decode(json_encode($request->delivery));
+            $newDispatch->deliver_requisition = json_decode(json_encode($request->delivery));
 
         }
         else {
 
-            $requisitionDispatch->return()->updateOrCreate(
-                [ 'dispatch_id' => $requisitionDispatch->id ],
+            $newDispatch->return()->updateOrCreate(
+                [ 'dispatch_id' => $newDispatch->id ],
                 [
                     'collection_point' => $request->agent['collection_point'], 
                     'receiving_confirmation' => false, 
@@ -196,7 +203,7 @@ class DispatchController extends Controller
 
         }
         
-        if ($requisitionDispatch->has_approval == 1) {
+        if ($newDispatch->has_approval == 1) {
             
             BroadcastRequisitionDispatch::dispatch($expectedRequisition);
 
