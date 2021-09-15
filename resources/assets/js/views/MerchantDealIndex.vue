@@ -354,7 +354,7 @@
 															:class="! errors.warehouses[merchantWarehouseIndex].warehouse ? 'is-valid' : 'is-invalid'"  
 															@close="validateFormInput('warehouse')" 
 															@input="resetWarehouseSpaces(merchantWarehouseIndex)" 
-															:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || singleMerchantDealData.payments.length > 1 || ! mutableWarehouse(merchantWarehouse)"
+															:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableWarehouse(merchantWarehouse)"
 														>
 														</multiselect>
 
@@ -390,7 +390,9 @@
 																	placeholder="Containers / Shelves / Units" 
 																	class="form-control p-0" 
 																	:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_type ? 'is-valid' : 'is-invalid'" 
-																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1" 
+																	
+																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || ! removableSpace(singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])" 
+
 																	@input="setWarehouseSpaces(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																	@close="validateFormInput('space_type')"
 																>
@@ -430,7 +432,7 @@
 																					:allow-empty="false" 
 																					class="form-control p-0" 
 																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || warehouseContainer.occupied != 0"
 																					@close="validateFormInput('containers')" 
 																				>
 																				</multiselect>
@@ -456,7 +458,7 @@
 																					:allow-empty="false" 
 																					class="form-control p-0" 
 																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex+1) || singleMerchantDealData.payments.length > 1"
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || warehouseContainer.occupied != 0"
 																					@close="validateFormInput('rent_period')" 
 																				>
 																				</multiselect>
@@ -479,8 +481,15 @@
 																			<div class="col-md-6 text-success">
 																				<i class="fa fa-plus" aria-hidden="true" @click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"></i>
 																			</div>
+
 																			<div class="col-md-6 text-danger">
-																				<i class="fa fa-minus" aria-hidden="true" @click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"></i>
+																				<i 
+																					class="fa fa-minus" 
+																					aria-hidden="true" 
+																					:disabled="warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1])" 
+																					@click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
+																				>	
+																				</i>
 																			</div>
 																		</div>
 																	</div>
@@ -505,7 +514,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableShelf(warehouseSpace.container)"
 																			@input="setContainerAvailableShelves(merchantWarehouseIndex, warehouseSpaceIndex)"
 																			@close="validateFormInput('parent_container')" 
 																		>
@@ -536,7 +545,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].shelves ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableShelf(warehouseSpace.container)"
 																			@close="validateFormInput('shelves')" 
 																		>
 																		</multiselect>
@@ -573,7 +582,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableShelf(warehouseSpace.container)"
 																			@close="validateFormInput('rent_period')" 
 																		>
 																		</multiselect>
@@ -600,7 +609,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@input="setContainerAvailableUnitShelves(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																			@close="validateFormInput('parent_container')" 
 																		>
@@ -627,7 +636,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_shelf  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@input="setContainerShelfAvailableUnits(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																			@close="validateFormInput('parent_shelf')" 
 																		>
@@ -660,7 +669,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@close="validateFormInput('units')" 
 																		>
 																		</multiselect>
@@ -695,7 +704,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@close="validateFormInput('rent_period')" 
 																		>
 																		</multiselect>
@@ -726,7 +735,12 @@
 																</button>
 															</div>
 															<div class="col-md-6 text-danger">
-																<button type="button" class="btn btn-outline-info btn-sm btn-block" @click="removeWarehouseSpace(merchantWarehouseIndex)">
+																<button 
+																	type="button" 
+																	class="btn btn-outline-info btn-sm btn-block" 
+																	:disabled="! removableSpace(singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])" 
+																	@click="removeWarehouseSpace(merchantWarehouseIndex)"
+																>
 																	Remove Space
 																</button>
 															</div>
@@ -1109,8 +1123,8 @@
 																						Status :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						<span :class="[warehouseContainer.engaged==1 ? 'badge-danger' : warehouseContainer.engaged==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
-																							{{ warehouseContainer.engaged==1 ? 'Packed' : warehouseContainer.engaged==0.5 ? 'Packed Partially' : 'Empty' }}
+																						<span :class="[warehouseContainer.occupied==1 ? 'badge-danger' : warehouseContainer.occupied==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																							{{ warehouseContainer.occupied==1 ? 'Packed' : warehouseContainer.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
 																						</span>
 																					</label>
 																				</div>
@@ -1158,8 +1172,8 @@
 
 																								{{ shelf.name ? shelf.name.substring(shelf.name.lastIndexOf("-")+1) : 'NA' }}
 																								
-																								<span :class="[shelf.engaged==1 ? 'badge-danger' : shelf.engaged==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
-																									{{ shelf.engaged==1 ? 'Packed' : shelf.engaged==0.5 ? 'Packed Partially' : 'Empty' }}
+																								<span :class="[shelf.occupied==1 ? 'badge-danger' : shelf.occupied==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																									{{ shelf.occupied==1 ? 'Packed' : shelf.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
 																								</span>	
 																							</li>	
 																						</ul>
@@ -1215,8 +1229,8 @@
 
 																								{{ unit.name ? unit.name.substring(unit.name.lastIndexOf("-")+1) : 'NA' }}
 																								
-																								<span :class="[unit.engaged==1 ? 'badge-danger' : unit.engaged==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
-																									{{ unit.engaged==1 ? 'Packed' : unit.engaged==0.5 ? 'Packed Partially' : 'Empty' }}
+																								<span :class="[unit.occupied==1 ? 'badge-danger' : unit.occupied==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																									{{ unit.occupied==1 ? 'Packed' : unit.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
 																								</span>
 																							</li>
 																						</ul>
@@ -2533,12 +2547,14 @@
 				
 				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.payments.length < 2){
 
-					if(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex){
+					if(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && ! this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex])){
 
 						this.emptyContainers.push(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers[this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers.length-1]);
+
 						this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers.pop();
 
 						// this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex], 'containers');
+						
 						this.validateFormInput('containers');
 
 					}
@@ -2568,7 +2584,7 @@
 			},
 			removeWarehouseSpace(merchantWarehouseIndex) {
 					
-				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > 0 && this.singleMerchantDealData.payments.length < 2) {
+				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > 0 && this.singleMerchantDealData.payments.length < 2 && this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])) {
 					
 					this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.pop();
 
@@ -2580,6 +2596,27 @@
 				
 				}
 				
+			},
+			removableSpace(warehouseSpace) {
+
+				if (warehouseSpace.type=='containers' && warehouseSpace.containers.some(warehouseContainer => warehouseContainer.occupied != 0)) {
+
+					return false;
+
+				}
+				else if (warehouseSpace.type=='shelves' && warehouseSpace.container.shelves.some(warehouseShelf => warehouseShelf.occupied != 0)) {
+
+					return false;
+
+				}
+				else if (warehouseSpace.type=='units' && warehouseSpace.container.shelf.units.some(warehouseUnit => warehouseUnit.occupied != 0)) {
+
+					return false;
+
+				}
+
+				return true;
+
 			},
 			addMoreWarehouse() {
 				if (this.singleMerchantDealData.warehouses.length < this.allAvailableWarehouseAndSpaces.length && this.singleMerchantDealData.payments.length < 2) {
@@ -2607,24 +2644,57 @@
 
 				const warehouseIsEngaged = (merchantWarehouse) => {
 					return merchantWarehouse.spaces.some(
-						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealSpace.containers.some(dealtContainer => dealtContainer.engaged != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.engaged != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.engaged != 0))
+						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealSpace.containers.some(dealtContainer => dealtContainer.occupied != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.occupied != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.occupied != 0))
 					)
 				};
 
 				return merchantDeal.payments.length < 2 || ! merchantDeal.warehouses.some(warehouseIsEngaged)
 
 			},
-			mutableWarehouse(merchantWarehouse) {
+			immutableWarehouse(merchantWarehouse) {
 
 				if (merchantWarehouse.hasOwnProperty('spaces') && merchantWarehouse.spaces.length) {
 
-					return ! merchantWarehouse.spaces.some(
-						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealtSpace.containers.some(dealtContainer => dealtContainer.engaged != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.engaged != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.engaged != 0))
+					return merchantWarehouse.spaces.some(
+						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealtSpace.containers.some(dealtContainer => dealtContainer.occupied != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.occupied != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.occupied != 0))
 					);
 
 				}
 
-				return true;
+				return false;
+
+			},
+			immutableContainer(warehouseContainer) {
+
+				if (warehouseContainer) {
+
+					return warehouseContainer.occupied != 0;
+
+				}
+
+				return false;
+
+			},
+			immutableShelf(warehouseContainer) {
+
+				if (warehouseContainer && warehouseContainer.hasOwnProperty('shelves') && warehouseContainer.shelves.length) {
+
+					return warehouseContainer.shelves.some(warehouseShelf => warehouseShelf.occupied != 0);
+
+				}
+
+				return false;
+
+			},
+			immutableUnit(warehouseContainer) {
+
+				if (warehouseContainer && warehouseContainer.hasOwnProperty('shelf') && warehouseContainer.shelf.hasOwnProperty('units') && warehouseContainer.shelf.units.length) {
+
+					return warehouseContainer.shelf.units.some(warehouseUnit => warehouseUnit.occupied != 0);
+
+				}
+
+				return false;
 
 			},
 			resetWarehouseSpaces(merchantWarehouseIndex){

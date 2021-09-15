@@ -993,6 +993,33 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
+														Available Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.available_quantity }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Dispatched Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.dispatched_quantity }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Pending Requested Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.requested_quantity }}
+													</label>
+												</div>	
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
 														Selling Price (unit) :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -1010,11 +1037,9 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
-														Created on :
-													</label>
-													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.created_at }}
+													<label class="col-sm-4 col-form-label font-weight-bold">Has Serials :</label>
+													<label class="col-sm-6 form-control-plaintext">
+														<span :class="[product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ product.has_serials ? 'Available' : 'NA' }}</span>
 													</label>
 												</div>
 
@@ -1022,6 +1047,15 @@
 													<label class="col-sm-4 col-form-label font-weight-bold">Has Variation :</label>
 													<label class="col-sm-6 form-control-plaintext">
 														<span :class="[product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ product.has_variations ? 'Available' : 'NA' }}</span>
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Created on :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.created_at }}
 													</label>
 												</div>
 

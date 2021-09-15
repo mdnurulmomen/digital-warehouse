@@ -61,7 +61,7 @@ class DealtSpaceCollection extends ResourceCollection
 
                     'warehouse_container_id' => $warehouseExpectedContainer->warehouse_container_id,
 
-                    'engaged' => $dealtSpace->engaged,
+                    'occupied' => $warehouseExpectedContainer->occupied,
 
                     'warehouse_container' => $warehouseExpectedContainer->warehouseContainer->loadMissing(['container']),
 
@@ -101,7 +101,7 @@ class DealtSpaceCollection extends ResourceCollection
                             [
                                 'id' => $warehouseExpectedShelf->id,
                                 'name' => $warehouseExpectedShelf->name,
-                                'engaged' => $dealtSpace->engaged,
+                                'occupied' => $warehouseExpectedShelf->occupied,
                                 'warehouse_container_status_id' => $warehouseExpectedShelf->warehouse_container_status_id,
                             ]
                             
@@ -152,7 +152,7 @@ class DealtSpaceCollection extends ResourceCollection
                                 [
                                     'id' => $warehouseExpectedUnit->id,
                                     'name' => $warehouseExpectedUnit->name,
-                                    'engaged' => $dealtSpace->engaged,
+                                    'occupied' => $warehouseExpectedUnit->occupied,
                                     // 'warehouse_container_shelf_status_id' => $warehouseExpectedUnit->warehouse_container_shelf_status_id,
                                 ]
                             
