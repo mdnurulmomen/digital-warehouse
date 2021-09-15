@@ -1,11 +1,11 @@
 
-<template v-if="userHasPermissionTo('view-product-index')">
+<template v-if="userHasPermissionTo('view-merchant-product-index')">
 
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'products'" 
-			:message="'All our products'"
+			:title="'merchants'" 
+			:message="'All our products for ' + merchant.first_name + ' ' + merchant.last_name + ' (' + merchant.user_name + ')' | capitalize"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -24,20 +24,20 @@
 										<div class="row">
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('create-product')" 
+											  		v-if="userHasPermissionTo('view-merchant-product-index') || userHasPermissionTo('create-merchant-product')" 
 											  		:query="query" 
 											  		:caller-page="'products'" 
-											  		:required-permission = "'product'" 
-											  		:disable-add-button="allProductCategories.length==0 ? true : false" 
+											  		:required-permission = "'merchant-product'" 
+											  		:disable-add-button="allProducts.length==0 ? true : false" 
 											  		
-											  		@showContentCreateForm="showContentCreateForm" 
+											  		@showContentCreateForm="showProductMerchantCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllProducts"
+											  		@fetchAllContents="fetchMerchantAllProducts"
 											  	></search-and-addition-option>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-										  		<tab 
+												<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['retail', 'bulk']" 
 										  			:current-tab="'retail'" 
@@ -46,49 +46,46 @@
 										  			@showBulkContents="showBulkContents" 
 										  		></tab>
 
-									  		<!-- 
-										  		<table-with-soft-delete-option 
-										  			:query="query" 
-										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
-										  			:contents-to-show = "productsToShow" 
-										  			:pagination = "pagination"
-
-										  			@showContentDetails="showContentDetails($event)" 
-										  			@openContentEditForm="openContentEditForm($event)" 
-										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@openContentRestoreForm="openContentRestoreForm($event)" 
-										  			@changeNumberContents="changeNumberContents($event)" 
-										  			@fetchAllProducts="fetchAllProducts" 
-										  			@searchData="searchData" 
-										  		>	
-										  		</table-with-soft-delete-option>
- 											-->
-
  												<div class="tab-content card-block">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
 																<thead>
 																	<tr>
-																		<th>Name</th>
-																		<!-- <th>SKU</th> -->
+																		<th>Product</th>
+																		<th>Manufacturer/Brand</th>
+																		<th>SKU</th>
+																		<th>Stock</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
-																<tbody>
 
-																	<tr v-for="content in productsToShow" :key="'content-' + content.id"
+																<tbody>
+																	<tr v-for="merchantProduct in productsToShow" 
+																		:key="'merchant-product-id' + merchantProduct.id + '-product-id-' + merchantProduct.product.id + '-merchant-id-' + merchantProduct.merchant.id"
 																	>
-																		<td>{{ content.name | capitalize }}</td>
-																		<!-- <td>{{ content.sku }}</td> -->
+																		<td>
+																			{{ merchantProduct.product ? merchantProduct.product.name : 'NA' | capitalize }}
+																		</td>
+																		
+																		<td>
+																			{{ merchantProduct.manufacturer ? merchantProduct.manufacturer.name : 'Own Product' | capitalize }}
+																		</td>
+
+																		<td>
+																			{{ merchantProduct.sku }}
+																		</td>
+
+																		<td>
+																			{{ merchantProduct.available_quantity }}
+																			{{ merchantProduct.hasOwnProperty('product') ? ' ' + merchantProduct.product.quantity_type : ' unit'  }}
+																		</td>
 																		
 																		<td>
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon"  
-																				@click="showContentDetails(content)"
+																				@click="showProductMerchantDetails(merchantProduct)"
 																			>
 																				<i class="fa fa-eye"></i>
 																			</button>
@@ -96,44 +93,57 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon"  
-																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('update-product')"
+																				@click="openProductMerchantEditForm(merchantProduct)" 
+																				v-if="userHasPermissionTo('update-merchant-product')"
 																			>
 																				<i class="fa fa-edit"></i>
 																			</button>
 
 																			<button 
 																				type="button" 
+																				class="btn btn-grd-danger btn-icon"  
+																				@click="openProductMerchantDeleteForm(merchantProduct)" 
+																				v-if="userHasPermissionTo('delete-merchant-product')" 
+																				:disabled="merchantProduct.product_immutability"
+																			>
+																				<i class="fa fa-trash"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
 																				class="btn btn-grd-warning btn-icon"  
-																				@click="goProductStore(content)" 
+																				@click="goProductStore(merchantProduct)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
-																				<i class="feather icon-command"></i>
+																				<i class='fas fa-store-alt'></i>
 																			</button>
 																		</td>
-																    
 																	</tr>
+
 																	<tr 
-																  		v-show="!productsToShow.length"
+																  		v-show="! productsToShow.length"
 																  	>
-															    		<td colspan="3">
+															    		<td colspan="5">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
 																    	</td>
 																  	</tr>
-
 																</tbody>
+
 																<tfoot>
 																	<tr>	
-																		<th>Name</th>
-																		<!-- <th>SKU</th> -->
+																		<th>Product</th>
+																		<th>Manufacturer/Brand</th>
+																		<th>SKU</th>
+																		<th>Stock</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
 															</table>
 														</div>
 													</div>
+
 													<div class="row d-flex align-items-center">
 														<div class="col-sm-2 col-4">
 															<select 
@@ -148,59 +158,47 @@
 																<option>50</option>
 															</select>
 														</div>
+
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? fetchAllProducts() : searchData()"
+																@click="query === '' ? fetchMerchantAllProducts() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
 															</button>
 														</div>
+
 														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllProducts() : searchData()"
+																@paginate="query === '' ? fetchMerchantAllProducts() : searchData()"
 															>
 															</pagination>
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div> 
+					</div>
 				</div>
 			</div>
 		</div>
 
-	<!-- 
-		<asset-create-or-edit-modal 
-			:create-mode="createMode" 
-			:caller-page="'variation'" 
-			:single-asset-data="singleProductData" 
-			:csrf="csrf"
-
-			@storeProduct="storeProduct($event)" 
-			@updateAsset="updateAsset($event)" 
-		></asset-create-or-edit-modal>
- 	-->
-
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="product-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product') || userHasPermissionTo('update-product')">
+		<div class="modal fade" id="product-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-product') || userHasPermissionTo('update-merchant-product')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Store' : 'Update' }} Product
+							{{ merchant.first_name + ' ' + merchant.last_name | capitalize }} {{ createMode ? ' New ' : ' Update ' | capitalize }} Product
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -209,106 +207,82 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="createMode ? storeProduct() : updateAsset()" 
+						v-on:submit.prevent="createMode ? storeProductMerchant() : updateProductMerchant()" 
 						autocomplete="off" 
 						novalidate="true" 
 					>
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
-							<!-- <transition-group name="fade"> -->
-
-							        <div class="form-row">
-							        	<div class="form-group col-sm-12 text-center">
+									<div class="form-row">
+										<div class="form-group col-sm-12">
+							        		<label for="inputUsername">Selected Merchant</label>
 								        	<multiselect 
-		                              			v-model="productMode" 
+		                              			v-model="merchant" 
 		                              			class="form-control p-0 is-valid" 
-		                              			placeholder="Product Mode" 
-		                                  		:custom-label="nameWithCapitalized" 
-		                                  		:options="['bulk product', 'retail product']" 
-		                                  		:required="true" 
+		                              			placeholder="Product Name" 
+		                                  		:custom-label="objectNameWithCapitalized" 
+		                                  		:options="[]" 
 		                                  		:allow-empty="false" 
-		                                  		@input="setProductMode" 
-		                                  		:disabled="singleProductData.product_immutability" 
+		                                  		:disabled="true" 
 		                              		>
 		                                	</multiselect>
 							        	</div>
-							        </div>
-							        	
-									<div class="form-row">
-										<div class="form-group col-md-6">
-											<label for="inputUsername">Product Category</label>
+									</div>
+
+							        <div class="form-row">
+							        	<div class="form-group col-md-6">
+											<label for="inputUsername">Product Name</label>
 											<multiselect 
-		                              			v-model="singleProductData.category" 
-		                              			class="form-control p-0 is-valid" 
-		                              			placeholder="Product Category" 
-		                                  		label="name" 
-		                                  		track-by="id" 
-		                                  		:custom-label="objectNameWithCapitalized" 
-		                                  		:options="allProductCategories" 
-		                                  		:required="true" 
-		                                  		:allow-empty="false"
-		                                  		selectLabel = "Press/Click"
-		                                  		deselect-label="Can't remove single value" 
-		                                  		:disabled="productMode=='bulk product'" 
-		                                  		@input="setProductCategory"
-		                              		>
-		                                	</multiselect>
-										</div>
-										<!-- 
-										<div class="form-group col-md-6">
-											<label for="inputUsername">Merchant</label>
-											<multiselect 
-		                              			v-model="singleProductData.merchant"
-		                              			placeholder="Merchant" 
+		                              			v-model="singleMerchantProductData.product"
+		                              			placeholder="Merchant Product" 
 		                                  		label="user_name" 
 		                                  		track-by="id" 
 		                                  		:custom-label="objectNameWithCapitalized" 
-		                                  		:options="allMerchants" 
+		                                  		:options="allProducts" 
 		                                  		:required="true" 
 		                                  		:allow-empty="false"
 		                                  		selectLabel = "Press/Click"
 		                                  		deselect-label="Can't remove single value" 
 		                                  		class="form-control p-0" 
-		                                  		:class="!errors.product.product_merchant_id  ? 'is-valid' : 'is-invalid'"
-		                                  		@close="validateFormInput('product_merchant_id')" 
-		                                  		@input="setProductMerchant"
+		                                  		:class="! errors.product.merchant_product_id  ? 'is-valid' : 'is-invalid'"
+		                                  		@close="validateFormInput('merchant_product_id')" 
+		                                  		@input="setMerchantProduct"
 		                              		>
 		                                	</multiselect>
 
 		                                	<div class="invalid-feedback">
-										    	{{ errors.product.product_merchant_id }}
+										    	{{ errors.product.merchant_product_id }}
 										    </div>
 										</div>
-										 -->
-									</div>
+
+										<div class="form-group col-md-6">
+											<label for="inputUsername">Manufacturer/Brand Name</label>
+
+											<multiselect 
+		                              			v-model="singleMerchantProductData.manufacturer"
+		                              			placeholder="Manufacturer" 
+		                                  		label="name" 
+		                                  		track-by="id" 
+		                                  		:custom-label="objectNameWithCapitalized" 
+		                                  		:options="allManufacturers" 
+		                                  		selectLabel = "Press/Click"
+		                                  		deselect-label="Press/Click To Remove" 
+		                                  		class="form-control p-0 is-valid" 
+		                                  		@input="setProductManufacturer"
+		                              		>
+		                                	</multiselect>
+										</div>
+							        </div>
 
 									<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Name</label>
+											<label for="inputFirstName">Product Code/SKU</label>
 											<input type="text" 
 												class="form-control" 
-												v-model="singleProductData.name" 
-												placeholder="Name should be unique" 
-												:class="!errors.product.product_name ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_name')" 
-												required="true" 
-											>
-
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_name }}
-									  		</div>
-										</div>
-
-										<!-- 
-										<div class="form-group col-md-6">
-											<label for="inputFirstName">SKU/Barcode</label>
-											<input type="text" 
-												class="form-control" 
-												v-model="singleProductData.sku" 
-												placeholder="Unique code" 
-												:class="!errors.product.product_sku  ? 'is-valid' : 'is-invalid'" 
+												v-model="singleMerchantProductData.sku" 
+												placeholder="SKU should be unique" 
+												:class="!errors.product.product_sku ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_sku')" 
 												required="true" 
 											>
@@ -317,238 +291,275 @@
 									        	{{ errors.product.product_sku }}
 									  		</div>
 										</div>
- 										-->
-									</div>
 
-									<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Qty Type</label>
-											<input type="text" 
-												class="form-control" 
-												v-model="singleProductData.quantity_type" 
-												placeholder="Kg / Meter / Box" 
-												:class="!errors.product.product_quantity_type  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_quantity_type')" 
-												required="true" 
-											>
-
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_quantity_type }}
-									  		</div>
-										</div>
-
-										<!-- 
-										<div class="form-group col-md-6">
-											<label for="inputFirstName">Price</label>
+											<label for="inputFirstName">Selling Price (unit)</label>
 											<input type="number" 
 												class="form-control" 
-												v-model.number="singleProductData.price" 
-												placeholder="Product price" 
-												:readonly="productMode=='bulk product'" 
-												:class="!errors.product.product_price ? 'is-valid' : 'is-invalid'"
+												v-model.number="singleMerchantProductData.selling_price" 
+												placeholder="Product Selling Price" 
+												:class="!errors.product.product_price  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_price')" 
-												required="true" 
+												:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.product_category_id ? false : true"
 											>
 
 											<div class="invalid-feedback">
 									        	{{ errors.product.product_price }}
 									  		</div>
 										</div>
- 										-->
 									</div>
 
 									<div class="form-row">
-									<!-- 
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Qty</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleProductData.initial_quantity" 
-												placeholder="Product initial qty" 
-												:class="!errors.product.product_initial_quantity  ? 'is-valid' : 'is-invalid'" 
-												:readonly="!createMode" 
-												@change="validateFormInput('product_initial_quantity')" 
-												required="true" 
-											>
+											<label for="inputFirstName">Discount</label>
 
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_initial_quantity }}
+											<div class="input-group mb-0">
+											    <input 
+											    	type="number" 
+											    	class="form-control" 
+													v-model.number="singleMerchantProductData.discount" 
+													placeholder="Product Discount" 
+													:class="!errors.product.discount ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('discount')" 
+													:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.product_category_id ? false : true"
+											    >
+											    <div class="input-group-append">
+											      	<span class="input-group-text">%</span>
+											    </div>
+											</div>
+
+											<div 
+												class="invalid-feedback" 
+												style="display: block;" 
+												v-show="errors.product.discount"
+											>
+									        	{{ errors.product.discount }}
 									  		</div>
 										</div>
-										<div class="form-group col-md-4">
-											<label for="inputFirstName">Available quantity</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleProductData.available_quantity" 
-												placeholder="Product available quantity" 
-												:class="!errors.product.product_available_quantity  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_available_quantity')" 
-												required="true" 
-											>
 
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_available_quantity }}
-									  		</div>
+										<div class="form-group col-md-6">
+											<label for="inputFirstName">Warning Quantity</label>
+											<input type="number" 
+												class="form-control is-valid" 
+												v-model.number="singleMerchantProductData.warning_quantity" 
+												placeholder="Product Warning Quantity" 
+											>
 										</div>
-										-->
-										
+									</div>
+
+									<div class="form-row">
+										<div class="col-md-12">
+											<div class="card">
+										    	<div class="card-body">
+										    		<div class="form-row d-flex align-items-center text-center">
+														<div class="form-group col-md-6">
+															<img 
+																class="img-fluid" 
+																ref="merchantProductPreview" 
+																:src="showPreview(singleMerchantProductData.preview)"
+																alt="Product Preview" 
+															>
+														</div>
+														
+														<div class="form-group col-md-6">
+															<div class="custom-file">
+															    <input type="file" 
+															    	class="form-control custom-file-input" 
+																	:class="! errors.product.preview  ? 'is-valid' : 'is-invalid'" 
+														    	 	@change="onProductPreviewChange" 
+														    	 	accept="image/*"
+															    >
+															    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+															    <div class="invalid-feedback">
+															    	{{ errors.product.preview }}
+															    </div>
+														  	</div>
+														</div>
+													</div>
+										    	</div>
+										  	</div>
+										</div>
+									</div>
+
+									<div class="form-row">
 										<div class="form-group col-md-12">
 											<label for="inputFirstName">Description</label>
 											<ckeditor 
 				                              	class="form-control" 
 				                              	:editor="editor" 
-				                              	v-model="singleProductData.description"
+				                              	v-model="singleMerchantProductData.description"
 				                            >
 			                              	</ckeditor>
 										</div>
 									</div>
 
-									<div class="form-control form-group">
+									<div class="form-control form-group" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials">
 										<div class="form-row mt-2">
 											<div class="col-md-12 text-center">
 												<toggle-button 
-													v-model="singleProductData.has_serials" 
+													v-model="singleMerchantProductData.product.has_serials" 
 													:width=200 
 													:sync="true"
 													:color="{checked: 'orange', unchecked: 'green'}"
 													:labels="{checked: 'Has Serial', unchecked: 'No Serial'}" 
-													:disabled="productMode=='bulk product' || singleProductData.product_immutability" 
+													:disabled="true" 
 												/>
 											</div>
 										</div>
 									</div>
 
-									<div class="form-control form-group">
+									<div class="form-control form-group" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations">
 										<div class="form-row mt-3">
 											<div class="form-group col-md-12 text-center">
 												<toggle-button 
-													v-model="singleProductData.has_variations" 
+													v-model="singleMerchantProductData.product.has_variations" 
 													:width=200 
 													:sync="true"
 													:color="{checked: 'green', unchecked: 'blue'}"
 													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
-													:disabled="productMode=='bulk product' || singleProductData.product_immutability || allVariationTypes.length==0" 
-													@change="resetProductVariations()"
+													:disabled="true" 
 												/>
 											</div>
 										</div>
 										
-										<div class="form-row" v-show="singleProductData.has_variations">
+										<div class="form-row">
 											<div class="form-group col-md-3">
 												<label for="inputFirstName">Variation Type</label>
 												<multiselect 
-			                              			v-model="singleProductData.variation_type"
+			                              			v-model="singleMerchantProductData.product.variation_type"
 			                              			placeholder="Choose Type" 
 			                                  		label="name" 
 			                                  		track-by="id" 
 			                                  		:custom-label="objectNameWithCapitalized" 
-			                                  		:options="allVariationTypes" 
+			                                  		:options="[]" 
 			                                  		:required="true" 
 			                                  		:allow-empty="false"
-			                                  		selectLabel = "Press/Click"
-			                                  		deselect-label="Can't remove single value" 
-			                                  		class="form-control p-0" 
-			                                  		:class="!errors.product.product_variation_type  ? 'is-valid' : 'is-invalid'" 
-			                                  		:disabled="singleProductData.product_immutability"
-			                                  		@close="validateFormInput('product_variation_type')" 
-			                                  		@input="setProductVariation"
+			                                  		class="form-control p-0 is-valid" 
+			                                  		:disabled="true"
 			                              		>
 			                                	</multiselect>
-			                                	<div class="invalid-feedback">
-											    	{{ errors.product.product_variation_type }}
-											    </div>
 											</div>
-											<div 
-												class="form-group col-md-9" 
-												v-if="singleProductData.variations && singleProductData.variations.length"
-											>
 
+											<div class="form-group col-md-9" v-if="singleMerchantProductData.hasOwnProperty('variations') && errors.product.hasOwnProperty('variations') && singleMerchantProductData.variations.length == errors.product.variations.length">
 												<div 
-													class="form-row" 
-													v-for="(productVariation, index) in singleProductData.variations" 
-													:key="'product-variation-index' + index + 'A'"
-												>	
-													<div 
-														class="form-group col-md-4" 
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">Variaiton</label>
-														<multiselect 
-					                              			v-model="productVariation.variation"
-					                              			placeholder="Select Variation" 
-					                                  		label="name" 
-					                                  		track-by="id" 
-					                                  		:custom-label="objectNameWithCapitalized" 
-					                                  		:options="availableVariations" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		selectLabel = "Press/Click"
-					                                  		deselect-label="Can't remove single value" 
-					                                  		:disabled="productVariation.variation_immutability" 
-					                                  		class="form-control p-0" 
-					                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
-					                                  		@close="validateFormInput('product_variation_id')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div class="invalid-feedback">
-													    	{{ errors.product.variations[index].product_variation_id }}
-													    </div>
-													</div>
+													class="card" 
+													v-for="(merchantProductVariation, index) in singleMerchantProductData.variations" 
+													:key="'merchant-product-variation-index-' + index + '-merchant-product-variation-' + merchantProductVariation.id + '-A'"
+												>
+													<div class="card-body">
+														<div 
+															class="form-row" 
+															v-if="singleMerchantProductData.variations.length == errors.product.variations.length"
+														>	
+															<div class="form-group col-md-12">
+																<label for="inputFirstName">Variaiton</label>
 
-												<!-- 
-													<div 
-														class="form-group col-md-3"
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">Qty</label>
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singleProductData.variations[index].initial_quantity" 
-															:min="singleProductData.variations[index].requested_quantity"
-															:max="singleProductData.initial_quantity" 
-															placeholder="Product Qty" 
-															:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('product_variation_quantity')" 
-															required="true" 
-														>
+																<multiselect 
+							                              			v-model="merchantProductVariation.variation"
+							                              			placeholder="Select Variation" 
+							                                  		label="name" 
+							                                  		track-by="id" 
+							                                  		:custom-label="objectNameWithCapitalized" 
+							                                  		:options="allVariations" 
+							                                  		:disabled="singleMerchantProductData.variations[index].variation_immutability" 
+							                                  		class="form-control p-0" 
+							                                  		:class="! errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
+							                                  		:required="true" 
+					                                  				:allow-empty="false"
+							                                  		@close="validateFormInput('product_variation_id')" 
+							                              		>
+							                                	</multiselect>
 
-														<div class="invalid-feedback">
-												        	{{ errors.product.variations[index].product_variation_quantity }}
-												  		</div>
-													</div>
-													-->
-													<!-- 
-													<div 
-														class="form-group col-md-4"
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">Price</label>
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singleProductData.variations[index].price" 
-															placeholder="Product Price" 
-															:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('product_variation_price')" 
-															required="true" 
-														>
+							                                	<div class="invalid-feedback">
+															    	{{ errors.product.variations[index].product_variation_id }}
+															    </div>
+															</div> 
 
-														<div class="invalid-feedback">
-												        	{{ errors.product.variations[index].product_variation_price }}
-												  		</div>
-													</div>
+															<!-- 
+															<div 
+																class="form-group col-md-12" 
+																v-if="merchantProductVariation.variation && merchantProductVariation.variation.hasOwnProperty('sub_variation')"
+															>
+																<div class="form-row ml-3 mr-3">
+																	<div class="form-group col-md-12">
+																		<label for="inputFirstName">Sub-Variation</label>
+																		<multiselect 
+									                              			v-model="merchantProductVariation.variation.sub_variation"
+									                              			placeholder="Select Sub-Variation" 
+									                                  		label="name" 
+									                                  		track-by="id" 
+									                                  		:custom-label="objectNameWithCapitalized" 
+									                                  		:options="[]" 
+									                                  		selectLabel = "Press to select"
+									                                  		deselect-label="Press to remove" 
+									                                  		:disabled="true" 
+									                                  		class="form-control is-valid p-0" 
+									                              		>
+									                                	</multiselect>
+																	</div>
+																</div> 
+															</div> 
+															-->
+															
+															<div class="form-group col-md-12">
+																<div class="form-row">
+																	<div class="form-group col-md-6">
+																		<label for="inputFirstName">Selling Price (unit)</label>
 
-													<div 
-														class="form-group col-md-4"
-														v-if="singleProductData.variations[index] && errors.product.variations[index]"
-													>
-														<label for="inputFirstName">SKU</label>
-														<input type="text" 
-															class="form-control is-valid" 
-															v-model="singleProductData.variations[index].sku" 
-															placeholder="Unique SKU" 
-														>
+																		<input type="number" 
+																			class="form-control" 
+																			v-model.number="merchantProductVariation.selling_price" 
+																			placeholder="Variation Selling Price" 
+																			:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																			@change="validateFormInput('product_variation_price')" 
+																			required="true" 
+																		>
+
+																		<div class="invalid-feedback">
+																        	{{ errors.product.variations[index].product_variation_price }}
+																  		</div>	
+																	</div>
+
+																	<div class="form-group col-md-6">
+																		<label for="inputFirstName">Variation SKU</label>
+																
+																		<input type="text" 
+																			class="form-control is-valid" 
+																			v-model="merchantProductVariation.sku" 
+																			placeholder="Variation Unique SKU" 
+																		>
+																	</div>
+																</div>
+															</div>
+
+															<div class="form-group col-md-12">
+																<div class="form-row text-center d-flex">
+																	<div class="col-md-6 form-group">
+																		<img 
+																			class="img-fluid" 
+																			:src="showPreview(merchantProductVariation.preview)"
+																			alt="Variation Preview" 
+																			:ref="'merchantProductVariationPreview-' + index" 
+																		>
+																	</div>
+																	<div class="col-md-6 form-group align-self-center">
+																		<div class="custom-file">
+																		    <input type="file" 
+																		    	class="form-control custom-file-input" 
+																				:class="!errors.product.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
+																	    	 	@change="onVariationPreviewChange($event, index)" 
+																	    	 	accept="image/*"
+																		    >
+																		    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+																		    <div class="invalid-feedback">
+																		    	{{ errors.product.variations[index].preview }}
+																		    </div>
+																	  	</div>
+																	</div>
+																</div>
+															</div>							
+														</div>
 													</div>
-													 -->									
 												</div>
 
 												<div class="form-row">
@@ -556,379 +567,57 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.product.variations && singleMerchantProductData.variations.length >= singleMerchantProductData.product.variations.length" 
 															@click="addMoreVariation()"
 														>
 															Add Variation
 														</button>
 													</div>
+
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
+															:disabled="singleMerchantProductData.variations[singleMerchantProductData.variations.length-1].variation_immutability || singleMerchantProductData.variations.length < 2"
 															@click="removeVariation()"
 														>
 															Remove Variation
 														</button>
 													</div>
 												</div>
-
 											</div>
 										</div>
 									</div>
 
-
-
 									<div class="form-row card-footer">
-										<div class="col-sm-12 text-right" v-show="!submitForm">
+										<div class="col-sm-12 text-right" v-show="! submitForm">
 											<span class="text-danger small mb-1">
 										  		Please input required fields
 										  	</span>
 										</div>
+
 										<div class="col-sm-12">
 						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
 									</div>
-										
-											
-								    
-							    	<!-- 
-								    	<div class="form-row">
-									    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
-											  		Please input required fields
-									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
-							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-							                  	</button>
-								          	</div>
-								    	</div>
- 									-->
-
-						    <!-- 
-							    <div 
-									class="row" 
-									v-bind:key="2" 
-									v-show="!loading && step==2"
-								>
-									<h2 class="mx-auto mb-4 lead">Store Product</h2>
-
-									<div 
-										class="col-md-12"
-										v-for="(productSpace, index) in singleProductData.addresses" 
-										:key="'product-space-' + index"
-									>
-										<div 
-											class="card"
-											v-if="singleProductData.addresses[index] && errors.product.addresses[index]"
-										>
-											<div class="card-body">
-
-												<div class="form-row ml-5 mr-5">
-													<div class="form-group col-md-12 text-center">
-														<label for="inputFirstName">
-															Required Space Type {{ index + 1 }}
-														</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].type"
-					                                  		:options="['containers', 'shelves', 'units']" 
-					                                  		:custom-label="nameWithCapitalized" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                              			placeholder="Containers / Shelves / Units" 
-					                                  		:class="!errors.product.addresses[index].product_space_type  ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)" 
-					                                  		@input="setProductSpaceType(index)" 
-					                                  		@close="validateFormInput('product_space_type')"
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_space_type"
-					                                	>
-													    	{{ errors.product.addresses[index].product_space_type }}
-													    </div>
-													</div>
-												</div>
-
-												<div 
-													class="form-row" 
-													v-show="singleProductData.addresses[index].type=='containers'"
-												>
-													<div class="form-group col-md-12">
-														<label for="inputFirstName">Select Containers</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].containers"
-					                              			placeholder="Select Containers" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyContainers" 
-					                                  		:multiple="true" 
-					                                  		:close-on-select="false" 
-					                                  		:clear-on-select="false" 
-					                                  		:preserve-search="true" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		:class="!errors.product.addresses[index].product_containers  ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)"
-					                                  		@close="validateFormInput('product_containers')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_containers"
-					                                	>
-													    	{{ errors.product.addresses[index].product_containers }}
-													    </div>
-													</div>
-												</div>
-
-												<div 
-													class="form-row" 
-													v-show="singleProductData.addresses[index].type=='shelves'"
-												>
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Select Parent Container</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].container"
-					                              			placeholder="Parent Container" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyShelfContainers" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		:class="!errors.product.addresses[index].product_container ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)"
-					                                  		@input="setAvailableShelves(index)"
-					                                  		@close="validateFormInput('product_container')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_container"
-					                                	>
-													    	{{ errors.product.addresses[index].product_container }}
-													    </div>
-													</div>
-
-													<div 
-														class="form-group col-md-6" 
-														v-if="singleProductData.addresses[index].container"
-													>
-														<label for="inputFirstName">Select Shelves</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].container.shelves"
-					                              			placeholder="Select Shelves" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyShelves" 
-					                                  		:multiple="true" 
-					                                  		:close-on-select="false" 
-					                                  		:clear-on-select="false" 
-					                                  		:preserve-search="true" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		:class="!errors.product.addresses[index].product_shelves ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)"
-					                                  		@close="validateFormInput('product_shelves')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_shelves"
-					                                	>
-													    	{{ errors.product.addresses[index].product_shelves }}
-													    </div>
-													</div>
-												</div>
-
-												<div class="form-row" v-show="singleProductData.addresses[index].type=='units'">
-													<div class="form-group col-md-4">
-														<label for="inputFirstName">Select Parent Container</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].container"
-					                              			placeholder="Parent Container" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyUnitContainers" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		:class="!errors.product.addresses[index].product_container  ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)"
-					                                  		@input="setAvailableUnitShelves(index)" 
-					                                  		@close="validateFormInput('product_container')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_container"
-					                                	>
-													    	{{ errors.product.addresses[index].product_container }}
-													    </div>
-													</div>
-
-													<div 
-														class="form-group col-md-4" 
-														v-if="singleProductData.addresses[index].container"
-													>
-														<label for="inputFirstName">Select Parent Shelf</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].container.shelf"
-					                              			placeholder="Parent Shelf" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyUnitShelves" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		:class="!errors.product.addresses[index].product_shelf  ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)"
-					                                  		@input="setAvailableUnits(index)" 
-					                                  		@close="validateFormInput('product_shelf')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_shelf"
-					                                	>
-													    	{{ errors.product.addresses[index].product_shelf }}
-													    </div>
-													</div>
-
-													<div 
-														class="form-group col-md-4" 
-														v-if="singleProductData.addresses[index].container && singleProductData.addresses[index].container.shelf"
-													>
-														<label for="inputFirstName">Select Units</label>
-														<multiselect 
-					                              			v-model="singleProductData.addresses[index].container.shelf.units"
-					                              			placeholder="Select Units" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyUnits" 
-					                                  		:multiple="true" 
-					                                  		:close-on-select="false" 
-					                                  		:clear-on-select="false" 
-					                                  		:preserve-search="true" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false"
-					                                  		:class="!errors.product.addresses[index].product_units ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleProductData.addresses.length > (index+1)"
-					                                  		@close="validateFormInput('product_units')" 
-					                              		>
-					                                	</multiselect>
-					                                	<div 
-						                                	class="invalid-feedback" 
-						                                	style="display: block;" 
-						                                	v-show="errors.product.addresses[index].product_units"
-					                                	>
-													    	{{ errors.product.addresses[index].product_units }}
-													    </div>
-													</div>
-												</div>
-
-											</div>
-										</div>
-									</div>
-
-									<div 
-										class="col-md-12 text-center" 
-										v-show="!singleProductData.addresses.length"
-									>
-										<p class="text-danger">
-											No Space Found.
-										</p>
-									</div>
-
-									<div class="col-md-12">
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<button 
-													type="button" 
-													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-													@click="addMoreSpace()"
-												>
-													Add Space
-												</button>
-											</div>
-											<div class="form-group col-md-6">
-												<button 
-													type="button" 
-													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-													@click="removeSpace()"
-												>
-													Remove Space
-												</button>
-											</div>
-										</div>
-									</div>
-
-									<div class="col-sm-12 card-footer">
-										<div class="form-row">
-											<div class="col-sm-12 text-right" v-show="!submitForm">
-												<span class="text-danger small mb-1">
-											  		Please input required fields
-											  	</span>
-											</div>
-											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
-							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
-							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
-													{{ createMode ? 'Save' : 'Update' }}
-												</button>
-											</div>
-										</div>
-									</div>
-								</div> 
-							-->
-
-
 							<!-- </transition-group> -->
-
 						</div>
-
 					</form>
 				</div>
 			</div>
 		</div>
 
-	<!-- 
-		<delete-confirmation-modal 
-			:csrf="csrf" 
-			:submit-method-name="'deleteAsset'" 
-			:content-to-delete="singleProductData"
-			:restoration-message="'But once you think, you can restore this item !'" 
-			
-			@deleteAsset="deleteAsset($event)" 
-		></delete-confirmation-modal>
-
-		<restore-confirmation-modal 
-			:csrf="csrf" 
-			:submit-method-name="'restoreAsset'" 
-			:content-to-restore="singleProductData"
-			:restoration-message="'This will restore all related items !'" 
-
-			@restoreAsset="restoreAsset($event)" 
-		></restore-confirmation-modal>
- 	-->
-
- 		<!-- Modal -->
-		<div class="modal fade" id="product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+ 		<!-- View Modal -->
+		<div class="modal fade" id="merchant-product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Product Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">{{ singleMerchantProductData.hasOwnProperty('product') ? singleMerchantProductData.product.name : 'NA' | capitalize }} Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -937,346 +626,321 @@
 					<div class="modal-body">
 						<div class="card">
 							<div class="card-body">
-								
 								<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
 									<li class="nav-item">
-										<a class="nav-link active" data-toggle="tab" href="#product-profile" role="tab">
+										<a class="nav-link active" data-toggle="tab" href="#merchant-product-profile" role="tab">
 											Profile
 										</a>
 									</li>
 
-									<li class="nav-item" v-show="singleProductData.has_serials">
+									<li class="nav-item" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
 										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
 											Serials
 										</a>
 									</li>
 
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#product-store" role="tab">
+										<a class="nav-link" data-toggle="tab" href="#product-address" role="tab">
 											Store
 										</a>
 									</li>
 								</ul>
 
 								<div class="tab-content tabs card-block">
-									<div class="tab-pane active" id="product-profile" role="tabpanel">
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Type :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' }}
-											</label>
-										</div>
+									<div class="tab-pane active" id="merchant-product-profile" role="tabpanel">
+										<div class="form-row d-flex">
+											<div class="col-md-4 align-self-center text-center">
+												<img 
+													:src="'/' + singleMerchantProductData.preview" 
+													class="img-fluid" 
+													alt="Product Preview" 
+													width="150px"
+												>
+											</div>
 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Merchant :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.merchant ? singleProductData.merchant.user_name : 'None' }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Name :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.name | capitalize }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Description :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												<span v-html="singleProductData.description"></span>
-											</label>
-										</div>
-
-										<!-- 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												SKU Code :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.sku }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Price :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.price || 'NA' }}
-											</label>
-										</div>
- 										-->
-
-									<!-- 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Prev Qty
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.initial_quantity }} 
-												{{ singleProductData.quantity_type }}
-											</label>
-										</div>
- 									-->
-										<!-- 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Available Qty:
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.available_quantity }}
-												{{ singleProductData.quantity_type }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Dispatched Qty:
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ singleProductData.dispatched_quantity }}
-												{{ singleProductData.quantity_type }}
-												(including recommended)
-											</label>
-										</div>
-										 -->
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Serial :</label>
-											<label class="col-sm-6 form-control-plaintext">
-												<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
-											<label class="col-sm-6 form-control-plaintext">
-												<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
-											</label>
-										</div>
-
-										<div class="form-row" v-if="singleProductData.has_variations && singleProductData.variations.length">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Variations :
-											</label>
-											<div class="col-sm-12">
+											<div class="col-md-8">
 												<div class="form-row">
-													
-													<div 
-														class="col-md-6 ml-auto" 
-														v-for="(productVariation, variationIndex) in singleProductData.variations" 
-														:key="'product-variation-' + variationIndex"
-													>
-														<div class="card">
-															<div class="card-body">
-																
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Name :
-																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productVariation.variation ? productVariation.variation.name : 'NA' }}
-																	</label>
-																</div>
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Merchant Name :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
+													</label>
+												</div>
 
-																<!-- 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		SKU :
-																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productVariation.sku }}
-																	</label>
-																</div>
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Manufacturer/Brand Name :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
+													</label>
+												</div>
 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Price :</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productVariation.price }}
-																	</label>
-																</div>
- 																-->
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Product Code/SKU :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.sku }}
+													</label>
+												</div>
 
-															<!-- 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Prev Qty :</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productVariation.initial_quantity }}
-																	</label>
-																</div>
-															-->
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Description :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														<span v-html="singleMerchantProductData.description"></span>
+													</label>
+												</div>
 
-																<!-- 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productVariation.available_quantity }}
-																	</label>
-																</div>
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Warning Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.warning_quantity }}
+													</label>
+												</div>
 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Dispatched Qty :</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productVariation.dispatched_quantity }}
-																		{{ singleProductData.quantity_type }}
-																		(including recommended)
-																	</label>
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Available Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.available_quantity }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Dispatched Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.dispatched_quantity }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Pending Requested Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.requested_quantity }}
+													</label>
+												</div>	
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Selling Price (unit) :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.selling_price }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Discount :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.discount || 0 }} %
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">Has Serials :</label>
+													<label class="col-sm-6 form-control-plaintext">
+														<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">Has Variation :</label>
+													<label class="col-sm-6 form-control-plaintext">
+														<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Created on :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ singleMerchantProductData.created_at }}
+													</label>
+												</div>
+
+												<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
+													<label class="col-sm-4 col-form-label font-weight-bold">
+														Variations :
+													</label>
+													<div class="col-sm-12">
+														<div class="form-row">
+															<div 
+																class="col-md-6 ml-auto" 
+																v-for="(merchantProductVariation, merchantProductVariationIndex) in singleMerchantProductData.variations" 
+																:key="'merchant-product-variation-index-' + merchantProductVariationIndex + '-variation-' + merchantProductVariation.id"
+															>
+																<div class="card">
+																	<div class="card-body">
+																		<div class="form-row">
+																			<div class="col-sm-12 text-center">
+																				<img 
+																					class="img-fluid" 
+																					:src="'/' + merchantProductVariation.preview || ''"
+																					:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
+																					width="100px"
+																				>
+
+																				<p>
+																					{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+																				</p>
+																			</div>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-sm-4 col-form-label font-weight-bold">
+																				Variation :
+																			</label>
+																			<label class="col-sm-8 col-form-label">
+																				{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-sm-4 col-form-label font-weight-bold">
+																				SKU :
+																			</label>
+																			<label class="col-sm-8 col-form-label">
+																				{{ merchantProductVariation.sku }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-sm-4 col-form-label font-weight-bold">
+																				Selling Price (unit) :
+																			</label>
+																			<label class="col-sm-8 col-form-label">
+																				{{ merchantProductVariation.selling_price }}
+																			</label>
+																		</div>
+																	</div>
 																</div>
-																 -->
 															</div>
 														</div>
 													</div>
-
 												</div>
 											</div>
 										</div>
+
 									</div>
 
-									<!-- 
-									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleProductData.has_serials">
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold">
 												Serials :
 											</label>
-											<div class="col-sm-6 col-form-label text-left">
+											<div class="col-sm-8 col-form-label">
 												<ol 
-													v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
+													v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
 												>
-													<li v-for="(productSerial, productSerialIndex) in singleProductData.serials">
+													<li v-for="(productSerial, productIndex) in singleMerchantProductData.serials">
 														{{ productSerial.serial_no }}
-														<span 
-															:class="[productSerial.has_dispatched ? 'badge-success' : productSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
-															v-show="productSerial.has_dispatched || productSerial.has_requisitions"
-														>
-															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
-														</span>
-
-														<span 
-															:class="[! productSerial.has_approval ? 'badge-danger' : '', 'badge']" 
-															v-show="! productSerial.has_approval"
-														>
-															{{ ! productSerial.has_approval ? 'Not Approved' : '' }}
-														</span>
-
-														<span v-show="(productSerialIndex + 1) < singleProductData.serials.length">, </span> 
+														<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span> 
 													</li>	
 												</ol>
-
-												<span class="text-danger" v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length==0">
-													No Serials Found
-												</span>
 												
-												<div class="form-row" v-if="singleProductData.hasOwnProperty('variations') && singleProductData.variations.length">
+												<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
 													<div 
 														class="col-md-12" 
-														v-for="(productVariation, variationIndex) in singleProductData.variations" 
+														v-for="(merchantProductVariation, variationIndex) in singleMerchantProductData.variations" 
 														:key="'product-variation-index-' + variationIndex + '-C'"
 													>
 														<div class="form-row">
 															<label class="col-form-label font-weight-bold text-right">
-																{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }} |
+																{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }} |
 															</label>
 
 															<label class="col-form-label text-left">
-																{{ productVariation.stock_quantity }}
-																
+																{{ merchantProductVariation.stock_quantity }}
 																<ol 
-																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
+																	v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
 																>
-																	<li v-for="(variationSerial, variationSerialIndex) in productVariation.serials">
-
+																	<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
 																		{{ variationSerial.serial_no }}
-																		
-																		<span 
-																			:class="[variationSerial.has_dispatched ? 'badge-success' : variationSerial.has_requisitions ? 'badge-warning' : '', 'badge']" 
-																			v-show="variationSerial.has_dispatched || variationSerial.has_requisitions"
-																		>
-																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
-																		</span>
-
-																		<span 
-																			:class="[! variationSerial.has_approval ? 'badge-danger' : '', 'badge']" 
-																			v-show="! variationSerial.has_approval"
-																		>
-																			{{ ! variationSerial.has_approval ? 'Not Approved' : '' }}
-																		</span>
-
-																		<span v-show="(variationSerialIndex + 1) < productVariation.serials.length">, </span> 
+																		<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
 																	</li>	
 																</ol>
-
-																<span class="text-danger" v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length==0">
-																	No Serials Found
-																</span>
 															</label>
 														</div>
+														
+														<!-- 
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																Available Quantity :
+															</label>
+															<label class="col-form-label text-left">
+																{{ merchantProductVariation.available_quantity }}
+															</label>
+														</div>
+														-->
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-									-->
 
-									<!-- 
-									<div class="tab-pane" id="product-store" role="tabpanel">
+									<div class="tab-pane" id="product-address" role="tabpanel">
 										<div 
 											class="form-row" 
-											v-if="singleProductData.hasOwnProperty('addresses') && singleProductData.addresses.length"
+											v-if="singleMerchantProductData.hasOwnProperty('addresses') && singleMerchantProductData.addresses.length"
 										>
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold">
 												Address Detail :
 											</label>
-
 											<div class="col-sm-12">
 												<div class="form-row">
 													<div 
 														class="col-md-6 ml-auto" 
-														v-for="(productAddress, addressIndex) in singleProductData.addresses" 
-														:key="'product-address-type-' + productAddress.type + '-index-' + addressIndex"
+														v-for="(stockAddress, addressIndex) in singleMerchantProductData.addresses" 
+														:key="'stock-address-' + stockAddress.type + addressIndex"
 													>
 														<div 
 															class="card" 
-															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('containers')"
+															v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('containers')"
 														>
 															<div 
 																class="card-body" 
-																v-for="containerAddress in productAddress.containers" 
-																:key="'container-address-' + containerAddress.id"
+																v-for="containerAddress in stockAddress.containers" 
+																:key="'container-address-' + containerAddress.id + 'address-index-' + addressIndex + '-stock-id-' + singleMerchantProductData.id"
 															>
 																<h6>Container Address</h6>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Warehouse :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.container.name) : 'NA' }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Container # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 																		{{ containerAddress.name.substring(containerAddress.name.indexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1286,51 +950,42 @@
 
 														<div 
 															class="card" 
-															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('shelves') && productAddress.hasOwnProperty('container') &&  productAddress.container.hasOwnProperty('warehouse_container')"
+															v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('shelves') && stockAddress.hasOwnProperty('container') &&  stockAddress.container.hasOwnProperty('warehouse_container')"
 														>
 															<div class="card-body">
 
 																<h6>Shelves Address</h6>
 																
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Warehouse :
-																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warehouse_container.warehouse.name | capitalize }}
-																	</label>
-																</div>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warehouse_container.container.name | capitalize }}
+																	<label class="col-sm-8 col-form-label">
+																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Container # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.name.substring(productAddress.container.name.indexOf("-")+1) }}
+																	<label class="col-sm-8 col-form-label">
+																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
 																	</label>
 																</div>
 
 																<div 
 																	class="form-row"
 																>
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Shelf # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 
 																		<ul id="shelf-addresses">
 																			<li 
-																				v-for="shelfAddress in productAddress.container.shelves" 
-																				:key="'container-shelf-address-' + shelfAddress.id + '-container-id-' + productAddress.container.id + '-container-name-' + productAddress.container.name"
+																				v-for="shelfAddress in stockAddress.container.shelves" 
+																				:key="'shelf-address-' + shelfAddress.id"
 																			>
 
 																				{{ shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) }}
@@ -1346,58 +1001,49 @@
 
 														<div 
 															class="card" 
-															v-if="productAddress.hasOwnProperty('type') && productAddress.type.includes('units') && productAddress.hasOwnProperty('container') && productAddress.container.hasOwnProperty('warehouse_container')"
+															v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('units') && stockAddress.hasOwnProperty('container') && stockAddress.container.hasOwnProperty('warehouse_container')"
 														>
 															<div class="card-body">
 																
 																<h6>Units Address</h6>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Warehouse :
-																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warehouse_container.warehouse.name | capitalize }}
-																	</label>
-																</div>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.warehouse_container.container.name | capitalize }}
+																	<label class="col-sm-8 col-form-label">
+																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Container # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.name.substring(productAddress.container.name.indexOf("-")+1) }}
+																	<label class="col-sm-8 col-form-label">
+																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Shelf # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
-																		{{ productAddress.container.shelf.name.substring(productAddress.container.shelf.name.lastIndexOf("-")+1) }}
+																	<label class="col-sm-8 col-form-label">
+																		{{ stockAddress.container.shelf.name.substring(stockAddress.container.shelf.name.lastIndexOf("-")+1) }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold">
 																		Unit # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 
 																		<ul id="unit-addresses">
 																			<li 
-																				v-for="unitAddress in productAddress.container.shelf.units" 
-																				:key="'container-shelf-unit-address-' + unitAddress.id + '-shelf-id-' + productAddress.container.shelf.id + '-shelf-name-' + productAddress.container.shelf.name + '-container-id-' + productAddress.container.id + '-container-name-' + productAddress.container.name"
+																				v-for="unitAddress in stockAddress.container.shelf.units" 
+																				:key="'unit-address-' + unitAddress.id"
 																			>
 
 																				{{ unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) }}
@@ -1418,7 +1064,7 @@
 										<div class="form-row" v-else>
 											<div 
 												class="col-md-12 text-center" 
-												v-show="!singleProductData.hasOwnProperty('addresses') || !singleProductData.addresses.length"
+												v-show="!singleMerchantProductData.hasOwnProperty('addresses') || !singleMerchantProductData.addresses.length"
 											>
 												<p class="text-danger">
 													No Space Found.
@@ -1426,7 +1072,6 @@
 											</div>
 										</div>
 									</div>
-									 -->
 								</div>
 							</div>
 						</div>
@@ -1439,8 +1084,50 @@
 			</div>
 		</div>
 
-	</div>
+		<!-- 		
+		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-merchant-product')" 
+			:csrf="csrf" 
+			:submit-method-name="'deleteProductMerchant'" 
+			:content-to-delete="singleMerchantProductData"
+			:restoration-message="'Warning : You can not restore this item !'" 
+			
+			@deleteProductMerchant="deleteProductMerchant($event)" 
+		></delete-confirmation-modal> 
+		-->
 
+		<!-- Delete Modal -->
+		<div class="modal fade" id="delete-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<form 
+						class="form-horizontal" 
+						v-on:submit.prevent="deleteProductMerchant" 
+						autocomplete="off"
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-header bg-danger">
+							<h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+
+						<div class="modal-body text-center">
+							<h4 class="text-danger">Want to delete '{{ singleMerchantProductData.hasOwnProperty('product') ? singleMerchantProductData.product.name : '' | capitalize }}' ?</h4>
+							<h6 class="sub-heading text-secondary">Warning : You can not restore this item !</h6>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-danger">Delete</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script type="text/javascript">
@@ -1450,22 +1137,23 @@
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-    let singleProductData = {
+    let singleMerchantProductData = {
     	// name : null,
     	// description : null,
     	// sku : null,
-    	// price : null,
+    	// selling_price : null,
     	// initial_quantity : null,
     	// available_quantity : null,
     	// quantity_type : null,
     	// has_variations : null,
     	
-    	variations : [],
+    	// product : {},
+    	// variations : [],
 		
 		/*
-		addresses : [
-			{},
-		],
+			addresses : [
+				{},
+			],
 		*/
 	
     	// product_category_id : null,
@@ -1481,6 +1169,19 @@
 			ckeditor: CKEditor.component,
 		},
 
+		props: {
+
+			merchant:{
+				type: Object,
+				required: true,
+			},
+			merchantName:{
+				type: String,
+				required: true,
+			},
+
+		},
+
 	    data() {
 
 	        return {
@@ -1490,22 +1191,23 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
-	        	
+
 	        	currentTab : 'retail',
-	        	productMode : 'retail product',
 
 	        	editor: ClassicEditor,
 
 	        	createMode : true,
 	        	submitForm : true,
+	        	formSubmitted : false,
 
-	        	allMerchants : [],
-	        	allVariationTypes : [],
-	        	availableVariations : [],
-	        	allProductCategories : [],
+	        	// allVariationTypes : [],
+	        	
+	        	allProducts : [],
+	        	allVariations : [],
+	        	allManufacturers : [],
 
 	        	productsToShow : [],
-	        	allFetchedProducts : [],
+	        	merchantAllProducts : [],
 
 	        	// allContainers : [],
 	        	
@@ -1522,16 +1224,16 @@
 		        	current_page: 1
 		      	},
 
-	        	singleProductData : singleProductData,
+	        	singleMerchantProductData : singleMerchantProductData,
 
 	        	errors : {
 					product : {
-						variations : [],
+						// variations : [],
 						
 						/*
-						addresses : [
-							{}
-						],
+							addresses : [
+								{}
+							],
 						*/
 					},
 				},
@@ -1545,27 +1247,17 @@
 		created(){
 
 			this.fetchAllProducts();
-
-			if (this.userHasPermissionTo('view-merchant-index')) {
-
-				this.fetchAllMerchants();
-
-			}
-
+			this.fetchAllManufacturers();
+			// this.setProductVariation();
 			// this.fetchAllContainers();
-			
-			if (this.userHasPermissionTo('view-asset-index')) {
-
-				this.fetchAllVariationTypes();
-				this.fetchProductAllCategories();
-
-			}
+			this.fetchMerchantAllProducts();
 
 		},
 
 		filters: {
 
 			capitalize: function (value) {
+
 				if (!value) return ''
 
 				const words = value.split(" ");
@@ -1581,24 +1273,25 @@
 				}
 
 				return words.join(" ");
+
 			}
 
 		},
 		
 		methods : {
 
-			fetchAllProducts() {
+			fetchMerchantAllProducts() {
 
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.allFetchedProducts = [];
+				this.merchantAllProducts = [];
 				
 				axios
-					.get('/api/products/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/merchant-products/' + this.merchant.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
-							this.allFetchedProducts = response.data;
+							this.merchantAllProducts = response.data;
 							this.showSelectedTabProducts();
 						}
 					})
@@ -1626,25 +1319,25 @@
 					});
 
 			},
-			fetchProductAllCategories() {
+			fetchAllProducts() {
+				
+				if (! this.userHasPermissionTo('view-product-index')) {
 
-				if (! this.userHasPermissionTo('view-asset-index')) {
-
-					this.error = 'You do not have permission to view product-categories';
+					this.error = 'You do not have permission to view products';
 					return;
 
 				}
-				
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.allProductCategories = [];
+				this.allProducts = [];
 				
 				axios
-					.get('/api/product-categories/')
+					.get('/api/products/')
 					.then(response => {
 						if (response.status == 200) {
-							this.allProductCategories = response.data;
+							this.allProducts = response.data.data;
 						}
 					})
 					.catch(error => {
@@ -1671,11 +1364,11 @@
 					});
 
 			},
-			fetchAllMerchants() {
+			fetchAllManufacturers() {
 				
-				if (! this.userHasPermissionTo('view-merchant-index')) {
+				if (! this.userHasPermissionTo('view-product-manufacturer-index')) {
 
-					this.error = 'You do not have permission to view merchants';
+					this.error = 'You do not have permission to view manufacturers';
 					return;
 
 				}
@@ -1683,13 +1376,13 @@
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.allMerchants = [];
+				this.allManufacturers = [];
 				
 				axios
-					.get('/api/merchants/')
+					.get('/api/manufacturers/')
 					.then(response => {
 						if (response.status == 200) {
-							this.allMerchants = response.data;
+							this.allManufacturers = response.data;
 						}
 					})
 					.catch(error => {
@@ -1716,104 +1409,235 @@
 					});
 
 			},
-			fetchAllVariationTypes() {
-
-				if (! this.userHasPermissionTo('view-asset-index')) {
-
-					this.error = 'You do not have permission to view variation types';
-					return;
-
-				}
-				
-				this.query = '';
-				this.error = '';
-				this.loading = true;
-				this.allVariationTypes = [];
-				
-				axios
-					.get('/api/variation-types/')
-					.then(response => {
-						if (response.status == 200) {
-							// this.allVariationTypes = response.data;
-							this.allVariationTypes = response.data.filter(variation=>variation.variations.length > 1);
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
-						}
-
-					})
-					.finally(response => {
-						this.loading = false;
-					});
-
-			},
+			
 			/*
-			fetchAllContainers() {
+				fetchAllContainers() {
+					
+					this.query = '';
+					this.error = '';
+					// this.loading = true;
+					this.allContainers = [];
+					this.emptyContainers = [];
+					this.emptyShelfContainers = [];
+					this.emptyUnitContainers = [];
+
+					axios
+						.get('/api/warehouse-containers')
+						.then(response => {
+							if (response.status == 200) {
+								
+								this.allContainers = response.data;
+								this.setAvailableSpaces();
+								
+								
+								// this.emptyContainers = response.data.emptyContainers;
+								// this.emptyShelfContainers = response.data.emptyShelfContainers;
+								// this.emptyUnitContainers = response.data.emptyUnitContainers;
+								
+						
+							}
+						})
+						.catch(error => {
+							this.error = error.toString();
+							// Request made and server responded
+							if (error.response) {
+								console.log(error.response.data);
+								console.log(error.response.status);
+								console.log(error.response.headers);
+								console.log(error.response.data.errors[x]);
+							} 
+							// The request was made but no response was received
+							else if (error.request) {
+								console.log(error.request);
+							} 
+							// Something happened in setting up the request that triggered an Error
+							else {
+								console.log('Error', error.message);
+							}
+
+						})
+						.finally(response => {
+							// this.loading = false;
+						});
+
+				},
+			*/
+			showProductMerchantDetails(object) {		
+				// this.singleMerchantProductData = { ...object };
+				// this.singleMerchantProductData = Object.assign({}, this.singleMerchantProductData, object);
+				this.singleMerchantProductData = JSON.parse(JSON.stringify(object));
+				$('#merchant-product-view-modal').modal('show');
+			},
+			openProductMerchantDeleteForm(object) {	
+				this.singleMerchantProductData = object;
+				$('#delete-confirmation-modal').modal('show');
+			},
+			showProductMerchantCreateForm() {
+				// this.step = 1;
+				this.createMode = true;
+	        	this.submitForm = true;
+	        	this.formSubmitted = false;
+	        	
+				this.singleMerchantProductData = {
+					merchant_id : this.merchant.id
+				};
+
+				this.errors = {
+					
+					product : {
+						
+						// variations : [],
+					
+					},
+
+				};
+
+				// this.setProductVariation();
+
+				$('#product-createOrEdit-modal').modal('show');
+			},
+			openProductMerchantEditForm(object) {
+				// this.step = 1;
+				this.createMode = false;
+	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 				
-				this.query = '';
-				this.error = '';
-				// this.loading = true;
-				this.allContainers = [];
-				this.emptyContainers = [];
-				this.emptyShelfContainers = [];
-				this.emptyUnitContainers = [];
+				this.resetErrorProductVariations(object);
+				this.allVariations = object.product.variations;
+
+				this.singleMerchantProductData = JSON.parse(JSON.stringify(object));
+
+				$('#product-createOrEdit-modal').modal('show');
+			},
+			storeProductMerchant() {
+				
+				if (!this.verifyUserInput()) {
+					// this.submitForm = false;
+					// this.formSubmitted = false;
+					return;
+				}
+
+				this.formSubmitted = true;
+				// this.singleMerchantProductData.product_id = this.product.id;
 
 				axios
-					.get('/api/warehouse-containers')
+					.post('/merchant-products/' + this.perPage, this.singleMerchantProductData)
 					.then(response => {
+
 						if (response.status == 200) {
+
+							this.$toastr.s("New merchant has been stored", "Success");
 							
-							this.allContainers = response.data;
-							this.setAvailableSpaces();
+							this.merchantAllProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
-							
-							// this.emptyContainers = response.data.emptyContainers;
-							// this.emptyShelfContainers = response.data.emptyShelfContainers;
-							// this.emptyUnitContainers = response.data.emptyUnitContainers;
-							
-					
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
+							if (this.query) {
+
+								this.searchData();
+
+							}
+
+							$('#product-createOrEdit-modal').modal('hide');
 						}
 
 					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
 					.finally(response => {
-						// this.loading = false;
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
 					});
 
 			},
-			*/
+			updateProductMerchant() {
+				
+				if (!this.verifyUserInput()) {
+					// this.submitForm = false;
+					// this.formSubmitted = false;
+					return;
+				}
+
+				this.formSubmitted = true;
+				// this.singleMerchantProductData.product_id = this.product.id;
+
+				axios
+					.put('/merchant-products/' + this.singleMerchantProductData.id + '/' + this.perPage, this.singleMerchantProductData)
+					.then(response => {
+
+						if (response.status == 200) {
+
+							this.$toastr.s("Merchant has been updated", "Success");
+							
+							this.merchantAllProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
+							if (this.query) {
+
+								this.searchData();
+
+							}
+
+							$('#product-createOrEdit-modal').modal('hide');
+							
+						}
+
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
+
+			},
+			deleteProductMerchant() {
+
+				// this.singleMerchantProductData.product_id = this.product.id;
+
+				axios
+					.delete('/merchant-products/' + this.singleMerchantProductData.id + '/' + this.perPage)
+					.then(response => {
+
+						if (response.status == 200) {
+
+							this.$toastr.s("Merchant has been deleted", "Success");
+							
+							this.merchantAllProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
+							if (this.query) {
+
+								this.searchData();
+
+							}
+
+							$('#delete-confirmation-modal').modal('hide');
+							
+						}
+
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						// this.fetchAllContainers();
+					});
+
+			},
 			searchData(emitedValue=false) {
 
 				if (emitedValue) {
@@ -1821,17 +1645,17 @@
 				}
 
 				this.error = '';
-				this.allFetchedProducts = [];
+				this.merchantAllProducts = [];
 				this.pagination.current_page = 1;
 				
 				axios
 				.get(
-					"/api/search-products/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-merchant-products/" + this.merchant.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
-					this.allFetchedProducts = response.data;
-					this.productsToShow = this.allFetchedProducts.all.data;
-					this.pagination = this.allFetchedProducts.all;
+					this.merchantAllProducts = response.data;
+					this.productsToShow = this.merchantAllProducts.all.data;
+					this.pagination = this.merchantAllProducts.all;
 				})
 				.catch(e => {
 					this.error = e.toString();
@@ -1843,194 +1667,61 @@
 				this.pagination.current_page = 1;
 
 				if (this.query === '') {
-					this.fetchAllProducts();
+					this.fetchMerchantAllProducts();
 				}
 				else {
 					this.searchData();
 				}
+
     		},
-    		showContentDetails(object) {		
-				// this.singleProductData = { ...object };
-				// this.singleProductData = Object.assign({}, this.singleProductData, object);
-				this.singleProductData = JSON.parse(JSON.stringify(object));
-				$('#product-view-modal').modal('show');
+    		showRetailContents() {
+				this.currentTab = 'retail';
+				this.showSelectedTabProducts();
 			},
-			showContentCreateForm() {
-				// this.step = 1;
-				this.createMode = true;
-	        	this.submitForm = true;
-	        	
-				this.singleProductData = {
-					variations : [],
-					/*
-					addresses : [
-						{},
-					],
-					*/
-				};
-
-				this.errors = {
-					product : {
-						variations : [],
-						/*
-						addresses : [
-							{},
-						],
-						*/
-					},
-				};
-
-				$('#product-createOrEdit-modal').modal('show');
+			showBulkContents() {
+				this.currentTab = 'bulk';
+				this.showSelectedTabProducts();
 			},
-			openContentEditForm(object) {
+    		showSelectedTabProducts() {
 				
-				// console.log(object);
-
-				// this.step = 1;
-				this.createMode = false;
-	        	this.submitForm = true;
-				
-				this.errors = {
-					product : {
-						variations : [],
-						/*addresses : [],*/
-					},
-				};
-
-				/*
-				object.addresses.forEach(
-					(productAddress, index) => {
-						this.errors.product.addresses.push({});
-					}
-				);
-				*/
-
-				if (object.hasOwnProperty('category') && object.category) {
-
-					this.productMode = 'retail product';
-
-					if (object.has_variations) {
-						
-						object.variations.forEach(
-							(productVariation, index) => {
-								this.errors.product.variations.push({});
-							}
-						);
-						
-						this.availableVariations = object.variation_type.variations ?? [];
-					
-					}
-
+				if (this.currentTab=='retail') {
+					this.productsToShow = this.merchantAllProducts.retail.data;
+					this.pagination = this.merchantAllProducts.retail;
 				}
 				else {
-
-					this.productMode = 'bulk product';
-
+					this.productsToShow = this.merchantAllProducts.bulk.data;
+					this.pagination = this.merchantAllProducts.bulk;
 				}
-
-				this.singleProductData = JSON.parse(JSON.stringify(object));
-
-				/*this.setAvailableShelvesAndUnits();*/
-
-				$('#product-createOrEdit-modal').modal('show');
-			},
-			storeProduct() {
-				
-				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					return;
-				}
-
-				axios
-					.post('/products/' + this.perPage, this.singleProductData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("New product has been stored", "Success");
-							this.allFetchedProducts = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-							$('#product-createOrEdit-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					})
-					.finally(response => {
-						// this.fetchAllContainers();
-					});
-
-			},
-			updateAsset() {
-				
-				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					return;
-				}
-
-				axios
-					.put('/products/' + this.singleProductData.id + '/' + this.perPage, this.singleProductData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("Product has been updated", "Success");
-							this.allFetchedProducts = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-							$('#product-createOrEdit-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					})
-					.finally(response => {
-						// this.fetchAllContainers();
-					});
 
 			},
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: object, productName: object.name }});
-
-			},
-			showSelectedTabProducts() {
-				
-				if (this.currentTab=='retail') {
-					this.productsToShow = this.allFetchedProducts.retail.data;
-					this.pagination = this.allFetchedProducts.retail;
-				}
-				else {
-					this.productsToShow = this.allFetchedProducts.bulk.data;
-					this.pagination = this.allFetchedProducts.bulk;
-				}
+				this.$router.push({ name: 'product-stocks', params: { product: object.product, merchantName: this.merchant.user_name.replace(/ /g,"-"), productMerchant: object }});
 
 			},
 			verifyUserInput() {
 				
-				this.validateFormInput('product_merchant_id');
-				this.validateFormInput('product_name');
-				// this.validateFormInput('product_sku');
-				// this.validateFormInput('product_price');
+				this.validateFormInput('product_sku');
+				this.validateFormInput('product_price');
+				this.validateFormInput('discount');
+				this.validateFormInput('merchant_product_id');
+				
 				// this.validateFormInput('product_initial_quantity');
 				// this.validateFormInput('product_available_quantity');
-				this.validateFormInput('product_quantity_type');
+				// this.validateFormInput('product_quantity_type');
 
-				if (this.singleProductData.has_variations) {
+				if (this.singleMerchantProductData.product.has_variations) {
 					
-					this.validateFormInput('product_variation_type');
 					this.validateFormInput('product_variation_id');
+					// this.validateFormInput('product_variation_type');
 					// this.validateFormInput('product_variation_quantity');
-					// this.validateFormInput('product_variation_price');
+					this.validateFormInput('product_variation_price');
 					// this.validateFormInput('product_variation_total_quantity');
 
 				}
 
-				if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 2 && !this.errorInArray(this.errors.product.variations)) {
+				if (this.errors.product.constructor === Object && ((! this.singleMerchantProductData.product.has_variations && Object.keys(this.errors.product).length < 1) || (this.singleMerchantProductData.product.has_variations && Object.keys(this.errors.product).length < 2)) && ! this.errorInArray(this.errors.product.variations)) {
 					// this.step += 1;
 					this.submitForm = true;
 					return true;
@@ -2040,22 +1731,22 @@
 					return false;
 				}
 
-		/*
-				this.validateFormInput('product_space_type');
-				this.validateFormInput('product_container');
-				this.validateFormInput('product_containers');
-				this.validateFormInput('product_shelf');
-				this.validateFormInput('product_shelves');
-				this.validateFormInput('product_units');
+				/*
+						this.validateFormInput('product_space_type');
+						this.validateFormInput('product_container');
+						this.validateFormInput('product_containers');
+						this.validateFormInput('product_shelf');
+						this.validateFormInput('product_shelves');
+						this.validateFormInput('product_units');
 
-				if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations) && !this.errorInArray(this.errors.product.addresses)) {
+						if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations) && !this.errorInArray(this.errors.product.addresses)) {
 
-					return true;
-				
-				}
+							return true;
+						
+						}
 
-				return false;
-		*/
+						return false;
+				*/
 			},
 			errorInArray(array = []) {
 				const variationError = (variation) => {
@@ -2072,17 +1763,18 @@
 				
 				if (this.step==1) {
 					
-					this.validateFormInput('product_merchant_id');
-					this.validateFormInput('product_name');
 					this.validateFormInput('product_sku');
 					this.validateFormInput('product_price');
-					this.validateFormInput('product_initial_quantity');
-					// this.validateFormInput('product_available_quantity');
-					this.validateFormInput('product_quantity_type');
+					this.validateFormInput('discount');
+					this.validateFormInput('merchant_product_id');
 
-					if (this.singleProductData.has_variations) {
+					// this.validateFormInput('product_initial_quantity');
+					// this.validateFormInput('product_available_quantity');
+					// this.validateFormInput('product_quantity_type');
+
+					if (this.singleMerchantProductData.product.has_variations) {
 						
-						this.validateFormInput('product_variation_type');
+						// this.validateFormInput('product_variation_type');
 						this.validateFormInput('product_variation_id');
 						// this.validateFormInput('product_variation_quantity');
 						this.validateFormInput('product_variation_price');
@@ -2100,51 +1792,28 @@
 
 				}
 
-			},
-			showRetailContents() {
-				this.currentTab = 'retail';
-				this.showSelectedTabProducts();
-			},
-			showBulkContents() {
-				this.currentTab = 'bulk';
-				this.showSelectedTabProducts();
-			},
-			addMoreVariation() {
-				this.singleProductData.variations.push({});
-				this.errors.product.variations.push({});
-			},
-			removeVariation() {
-				if (this.singleProductData.variations.length > 2) {	
-					this.singleProductData.variations.pop();
-					this.errors.product.variations.pop();
+			},	
+			/*
+				addMoreSpace() {
+					if (this.singleMerchantProductData.addresses.length < 3) {
 
-					if (!this.errorInArray(this.errors.product.variations)) {
-						this.submitForm = true;
+						this.singleMerchantProductData.addresses.push({});
+						this.errors.product.addresses.push({});
+
 					}
+				},
+				removeSpace() {
+						
+					if (this.singleMerchantProductData.addresses.length > 1) {
 
-				}
-			},
-		/*
-			addMoreSpace() {
-				if (this.singleProductData.addresses.length < 3) {
-
-					this.singleProductData.addresses.push({});
-					this.errors.product.addresses.push({});
-
-				}
-			},
-			removeSpace() {
+						this.singleMerchantProductData.addresses.pop();
+						this.errors.product.addresses.pop();
 					
-				if (this.singleProductData.addresses.length > 1) {
-
-					this.singleProductData.addresses.pop();
-					this.errors.product.addresses.pop();
-				
-				}
-				
-			},
-		*/
-			objectNameWithCapitalized ({ name, user_name }) {
+					}
+					
+				},
+			*/
+			objectNameWithCapitalized ({ name, user_name, variation }) {
 		      	if (name) {
 				    name = name.toString()
 				    return name.charAt(0).toUpperCase() + name.slice(1)
@@ -2153,412 +1822,248 @@
 		      		user_name = user_name.toString()
 				    return user_name.charAt(0).toUpperCase() + user_name.slice(1)
 		      	}
+		      	else if (variation) {
+		      		var variation_name = variation.name.toString();
+		      		
+		      		if (variation.hasOwnProperty('sub_variation') && variation.sub_variation.hasOwnProperty('name')) {
+
+		      			variation_name = variation_name + '-' + variation.sub_variation.name
+
+		      		}
+
+				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
+		      	}
 		      	else 
 		      		return ''
 		    },
-			nameWithCapitalized (name) {
+			/*
+				nameWithCapitalized (name) {
+					
+					if (!name) return ''
+
+					const words = name.split(" ");
+
+					for (let i = 0; i < words.length; i++) {
+					    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+					}
+
+					return words.join(" ");
+
+			    },
+				setProductCategory() {
+					// console.log('category has been triggered');
+					if (this.singleMerchantProductData.category && Object.keys(this.singleMerchantProductData.category).length > 0) {
+						this.singleMerchantProductData.product_category_id = this.singleMerchantProductData.category.id;
+					}
+				},
+			*/
+			setMerchantProduct() {
 				
-				if (!name) return ''
-
-				const words = name.split(" ");
-
-				for (let i = 0; i < words.length; i++) {
-				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+				if (this.singleMerchantProductData.hasOwnProperty('product') && Object.keys(this.singleMerchantProductData.product).length > 0) {
+					
+					this.setProductVariation();
+					this.singleMerchantProductData.product_id = this.singleMerchantProductData.product.id;
+					
 				}
 
-				return words.join(" ");
-
-		    },
-			setProductCategory() {
-				// console.log('category has been triggered');
-				if (this.singleProductData.category && Object.keys(this.singleProductData.category).length > 0) {
-					this.singleProductData.product_category_id = this.singleProductData.category.id;
-				}
 			},
-			setProductMerchant() {
-				// console.log('merchant has been triggered');
-				if (this.singleProductData.merchant && Object.keys(this.singleProductData.merchant).length > 0) {
-					this.singleProductData.merchant_id = this.singleProductData.merchant.id;
-				}
-			},
-			resetProductVariations() {
-
-				if (this.singleProductData.has_variations) {
-
-					this.singleProductData.variations = [
-						{}, {}
-					];
-					this.errors.product.variations = [
-						{}, {}
-					];
-
+			setProductManufacturer() {
+				
+				if (this.singleMerchantProductData.manufacturer && Object.keys(this.singleMerchantProductData.manufacturer).length > 0) {
+					
+					this.singleMerchantProductData.manufacturer_id = this.singleMerchantProductData.manufacturer.id;
+					
 				}
 				else {
 
-					this.singleProductData.variations = [];
+					this.$delete(this.singleMerchantProductData, 'manufacturer_id');
+
+				}
+
+			},
+			resetErrorProductVariations(object) {
+
+				this.errors = {
+
+					product : {
+
+					},
+
+				};
+
+				if (object.product.has_variations && object.hasOwnProperty('variations') && object.variations.length) {
+
 					this.errors.product.variations = [];
 
-					this.$delete(this.errors.product, 'product_variation_type');
+					object.variations.forEach(
+						(merchantProductVariation, merchantProductVariationIndex) => {
+							
+							this.errors.product.variations.push({});
+
+						}
+					);
 
 				}
 
 			},
 			setProductVariation() {
-				if (this.singleProductData.has_variations && this.singleProductData.variation_type && Object.keys(this.singleProductData.variation_type).length > 0) {
-					// this.singleProductData.variation_type_id = this.singleProductData.variation_type.id;
-					this.singleProductData.variations = [
-						{}, {}
-					];
-					this.availableVariations = this.singleProductData.variation_type.variations;
-				}
-			},
-			setProductMode() {
-				if (this.productMode=='bulk product') {
-					this.singleProductData.has_variations = false;
-					this.$delete(this.singleProductData, 'category');
-					this.$delete(this.singleProductData, 'product_category_id');
-				}
-			},
-		/*
-			resetEmptyContainers({engaged, id, name, container_shelf_statuses, warehouse_container_id}) {
-
-				const existingContainer = currentContainer => 
-					currentContainer.id==id && currentContainer.name==name && currentContainer.warehouse_container_id==warehouse_container_id;
-
-				if (!this.emptyContainers.some(existingContainer)) {
-
-					this.emptyContainers.push({engaged, id, name, warehouse_container_id});
-				}
-
-				if (container_shelf_statuses) {
-
-					if (!this.emptyShelfContainers.some(existingContainer)) {
-
-						this.emptyShelfContainers.push({engaged, id, name, container_shelf_statuses, warehouse_container_id});
-					}
-
-					if (container_shelf_statuses.some(shelf=>shelf.hasOwnProperty('container_shelf_unit_statuses') && shelf.container_shelf_unit_statuses.length)) {
-
-						if (!this.emptyUnitContainers.some(existingContainer)) {
-
-							this.emptyUnitContainers.push({engaged, id, name, container_shelf_statuses, warehouse_container_id});
-						}
-
-					}
 				
+				if (this.singleMerchantProductData.product.has_variations && this.singleMerchantProductData.product.hasOwnProperty('variations') && this.singleMerchantProductData.product.variations.length) {
+					
+					// this.singleMerchantProductData.variation_type_id = this.singleMerchantProductData.variation_type.id;
+					
+					// this.singleMerchantProductData.variations = [
+					// 	{}
+					// ];
+
+					// this.errors.product.variations = [
+					// 	{}
+					// ];
+					
+					this.$set(this.singleMerchantProductData, 'variations', [ {} ]);
+					this.$set(this.errors.product, 'variations', [ {} ]);
+
+					this.allVariations = this.singleMerchantProductData.product.variations;
+
 				}
+				else {
 
-			},
-		*/
-		/*
-			resetEmptyShelves({engaged, id, name, warehouse_container_id, warehouse_container_status_id}) {
+					this.$delete(this.singleMerchantProductData, 'variations');
+					this.$delete(this.errors.product, 'variations');
 
-				console.log(engaged);
-				console.log(id);
-				console.log(name);
-				console.log(warehouse_container_id);
-				console.log(warehouse_container_status_id);
-
-				const existingShelf = currentContainer => 
-					currentContainer.id==id && currentContainer.name==name && currentContainer.warehouse_container_id==warehouse_container_id && currentContainer.warehouse_container_status_id==warehouse_container_status_id;
-
-				if (!this.emptyShelves.some(existingShelf)) {
-
-					this.emptyShelves.push({engaged, id, name, warehouse_container_id, warehouse_container_status_id});
+				}
 				
-				}
-
-				if (container_shelf_statuses.some(shelf=>shelf.hasOwnProperty('container_shelf_unit_statuses') && shelf.container_shelf_unit_statuses.length)) {
-
-					if (!this.emptyUnitContainers.some(existingContainer)) {
-
-						this.emptyUnitContainers.push({engaged, id, name, container_shelf_statuses, warehouse_container_id});
-					}
-
-				}	
-
 			},
-		*/
-		/*
-			setAvailableShelvesAndUnits() {
-
-				this.singleProductData.addresses.forEach(
-					space => {
-
-						if (space.type=='containers') {
-
-						}
-						else if (space.type=='shelves') {
-							let searchedContainer = this.emptyShelfContainers.find(
-								container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
-							)
-
-							if (searchedContainer) {
-
-								this.emptyShelves = searchedContainer.container_shelf_statuses;
-							}
-						}
-						else if (space.type=='units') {
-
-							const containerExists = container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id;
-
-							if (this.emptyUnitContainers.some(containerExists)) {
-
-								let searchedContainer = this.emptyUnitContainers.find(
-									container => container.id==space.container.id && container.name==space.container.name && container.warehouse_container_id==space.container.warehouse_container_id
-								);
-
-								if (searchedContainer) {
-
-									this.emptyUnitShelves = searchedContainer.container_shelf_statuses;
-
-									let searchedShelf = searchedContainer.container_shelf_statuses.find(
-										shelf => shelf.id==space.container.shelf.id && shelf.name==space.container.shelf.name && shelf.warehouse_container_id==space.container.shelf.warehouse_container_id &&  shelf.warehouse_container_status_id==space.container.shelf.warehouse_container_status_id 
-									);
-
-									if (searchedShelf) {
-
-										this.emptyUnits = searchedShelf.container_shelf_unit_statuses;
-
-									}
-
-								}
-
-							}
-
-						}
-
-					}
-				);
-
-			},
-		*/
-		/*	
-			setAvailableShelves(index) {
-				// console.log('container if has been triggered');
-				if (this.singleProductData.addresses[index].container && Object.keys(this.singleProductData.addresses[index].container).length > 0) {
-					this.$delete(this.singleProductData.addresses[index].container, 'shelves');
-					this.emptyShelves = this.singleProductData.addresses[index].container.container_shelf_statuses;
-				}
-			},
-			setAvailableUnitShelves(index) {
-				// console.log('container if has been triggered');
-				if (this.singleProductData.addresses[index].container && Object.keys(this.singleProductData.addresses[index].container).length > 0) {
-					this.$delete(this.singleProductData.addresses[index].container, 'shelf');
-					this.emptyUnitShelves = this.singleProductData.addresses[index].container.container_shelf_statuses;
-				}
-			},
-			setAvailableUnits(index) {
-				// console.log('shelf if has been triggered');
-				if (this.singleProductData.addresses[index].container && Object.keys(this.singleProductData.addresses[index].container).length > 0 && Object.keys(this.singleProductData.addresses[index].container.shelf).length > 0) {
-					this.$delete(this.singleProductData.addresses[index].container.shelf, 'units');
-					this.emptyUnits = this.singleProductData.addresses[index].container.shelf.container_shelf_unit_statuses;
-				}
-			},
-			setProductSpaceType(index) {
-				// resetting
-				this.$delete(this.singleProductData.addresses[index], 'container');
-				this.$delete(this.singleProductData.addresses[index], 'containers');
-
-				this.errors.product.addresses[index] = {};
-
-				this.resetAvailableSpaces();
-		
-			},
-			setAvailableSpaces() {
+			addMoreVariation() {
 				
-				// this.emptyContainers = [ ...this.allContainers.emptyContainers ];
-				// this.emptyShelfContainers = [ ...this.allContainers.emptyShelfContainers ];
-				// this.emptyUnitContainers = [ ...this.allContainers.emptyUnitContainers ];
+				if (this.singleMerchantProductData.variations.length < this.singleMerchantProductData.product.variations.length) {
+					
+					// this.$set(this.singleMerchantProductData.variations, this.singleMerchantProductData.variations.length, {});
+					// this.$set(this.errors.product.variations, this.errors.product.variations.length, {});
 
-				this.emptyContainers = JSON.parse( JSON.stringify( this.allContainers.emptyContainers ) );
-				this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allContainers.emptyShelfContainers ) );
-				this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allContainers.emptyUnitContainers ) );
+					// Vue.set(this.singleMerchantProductData.variations, this.singleMerchantProductData.variations.length, {});
+					// Vue.set(this.errors.product.variations, this.errors.product.variations.length, {});
+
+					this.singleMerchantProductData.variations.push({});
+					this.errors.product.variations.push({});
+
+				}
 
 			},
-			resetAvailableSpaces() {
+			removeVariation() {
 
-				this.setAvailableSpaces();
+				if (this.singleMerchantProductData.variations.length > 1) {	
+					
+					this.singleMerchantProductData.variations.pop();
+					this.errors.product.variations.pop();
 
-				this.singleProductData.addresses.forEach(
-
-					(productAddress, index) => {
-						
-						if (productAddress.type=='containers' && productAddress.containers && productAddress.containers.length) {
-
-							// for every selected container
-							productAddress.containers.forEach(
-
-								(selectedContainer) => {
-
-									// containers with empty shelves
-									var selectedContainerIndex = this.emptyShelfContainers.findIndex(
-										(currentContainer) => 
-											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
-										
-									);
-
-									// console.log('Container Index in emptyShelfContainers : ' + selectedContainerIndex);
-
-									if (selectedContainerIndex > -1) {
-
-										this.emptyShelfContainers.splice(selectedContainerIndex, 1);
-									
-									}
-
-
-									// containers with empty units
-									var selectedContainerIndex = this.emptyUnitContainers.findIndex(
-										(currentContainer) => 
-											currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
-										
-									);
-
-									// console.log('Container Index in emptyUnitContainers : ' + selectedContainerIndex);
-
-									if (selectedContainerIndex > -1) {
-
-										this.emptyUnitContainers.splice(selectedContainerIndex, 1);
-
-									}
-
-								}
-
-							);
-
-						}
-						else if (productAddress.type=='shelves' && productAddress.container && productAddress.container.shelves && productAddress.container.shelves.length) {
-
-							// downward
-
-							// for every container-shelves with empty units
-							this.emptyUnitContainers.forEach(
-
-								(emptyUnitContainer) => {
-
-									if (emptyUnitContainer.id==productAddress.container.id && emptyUnitContainer.name==productAddress.container.name && emptyUnitContainer.warehouse_container_id==productAddress.container.warehouse_container_id) {
-
-										
-										// for every selected shelves
-										productAddress.container.shelves.forEach(
-
-											(selectedShelf) => {
-
-												// unit
-												var selectedShelfIndex = emptyUnitContainer.container_shelf_statuses.findIndex(
-													(containerShelf) => 
-														containerShelf.id == selectedShelf.id && containerShelf.name == selectedShelf.name && containerShelf.warehouse_container_status_id == selectedShelf.warehouse_container_status_id
-												);
-
-												if (selectedShelfIndex > -1) {
-
-													emptyUnitContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
-												}
-
-											}
-
-										);
-
-									}
-
-								}
-
-							);
-
-							// upward
-							// for every empty containers
-							var selectedContainerIndex = this.emptyContainers.findIndex(
-								(currentContainer) => 
-									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warehouse_container_id == productAddress.container.warehouse_container_id
-							);
-
-							if (selectedContainerIndex > -1) {
-
-								this.emptyContainers.splice(selectedContainerIndex, 1);
-
-							}
-
-						}
-						else if (productAddress.type=='units' && productAddress.container && productAddress.container.shelf && productAddress.container.shelf.units && productAddress.container.shelf.units.length) {
-
-							// upward
-							// for every empty containers
-							var selectedContainerIndex = this.emptyContainers.findIndex(
-								(currentContainer) => 
-									currentContainer.id == productAddress.container.id && currentContainer.name == productAddress.container.name && currentContainer.warehouse_container_id == productAddress.container.warehouse_container_id
-							);
-
-							if (selectedContainerIndex > -1) {
-
-								this.emptyContainers.splice(selectedContainerIndex, 1);
-
-							}
-
-							// upward
-							// for containers with empty shelves
-							this.emptyShelfContainers.forEach(
-
-								(emptyShelfContainer) => {
-
-									if (emptyShelfContainer.id == productAddress.container.id && emptyShelfContainer.name == productAddress.container.name && emptyShelfContainer.warehouse_container_id == productAddress.container.warehouse_container_id) {
-
-
-										var selectedShelfIndex = emptyShelfContainer.container_shelf_statuses.findIndex(
-											(currentShelf) => currentShelf.id == productAddress.container.shelf.id && currentShelf.name == productAddress.container.shelf.name && currentShelf.warehouse_container_id == productAddress.container.shelf.warehouse_container_id
-										)
-
-										if (selectedShelfIndex > -1) {
-
-											emptyShelfContainer.container_shelf_statuses.splice(selectedShelfIndex, 1);
-
-										}
-
-									}
-
-								}
-								
-							);
-
-						}
+					if (! this.errorInArray(this.errors.product.variations)) {
+						this.submitForm = true;
 					}
-				);
+
+				}
+
 			},
-		*/
+			onProductPreviewChange(evnt) {
+				
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	
+		      		let reader = new FileReader();
+	                reader.onload = (evnt) => {
+
+	                    this.singleMerchantProductData.preview = evnt.target.result; 
+                    	// this.$refs.merchantProductPreview.attributes[1]['value'] = evnt.target.result;
+						// console.log(this.$refs.merchantProductPreview);
+	                    
+	                };
+	                
+	                reader.readAsDataURL(files[0]);                    
+
+                	this.$delete(this.errors.product, 'preview');
+
+		      	}
+		      	else{
+
+		      		this.errors.product.preview = 'File should be image';
+
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+
+			},
+			onVariationPreviewChange(evnt, index) {
+				
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	
+		      		let reader = new FileReader();
+	                
+	                reader.onload = (evnt) => {
+
+	                    this.singleMerchantProductData.variations[index].preview = evnt.target.result;
+                    	// this.$refs['merchantProductVariationPreview-' + index][0]['attributes'][1]['value'] = evnt.target.result;
+						// console.log(this.$refs['merchantProductVariationPreview-' + index][0]);
+
+	                };
+
+	                reader.readAsDataURL(files[0]);
+                	
+                	this.$delete(this.errors.product.variations[index], 'preview');
+
+		      	}
+		      	else{
+
+		      		this.errors.product.variations[index].preview = 'File should be image';
+
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+
+			},
+			showPreview(imagePath = 'default') {
+				
+				if (imagePath != null && imagePath.startsWith('data:')) {
+					return imagePath;
+				}
+				else {
+					return '/' + imagePath;
+				}
+
+				// return '';
+
+			},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
 
 				switch(formInputName) {
 
-					case 'product_merchant_id' :
+					case 'merchant_product_id' :
 
-						if (!this.singleProductData.merchant || Object.keys(this.singleProductData.merchant).length == 0) {
-							this.errors.product.product_merchant_id = 'Merchant is required';
+						if (! this.singleMerchantProductData.hasOwnProperty('product') || Object.keys(this.singleMerchantProductData.product).length == 0) {
+							this.errors.product.merchant_product_id = 'Product is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_merchant_id');
+							this.$delete(this.errors.product, 'merchant_product_id');
 						}
 
 						break;
 
-					case 'product_name' :
-
-						if (!this.singleProductData.name || !this.singleProductData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.product.product_name = 'No special character';
-						}
-						else{
-							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_name');
-						}
-
-						break;
-
-					/*
 					case 'product_sku' :
 
-						if (this.singleProductData.sku && !this.singleProductData.sku.match(/^[a-zA-Z0-9]*$/g)) {
-							this.errors.product.product_sku = 'Invalid code';
+						if (! this.singleMerchantProductData.sku) {
+							this.errors.product.product_sku = 'Product SKU is required';
+						}
+						else if (! this.singleMerchantProductData.sku.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.product.product_sku = 'No special character';
 						}
 						else{
 							this.submitForm = true;
@@ -2569,7 +2074,7 @@
 
 					case 'product_price' :
 
-						if (this.productMode==='retail product' && (!this.singleProductData.price || this.singleProductData.price < 0)) {
+						if (this.singleMerchantProductData.hasOwnProperty('product') && this.singleMerchantProductData.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)) {
 							this.errors.product.product_price = 'Price is required';
 						}
 						else{
@@ -2578,12 +2083,37 @@
 						}
 
 						break;
-					*/
+
+					case 'discount' :
+
+						if (this.singleMerchantProductData.hasOwnProperty('product') && this.singleMerchantProductData.product.category && (this.singleMerchantProductData.discount > 100 || this.singleMerchantProductData.discount < 0)) {
+							this.errors.product.discount = 'Discount should be between 0 to 100';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.product, 'discount');
+						}
+
+						break;
+
+				/*
+					case 'product_sku' :
+
+						if (this.singleMerchantProductData.sku && !this.singleMerchantProductData.sku.match(/^[a-zA-Z0-9]*$/g)) {
+							this.errors.product.product_sku = 'Invalid code';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.product, 'product_sku');
+						}
+
+						break;
+				*/
 
 				/*
 					case 'product_initial_quantity' :
 
-						if (!this.singleProductData.initial_quantity || this.singleProductData.initial_quantity < 1) {
+						if (!this.singleMerchantProductData.initial_quantity || this.singleMerchantProductData.initial_quantity < 1) {
 							this.errors.product.product_initial_quantity = 'Qty is required';
 						}
 						else{
@@ -2595,7 +2125,7 @@
 
 					case 'product_available_quantity' :
 
-						if (!this.singleProductData.available_quantity || this.singleProductData.available_quantity < 0 || this.singleProductData.available_quantity > this.singleProductData.initial_quantity) {
+						if (!this.singleMerchantProductData.available_quantity || this.singleMerchantProductData.available_quantity < 0 || this.singleMerchantProductData.available_quantity > this.singleMerchantProductData.initial_quantity) {
 							this.errors.product.product_available_quantity = 'Quantity is required';
 						}
 						else{
@@ -2605,10 +2135,9 @@
 
 						break;
 
-				*/
 					case 'product_quantity_type' :
 
-						if (!this.singleProductData.quantity_type) {
+						if (!this.singleMerchantProductData.quantity_type) {
 							this.errors.product.product_quantity_type = 'Qty type is required';
 						}
 						else{
@@ -2620,11 +2149,11 @@
 
 					case 'product_variation_type' : 
 						
-						if (!this.singleProductData.has_variations) {
+						if (!this.singleMerchantProductData.has_variations) {
 							this.submitForm = true;
 							this.$delete(this.errors.product, 'product_variation_type');
 						}
-						else if (this.singleProductData.has_variations && (!this.singleProductData.variation_type || Object.keys(this.singleProductData.variation_type).length == 0)) {
+						else if (this.singleMerchantProductData.has_variations && (!this.singleMerchantProductData.variation_type || Object.keys(this.singleMerchantProductData.variation_type).length == 0)) {
 							
 							this.errors.product.product_variation_type = 'Variation type is required';
 						}
@@ -2634,27 +2163,44 @@
 						}
 
 						break;
+				*/
 
 					case 'product_variation_id' :
 						
-						if (this.singleProductData.has_variations) {
+						if (this.singleMerchantProductData.hasOwnProperty('product') && this.singleMerchantProductData.product.has_variations && this.singleMerchantProductData.hasOwnProperty('variations') && this.singleMerchantProductData.variations.length) {
 							
-							this.singleProductData.variations.forEach(
-								(productVariation, index) => {
-									if (! productVariation.hasOwnProperty('variation') || Object.keys(productVariation.variation).length == 0) {
+							const noVariation = (merchantProductVariation) => ! merchantProductVariation.hasOwnProperty('variation') || ! merchantProductVariation.variation || Object.keys(merchantProductVariation.variation).length == 0;
+
+							if (this.singleMerchantProductData.variations.some(noVariation)) {
 										
-										this.errors.product.variations[index].product_variation_id = 'Variation is required';
+								this.errors.product.variations[this.singleMerchantProductData.variations.findIndex(noVariation)].product_variation_id = 'Variation is required';
 
-									}
-									else if (this.singleProductData.variations.filter((obj) => (obj.hasOwnProperty('variation') && obj.variation.id) === productVariation.variation.id).length > 1) {
+							}
+							else {
 
-										this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+								this.singleMerchantProductData.variations.forEach(
+									
+									(merchantProductVariation, index) => {
+										
+										if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
+
+											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+
+										}
+										else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
+
+											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+
+										}
+										else {
+											this.$delete(this.errors.product.variations[index], 'product_variation_id');
+										}
+										
 									}
-									else {
-										this.$delete(this.errors.product.variations[index], 'product_variation_id');
-									}
-								}
-							);
+
+								);								
+
+							}
 							
 							if (!this.errorInArray(this.errors.product.variations)) {
 								this.submitForm = true;
@@ -2663,7 +2209,7 @@
 						}
 						else {
 							this.submitForm = true;
-							this.errors.product.variations = [];
+							this.$delete(this.errors.product, 'variations');
 						}
 
 						break;
@@ -2671,9 +2217,9 @@
 					/*
 					case 'product_variation_quantity' :
 
-						if (this.singleProductData.has_variations) {
+						if (this.singleMerchantProductData.has_variations) {
 
-							this.singleProductData.variations.forEach(
+							this.singleMerchantProductData.variations.forEach(
 								(productVariation, index) => {
 
 									if (!productVariation.hasOwnProperty('initial_quantity') || productVariation.initial_quantity < 1) {
@@ -2705,21 +2251,22 @@
 						break;
 					*/
 
-					/*
 					case 'product_variation_price' :
 
-						if (this.singleProductData.has_variations) {
+						if (this.singleMerchantProductData.hasOwnProperty('product') && this.singleMerchantProductData.product.has_variations && this.singleMerchantProductData.hasOwnProperty('variations') && this.singleMerchantProductData.variations.length) {
 
-							this.singleProductData.variations.forEach(
+							this.singleMerchantProductData.variations.forEach(
 								(productVariation, index) => {
-									if (!productVariation.price || productVariation.price < 0) {
+									
+									if (! productVariation.selling_price || productVariation.selling_price < 0) {
 										
-										this.errors.product.variations[index].product_variation_price = 'Variation price is required';
+										this.errors.product.variations[index].product_variation_price = 'Variation selling price is required';
 
 									}
 									else {
 										this.$delete(this.errors.product.variations[index], 'product_variation_price');
 									}
+
 								}
 							);
 							
@@ -2729,30 +2276,31 @@
 						}
 						else {
 							this.submitForm = true;
-							this.errors.product.variations = [];
+							// this.errors.product.variations = [];
+							this.$delete(this.errors.product, 'variations');
 						}
 
 						break;
-					*/
+					
 
 					/*
 					case 'product_variation_total_quantity' :
 
-						if (this.singleProductData.has_variations) {
+						if (this.singleMerchantProductData.has_variations) {
 
 							if (!this.errorInArray(this.errors.product.variations)) {
 
-								let variationTotalQuantity = this.singleProductData.variations.reduce(
+								let variationTotalQuantity = this.singleMerchantProductData.variations.reduce(
 									(value, currentObject) => {
 										return value + currentObject.initial_quantity;
 									}, 
 								0);
 
-								if (variationTotalQuantity !== this.singleProductData.initial_quantity) {
-									this.errors.product.variations[this.singleProductData.variations.length-1].product_variation_quantity = 'Total variation qty should be equal to qty';
+								if (variationTotalQuantity !== this.singleMerchantProductData.initial_quantity) {
+									this.errors.product.variations[this.singleMerchantProductData.variations.length-1].product_variation_quantity = 'Total variation qty should be equal to qty';
 								}
 								else {
-									this.$delete(this.errors.product.variations[this.singleProductData.variations.length-1], 'product_variation_quantity');
+									this.$delete(this.errors.product.variations[this.singleMerchantProductData.variations.length-1], 'product_variation_quantity');
 								}
 							}
 
@@ -2770,14 +2318,14 @@
 				/*
 					case 'product_space_type' :
 
-						this.singleProductData.addresses.forEach(
+						this.singleMerchantProductData.addresses.forEach(
 							
 							(productSpace, index) => {
 
 								if (!productSpace.type) {
 									this.errors.product.addresses[index].product_space_type = 'Space type is required';
 								}
-								else if (this.singleProductData.addresses.filter((obj) => obj.type === productSpace.type).length > 1) {
+								else if (this.singleMerchantProductData.addresses.filter((obj) => obj.type === productSpace.type).length > 1) {
 
 									this.errors.product.addresses[index].product_space_type = 'Same type selected';
 								}
@@ -2797,7 +2345,7 @@
 
 					case 'product_containers' :
 
-						this.singleProductData.addresses.forEach(
+						this.singleMerchantProductData.addresses.forEach(
 							
 							(productSpace, index) => {
 
@@ -2820,7 +2368,7 @@
 
 					case 'product_container' :
 
-						this.singleProductData.addresses.forEach(
+						this.singleMerchantProductData.addresses.forEach(
 							
 							(productSpace, index) => {
 
@@ -2842,7 +2390,7 @@
 
 					case 'product_shelves' : 
 
-						this.singleProductData.addresses.forEach(
+						this.singleMerchantProductData.addresses.forEach(
 							
 							(productSpace, index) => {
 
@@ -2864,7 +2412,7 @@
 
 					case 'product_shelf' :
 
-						this.singleProductData.addresses.forEach(
+						this.singleMerchantProductData.addresses.forEach(
 							
 							(productSpace, index) => {
 
@@ -2887,7 +2435,7 @@
 
 					case 'product_units' :
 
-						this.singleProductData.addresses.forEach(
+						this.singleMerchantProductData.addresses.forEach(
 							
 							(productSpace, index) => {
 

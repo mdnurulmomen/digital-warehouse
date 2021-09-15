@@ -25,11 +25,11 @@ class MyProductVariationResource extends JsonResource
             // 'variation_immutability' => $this->variation_immutability,
             'variation' => $this->productVariation->variation,
 
-            'serials' => $this->when($this->product->has_serials && $this->product->has_variations, $this->serials()->where('has_requisitions', false)->where('has_dispatched', false)->whereHas('variationStock.productStock.stock', function ($query) {
+            'serials' => $this->when($this->merchantProduct->product->has_serials && $this->merchantProduct->product->has_variations, $this->serials()->where('has_requisitions', false)->where('has_dispatched', false)->whereHas('variationStock.productStock.stock', function ($query) {
                     $query->where('has_approval', 1);
                 })->get()->pluck('serial_no')),
 
-            'dispatched_serials' => $this->when($this->product->has_serials && $this->product->has_variations, $this->serials()->where('has_requisitions', true)->where('has_dispatched', true)->whereHas('variationStock.productStock.stock', function ($query) {
+            'dispatched_serials' => $this->when($this->merchantProduct->product->has_serials && $this->merchantProduct->product->has_variations, $this->serials()->where('has_requisitions', true)->where('has_dispatched', true)->whereHas('variationStock.productStock.stock', function ($query) {
                     $query->where('has_approval', 1);
                 })->get()->pluck('serial_no'))
         ];

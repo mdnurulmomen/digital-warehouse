@@ -68,6 +68,11 @@ class MerchantProductVariation extends Model
         else if ($this->stocks()->count()) {
              return true;
         }
+        /*
+            else if ($this->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count()) {
+                 return true;
+            }
+        */
 
         return false;
     }

@@ -60,6 +60,7 @@
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@goMerchantDeals="goMerchantDeals($event)" 
+										  			@goMerchantProducts="goMerchantProducts($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
@@ -231,6 +232,12 @@
 
 				// console.log(object);
 				this.$router.push({ name: 'merchant-deals', params: { merchant: object, merchantName: object.user_name.replace(/ /g,"-") }});
+
+			},
+			goMerchantProducts(object) {
+
+				// console.log(object);
+				this.$router.push({ name: 'merchant-products', params: { merchant: object, merchantName: object.user_name.replace(/ /g,"-") }});
 
 			},
 			showContentDetails(object) {	

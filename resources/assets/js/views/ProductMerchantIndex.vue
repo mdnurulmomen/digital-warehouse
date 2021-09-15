@@ -46,6 +46,7 @@
 																		<th>Merchant</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
+																		<th>Stock</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -60,7 +61,10 @@
 																		<td>
 																			{{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Own Product' | capitalize }}
 																		</td>
+
 																		<td>{{ productMerchant.sku }}</td>
+
+																		<td>{{ productMerchant.available_quantity + ' ' + product.quantity_type }}</td>
 																		
 																		<td>
 																			<button 
@@ -104,7 +108,7 @@
 																	<tr 
 																  		v-show="! productAllMerchants.length"
 																  	>
-															    		<td colspan="4">
+															    		<td colspan="5">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -117,6 +121,7 @@
 																		<th>Merchant</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
+																		<th>Stock</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -2726,44 +2731,39 @@
 					case 'product_variation_id' :
 						
 						if (this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
-							
-							// if (! this.singleMerchantProductData.hasOwnProperty('variations') || ! this.singleMerchantProductData.variations.length) {
+														
+							const noVariation = (merchantProductVariation) => ! merchantProductVariation.hasOwnProperty('variation') || ! merchantProductVariation.variation || Object.keys(merchantProductVariation.variation).length == 0;
 
-
-
-							// }
-
-							// else {
-
-							this.singleMerchantProductData.variations.forEach(
-								
-								(merchantProductVariation, index) => {
-									
-									if (! merchantProductVariation.hasOwnProperty('variation') || ! merchantProductVariation.variation || Object.keys(merchantProductVariation.variation).length == 0) {
+							if (this.singleMerchantProductData.variations.some(noVariation)) {
 										
-										this.errors.product.variations[index].product_variation_id = 'Variation is required';
+								this.errors.product.variations[this.singleMerchantProductData.variations.findIndex(noVariation)].product_variation_id = 'Variation is required';
 
-									}
-									else if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
+							}
+							else {
 
-										 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
-
-									}
-									else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
-
-										 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
-
-									}
-									else {
-										this.$delete(this.errors.product.variations[index], 'product_variation_id');
-									}
+								this.singleMerchantProductData.variations.forEach(
 									
-								}
+									(merchantProductVariation, index) => {
+										
+										if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
 
-							);								
+											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 
-							// }
+										}
+										else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
 
+											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+
+										}
+										else {
+											this.$delete(this.errors.product.variations[index], 'product_variation_id');
+										}
+										
+									}
+
+								);								
+
+							}
 							
 							if (!this.errorInArray(this.errors.product.variations)) {
 								this.submitForm = true;

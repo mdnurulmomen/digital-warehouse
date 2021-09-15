@@ -13,13 +13,14 @@ use Illuminate\Validation\Rule;
 use App\Models\ProductManufacturer;
 use Illuminate\Support\Facades\File; 
 use App\Models\ProductVariationSerial;
-use App\Models\WarehouseContainerStatus;
-use Illuminate\Support\Facades\Validator;
-use App\Models\WarehouseContainerShelfStatus;
+// use App\Models\WarehouseContainerStatus;
+// use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Web\ProductResource;
+// use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\ProductCollection;
-use App\Models\WarehouseContainerShelfUnitStatus;
+// use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Http\Resources\Web\ProductStockCollection;
-use App\Http\Resources\Web\ManagerProductCollection;
+// use App\Http\Resources\Web\ManagerProductCollection;
 use App\Http\Resources\Web\MerchantProductCollection;
 
 class ProductController extends Controller
@@ -228,7 +229,7 @@ class ProductController extends Controller
 
         }
 
-        return Product::all();
+        return ProductResource::collection(Product::all());
     }
 
     public function storeNewProduct(Request $request, $perPage)
@@ -346,9 +347,14 @@ class ProductController extends Controller
     public function searchAllProducts($search, $perPage)
     {
         $query = Product::where('name', 'like', "%$search%")
-                        ->orWhere('sku', 'like', "%$search%")
+                        // ->orWhere('sku', 'like', "%$search%")
                         // ->orWhere('price', 'like', "%$search%")
                         ->orWhere('quantity_type', 'like', "%$search%")
+                        ->orWhereHas('merchants', function ($q) use ($search) {
+                            $q->where('merchants.first_name', 'like', "%$search%")
+                            ->orWhere('merchants.last_name', 'like', "%$search%")
+                            ->orWhere('merchants.user_name', 'like', "%$search%");
+                        })
                         ->orWhereHas('category', function ($q) use ($search) {
                             $q->where('name', 'like', "%$search%");
                         });
@@ -889,78 +895,17 @@ class ProductController extends Controller
     }
 
     // Manager Products
-    public function showManagerAllProducts($perPage=false)
-    {
-        if ($perPage) {
+    /*
+        public function showManagerAllProducts($perPage=false)
+        {
+            if ($perPage) {
 
-            $manager = \Auth::guard('manager')->user();
+                $manager = \Auth::guard('manager')->user();
 
-            return response()->json([
+                return response()->json([
 
-                'retail' => new ManagerProductCollection(
-                    Product::where('product_category_id', '!=', 0)->whereHas('addresses', function ($query) use ($manager) {
-                        $query->whereHasMorph(
-                            'space',
-                            [WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class],
-                            function ($query1) use ($manager) {
-                                $query1->whereHas('warehouseContainer', function ($query2) use ($manager) {
-                                    $query2->whereHas('warehouse', function ($query3) use ($manager) {
-                                        $query3->whereHas('managers', function ($query4) use ($manager) {
-                                            $query4->where('manager_id', $manager->id);
-                                        });
-                                    });
-                                });
-                            }
-                        );
-                    })->paginate($perPage)
-                ),
-
-                'bulk' => new ManagerProductCollection(
-                    Product::whereNull('product_category_id')->whereHas('addresses', function ($query) use ($manager) {
-                        $query->whereHasMorph(
-                            'space',
-                            [WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class],
-                            function ($query1) use ($manager) {
-                                $query1->whereHas('warehouseContainer', function ($query2) use ($manager) {
-                                    $query2->whereHas('warehouse', function ($query3) use ($manager) {
-                                        $query3->whereHas('managers', function ($query4) use ($manager) {
-                                            $query4->where('manager_id', $manager->id);
-                                        });
-                                    });
-                                });
-                            }
-                        );
-                    })->paginate($perPage)
-                ),
-
-            ], 200);
-
-            /*
-            return response()->json([
-
-                'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)->paginate($perPage)),
-                'bulk' => new ProductCollection(Product::whereNull('product_category_id')->orWhere('product_category_id', 0)->paginate($perPage)),
-
-            ], 200);
-            */
-
-        }
-
-        return Product::all();
-    }
-    
-    public function searchManagerAllProducts($search, $perPage)
-    {
-        $query = Product::where('name', 'like', "%$search%")
-                        ->orWhere('sku', 'like', "%$search%")
-                        ->orWhere('price', 'like', "%$search%")
-                        ->orWhere('quantity_type', 'like', "%$search%")
-                        ->orWhereHas('category', function ($q) use ($search) {
-                            $q->where('name', 'like', "%$search%");
-                        });
-
-                        /*
-                        ->whereHas('addresses', function ($query) use ($manager) {
+                    'retail' => new ManagerProductCollection(
+                        Product::where('product_category_id', '!=', 0)->whereHas('addresses', function ($query) use ($manager) {
                             $query->whereHasMorph(
                                 'space',
                                 [WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class],
@@ -974,13 +919,49 @@ class ProductController extends Controller
                                     });
                                 }
                             );
-                        })
-                         */
+                        })->paginate($perPage)
+                    ),
 
-        return response()->json([
-            'all' => new ProductCollection($query->paginate($perPage)),  
-        ], 200);
-    }
+                    'bulk' => new ManagerProductCollection(
+                        Product::whereNull('product_category_id')->whereHas('addresses', function ($query) use ($manager) {
+                            $query->whereHasMorph(
+                                'space',
+                                [WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class],
+                                function ($query1) use ($manager) {
+                                    $query1->whereHas('warehouseContainer', function ($query2) use ($manager) {
+                                        $query2->whereHas('warehouse', function ($query3) use ($manager) {
+                                            $query3->whereHas('managers', function ($query4) use ($manager) {
+                                                $query4->where('manager_id', $manager->id);
+                                            });
+                                        });
+                                    });
+                                }
+                            );
+                        })->paginate($perPage)
+                    ),
+
+                ], 200);
+
+            }
+
+            return Product::all();
+        }
+        
+        public function searchManagerAllProducts($search, $perPage)
+        {
+            $query = Product::where('name', 'like', "%$search%")
+                            ->orWhere('sku', 'like', "%$search%")
+                            ->orWhere('price', 'like', "%$search%")
+                            ->orWhere('quantity_type', 'like', "%$search%")
+                            ->orWhereHas('category', function ($q) use ($search) {
+                                $q->where('name', 'like', "%$search%");
+                            });
+
+            return response()->json([
+                'all' => new ProductCollection($query->paginate($perPage)),  
+            ], 200);
+        }
+    */
 
     // Product-Merchants
     public function showProductAllMerchants($product, $perPage)

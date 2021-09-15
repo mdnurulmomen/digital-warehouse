@@ -44,15 +44,15 @@ Route::name('merchant.')->group(function () {
 		Route::post('/password', 'ProfileController@updateMerchantPassword')->name('password');
 		
 		// complementary routes for fundamental routes (my-properties)
-		Route::get('/api/my-agents/{perPage?}', 'MerchantController@showMerchantAllAgents')->name('my-agents');
+		Route::get('/api/my-agents/{perPage?}', 'MerchantController@showMyAllAgents')->name('my-agents');
 
 		// my-properties
-		Route::get('/api/my-products/{perPage?}', 'MerchantController@showMerchantAllProducts')->name('my-products');
-		Route::get('/search-my-products/{query}/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('my-products');
+		Route::get('/api/my-products/{perPage?}', 'MerchantController@showMyAllProducts')->name('my-products');
+		Route::get('/search-my-products/{query}/{perPage}', 'MerchantController@searchMyAllProducts')->name('my-products');
 
-		Route::get('/api/my-requisitions/{perPage?}', 'MerchantController@showMerchantAllRequisitions')->name('my-requisitions');
+		Route::get('/api/my-requisitions/{perPage?}', 'MerchantController@showMyAllRequisitions')->name('my-requisitions');
 		Route::post('/requisitions/{perPage}', 'MerchantController@makeNewRequisition')->name('my-requisitions');
-		Route::get('/api/search-my-requisitions/{search}/{perPage?}', 'MerchantController@searchMerchantAllRequisitions')->name('search-my-requisitions');
+		Route::get('/api/search-my-requisitions/{search}/{perPage?}', 'MerchantController@searchMyAllRequisitions')->name('search-my-requisitions');
 
 		// Receive products
 		Route::post('/receive-dispatched-products/{perPage}', 'MerchantController@receiveDispatchedProducts')->name('receive-dispatched-products');

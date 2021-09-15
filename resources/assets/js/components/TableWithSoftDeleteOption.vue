@@ -82,6 +82,14 @@
 							</button>
 
 							<button type="button" 
+									class="btn btn-grd-success btn-icon" 
+									@click="$emit('goMerchantProducts', content)" 
+									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-product-index')"
+							>
+								<i aria-hidden="true" class="fab fa-product-hunt"></i>
+							</button>
+
+							<button type="button" 
 									class="btn btn-grd-warning btn-icon" 
 									@click="$emit('goCategoryProducts', content)" 
 									v-if="$route.name=='product-categories' && userHasPermissionTo('view-product-index')"

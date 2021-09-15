@@ -70,6 +70,11 @@ class MerchantProduct extends Model
         else if ($this->stocks()->count()) {
              return true;
         }
+        /*
+            else if ($this->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->count()) {
+                 return true;
+            }
+        */
 
         return false;
     }
@@ -261,7 +266,7 @@ class MerchantProduct extends Model
 
             foreach ($merchantProductNewVariations as $merchantProductNewVariation) {
 
-                $previewPath = $this->saveProductVariationPreview($merchantProductNewVariation->preview, $this->merchant->user_name, $this->product->name, $merchantProductNewVariation->variation);
+                $previewPath = $this->saveProductVariationPreview($merchantProductNewVariation->preview ?? NULL, $this->merchant->user_name, $this->product->name, $merchantProductNewVariation->variation);
 
                 $merchantProductVariation = $this->variations()->updateOrCreate(
                     

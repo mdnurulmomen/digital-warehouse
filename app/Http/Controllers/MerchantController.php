@@ -8,28 +8,38 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Warehouse;
 use App\Models\Requisition;
-use App\Models\ProductStock;
+// use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductSerial;
 use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
 use App\Models\RequisitionAgent;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File; 
 use App\Jobs\BroadcastNewRequisition;
 use App\Models\ProductVariationSerial;
 use App\Http\Resources\Web\MyProductResource;
 use App\Http\Resources\Web\MyProductCollection;
 use App\Jobs\BroadcastProductReceiveConfirmation;
 use App\Http\Resources\Web\MyRequisitionCollection;
+use App\Http\Resources\Web\MerchantProductResource;
+use App\Http\Resources\Web\MerchantProductCollection;
 
 class MerchantController extends Controller
 {
     public function __construct()
     {
+        // Merchants
         $this->middleware("permission:view-merchant-index")->only(['showAllMerchants', 'searchAllMerchants']);
         $this->middleware("permission:create-merchant")->only('storeNewMerchant');
         $this->middleware("permission:update-merchant")->only('updateMerchant');
         $this->middleware("permission:delete-merchant")->only(['deleteMerchant', 'restoreMerchant']);
+
+        // Merchant-Products
+        $this->middleware("permission:view-merchant-product-index")->only(['showMerchantAllProducts', 'searchMerchantAllProducts']);
+        $this->middleware("permission:create-merchant-product")->only('storeMerchantNewProduct');
+        $this->middleware("permission:update-merchant-product")->only('updateMerchantProduct');
+        $this->middleware("permission:delete-merchant-product")->only('deleteMerchantProduct');  
     }
 
     public function showAllMerchants($perPage = false)
@@ -165,7 +175,7 @@ class MerchantController extends Controller
     }
 
     // Merchant-Products (web.php) 
-    public function showMerchantAllProducts($perPage=false)
+    public function showMyAllProducts($perPage=false)
     {
         $currentMerchant = \Auth::user();
         
@@ -210,7 +220,7 @@ class MerchantController extends Controller
 
     }
 
-    public function searchMerchantAllProducts($search, $perPage)
+    public function searchMyAllProducts($search, $perPage)
     {
         $currentMerchant = \Auth::user();
 
@@ -237,8 +247,8 @@ class MerchantController extends Controller
         ];
     }
     
-    // Merchant-Agents (web.php)
-    public function showMerchantAllAgents()
+    // My-Agents (web.php)
+    public function showMyAllAgents()
     {
         $currentMerchant = \Auth::user();
 
@@ -247,8 +257,8 @@ class MerchantController extends Controller
         })->get()->unique('name');
     }
 
-    // Requisition
-    public function showMerchantAllRequisitions($perPage = false)
+    // My-Requisition (web.php)
+    public function showMyAllRequisitions($perPage = false)
     {
         $currentMerchant = \Auth::user();
             
@@ -273,12 +283,15 @@ class MerchantController extends Controller
         $request->validate([
             'subject' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
+            
             'products' => 'required|array|min:1',
             'products.*.id' => 'required|numeric|exists:products,id',
             'products.*.total_quantity' => 'required|numeric|min:1',
             'products.*.packaging_service' => 'boolean',
             // 'products.*.package' => 'required_if:products.*.packaging_service,true',
             'products.*.product' => 'required',
+            'products.*.product.has_serials' => 'required|boolean',
+            'products.*.product.has_variations' => 'required|boolean',
 
             'products.*.serials' => 'exclude_if:products.*.product.has_variations,true|required_if:products.*.product.has_serials,true|array',
             'products.*.serials.*' => [
@@ -347,10 +360,10 @@ class MerchantController extends Controller
 
         BroadcastNewRequisition::dispatch($newRequisition);
 
-        return $this->showMerchantAllRequisitions($perPage);
+        return $this->showMyAllRequisitions($perPage);
     }
 
-    public function searchMerchantAllRequisitions($search, $perPage)
+    public function searchMyAllRequisitions($search, $perPage)
     {
         $currentMerchant = \Auth::user();
 
@@ -402,7 +415,320 @@ class MerchantController extends Controller
 
         BroadcastProductReceiveConfirmation::dispatch($dispatchedRequisition);
 
-        return $this->showMerchantAllRequisitions($perPage);
+        return $this->showMyAllRequisitions($perPage);
+    }
+
+    // Merchant-Products of specific merchant 
+    public function showMerchantAllProducts($merchant, $perPage=false)
+    {
+        $expectedMerchant = Merchant::findOrFail($merchant);
+        
+        if ($perPage) {
+            
+            return [
+
+                'retail' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)
+                                                        ->whereHas('product', function ($query) {
+                                                            $query->where('product_category_id', '>', 0);
+                                                        })
+                                                        ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->paginate($perPage)),
+                
+                'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)
+                                                        ->whereHas('product', function ($query) {
+                                                            $query->whereNull('product_category_id')
+                                                                ->orWhere('product_category_id', 0);
+                                                        })
+                                                        ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                       ->paginate($perPage)),
+            ];
+
+        }
+       
+        return MerchantProductResource::collection(
+            MerchantProduct::where('merchant_id', $expectedMerchant->id)->whereHas('latestStock', function ($query) {
+                $query->where('available_quantity', '>', 0);
+            })
+            ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+            ->get()
+        );
+
+    }
+
+    public function storeMerchantNewProduct(Request $request, $perPage)
+    {
+        $product = Product::findOrFail($request->product_id);
+
+        $request->validate([
+            // 'product' => 'required',
+            // 'product.id' => 'required|numeric|exists:products,id',
+            // 'merchant' => 'required',
+            // 'merchant.id' => 'required|numeric|exists:merchants,id',
+            'product_id' => [
+                'required', 'numeric', 'exists:products,id', 
+                Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
+                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
+                }),
+            ],
+            'merchant_id' => [
+                'required', 'numeric', 'exists:merchants,id', 
+                Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('manufacturer_id', $request->manufacturer_id);
+                }),
+            ],
+            'sku' => [
+                'required', 'string', 
+                Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
+                }),
+            ],
+            'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
+            // 'selling_price' => 'required|numeric',
+            'selling_price' => [ 'nullable', 'numeric', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->product_category_id != NULL;
+                }),
+            ],
+            'discount' => 'nullable|numeric|between:0,100',
+            'description' => 'nullable|string|max:255',
+            'warning_quantity' => 'nullable|numeric',
+            'variations' => [
+                'array', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
+                })
+            ],
+            'variations.*.variation' => 'required_with:variations',
+            'variations.*.variation.id' => [
+                'required_with:variations', 
+                Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
+            ],
+            'variations.*.selling_price' => 'required_with:variations|numeric',
+            'variations.*.sku' => 'string',
+        ],
+        [
+            'product_id.required' => 'Product is required',
+            'product_id.unique' => 'Product already exists',
+            'product_id.*' => 'Product is invalid',
+
+            'merchant_id.required' => 'Merchant is required',
+            'merchant_id.unique' => 'Merchant already exists',
+            'merchant_id.*' => 'Merchant is invalid', 
+
+            'sku.required' => 'SKU is required',
+            'sku.unique' => 'SKU already exists',
+            'sku.*' => 'SKU is invalid', 
+
+            'manufacturer_id' => 'Manufacturer is invalid', 
+            'selling_price' => 'Product selling price is required',
+            'warning_quantity' => 'Warning quantity should be numeric',
+            'variations.*.variation' => 'Variation name is required',
+            'variations.*.variation.id.*' => 'Invalid variations, please reload',
+            'variations.*.selling_price' => 'Variation selling price is required',
+            'variations.*.sku' => 'Invalid variation SKU',
+        ]);
+
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+
+        if (empty($currentUser)) {
+
+            return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
+            
+        }
+
+        $productNewMerchant = MerchantProduct::create([
+
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, $request->manufacturer_id), 
+            // 'merchant_product_preview' => $request->preview, 
+            'description' => strtolower($request->description), 
+            'manufacturer_id' => $request->manufacturer_id, 
+            'warning_quantity' => $request->warning_quantity ?? 0,
+            'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
+            'discount' => $product->product_category_id ? $request->discount : NULL,
+            'product_id' => $request->product_id,
+            'merchant_id' => $request->merchant_id,
+            'created_at' => now()
+
+        ]);
+
+        $productNewMerchant->merchant_product_preview = $request->preview;
+        $productNewMerchant->save();
+
+        if ($product->has_variations) {
+            
+            $productNewMerchant->merchant_product_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        return $this->showMerchantAllProducts($request->merchant_id, $perPage);
+    }
+
+    public function updateMerchantProduct(Request $request, $productMerchant, $perPage)
+    {
+        $product = Product::findOrFail($request->product_id);
+
+        $request->validate([
+            // 'product' => 'required',
+            // 'product.id' => 'required|numeric|exists:products,id',
+            // 'merchant' => 'required',
+            // 'merchant.id' => 'required|numeric|exists:merchants,id',
+            'product_id' => [
+                'required', 'numeric', 'exists:products,id', 
+                Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
+                    return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
+                })->ignore($productMerchant),
+            ],
+            'merchant_id' => [
+                'required', 'numeric', 'exists:merchants,id', 
+                Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('manufacturer_id', $request->manufacturer_id);
+                })->ignore($productMerchant),
+            ],
+            'sku' => [
+                'required', 'string', 
+                Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
+                })->ignore($productMerchant),
+            ], 
+            'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
+            // 'selling_price' => 'required|numeric',
+            'selling_price' => [ 'nullable', 'numeric', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->product_category_id != NULL;
+                }),
+            ],
+            'discount' => 'nullable|numeric|between:0,100',
+            'description' => 'nullable|string|max:255',
+            'warning_quantity' => 'nullable|numeric',
+            'variations' => [
+                'array', 
+                Rule::requiredIf(function () use ($product) {
+                    return $product->has_variations;
+                })
+            ],
+            'variations.*.variation.id' => 'required_without:variations.*.product_variation_id',
+            'variations.*.product_variation_id' => [
+                'required_without:variations.*.variation.id',
+                Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
+            ],
+            'variations.*.selling_price' => 'required_with:variations|numeric',
+            'variations.*.sku' => 'string',
+        ],
+        [
+            'product_id.required' => 'Product is required',
+            'product_id.unique' => 'Product already exists',
+            'product_id.*' => 'Product is invalid',
+
+            'merchant_id.required' => 'Merchant is required',
+            'merchant_id.unique' => 'Merchant already exists',
+            'merchant_id.*' => 'Merchant is invalid', 
+
+            'sku.required' => 'SKU is required',
+            'sku.unique' => 'SKU already exists',
+            'sku.*' => 'SKU is invalid', 
+
+            'manufacturer_id' => 'Manufacturer is invalid', 
+            'selling_price' => 'Product selling price is required',
+            'warning_quantity' => 'Warning quantity should be numeric',
+            'variations.*.variation' => 'Variation name is required',
+            'variations.*.variation.id.*' => 'Invalid variations, please reload',
+            'variations.*.selling_price' => 'Variation selling price is required',
+            'variations.*.sku' => 'Invalid variation SKU',
+        ]);
+
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+
+        if (empty($currentUser)) {
+
+            return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
+            
+        }
+
+        $productMerchantToUpdate = MerchantProduct::findOrFail($productMerchant);
+
+        $productMerchantToUpdate->update([
+
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, $request->manufacturer_id), 
+            'manufacturer_id' => $request->manufacturer_id, 
+            // 'merchant_product_preview' => $request->preview, 
+            'description' => strtolower($request->description), 
+            'warning_quantity' => $request->warning_quantity ?? 0,
+            'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
+            'discount' => $product->product_category_id ? $request->discount : NULL,
+            'product_id' => $request->product_id,
+            'merchant_id' => $request->merchant_id,
+            'created_at' => now()
+
+        ]);
+
+        $productMerchantToUpdate->merchant_product_preview = $request->preview;
+        $productMerchantToUpdate->save();
+
+        if ($product->has_variations) {
+            
+            $productMerchantToUpdate->merchant_product_variations = json_decode(json_encode($request->variations));
+
+        }
+
+        return $this->showMerchantAllProducts($request->merchant_id, $perPage);
+    }
+
+    public function deleteMerchantProduct($productMerchant, $perPage)
+    {
+        $merchantProductToDelete = MerchantProduct::findOrFail($productMerchant);
+        $merchant = $merchantProductToDelete->merchant_id;
+
+        // if any related stock / requisition exists
+        if ($merchantProductToDelete->product_immutability) {
+            
+           return response()->json(['errors'=>["undeletableMerchant" => "Merchant has stock or requisition"]], 422); 
+
+        }
+            
+        // $merchantProductToDelete->stocks()->delete();
+        // $merchantProductToDelete->requests()->delete();
+        // $merchantProductToDelete->deleteOldAddresses();
+        
+        File::delete($merchantProductToDelete->preview);
+
+        foreach ($merchantProductToDelete->variations as $merchantProductVariationKey => $merchantProductVariationToDelete) {
+            
+            File::delete($merchantProductVariationToDelete->preview);
+            
+        }
+
+        $merchantProductToDelete->variations()->delete();
+        $merchantProductToDelete->delete();
+
+        return $this->showMerchantAllProducts($merchant, $perPage);
+    }
+
+    public function searchMerchantAllProducts($merchant, $search, $perPage)
+    {
+        $expectedMerchant = Merchant::findOrFail($merchant);
+
+        $query = MerchantProduct::where('merchant_id', $expectedMerchant->id)
+                ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                ->where(function ($query1) use ($search) {
+                    $query1->where('sku', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhere('warning_quantity', 'like', "%$search%")
+                    ->orWhere('selling_price', 'like', "%$search%")
+                    ->orWhereHas('manufacturer', function ($query2) use ($search) {
+                        $query2->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('product', function ($query3) use ($search) {
+                        $query3->where('name', 'like', "%$search%")
+                            ->orWhere('quantity_type', 'like', "%$search%")
+                            ->orWhereHas('category', function ($q) use ($search) {
+                                $q->where('name', 'like', "%$search%");
+                            });
+                    });
+                });
+
+        return [
+            'all' => new MerchantProductCollection($query->paginate($perPage)),  
+        ];
     }
 
     protected function validateProductSerials($products = [])

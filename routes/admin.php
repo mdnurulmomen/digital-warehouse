@@ -142,7 +142,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-category-products/{category}/{search}/{perPage?}', 'ProductController@searchCategoryAllProducts')->name('search-category-products');
 
 		// product
-		Route::get('/api/products/{perPage}', 'ProductController@showAllProducts')->name('products');
+		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');
 		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
@@ -196,6 +196,13 @@ Route::name('admin.')->group(function () {
 		Route::put('/product-merchants/{productMerchant}/{perPage}', 'ProductController@updateProductMerchant')->name('product-merchants');
 		Route::delete('/product-merchants/{productMerchant}/{perPage}', 'ProductController@deleteProductMerchant')->name('product-merchants');
 		Route::get('/api/search-product-merchants/{product}/{search}/{perPage}', 'ProductController@searchProductAllMerchants')->name('search-product-merchants');
+
+		// merchant-products
+		Route::get('/api/merchant-products/{merchant}/{perPage}', 'MerchantController@showMerchantAllProducts')->name('merchant-products');
+		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products');	
+		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products');
+		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products');
+		Route::get('/api/search-merchant-products/{merchant}/{search}/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('search-merchant-products');
 
 		// merchant-deals
 		Route::get('/api/merchant-deals/{merchant}/{perPage?}','DealController@showMerchantAllDeals')->name('merchant-deals');

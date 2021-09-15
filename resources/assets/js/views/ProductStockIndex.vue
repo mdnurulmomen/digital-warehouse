@@ -251,228 +251,259 @@
 									<h2 class="mx-auto mb-4 lead">Product Profile</h2>
 
 									<div class="col-md-12">
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Product Category :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ product.category ? product.category.name : 'bulk product' | capitalize }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Merchant :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ productMerchant.merchant ? productMerchant.merchant.user_name : 'None' | capitalize }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Name :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ product.name | capitalize }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Manufacturer :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ productMerchant.manufacturer_name ? productMerchant.manufacturer_name : 'Own Product' | capitalize }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												SKU Code :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ productMerchant.sku }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Price :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ productMerchant.selling_price || 'NA' }}
-											</label>
-										</div>
-
-										<!-- 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Description :
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												<span v-html="product.description"></span>
-											</label>
-										</div>
- 										-->
-
- 										<div class="form-row form-group">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Select Warehouse :
-											</label>
-											<div class="col-sm-6">
-												<multiselect 
-			                              			v-model="singleStockData.warehouse"
-			                                  		:options="allDealtEmptyWarehouses" 
-			                                  		:custom-label="objectNameWithCapitalized" 
-			                                  		:required="true" 
-			                                  		:allow-empty="false" 
-			                                  		label="name" 
-			                                  		track-by="id" 
-			                              			placeholder="Select Warehouse" 
-			                              			class="form-control p-0" 
-			                                  		:class="!errors.stock.warehouse  ? 'is-valid' : 'is-invalid'"  
-			                                  		@close="validateFormInput('warehouse')" 
-			                                  		@input="singleStockData.addresses = [ {} ]" 
-			                              		>
-			                                	</multiselect>
-			                                	<div class="invalid-feedback">
-											    	{{ errors.stock.warehouse }}
-											    </div>
-											</div>
-										</div>
-
- 										<div class="form-row form-group">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Stock Qty :
-											</label>
-											<div class="col-sm-6">
-												<div class="input-group mb-0">
-													<input type="number" 
-														class="form-control" 
-														v-model.number="singleStockData.stock_quantity" 
-														placeholder="Product initial qty" 
-														:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
-														@change="validateFormInput('product_stock_quantity')" 
-														required="true" 
-														:readonly="! createMode && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
-														:min="createMode ? 1 : singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity"
-													>
-													<div class="input-group-append">
-														<span class="input-group-text">
-															{{ product.quantity_type }}
-														</span>
-													</div>
-												</div>
-												<div class="invalid-feedback" 
-													style="display: block;" 
-													v-show="errors.stock.product_stock_quantity"
+										<div class="row">
+											<div class="col-md-4 align-self-center text-center">
+												<img 
+													:src="'/' + productMerchant.preview" 
+													class="img-fluid" 
+													alt="Product Preview" 
+													width="150px"
 												>
-										        	{{ errors.stock.product_stock_quantity }}
-										  		</div>
 											</div>
-										</div>
 
-									<!-- 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Available Qty:
-											</label>
-											<label class="col-sm-6 col-form-label text-left">
-												{{ product.available_quantity }}
-												{{ product.quantity_type }}
-											</label>
-										</div>
- 									-->
+											<div class="col-md-8">
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Product Category :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ product.category ? product.category.name : 'bulk product' | capitalize }}
+													</label>
+												</div>
 
-										<div class="form-row mt-2">
-											<div class="form-group col-md-12 text-center">
-												<toggle-button 
-													v-model="productMerchant.has_variations" 
-													:width=150 
-													:sync="true"
-													:color="{checked: 'green', unchecked: 'blue'}"
-													:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
-													:disabled="true" 
-												/>
-											</div>
-										</div>
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Name :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ product.name | capitalize }}
+													</label>
+												</div>
 
-										<div class="form-row" v-if="productMerchant.has_variations">
-											<div 
-												class="form-group col-md-12" 
-												v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length"
-											>
-												<div 
-													class="form-row" 
-													v-for="(stockVariation, variationIndex) in singleStockData.variations" 
-													:key="'product-variation-index-' + variationIndex + 'A'"
-												>	
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Variaiton</label>
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Merchant :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ productMerchant.merchant ? productMerchant.merchant.user_name : 'None' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Manufacturer :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ productMerchant.manufacturer_name ? productMerchant.manufacturer_name : 'Own Product' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														SKU Code :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ productMerchant.sku }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Warning Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ productMerchant.warning_quantity }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Available Quantity :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ productMerchant.available_quantity }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Price :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ productMerchant.selling_price || 'NA' }}
+													</label>
+												</div>
+
+												<!-- 
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Description :
+													</label>
+													<label class="col-sm-8 col-form-label">
+														<span v-html="product.description"></span>
+													</label>
+												</div>
+		 										-->
+
+		 										<div class="form-row form-group">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Select Warehouse :
+													</label>
+													<div class="col-sm-8">
 														<multiselect 
-					                              			v-model="singleStockData.variations[variationIndex].variation"
-					                              			placeholder="Select Variation" 
+					                              			v-model="singleStockData.warehouse"
+					                                  		:options="allDealtEmptyWarehouses" 
+					                                  		:custom-label="objectNameWithCapitalized" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false" 
 					                                  		label="name" 
 					                                  		track-by="id" 
-					                                  		class="form-control p-0 is-valid" 
-					                                  		:custom-label="objectNameWithCapitalized" 
-					                                  		:options="[]" 
-					                                  		:disabled="true"
+					                              			placeholder="Select Warehouse" 
+					                              			class="form-control p-0" 
+					                                  		:class="!errors.stock.warehouse  ? 'is-valid' : 'is-invalid'"  
+					                                  		@close="validateFormInput('warehouse')" 
+					                                  		@input="singleStockData.addresses = [ {} ]" 
 					                              		>
 					                                	</multiselect>
+					                                	<div class="invalid-feedback">
+													    	{{ errors.stock.warehouse }}
+													    </div>
 													</div>
+												</div>
 
-													<div 
-														class="form-group col-md-6"
-													>
-														<label for="inputFirstName">Variation Qty</label>
-														
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singleStockData.variations[variationIndex].stock_quantity" 
-															placeholder="Variation Qty" 
-															:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('product_variation_quantity')" 
-															required="true" 
-															:readonly="! createMode && allStocks.length && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
-															:min="createMode ? 1 : stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity"
+		 										<div class="form-row form-group">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Stock Qty :
+													</label>
+													<div class="col-sm-8">
+														<div class="input-group mb-0">
+															<input type="number" 
+																class="form-control" 
+																v-model.number="singleStockData.stock_quantity" 
+																placeholder="Product initial qty" 
+																:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
+																@change="validateFormInput('product_stock_quantity')" 
+																required="true" 
+																:readonly="! createMode && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
+																:min="createMode ? 1 : singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity"
+															>
+															<div class="input-group-append">
+																<span class="input-group-text">
+																	{{ product.quantity_type }}
+																</span>
+															</div>
+														</div>
+														<div class="invalid-feedback" 
+															style="display: block;" 
+															v-show="errors.stock.product_stock_quantity"
 														>
-
-														<div class="invalid-feedback">
-												        	{{ errors.stock.variations[variationIndex].product_variation_quantity }}
+												        	{{ errors.stock.product_stock_quantity }}
 												  		</div>
 													</div>
-													
-													<!-- 
-													<div class="form-group col-md-3">
-														<label for="inputFirstName">Price</label>
-														<label class="col-form-label text-left">
-															{{ productVariation.selling_price }}
-														</label>
-													</div>
-
-													<div class="form-group col-md-3">
-														<label for="inputFirstName">SKU</label>
-														<label class="col-form-label text-left">
-															{{ productVariation.sku }}
-														</label>
-													</div>
- 													-->
 												</div>
-											</div>
+
+											<!-- 
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Available Qty:
+													</label>
+													<label class="col-sm-8 col-form-label">
+														{{ product.available_quantity }}
+														{{ product.quantity_type }}
+													</label>
+												</div>
+		 									-->
+
+												<div class="form-row mt-3">
+													<div class="form-group col-md-12 text-center">
+														<toggle-button 
+															v-model="productMerchant.has_variations" 
+															:width=150 
+															:sync="true"
+															:color="{checked: 'green', unchecked: 'blue'}"
+															:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
+															:disabled="true" 
+														/>
+													</div>
+												</div>
+
+												<div class="form-row" v-if="productMerchant.has_variations">
+													<div 
+														class="form-group col-md-12" 
+														v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length"
+													>
+														<div 
+															class="form-row" 
+															v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+															:key="'product-variation-index-' + variationIndex + 'A'"
+														>	
+															<div class="form-group col-md-6">
+																<label for="inputFirstName">Variaiton</label>
+																<multiselect 
+							                              			v-model="singleStockData.variations[variationIndex].variation"
+							                              			placeholder="Select Variation" 
+							                                  		label="name" 
+							                                  		track-by="id" 
+							                                  		class="form-control p-0 is-valid" 
+							                                  		:custom-label="objectNameWithCapitalized" 
+							                                  		:options="[]" 
+							                                  		:disabled="true"
+							                              		>
+							                                	</multiselect>
+															</div>
+
+															<div 
+																class="form-group col-md-6"
+															>
+																<label for="inputFirstName">Variation Qty</label>
+																
+																<input type="number" 
+																	class="form-control" 
+																	v-model.number="singleStockData.variations[variationIndex].stock_quantity" 
+																	placeholder="Variation Qty" 
+																	:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+																	@change="validateFormInput('product_variation_quantity')" 
+																	required="true" 
+																	:readonly="! createMode && allStocks.length && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
+																	:min="createMode ? 1 : stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity"
+																>
+
+																<div class="invalid-feedback">
+														        	{{ errors.stock.variations[variationIndex].product_variation_quantity }}
+														  		</div>
+															</div>
+															
+															<!-- 
+															<div class="form-group col-md-3">
+																<label for="inputFirstName">Price</label>
+																<label class="col-form-label">
+																	{{ productVariation.selling_price }}
+																</label>
+															</div>
+
+															<div class="form-group col-md-3">
+																<label for="inputFirstName">SKU</label>
+																<label class="col-form-label">
+																	{{ productVariation.sku }}
+																</label>
+															</div>
+		 													-->
+														</div>
+													</div>
+												</div>
+										    	 
+										    	<div class="form-row">
+											    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
+										          		<div class="text-danger small mb-1" v-show="!submitForm">
+													  		Please input required fields
+											          	</div>
+											          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+									                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+									                  	</button>
+										          	</div>
+										    	</div>
+											</div>	
 										</div>
-								    	 
-								    	<div class="form-row">
-									    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
-											  		Please input required fields
-									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
-							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-							                  	</button>
-								          	</div>
-								    	</div>
 									</div>
 							    </div>
 
@@ -925,65 +956,65 @@
 									<!-- 
 									<div class="tab-pane active" id="product-profile" role="tabpanel">
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Type :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												{{ product.category ? product.category.name : 'Bulk Product' }}
 											</label>
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Merchant :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												{{ product.merchant ? product.merchant.user_name : 'None' }}
 											</label>
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Name :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												{{ product.name }}
 											</label>
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												SKU Code :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												{{ product.sku }}
 											</label>
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Price :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												{{ product.price || 'NA' }}
 											</label>
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Description :
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												<span v-html="product.description"></span>
 											</label>
 										</div>
 
 										
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Available Qty:
 											</label>
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-8 col-form-label">
 												{{ product.available_quantity }}
 												{{ product.quantity_type }}
 											</label>
@@ -991,14 +1022,14 @@
  										
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">Has Variation :</label>
 											<label class="col-sm-6 form-control-plaintext">
 												<span :class="[product.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ product.has_variations ? 'Available' : 'NA' }}</span>
 											</label>
 										</div>
 
 										<div class="form-row" v-if="product.has_variations && product.variations.length">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Variations :
 											</label>
 											<div class="col-sm-12">
@@ -1013,34 +1044,34 @@
 															<div class="card-body">
 																
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold text-right">
 																		Name :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 																		{{ productVariation.variation ? productVariation.variation.name : 'NA' }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-4 col-form-label font-weight-bold text-right">
 																		SKU :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-8 col-form-label">
 																		{{ productVariation.sku }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Price :</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-4 col-form-label font-weight-bold text-right">Price :</label>
+																	<label class="col-sm-8 col-form-label">
 																		{{ productVariation.price }}
 																	</label>
 																</div>
 
 																
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-4 col-form-label font-weight-bold text-right">Available Qty :</label>
+																	<label class="col-sm-8 col-form-label">
 																		{{ productVariation.available_quantity }}
 																	</label>
 																</div>
@@ -1060,7 +1091,7 @@
 												Product Name :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ product.name | capitalize }}
 											</label>
 										</div>
@@ -1070,7 +1101,7 @@
 												Stock Quantity :
 											</label>
 
-											<div class="col-sm-6 col-form-label text-left">
+											<div class="col-sm-6 col-form-label">
 												
 												{{ singleStockData.stock_quantity }}
 												
@@ -1082,10 +1113,10 @@
 													>
 														<div class="form-row">
 															<label class="col-form-label font-weight-bold text-right">
-																{{ stockVariation.variation.name | capitalize }} :
+																-{{ stockVariation.variation.name | capitalize }} :
 															</label>
 
-															<label class="col-form-label text-left">
+															<label class="col-form-label">
 																{{ stockVariation.stock_quantity }}
 															</label>
 														</div>
@@ -1095,7 +1126,7 @@
 															<label class="col-form-label font-weight-bold text-right">
 																Available Quantity :
 															</label>
-															<label class="col-form-label text-left">
+															<label class="col-form-label">
 																{{ stockVariation.available_quantity }}
 															</label>
 														</div>
@@ -1110,7 +1141,7 @@
 												Available Quantity (then) :
 											</label>
 											
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.available_quantity }}
 											</label>
 										</div>
@@ -1120,7 +1151,7 @@
 												Stocked on :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.created_at }}
 											</label>
 										</div>
@@ -1130,7 +1161,7 @@
 												Stocked at :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.hasOwnProperty('warehouse') ? singleStockData.warehouse.name : '' }}
 											</label>
 										</div>
@@ -1140,7 +1171,7 @@
 												Stored By :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.keeper.user_name | capitalize }}
 											</label>
 										</div>
@@ -1150,7 +1181,7 @@
 												Approval :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												<span :class="[singleStockData.has_approval==1 ? 'badge-success' : singleStockData.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
 													{{ singleStockData.has_approval==1 ? 'Approved' : singleStockData.has_approval==-1 ? 'Cancelled' : 'NA' }}
 												</span>
@@ -1162,7 +1193,7 @@
 												{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.approver.user_name | capitalize }}
 											</label>
 										</div>
@@ -1172,7 +1203,7 @@
 												{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
 											</label>
 
-											<label class="col-sm-6 col-form-label text-left">
+											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.updated_at }}
 											</label>
 										</div>
@@ -1183,7 +1214,7 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Serials :
 											</label>
-											<div class="col-sm-6 col-form-label text-left">
+											<div class="col-sm-6 col-form-label">
 												<ol 
 													v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
 												>
@@ -1204,7 +1235,7 @@
 																{{ stockVariation.variation.name | capitalize }} |
 															</label>
 
-															<label class="col-form-label text-left">
+															<label class="col-form-label">
 																{{ stockVariation.stock_quantity }}
 																<ol 
 																	v-if="singleStockData.has_serials && stockVariation.serials.length"
@@ -1222,7 +1253,7 @@
 															<label class="col-form-label font-weight-bold text-right">
 																Available Quantity :
 															</label>
-															<label class="col-form-label text-left">
+															<label class="col-form-label">
 																{{ stockVariation.available_quantity }}
 															</label>
 														</div>
@@ -1238,7 +1269,7 @@
 											class="form-row" 
 											v-if="singleStockData.hasOwnProperty('addresses') && singleStockData.addresses.length"
 										>
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-right">
 												Address Detail :
 											</label>
 											<div class="col-sm-12">
@@ -1263,7 +1294,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Warehouse :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
 																	</label>
 																</div>
@@ -1272,7 +1303,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.container.name) : 'NA' }}
 																	</label>
 																</div>
@@ -1281,7 +1312,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ containerAddress.name.substring(containerAddress.name.indexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1301,7 +1332,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
@@ -1310,7 +1341,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1321,7 +1352,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Shelf # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 
 																		<ul id="shelf-addresses">
 																			<li 
@@ -1352,7 +1383,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
@@ -1361,7 +1392,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Container # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1370,7 +1401,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Shelf # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 																		{{ stockAddress.container.shelf.name.substring(stockAddress.container.shelf.name.lastIndexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1379,7 +1410,7 @@
 																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																		Unit # :
 																	</label>
-																	<label class="col-sm-6 col-form-label text-left">
+																	<label class="col-sm-6 col-form-label">
 
 																		<ul id="unit-addresses">
 																			<li 
