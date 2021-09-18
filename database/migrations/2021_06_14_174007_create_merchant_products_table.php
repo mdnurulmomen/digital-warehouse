@@ -20,7 +20,7 @@ class CreateMerchantProductsTable extends Migration
             $table->unsignedMediumInteger('manufacturer_id')->nullable();
             $table->string('description')->nullable(); // short description about what has been stored (may be hints for identification / bulk products)
             $table->unsignedSmallInteger('warning_quantity')->default(100);
-            $table->unsignedDecimal('discount', $precision = 5, $scale = 2)->default(0.0);
+            $table->unsignedDecimal('discount', $precision = 5, $scale = 2)->nullable()->default(0.0);
             $table->unsignedDecimal('selling_price', $precision = 8, $scale = 2)->nullable();
             $table->unsignedInteger('product_id'); // which product is this
             $table->unsignedInteger('merchant_id'); // who's product is this
