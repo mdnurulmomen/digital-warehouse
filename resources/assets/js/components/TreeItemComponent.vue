@@ -3,11 +3,11 @@
 
 	<li>
 		<div
-			:class="{'font-weight-bold': hasParent}"
+			:class="{'font-weight-bold': ! hasParent}"
 			@click="toggle"
 		>
 			{{ item.name | capitalize }}
-			<span v-if="hasParent">[{{ isOpen ? '-' : '+' }}]</span>
+			<span class="font-weight-bold" v-if="hasParent">[{{ isOpen ? '-' : '+' }}]</span>
 		</div>
 		<ul v-show="isOpen" v-if="hasParent">
 			<tree-item 

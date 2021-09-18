@@ -34,14 +34,14 @@ class AssetController extends Controller
             
             return response()->json([
 
-        		'current' => StorageType::paginate($perPage),
-        		'trashed' => StorageType::onlyTrashed()->paginate($perPage),
+        		'current' => StorageType::latest('id')->paginate($perPage),
+        		'trashed' => StorageType::latest('id')->onlyTrashed()->paginate($perPage),
 
         	], 200);
 
         }
 
-        return StorageType::all();
+        return StorageType::latest('id')->get();
     }
 
     public function storeNewStorageType(Request $request, $perPage)
@@ -117,8 +117,8 @@ class AssetController extends Controller
         if ($perPage) {
             return response()->json([
 
-                'current' => Container::with(['shelf.unit'])->paginate($perPage),
-                'trashed' => Container::with(['shelf.unit'])->onlyTrashed()->paginate($perPage),
+                'current' => Container::with(['shelf.unit'])->latest('id')->paginate($perPage),
+                'trashed' => Container::with(['shelf.unit'])->onlyTrashed()->latest('id')->paginate($perPage),
 
             ], 200);
         }
@@ -285,14 +285,14 @@ class AssetController extends Controller
             
             return response()->json([
 
-                'current' => RentPeriod::paginate($perPage),
-                'trashed' => RentPeriod::onlyTrashed()->paginate($perPage),
+                'current' => RentPeriod::latest('id')->paginate($perPage),
+                'trashed' => RentPeriod::latest('id')->onlyTrashed()->paginate($perPage),
 
             ], 200);
 
         }
 
-        return RentPeriod::all();
+        return RentPeriod::latest('id')->get();
     }
 
     public function storeNewRentPeriod(Request $request, $perPage)
@@ -370,8 +370,8 @@ class AssetController extends Controller
             
             return response()->json([
 
-                'current' => VariationType::paginate($perPage),
-                'trashed' => VariationType::onlyTrashed()->paginate($perPage),
+                'current' => VariationType::latest('id')->paginate($perPage),
+                'trashed' => VariationType::onlyTrashed()->latest('id')->paginate($perPage),
 
             ], 200);
 
@@ -382,10 +382,8 @@ class AssetController extends Controller
                 'variations' => function ($query) {
                     $query->whereNull('variation_parent_id');
                 }, 
-            ])->get()
+            ])->latest('id')->get()
         );
-        
-        // return VariationType::with('variations')->get();
     }
 
     public function storeVariationType(Request $request, $perPage)
@@ -463,14 +461,15 @@ class AssetController extends Controller
             
             return response()->json([
 
-                'current' => new VariationCollection(Variation::with(['type.variations', 'parent'])->paginate($perPage)),
-                'trashed' => new VariationCollection(Variation::with(['type.variations', 'parent'])->onlyTrashed()->paginate($perPage)),
+                'current' => new VariationCollection(Variation::with([ 'type', 'parent' ])->latest('id')->paginate($perPage)),
+
+                'trashed' => new VariationCollection(Variation::with([ 'type', 'parent' ])->onlyTrashed()->latest('id')->paginate($perPage)),
 
             ], 200);
 
         }
 
-        return Variation::all();
+        return Variation::latest('id')->get();
     }
 
     public function storeNewVariation(Request $request, $perPage)
@@ -579,7 +578,7 @@ class AssetController extends Controller
 
         }
 
-        return PackagingPackage::all();
+        return PackagingPackage::latest('id')->get();
     }
 
     public function storeNewPackagingPackage(Request $request, $perPage)
