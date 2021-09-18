@@ -74,7 +74,7 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeContentsOrder('variation')"
+																			@click="changeContentsOrder('name')"
 																		> 
 																			Variation
 																			<span v-show="currentSorting==='variation' && ascending">
@@ -90,42 +90,10 @@
 																	</th>
 
 																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeContentsOrder('type')"
-																		> 
-																			Type
-																			<span v-show="currentSorting==='type' && ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting==='type' && descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting!=='type'">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
+																		Type
 																	</th>
 
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeContentsOrder('parent')"
-																		> 
-																			Parent
-																			<span v-show="currentSorting==='parent' && ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting==='parent' && descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting!=='parent'">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>Ancestors Path</th>
+																	<th>Parents</th>
 
 																	<th>Actions</th>
 																</tr>
@@ -141,16 +109,13 @@
 																	<td>
 																		{{ content.type ? content.type.name : 'NA' }}
 																	</td>
-
-																	<td>
-																		{{ content.parent ? content.parent.name : 'NA' }}
-																	</td>
 																		
 																	<td>
 																		<ul>
 																			<tree-item
+																				v-if="content.parent"
 																				class=""
-																				:item="content"
+																				:item="content.parent"
 																			></tree-item>
 																		</ul>
 																	</td>
@@ -201,7 +166,7 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeContentsOrder('variation')"
+																			@click="changeContentsOrder('name')"
 																		> 
 																			Variation
 																			<span v-show="currentSorting==='variation' && ascending">
@@ -217,42 +182,10 @@
 																	</th>
 
 																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeContentsOrder('type')"
-																		> 
-																			Type
-																			<span v-show="currentSorting==='type' && ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting==='type' && descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting!=='type'">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
+																		Type
 																	</th>
 
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeContentsOrder('parent')"
-																		> 
-																			Parent
-																			<span v-show="currentSorting==='parent' && ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting==='parent' && descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="currentSorting!=='parent'">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>Ancestors Path</th>
+																	<th>Parents</th>
 
 																	<th>Actions</th>
 																</tr>
@@ -391,20 +324,33 @@
 							<div class="form-row" v-if="singleAssetData.type && singleAssetData.type.hasOwnProperty('variations') && singleAssetData.type.variations.length">
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Parent Variation</label>
-									<multiselect 
-                              			v-model="singleAssetData.parent"
-                              			placeholder="Parent Variation" 
-                                  		label="name" 
-                                  		track-by="id" 
-                                  		:options="singleAssetData.type.variations" 
-                                  		:custom-label="objectNameWithCapitalized" 
-                                  		:required="true" 
-                                  		class="form-control p-0 is-valid" 
-                                  		selectLabel = "Press/Click"
-                                  		deselect-label="Press/Click to remove" 
-                                  		@change="validateFormInput('variation_parent_id')" 
-                              		>
-                                	</multiselect>
+									
+									<!-- 
+										<multiselect 
+	                              			v-model="singleAssetData.parent"
+	                              			placeholder="Parent Variation" 
+	                                  		label="name" 
+	                                  		track-by="id" 
+	                                  		:options="singleAssetData.type.variations" 
+	                                  		:custom-label="objectNameWithCapitalized" 
+	                                  		class="form-control p-0 is-valid" 
+	                                  		selectLabel = "Press/Click"
+	                                  		deselect-label="Press/Click to remove" 
+	                                  		@change="validateFormInput('variation_parent_id')" 
+	                              		>
+	                                	</multiselect> 
+	                                -->
+
+                                	<treeselect
+                                		v-model="singleAssetData.parent" 
+										:options="singleAssetData.type.variations"
+										:show-count="true" 
+										:normalizer="treeSelectCustomFunction" 
+										:valueFormat="'object'"
+										@select="validateFormInput('variation_parent_id')" 
+										class="form-control p-0 is-valid" 
+										placeholder="Variation Parent"
+									/>
 
                                 	<div 
 										class="invalid-feedback" 
@@ -520,13 +466,16 @@
 
 	import axios from 'axios';
 	import Multiselect from 'vue-multiselect';
+	import Treeselect from '@riophae/vue-treeselect'
+	// import the styles
+  	import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
     let singleAssetData = {
     	type : {},
     };
 
     // demo data
-    let variationData = {
+    /*let variationData = {
     	name: "Rip Mango",
     	parent: {
     		name: "Mango",
@@ -540,11 +489,12 @@
     		
     	}
     	
-    };
+    };*/
 
 	export default {
 
 	    components: { 
+	    	Treeselect,
 			multiselect : Multiselect,
 		},
 
@@ -573,7 +523,7 @@
 		        	current_page: 1
 		      	},
 
-		      	variationData : variationData,
+		      	// variationData : variationData,
 	        	singleAssetData : singleAssetData,
 
 	        	errors : {
@@ -770,6 +720,10 @@
 
 				this.singleAssetData = object;
 
+				this.singleAssetData.type.variations = this.allVariationTypes.find(
+					(variationType) => variationType.name == object.type.name && variationType.id == object.type.id
+				).variations;
+
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
@@ -915,6 +869,13 @@
 
 				return false;
 			},
+			treeSelectCustomFunction(node) {
+				return {
+					id: node.id,
+					label: node.name,
+					children: node.childs,
+				}
+			},
 			objectNameWithCapitalized ({ name }) {
 		      	if (name) {
 				    name = name.toString();
@@ -949,7 +910,7 @@
 						this.ascending = false;
 						this.descending = true;
 
-						this.contentsToShow.some(nameExists) ? this.descendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.descendingAlphabets('first_name') : this.descendingAlphabets('last_name');
+						this.descendingAlphabets('name');
 
 					}
 					else if (this.descending) {
@@ -957,7 +918,7 @@
 						this.ascending = true;
 						this.descending = false;
 
-						this.contentsToShow.some(nameExists) ? this.ascendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+						this.ascendingAlphabets('name');
 
 					}
 					else {
@@ -965,7 +926,7 @@
 						this.ascending = true;
 						this.descending = false;
 
-						this.contentsToShow.some(nameExists) ? this.ascendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+						this.ascendingAlphabets('name');
 
 					}
 

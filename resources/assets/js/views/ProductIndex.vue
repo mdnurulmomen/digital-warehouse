@@ -503,6 +503,8 @@
 														>
 															<div class="form-group col-md-12">
 																<label for="inputFirstName">Variation</label>
+																
+																<!-- 
 																<multiselect 
 							                              			v-model="productVariation.variation"
 							                              			placeholder="Select Variation" 
@@ -520,6 +522,23 @@
 							                                  		@close="validateFormInput('product_variation_id')" 
 							                              		>
 							                                	</multiselect>
+ 																-->
+
+ 																<treeselect
+							                                		v-model="productVariation.variation"
+																	:options="availableVariations" 
+																	:show-count="true" 
+																	:normalizer="treeSelectCustomFunction" 
+																	:valueFormat="'object'" 
+																	:required="true" 
+																	:disabled="productVariation.variation_immutability" 
+																	@select="validateFormInput('variation_parent_id')"
+																	@close="validateFormInput('product_variation_id')"  
+																	class="form-control p-0" 
+							                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
+																	placeholder="Select Variation" 
+																/>
+
 							                                	<div class="invalid-feedback">
 															    	{{ errors.product.variations[index].product_variation_id }}
 															    </div>
@@ -552,14 +571,14 @@
 															 -->
 
 															<div class="form-group col-md-12">
-													    		<div class="form-row text-center">
-																	<div class="col-md-6">
+													    		<div class="d-flex form-row text-center">
+																	<div class="col-md-8">
 																		<img class="img-fluid" 
 																			:src="productVariation.preview || ''"
 																			alt="Variation Picture" 
 																		>
 																	</div>
-																	<div class="col-md-6">
+																	<div class="col-md-4 align-self-center">
 																		<div class="custom-file">
 																		    <input type="file" 
 																		    	class="form-control custom-file-input" 
@@ -1115,6 +1134,9 @@
 
 	import axios from 'axios';
 	import Multiselect from 'vue-multiselect';
+	import Treeselect from '@riophae/vue-treeselect'
+	// import the styles
+  	import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
     let singleProductData = {
     	// name : null,
@@ -1144,6 +1166,7 @@
 	export default {
 
 	    components: { 
+	    	Treeselect,
 			multiselect : Multiselect,
 		},
 
@@ -1587,7 +1610,11 @@
 							}
 						);
 						
-						this.availableVariations = object.variation_type.variations ?? [];
+						// this.availableVariations = object.variation_type.variations ?? [];
+						
+						this.availableVariations = this.allVariationTypes.find(
+							(variationType) => variationType.id == object.variation_type.id && variationType.name == object.variation_type.name
+						).variations;
 					
 					}
 
@@ -1849,6 +1876,13 @@
 				return words.join(" ");
 
 		    },
+		    treeSelectCustomFunction(node) {
+				return {
+					id: node.id,
+					label: node.name,
+					children: node.childs,
+				}
+			},
 			setProductCategory() {
 				// console.log('category has been triggered');
 				if (this.singleProductData.category && Object.keys(this.singleProductData.category).length > 0) {

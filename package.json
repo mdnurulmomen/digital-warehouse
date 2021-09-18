@@ -28,6 +28,7 @@
     "dependencies": {
         "@ckeditor/ckeditor5-build-classic": "^23.0.0",
         "@ckeditor/ckeditor5-vue": "^1.0.3",
+        "@riophae/vue-treeselect": "^0.4.0",
         "chart.js": "^2.9.4",
         "vue-axios": "^2.1.5",
         "vue-chartjs": "^3.5.1",

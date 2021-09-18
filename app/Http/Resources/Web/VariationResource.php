@@ -21,7 +21,7 @@ class VariationResource extends JsonResource
             'deleted_at' => $this->deleted_at,
             // 'parent' => new VariationResource($this->parent ? $this->parent->loadMissing('parent') : NULL),
             'parent' => $this->when($this->whenLoaded('parent'), new VariationResource($this->parent ? $this->parent->loadMissing('parent') : NULL)),
-            'children' => $this->whenLoaded('nestedChilds'),
+            'childs' => $this->whenLoaded('nestedChilds'),
         ];
     }
 }
