@@ -12,6 +12,7 @@ use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductReturn;
 use App\Models\WarehouseOwner;
+use App\Models\MerchantProduct;
 use App\Models\ProductDelivery;
 
 class AnalyticsController extends Controller
@@ -35,15 +36,17 @@ class AnalyticsController extends Controller
         
     	$numberPendingDispatches = Dispatch::where('has_approval', 0)->count();
     	$numberPendingRequistiions = Requisition::where('status', 0)->count();
-    	$numberPendingProductStocks = ProductStock::where('has_approval', 0)->count();
+        $numberPendingProductStocks = ProductStock::whereHas('stock', function ($query) {
+            $query->where('has_approval', 0);
+        })->count();
 
-        $limitedStockProducts = Product::with(['merchant', 'latestStock'])
+        $limitedStockProducts = MerchantProduct::with(['merchant', 'latestStock'])
         ->doesntHave('stocks')
         ->orWhere(
             ProductStock::select('available_quantity')
-                ->whereColumn('product_stocks.product_id', 'products.id')
+                ->whereColumn('product_stocks.merchant_product_id', 'merchant_products.id')
                 ->latest()
-                ->take(1), '<', 50
+                ->take(1), '<=', 'merchant_products.warning_quantity'
         )
         ->get();
 
