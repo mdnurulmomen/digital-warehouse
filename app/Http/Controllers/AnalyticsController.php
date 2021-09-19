@@ -40,7 +40,7 @@ class AnalyticsController extends Controller
             $query->where('has_approval', 0);
         })->count();
 
-        $limitedStockProducts = MerchantProduct::with(['merchant', 'latestStock'])
+        $limitedStockProducts = MerchantProduct::with(['product', 'merchant', 'manufacturer', 'latestStock'])
         ->doesntHave('stocks')
         ->orWhere(
             ProductStock::select('available_quantity')

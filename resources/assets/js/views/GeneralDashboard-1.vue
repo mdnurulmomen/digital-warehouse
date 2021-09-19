@@ -204,21 +204,33 @@
                                             <table class="table table-hover m-b-0 text-center">
                                                 <thead>
                                                     <tr>
-                                                        <th>Name</th>
-                                                        <th>Product Code</th>
+                                                        <th>Product</th>
+                                                        <th>Code/SKU</th>
+                                                        <th>Manufacturer</th>
                                                         <th>Merchant</th>
                                                         <th>Status</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="product in dashboard.limitedStockProducts" :key="'product-' + product.id"
+                                                    <tr v-for="merchantProduct in dashboard.limitedStockProducts" :key="'merchant-product-' + merchantProduct.id"
                                                     >
-                                                        <td>{{ product.name | capitalize }}</td>
-                                                        <td>{{ product.sku }}</td>
-                                                        <td>{{ product.hasOwnProperty('merchant') ? product.merchant.user_name : 'NA' | capitalize }}</td>
                                                         <td>
-                                                            <span :class="[! product.latest_stock || product.latest_stock.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']">
-                                                                {{ ! product.latest_stock || product.latest_stock.available_quantity == 0 ? 'Stock Out' : product.latest_stock.available_quantity }}
+                                                            {{ merchantProduct.hasOwnProperty('product') ? merchantProduct.product.name : 'NA' | capitalize }}
+                                                        </td>
+
+                                                        <td>{{ merchantProduct.sku }}</td>
+
+                                                        <td>
+                                                            {{ merchantProduct.hasOwnProperty('manufacturer') && merchantProduct.manufacturer ? merchantProduct.manufacturer.name : 'Own Product' | capitalize }}
+                                                        </td>
+
+                                                        <td>
+                                                            {{ merchantProduct.hasOwnProperty('merchant') ? merchantProduct.merchant.user_name : 'NA' | capitalize }}
+                                                        </td>
+
+                                                        <td>
+                                                            <span :class="[! merchantProduct.latest_stock || merchantProduct.latest_stock.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']">
+                                                                {{ ! merchantProduct.latest_stock || merchantProduct.latest_stock.available_quantity == 0 ? 'Stock Out' : product.latest_stock.available_quantity }}
                                                             </span>
                                                         </td>
                                                     </tr>
