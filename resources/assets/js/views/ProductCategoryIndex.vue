@@ -1,5 +1,5 @@
 
-<template v-if="userHasPermissionTo('view-asset-index')">
+<template v-if="userHasPermissionTo('view-product-category-index')">
 
 	<div class="pcoded-content">
 
@@ -24,10 +24,10 @@
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
+											  		v-if="userHasPermissionTo('view-product-category-index') || userHasPermissionTo('create-product-category')" 
 											  		:query="query" 
 											  		:caller-page="'product category'" 
-											  		:required-permission = "'asset'" 
+											  		:required-permission = "'product-category'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -45,14 +45,15 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<!-- 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', '# products']" 
-										  			:column-values-to-show="['name', 'products_count']" 
+										  			:column-names="['name', 'parents', '# products']" 
+										  			:column-values-to-show="['name', 'parents', 'products_count']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'asset'" 
+										  			:required-permission="'product-category'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -64,6 +65,241 @@
 										  			@goCategoryProducts="goCategoryProducts($event)" 
 										  		>	
 										  		</table-with-soft-delete-option>
+ 												-->
+
+										  		<div class="tab-content card-block">
+													<div class="table-responsive">
+														<table class="table table-striped table-bordered nowrap text-center">
+															<thead>
+																<tr>
+																	<th>
+																		<a href="javascript:void(0)" @click="changeContentsOrder('name')"> 
+																			Name
+																			<span 
+																				v-show="currentSorting==='name' && ascending"
+																			>
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting === 'name' && descending"
+																			>
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting !== 'name'"
+																			>
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		Parents
+																	</th>
+
+																	<th>
+																		<a href="javascript:void(0)" @click="changeContentsOrder('products_count')"> 
+																			# Products
+																			<span 
+																				v-show="currentSorting==='products_count' && ascending"
+																			>
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting === 'products_count' && descending"
+																			>
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting !== 'products_count'"
+																			>
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		Actions
+																	</th>
+																</tr>
+															</thead>
+															
+															<tbody>
+																<tr 
+																	v-for="(content, contentIndex) in contentsToShow" 
+																	:key="'category-index-' + contentIndex + '-category-' + content.id"
+																>
+																	<td> {{ content.name }} </td>
+																	
+																	<td> 
+																		<ul>
+																			<tree-item
+																				v-if="content.parent"
+																				class=""
+																				:item="content.parent"
+																			></tree-item>
+																		</ul>
+																	</td>
+
+																	<td> 
+																		{{ content.products_count }} 
+																	</td>
+																	
+																	<td>
+																		<button type="button" 
+																				class="btn btn-grd-info btn-icon"  
+																				@click="showContentDetails(content)" 
+																		>
+																			<i class="fa fa-eye"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-primary btn-icon" 
+																				v-show="! content.deleted_at" 
+																				@click="openContentEditForm(content)" 
+																				v-if="userHasPermissionTo('update-product-category')"
+																		>
+																			<i class="fa fa-edit"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-danger btn-icon" 
+																				v-show="! content.deleted_at" 
+																				@click="openContentDeleteForm(content)" 
+																				v-if="userHasPermissionTo('delete-product-category')" 
+																		>
+																			<i class="fa fa-trash"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-warning btn-icon" 
+																				v-show="content.deleted_at" 
+																				@click="openContentRestoreForm(content)" 
+																				v-if="userHasPermissionTo('delete-product-category')"
+																		>
+																			<i class="fa fa-undo"></i>
+																		</button>
+
+																		<button type="button" 
+																				class="btn btn-grd-warning btn-icon" 
+																				@click="goCategoryProducts(content)" 
+																				v-if="userHasPermissionTo('view-product-index')"
+																		>
+																			<i class="fab fa-product-hunt"></i>
+																		</button>
+																	</td>
+																</tr>
+																
+																<tr 
+															  		v-show="! contentsToShow.length"
+															  	>
+														    		<td colspan="4">
+															      		<div class="alert alert-danger" role="alert">
+															      			Sorry, No data found.
+															      		</div>
+															    	</td>
+															  	</tr>
+															</tbody>
+															
+															<tfoot>
+																<tr>
+																	<th>
+																		<a href="javascript:void(0)" @click="changeContentsOrder('name')"> 
+																			Name
+																			<span 
+																				v-show="currentSorting==='name' && ascending"
+																			>
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting === 'name' && descending"
+																			>
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting !== 'name'"
+																			>
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		Parents
+																	</th>
+
+																	<th>
+																		<a href="javascript:void(0)" @click="changeContentsOrder('products_count')"> 
+																			# Products
+																			<span 
+																				v-show="currentSorting==='products_count' && ascending"
+																			>
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting === 'products_count' && descending"
+																			>
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+
+																			<span 
+																				v-show="currentSorting !== 'products_count'"
+																			>
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
+																	<th>
+																		Actions
+																	</th>
+																</tr>
+															</tfoot>
+														</table>
+													</div>
+													
+													<div class="row d-flex align-items-center">
+														<div class="col-sm-2 col-4">
+															<select 
+																class="form-control" 
+																v-model.number="perPage" 
+																@change="changeNumberContents(perPage)"
+															>
+																<option>10</option>
+																<option>20</option>
+																<option>30</option>
+																<option>40</option>
+																<option>50</option>
+															</select>
+														</div>
+														<div class="col-sm-2 col-8">
+															<button 
+																type="button" 
+																class="btn btn-primary btn-sm" 
+																@click="query === '' ? fetchAllContents() : searchData()"
+															>
+																Reload
+																<i class="fa fa-sync"></i>
+															</button>
+														</div>
+														<div class="col-sm-8 col-12 text-right form-group">
+															<pagination
+																v-if="pagination.last_page > 1"
+																:pagination="pagination"
+																:offset="5"
+																@paginate="query === '' ? fetchAllContents() : searchData()"
+															>
+															</pagination>
+														</div>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -75,20 +311,20 @@
 			</div>
 		</div>
 
-	<!-- 
-		<asset-create-or-edit-modal 
-			:create-mode="createMode" 
-			:caller-page="'variation'" 
-			:single-asset-data="singleAssetData" 
-			:csrf="csrf"
+		<!-- 
+			<asset-create-or-edit-modal 
+				:create-mode="createMode" 
+				:caller-page="'variation'" 
+				:single-asset-data="singleAssetData" 
+				:csrf="csrf"
 
-			@storeAsset="storeAsset($event)" 
-			@updateAsset="updateAsset($event)" 
-		></asset-create-or-edit-modal>
- 	-->
+				@storeAsset="storeAsset($event)" 
+				@updateAsset="updateAsset($event)" 
+			></asset-create-or-edit-modal>
+	 	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')">
+		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-category') || userHasPermissionTo('update-product-category')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -127,11 +363,12 @@
 								</div>
 							</div>
 
-							<div class="form-row">
+							<div class="form-row" v-if="categoriesToShow.length">
 								<div class="form-group col-md-12">
 									<label for="inputUsername">Parent Category</label>
+									<!-- 
 									<multiselect 
-                              			v-model="singleAssetData.category"
+                              			v-model="singleAssetData.parent"
                               			placeholder="Parent Category" 
                                   		label="name" 
                                   		track-by="id" 
@@ -143,7 +380,27 @@
                                   		selectLabel = "Press/Click"
                                   		deselect-label="Can't remove single value"
                               		>
-                                	</multiselect>
+                                	</multiselect> 
+                                	-->
+
+                                	<treeselect
+                                		v-model="singleAssetData.parent" 
+										:options="categoriesToShow"
+										:show-count="true" 
+										:normalizer="treeSelectCustomFunction" 
+										:valueFormat="'object'"
+										@select="validateFormInput('parent_category_id')" 
+										class="form-control p-0 is-valid" 
+										placeholder="Parent Category"
+									/>
+
+									<div 
+										class="invalid-feedback" 
+										style="display: block;"
+										v-show="errors.asset.parent_category_id" 
+									>
+							        	{{ errors.asset.parent_category_id }}
+							  		</div>
 								</div>
 							</div>
 						</div>
@@ -169,7 +426,7 @@
 		</div>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-product-category')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -179,7 +436,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-product-category')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
@@ -210,7 +467,7 @@
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Name</label>
+								<label class="font-weight-bold">Name:</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
 								{{ singleAssetData.name | capitalize }}
@@ -219,10 +476,10 @@
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Parent Category</label>
+								<label class="font-weight-bold">Parent Category:</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.category ? singleAssetData.category.name : 'None' | capitalize }}
+								{{ singleAssetData.parent ? singleAssetData.parent.name : 'None' | capitalize }}
 							</div>
 						</div>
 
@@ -242,14 +499,18 @@
 
 	import axios from 'axios';
 	import Multiselect from 'vue-multiselect';
+	import Treeselect from '@riophae/vue-treeselect'
+	// import the styles
+  	import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
     let singleAssetData = {
-    	// category : {},
+    	// parent : {},
     };
 
 	export default {
 
 	    components: { 
+	    	Treeselect,
 			multiselect : Multiselect,
 		},
 
@@ -261,6 +522,10 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
+
+	        	ascending : false,
+	      		descending : false,
+	      		currentSorting : '',
 	        	currentTab : 'current',
 
 	        	createMode : true,
@@ -296,9 +561,10 @@
 		},
 
 		watch: {
-			'singleAssetData.category': function (object) {
+			'singleAssetData.parent': function (object) {
 				if (object && Object.keys(object).length > 0) {
 					this.singleAssetData.parent_category_id = object.id;
+					this.validateFormInput('parent_category_id');
 				}
 			},
 		},
@@ -377,7 +643,7 @@
 					.get('/api/product-categories/')
 					.then(response => {
 						if (response.status == 200) {
-							this.allCategories = response.data;
+							this.allCategories = response.data.data;
 						}
 					})
 					.catch(error => {
@@ -443,7 +709,7 @@
 				};
 
 				this.singleAssetData = {
-					// category : {},
+					// parent : {},
 				};
 
 				$('#asset-createOrEdit-modal').modal('show');
@@ -453,7 +719,16 @@
 				this.createMode = false;
 
 				this.categoriesToShow = [ ...this.allCategories ];
-				this.categoriesToShow.splice(this.categoriesToShow.findIndex(category=>category.id==object.id), 1);
+
+				if (this.categoriesToShow.findIndex(category => category.id==object.id && category.name==object.name) > -1) {
+
+					this.categoriesToShow.splice(
+						this.categoriesToShow.findIndex(
+							category => category.id==object.id && category.name==object.name
+						), 1
+					);
+
+				}
 
 				this.errors = {
 					asset : {},
@@ -622,12 +897,20 @@
 			},
 			verifyUserInput() {
 				this.validateFormInput('name');
+				this.validateFormInput('parent_category_id');
 
 				if (this.errors.asset.constructor === Object && Object.keys(this.errors.asset).length == 0) {
 					return true;
 				}
 
 				return false;
+			},
+			treeSelectCustomFunction(node) {
+				return {
+					id: node.id,
+					label: node.name,
+					children: node.childs,
+				}
 			},
 			objectNameWithCapitalized ({ name }) {
 		      	if (name) {
@@ -637,6 +920,99 @@
 		      	else 
 		      		return ''
 		    },
+		    changeContentsOrder(columnName) {
+
+				this.currentSorting = columnName;
+
+				if (columnName.match(/name/gi)) {
+
+					const nameExists = (object) => object.hasOwnProperty('name');
+					const firstNameExists = (object) => object.hasOwnProperty('first_name');
+
+					if (this.ascending) {
+
+						this.ascending = false;
+						this.descending = true;
+
+						this.contentsToShow.some(nameExists) ? this.descendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.descendingAlphabets('first_name') : this.descendingAlphabets('last_name');
+
+					}
+					else if (this.descending) {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.contentsToShow.some(nameExists) ? this.ascendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+
+					}
+					else {
+
+						this.ascending = true;
+						this.descending = false;
+
+						this.contentsToShow.some(nameExists) ? this.ascendingAlphabets('name') : this.contentsToShow.some(firstNameExists) ? this.ascendingAlphabets('first_name') : this.ascendingAlphabets('last_name');
+
+					}
+
+				}
+
+				else if (columnName.match(/products_count/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingNumeric('products_count');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('products_count');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('products_count');
+					}
+					
+				}
+				
+			},
+			ascendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x < y) {return -1;}
+						if (x > y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			descendingAlphabets(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
+						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
+						if (x > y) {return -1;}
+						if (x < y) {return 1;}
+						return 0;
+					}
+				);
+			},
+			ascendingNumeric(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						return a[columnValue] - b[columnValue];
+					}
+				);
+			},
+			descendingNumeric(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						return b[columnValue] - a[columnValue];
+					}
+				);
+			},
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
@@ -651,6 +1027,18 @@
 						else{
 							this.submitForm = true;
 							this.$delete(this.errors.asset, 'name');
+						}
+
+						break;
+
+					case 'parent_category_id' :
+
+						if (this.singleAssetData.hasOwnProperty('parent') && this.singleAssetData.parent.id==this.singleAssetData.id && this.singleAssetData.parent.name==this.singleAssetData.name) {
+							this.errors.asset.parent_category_id = 'Parent category cant be same';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.asset, 'parent_category_id');
 						}
 
 						break;

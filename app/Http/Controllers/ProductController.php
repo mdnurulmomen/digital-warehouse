@@ -21,7 +21,9 @@ use App\Http\Resources\Web\ProductCollection;
 // use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Http\Resources\Web\ProductStockCollection;
 // use App\Http\Resources\Web\ManagerProductCollection;
+use App\Http\Resources\Web\ProductCategoryResource;
 use App\Http\Resources\Web\MerchantProductCollection;
+use App\Http\Resources\Web\ProductCategoryCollection;
 
 class ProductController extends Controller
 {
@@ -138,14 +140,17 @@ class ProductController extends Controller
             
             return response()->json([
 
-                'current' => ProductCategory::withCount('products')->paginate($perPage),
-                'trashed' => ProductCategory::withCount('products')->onlyTrashed()->paginate($perPage),
+                'current' => new ProductCategoryCollection(ProductCategory::withCount('products')->with('parent')->latest('id')->paginate($perPage)),
+
+                'trashed' => new ProductCategoryCollection(ProductCategory::withCount('products')->onlyTrashed()->with('parent')->latest('id')->paginate($perPage)),
 
             ], 200);
 
         }
 
-        return ProductCategory::all();
+        return ProductCategoryResource::collection(
+            ProductCategory::whereNull('parent_category_id')->with('childs')->latest('id')->get()
+        );
     }
 
     public function storeProductNewCategory(Request $request, $perPage)
@@ -171,7 +176,11 @@ class ProductController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:product_categories,name,'.$assetToUpdate->id,
-            'parent_category_id' => 'nullable|exists:product_categories,id',
+            // 'parent_category_id' => 'nullable|exists:product_categories,id',
+            'parent_category_id' => [
+                'nullable', 'exists:product_categories,id', 
+                Rule::notIn([ $asset ]),
+            ],
         ]);
 
         $assetToUpdate->name = strtolower($request->name);

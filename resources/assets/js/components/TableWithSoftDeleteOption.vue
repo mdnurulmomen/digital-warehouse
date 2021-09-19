@@ -39,7 +39,6 @@
 							<button type="button" 
 									class="btn btn-grd-info btn-icon"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-if="userHasPermissionTo('view-' + requiredPermission + '-index')" 
 								 	v-show="$route.name!='variations'"
 							>
 								<i class="fa fa-eye"></i>
@@ -87,14 +86,6 @@
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-product-index')"
 							>
 								<i aria-hidden="true" class="fab fa-product-hunt"></i>
-							</button>
-
-							<button type="button" 
-									class="btn btn-grd-warning btn-icon" 
-									@click="$emit('goCategoryProducts', content)" 
-									v-if="$route.name=='product-categories' && userHasPermissionTo('view-product-index')"
-							>
-								<i class="fab fa-product-hunt"></i>
 							</button>
 						</td>
 					</tr>
@@ -248,6 +239,7 @@
 		},
 
 		methods : {
+			
 			getFullName(object) {
 				if (!object.first_name && !object.last_name) {
 					return 'NA';
@@ -274,9 +266,6 @@
 				}
 				else if (columnValue.match(/owner_total_warehouses/gi)) {
 					return object.warehouses_count;
-				}
-				else if (columnValue.match(/products_count/gi)) {
-					return object.products_count;
 				}
 				else if (columnValue.match(/variation_type_name/gi)) {
 					return object.variation_type ? this.$options.filters.capitalize(object.variation_type.name) : '';
@@ -416,27 +405,6 @@
 					}
 					
 				}
-
-				else if (columnName.match(/#/gi) && columnName.match(/products/gi)) {
-					
-					if (this.ascending) {
-						this.ascending = false;
-						this.descending = true;
-						this.descendingNumeric('products_count');
-					}
-					else if (this.descending) {
-						this.ascending = true;
-						this.descending = false;
-						this.ascendingNumeric('products_count');
-					}
-					else {
-						this.ascending = true;
-						this.descending = false;
-						this.ascendingNumeric('products_count');
-					}
-					
-				}
-
 				else if (columnName.match(/status/gi)) {
 					
 					if (this.ascending) {
@@ -456,7 +424,6 @@
 					}
 					
 				}
-
 				else if (columnName.match(/code/gi)) {
 
 					if (this.ascending) {

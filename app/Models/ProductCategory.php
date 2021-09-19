@@ -12,12 +12,14 @@ class ProductCategory extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    protected $with = ['parent'];
+    // protected $with = ['parent'];
 
-    /*public function category()
-    {
-    	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
-    }*/
+    /*
+        public function category()
+        {
+        	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
+        }
+    */
 
     public function parent()
     {
@@ -28,6 +30,11 @@ class ProductCategory extends Model
     {
         return $this->hasMany(ProductCategory::class, 'parent_category_id', 'id');
     }
+
+    /*public function nestedChilds()
+    {
+        return $this->childs()->with('childs');
+    }*/
 
     public function products()
     {
