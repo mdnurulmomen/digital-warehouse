@@ -237,7 +237,7 @@
                                                     <tr 
                                                         v-show="! dashboard.hasOwnProperty('limitedStockProducts') || ! dashboard.limitedStockProducts.length"
                                                     >
-                                                        <td colspan="4">
+                                                        <td colspan="5">
                                                             <div class="alert alert-danger" role="alert">
                                                                 Sorry, No data found.
                                                             </div>

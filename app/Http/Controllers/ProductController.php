@@ -183,6 +183,10 @@ class ProductController extends Controller
             ],
         ]);
 
+        if ($request->parent_category_id && $assetToUpdate->id < $request->parent_category_id && ProductCategory::findOrFail($request->parent_category_id)->parent()->exists()) {
+            return response()->json(['errors'=>["invalidParent" => "Invalid parent category"]], 422);
+        }
+
         $assetToUpdate->name = strtolower($request->name);
         $assetToUpdate->parent_category_id = $request->parent_category_id;
 

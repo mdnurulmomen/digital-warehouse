@@ -111,13 +111,15 @@
 																	</td>
 																		
 																	<td>
-																		<ul>
+																		<ul v-if="content.parent">
 																			<tree-item
-																				v-if="content.parent"
-																				class=""
 																				:item="content.parent"
 																			></tree-item>
 																		</ul>
+
+																		<span v-else>
+																			--
+																		</span>
 																	</td>
 																	
 																	<td>
@@ -989,6 +991,9 @@
 
 						if (this.singleAssetData.parent && Object.keys(this.singleAssetData.parent).length && (this.singleAssetData.parent.id == this.singleAssetData.id || this.singleAssetData.parent.name.toLowerCase() == this.singleAssetData.name.toLowerCase())) {
 							this.errors.asset.variation_parent_id = 'Same type is invalid';
+						}
+						else if (this.singleAssetData.parent && this.singleAssetData.id && this.singleAssetData.id < this.singleAssetData.parent.id && this.singleAssetData.parent.variation_parent_id) {
+							this.errors.asset.variation_parent_id = 'Newer child type cant be parent';
 						}
 						else{
 							this.submitForm = true;

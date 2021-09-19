@@ -1340,7 +1340,7 @@
 					.get('/api/product-categories/')
 					.then(response => {
 						if (response.status == 200) {
-							this.allProductCategories = response.data;
+							this.allProductCategories = response.data.data;
 						}
 					})
 					.catch(error => {

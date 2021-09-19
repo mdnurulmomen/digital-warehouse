@@ -136,13 +136,15 @@
 																	<td> {{ content.name }} </td>
 																	
 																	<td> 
-																		<ul>
+																		<ul v-if="content.parent">
 																			<tree-item
-																				v-if="content.parent"
-																				class=""
 																				:item="content.parent"
 																			></tree-item>
 																		</ul>
+
+																		<span v-else>
+																			--
+																		</span>
 																	</td>
 
 																	<td> 
@@ -479,7 +481,7 @@
 								<label class="font-weight-bold">Parent Category:</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.parent ? singleAssetData.parent.name : 'None' | capitalize }}
+								{{ singleAssetData.parent ? singleAssetData.parent.name : '--' | capitalize }}
 							</div>
 						</div>
 
@@ -1033,8 +1035,11 @@
 
 					case 'parent_category_id' :
 
-						if (this.singleAssetData.hasOwnProperty('parent') && this.singleAssetData.parent.id==this.singleAssetData.id && this.singleAssetData.parent.name==this.singleAssetData.name) {
+						if (this.singleAssetData.parent && this.singleAssetData.parent.id==this.singleAssetData.id && this.singleAssetData.parent.name==this.singleAssetData.name) {
 							this.errors.asset.parent_category_id = 'Parent category cant be same';
+						}
+						else if (this.singleAssetData.parent && this.singleAssetData.id && this.singleAssetData.id < this.singleAssetData.parent.id && this.singleAssetData.parent.parent_category_id) {
+							this.errors.asset.parent_category_id = 'Newer child category cant be parent';
 						}
 						else{
 							this.submitForm = true;
@@ -1045,7 +1050,48 @@
 
 				}
 	 
+			},
+			/*
+			selectedCategoryChilds(currentCategoryId, categoriesToSearch = []) {
+
+				if (categoriesToSearch.some(categoryToSearch => categoryToSearch.id==currentCategoryId)) {
+					
+					return categoriesToSearch.find(categoryToSearch => categoryToSearch.id == currentCategoryId).childs;
+
+				}
+				else {
+
+					for (var i = categoriesToSearch.length - 1; i >= 0; i--) {
+						
+						let currentCategoryChilds = this.selectedCategoryChilds(currentCategoryId, categoriesToSearch[i].childs);
+
+						if (Array.isArray(currentCategoryChilds)) {
+
+							return currentCategoryChilds;
+
+						}
+
+					}
+
+					return false;
+
+				}
+
+			},
+			checkCategoryInvalidParent() {
+
+				let currentCategoryChilds = this.selectedCategoryChilds(this.singleAssetData.id, this.allCategories);
+
+				if (Array.isArray(currentCategoryChilds) && currentCategoryChilds.length && this.singleAssetData.parent) {
+
+					return currentCategoryChilds.some(childToCheck => childToCheck.id==this.singleAssetData.parent.id);
+
+				}
+
+				return false;
+
 			}
+			*/
             
 		}
   	}

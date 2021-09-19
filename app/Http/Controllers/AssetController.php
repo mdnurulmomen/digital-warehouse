@@ -522,6 +522,10 @@ class AssetController extends Controller
             ],
         ]);
 
+        if ($request->variation_parent_id && $assetToUpdate->id < $request->variation_parent_id && Variation::findOrFail($request->variation_parent_id)->parent()->exists()) {
+            return response()->json(['errors'=>["invalidParent" => "Invalid parent variation"]], 422);
+        }
+
         $assetToUpdate->name = strtolower($request->name);
         $assetToUpdate->variation_type_id = $request->variation_type_id;
         $assetToUpdate->variation_parent_id = $request->variation_parent_id;

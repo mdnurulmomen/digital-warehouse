@@ -19,8 +19,9 @@ class ProductCategoryResource extends JsonResource
             'name' => $this->name,
             'deleted_at' => $this->deleted_at,
             'products_count' => $this->products_count,
+            'parent_category_id' => $this->when($this->parent_category_id, $this->parent_category_id),
             
-            'parent' => $this->when($this->relationLoaded('parent'), new ProductCategoryResource($this->parent ? $this->parent->loadMissing('parent') : NULL)),
+            'parent' => $this->when($this->relationLoaded('parent') && $this->parent, new ProductCategoryResource($this->parent ? $this->parent->loadMissing('parent') : NULL)),
 
             'childs' => $this->when($this->relationLoaded('childs'), $this->childs ? ProductCategoryResource::collection($this->childs->loadMissing('childs')) : []),
             
