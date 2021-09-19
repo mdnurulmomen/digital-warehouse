@@ -1058,7 +1058,7 @@ class ProductController extends Controller
             'manufacturer_id' => $request->manufacturer_id, 
             'warning_quantity' => $request->warning_quantity ?? 0,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
-            'discount' => $product->product_category_id ? $request->discount : NULL,
+            'discount' => $product->product_category_id ? $request->discount : 0,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()
@@ -1168,7 +1168,7 @@ class ProductController extends Controller
             'description' => strtolower($request->description), 
             'warning_quantity' => $request->warning_quantity ?? 0,
             'selling_price' => $product->product_category_id ? $request->selling_price : NULL,
-            'discount' => $product->product_category_id ? $request->discount : NULL,
+            'discount' => $product->product_category_id ? $request->discount : 0,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()

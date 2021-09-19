@@ -1044,7 +1044,16 @@
 										Type :
 									</label>
 									<label class="col-sm-8 col-form-label">
-										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Product' | capitalize }}
+										{{ singleProductData.category ? 'Retail Product' : 'Bulk Product' | capitalize }}
+									</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Category :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.category ? singleProductData.category.name : 'NA' | capitalize }}
 									</label>
 								</div>
 

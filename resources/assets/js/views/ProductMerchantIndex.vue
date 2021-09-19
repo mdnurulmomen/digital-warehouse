@@ -450,8 +450,8 @@
 							                                  		class="form-control p-0" 
 							                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
 							                                  		:required="true" 
-					                                  				:allow-empty="false"
-							                                  		@close="validateFormInput('product_variation_id')" 
+					                                  				:allow-empty="false" 
+																	@close="changeProductVariation(index)"
 							                              		>
 							                                	</multiselect>
 
@@ -2018,40 +2018,44 @@
 
 				return false;
 			},
-			nextPage() {
+
+			/*
+				nextPage() {
 				
-				if (this.step==1) {
-					
-					this.validateFormInput('product_sku');
-					this.validateFormInput('product_price');
-					this.validateFormInput('discount');
-					this.validateFormInput('product_merchant_id');
-
-					// this.validateFormInput('product_initial_quantity');
-					// this.validateFormInput('product_available_quantity');
-					// this.validateFormInput('product_quantity_type');
-
-					if (this.product.has_variations) {
+					if (this.step==1) {
 						
-						// this.validateFormInput('product_variation_type');
-						this.validateFormInput('product_variation_id');
-						// this.validateFormInput('product_variation_quantity');
-						this.validateFormInput('product_variation_price');
-						// this.validateFormInput('product_variation_total_quantity');
+						this.validateFormInput('product_sku');
+						this.validateFormInput('product_price');
+						this.validateFormInput('discount');
+						this.validateFormInput('product_merchant_id');
+
+						// this.validateFormInput('product_initial_quantity');
+						// this.validateFormInput('product_available_quantity');
+						// this.validateFormInput('product_quantity_type');
+
+						if (this.product.has_variations) {
+							
+							// this.validateFormInput('product_variation_type');
+							this.validateFormInput('product_variation_id');
+							// this.validateFormInput('product_variation_quantity');
+							this.validateFormInput('product_variation_price');
+							// this.validateFormInput('product_variation_total_quantity');
+
+						}
+
+						if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations)) {
+							this.step += 1;
+							this.submitForm = true;
+						}
+						else {
+							this.submitForm = false;
+						}
 
 					}
 
-					if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations)) {
-						this.step += 1;
-						this.submitForm = true;
-					}
-					else {
-						this.submitForm = false;
-					}
-
-				}
-
-			},	
+				},
+			*/
+	
 			/*
 				addMoreSpace() {
 					if (this.singleMerchantProductData.addresses.length < 3) {
@@ -2164,6 +2168,19 @@
 				}
 
 			},
+			changeProductVariation(merchantProductVariationIndex) {
+
+				if (this.singleMerchantProductData.variations.length > merchantProductVariationIndex && this.singleMerchantProductData.variations[merchantProductVariationIndex].hasOwnProperty('variation')) {
+					
+					this.singleMerchantProductData.variations[merchantProductVariationIndex].product_variation_id = this.singleMerchantProductData.variations[merchantProductVariationIndex].variation.id;
+
+					this.validateFormInput('product_variation_id');
+
+				} else {
+					
+				}
+
+			},
 			setProductVariation() {
 				
 				if (this.product.has_variations && this.product.hasOwnProperty('variations') && this.product.variations.length) {
@@ -2214,6 +2231,8 @@
 					
 					this.singleMerchantProductData.variations.pop();
 					this.errors.product.variations.pop();
+
+					this.validateFormInput('product_variation_id');
 
 					if (! this.errorInArray(this.errors.product.variations)) {
 						this.submitForm = true;
@@ -2745,14 +2764,22 @@
 									
 									(merchantProductVariation, index) => {
 										
-										if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
+										/*
+											if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
 
-											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+												this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 
-										}
-										else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
+											}
+											else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
 
-											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+												this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+
+											}
+										*/
+
+										if (this.singleMerchantProductData.variations.filter(obj => obj.product_variation_id === merchantProductVariation.product_variation_id).length > 1) {
+										
+											this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 
 										}
 										else {
