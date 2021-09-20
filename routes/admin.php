@@ -158,7 +158,7 @@ Route::name('admin.')->group(function () {
 		// requisition
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');
 		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions');
-		Route::get('/api/search-requisitions/{search}/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
+		Route::post('/search-requisitions/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
 
 		// dispatch
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');

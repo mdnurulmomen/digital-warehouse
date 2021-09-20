@@ -16,7 +16,7 @@ class MyRequiredProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'product_id' => $this->product_id,
+            'product_id' => $this->merchantProduct->product_id,
             'product_name' => $this->merchantProduct->product->name,
             'quantity' => $this->quantity,
             'available_quantity' => $this->merchantProduct->latestStock->available_quantity ?? 0,

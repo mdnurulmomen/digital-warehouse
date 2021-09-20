@@ -266,9 +266,9 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'dispatched' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'cancelled' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'cancelled' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
@@ -285,7 +285,7 @@ class MerchantController extends Controller
             'description' => 'nullable|string|max:255',
             
             'products' => 'required|array|min:1',
-            'products.*.id' => 'required|numeric|exists:products,id',
+            'products.*.id' => 'required|numeric|exists:merchant_products,id',
             'products.*.total_quantity' => 'required|numeric|min:1',
             'products.*.packaging_service' => 'boolean',
             // 'products.*.package' => 'required_if:products.*.packaging_service,true',
@@ -367,10 +367,10 @@ class MerchantController extends Controller
     {
         $currentMerchant = \Auth::user();
 
-        $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where(function ($query) use ($search) {
+        $query = Requisition::with(['products.merchantProduct.product', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
-                                            ->orWhereHas('products.product', function ($q) use ($search) {
+                                            ->orWhereHas('products.merchantProduct.product', function ($q) use ($search) {
                                                 $q->where('name', 'like', "%$search%");
                                             })
                                             ->orWhereHasMorph(

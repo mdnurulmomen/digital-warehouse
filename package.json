@@ -35,6 +35,7 @@
         "vue-js-toggle-button": "^1.3.3",
         "vue-multiselect": "^2.1.6",
         "vue-router": "^3.5.2",
-        "vue-toastr": "^2.1.2"
+        "vue-toastr": "^2.1.2",
+        "vuejs-datepicker": "^1.6.2"
     }
 }

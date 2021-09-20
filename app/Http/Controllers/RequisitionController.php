@@ -22,15 +22,15 @@ class RequisitionController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
+        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
 
     }
 
@@ -98,16 +98,81 @@ class RequisitionController extends Controller
         return $this->showAllRequisitions($perPage);
     }
 
-    public function searchAllRequisitions($search, $perPage)
+    public function searchAllRequisitions(Request $request, $perPage)
     {
-        $query = $query = Requisition::with(['products.merchantProduct.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
-                                ->where(function ($query) use ($search) {
-                                    $query->where('subject', 'like', "%$search%")
-                                            ->orWhere('description', 'like', "%$search%")
-                                            ->orWhereHas('products.merchantProduct.product', function ($q) use ($search) {
-                                                $q->where('name', 'like', "%$search%");
-                                            });
-                                });
+        $request->validate([
+            'search' => 'required|string', 
+            'dateTo' => 'nullable|date',
+            'dateFrom' => 'nullable|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);        
+
+        $query = Requisition::with(['products.merchantProduct.product', 'products.variations.merchantProductVariation.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
+                ->where(function ($query1) use ($request) {
+                    $query1->where('subject', 'like', "%$request->search%")
+                            ->orWhere('description', 'like', "%$request->search%")
+                            ->orWhereHas('products.merchantProduct.product', function ($q) use ($request) {
+                                $q->where('name', 'like', "%$request->search%");
+                            });
+                });
+
+        /*
+        
+            if ($request->showPendingRequisitions) {
+                
+                $query->where('status', 0);
+
+            }
+
+            if ($request->showCancelledRequisitions) {
+                
+                $query->where('status', -1);
+
+            }
+
+            if ($request->showDispatchedRequisitions) {
+                
+                $query->where('status', 1);
+
+            }
+
+         */
+
+
+        if ($request->dateFrom) {
+            
+            $query->where('created_at', '>', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->where('created_at', '<', $request->dateTo);
+
+        }
+
+        /*
+        
+            if ($request->showProduct) {
+                
+                $query->whereHas('products.merchantProduct.product', function ($q) use ($request) {
+                    $q->where('name', 'like', "%$request->showProduct%");
+                })
+                ->with([
+                    'products.merchantProduct.product' => function ($q) use ($request) {
+                        $q->where('name', 'like', "%$request->showProduct%");
+                    },
+                    'products.variations.merchantProductVariation.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'
+                ]);
+
+            }
+        
+         */
+
+
 
         return [
             'all' => new RequisitionCollection($query->paginate($perPage)),  

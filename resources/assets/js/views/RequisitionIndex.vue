@@ -21,32 +21,83 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">											
-
-											<div class="col-sm-12 sub-title">
- 												<div class="row d-flex align-items-center text-center">
-											  		<div class="col-sm-3 form-group">	
-											  			Requisitions List
+										<div class="row">
+											<div class="col-sm-12">
+ 												<div class="row form-group d-flex align-items-center">
+											  		<div class="col-6 sub-title">	
+											  			{{ 
+											  				(/* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Requisitions List' : 'Requisitions List'
+											  			}}
 											  		</div>
 
-											  		<div class="col-sm-9 was-validated form-group">
-											  			<input 	type="text" 
-														  		v-model="query" 
-														  		pattern="[^'!#$%^()\x22]+" 
-														  		class="form-control" 
-														  		placeholder="Search"
-													  	>
-													  	<div class="invalid-feedback">
-													  		Please search with releavant input
-													  	</div>
+											  		<div class="col-6 text-right">	
+											  			<i class="fa fa-print fa-2x p-2" aria-hidden="true"></i>
+											  			<i class="fas fa-file-export fa-2x"></i> 
 											  		</div>
 											  	</div>
+
+											  	<div class="row form-group">
+											  		<div class="col-sm-2"></div>
+									  				
+									  				<div class="col-sm-8 was-validated">
+									  					<input 	
+															type="text" 
+													  		v-model="searchAttributes.search" 
+													  		pattern="[^'!#$%^()\x22]+" 
+													  		class="form-control mr-1" 
+													  		placeholder="Search Requisitions"
+												  		>
+
+												  		<div class="invalid-feedback">
+													  		Please search with releavant input
+													  	</div>
+									  				</div>
+
+									  				<div class="col-sm-2"></div>
+									  			</div>
+
+									  			<div class="row" v-show="searchAttributes.search">
+									  				<div class="col-sm-2"></div>
+
+									  				<div class="col-sm-8">
+									  					<div class="card card-body">
+															<div class="form-row">
+																<div class="col-sm-3 col-md-6">
+																	<label for="inputFirstName">
+																		Date From
+																	</label>
+																	
+																	<datepicker 
+																		name="uniquename"
+																		format="yyyy-MM-dd"
+																		v-model="searchAttributes.dateFrom" 
+																	>
+																	</datepicker>
+																</div>
+
+																<div class="col-sm-3 col-md-6">
+																	<label for="inputFirstName">
+																		Date To
+																	</label>
+																	
+																	<datepicker 
+																		v-model="searchAttributes.dateTo" 
+																		name="uniquename"
+																		format="yyyy-MM-dd"
+																	>	
+																	</datepicker>
+																</div>							
+															</div>
+														</div>
+									  				</div>
+
+									  				<div class="col-sm-2"></div>
+									  			</div>
 											</div>
 											
-											<div class="col-sm-12 col-lg-12">
-										  		
+											<div class="col-sm-12 col-lg-12">	
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
 										  			:current-tab="'pending'" 
 
@@ -171,7 +222,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? fetchAllRequisitions() : searchData()"
+																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -182,7 +233,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllRequisitions() : searchData()"
+																@paginate="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -1456,6 +1507,7 @@
 <script type="text/javascript">
 
 	import axios from 'axios';
+	import Datepicker from 'vuejs-datepicker';
 	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -1485,6 +1537,7 @@
 	export default {
 
 	    components: { 
+	    	Datepicker,
 			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
 		},
@@ -1494,12 +1547,27 @@
 	        return {
 
 	        	step : 1,
-	        	query : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
 	        	
 	        	currentTab : 'pending',
+	        	
+	        	searchAttributes : {
+
+	        		search : '',
+		        	dateTo : null,
+		        	dateFrom : null,
+		        	
+		        	/*
+			        	showPendingRequisitions : false,
+			        	showCancelledRequisitions : false,
+			        	showDispatchedRequisitions : false,
+			        	showProduct : null,
+		        	*/
+
+	        	},
+
 	        	
 	        	editor: ClassicEditor,
 
@@ -1561,13 +1629,49 @@
 
 				return false;
 
-			}
+			},
 
 		},
 
 		watch : {
 
-			query : function(val){
+			'searchAttributes.search' : function(val){
+				
+				if (val==='') {
+
+					this.fetchAllRequisitions();
+
+				}
+				else {
+
+					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
+
+					if (! format.test(val)) {
+
+						this.searchAttributes = {
+							
+							search : val,
+				        	dateTo : null,
+				        	dateFrom : null,
+				        	
+				        	/*
+					        	showProduct : null,
+					        	showPendingRequisitions : false,
+					        	showCancelledRequisitions : false,
+					        	showDispatchedRequisitions : false,
+				        	*/
+
+						}
+
+						this.searchData();
+					
+					}
+
+				}
+
+			},
+
+			'searchAttributes.dateFrom' : function(val){
 				
 				if (val==='') {
 
@@ -1577,7 +1681,22 @@
 				else {
 
 					this.searchData();
+						
+				}
 
+			},
+
+			'searchAttributes.dateTo' : function(val){
+				
+				if (val==='') {
+
+					this.fetchAllRequisitions();
+
+				}
+				else {
+
+					this.searchData();
+						
 				}
 
 			},
@@ -1612,7 +1731,7 @@
 
 			fetchAllRequisitions() {
 
-				this.query = '';
+				this.searchAttributes.search = '';
 				this.error = '';
 				this.loading = true;
 				this.allFetchedRequisitions = [];
@@ -1651,7 +1770,7 @@
 			},
 			fetchAvailableRequisitions() {
 
-				this.query = '';
+				this.searchAttributes.search = '';
 				this.error = '';
 				this.loading = true;
 				this.availableRequisitions = [];
@@ -1689,7 +1808,7 @@
 			},
 			fetchAllPackagingPackages() {
 				
-				this.query = '';
+				this.searchAttributes.search = '';
 				this.error = '';
 				this.loading = true;
 				this.allPackagingPackages = [];
@@ -1851,7 +1970,7 @@
 							this.userHasPermissionTo('approve-dispatch') ? this.$toastr.s("Requisition has been dispatched", "Success") : this.$toastr.i("Requisition has been recommended", "Success");
 
 							this.allFetchedRequisitions = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
 							$('#dispatch-createOrEdit-modal').modal('hide');
 						}
@@ -1890,7 +2009,7 @@
 							this.$toastr.s("Requisition has been cancelled", "Success");
 
 							this.allFetchedRequisitions = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
 							$('#cancel-confirmation-modal').modal('hide');
 							$('#dispatch-createOrEdit-modal').modal('hide');
@@ -1906,6 +2025,24 @@
 					.finally(response => {
 						// this.fetchAllRequisitions();
 					});
+
+			},
+			searchData() {
+
+				this.error = '';
+				this.allFetchedRequisitions = [];
+				this.pagination.current_page = 1;
+				
+				axios
+				.post('/search-requisitions/' + this.perPage, this.searchAttributes)
+				.then(response => {
+					this.allFetchedRequisitions = response.data;
+					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
+					this.pagination = this.allFetchedRequisitions.all;
+				})
+				.catch(e => {
+					this.error = e.toString();
+				});
 
 			},
 			verifyUserInput() {
@@ -1924,26 +2061,6 @@
 				}
 
 				return false;
-			},
-			searchData() {
-
-				this.error = '';
-				this.allFetchedRequisitions = [];
-				this.pagination.current_page = 1;
-				
-				axios
-				.get(
-					"/api/search-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
-				.then(response => {
-					this.allFetchedRequisitions = response.data;
-					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
-					this.pagination = this.allFetchedRequisitions.all;
-				})
-				.catch(e => {
-					this.error = e.toString();
-				});
-
 			},
 			configureErrorObject(object) {
 
@@ -1974,7 +2091,7 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.query === '') {
+				if (this.searchAttributes.search === '') {
 					this.fetchAllRequisitions();
 				}
 				else {
