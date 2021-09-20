@@ -992,7 +992,7 @@
 														Warning Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.warning_quantity }}
+														{{ singleMerchantProductData.warning_quantity + ' ' + product.quantity_type }}
 													</label>
 												</div>
 
@@ -1001,7 +1001,7 @@
 														Available Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.available_quantity }}
+														{{ singleMerchantProductData.available_quantity + ' ' + product.quantity_type }}
 													</label>
 												</div>
 
@@ -1010,7 +1010,7 @@
 														Dispatched Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.dispatched_quantity }}
+														{{ singleMerchantProductData.dispatched_quantity + ' ' + product.quantity_type }}
 													</label>
 												</div>
 
@@ -1019,7 +1019,7 @@
 														Pending Requested Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.requested_quantity }}
+														{{ singleMerchantProductData.requested_quantity + ' ' + product.quantity_type }}
 													</label>
 												</div>	
 

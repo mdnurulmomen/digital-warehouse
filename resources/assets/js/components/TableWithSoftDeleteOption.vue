@@ -39,7 +39,7 @@
 							<button type="button" 
 									class="btn btn-grd-info btn-icon"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-show="$route.name!='variations'"
+								 	v-show="$route.name!='variations' && $route.name!='product-manufacturers'"
 							>
 								<i class="fa fa-eye"></i>
 							</button>

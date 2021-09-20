@@ -100,11 +100,11 @@ class RequisitionController extends Controller
 
     public function searchAllRequisitions($search, $perPage)
     {
-        $query = $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
+        $query = $query = Requisition::with(['products.merchantProduct.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
                                 ->where(function ($query) use ($search) {
                                     $query->where('subject', 'like', "%$search%")
                                             ->orWhere('description', 'like', "%$search%")
-                                            ->orWhereHas('products.product', function ($q) use ($search) {
+                                            ->orWhereHas('products.merchantProduct.product', function ($q) use ($search) {
                                                 $q->where('name', 'like', "%$search%");
                                             });
                                 });

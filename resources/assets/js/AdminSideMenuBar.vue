@@ -57,7 +57,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-command"></i>
+										<i class="fas fa-warehouse"></i>
 									</span>
 									<span class="pcoded-mtext">Warehouse</span>
 								</a>

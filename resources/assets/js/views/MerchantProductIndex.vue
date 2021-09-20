@@ -701,6 +701,7 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.warning_quantity }}
+														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
 
@@ -710,6 +711,7 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.available_quantity }}
+														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
 
@@ -719,6 +721,7 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.dispatched_quantity }}
+														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
 
@@ -728,6 +731,7 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.requested_quantity }}
+														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>	
 

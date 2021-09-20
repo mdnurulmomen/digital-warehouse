@@ -196,15 +196,6 @@
 							</div>
 						</div>
 
-						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Parent Category</label>
-							</div>
-							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.manufacturer ? singleAssetData.manufacturer.name : 'None' | capitalize }}
-							</div>
-						</div>
-
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>

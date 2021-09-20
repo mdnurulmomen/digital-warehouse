@@ -133,7 +133,7 @@
 																	v-for="(content, contentIndex) in contentsToShow" 
 																	:key="'category-index-' + contentIndex + '-category-' + content.id"
 																>
-																	<td> {{ content.name }} </td>
+																	<td> {{ content.name | capitalize }} </td>
 																	
 																	<td> 
 																		<ul v-if="content.parent">
