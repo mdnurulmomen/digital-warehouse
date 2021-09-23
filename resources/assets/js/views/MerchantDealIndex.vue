@@ -391,7 +391,7 @@
 																	class="form-control p-0" 
 																	:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_type ? 'is-valid' : 'is-invalid'" 
 																	
-																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || ! removableSpace(singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])" 
+																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || ! removableSpace(warehouseSpace)" 
 
 																	@input="setWarehouseSpaces(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																	@close="validateFormInput('space_type')"
@@ -738,7 +738,7 @@
 																<button 
 																	type="button" 
 																	class="btn btn-outline-info btn-sm btn-block" 
-																	:disabled="! removableSpace(singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])" 
+																	:disabled="! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
 																	@click="removeWarehouseSpace(merchantWarehouseIndex)"
 																>
 																	Remove Space
@@ -2599,17 +2599,17 @@
 			},
 			removableSpace(warehouseSpace) {
 
-				if (warehouseSpace.type=='containers' && warehouseSpace.containers.some(warehouseContainer => warehouseContainer.occupied != 0)) {
+				if (warehouseSpace.type=='containers' && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.some(warehouseContainer => warehouseContainer.occupied != 0)) {
 
 					return false;
 
 				}
-				else if (warehouseSpace.type=='shelves' && warehouseSpace.container.shelves.some(warehouseShelf => warehouseShelf.occupied != 0)) {
+				else if (warehouseSpace.type=='shelves' && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.some(warehouseShelf => warehouseShelf.occupied != 0)) {
 
 					return false;
 
 				}
-				else if (warehouseSpace.type=='units' && warehouseSpace.container.shelf.units.some(warehouseUnit => warehouseUnit.occupied != 0)) {
+				else if (warehouseSpace.type=='units' && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.some(warehouseUnit => warehouseUnit.occupied != 0)) {
 
 					return false;
 

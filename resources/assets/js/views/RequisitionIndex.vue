@@ -32,7 +32,16 @@
 
 											  		<div class="col-6 text-right">	
 											  			<i class="fa fa-print fa-2x p-2" aria-hidden="true"></i>
-											  			<i class="fas fa-file-export fa-2x"></i> 
+											  			
+											  			<download-excel 
+											  				class="btn btn-default"
+															:data="requisitionsToShow"
+															:fields="dataToExport" 
+															worksheet="Requisitions sheet"
+															:name="(searchAttributes.search != '' ? 'searched-requisitions-' : 'requisitions-list-') + currentTime + '-page-' + pagination.current_page + '.xls'"
+											  			>
+															<i class="fas fa-file-export fa-2x"></i> 
+														</download-excel>
 											  		</div>
 											  	</div>
 
@@ -61,14 +70,14 @@
 
 									  				<div class="col-sm-8">
 									  					<div class="card card-body">
-															<div class="form-row">
+															<div class="form-row text-center">
 																<div class="col-sm-3 col-md-6">
 																	<label for="inputFirstName">
 																		Date From
 																	</label>
 																	
 																	<datepicker 
-																		name="uniquename"
+																		class="text-center"
 																		format="yyyy-MM-dd"
 																		v-model="searchAttributes.dateFrom" 
 																	>
@@ -81,9 +90,9 @@
 																	</label>
 																	
 																	<datepicker 
-																		v-model="searchAttributes.dateTo" 
-																		name="uniquename"
+																		class="text-center"
 																		format="yyyy-MM-dd"
+																		v-model="searchAttributes.dateTo" 
 																	>	
 																	</datepicker>
 																</div>							
@@ -1507,6 +1516,7 @@
 <script type="text/javascript">
 
 	import axios from 'axios';
+	import JsonExcel from "vue-json-excel";
 	import Datepicker from 'vuejs-datepicker';
 	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
@@ -1538,6 +1548,7 @@
 
 	    components: { 
 	    	Datepicker,
+	    	downloadExcel : JsonExcel, 
 			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
 		},
@@ -1595,6 +1606,120 @@
 					// agent : {}
 				},
 
+				dataToExport: {
+
+					Subject: 'subject',
+
+					"Requested On": 'created_at',
+
+					"Products": {
+						field: "products",
+						callback: (products) => {
+
+							if (products) {
+								
+								var infosToReturn = '';
+
+								products.forEach(
+					
+									(requiredProduct, requiredProductIndex) => {
+
+										infosToReturn += "\nProduct:" + requiredProduct.product_name + ' , Qty:' + requiredProduct.quantity;
+
+										if (requiredProduct.hasOwnProperty('variations') && requiredProduct.variations.length) {
+
+											requiredProduct.variations.forEach(
+						
+												(requiredProductVariation, requiredProductVariationIndex) => {
+
+													infosToReturn +=  "\n  (Variation:" + requiredProductVariation.variation_name + ' , Qty:' + requiredProductVariation.quantity + ')';					
+
+												}
+												
+											);
+
+										}
+
+									}
+									
+								);
+
+								return infosToReturn;
+
+							}
+							else {
+								return 'No Products'
+							}
+
+						},
+					},
+					
+					"Service": {
+						field: "agent",
+						callback: (agent) => {
+							if (agent) {
+								return 'Agent Service' + "\n" + 'Agent:' + agent.name + ' , Mobile:' + agent.mobile + ' , Code:' + agent.code;
+							}
+							else{
+								return 'Delivery Service'
+							}
+						},
+					},
+
+					"Status": {
+						callback: (object) => {
+							
+							if (object.status==1) {
+								return "Recommended\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ')') : '');
+							}
+							else if (object.status==-1) {
+								return "Cancelled\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ')') : '');
+							}
+							else {
+								return 'Pending';
+							}
+
+						},
+					},
+
+					"Approval": {
+						field: "dispatch",
+						callback: (dispatch) => {
+							if (dispatch) {
+								return (dispatch.has_approval==1 ? 'Approved' : 'Cancelled') + "\n" + dispatch.updater.first_name + ' ' + dispatch.updater.last_name + '(' + dispatch.updated_at + ')';
+							}
+							else {
+								return 'NA'
+							}
+						},
+					},
+
+					"Collection Point": {
+						field: "dispatch",
+						callback: (dispatch) => {
+							if (dispatch && dispatch.hasOwnProperty('agent')) {
+								return dispatch.agent.collection_point;
+							}
+							else {
+								return 'NA'
+							}
+						},
+					},
+
+					"Received": {
+						field: "dispatch",
+						callback: (dispatch) => {
+							if (dispatch) {
+								return (dispatch.hasOwnProperty('delivery') && dispatch.delivery.receiving_confirmation==1) ? 'Received' : (dispatch.hasOwnProperty('agent') && dispatch.agent.receiving_confirmation==1) ?  'Received' : 'Not Confirmed';
+							}
+							else {
+								return 'NA'
+							}
+						},
+					},
+					
+				},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -1630,6 +1755,13 @@
 				return false;
 
 			},
+
+			currentTime: function() {
+
+				let date = new Date();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+
+			}
 
 		},
 
