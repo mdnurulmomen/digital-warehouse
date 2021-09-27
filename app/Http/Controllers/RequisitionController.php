@@ -101,23 +101,16 @@ class RequisitionController extends Controller
     public function searchAllRequisitions(Request $request, $perPage)
     {
         $request->validate([
-            'search' => 'required|string', 
-            'dateTo' => 'nullable|date',
-            'dateFrom' => 'nullable|date',
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
             // 'showPendingRequisitions' => 'nullable|boolean',
             // 'showCancelledRequisitions' => 'nullable|boolean',
             // 'showDispatchedRequisitions' => 'nullable|boolean',
             // 'showProduct' => 'nullable|string', 
         ]);        
 
-        $query = Requisition::with(['products.merchantProduct.product', 'products.variations.merchantProductVariation.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
-                ->where(function ($query1) use ($request) {
-                    $query1->where('subject', 'like', "%$request->search%")
-                            ->orWhere('description', 'like', "%$request->search%")
-                            ->orWhereHas('products.merchantProduct.product', function ($q) use ($request) {
-                                $q->where('name', 'like', "%$request->search%");
-                            });
-                });
+        $query = Requisition::with(['products.merchantProduct.product', 'products.variations.merchantProductVariation.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return']);
 
         /*
         
@@ -141,16 +134,27 @@ class RequisitionController extends Controller
 
          */
 
+        if ($request->search) {
+            
+            $query->where(function ($query1) use ($request) {
+                $query1->where('subject', 'like', "%$request->search%")
+                    ->orWhere('description', 'like', "%$request->search%")
+                    ->orWhereHas('products.merchantProduct.product', function ($q) use ($request) {
+                        $q->where('name', 'like', "%$request->search%");
+                });
+            });
+
+        }
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>', $request->dateFrom);
+            $query->where('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<', $request->dateTo);
+            $query->where('created_at', '<=', $request->dateTo);
 
         }
 

@@ -13,100 +13,92 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
 											<div class="col-sm-12">
- 												<div class="row form-group d-flex align-items-center">
-											  		<div class="col-6 sub-title">	
-											  			{{ 
-											  				(/* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Requisitions List' : 'Requisitions List'
-											  			}}
+ 												<div class="row form-group">
+											  		<div class="col-sm-6 d-flex align-items-center form-group">
+											  			<div class="mr-2">
+											  				<span>
+													  			{{ 
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Requisitions List' : 'Requisitions List'
+													  			}}
+											  				</span>
+											  			</div>
+
+											  			<div class="d-flex align-items-center ml-auto ml-sm-0">
+											  				<div>
+											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
+											  				</div>
+									  						
+												  			<download-excel 
+												  				class="btn btn-default p-1"
+																:data="requisitionsToShow"
+																:fields="dataToExport" 
+																worksheet="Requisitions sheet"
+																:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+												  			>
+																<i class="fas fa-download fa-lg"></i> 
+															</download-excel>
+											  			</div>
 											  		</div>
 
-											  		<div class="col-6 text-right">	
-											  			<i class="fa fa-print fa-2x p-2" aria-hidden="true"></i>
-											  			
-											  			<download-excel 
-											  				class="btn btn-default"
-															:data="requisitionsToShow"
-															:fields="dataToExport" 
-															worksheet="Requisitions sheet"
-															:name="(searchAttributes.search != '' ? 'searched-requisitions-' : 'requisitions-list-') + currentTime + '-page-' + pagination.current_page + '.xls'"
-											  			>
-															<i class="fas fa-file-export fa-2x"></i> 
-														</download-excel>
-											  		</div>
-											  	</div>
+											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
+											  			<div class="ml-sm-auto mr-3">
+										  					<input 	
+																type="text" 
+														  		class="form-control" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		v-model="searchAttributes.search" 
+														  		placeholder="Search Requisitions"
+													  		>
 
-											  	<div class="row form-group">
-											  		<div class="col-sm-2"></div>
-									  				
-									  				<div class="col-sm-8 was-validated">
-									  					<input 	
-															type="text" 
-													  		v-model="searchAttributes.search" 
-													  		pattern="[^'!#$%^()\x22]+" 
-													  		class="form-control mr-1" 
-													  		placeholder="Search Requisitions"
-												  		>
+													  		<div class="invalid-feedback">
+														  		Please search with releavant input
+														  	</div>
+											  			</div>
 
-												  		<div class="invalid-feedback">
-													  		Please search with releavant input
-													  	</div>
-									  				</div>
-
-									  				<div class="col-sm-2"></div>
-									  			</div>
-
-									  			<div class="row" v-show="searchAttributes.search">
-									  				<div class="col-sm-2"></div>
-
-									  				<div class="col-sm-8">
-									  					<div class="card card-body">
-															<div class="form-row text-center">
-																<div class="col-sm-3 col-md-6">
-																	<label for="inputFirstName">
-																		Date From
-																	</label>
-																	
-																	<datepicker 
-																		class="text-center"
-																		format="yyyy-MM-dd"
-																		v-model="searchAttributes.dateFrom" 
+														<div class="ml-auto ml-sm-0">
+															
+															<ul class="nav nav-pills">
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-1"
+																		@click="setTodayDate()" 
+																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
 																	>
-																	</datepicker>
-																</div>
+																		Today
+																	</a>
+																</li>
 
-																<div class="col-sm-3 col-md-6">
-																	<label for="inputFirstName">
-																		Date To
-																	</label>
-																	
-																	<datepicker 
-																		class="text-center"
-																		format="yyyy-MM-dd"
-																		v-model="searchAttributes.dateTo" 
-																	>	
-																	</datepicker>
-																</div>							
-															</div>
-														</div>
-									  				</div>
-
-									  				<div class="col-sm-2"></div>
-									  			</div>
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-0" 
+																		data-toggle="modal" 
+																		data-target="#requisition-custom-search"
+																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
+																	>
+																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
+																	</a>
+																</li>
+															</ul>
+													  	</div>
+													</div>
+											  	</div>
 											</div>
 											
-											<div class="col-sm-12 col-lg-12">	
+											<div class="col-sm-12 col-lg-12">
+												<loading v-show="loading"></loading>	
+
 										  		<tab 
-										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
+										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
 										  			:current-tab="'pending'" 
 
@@ -115,7 +107,7 @@
 										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
 
- 												<div class="tab-content card-block">
+ 												<div class="tab-content card-block" v-show="!loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -131,7 +123,10 @@
 
 																	<tr v-for="content in requisitionsToShow" :key="'content-' + content.id"
 																	>
-																		<td>{{ content.subject | capitalize }}</td>
+																		<td>
+																			{{ content.subject | capitalize }}
+																		</td>
+
 																		<td>
 																			<span :class="[content.status==1 && content.dispatch.has_approval==1 ? 'badge-success' : content.status==1 && content.dispatch.has_approval==0 ? 'badge-warning' : content.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
 																				
@@ -139,6 +134,7 @@
 
 																			</span>
 																		</td>
+
 																		<td>
 																			<span 
 																			v-if="content.status==1 && content.dispatch.has_approval==1"
@@ -151,6 +147,7 @@
 																				NA
 																			</span>
 																		</td>
+																		
 																		<td>
 																			<button 
 																				type="button" 
@@ -202,6 +199,7 @@
 																  	</tr>
 
 																</tbody>
+
 																<tfoot>
 																	<tr>	
 																		<th>Name</th>
@@ -213,6 +211,7 @@
 															</table>
 														</div>
 													</div>
+
 													<div class="row d-flex align-items-center">
 														<div class="col-sm-2 col-4">
 															<select 
@@ -227,6 +226,7 @@
 																<option>50</option>
 															</select>
 														</div>
+
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
@@ -237,6 +237,7 @@
 																<i class="fa fa-sync"></i>
 															</button>
 														</div>
+
 														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
@@ -248,9 +249,7 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -1454,6 +1453,51 @@
 			</div>
 		</div>
 
+		<!-- Modal -->
+		<div class="modal fade" id="requisition-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-row">
+							<div class="col-12 text-center">
+								<p>
+									Timelaps
+								</p>
+								 
+								<v-date-picker 
+									v-model="searchAttributes.dates" 
+									color="red" 
+									is-dark
+									is-range 
+									is-inline
+									:max-date="new Date()" 
+									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
+									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+									@input="setSearchingDates()"
+								/> 
+							</div>					
+						</div>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+	                  		Reset
+	                  	</button>
+
+						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+	                  		See Results
+	                  	</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Cancel Requisitions -->
 		<div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" v-if="userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -1517,10 +1561,10 @@
 
 	import axios from 'axios';
 	import JsonExcel from "vue-json-excel";
-	import Datepicker from 'vuejs-datepicker';
 	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+	import DatePicker from 'v-calendar/lib/components/date-picker.umd';
 
     let singleRequisitionData = {
 
@@ -1547,7 +1591,7 @@
 	export default {
 
 	    components: { 
-	    	Datepicker,
+	    	vDatePicker : DatePicker,
 	    	downloadExcel : JsonExcel, 
 			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
@@ -1566,6 +1610,7 @@
 	        	
 	        	searchAttributes : {
 
+	        		dates : {},
 	        		search : '',
 		        	dateTo : null,
 		        	dateFrom : null,
@@ -1761,7 +1806,7 @@
 				let date = new Date();
 				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
 
-			}
+			},
 
 		},
 
@@ -1769,7 +1814,7 @@
 
 			'searchAttributes.search' : function(val){
 				
-				if (val==='') {
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllRequisitions();
 
@@ -1780,21 +1825,6 @@
 
 					if (! format.test(val)) {
 
-						this.searchAttributes = {
-							
-							search : val,
-				        	dateTo : null,
-				        	dateFrom : null,
-				        	
-				        	/*
-					        	showProduct : null,
-					        	showPendingRequisitions : false,
-					        	showCancelledRequisitions : false,
-					        	showDispatchedRequisitions : false,
-				        	*/
-
-						}
-
 						this.searchData();
 					
 					}
@@ -1802,10 +1832,10 @@
 				}
 
 			},
-
+			
 			'searchAttributes.dateFrom' : function(val){
 				
-				if (val==='') {
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllRequisitions();
 
@@ -1820,7 +1850,7 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
-				if (val==='') {
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllRequisitions();
 
@@ -2262,6 +2292,7 @@
 				return false;  // confirmed
 				
 			},
+			/*
 			unapproved(object) {
 
 				if (object.status==1 && object.dispatch.has_approval==0) {
@@ -2273,6 +2304,7 @@
 				return false;  // confirmed
 				
 			},
+			*/
 			nextPage() {
 				
 				if (this.step==1) {
@@ -2336,7 +2368,7 @@
 			},
 			removeSpace(productIndex) {	
 				
-				if (this.singleDispatchData.requisition.products.length && this.singleDispatchData.requisition.products[productIndex].addresses.length > 1) {
+				if (this.singleDispatchData.requisition.products.length > productIndex && this.singleDispatchData.requisition.products[productIndex].addresses.length > 1) {
 						
 					this.singleDispatchData.requisition.products[productIndex].addresses.pop();
 				
@@ -2504,6 +2536,45 @@
                 };
 
                 reader.readAsDataURL(file);
+            },
+            resetSearchingDates(){
+
+            	this.searchAttributes.dates = {};
+				this.searchAttributes.dateTo = null;
+				this.searchAttributes.dateFrom = null;				
+
+            },
+            setSearchingDates(){
+
+            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
+
+					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
+					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
+						
+				}
+				else {
+
+					this.resetSearchingDates();
+
+				}
+
+            },
+            setTodayDate() {
+            	
+            	if (this.searchAttributes.dateFrom != this.currentTime || this.searchAttributes.dateTo) {
+	            	
+	            	// this.searchAttributes.dateTo = null; 
+	            	this.searchAttributes.dates = {};
+	            	this.searchAttributes.dateTo = null;
+	            	this.searchAttributes.dateFrom = this.currentTime;
+
+            	}
+            	else {
+
+	            	this.searchAttributes.dateFrom = null
+
+            	}
+
             },
 			validateFormInput (formInputName) {
 
