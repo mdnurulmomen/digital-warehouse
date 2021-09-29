@@ -24,6 +24,9 @@ Vue.component('ToggleButton', ToggleButton)
 // importing custom components
 import { routeNeedsPermission, userHasPermissionTo } from './public.js'
 
+import VueHtmlToPaper from 'vue-html-to-paper';
+Vue.use(VueHtmlToPaper);
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

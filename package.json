@@ -34,6 +34,7 @@
         "v-calendar": "^2.3.2",
         "vue-axios": "^2.1.5",
         "vue-chartjs": "^3.5.1",
+        "vue-html-to-paper": "^1.4.3",
         "vue-js-toggle-button": "^1.3.3",
         "vue-json-excel": "^0.3.0",
         "vue-multiselect": "^2.1.6",

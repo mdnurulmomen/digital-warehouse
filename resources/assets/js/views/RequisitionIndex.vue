@@ -32,9 +32,11 @@
 											  			</div>
 
 											  			<div class="d-flex align-items-center ml-auto ml-sm-0">
+											  				<!-- 
 											  				<div>
 											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
-											  				</div>
+											  				</div> 
+											  				-->
 									  						
 												  			<download-excel 
 												  				class="btn btn-default p-1"
@@ -637,7 +639,7 @@
 										class="form-group col-md-12" 
 										v-if="Object.keys(singleDispatchData.requisition).length > 0"
 									>
-										<label for="inputFirstName">Description</label>
+										<label for="inputFirstName">Short Note</label>
 										<ckeditor 
 			                              	class="form-control" 
 			                              	:editor="editor" 
@@ -1112,16 +1114,7 @@
 												Subject :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.subject }}
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Description :
-											</label>
-											<label class="col-sm-6 col-form-label">
-												<span v-html="singleRequisitionData.description"></span>
+												{{ singleRequisitionData.subject | capitalize }}
 											</label>
 										</div>
 
@@ -1299,6 +1292,15 @@
 												</div>
 											</div>
 										</div>
+
+										<div class="form-row" v-if="singleRequisitionData.description">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Product Note :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												<span v-html="singleRequisitionData.description"></span>
+											</label>
+										</div>
 									</div>
 
 									<div class="tab-pane" id="requisition-dispatch" role="tabpanel">
@@ -1447,7 +1449,8 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-danger" @click="print">Print</button>
 					</div>
 				</div>
 			</div>
@@ -1553,6 +1556,323 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Printing Section -->
+		<div id="sectionToPrint" class="d-none">
+			<div class="card">
+				<div class="card-body">
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Subject :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.subject | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">Status :</label>
+
+						<label class="col-6 col-form-label">
+															
+							<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+															
+								{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
+
+							</span>
+							
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('cancellation_reason')">
+						<label class="col-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
+
+						<label class="col-6 col-form-label">
+							<span v-html="singleRequisitionData.cancellation_reason"></span>
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Requested on :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.created_at }}
+						</label>
+					</div>
+
+					<div 
+						class="form-row" 
+						v-if="singleRequisitionData.products && singleRequisitionData.products.length"
+					>
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Product Detail :
+						</label>
+						<div class="col-6">
+							<div class="form-row">
+								
+								<div 
+									class="col-md-12 ml-auto" 
+									v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
+									:key="'required-product-' + requiredProduct.id + productIndex"
+								>
+									<div class="card">
+										<div class="card-body">
+											<div class="form-row">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Product Name :
+												</label>
+												<label class="col-6 col-form-label">
+													{{ requiredProduct.product_name | capitalize }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Total Quantity :
+												</label>
+												<label class="col-6 col-form-label">
+													{{ requiredProduct.quantity }}
+												</label>
+											</div>
+
+											<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Product Serials :
+												</label>
+												<label class="col-6 col-form-label">
+													<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials" :key="'required-product-' + productIndex + '-product-serial-index-' + productSerialIndex + '-product-serial-' + productSerial.serial.serial_no">
+
+														{{ productSerial.serial.serial_no }}
+
+														<span v-show="(productSerialIndex+1) < requiredProduct.serials.length">, </span>
+													</span>
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Variations :
+												</label>
+												<label class="col-6 col-form-label">
+													<span :class="[requiredProduct.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ requiredProduct.has_variations ? 'Yes' : 'No' }}
+													</span>
+												</label>
+											</div>
+
+											<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
+												<div 
+													class="col-sm-12" 
+													v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+													:key="'required-product-variation-' + productVariation.id + variationIndex"
+												>
+													<div class="form-row">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															 {{ productVariation.variation_name | capitalize }} :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ productVariation.quantity }}
+														</label>
+													</div>
+
+													<div class="form-row" v-if="productVariation.has_serials && productVariation.serials.length">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															{{ productVariation.variation_name | capitalize }} Serials :
+														</label>
+														<label class="col-6 col-form-label">
+															<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials" :key="'required-product-' + productIndex + '-variation-index-' + variationIndex + '-product-variation-serial-index-' + variationSerialIndex + '-product-variation-serial-' + variationSerial.serial.serial_no">
+
+																{{ variationSerial.serial.serial_no }}
+
+																<span v-show="(variationSerialIndex+1) < productVariation.serials.length">, </span>
+															</span>
+														</label>
+													</div>
+												</div>
+											</div>
+
+											<div class="form-row">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Packaging Service :
+												</label>
+												<label class="col-6 col-form-label">
+													<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
+														{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
+													</span>
+												</label>
+											</div>
+
+											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package') && requiredProduct.preferred_package">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Preferred Package :
+												</label>
+												<label class="col-6 col-form-label">
+													{{ requiredProduct.preferred_package.name | capitalize }}
+												</label>
+											</div>
+
+											<div class="form-row" v-else-if="requiredProduct.hasOwnProperty('preferred_package') && !requiredProduct.preferred_package">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Preferred Package :
+												</label>
+												<label class="col-6 col-form-label">
+													<span class="badge badge-info">
+														NA
+													</span>
+												</label>
+											</div>
+
+											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Dispatched Package :
+												</label>
+												<label class="col-6 col-form-label">
+													{{ requiredProduct.dispatched_package.name | capitalize }}
+												</label>
+											</div>
+
+											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+												<label class="col-6 col-form-label font-weight-bold text-right">
+													Package Quantity :
+												</label>
+												<label class="col-6 col-form-label">
+													{{ requiredProduct.dispatched_package.quantity }}
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.description">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Product Note :
+						</label>
+						<label class="col-6 col-form-label">
+							<span v-html="singleRequisitionData.description"></span>
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Service :
+						</label>
+						<label class="col-6 col-form-label">
+							<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.delivery">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Delivery Address :
+						</label>
+						<label class="col-6 col-form-label">
+							<span v-html="singleRequisitionData.delivery.address"></span>
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('delivery')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Delivery Receipt :
+						</label>
+						<label class="col-6 col-form-label">
+							<img 
+								class="img-fluid" 
+								:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
+								alt="delivery receipt" 
+							>
+						</label>
+					</div>
+
+					<div class="form-row" v-show="singleRequisitionData.agent">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Agent Name :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
+						</label>
+					</div>
+
+					<div class="form-row" v-show="singleRequisitionData.agent">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Agent Mobile :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
+						</label>
+					</div>
+
+					<div class="form-row" v-show="singleRequisitionData.agent">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Agent Code :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} on :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.updated_at }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} By :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.updater.user_name | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  On :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.dispatch.updated_at }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval==1">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Received :
+						</label>
+						<label class="col-6 col-form-label">
+							<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
+								{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
+							</span>
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('agent')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Collection Point :
+						</label>
+						<label class="col-6 col-form-label">
+							<span v-html="singleRequisitionData.dispatch.agent.collection_point"></span>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Printing Section -->
 	</div>
 
 </template>
@@ -1763,6 +2083,26 @@
 						},
 					},
 					
+				},
+
+				printingStyles : {
+				    
+				    name: 'Test Name',
+				    
+				    specs: [
+				        'fullscreen=yes',
+				        // 'titlebar=yes',
+				        'scrollbars=yes'
+				    ],
+
+				    styles: [
+				    	"/css/bootstrap.min.css",
+				    ],
+
+				    timeout: 1000, // default timeout before the print window appears
+					autoClose: true, // if false, the window will not close after printing
+					windowTitle: 'Requisition Details' 
+
 				},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -2413,6 +2753,16 @@
 					}
 					
 				);
+
+			},
+			print() {
+
+				// this.printingStyles.name = `${ this.singleRequisitionData.subject } Details`;
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singleRequisitionData.subject } Details`);
+
+				this.$htmlToPaper('sectionToPrint', this.printingStyles);
+
+				$('#requisition-view-modal').modal('hide');
 
 			},
 			nameWithCapitalized (name) {
