@@ -13,33 +13,142 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
+						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">			
+										  	<div class="col-sm-12">
+ 												<div class="row form-group">
+											  		<div class="col-sm-6 d-flex align-items-center form-group">
+											  			<div class="mr-2">
+											  				<span>
+													  			{{ 
+													  				( /* searchAttributes.showPendingStocks || searchAttributes.showCancelledStocks || searchAttributes.showDispatchedStocks || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Stocks List' : 'Stocks List'
+													  			}}
+											  				</span>
+											  			</div>
+
+											  			<div class="d-flex align-items-center ml-auto ml-sm-0">
+											  				<!-- 
+											  				<div>
+											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
+											  				</div> 
+											  				-->
+
+											  				<div class="dropdown">
+										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+											  					
+											  					<div class="dropdown-menu">
+										  							<download-excel 
+														  				class="btn btn-default p-1 dropdown-item active"
+																		:data="allStocks"
+																		:fields="dataToExport" 
+																		worksheet="Stocks sheet"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+														  			>
+														  				Excel
+																	</download-excel>
+											  						
+											  						<!-- 
+											  						<download-excel 
+											  							type="csv"
+														  				class="btn btn-default p-1 dropdown-item disabled"
+																		:data="allStocks"
+																		:fields="dataToExport" 
+																		worksheet="Stocks sheet"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+														  			>
+														  				CSV
+																	</download-excel> 
+																	-->
+											  					</div>
+											  				</div>
+
+											  				<div 
+											  					class="ml-2"
+											  					v-if="userHasPermissionTo('create-product-stock')"
+											  				>
+													  			<button 
+														  			class="btn btn-success btn-outline-success btn-sm" 
+														  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
+														  			@click="showStockCreateForm"
+													  			>
+													  				<i class="fa fa-plus"></i>
+													  				New Stock
+													  			</button>
+													  		</div>
+											  			</div>
+											  		</div>
+
+											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
+											  			<div class="ml-sm-auto mr-3">
+										  					<input 	
+																type="text" 
+														  		class="form-control" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		v-model="searchAttributes.search" 
+														  		placeholder="Search Stocks"
+													  		>
+
+													  		<div class="invalid-feedback">
+														  		Please search with releavant input
+														  	</div>
+											  			</div>
+
+														<div class="ml-auto ml-sm-0">
+															<ul class="nav nav-pills">
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-1"
+																		@click="setTodayDate()" 
+																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
+																	>
+																		Today
+																	</a>
+																</li>
+
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-0" 
+																		data-toggle="modal" 
+																		data-target="#stock-custom-search"
+																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
+																	>
+																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
+																	</a>
+																</li>
+															</ul>
+													  	</div>
+													</div>
+											  	</div>
+											</div>
+
+										  	<!-- 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-product-stock-index') || userHasPermissionTo('create-product-stock')"
-											  		:query="query" 
+											  		:search="searchAttributes.search" 
 											  		:caller-page="'stocks'" 
 											  		:required-permission="'product-stock'" 
 											  		:disable-add-button="allDealtEmptyWarehouses.length==0 ? true : false" 									  
 											  		@showContentCreateForm="showStockCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchProductAllStocks"
-											  	></search-and-addition-option>
+											  	></search-and-addition-option> 
 											</div>
+										  	-->
 											
 											<div class="col-sm-12 col-lg-12">
-
-									  		<!-- 
+									  			<!-- 
 										  		<table-with-soft-delete-option 
-										  			:query="query" 
+										  			:search="searchAttributes.search" 
 										  			:per-page="perPage"  
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
@@ -55,9 +164,11 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
- 											-->
+ 												-->
 
- 												<div class="tab-content card-block">
+ 												<loading v-show="loading"></loading>
+
+ 												<div class="tab-content" v-show="!loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -178,7 +289,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? fetchProductAllStocks() : searchData()"
+																@click="searchAttributes.search === '' ? fetchProductAllStocks() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -189,7 +300,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchProductAllStocks() : searchData()"
+																@paginate="searchAttributes.search === '' ? fetchProductAllStocks() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -897,7 +1008,7 @@
 			@deleteStock="deleteStock($event)" 
 		></delete-confirmation-modal>
 
-	<!-- 
+		<!-- 
 		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
@@ -906,7 +1017,7 @@
 
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
- 	-->
+ 		-->
 
  		<!-- View Modal -->
 		<div class="modal fade" id="stock-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -1422,10 +1533,8 @@
 																				
 																			</li>
 																		</ul>
-
 																	</label>
 																</div>
-
 															</div>
 														</div>
 													</div>
@@ -1445,16 +1554,222 @@
 										</div>
 									</div>
 								</div>
-								 
-							
 							</div>
 						</div>
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">
+						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">
 							Close
 						</button>
+
+						<button type="button" class="btn btn-danger" @click="print()">
+							Print
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="stock-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-row">
+							<div class="col-12 text-center">
+								<p>
+									Timelaps
+								</p>
+								 
+								<v-date-picker 
+									v-model="searchAttributes.dates" 
+									color="red" 
+									is-dark
+									is-range 
+									is-inline
+									:max-date="new Date()" 
+									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
+									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+									@input="setSearchingDates()"
+								/> 
+							</div>					
+						</div>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+	                  		Reset
+	                  	</button>
+
+						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+	                  		See Results
+	                  	</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="sectionToPrint" class="d-none">
+			<div class="card">
+				<div class="card-body">
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Product Name :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ product.name | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stock Quantity :
+						</label>
+
+						<div class="col-6 col-form-label">
+							
+							{{ singleStockData.stock_quantity }}
+							
+							<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
+								<div 
+									class="col-md-12" 
+									v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+										:key="'product-variation-index-' + variationIndex + 'B'"
+								>
+									<div class="form-row">
+										<label class="col-form-label font-weight-bold text-right">
+											-{{ stockVariation.variation.name | capitalize }} :
+										</label>
+
+										<label class="col-form-label">
+											{{ stockVariation.stock_quantity }}
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Available Quantity (then) :
+						</label>
+						
+						<label class="col-6 col-form-label">
+							{{ singleStockData.available_quantity }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stocked on :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.created_at }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stocked at :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.hasOwnProperty('warehouse') ? singleStockData.warehouse.name : '' }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleStockData.hasOwnProperty('keeper')">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stored By :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.keeper.user_name | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Approval :
+						</label>
+
+						<label class="col-6 col-form-label">
+							<span :class="[singleStockData.has_approval==1 ? 'badge-success' : singleStockData.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
+								{{ singleStockData.has_approval==1 ? 'Approved' : singleStockData.has_approval==-1 ? 'Cancelled' : 'NA' }}
+							</span>
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleStockData.has_approval">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.approver.user_name | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row" v-if="singleStockData.has_approval">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.updated_at }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Serials :
+						</label>
+						<div class="col-6 col-form-label">
+							<ol 
+								v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
+							>
+								<li v-for="(productSerial,productIndex) in singleStockData.serials">
+									{{ productSerial.serial_no }}
+									<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
+								</li>	
+							</ol>
+							
+							<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
+								<div 
+									class="col-md-12" 
+									v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+									:key="'product-variation-index-' + variationIndex + '-C'"
+								>
+									<div class="form-row">
+										<label class="col-form-label font-weight-bold text-right">
+											{{ stockVariation.variation.name | capitalize }} |
+										</label>
+
+										<label class="col-form-label">
+											{{ stockVariation.stock_quantity }}
+											<ol 
+												v-if="singleStockData.has_serials && stockVariation.serials.length"
+											>
+												<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
+													{{ variationSerial.serial_no }}
+													<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
+												</li>	
+											</ol>
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1497,7 +1812,7 @@
 	        return {
 
 	        	step : 1,
-	        	query : '',
+	        	// search : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
@@ -1546,9 +1861,211 @@
 					},
 				},
 
+				searchAttributes : {
+
+	        		dates : {},
+	        		search : '',
+		        	dateTo : null,
+		        	dateFrom : null,
+
+	        	},
+
+	        	printingStyles : {
+				    
+				    // name: 'Test Name',
+				    
+				    specs: [
+				        'fullscreen=yes',
+				        // 'titlebar=yes',
+				        'scrollbars=yes'
+				    ],
+
+				    styles: [
+				    	"/css/bootstrap.min.css",
+				    ],
+
+				    timeout: 1000, // default timeout before the print window appears
+					autoClose: true, // if false, the window will not close after printing
+					windowTitle: 'Stock Details' 
+
+				},
+
+	        	dataToExport: {
+
+					"Product": {
+						field: "stock_quantity",
+						callback: (stock_quantity) => {
+							
+							return this.productMerchant.hasOwnProperty('product') ? this.productMerchant.product.name : 'NA';
+							
+						},
+					},
+
+					"Manufacturer/Brand": {
+						field: "stock_quantity",
+						callback: (stock_quantity) => {
+							
+							return this.productMerchant.manufacturer ? this.productMerchant.manufacturer.name : 'Own Product';
+							
+						},
+					},
+
+					"Merchant": {
+						field: "stock_quantity",
+						callback: (stock_quantity) => {
+							
+							return this.productMerchant.hasOwnProperty('merchant') ? `${this.productMerchant.merchant.first_name} ${this.productMerchant.merchant.last_name}` : 'NA';
+							
+						},
+					},
+
+					"Stock Quantity": {
+						
+						callback: (object) => {
+
+							var stockDetailToReturn = '';
+
+							stockDetailToReturn += `${object.stock_quantity} (Available:${object.available_quantity})
+							` ;
+
+							if (object.hasOwnProperty('variations') && object.variations.length) {
+
+								object.variations.forEach(
+					
+									(stockedProductVariation, stockedProductVariationIndex) => {
+
+										if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
+
+											stockDetailToReturn +=  `(Variation: ${stockedProductVariation.variation.name}, Qty: ${stockedProductVariation.stock_quantity})
+											`;
+
+										}
+
+										stockedProductVariation.serials.forEach(
+					
+											(stockedProductVariationSerial, stockedProductVariationSerialIndex) => {
+
+												if (stockedProductVariationSerial.serial_no) {
+
+													stockDetailToReturn +=  `(Serial: ${stockedProductVariationSerial.serial_no})
+													`;
+
+												}
+
+											}
+											
+										);
+
+									}
+									
+								);
+
+								return stockDetailToReturn;
+
+							}
+
+						},
+
+					},
+
+					"Stocked": {
+						callback: (object) => {
+							var stockInfosToReturn = '';
+
+							stockInfosToReturn += 'Warehouse:' + (object.hasOwnProperty('warehouse') ? object.warehouse.name : 'NA') + '(' + object.created_at + ')' + "\n";
+
+							stockInfosToReturn += `Keeper: ${object.keeper.first_name} ${object.keeper.last_name}
+							` 
+
+							return stockInfosToReturn;
+							
+						},
+					},
+
+					"Approval": {
+						callback: (object) => {
+							
+							if (object.has_approval==1) {
+								return "Approved (" + object.updated_at + ').' + "\n" + (object.approver ? object.approver.first_name + ' ' + object.approver.last_name : '');
+							}
+							else {
+								return 'Pending.';
+							}
+
+						},
+					},
+					
+				},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
+
+		},
+
+		computed: {
+
+			currentTime: function() {
+
+				let date = new Date();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+
+			},
+
+		},
+
+		watch : {
+
+			'searchAttributes.search' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchProductAllStocks();
+
+				}
+				else {
+
+					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
+
+					if (! format.test(val)) {
+
+						this.searchData();
+					
+					}
+
+				}
+
+			},
+			
+			'searchAttributes.dateFrom' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchProductAllStocks();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
+
+			'searchAttributes.dateTo' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchProductAllStocks();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
 
 		},
 		
@@ -1592,10 +2109,10 @@
 
 			fetchProductAllStocks() {
 
-				this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.allStocks = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/product-stocks/' + this.productMerchant.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
@@ -1632,7 +2149,7 @@
 			/*
 			fetchWarehouseAllContainers(warehouse) {
 				
-				this.query = '';
+				this.search = '';
 				this.error = '';
 				// this.loading = true;
 				this.allContainers = [];
@@ -1681,9 +2198,9 @@
 			*/
 			fetchMerchantAllWarehouses() {
 				
-				this.query = '';
 				this.error = '';
 				this.loading = true;
+				this.searchAttributes.search = '';
 				this.allDealtEmptyWarehouses = [];
 
 				axios
@@ -1869,7 +2386,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been stored", "Success");
-							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1901,7 +2418,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been updated", "Success");
-							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1928,7 +2445,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been deleted", "Success");
-							this.query !== '' ? this.searchData() : this.setAvailableContents(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -1946,20 +2463,14 @@
 					});
 
 			},
-			searchData(emittedValue) {
-
-				if (emittedValue) {
-					this.query = emittedValue;
-				}
+			searchData() {
 
 				this.error = '';
 				this.allStocks = [];
 				this.pagination.current_page = 1;
 				
 				axios
-				.get(
-					"/api/search-product-stocks/" + this.productMerchant.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
+				.post("/api/search-product-stocks/" + this.productMerchant.id + "/" + this.perPage, this.searchAttributes)
 				.then(response => {
 					this.allStocks = response.data.all.data;
 					this.pagination = response.data.all;
@@ -2621,7 +3132,7 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.query === '') {
+				if (this.searchAttributes.search === '') {
 					this.fetchProductAllStocks();
 				}
 				else {
@@ -2669,6 +3180,55 @@
 				return words.join(" ");
 
 		    },
+		    print() {
+
+				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
+
+				this.$htmlToPaper('sectionToPrint', this.printingStyles);
+
+				$('#requisition-view-modal').modal('hide');
+
+			},
+		    resetSearchingDates(){
+
+            	this.searchAttributes.dates = {};
+				this.searchAttributes.dateTo = null;
+				this.searchAttributes.dateFrom = null;				
+
+            },
+            setSearchingDates(){
+
+            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
+
+					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
+					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
+						
+				}
+				else {
+
+					this.resetSearchingDates();
+
+				}
+
+            },
+            setTodayDate() {
+            	
+            	if (this.searchAttributes.dateFrom != this.currentTime || this.searchAttributes.dateTo) {
+	            	
+	            	// this.searchAttributes.dateTo = null; 
+	            	this.searchAttributes.dates = {};
+	            	this.searchAttributes.dateTo = null;
+	            	this.searchAttributes.dateFrom = this.currentTime;
+
+            	}
+            	else {
+
+	            	this.searchAttributes.dateFrom = null
+
+            	}
+
+            },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;

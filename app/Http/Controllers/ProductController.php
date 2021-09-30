@@ -893,14 +893,45 @@ class ProductController extends Controller
         return $this->showProductAllStocks($stockToDelete->merchant_product_id, $perPage);
     }
 
-    public function searchProductAllStocks($merchantProduct, $search, $perPage)
+    public function searchProductAllStocks(Request $request, $merchantProduct, $perPage)
     {
+        $request->validate([
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
         $query = ProductStock::with(['addresses', 'variations', 'serials'])
-                        ->where('merchant_product_id', $merchantProduct)
-                        ->where(function($q) use ($search) {
-                            $q->where('stock_quantity', 'like', "%$search%")
-                            ->orWhere('available_quantity', 'like', "%$search%");
-                        });
+                        ->where('merchant_product_id', $merchantProduct);
+
+        if ($request->search) {
+            
+            $query->where(function($q) use ($request) {
+                $q->where('stock_quantity', 'like', "%$request->search%")
+                ->orWhere('available_quantity', 'like', "%$request->search%");
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereHas('stock', function ($q) use ($request) {
+                $q->where('created_at', '>=', $request->dateFrom);
+            });
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereHas('stock', function ($q) use ($request) {
+                $q->where('created_at', '<=', $request->dateTo);
+            });
+
+        }
 
         return response()->json([
             'all' => new ProductStockCollection($query->paginate($perPage)),  

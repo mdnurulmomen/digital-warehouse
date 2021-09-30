@@ -153,7 +153,7 @@ Route::name('admin.')->group(function () {
 		Route::put('/product-stocks/{stock}/{perPage}', 'ProductController@updateProductStock')->name('product-stocks');
 		Route::delete('/product-stocks/{stock}/{perPage}', 'ProductController@deleteProductStock')->name('product-stocks');
 		Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
-		Route::get('/api/search-product-stocks/{productMerchant}/{search}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
+		Route::post('/api/search-product-stocks/{productMerchant}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
 
 		// requisition
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');

@@ -39,6 +39,7 @@ Vue.use(VueHtmlToPaper);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Registering component globally
+Vue.component('download-excel', require('vue-json-excel').default);
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('alert', require('./components/AlertComponent.vue').default);
 Vue.component('loading', require('./components/LoadingComponent.vue').default);
@@ -46,6 +47,7 @@ Vue.component('tree-item', require('./components/TreeItemComponent.vue').default
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
 Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
+Vue.component('v-date-picker', require('v-calendar/lib/components/date-picker.umd'));
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);

@@ -31,7 +31,7 @@
 											  				</span>
 											  			</div>
 
-											  			<div class="d-flex align-items-center ml-auto ml-sm-0">
+											  			<div class="ml-auto ml-sm-0">
 											  				<!-- 
 											  				<div>
 											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
@@ -128,7 +128,7 @@
 										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
 
- 												<div class="tab-content card-block" v-show="!loading">
+ 												<div class="tab-content" v-show="!loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -1899,11 +1899,11 @@
 <script type="text/javascript">
 
 	import axios from 'axios';
-	import JsonExcel from "vue-json-excel";
+	// import JsonExcel from "vue-json-excel";
 	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-	import DatePicker from 'v-calendar/lib/components/date-picker.umd';
+	// import DatePicker from 'v-calendar/lib/components/date-picker.umd';
 
     let singleRequisitionData = {
 
@@ -1930,8 +1930,8 @@
 	export default {
 
 	    components: { 
-	    	vDatePicker : DatePicker,
-	    	downloadExcel : JsonExcel, 
+	    	// vDatePicker : DatePicker,
+	    	// downloadExcel : JsonExcel, 
 			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
 		},
@@ -2107,7 +2107,7 @@
 
 				printingStyles : {
 				    
-				    name: 'Test Name',
+				    // name: 'Test Name',
 				    
 				    specs: [
 				        'fullscreen=yes',
