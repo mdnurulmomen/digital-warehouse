@@ -37,16 +37,35 @@
 											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
 											  				</div> 
 											  				-->
-									  						
-												  			<download-excel 
-												  				class="btn btn-default p-1"
-																:data="requisitionsToShow"
-																:fields="dataToExport" 
-																worksheet="Requisitions sheet"
-																:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
-												  			>
-																<i class="fas fa-download fa-lg"></i> 
-															</download-excel>
+
+											  				<div class="dropdown">
+										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+											  					
+											  					<div class="dropdown-menu">
+										  							<download-excel 
+														  				class="btn btn-default p-1 dropdown-item active"
+																		:data="requisitionsToShow"
+																		:fields="dataToExport" 
+																		worksheet="Requisitions sheet"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+														  			>
+														  				Excel
+																	</download-excel>
+											  						
+											  						<!-- 
+											  						<download-excel 
+											  							type="csv"
+														  				class="btn btn-default p-1 dropdown-item disabled"
+																		:data="requisitionsToShow"
+																		:fields="dataToExport" 
+																		worksheet="Requisitions sheet"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+														  			>
+														  				CSV
+																	</download-excel> 
+																	-->
+											  					</div>
+											  				</div>
 											  			</div>
 											  		</div>
 
@@ -1989,7 +2008,7 @@
 					
 									(requiredProduct, requiredProductIndex) => {
 
-										infosToReturn += "\nProduct:" + requiredProduct.product_name + ' , Qty:' + requiredProduct.quantity;
+										infosToReturn += "Product:" + requiredProduct.product_name + ' , Qty:' + requiredProduct.quantity + "\n";
 
 										if (requiredProduct.hasOwnProperty('variations') && requiredProduct.variations.length) {
 
@@ -1997,7 +2016,7 @@
 						
 												(requiredProductVariation, requiredProductVariationIndex) => {
 
-													infosToReturn +=  "\n  (Variation:" + requiredProductVariation.variation_name + ' , Qty:' + requiredProductVariation.quantity + ')';					
+													infosToReturn +=  "(Variation:" + requiredProductVariation.variation_name + ' , Qty:' + requiredProductVariation.quantity + ').' + "\n";					
 
 												}
 												
@@ -2013,7 +2032,7 @@
 
 							}
 							else {
-								return 'No Products'
+								return 'No Products.'
 							}
 
 						},
@@ -2023,10 +2042,11 @@
 						field: "agent",
 						callback: (agent) => {
 							if (agent) {
-								return 'Agent Service' + "\n" + 'Agent:' + agent.name + ' , Mobile:' + agent.mobile + ' , Code:' + agent.code;
+								return `Agent Service.
+										Agent: ${agent.name}, Mobile: ${agent.mobile}, Code: ${agent.code}`;
 							}
 							else{
-								return 'Delivery Service'
+								return 'Delivery Service.'
 							}
 						},
 					},
@@ -2035,13 +2055,13 @@
 						callback: (object) => {
 							
 							if (object.status==1) {
-								return "Recommended\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ')') : '');
+								return "Recommended.\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ').') : '');
 							}
 							else if (object.status==-1) {
-								return "Cancelled\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ')') : '');
+								return "Cancelled.\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ').') : '');
 							}
 							else {
-								return 'Pending';
+								return 'Pending.';
 							}
 
 						},
@@ -2051,7 +2071,7 @@
 						field: "dispatch",
 						callback: (dispatch) => {
 							if (dispatch) {
-								return (dispatch.has_approval==1 ? 'Approved' : 'Cancelled') + "\n" + dispatch.updater.first_name + ' ' + dispatch.updater.last_name + '(' + dispatch.updated_at + ')';
+								return (dispatch.has_approval==1 ? 'Approved.' : 'Cancelled.') + "\n" + dispatch.updater.first_name + ' ' + dispatch.updater.last_name + '(' + dispatch.updated_at + ').';
 							}
 							else {
 								return 'NA'
@@ -2075,7 +2095,7 @@
 						field: "dispatch",
 						callback: (dispatch) => {
 							if (dispatch) {
-								return (dispatch.hasOwnProperty('delivery') && dispatch.delivery.receiving_confirmation==1) ? 'Received' : (dispatch.hasOwnProperty('agent') && dispatch.agent.receiving_confirmation==1) ?  'Received' : 'Not Confirmed';
+								return (dispatch.hasOwnProperty('delivery') && dispatch.delivery.receiving_confirmation==1) ? 'Received.' : (dispatch.hasOwnProperty('agent') && dispatch.agent.receiving_confirmation==1) ?  'Received.' : 'Not Confirmed.';
 							}
 							else {
 								return 'NA'
