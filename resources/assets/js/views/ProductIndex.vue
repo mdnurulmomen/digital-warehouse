@@ -72,7 +72,7 @@
 																<thead>
 																	<tr>
 																		<th>Name</th>
-																		<!-- <th>SKU</th> -->
+																		<th># Merchants</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -82,7 +82,7 @@
 																	>
 																		<td>{{ content.name | capitalize }}</td>
 																		
-																		<!-- <td>{{ content.sku }}</td> -->
+																		<td>{{ content.merchants_count || 0 }}</td>
 																		
 																		<td>
 																			<button 
@@ -182,7 +182,7 @@
 			</div>
 		</div>
 
-	<!-- 
+		<!-- 
 		<asset-create-or-edit-modal 
 			:create-mode="createMode" 
 			:caller-page="'variation'" 
@@ -192,7 +192,7 @@
 			@storeProduct="storeProduct($event)" 
 			@updateAsset="updateAsset($event)" 
 		></asset-create-or-edit-modal>
- 	-->
+	 	-->
 
  		<!--Create Or Edit Modal -->
 		<div class="modal fade" id="product-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product') || userHasPermissionTo('update-product')">
@@ -238,6 +238,8 @@
 
 							        	<div class="form-group col-md-6">
 											<label for="inputUsername">Product Category</label>
+											
+											<!-- 
 											<multiselect 
 		                              			v-model="singleProductData.category" 
 		                              			class="form-control p-0" 
@@ -254,7 +256,23 @@
 		                                  		:disabled="productMode=='bulk product'" 
 		                                  		@input="setProductCategory"
 		                              		>
-		                                	</multiselect>
+		                                	</multiselect> 
+		                                	-->
+
+		                                	<treeselect
+		                                		v-model="singleProductData.category"
+												class="form-control p-0" 
+												placeholder="Select Variation" 
+		                                  		:class="! errors.product.product_category ? 'is-valid' : 'is-invalid'"
+												:options="allProductCategories" 
+												:show-count="true" 
+												:normalizer="treeSelectCustomFunction" 
+												:valueFormat="'object'" 
+												:required="true" 
+												:disabled="productMode=='bulk product'" 
+												@select="setProductCategory"
+											/>
+
 		                                	<div class="invalid-feedback">
 										    	{{ errors.product.product_category }}
 										    </div>
@@ -1195,7 +1213,7 @@
 	        	createMode : true,
 	        	submitForm : true,
 
-	        	allMerchants : [],
+	        	// allMerchants : [],
 	        	allVariationTypes : [],
 	        	availableVariations : [],
 	        	allProductCategories : [],
@@ -1929,17 +1947,26 @@
 
 			},
 			setProductVariation() {
+				
 				if (this.singleProductData.has_variations && this.singleProductData.variation_type && Object.keys(this.singleProductData.variation_type).length > 0) {
+					
 					// this.singleProductData.variation_type_id = this.singleProductData.variation_type.id;
 					// this.singleProductData.variations = [
 					// 	{}, {}
 					// ];
+					
 					this.availableVariations = this.singleProductData.variation_type.variations;
+
 				}
 				else {
 					// this.singleProductData.variations = [];
 					this.availableVariations = [];
 				}
+
+				if (this.singleProductData.variations.some(productVariation => Object.keys(productVariation).length > 0)) {
+					this.resetProductVariations();
+				}
+
 			},
 			setProductMode() {
 				if (this.productMode=='bulk product') {
@@ -2441,7 +2468,7 @@
 							
 							this.singleProductData.variations.forEach(
 								(productVariation, index) => {
-									if (! productVariation.hasOwnProperty('variation') || Object.keys(productVariation.variation).length == 0) {
+									if (! productVariation.hasOwnProperty('variation') || ! productVariation.variation || Object.keys(productVariation.variation).length == 0) {
 										
 										this.errors.product.variations[index].product_variation_id = 'Variation is required';
 

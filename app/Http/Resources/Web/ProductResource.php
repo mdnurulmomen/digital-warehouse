@@ -35,6 +35,7 @@ class ProductResource extends JsonResource
             'product_category_id' => $this->product_category_id,
             // 'merchant_id' => $this->merchant_id,
             'category' => $this->category,
+            'merchants_count' => $this->when($this->merchants_count, $this->merchants_count),
             
             // 'merchants' => $this->merchants,
             
