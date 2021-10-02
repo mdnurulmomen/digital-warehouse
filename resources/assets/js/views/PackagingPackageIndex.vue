@@ -1,8 +1,6 @@
 
-<template>
-
+<template v-if="userHasPermissionTo('view-product-asset-index')">
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'packaging packages'" 
 			:message="'All our packages for packaging'"
@@ -41,7 +39,7 @@
 													  	</div>
 											  		</div>
 											  		
-											  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-asset')">
+											  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-product-asset')">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
 												  			@click="showContentCreateForm()"
@@ -135,7 +133,7 @@
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('update-asset')" 
+																				v-if="userHasPermissionTo('update-product-asset')" 
 																		>
 																			<i class="fa fa-edit"></i>
 																		</button>
@@ -144,7 +142,7 @@
 																				class="btn btn-grd-danger btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
-																				v-if="userHasPermissionTo('delete-asset')" 
+																				v-if="userHasPermissionTo('delete-product-asset')" 
 																		>
 																			<i class="fa fa-trash"></i>
 																		</button>
@@ -153,7 +151,7 @@
 																				class="btn btn-grd-warning btn-icon" 
 																				v-show="content.deleted_at" 
 																				@click="openContentRestoreForm(content)" 
-																				v-if="userHasPermissionTo('delete-asset')" 
+																				v-if="userHasPermissionTo('delete-product-asset')" 
 																		>
 																			<i class="fa fa-undo"></i>
 																		</button>
@@ -287,7 +285,7 @@
 		</div>
 
 		<!-- Modal -->
-		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')">
+		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -481,7 +479,7 @@
 		</div>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -491,7 +489,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"

@@ -21,40 +21,33 @@ class PermissionSeeder extends Seeder
             */
            
             $modelsCRUDable = [
-            	'Asset',
+            	'Role',
+            	'Product',
             	'Manager',
             	'Merchant',
-            	// 'MerchantDeal',
-            	// 'PackagingPackage',
-            	// 'DeliveryCompany',
-                'Product-Category',
-            	'Product-Manufacturer',
-                'Product-Stock',
-            	'Product',
-            	'Role',
-            	'Warehouse-Owner',
                 'Warehouse',
-            	// 'Warehouse-Manager',
+            	'Product-Asset',
+                'Product-Stock',
+            	'Warehouse-Owner',
+                'Warehouse-Asset',
+            	// 'WarehouseProduct',   // Product-Stock
+                // 'Product-Category',  // Product-Asset
+            	// 'Product-Manufacturer',  // Product-Asset
             	// 'WarehouseDeliveryCompany'
-            	// 'WarehouseManager'
-            	// 'WarehouseProduct',
-                
-                // to add at vue components
                 'Merchant-Deal',
-                'Delivery-Company',
                 'Merchant-Product',
                 'Merchant-Payment',
             ];
 
-            /*
-                $modelsCreateableAndUpdatable = [
-                    'Packaging-Package'     // Asset
-                ];
-            */
+            $modelsCreateableUpdatableAndDeletable = [
+                'Logistic-Asset',
+                // 'Delivery-Company',      // Logistic
+                // 'Packaging-Package'     // Logistic
+            ];            
 
             $modelsViewableAndUpdatable = [
-                'Application-Setting',  // view / update
                 'Requisition', // view / update(cancel)
+                'Application-Setting',  // view / update
             ];
 
             $modelsViewableRecommendableAndApproveable = [
@@ -99,18 +92,17 @@ class PermissionSeeder extends Seeder
 
             }
 
-            /*
-                foreach ($modelsCreateableAndUpdatable as $model) {
-                    
-                    Permission::insert([
-                    
-                        [ 'name' => 'create-'.strtolower($model) ],
-                        [ 'name' => 'update-'.strtolower($model) ],
+            foreach ($modelsCreateableUpdatableAndDeletable as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'create-'.strtolower($model) ],
+                    [ 'name' => 'update-'.strtolower($model) ],
+                    [ 'name' => 'delete-'.strtolower($model) ],
 
-                    ]);
+                ]);
 
-                }
-            */
+            }
 
             foreach ($modelsViewableAndUpdatable as $model) {
                 

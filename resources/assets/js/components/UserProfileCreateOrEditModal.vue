@@ -366,6 +366,50 @@
 													</div>
 												</div>
 
+												<!-- CUD Models -->
+												<div 
+													class="col-md-6" 
+													v-for="model in modelsCreateableUpdatableAndDeletable" 
+													:key="'crud-model-permission-name-' + model"
+												>
+													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+													<!-- create -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('create-' + model)" 
+															@change="insertPermission('create-' + model, $event)" 
+															:ref="'create-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('create-' + model) }}</label>
+													</div>
+
+													<!-- update -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('update-' + model)" 
+															@change="insertPermission('update-' + model, $event)" 
+															:ref="'update-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('update-' + model) }}</label>
+													</div>
+
+													<!-- delete -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('delete-' + model)" 
+															@change="insertPermission('delete-' + model, $event)" 
+															:ref="'delete-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('delete-' + model) }}</label>
+													</div>
+
+													<!-- view is public-->
+												</div>
+
 												<!-- Viewable and Updatable CRUD -->
 												<div 
 													class="col-md-6" 
@@ -567,19 +611,27 @@
 	            ],
 
 				modelsCRUDable : [
-	        		'Asset',
+	        		'Role',
+	            	'Product',
 	            	'Manager',
 	            	'Merchant',
-	            	'Product-Category',
-	            	'Product',
-	            	'Role',
+	                'Warehouse',
+	            	'Product-Asset',
+	                // 'Product-Stock',
+	                'Merchant-Deal',
 	            	'Warehouse-Owner',
-	            	'Warehouse',
+	                'Warehouse-Asset',
+	                'Merchant-Product',
+	                'Merchant-Payment',
 	        	],
 
+	        	modelsCreateableUpdatableAndDeletable : [
+                	'Logistic-Asset',
+	            ],
+
 	        	modelsViewableAndUpdatable : [
-	        		'Application-Setting',  // view / update
                 	'Requisition', // view / update(cancel)
+	        		'Application-Setting',  // view / update
 	        	],
 
 	        	modelsViewableRecommendableAndApproveable : [
@@ -876,6 +928,8 @@
 
 						}
 
+						this.setRelatedPermissions(permissionName);
+
 					}
 
 				}
@@ -1020,6 +1074,99 @@
 		      	else 
 		      		return ''
 		    },
+		    setRelatedPermissions(permissionName) {
+
+				let permissionRefName = permissionName.toLowerCase();
+
+				if (permissionRefName === 'create-product' || permissionRefName === 'update-product') {
+
+					if (! this.$refs['view-product-asset-index'][0].checked) {
+
+						this.$refs['view-product-asset-index'][0].click();
+
+					}
+
+				}
+				else if (permissionRefName === 'create-warehouse' || permissionRefName === 'update-warehouse') {
+
+					if (! this.$refs['view-warehouse-asset-index'][0].checked) {
+
+						this.$refs['view-warehouse-asset-index'][0].click();
+
+					}
+
+				}
+				else if (permissionRefName === 'create-product-stock' || permissionRefName === 'update-product-stock') {
+
+					if (! this.$refs['view-merchant-index'][0].checked) {
+
+						this.$refs['view-merchant-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-product-index'][0].checked) {
+
+						this.$refs['view-product-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-merchant-product-index'][0].checked) {
+
+						this.$refs['view-merchant-product-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-merchant-product' || permissionRefName === 'update-merchant-product') {
+
+					if (! this.$refs['view-merchant-index'][0].checked) {
+
+						this.$refs['view-merchant-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-product-index'][0].checked) {
+
+						this.$refs['view-product-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-merchant-deal' || permissionRefName === 'update-merchant-deal') {
+
+					if (! this.$refs['view-merchant-index'][0].checked) {
+
+						this.$refs['view-merchant-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-merchant-payment-index'][0].checked) {
+
+						this.$refs['view-merchant-payment-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'recommend-dispatch' || permissionRefName === 'approve-dispatch') {
+
+					if (! this.$refs['view-requisition-index'][0].checked) {
+
+						this.$refs['view-requisition-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-delivery-company-index'][0].checked) {
+
+						this.$refs['view-delivery-company-index'][0].click();
+
+					}
+
+				}
+
+			},
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;

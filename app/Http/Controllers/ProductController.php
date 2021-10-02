@@ -30,16 +30,16 @@ class ProductController extends Controller
     public function __construct()
     {
         // Manufacturers
-        $this->middleware("permission:view-product-manufacturer-index")->only(['showAllManufacturers', 'searchAllManufacturers']);
-        $this->middleware("permission:create-product-manufacturer")->only('storeNewManufacturer');
-        $this->middleware("permission:update-product-manufacturer")->only('updateManufacturer');
-        $this->middleware("permission:delete-product-manufacturer")->only(['deleteManufacturer', 'restoreManufacturer']);
+        $this->middleware("permission:view-product-asset-index")->only(['showAllManufacturers', 'searchAllManufacturers']);
+        $this->middleware("permission:create-product-asset")->only('storeNewManufacturer');
+        $this->middleware("permission:update-product-asset")->only('updateManufacturer');
+        $this->middleware("permission:delete-product-asset")->only(['deleteManufacturer', 'restoreManufacturer']);
 
         // Product-Category
-        $this->middleware("permission:view-product-category-index")->only(['showProductAllCategories', 'searchProductAllCategories']);
-        $this->middleware("permission:create-product-category")->only('storeProductNewCategory');
-        $this->middleware("permission:update-product-category")->only('updateProductCategory');
-        $this->middleware("permission:delete-product-category")->only(['deleteProductCategory', 'restoreProductCategory']);
+        $this->middleware("permission:view-product-asset-index")->only(['showProductAllCategories', 'searchProductAllCategories']);
+        $this->middleware("permission:create-product-asset")->only('storeProductNewCategory');
+        $this->middleware("permission:update-product-asset")->only('updateProductCategory');
+        $this->middleware("permission:delete-product-asset")->only(['deleteProductCategory', 'restoreProductCategory']);
 
         // Product
         $this->middleware("permission:view-product-index")->only(['showAllProducts', 'searchAllProducts', 'showCategoryAllProducts', 'searchCategoryAllProducts']);

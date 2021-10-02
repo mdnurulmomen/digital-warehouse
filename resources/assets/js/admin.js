@@ -143,7 +143,7 @@ const router = new VueRouter({
             component: StorageTypeIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-asset-index' 
+                requiredPermission: 'view-warehouse-asset-index' 
             }
         },
         {
@@ -152,7 +152,7 @@ const router = new VueRouter({
             component: ContainerIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-asset-index' 
+                requiredPermission: 'view-warehouse-asset-index' 
             }
         },
         {
@@ -161,7 +161,7 @@ const router = new VueRouter({
             component: RentPeriodIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-asset-index' 
+                requiredPermission: 'view-warehouse-asset-index' 
             }
         },
         {
@@ -170,7 +170,7 @@ const router = new VueRouter({
             component: VariationTypeIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-asset-index' 
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
@@ -179,7 +179,7 @@ const router = new VueRouter({
             component: VariationIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-asset-index' 
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
@@ -235,7 +235,7 @@ const router = new VueRouter({
             component: ProductCategoryIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-product-category-index' 
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
@@ -244,7 +244,7 @@ const router = new VueRouter({
             component: ProductManufacturerIndex,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-product-manufacturer-index' 
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
@@ -401,7 +401,7 @@ const router = new VueRouter({
             component: PackagingPackageIndex,
             meta: {
                 // authRequired: true,
-                // requiredPermission: 'view-asset-index' 
+                // requiredPermission: 'view-product-asset-index' 
             }
         },
 

@@ -18,13 +18,21 @@ class AssetController extends Controller
 {
     public function __construct()
     {
-        $this->middleware("permission:view-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods', 'showAllVariationTypes', 'searchVariationTypes', 'showAllVariations', 'searchAllVariations']);
+        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods']);
 
-        $this->middleware("permission:create-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod', 'storeVariationType', 'storeNewVariation', 'storeNewPackagingPackage']);
+        $this->middleware("permission:view-product-asset-index")->only(['showAllVariationTypes', 'searchVariationTypes', 'showAllVariations', 'searchAllVariations']);
 
-        $this->middleware("permission:update-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod', 'updateVariationType', 'updateVariation', 'updatePackagingPackage']);
+        $this->middleware("permission:create-warehouse-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod']);
+
+        $this->middleware("permission:create-product-asset")->only(['storeVariationType', 'storeNewVariation', 'storeNewPackagingPackage']);
+
+        $this->middleware("permission:update-warehouse-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod']);
+
+        $this->middleware("permission:update-product-asset")->only(['updateVariationType', 'updateVariation', 'updatePackagingPackage']);
         
-        $this->middleware("permission:delete-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod', 'deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation', 'deletePackagingPackage', 'restorePackagingPackage']);
+        $this->middleware("permission:delete-warehouse-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
+
+        $this->middleware("permission:delete-product-asset")->only(['deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation', 'deletePackagingPackage', 'restorePackagingPackage']);
     }
 
     // storage types

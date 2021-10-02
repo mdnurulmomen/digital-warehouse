@@ -1,8 +1,6 @@
 
-<template v-if="userHasPermissionTo('view-asset-index')">
-
+<template v-if="userHasPermissionTo('view-warehouse-asset-index')">
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'containers'" 
 			:message="'All our containers'"
@@ -25,10 +23,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
+											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
 											  		:query="query" 
 											  		:caller-page="'container'" 
-											  		:required-permission="'asset'" 
+											  		:required-permission="'warehouse-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData" 
@@ -54,7 +52,7 @@
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'asset'"
+										  			:required-permission="'warehouse-asset'"
 
 										  			@showContentDetails="showContentDetails" 
 										  			@openContentEditForm="openContentEditForm" 
@@ -92,7 +90,7 @@
  	-->
 
  		<!-- modal-createOrEdit-container -->
-		<div class="modal fade" id="container-createOrEdit-modal" v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')" >
+		<div class="modal fade" id="container-createOrEdit-modal" v-if="userHasPermissionTo('create-warehouse-asset') || userHasPermissionTo('update-warehouse-asset')" >
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					
@@ -507,7 +505,7 @@
 		</div>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -517,7 +515,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"

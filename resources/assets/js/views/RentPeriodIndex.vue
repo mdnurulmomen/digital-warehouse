@@ -1,8 +1,6 @@
 
-<template v-if="userHasPermissionTo('view-asset-index')">
-
+<template v-if="userHasPermissionTo('view-warehouse-asset-index')">
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'rent-periods'" 
 			:message="'All our warehouse rent-periods'"
@@ -25,10 +23,10 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('create-asset')" 
+											  		v-if="userHasPermissionTo('create-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
 											  		:query="query" 
 											  		:caller-page="'rent period'" 
-											  		:required-permission="'asset'" 
+											  		:required-permission="'warehouse-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -68,7 +66,7 @@
 																			</span>
 																		</a>
 																	</th>
-																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
+																	<th v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
 																		Actions
 																	</th>
 																</tr>
@@ -83,7 +81,7 @@
 																		{{ content.name | capitalize }}
 																	</td>
 																	
-																	<td v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
+																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
 																		<!-- 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
@@ -97,7 +95,7 @@
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('update-asset')" 
+																				v-if="userHasPermissionTo('update-warehouse-asset')" 
 																		>
 																			<i class="fa fa-edit"></i>
 																		</button>
@@ -106,7 +104,7 @@
 																				class="btn btn-grd-danger btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
-																				v-if="userHasPermissionTo('delete-asset')" 
+																				v-if="userHasPermissionTo('delete-warehouse-asset')" 
 																		>
 																			<i class="fa fa-trash"></i>
 																		</button>
@@ -115,7 +113,7 @@
 																				class="btn btn-grd-warning btn-icon" 
 																				v-show="content.deleted_at" 
 																				@click="openContentRestoreForm(content)" 
-																				v-if="userHasPermissionTo('delete-asset')" 
+																				v-if="userHasPermissionTo('delete-warehouse-asset')" 
 																		>
 																			<i class="fa fa-undo"></i>
 																		</button>
@@ -125,7 +123,7 @@
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
-														    		<td :colspan="(userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')) ? 2 : 1">
+														    		<td :colspan="(userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')) ? 2 : 1">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -152,7 +150,7 @@
 																			</span>
 																		</a>
 																	</th>
-																	<th v-if="userHasPermissionTo('update-asset') || userHasPermissionTo('delete-asset')">
+																	<th v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
 																		Actions
 																	</th>
 																</tr>
@@ -229,7 +227,7 @@
 		</div>
 
 		<asset-create-or-edit-modal 
-			v-if="userHasPermissionTo('create-asset') || userHasPermissionTo('update-asset')" 
+			v-if="userHasPermissionTo('create-warehouse-asset') || userHasPermissionTo('update-warehouse-asset')" 
 			:create-mode="createMode" 
 			:caller-page="'rent period'" 
 			:single-asset-data="singleAssetData" 
@@ -240,7 +238,7 @@
 		></asset-create-or-edit-modal>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -250,7 +248,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
-			v-if="userHasPermissionTo('delete-asset')" 
+			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"

@@ -1,10 +1,10 @@
 
-<template v-if="userHasPermissionTo('view-product-manufacturer-index')">
+<template v-if="userHasPermissionTo('view-product-asset-index')">
 
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'product categories'" 
+			:title="'product manufacturers'" 
 			:message="'All our product-manufacturers'"
 		></breadcrumb>			
 
@@ -24,10 +24,10 @@
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-product-manufacturer-index') || userHasPermissionTo('create-product-manufacturer')" 
+											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')" 
 											  		:query="query" 
 											  		:caller-page="'product manufacturer'" 
-											  		:required-permission = "'product-manufacturer'" 
+											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -87,7 +87,7 @@
  	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="product-manufacturer-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-manufacturer') || userHasPermissionTo('update-product-manufacturer')">
+		<div class="modal fade" id="product-manufacturer-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -148,7 +148,7 @@
 		</div>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-product-manufacturer')" 
+			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
@@ -158,7 +158,7 @@
 		></delete-confirmation-modal>
 
 		<restore-confirmation-modal 
-			v-if="userHasPermissionTo('delete-product-manufacturer')" 
+			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"

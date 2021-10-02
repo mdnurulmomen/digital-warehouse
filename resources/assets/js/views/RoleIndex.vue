@@ -865,14 +865,19 @@
 	            ],
 
 				modelsCRUDable : [
-	        		'Asset',
+	        		'Role',
+	            	'Product',
 	            	'Manager',
 	            	'Merchant',
-	            	'Product-Category',
-	            	'Product',
-	            	'Role',
+	                'Warehouse',
+	                'Merchant-Deal',
+	            	'Product-Asset',
+	                // 'Product-Stock',
 	            	'Warehouse-Owner',
-	            	'Warehouse',
+	                'Warehouse-Asset',
+	                'Delivery-Company',
+	                'Merchant-Product',
+	                'Merchant-Payment',
 	        	],
 
 	        	modelsViewableAndUpdatable : [
@@ -1350,6 +1355,8 @@
 
 						}
 
+						this.setRelatedPermissions(permissionName);
+
 					}
 					/*
 						else {
@@ -1382,6 +1389,99 @@
 						
 						}
 					*/
+
+				}
+
+			},
+			setRelatedPermissions(permissionName) {
+
+				let permissionRefName = permissionName.toLowerCase();
+
+				if (permissionRefName === 'create-product' || permissionRefName === 'update-product') {
+
+					if (! this.$refs['view-product-asset-index'][0].checked) {
+
+						this.$refs['view-product-asset-index'][0].click();
+
+					}
+
+				}
+				else if (permissionRefName === 'create-warehouse' || permissionRefName === 'update-warehouse') {
+
+					if (! this.$refs['view-warehouse-asset-index'][0].checked) {
+
+						this.$refs['view-warehouse-asset-index'][0].click();
+
+					}
+
+				}
+				else if (permissionRefName === 'create-product-stock' || permissionRefName === 'update-product-stock') {
+
+					if (! this.$refs['view-merchant-index'][0].checked) {
+
+						this.$refs['view-merchant-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-product-index'][0].checked) {
+
+						this.$refs['view-product-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-merchant-product-index'][0].checked) {
+
+						this.$refs['view-merchant-product-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-merchant-product' || permissionRefName === 'update-merchant-product') {
+
+					if (! this.$refs['view-merchant-index'][0].checked) {
+
+						this.$refs['view-merchant-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-product-index'][0].checked) {
+
+						this.$refs['view-product-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-merchant-deal' || permissionRefName === 'update-merchant-deal') {
+
+					if (! this.$refs['view-merchant-index'][0].checked) {
+
+						this.$refs['view-merchant-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-merchant-payment-index'][0].checked) {
+
+						this.$refs['view-merchant-payment-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'recommend-dispatch' || permissionRefName === 'approve-dispatch') {
+
+					if (! this.$refs['view-requisition-index'][0].checked) {
+
+						this.$refs['view-requisition-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-delivery-company-index'][0].checked) {
+
+						this.$refs['view-delivery-company-index'][0].click();
+
+					}
 
 				}
 
