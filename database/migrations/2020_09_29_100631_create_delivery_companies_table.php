@@ -18,6 +18,7 @@ class CreateDeliveryCompaniesTable extends Migration
             $table->string('name', 100);
             $table->string('service_time')->nullable();
             $table->unsignedTinyInteger('commission')->default(10);
+            $table->softDeletes();
         });
     }
 

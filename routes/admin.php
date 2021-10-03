@@ -190,6 +190,14 @@ Route::name('admin.')->group(function () {
 		Route::patch('/packaging-packages/{package}/{perPage}','AssetController@restorePackagingPackage')->name('packaging-packages');
 		Route::get('/api/search-packaging-packages/{search}/{perPage}','AssetController@searchAllPackagingPackages')->name('search-packaging-packages');
 
+		// delivery-companies
+		Route::get('/api/delivery-companies/{perPage?}','AssetController@showDeliveryAllCompanies')->name('delivery-companies');
+		Route::post('/delivery-companies/{perPage}','AssetController@storeDeliveryNewCompany')->name('delivery-companies');	
+		Route::put('/delivery-companies/{company}/{perPage}','AssetController@updateDeliveryCompany')->name('delivery-companies');	
+		Route::delete('/delivery-companies/{company}/{perPage}','AssetController@deleteDeliveryCompany')->name('delivery-companies');
+		Route::patch('/delivery-companies/{company}/{perPage}','AssetController@restoreDeliveryCompany')->name('delivery-companies');
+		Route::get('/api/search-delivery-companies/{search}/{perPage}','AssetController@searchDeliveryAllCompanies')->name('search-delivery-companies');
+
 		// product-merchants
 		Route::get('/api/product-merchants/{product}/{perPage}', 'ProductController@showProductAllMerchants')->name('product-merchants');
 		Route::post('/product-merchants/{perPage}', 'ProductController@storeProductNewMerchant')->name('product-merchants');	

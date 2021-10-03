@@ -9,6 +9,7 @@ use App\Models\StorageType;
 use Illuminate\Http\Request;
 use App\Models\VariationType;
 use Illuminate\Validation\Rule;
+use App\Models\DeliveryCompany;
 use App\Models\PackagingPackage;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Web\VariationCollection;
@@ -24,15 +25,21 @@ class AssetController extends Controller
 
         $this->middleware("permission:create-warehouse-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod']);
 
-        $this->middleware("permission:create-product-asset")->only(['storeVariationType', 'storeNewVariation', 'storeNewPackagingPackage']);
+        $this->middleware("permission:create-product-asset")->only(['storeVariationType', 'storeNewVariation']);
+
+        $this->middleware("permission:create-logistic-asset")->only(['storeNewPackagingPackage', 'storeDeliveryNewCompany']);
 
         $this->middleware("permission:update-warehouse-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod']);
 
-        $this->middleware("permission:update-product-asset")->only(['updateVariationType', 'updateVariation', 'updatePackagingPackage']);
+        $this->middleware("permission:update-product-asset")->only(['updateVariationType', 'updateVariation']);
+
+        $this->middleware("permission:update-logistic-asset")->only(['updatePackagingPackage', 'updateDeliveryCompany']);
         
         $this->middleware("permission:delete-warehouse-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
 
-        $this->middleware("permission:delete-product-asset")->only(['deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation', 'deletePackagingPackage', 'restorePackagingPackage']);
+        $this->middleware("permission:delete-product-asset")->only(['deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation']);
+
+        $this->middleware("permission:delete-logistic-asset")->only(['deletePackagingPackage', 'restorePackagingPackage', 'deleteDeliveryCompany', 'restoreDeliveryCompany']);
     }
 
     // storage types
@@ -658,6 +665,94 @@ class AssetController extends Controller
         $columnsToSearch = ['name', 'price', 'description'];
 
         $query = PackagingPackage::withTrashed();
+
+        foreach($columnsToSearch as $column){
+            $query->orWhere($column, 'like', "%$search%");
+        }
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
+    // delivery-companies
+    public function showDeliveryAllCompanies($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => DeliveryCompany::paginate($perPage),
+                'trashed' => DeliveryCompany::onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return DeliveryCompany::latest('id')->get();
+    }
+
+    public function storeDeliveryNewCompany(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:delivery_companies,name',
+            'commission' => 'required|numeric',
+            'service_time' => 'nullable|string|max:255',
+        ]);
+
+        $newAsset = new DeliveryCompany();
+
+        $newAsset->name = strtolower($request->name);
+        $newAsset->commission = $request->commission;
+        $newAsset->service_time = $request->service_time;
+
+        $newAsset->save();
+
+        return $this->showDeliveryAllCompanies($perPage);
+    }
+
+    public function updateDeliveryCompany(Request $request, $owner, $perPage)
+    {
+        $assetToUpdate = DeliveryCompany::findOrFail($owner);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:delivery_companies,name,'.$assetToUpdate->id,
+            'commission' => 'required|numeric',
+            'service_time' => 'nullable|string|max:255',
+        ]);
+
+        $assetToUpdate->name = strtolower($request->name);
+        $assetToUpdate->commission = $request->commission;
+        $assetToUpdate->service_time = $request->service_time;
+
+        $assetToUpdate->save();
+
+        return $this->showDeliveryAllCompanies($perPage);
+    }
+
+    public function deleteDeliveryCompany($package, $perPage)
+    {
+        $assetToDelete = DeliveryCompany::findOrFail($package);
+        // $userToDelete->warehouses()->delete();
+        $assetToDelete->delete();
+
+        return $this->showDeliveryAllCompanies($perPage);
+    }
+
+    public function restoreDeliveryCompany($package, $perPage)
+    {
+        $userToRestore = DeliveryCompany::withTrashed()->findOrFail($package);
+        // $userToRestore->warehouses()->restore();
+        $userToRestore->restore();
+
+        return $this->showDeliveryAllCompanies($perPage);
+    }
+
+    public function searchDeliveryAllCompanies($search, $perPage)
+    {
+        $columnsToSearch = ['name', 'commission', 'service_time'];
+
+        $query = DeliveryCompany::withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

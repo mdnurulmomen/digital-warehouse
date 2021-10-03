@@ -85,6 +85,7 @@ import ProductStockIndex from './views/ProductStockIndex'
 import ProductMerchantIndex from './views/ProductMerchantIndex'
 import MerchantProductIndex from './views/MerchantProductIndex'
 import RoleIndex from './views/RoleIndex'
+import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 import MerchantDealIndex from './views/MerchantDealIndex'
 import DealPaymentIndex from './views/DealPaymentIndex'
@@ -399,6 +400,16 @@ const router = new VueRouter({
             path: '/packaging-packages',
             name: 'packaging-packages',
             component: PackagingPackageIndex,
+            meta: {
+                // authRequired: true,
+                // requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        // view companies is permissible for all
+        {
+            path: '/delivery-companies',
+            name: 'delivery-companies',
+            component: DeliveryCompanyIndex,
             meta: {
                 // authRequired: true,
                 // requiredPermission: 'view-product-asset-index' 

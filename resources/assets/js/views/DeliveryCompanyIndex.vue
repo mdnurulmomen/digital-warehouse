@@ -2,8 +2,8 @@
 <template>
 	<div class="pcoded-content">
 		<breadcrumb 
-			:title="'packaging packages'" 
-			:message="'All our packages for packaging'"
+			:title="'delivery company'" 
+			:message="'All our companies for delivery'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -24,7 +24,7 @@
 											<div class="col-sm-12 sub-title">
 											  	<div class="row d-flex align-items-center text-center">
 											  		<div class="col-sm-3 form-group">	
-															Packaging Packages List
+															Delivery Companies List
 											  		</div>
 
 											  		<div class="col-sm-6 was-validated form-group">
@@ -45,7 +45,7 @@
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
-											  				New Package
+											  				New Company
 											  			</button>
 											  		</div>
 											  	</div>
@@ -89,7 +89,7 @@
 																			href="javascript:void(0)" 
 																			@click="changePricesOrder"
 																		> 
-																			Price
+																			Commission
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -118,7 +118,7 @@
 																	</td>
 
 																	<td>
-																		{{ content.price }}
+																		{{ content.commission }}
 																	</td>
 																	
 																	<td> 
@@ -160,7 +160,7 @@
 																</tr>
 
 																<tr 
-															  		v-show="!contentsToShow.length"
+															  		v-show="! contentsToShow.length"
 															  	>
 														    		<td colspan="3">
 															      		<div class="alert alert-danger" role="alert">
@@ -195,7 +195,7 @@
 																			href="javascript:void(0)" 
 																			@click="changePricesOrder"
 																		> 
-																			Price
+																			Commission
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -326,81 +326,30 @@
 
 							<div class="form-row">
 								<div class="form-group col-md-12">
-									<label for="inputFirstName">Price</label>
-									<input type="number" 
-										class="form-control" 
-										v-model="singleAssetData.price" 
-										placeholder="Name should be unique" 
-										:class="!errors.asset.price  ? 'is-valid' : 'is-invalid'" 
-										@change="validateFormInput('price')" 
-										required="true" 
-									>
-
-									<div class="invalid-feedback">
-							        	{{ errors.asset.price }}
-							  		</div>
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="card">
-							    	<div class="card-body">
-							    		<div class="form-row d-flex align-items-center text-center">
-											<div class="form-group col-md-6">
-												<img class="img-fluid" 
-													:src="singleAssetData.preview || ''"
-													alt="Package Picture" 
-												>
-											</div>
-											<div class="form-group col-md-6">
-												<div class="custom-file">
-												    <input type="file" 
-												    	class="form-control custom-file-input" 
-														:class="!errors.asset.preview  ? 'is-valid' : 'is-invalid'" 
-											    	 	@change="onImageChange" 
-											    	 	accept="image/*"
-												    >
-												    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
-												    <div class="invalid-feedback">
-												    	{{ errors.asset.preview }}
-												    </div>
-											  	</div>
-											</div>
+									<label for="inputFirstName">Commission</label>
+									<div class="input-group mb-0">
+										<input type="number" 
+											class="form-control" 
+											v-model="singleAssetData.commission" 
+											:class="!errors.asset.commission  ? 'is-valid' : 'is-invalid'" 
+											@change="validateFormInput('commission')" 
+											required="true" 
+										>
+										<div class="input-group-append">
+											<span class="input-group-text">%</span>
 										</div>
-							    	</div>
-							  	</div>
-							</div>
+									</div>
 
-							<div class="form-row">
-								<div class="form-group col-md-12">
-									<label for="inputFirstName">Short Description</label>
-									<ckeditor 
-		                              	class="form-control" 
-		                              	:editor="editor" 
-		                              	v-model="singleAssetData.description"
-		                            >
-	                              	</ckeditor>
-								</div>
-							</div>
-
-							<!-- 
-							<div class="form-row">
-								<div class="form-group col-md-12">
-									<label for="inputUsername">Short Code (for recognizing)</label>
-									<input type="text" 
-										class="form-control" 
-										v-model="singleAssetData.code" 
-										placeholder="Code should be unique" 
-										:class="!errors.asset.code  ? 'is-valid' : 'is-invalid'" 
-										@change="validateFormInput('code')"
+									<div 
+										style="display: block;" 
+										class="invalid-feedback" 
+										v-show="errors.asset.commission"
 									>
-
-									<div class="invalid-feedback">
-							        	{{ errors.asset.code }}
+							        	{{ errors.asset.commission }}
 							  		</div>
 								</div>
+
 							</div>
-							 -->
 						</div>
 						<div class="modal-footer flex-column">
 							<div class="col-sm-12 text-right" v-show="!submitForm">
@@ -435,39 +384,30 @@
 					</div>
 					<div class="modal-body">
 
-						<div class="card">
-							<div class="card-body text-center">	
-								<img class="img-fluid" 
-									:src="singleAssetData.preview || ''"
-									alt="Package Picture" 
-								>
-							</div>
-						</div>
-
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
 								<label class="font-weight-bold">Name:</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.name }}
+								{{ singleAssetData.name | capitalize }}
 							</div>
 						</div>
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Price:</label>
+								<label class="font-weight-bold">Commission:</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.price }}
+								{{ singleAssetData.commission }} %
 							</div>
 						</div>
 
 						<div class="form-row"> 
 						    <div class="form-group col-md-6 text-right">
-								<label class="font-weight-bold">Description:</label>
+								<label class="font-weight-bold">Service Schedule:</label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								<span v-html="singleAssetData.description"></span>
+								
 							</div>
 						</div>
 					</div>
@@ -566,12 +506,18 @@
 		watch : {
 
 			query : function(val){
+				
 				if (val==='') {
+					
 					this.fetchAllContents();
+				
 				}
 				else {
+
 					this.searchData();
+
 				}
+
 			},
 
 		},
@@ -608,7 +554,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/packaging-packages/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/delivery-companies/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -647,7 +593,7 @@
 				
 				axios
 				.get(
-					"/api/search-packaging-packages/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-delivery-companies/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -696,7 +642,7 @@
 			verifyUserInput() {
 
 				this.validateFormInput('name');
-				this.validateFormInput('price');
+				this.validateFormInput('commission');
             	
             	if (this.errors.asset.constructor === Object && Object.keys(this.errors.asset).length !== 0) {
 					this.submitForm = false;
@@ -720,7 +666,7 @@
 			storeAsset() {
 				
 				axios
-					.post('/packaging-packages/' + this.perPage, this.singleAssetData)
+					.post('/delivery-companies/' + this.perPage, this.singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New package has been created", "Success");
@@ -741,10 +687,10 @@
 			updateAsset() {
 				
 				axios
-					.put('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
+					.put('/delivery-companies/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Package has been updated", "Success");
+							this.$toastr.s("Company has been updated", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#asset-createOrEdit-modal').modal('hide');
@@ -762,10 +708,10 @@
 			deleteAsset(singleAssetData) {
 				
 				axios
-					.delete('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage)
+					.delete('/delivery-companies/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Package has been deleted", "Success");
+							this.$toastr.s("Company has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
@@ -783,10 +729,10 @@
 			restoreAsset(singleAssetData) {
 				
 				axios
-					.patch('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage)
+					.patch('/delivery-companies/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Package has been restored", "Success");
+							this.$toastr.s("Company has been restored", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#restore-confirmation-modal').modal('hide');
@@ -867,7 +813,7 @@
 					this.ascending = false;
 					this.descending = true;
 
-					this.descendingNumeric('price');
+					this.descendingNumeric('commission');
 
 				}
 				else if (this.descending) {
@@ -875,7 +821,7 @@
 					this.ascending = true;
 					this.descending = false;
 
-					this.ascendingNumeric('price');
+					this.ascendingNumeric('commission');
 
 				}
 				else {
@@ -883,35 +829,10 @@
 					this.ascending = true;
 					this.descending = false;
 
-					this.ascendingNumeric('price');
+					this.ascendingNumeric('commission');
 
 				}
 				
-			},
-			onImageChange(evnt) {
-				
-				let files = evnt.target.files || evnt.dataTransfer.files;
-
-                // Only process image files.
-		      	if (files.length && files[0].type.match('image.*')) {
-                	
-		      		let reader = new FileReader();
-	                reader.onload = (evnt) => {
-
-	                    this.singleAssetData.preview = evnt.target.result;
-	                    
-	                };
-	                reader.readAsDataURL(files[0]);
-
-                	this.$delete(this.errors.asset, 'preview');
-		      	}
-		      	else{
-		      		this.errors.asset.preview = 'File should be image';
-		      	}
-
-		      	evnt.target.value = '';
-		      	return;
-
 			},
 			ascendingNumeric(columnValue) {
 				this.contentsToShow.sort(
@@ -968,18 +889,20 @@
 						break;
 
 					
-					case 'price' :
+					case 'commission' :
 
-						if (! this.singleAssetData.price || this.singleAssetData.price < 0) {
-							this.errors.asset.price = 'Price is required';
+						if (! this.singleAssetData.commission) {
+							this.errors.asset.commission = 'Commission is required';
+						}
+						else if (this.singleAssetData.commission < 0) {
+							this.errors.asset.commission = 'Rate should be between 0 to 100';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'price');
+							this.$delete(this.errors.asset, 'commission');
 						}
 
-						break;
-					
+						break;					
 
 				}
 	 
