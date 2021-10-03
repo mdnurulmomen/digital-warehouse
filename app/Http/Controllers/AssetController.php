@@ -138,14 +138,14 @@ class AssetController extends Controller
             ], 200);
         }
 
-        return Container::with(['shelf.unit'])->get();
+        return Container::with(['shelf.unit'])->latest('id')->get();
     }
 
     public function storeNewContainer(Request $request, $perPage)
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:containers,name',
-            // 'code' => 'required|string|max:100|unique:containers,code',
+            'code' => 'required|string|max:100|unique:containers,code',
             'length' => 'required|numeric',
             'width' => 'required|numeric',
             'height' => 'required|numeric',
@@ -164,6 +164,7 @@ class AssetController extends Controller
         $newContainer = new Container();
 
         $newContainer->name = strtolower($request->name);
+        $newContainer->code = strtolower($request->code);
         $newContainer->length = $request->length;
         $newContainer->width = $request->width;
         $newContainer->height = $request->height;
@@ -205,7 +206,7 @@ class AssetController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:containers,name,'.$containerToUpdate->id,
-            // 'code' => 'required|string|max:100|unique:containers,code',
+            'code' => 'required|string|max:100|unique:containers,code,'.$containerToUpdate->id,
             'length' => 'required|numeric',
             'width' => 'required|numeric',
             'height' => 'required|numeric',
@@ -223,6 +224,7 @@ class AssetController extends Controller
 
         $containerToUpdate->update([
             'name' => strtolower($request->name),
+            'code' => strtolower($request->code),
             'length' => $request->length,
             'width' => $request->width,
             'height' => $request->height,

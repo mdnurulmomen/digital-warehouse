@@ -15,8 +15,8 @@ class CreateContainersTable extends Migration
     {
         Schema::create('containers', function (Blueprint $table) {
             $table->smallIncrements('id');
-            $table->string('name', 100);
-            // $table->string('code', 100);
+            $table->string('name', 100)->unique();
+            $table->string('code', 100)->unique();
             $table->unsignedSmallInteger('length')->default(100);
             $table->unsignedSmallInteger('width')->default(100);
             $table->unsignedSmallInteger('height')->default(100);

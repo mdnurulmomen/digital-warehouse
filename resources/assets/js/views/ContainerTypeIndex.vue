@@ -48,8 +48,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
+										  			:column-names="['name', 'Recognizing Code']" 
+										  			:column-values-to-show="['name', 'code']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission="'warehouse-asset'"
@@ -132,53 +132,107 @@
 										  		</div>
 											</div>
 										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">Recognizing Code</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleAssetData.code" 
+													placeholder="Code should be unique" 
+													:class="!errors.container.code  ? 'is-valid' : 'is-invalid'" 
+													@blur="validateFormInput('code')" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.container.code }}
+										  		</div>
+											</div>
+										</div>
 						    		 
 						    			<!-- container measurement -->
 							    		<div class="form-row">
 							    			<div class="col-sm-12 form-group">	
 							    				<label for="phone">Cntnr. Length</label>
-												<input type="number" 
-													class="form-control" 
-													v-model.number="singleAssetData.length" 
-													placeholder="Lenght of container" 
-													:class="!errors.container.length ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('container_length')" 
-													required="true" 
-												>
+												
+							    				<div class="input-group mb-0">
+							    					<input type="number" 
+														class="form-control" 
+														v-model.number="singleAssetData.length" 
+														placeholder="Lenght of container" 
+														:class="!errors.container.length ? 'is-valid' : 'is-invalid'" 
+														@blur="validateFormInput('container_length')" 
+														required="true" 
+													>
 
-												<div class="invalid-feedback">
+							    					<div class="input-group-append">
+							    						<span class="input-group-text">
+							    							{{ general_settings.default_measure_unit }}
+							    						</span>
+							    					</div>
+							    				</div>
+
+												<div 
+													style="display: block;" 
+													class="invalid-feedback" 
+													v-show="errors.container.length"
+												>
 										        	{{ errors.container.length }}
 										  		</div>
 							    			</div>
 							    		
 							    			<div class="col-sm-12 form-group">	
 							    				<label for="phone">Cntnr. Width</label>
-												<input type="number" 
-													class="form-control" 
-													v-model.number="singleAssetData.width" 
-													placeholder="Lenght of container" 
-													:class="!errors.container.width ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('container_width')" 
-													required="true" 
-												>
 
-												<div class="invalid-feedback">
+							    				<div class="input-group mb-0">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singleAssetData.width" 
+														placeholder="Lenght of container" 
+														:class="!errors.container.width ? 'is-valid' : 'is-invalid'" 
+														@blur="validateFormInput('container_width')" 
+														required="true" 
+													>
+							    					<div class="input-group-append">
+							    						<span class="input-group-text">
+							    							{{ general_settings.default_measure_unit }}
+							    						</span>
+							    					</div>
+							    				</div>
+
+												<div 
+													style="display: block;" 
+													class="invalid-feedback" 
+													v-show="errors.container.width"
+												>
 										        	{{ errors.container.width }}
 										  		</div>
 							    			</div>
 							    		
 							    			<div class="col-sm-12 form-group">	
 							    				<label for="phone">Cntnr. Height</label>
-												<input type="number" 
-													class="form-control" 
-													v-model.number="singleAssetData.height" 
-													placeholder="Lenght of container" 
-													:class="!errors.container.height ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('container_height')" 
-													required="true" 
-												>
 
-												<div class="invalid-feedback">
+							    				<div class="input-group mb-0">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singleAssetData.height" 
+														placeholder="Lenght of container" 
+														:class="!errors.container.height ? 'is-valid' : 'is-invalid'" 
+														@blur="validateFormInput('container_height')" 
+														required="true" 
+													>
+							    					<div class="input-group-append">
+							    						<span class="input-group-text">
+							    							{{ general_settings.default_measure_unit }}
+							    						</span>
+							    					</div>
+							    				</div>
+
+												<div 
+													style="display: block;" 
+													class="invalid-feedback" 
+													v-show="errors.container.height"
+												>
 										        	{{ errors.container.height }}
 										  		</div>
 							    			</div>
@@ -417,18 +471,27 @@
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Name :</label>
 									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.name | capitalize }}</label>
 								</div>
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Recognizing Code :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.code | capitalize }}</label>
+								</div>
+
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.length }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.length + ' ' + general_settings.default_measure_unit }}</label>
 								</div>
+
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Width :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.width }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.width + ' ' + general_settings.default_measure_unit }}</label>
 								</div>
+
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.height }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.height + ' ' + general_settings.default_measure_unit }}</label>
 								</div>
+
 								<!-- 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Default Storing Price :</label>
@@ -439,6 +502,7 @@
 									<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.selling_price }}</label>
 								</div>
 								-->
+								
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Shelf :</label>
 									<label class="col-sm-6 form-control-plaintext">
@@ -556,6 +620,7 @@
 	        	loading : false,
 	        	currentTab : 'current',
 
+	        	submitForm : true,
 	        	createMode : true,
 
 	        	allFetchedContents : [],
@@ -575,7 +640,7 @@
 	        		},
 	        	},
 
-	        	submitForm : true,
+	        	general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -859,6 +924,18 @@
 						}
 
 						break;
+
+					case 'code' :
+
+						if (this.singleAssetData.code && ! this.singleAssetData.code.match(/^[a-zA-Z0-9-_]+$/)) {
+							this.errors.container.code = 'No space or special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'code');
+						}
+
+						break;	
 
 				
 					case 'container_length' :
