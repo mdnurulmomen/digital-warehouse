@@ -61,7 +61,7 @@ class AnalyticsController extends Controller
         // $stockOuts = $this->getRecentStockOutChartData();
 
         // // warehouses
-        // $warehouseAnalyticDatas = $this->getWarehouseUnusedContainerChartData();
+        // $warehouseAnalyticDatas = $this->getWarehouseNotRentedContainerChartData();
 
     	return response()->json([
 
@@ -91,7 +91,7 @@ class AnalyticsController extends Controller
         $stockOuts = $this->getRecentStockOutChartData();
 
         // warehouses
-        $warehouseAnalyticDatas = $this->getWarehouseUnusedContainerChartData();
+        $warehouseAnalyticDatas = $this->getWarehouseNotRentedContainerChartData();
 
         return response()->json([
 
@@ -133,14 +133,16 @@ class AnalyticsController extends Controller
             ]
         ];
 
-        $stockedProducts = Product::whereHas('stocks', function ($query) {
+        $stockedProducts = MerchantProduct::whereHas('stocks.stock', function ($query) {
+            
             $query->where('created_at', '>=', now()->subDays(7));
+           
         })->get();
 
-        foreach ($stockedProducts as $product) {
+        foreach ($stockedProducts as $merchantProduct) {
             
-            $stockIns['labels'][] = ucwords($product->name);
-            $stockIns['datasets'][0]['data'][] = $product->stocks->sum('stock_quantity');
+            $stockIns['labels'][] = ucwords($merchantProduct->product->name.'-'.$merchantProduct->merchant->name);
+            $stockIns['datasets'][0]['data'][] = $merchantProduct->stocks->sum('stock_quantity');
             $stockIns['datasets'][0]['backgroundColor'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
 
         }
@@ -185,18 +187,20 @@ class AnalyticsController extends Controller
             
             foreach ($dispatchedRequisition->products as $requiredProduct) {
                 
-                if (! in_array(ucwords($requiredProduct->product->name), $stockOuts['labels'])) {
+                if (! in_array(ucwords($requiredProduct->merchantProduct->product->name), $stockOuts['labels'])) {
                     
-                    $stockOuts['labels'][] = ucwords($requiredProduct->product->name);
+                    $stockOuts['labels'][] = ucwords($requiredProduct->merchantProduct->product->name);
 
                     $stockOuts['datasets'][0]['data'][] = Requisition::with(['products' => function ($query) use ($requiredProduct) {
-                                                            $query->where('product_id', $requiredProduct->product_id);
+                                                            $query->where('merchant_product_id', $requiredProduct->merchant_product_id);
                                                         }])
                                                         ->where('status', 1)->where('created_at', '>=', now()->subDays(7))
                                                         ->whereHas('products', function ($query) use ($requiredProduct) {
-                                                            $query->where('product_id', $requiredProduct->product_id);
+                                                            $query->where('merchant_product_id', $requiredProduct->merchant_product_id);
                                                         })
-                                                        ->get()->pluck('products')->collapse()
+                                                        ->get()
+                                                        ->pluck('products')
+                                                        ->collapse()
                                                         ->sum('quantity');
 
                     $stockOuts['datasets'][0]['backgroundColor'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
@@ -211,7 +215,7 @@ class AnalyticsController extends Controller
         return $stockOuts;
     }
 
-    protected function getWarehouseUnusedContainerChartData()
+    protected function getWarehouseNotRentedContainerChartData()
     {
         $warehouses = Warehouse::where('active', true)->whereHas('containerStatuses', function ($query) {
             $query->where('engaged', 0.0);
@@ -235,7 +239,7 @@ class AnalyticsController extends Controller
 
                     0 => [
 
-                        "label" => "$warehouse->name Unused Spaces (%)",
+                        "label" => "$warehouse->name Not Rented Spaces (%)",
 
                         "data" => [ 
                             // Unused Percentage, 
@@ -252,11 +256,17 @@ class AnalyticsController extends Controller
                 ]
             ];
 
-            foreach ($warehouse->containers as $warehouseContainerIndex => $warehouseContainer) {
+            $warehouseNotRentedContainers = $warehouse->containers()->whereHas('containerStatuses', function ($query) {
+                $query->where('engaged', 0.0);
+            })->with(['container', 'containerStatuses'])->get();
+
+            foreach ($warehouseNotRentedContainers as $warehouseContainerIndex => $warehouseContainer) {
                 
                 // container types
                 $warehouseAnalyticDatas[$warehouseIndex]['labels'][] = ucwords($warehouseContainer->container->name);
-                $warehouseAnalyticDatas[$warehouseIndex]['datasets'][0]['data'][] = ( $warehouseContainer->containerStatuses()->where('engaged', 0.0)->count() / $warehouseContainer->quantity ) * 100;
+                
+                $warehouseAnalyticDatas[$warehouseIndex]['datasets'][0]['data'][] = ( $warehouseContainer->containerStatuses->where('engaged', 0.0)->count() / $warehouseContainer->quantity ) * 100;
+
                 $warehouseAnalyticDatas[$warehouseIndex]['datasets'][0]['backgroundColor'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
 
             }

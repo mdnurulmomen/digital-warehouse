@@ -76,9 +76,9 @@
                                     <div class="card-block">
                                         <div class="row">
                                             <div class="col-xl-3 col-md-6" v-for="(warehouse, warehouseIndex) in dashboard.warehouses" :key="'warehouse-unused-container-percentage-' + warehouseIndex + '-warehouse-' + warehouse.id">
-                                                <h6 class="text-center">{{ warehouse.name }} Unused Spaces (%)</h6>
+                                                <h6 class="text-center">{{ warehouse.name }} Not Rented Spaces (%)</h6>
                                                 <!-- Pie Chart -->
-		                                        <pie-chart :data="warehouse" :styles="{ height: '300px', width: '100%', position: 'relative' }" v-if="warehouse.hasOwnProperty('datasets') && warehouse.datasets[0].data && warehouse.datasets[0].data.every(item => item != 0)" />
+		                                        <pie-chart :data="warehouse" :styles="{ height: '300px', width: '50%', position: 'relative' }" v-if="warehouse.hasOwnProperty('datasets') && warehouse.datasets[0].data && warehouse.datasets[0].data.every(item => item != 0)" />
 		                                        <p class="text-center text-success" v-else>NA</p>
                                             </div>
                                         </div>
