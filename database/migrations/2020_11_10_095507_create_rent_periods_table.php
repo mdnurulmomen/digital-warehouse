@@ -15,7 +15,8 @@ class CreateRentPeriodsTable extends Migration
     {
         Schema::create('rent_periods', function (Blueprint $table) {
             $table->tinyIncrements('id');
-            $table->string('name', 100);
+            $table->string('name', 100)->unique();
+            $table->unsignedTinyInteger('number_days')->nullable()->default(1);
             // $table->string('code', 100);
             $table->softDeletes();
         });

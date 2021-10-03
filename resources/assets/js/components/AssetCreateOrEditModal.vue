@@ -45,25 +45,36 @@
 						  		</div>
 							</div>
 						</div>
-						<!-- 
-						<div class="form-row">
+						
+						
+						<div class="form-row" v-if="currentRouteName=='rent-periods'">
 							<div class="form-group col-md-12">
-								<label for="inputUsername">Short Code (for recognizing)</label>
-								<input type="text" 
-									class="form-control" 
-									v-model="singleAssetData.code" 
-									placeholder="Code should be unique" 
-									:class="!errors.asset.code  ? 'is-valid' : 'is-invalid'" 
-									@change="validateFormInput('code')"
-								>
+								<label for="inputUsername">Number Days</label>
+								
+								<div class="input-group mb-0">
+									<input type="text" 
+										class="form-control" 
+										v-model="singleAssetData.number_days" 
+										placeholder="Number should be unique" 
+										:class="!errors.asset.number_days  ? 'is-valid' : 'is-invalid'" 
+										@change="validateFormInput('number_days')"
+									>
 
-								<div class="invalid-feedback">
-						        	{{ errors.asset.code }}
+									<div class="input-group-append">
+										<span class="input-group-text">Days</span>
+									</div>
+								</div>								
+
+								<div 
+									style="display: block;" 
+									class="invalid-feedback" 
+									v-show="errors.asset.number_days"
+								>
+						        	{{ errors.asset.number_days }}
 						  		</div>
 							</div>
 						</div>
-						 -->
-
+						
 					</div>
 					<div class="modal-footer flex-column">
 						<div class="col-sm-12 text-right" v-show="!submitForm">
@@ -127,6 +138,16 @@
 
 		},
 
+		computed: {
+
+		    currentRouteName() {
+
+		        return this.$route.name;
+		    
+		    }
+
+		},
+
 		filters: {
 			capitalize: function (value) {
 				if (!value) return ''
@@ -152,7 +173,7 @@
             verifyUserInput() {
 
 				this.validateFormInput('name');
-				// this.validateFormInput('code');
+				this.validateFormInput('number_days');
             	
             	if (Object.keys(this.errors.asset).length !== 0 && this.errors.asset.constructor === Object) {
 					this.submitForm = false;
@@ -190,20 +211,18 @@
 						}
 
 						break;
+					
+					case 'number_days' :
 
-					/*
-					case 'code' :
-
-						if (this.singleAssetData.code && !this.singleAssetData.code.match(/^[-\w\.\@]{3,}$/g)) {
-							this.errors.asset.code = 'No special character';
+						if (this.currentRouteName=='rent-periods' && (! this.singleAssetData.number_days || this.singleAssetData.number_days < 1)) {
+							this.errors.asset.number_days = 'Day count is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'code');
+							this.$delete(this.errors.asset, 'number_days');
 						}
 
 						break;
-					*/
 
 				}
 	 

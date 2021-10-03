@@ -396,6 +396,50 @@
 											</div>
 										</div>
 
+										<!-- CUD Models -->
+										<div 
+											class="col-md-6" 
+											v-for="model in modelsCreateableUpdatableAndDeletable" 
+											:key="'crud-model-permission-name-' + model"
+										>
+											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+											<!-- create -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('create-' + model)" 
+													@change="insertPermission('create-' + model, $event)" 
+													:ref="'create-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('create-' + model) }}</label>
+											</div>
+
+											<!-- update -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('update-' + model)" 
+													@change="insertPermission('update-' + model, $event)" 
+													:ref="'update-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('update-' + model) }}</label>
+											</div>
+
+											<!-- delete -->
+											<div class="form-check">
+												<input 
+													type="checkbox" 
+													:checked="permissionExists('delete-' + model)" 
+													@change="insertPermission('delete-' + model, $event)" 
+													:ref="'delete-' + model.toLowerCase()"
+												>
+												<label>{{ modelName('delete-' + model) }}</label>
+											</div>
+
+											<!-- view is public for all-->
+										</div>
+
 										<!-- Viewable and Updatable CRUD -->
 										<div 
 											class="col-md-6" 
@@ -700,6 +744,56 @@
 										</p>
 									</div>
 
+									<!-- CUD Models -->
+									<div 
+										class="col-md-6" 
+										v-for="model in modelsCreateableUpdatableAndDeletable" 
+										:key="'crud-model-permission-name-' + model"
+									>
+										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+										<!-- create -->
+										<p class="m-0">
+											<span v-show="permissionExists('create-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('create-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('create-' + model) }}
+										</p>
+
+										<!-- update -->
+										<p class="m-0">
+											<span v-show="permissionExists('update-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('update-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('update-' + model) }}
+										</p>
+
+										<!-- delete -->
+										<p class="m-0">
+											<span v-show="permissionExists('delete-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('delete-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('delete-' + model) }}
+										</p>
+
+										<!-- view -->
+										<p class="m-0">
+											<span v-show="true" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											{{ modelName('view-' + model + '-list') }}
+										</p>
+									</div>
+
 									<!-- Viewable and Updatable CRUD -->
 									<div 
 										class="col-md-6" 
@@ -865,38 +959,41 @@
 	            ],
 
 				modelsCRUDable : [
-	        		'Role',
+	            	'Role',
 	            	'Product',
 	            	'Manager',
 	            	'Merchant',
 	                'Warehouse',
-	                'Merchant-Deal',
 	            	'Product-Asset',
 	                // 'Product-Stock',
 	            	'Warehouse-Owner',
 	                'Warehouse-Asset',
-	                'Delivery-Company',
+	                'Merchant-Deal',
 	                'Merchant-Product',
-	                'Merchant-Payment',
-	        	],
+	                'Merchant-Payment'
+	            ],
 
-	        	modelsViewableAndUpdatable : [
-	        		'Application-Setting',  // view / update
-                	'Requisition', // view / update(cancel)
-	        	],
+	            modelsCreateableUpdatableAndDeletable : [
+	                'Logistic-Asset',
+	            ],            
 
-	        	modelsViewableRecommendableAndApproveable : [
-	        		'Dispatch',  // view / recommend
-	        	],
+	            modelsViewableAndUpdatable : [
+	                'Requisition', // view / update(cancel)
+	                'Application-Setting'  // view / update
+	            ],
 
-	        	modelsViewable : [
-	        		'Permission',  // view
-	        	],
+	            modelsViewableRecommendableAndApproveable : [
+	                'Dispatch',  // view / make
+	            ],
 
-	        	modelsViewable2 : [
-	        		'General-Dashboard-One',  // view
-	        		'General-Dashboard-Two',  // view
-	        	],
+	            modelsViewable : [
+	                'Permission',  // view
+	            ],
+
+	            modelsViewable2 : [
+	                'General-Dashboard-One',  // view
+	                'General-Dashboard-Two'  // view
+	            ],
 
 	        	pagination: {
 		        	current_page: 1
@@ -1474,12 +1571,6 @@
 					if (! this.$refs['view-requisition-index'][0].checked) {
 
 						this.$refs['view-requisition-index'][0].click();
-
-					}
-
-					if (! this.$refs['view-delivery-company-index'][0].checked) {
-
-						this.$refs['view-delivery-company-index'][0].click();
 
 					}
 

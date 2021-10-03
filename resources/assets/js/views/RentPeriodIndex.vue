@@ -23,7 +23,7 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('create-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
+											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
 											  		:query="query" 
 											  		:caller-page="'rent period'" 
 											  		:required-permission="'warehouse-asset'" 
@@ -66,6 +66,25 @@
 																			</span>
 																		</a>
 																	</th>
+
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeDaysOrder"
+																		> 
+																			# Days
+																			<span v-show="ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="!ascending && !descending">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
 																	<th v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
 																		Actions
 																	</th>
@@ -79,6 +98,10 @@
 																>
 																	<td>
 																		{{ content.name | capitalize }}
+																	</td>
+
+																	<td>
+																		{{ content.number_days }} Days
 																	</td>
 																	
 																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
@@ -123,7 +146,7 @@
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
-														    		<td :colspan="(userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')) ? 2 : 1">
+														    		<td :colspan="(userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')) ? 3 : 2">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -150,6 +173,25 @@
 																			</span>
 																		</a>
 																	</th>
+
+																	<th>
+																		<a 
+																			href="javascript:void(0)" 
+																			@click="changeDaysOrder"
+																		> 
+																			# Days
+																			<span v-show="ascending">
+																				<i class="fa fa-sort-up" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="descending">
+																				<i class="fa fa-sort-down" aria-hidden="true"></i>
+																			</span>
+																			<span v-show="!ascending && !descending">
+																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																			</span>
+																		</a>
+																	</th>
+
 																	<th v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
 																		Actions
 																	</th>
@@ -172,6 +214,7 @@
 																<option>50</option>
 															</select>
 														</div>
+
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
@@ -182,6 +225,7 @@
 																<i class="fa fa-sync"></i>
 															</button>
 														</div>
+
 														<div class="col-sm-8 col-12 text-right form-group">
 															<pagination
 																v-if="pagination.last_page > 1"
@@ -566,6 +610,39 @@
 
 				}
 				
+			},
+			changeDaysOrder() {
+
+				if (this.ascending) {
+					this.ascending = false;
+					this.descending = true;
+					this.descendingNumeric('number_days');
+				}
+				else if (this.descending) {
+					this.ascending = true;
+					this.descending = false;
+					this.ascendingNumeric('number_days');
+				}
+				else {
+					this.ascending = true;
+					this.descending = false;
+					this.ascendingNumeric('number_days');
+				}
+				
+			},
+			ascendingNumeric(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						return a[columnValue] - b[columnValue];
+					}
+				);
+			},
+			descendingNumeric(columnValue) {
+				this.contentsToShow.sort(
+			 		function(a, b){
+						return b[columnValue] - a[columnValue];
+					}
+				);
 			},
 			ascendingAlphabets(columnValue) {
 				this.contentsToShow.sort(

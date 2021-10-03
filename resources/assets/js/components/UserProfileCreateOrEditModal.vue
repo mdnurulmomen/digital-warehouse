@@ -1158,12 +1158,6 @@
 
 					}
 
-					if (! this.$refs['view-delivery-company-index'][0].checked) {
-
-						this.$refs['view-delivery-company-index'][0].click();
-
-					}
-
 				}
 
 			},

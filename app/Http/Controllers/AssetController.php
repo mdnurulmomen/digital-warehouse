@@ -313,14 +313,14 @@ class AssetController extends Controller
     public function storeNewRentPeriod(Request $request, $perPage)
     {
         $request->validate([
-            'name' => 'required|string|max:100|unique:rent_periods,name|in:daily,weekly,monthly,yearly',
-            // 'code' => 'required|string|max:100|unique:storage_types,code',
+            'name' => 'required|string|max:100|unique:rent_periods,name',
+            'number_days' => 'required|numeric|unique:rent_periods,number_days|max:255',
         ]);
 
         $newAsset = new RentPeriod();
 
         $newAsset->name = strtolower($request->name);
-        // $newAsset->code = $request->code;
+        $newAsset->number_days = $request->number_days;
 
         $newAsset->save();
 
@@ -332,12 +332,12 @@ class AssetController extends Controller
         $assetToUpdate = RentPeriod::findOrFail($owner);
 
         $request->validate([
-            'name' => 'required|string|max:100|in:daily,weekly,monthly,yearly|unique:rent_periods,name,'.$assetToUpdate->id,
-            // 'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
+            'name' => 'required|string|max:100|unique:rent_periods,name,'.$assetToUpdate->id,
+            'number_days' => 'required|numeric|max:255|unique:rent_periods,number_days,'.$assetToUpdate->id,
         ]);
 
         $assetToUpdate->name = strtolower($request->name);
-        // $assetToUpdate->code = $request->code;
+        $assetToUpdate->number_days = $request->number_days;
 
         $assetToUpdate->save();
 
