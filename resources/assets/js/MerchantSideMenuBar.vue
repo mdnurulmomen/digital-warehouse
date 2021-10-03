@@ -43,6 +43,7 @@
 							</li>
 
 							<!-- special routes -->
+							
 							<li 
 								:class="currentRouteName=='roles' ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-role-index')"
@@ -51,7 +52,6 @@
 									<span class="pcoded-micon">
 										<i class="fa fa-tasks" aria-hidden="true"></i>
 									</span>
-
 									<span class="pcoded-mtext">
 										Roles
 									</span>
@@ -61,11 +61,11 @@
 							<li 
 								class="pcoded-hasmenu" 
 								:class="['owners', 'warehouses', 'storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
-								v-if="userHasPermissionTo('view-asset-index') || userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('view-warehouse-index')"
+								v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('view-warehouse-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-command"></i>
+										<i class="fas fa-warehouse"></i>
 									</span>
 									<span class="pcoded-mtext">Warehouse</span>
 								</a>
@@ -73,7 +73,7 @@
 									<li 
 										class="pcoded-hasmenu" 
 										:class="['storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
-										v-if="userHasPermissionTo('view-asset-index')"
+										v-if="userHasPermissionTo('view-warehouse-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">
@@ -122,21 +122,19 @@
 									<span class="pcoded-micon">
 										<i class="fa fa-user"></i>
 									</span>
-
 									<span class="pcoded-mtext">
 										Managers
 									</span>
 								</router-link>
 							</li>
 
-							<li :class="['merchants', 'merchant-deals', 'deal-payments'].includes(currentRouteName) ? 'active' : ''" 
+							<li :class="['merchants', 'merchant-deals', 'deal-payments', 'merchant-products'].includes(currentRouteName) ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-merchant-index')"
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-users"></i>
 									</span>
-
 									<span class="pcoded-mtext">
 										Merchants
 									</span>
@@ -145,13 +143,12 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['my-products', 'products', 'product-categories', 'category-products', 'product-merchants', 'product-stocks', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['my-products', 'products', 'product-merchants', 'product-stocks', 'product-categories', 'category-products', 'variation-types', 'variations', 'product-manufacturers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fab fa-product-hunt"></i>
 									</span>
-									
 									<span class="pcoded-mtext">Product</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
@@ -160,7 +157,7 @@
 										<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">My Products</span>
 										</router-link>
-									</li>
+									</li> 
 
 									<li 
 										:class="['products', 'product-merchants', 'product-stocks'].includes(currentRouteName) ? 'active' : ''" 
@@ -173,43 +170,40 @@
 
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+										:class="['product-categories', 'category-products', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										v-if="userHasPermissionTo('view-product-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Variations</span>
+											<span class="pcoded-mtext">Assets</span>
 										</a>
 										<ul class="pcoded-submenu">
-											<li :class="currentRouteName=='variation-types' ? 'active' : ''">
-												<router-link :to="{ name: 'variation-types' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Types</span>
+											<li :class="['product-categories', 'category-products'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Categories</span>
+												</router-link>
+											</li>
+
+											<li 
+												:class="['product-manufacturers'].includes(currentRouteName) ? 'active' : ''" 
+											>
+												<router-link :to="{ name: 'product-manufacturers' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Manufacturers</span>
 												</router-link>
 											</li>
 											
-											<li :class="currentRouteName=='variations' ? 'active' : ''">
+											<li :class="['variation-types'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'variation-types' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Variation-Types</span>
+												</router-link>
+											</li>
+
+											<li :class="['variations'].includes(currentRouteName) ? 'active' : ''">
 												<router-link :to="{ name: 'variations' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Variations</span>
+													<span class="pcoded-mtext">Variation-Names</span>
 												</router-link>
 											</li>
 										</ul>
-									</li>
-									
-									<li 
-										:class="['product-categories', 'category-products'].includes(currentRouteName) ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-product-category-index')"
-									>
-										<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Categories</span>
-										</router-link>
-									</li>
-
-									<li 
-										:class="['product-manufacturers'].includes(currentRouteName) ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-product-manufacturer-index')"
-									>
-										<router-link :to="{ name: 'product-manufacturers' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Manufacturers</span>
-										</router-link>
-									</li>
+									</li>									
 								</ul>
 							</li>
 
@@ -219,9 +213,10 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-truck"></i>
+										<i class="fas fa-boxes"></i>
 									</span>
 									<span class="pcoded-mtext">Requisitions</span>
+									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
 									<li :class="currentRouteName=='my-requisitions' ? 'active' : ''">
@@ -229,60 +224,67 @@
 											<span class="pcoded-mtext">My Requisitions</span>
 										</router-link>
 									</li>
-									
-									<li 
-										:class="currentRouteName=='requisitions' ? 'active' : ''" 
+
+									<li :class="currentRouteName=='requisitions' ? 'active' : ''"
 										v-if="userHasPermissionTo('view-requisition-index')"
 									>
 										<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">All Requisitions</span>
-
+											<span class="pcoded-micon">
+												<i class="fa fa-truck"></i>
+											</span>
+											<span class="pcoded-mtext">
+												All Requisitions
+											</span>
 											<span class="pcoded-badge label label-warning" v-show="currentRouteName!='requisitions' && newRequisition.length">
 												{{ newRequisition.length }}
 											</span>
-
 											<span class="pcoded-badge label label-success" v-show="currentRouteName!='requisitions' && newAcceptance.length">
 												{{ newAcceptance.length }}
 											</span>
-										</router-link>
+										</router-link>	
 									</li>
 								</ul>
 							</li>
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="currentRouteName=='packaging-packages' ? 'active pcoded-trigger' : ''" 
+								:class="['packaging-packages', 'delivery-companies'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-gift" aria-hidden="true"></i>
+										<i class="fas fa-boxes"></i>
 									</span>
-									<span class="pcoded-mtext">Packaging</span>
+									<span class="pcoded-mtext">Logistics</span>
+									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
 									<li :class="currentRouteName=='packaging-packages' ? 'active' : ''">
 										<router-link :to="{ name: 'packaging-packages' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Packages</span>
+											<span class="pcoded-mtext">Packaging</span>
+										</router-link>
+									</li>
+
+									<li :class="currentRouteName=='delivery-companies' ? 'active' : ''">
+										<router-link :to="{ name: 'delivery-companies' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Delivery Companies</span>
 										</router-link>
 									</li>
 								</ul>
 							</li>
 
 							<!-- 
+								Merchant Special Routes
+								<li :class="currentRouteName=='my-products' ? 'active' : ''">
+									<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
+										<span class="pcoded-mtext">My Products</span>
+									</router-link>
+								</li> 
+
 								<li :class="currentRouteName=='my-requisitions' ? 'active' : ''">
 									<router-link :to="{ name: 'my-requisitions' }" class="waves-effect waves-dark">
 										<span class="pcoded-mtext">My Requisitions</span>
 									</router-link>
-								</li>
-								
-								<li 
-									:class="currentRouteName=='requisitions' ? 'active' : ''" 
-									v-if="userHasPermissionTo('view-requisition-index')"
-								>
-									<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
-										<span class="pcoded-mtext">All Requisitions</span>
-									</router-link>
-								</li>
+								</li> 
 							 -->
 						</ul>
 					</div>

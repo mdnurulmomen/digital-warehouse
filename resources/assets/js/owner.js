@@ -36,12 +36,15 @@ import { routeNeedsPermission, userHasPermissionTo } from './public.js'
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Registering component globally
+Vue.component('download-excel', require('vue-json-excel').default);
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('alert', require('./components/AlertComponent.vue').default);
 Vue.component('loading', require('./components/LoadingComponent.vue').default);
+Vue.component('tree-item', require('./components/TreeItemComponent.vue').default);
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
 Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
+Vue.component('v-date-picker', require('v-calendar/lib/components/date-picker.umd'));
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
@@ -59,8 +62,6 @@ import UnAuthorized from './views/403'
 import NotFound from './views/404'
 
 // special components
-import GeneralDashboardOne from './views/GeneralDashboard-1'
-import GeneralDashboardTwo from './views/GeneralDashboard-2'
 import ApplicationSetting from './views/SettingComponent'
 import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
 import ManagerIndex from './views/ManagerIndex'
@@ -72,12 +73,19 @@ import RentPeriodIndex from './views/RentPeriodIndex'
 import VariationTypeIndex from './views/VariationTypeIndex'
 import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
+import ProductManufacturerIndex from './views/ProductManufacturerIndex'
 import ProductIndex from './views/ProductIndex'
+import CategoryProductIndex from './views/CategoryProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
 // import DispatchIndex from './views/DispatchIndex'
 import ProductStockIndex from './views/ProductStockIndex'
+import ProductMerchantIndex from './views/ProductMerchantIndex'
+import MerchantProductIndex from './views/MerchantProductIndex'
 import RoleIndex from './views/RoleIndex'
+import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
+import MerchantDealIndex from './views/MerchantDealIndex'
+import DealPaymentIndex from './views/DealPaymentIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -107,26 +115,11 @@ const router = new VueRouter({
         // special routes
         
         {
-            path: '/general-dashboard-1',
-            name: 'general-dashboard-1',
-            component: GeneralDashboardOne,
-            meta: { 
-                requiredPermission: 'view-general-dashboard-one' 
-            },
-        },
-        {
-            path: '/general-dashboard-2',
-            name: 'general-dashboard-2',
-            component: GeneralDashboardTwo,
-            meta: { 
-                requiredPermission: 'view-general-dashboard-two' 
-            },
-        },
-        {
             path: '/settings',
             name: 'settings',
             component: ApplicationSetting,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-application-setting-index' 
             },
         },
@@ -134,47 +127,53 @@ const router = new VueRouter({
             path: '/storage-types',
             name: 'storage-types',
             component: StorageTypeIndex,
-            meta: { 
-                requiredPermission: 'view-asset-index' 
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-asset-index' 
             }
         },
         {
             path: '/containers',
             name: 'containers',
             component: ContainerIndex,
-            meta: { 
-                requiredPermission: 'view-asset-index' 
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-asset-index' 
             }
         },
         {
             path: '/rent-periods',
             name: 'rent-periods',
             component: RentPeriodIndex,
-            meta: { 
-                requiredPermission: 'view-asset-index' 
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-asset-index' 
             }
         },
         {
             path: '/variation-types',
             name: 'variation-types',
             component: VariationTypeIndex,
-            meta: { 
-                requiredPermission: 'view-asset-index' 
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
             path: '/variations',
             name: 'variations',
             component: VariationIndex,
-            meta: { 
-                requiredPermission: 'view-asset-index' 
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
             path: '/warehouse-owners',
             name: 'owners',
             component: WarehouseOwnerIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-warehouse-owner-index' 
             }
         },
@@ -182,7 +181,8 @@ const router = new VueRouter({
             path: '/managers',
             name: 'managers',
             component: ManagerIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-manager-index' 
             }
         },
@@ -190,7 +190,8 @@ const router = new VueRouter({
             path: '/merchants',
             name: 'merchants',
             component: MerchantIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-merchant-index' 
             }
         },
@@ -198,23 +199,64 @@ const router = new VueRouter({
             path: '/warehouses',
             name: 'warehouses',
             component: WarehouseIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-warehouse-index' 
             }
         },
+        /*
+            {
+                path: '/warehouse-managers',
+                name: 'warehouse-managers',
+                component: WarehouseManagerIndex,
+                meta: {
+                    // authRequired: true,
+                    requiredPermission: 'view-warehouse-manager-index' 
+                }
+            },
+        */
         {
             path: '/product-categories',
             name: 'product-categories',
             component: ProductCategoryIndex,
-            meta: { 
-                requiredPermission: 'view-product-category-index' 
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        {
+            path: '/product-manufacturers',
+            name: 'product-manufacturers',
+            component: ProductManufacturerIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        {
+            path: '/product-categories/:categoryName',
+            name: 'category-products',
+            component: CategoryProductIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.category && to.params.categoryName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/product-categories');
+                }
             }
         },
         {
             path: '/products',
             name: 'products',
             component: ProductIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-product-index' 
             }
         },
@@ -222,7 +264,8 @@ const router = new VueRouter({
             path: '/requisitions',
             name: 'requisitions',
             component: RequisitionIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-requisition-index' 
             }
         },
@@ -231,29 +274,112 @@ const router = new VueRouter({
                 path: '/dispatches',
                 name: 'dispatches',
                 component: DispatchIndex,
-                meta: { 
+                meta: {
+                    // authRequired: true,
                     requiredPermission: 'view-dispatch-index' 
                 }
             },
         */
         {
-            path: '/product-stocks/:productName',
+            path: '/product-stocks/:merchantName',
             name: 'product-stocks',
             component: ProductStockIndex,
             props: true,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-product-stock-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.product && to.params.merchantName && to.params.productMerchant) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/products');
+                }
+            }
+        },
+        {
+            path: '/product-merchants/:productName',
+            name: 'product-merchants',
+            component: ProductMerchantIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-product-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.product) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/products');
+                }
+            }
+        },
+        {
+            path: '/merchant-products/:merchantName',
+            name: 'merchant-products',
+            component: MerchantProductIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-product-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.merchant) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/merchants');
+                }
             }
         },
         {
             path: '/roles',
             name: 'roles',
             component: RoleIndex,
-            meta: { 
+            meta: {
+                // authRequired: true,
                 requiredPermission: 'view-role-index' 
             }
         },
-
+        {
+            path: '/merchant-deals/:merchantName',
+            name: 'merchant-deals',
+            component: MerchantDealIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-deal-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.merchant && to.params.merchantName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/merchants');
+                }
+            }
+        },
+        {
+            path: '/deal-payments/:merchantName/:dealDate',
+            name: 'deal-payments',
+            component: DealPaymentIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-payment-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.merchantName && to.params.dealDate && to.params.deal) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next({ name : 'merchant-deals', params: { merchantName: to.params.merchantName }});
+                }
+            }
+        },
+        
         // view packages is permissible for all
         {
             path: '/packaging-packages',
@@ -261,7 +387,17 @@ const router = new VueRouter({
             component: PackagingPackageIndex,
             meta: {
                 // authRequired: true,
-                // requiredPermission: 'view-asset-index' 
+                // requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        // view companies is permissible for all
+        {
+            path: '/delivery-companies',
+            name: 'delivery-companies',
+            component: DeliveryCompanyIndex,
+            meta: {
+                // authRequired: true,
+                // requiredPermission: 'view-product-asset-index' 
             }
         },
 

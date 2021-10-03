@@ -180,7 +180,6 @@ Route::name('admin.')->group(function () {
 		Route::put('/roles/{role}/{perPage}','RoleController@updateRole')->name('roles');	
 		Route::delete('/roles/{role}/{perPage}','RoleController@deleteRole')->name('roles');
 		Route::get('/api/search-roles/{search}/{perPage}','RoleController@searchAllRoles')->name('search-roles');
-
 		
 		// packaging-packages
 		Route::get('/api/packaging-packages/{perPage?}','AssetController@showAllPackagingPackages')->name('packaging-packages');

@@ -191,14 +191,6 @@
 											</li>
 										</ul>
 									</li>									
-
-									<li 
-										:class="['packaging-packages'].includes(currentRouteName) ? 'active' : ''" 
-									>
-										<router-link :to="{ name: 'packaging-packages' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Packaging</span>
-										</router-link>
-									</li>
 								</ul>
 							</li>
 
