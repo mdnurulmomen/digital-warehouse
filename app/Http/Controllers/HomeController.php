@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\ApplicationSetting;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -43,11 +44,12 @@ class HomeController extends Controller
      */
     public function adminHome()
     {
-        $access_token = Str::random(60);
+        $accessToken = Str::random(60);
         $roles = Auth::guard('admin')->user()->roles;
         $permissions = Auth::guard('admin')->user()->permissions;
+        $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -57,11 +59,12 @@ class HomeController extends Controller
      */
     public function managerHome()
     {
-        $access_token = Str::random(60);
+        $accessToken = Str::random(60);
         $roles = Auth::guard('manager')->user()->roles;
         $permissions = Auth::guard('manager')->user()->permissions;
+        $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -71,11 +74,12 @@ class HomeController extends Controller
      */
     public function ownerHome()
     {
-        $access_token = Str::random(60);
+        $accessToken = Str::random(60);
         $roles = Auth::guard('owner')->user()->roles;
         $permissions = Auth::guard('owner')->user()->permissions;
+        $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.owner', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        return view('layouts.owner', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -85,10 +89,11 @@ class HomeController extends Controller
      */
     public function warehouseHome()
     {
-        $access_token = Str::random(60);
+        $accessToken = Str::random(60);
         $roles = Auth::guard('warehouse')->user()->roles;
         $permissions = Auth::guard('warehouse')->user()->permissions;
+        $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.warehouse', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        return view('layouts.warehouse', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
     }
 }
