@@ -32,4 +32,9 @@ class Container extends Model
 	{
 		return $this->hasOneThrough(ContainerShelfUnit::class, ContainerShelf::class, 'container_id', 'container_shelf_id');
 	}
+
+	public function warehouses()
+    {
+        return $this->hasMany(WarehouseContainer::class, 'container_id', 'id');
+    }
 }

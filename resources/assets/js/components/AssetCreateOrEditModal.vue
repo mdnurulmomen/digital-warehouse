@@ -38,6 +38,7 @@
 									:class="!errors.asset.name  ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('name')" 
 									required="true" 
+									:disabled="singleAssetData.spaces_count > 0"
 								>
 
 								<div class="invalid-feedback">
@@ -57,7 +58,8 @@
 										v-model="singleAssetData.number_days" 
 										placeholder="Number should be unique" 
 										:class="!errors.asset.number_days  ? 'is-valid' : 'is-invalid'" 
-										@change="validateFormInput('number_days')"
+										@change="validateFormInput('number_days')" 
+										:disabled="singleAssetData.spaces_count > 0"
 									>
 
 									<div class="input-group-append">

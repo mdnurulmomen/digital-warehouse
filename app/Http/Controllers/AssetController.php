@@ -132,8 +132,8 @@ class AssetController extends Controller
         if ($perPage) {
             return response()->json([
 
-                'current' => Container::with(['shelf.unit'])->latest('id')->paginate($perPage),
-                'trashed' => Container::with(['shelf.unit'])->onlyTrashed()->latest('id')->paginate($perPage),
+                'current' => Container::with(['shelf.unit'])->withCount('warehouses')->latest('id')->paginate($perPage),
+                'trashed' => Container::with(['shelf.unit'])->onlyTrashed()->withCount('warehouses')->latest('id')->paginate($perPage),
 
             ], 200);
         }
@@ -302,8 +302,8 @@ class AssetController extends Controller
             
             return response()->json([
 
-                'current' => RentPeriod::latest('id')->paginate($perPage),
-                'trashed' => RentPeriod::latest('id')->onlyTrashed()->paginate($perPage),
+                'current' => RentPeriod::latest('id')->withCount('spaces')->paginate($perPage),
+                'trashed' => RentPeriod::latest('id')->onlyTrashed()->withCount('spaces')->paginate($perPage),
 
             ], 200);
 

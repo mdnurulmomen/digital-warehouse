@@ -381,7 +381,7 @@ class Warehouse extends Authenticatable
                 }
 
                 // else inputed container is new for this warehouse
-                else if(is_null($warehouseExistingContainer)) {
+                else if(is_null($warehouseExistingContainer) && $this->inputedContainerHasValidRent($inputedContainer->rents)) {
                     
                     // add currently working container to warehouse
                     $warehouseContainer = $this->createNewContainerToWarehouse($inputedContainer);
@@ -499,7 +499,6 @@ class Warehouse extends Authenticatable
                 
             }
 
-
         }
 
     }
@@ -541,14 +540,14 @@ class Warehouse extends Authenticatable
     {
         for($i=0; $i<$inputedContainer->quantity; $i++) {
 
-            $containerToAdd = Container::findOrFail($inputedContainer->container->id);
+            // $containerToAdd = Container::findOrFail($inputedContainer->container->id);
 
             // container statuses
             $warehouseContainerStatus = $warehouseContainer->containerStatuses()->create([
-                'name' => (($containerToAdd->code ?? 'cnt'.$containerToAdd->id).'-'.($i+1)),
+                'name' => (($inputedContainer->container->code ?? 'cnt'.$inputedContainer->container->id).'-'.($i+1)),
             ]);
 
-            if ($containerToAdd->has_shelve) {
+            if ($inputedContainer->container->has_shelve) {
                 
                 // shelves per container
                 for($j=0; $j<$inputedContainer->container->shelf->quantity; $j++) {
@@ -558,7 +557,7 @@ class Warehouse extends Authenticatable
                         'warehouse_container_id' => $warehouseContainer->id,
                     ]);
 
-                    if ($containerToAdd->shelf->has_units) {
+                    if ($inputedContainer->container->shelf->has_units) {
                         
                         // units per shelf
                         for($k=0; $k<$inputedContainer->container->shelf->unit->quantity; $k++){
@@ -586,7 +585,7 @@ class Warehouse extends Authenticatable
 
             // container statuses
             $warehouseContainerStatus = $warehouseContainer->containerStatuses()->create([
-                'name' => 'cnt'.$inputedContainer->container->id.'-'.($i+1),
+                'name' => (($inputedContainer->container->code ?? 'cnt'.$inputedContainer->container->id).'-'.($i+1)),
             ]);
 
             if ($inputedContainer->container->has_shelve) {
@@ -687,6 +686,19 @@ class Warehouse extends Authenticatable
             }
 
         }
+    }
+
+    protected function inputedContainerHasValidRent($inputedContainerRent)
+    {
+        foreach ($inputedContainerRent as $key => $value) {
+            
+            if ($value > 0) {
+                return true;
+            }
+
+        }
+
+        return false;
     }
 
 }

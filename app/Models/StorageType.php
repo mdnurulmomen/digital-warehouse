@@ -14,13 +14,9 @@ class StorageType extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    public function previews()
+    public function warehouses()
     {
-    	return $this->hasMany(WarhouseStoragePreview::class, 'storage_type_id', 'id');
+    	return $this->belongsToMany(Warehouse::class, 'warehouse_storage_types', 'storage_type_id', 'warehouse_id');
     }
 
-    public function features()
-    {
-    	return $this->hasMany(WarhouseStorageFeature::class, 'storage_type_id', 'id');
-    }
 }

@@ -142,6 +142,7 @@
 													placeholder="Code should be unique" 
 													:class="!errors.container.code  ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('code')" 
+													:disabled="singleAssetData.warehouses_count > 0"
 												>
 
 												<div class="invalid-feedback">
