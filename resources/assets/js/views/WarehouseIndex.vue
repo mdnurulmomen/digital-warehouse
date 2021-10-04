@@ -371,7 +371,8 @@
 				                                  		:class="!errors.warehouse.owner  ? 'is-valid' : 'is-invalid'"
 				                                  		:allow-empty="false"
 				                                  		selectLabel = "Press/Click"
-				                                  		deselect-label="Can't remove single value"
+				                                  		deselect-label="Can't remove single value" 
+				                                  		@input="setWarehouseOwner()"
 				                                  		@close="validateFormInput('owner')"
 			                                  		>
 				                                	</multiselect>
@@ -809,7 +810,7 @@
 																		<li 
 																			class="nav-item"
 																			v-for="(rentPeriod, rentIndex) in allRentPeriods" 
-																			:key="'y' + rentPeriod.id + rentPeriod.name" 
+																			:key="'y-' + rentPeriod.id + rentPeriod.name" 
 																		>
 																			<a 
 																				class="nav-link" 
@@ -827,10 +828,10 @@
 																	<div class="tab-content tabs card-block">
 																		<div 
 																			class="tab-pane" 
-																			:id="rentPeriod.name+ containerIndex" 
+																			:id="rentPeriod.name + containerIndex" 
 																			role="tabpanel" 
 																			v-for="(rentPeriod, rentIndex) in allRentPeriods" 
-																			:key="'x' + rentPeriod.id + rentPeriod.name" 
+																			:key="'x-' + rentPeriod.id + rentPeriod.name" 
 																			:class="{'active': rentIndex === 0}"
 																		>
 																			<div class="d-flex">
@@ -840,6 +841,7 @@
 																    					<div class="sub-title">Container</div>
 																    				</div>
 																		    		<div class="form-row">
+																		    			<!-- 
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Storing Price</label>
 																							<input 
@@ -853,23 +855,25 @@
 																							<div class="invalid-feedback">
 																					        	{{ errors.warehouse.containers[containerIndex]['container_storing_price_' + rentPeriod.name] }}
 																					  		</div>
-																		    			</div>
+																		    			</div> 
+																		    			-->
 																		    			<div class="col-sm-12 form-group">	
-																		    				<label for="phone">Selling Price</label>
+																		    				<label for="phone">Rent</label>
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_selling_price_' + rentPeriod.name]" 
-																								placeholder="Selling price" 
-																								:class="!errors.warehouse.containers[containerIndex]['container_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]" 
+																								placeholder="Rent price" 
+																								:class="!errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[containerIndex]['container_selling_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    		</div>
 																    			</div>
+
 																    			<!-- shelf -->
 																    			<div 
 																    				class="mr-1 p-2 border w-100" 
@@ -880,6 +884,7 @@
 																    				</div>
 
 																		    		<div class="form-row">
+																		    			<!-- 
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Storing Price</label>
 																							<input 
@@ -893,33 +898,36 @@
 																							<div class="invalid-feedback">
 																					        	{{ errors.warehouse.containers[containerIndex]['shelf_storing_price_' + rentPeriod.name] }}
 																					  		</div>
-																		    			</div>
+																		    			</div> 
+																		    			-->
 																		    			<div class="col-sm-12 form-group">	
-																		    				<label for="phone">Selling Price</label>
+																		    				<label for="phone">Rent</label>
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_selling_price_' + rentPeriod.name]" 
-																								placeholder="Selling price" 
-																								:class="!errors.warehouse.containers[containerIndex]['shelf_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]" 
+																								placeholder="Rent price" 
+																								:class="!errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[containerIndex]['shelf_selling_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    		</div>
 																    			</div>
+																    			
 																    			<!-- unit -->
 																    			<div 
 																    				class="mr-1 p-2 border w-100" 
-																    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
+																    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
 																    			>
 																		    		<div class="form-row">
 																    					<div class="sub-title">Unit</div>
 																    				</div>
 
 																		    		<div class="form-row">
+																		    			<!-- 
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Storing Price</label>
 																							<input 
@@ -933,19 +941,20 @@
 																							<div class="invalid-feedback">
 																					        	{{ errors.warehouse.containers[containerIndex]['unit_storing_price_' + rentPeriod.name] }}
 																					  		</div>
-																		    			</div>
+																		    			</div> 
+																		    			-->
 																		    			<div class="col-sm-12 form-group">	
-																		    				<label for="phone">Selling Price</label>
+																		    				<label for="phone">Rent</label>
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_selling_price_' + rentPeriod.name]" 
-																								placeholder="Selling price" 
-																								:class="!errors.warehouse.containers[containerIndex]['unit_selling_price_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]" 
+																								placeholder="Rent price" 
+																								:class="!errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
 																							<div class="invalid-feedback">
-																					        	{{ errors.warehouse.containers[containerIndex]['unit_selling_price_' + rentPeriod.name] }}
+																					        	{{ errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
 																		    		</div>
@@ -956,9 +965,19 @@
 																</div>
 												    		</div>
 
+												    		<!-- 
 												    		<div class="invalid-feedback text-center" style="display: block;" v-show="errors.warehouse.containers[containerIndex].container_price">
 												    			{{ errors.warehouse.containers[containerIndex].container_price }}
+												    		</div> 
+												    		-->
+															
+															<div 
+																class="invalid-feedback text-center" 
+																style="display: block;" v-show="errors.warehouse.containers[containerIndex].rent"
+															>
+												    			{{ errors.warehouse.containers[containerIndex].rent }}
 												    		</div>
+
 												    	</div>
 												  	</div>
 											  	</transition-group>	
@@ -1689,16 +1708,18 @@
 													    					<div class="sub-title">Container</div>
 													    				</div>
 															    		<div class="form-row">
+															    			<!-- 
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Storing Price : </label>
 															    				<label class="col-form-label">
 																					{{ singleWarehouseData.containers[containerIndex].rents['container_storing_price_' + rentPeriod.name] || 'NA' }}
 																				</label>
-															    			</div>
+															    			</div> 
+															    			-->
 															    			<div class="col-sm-12 form-group">	
-															    				<label for="phone">Selling Price : </label>
+															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
-																					{{ singleWarehouseData.containers[containerIndex].rents['container_selling_price_' + rentPeriod.name] || 'NA' }}
+																					{{ singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name] || 'NA' }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -1713,16 +1734,18 @@
 													    				</div>
 
 															    		<div class="form-row">
+															    			<!-- 
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Storing Price : </label>
 															    				<label class="col-form-label">
 																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_storing_price_' + rentPeriod.name] || 'NA' }}
 																				</label>
-															    			</div>
+															    			</div> 
+															    			-->
 															    			<div class="col-sm-12 form-group">	
-															    				<label for="phone">Selling Price : </label>
+															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
-																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_selling_price_' + rentPeriod.name] || 'NA' }}
+																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name] || 'NA' }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -1730,23 +1753,25 @@
 													    			<!-- unit -->
 													    			<div 
 													    				class="mr-1 p-2 border w-100" 
-													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
+													    				v-show="singleWarehouseData.containers[containerIndex].container.has_shelve && singleWarehouseData.containers[containerIndex].container.shelf && singleWarehouseData.containers[containerIndex].container.shelf.has_units"
 													    			>
 															    		<div class="form-row">
 													    					<div class="sub-title">Unit</div>
 													    				</div>
 
 															    		<div class="form-row">
+															    			<!-- 
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Storing Price : </label>
 															    				<label class="col-form-label">
 																					{{ singleWarehouseData.containers[containerIndex].rents['unit_storing_price_' + rentPeriod.name] || 'NA' }}
 																				</label>
-															    			</div>
+															    			</div> 
+															    			-->
 															    			<div class="col-sm-12 form-group">	
-															    				<label for="phone">Selling Price : </label>
+															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
-																					{{ singleWarehouseData.containers[containerIndex].rents['unit_selling_price_' + rentPeriod.name] || 'NA' }}
+																					{{ singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name] || 'NA' }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -2019,7 +2044,7 @@
 
 			}
 
-			if (this.userHasPermissionTo('view-asset-index')) {
+			if (this.userHasPermissionTo('view-warehouse-asset-index')) {
 
 				this.fetchAllRentPeriods();
 				this.fetchAllStorageTypes();
@@ -2059,11 +2084,6 @@
 
 		watch: {
 
-			ownerObject: function (object) {
-				if (object && Object.keys(object).length > 0) {
-					this.singleWarehouseData.warehouse_owner_id = object.id;
-				}
-			},
 			'singleWarehouseData.containers': {
 	            handler: function(newContainers) {
 
@@ -2072,29 +2092,29 @@
 
 							if (this.errors.warehouse.containers[index]) {
 
-								if (!container.container.has_shelve) {
+								if (! container.container.has_shelve) {
 
 									this.allRentPeriods.forEach(
 										rentPeriod => {
 
-											this.$delete(this.errors.warehouse.containers[index], 'shelf_storing_price_'+ rentPeriod.name);
-											this.$delete(this.errors.warehouse.containers[index], 'shelf_selling_price_'+ rentPeriod.name);
+											// this.$delete(this.errors.warehouse.containers[index], 'shelf_storing_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[index], 'shelf_rent_'+ rentPeriod.name);
 
-											this.$delete(this.errors.warehouse.containers[index], 'unit_storing_price_'+ rentPeriod.name);
-											this.$delete(this.errors.warehouse.containers[index], 'unit_selling_price_'+ rentPeriod.name);
+											// this.$delete(this.errors.warehouse.containers[index], 'unit_storing_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[index], 'unit_rent_'+ rentPeriod.name);
 
 										}
 									);
 
 								}
 
-								else if (container.container.has_shelve && !container.container.shelf.has_units) {
+								else if (container.container.has_shelve && container.container.shelf && ! container.container.shelf.has_units) {
 
 									this.allRentPeriods.forEach(
 										rentPeriod => {
 
-											this.$delete(this.errors.warehouse.containers[index], 'unit_storing_price_'+ rentPeriod.name);
-											this.$delete(this.errors.warehouse.containers[index], 'unit_selling_price_'+ rentPeriod.name);
+											// this.$delete(this.errors.warehouse.containers[index], 'unit_storing_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[index], 'unit_rent_'+ rentPeriod.name);
 
 										}
 									);
@@ -2290,7 +2310,7 @@
 			},
 			fetchAllStorageTypes() {
 
-				if (! this.userHasPermissionTo('view-asset-index')) {
+				if (! this.userHasPermissionTo('view-warehouse-asset-index')) {
 
 					this.error = 'You do not have permission to view storage types';
 					return;
@@ -2334,7 +2354,7 @@
 			},
 			fetchAllContainerTypes() {
 
-				if (! this.userHasPermissionTo('view-asset-index')) {
+				if (! this.userHasPermissionTo('view-warehouse-asset-index')) {
 
 					this.error = 'You do not have permission to view container types';
 					return;
@@ -2378,7 +2398,7 @@
 			},
 			fetchAllRentPeriods() {
 
-				if (! this.userHasPermissionTo('view-asset-index')) {
+				if (! this.userHasPermissionTo('view-warehouse-asset-index')) {
 
 					this.error = 'You do not have permission to view rent-periods';
 					return;
@@ -2568,7 +2588,7 @@
 			},
 			storeWarehouse() {
 
-				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
+				this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
 
 				this.formSubmitted = true;
 
@@ -2598,7 +2618,7 @@
 			},
 			updateWarehouse() {
 
-				this.insertDefaultPermissions(['view-asset-index', 'view-warehouse-owner-index']);
+				this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
 
 				this.formSubmitted = true;
 				
@@ -2713,6 +2733,11 @@
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
 			},
+			setWarehouseOwner() {
+				if (this.ownerObject && Object.keys(this.ownerObject).length > 0) {
+					this.singleWarehouseData.warehouse_owner_id = this.ownerObject.id;
+				}
+			},
 			objectNameWithCapitalized ({ name, user_name }) {
 		      	if (name) {
 				    name = name.toString();
@@ -2778,9 +2803,13 @@
 					this.validateFormInput('container');
 		        	this.validateFormInput('container_quantity');
 
+		        	this.validateFormInput('rent');
+
+		        	/*
 		        	this.validateFormInput('container_price');
 		        	this.validateFormInput('shelf_price');
 		        	this.validateFormInput('unit_price');
+		        	*/
 				}
 
 				const errorInArray = (element) => {
@@ -3404,6 +3433,7 @@
 
 						break;
 
+					/*
 					case 'container_price' :
 
 						this.singleWarehouseData.containers.forEach(
@@ -3419,13 +3449,13 @@
 
 									this.allRentPeriods.forEach(
 										rentPeriod => {
-											if ((container.rents['container_storing_price_' + rentPeriod.name] && !container.rents['container_selling_price_' + rentPeriod.name]) || (!container.rents['container_storing_price_' + rentPeriod.name] && container.rents['container_selling_price_' + rentPeriod.name])) {
+											if ((container.rents['container_storing_price_' + rentPeriod.name] && !container.rents['container_rent_' + rentPeriod.name]) || (!container.rents['container_storing_price_' + rentPeriod.name] && container.rents['container_rent_' + rentPeriod.name])) {
 
 												this.submitForm = false;
 
 												if (container.rents['container_storing_price_' + rentPeriod.name]) {
 
-													this.errors.warehouse.containers[containerIndex]['container_selling_price_' + rentPeriod.name] = 'Both field to be filled';
+													this.errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] = 'Both field to be filled';
 
 												}
 												else {
@@ -3439,10 +3469,10 @@
 											else {
 												this.submitForm = true;
 
-												this.$delete(this.errors.warehouse.containers[containerIndex], 'container_selling_price_'+ rentPeriod.name);
-												this.$delete(this.errors.warehouse.containers[containerIndex], 'container_storing_price_'+ rentPeriod.name);
+												this.$delete(this.errors.warehouse.containers[containerIndex], 'container_rent_'+ rentPeriod.name);
+												// this.$delete(this.errors.warehouse.containers[containerIndex], 'container_storing_price_'+ rentPeriod.name);
 
-												// this.errors.warehouse.containers[index]['container_selling_price_' + rentPeriod.name] = null;
+												// this.errors.warehouse.containers[index]['container_rent_' + rentPeriod.name] = null;
 												// this.errors.warehouse.containers[index]['container_storing_price_' + rentPeriod.name] = null;
 											}
 										}
@@ -3454,21 +3484,42 @@
 						);
 
 						break;
+					*/
 
-					case 'shelf_price' :
+					case 'rent' :
 
 						this.singleWarehouseData.containers.forEach(
+							
 							(container, containerIndex) => {
 
+								if (! container.hasOwnProperty('rents') || Object.keys(container.rents).length === 0 || (Object.keys(container.rents).length === 1 && container.rents[Object.keys(container.rents)[0]] < 1)) {
+
+									this.errors.warehouse.containers[containerIndex]['rent'] = 'One rent is required';
+
+								}
+								else if (Object.values(container.rents).indexOf(-1) > -1) {
+
+									this.errors.warehouse.containers[containerIndex]['rent'] = 'Negative rent is invalid';
+
+								}
+								else {
+
+									this.submitForm = true;
+									this.$delete(this.errors.warehouse.containers[containerIndex], 'rent');
+
+								}
+
+								/*
+								
 								this.allRentPeriods.forEach(
 									rentPeriod => {
-										if ((container.rents['shelf_storing_price_' + rentPeriod.name] && !container.rents['shelf_selling_price_' + rentPeriod.name]) || (!container.rents['shelf_storing_price_' + rentPeriod.name] && container.rents['shelf_selling_price_' + rentPeriod.name])) {
+										if ((container.rents['shelf_storing_price_' + rentPeriod.name] && !container.rents['shelf_rent_' + rentPeriod.name]) || (!container.rents['shelf_storing_price_' + rentPeriod.name] && container.rents['shelf_rent_' + rentPeriod.name])) {
 
 											this.submitForm = false;
 
 											if (container.rents['shelf_storing_price_' + rentPeriod.name]) {
 
-												this.errors.warehouse.containers[containerIndex]['shelf_selling_price_' + rentPeriod.name] = 'Both field to be filled';
+												this.errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] = 'Both field to be filled';
 
 											}
 											else {
@@ -3482,20 +3533,23 @@
 										else {
 											this.submitForm = true;
 
-											this.$delete(this.errors.warehouse.containers[containerIndex], 'shelf_selling_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[containerIndex], 'shelf_rent_'+ rentPeriod.name);
 											this.$delete(this.errors.warehouse.containers[containerIndex], 'shelf_storing_price_'+ rentPeriod.name);
 
-											// this.errors.warehouse.containers[index]['shelf_selling_price_' + rentPeriod.name] = null;
+											// this.errors.warehouse.containers[index]['shelf_rent_' + rentPeriod.name] = null;
 											// this.errors.warehouse.containers[index]['shelf_storing_price_' + rentPeriod.name] = null;
 										}
 									}
 								);
+								
+								*/
 
 							}
 						);
 
 						break;
 
+					/*
 					case 'unit_price' :
 
 						this.singleWarehouseData.containers.forEach(
@@ -3503,13 +3557,13 @@
 
 								this.allRentPeriods.forEach(
 									rentPeriod => {
-										if ((container.rents['unit_storing_price_' + rentPeriod.name] && !container.rents['unit_selling_price_' + rentPeriod.name]) || (!container.rents['unit_storing_price_' + rentPeriod.name] && container.rents['unit_selling_price_' + rentPeriod.name])) {
+										if ((container.rents['unit_storing_price_' + rentPeriod.name] && !container.rents['unit_rent_' + rentPeriod.name]) || (!container.rents['unit_storing_price_' + rentPeriod.name] && container.rents['unit_rent_' + rentPeriod.name])) {
 
 											this.submitForm = false;
 
 											if (container.rents['unit_storing_price_' + rentPeriod.name]) {
 
-												this.errors.warehouse.containers[containerIndex]['unit_selling_price_' + rentPeriod.name] = 'Both field to be filled';
+												this.errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] = 'Both field to be filled';
 
 											}
 											else {
@@ -3522,10 +3576,11 @@
 										else {
 											this.submitForm = true;
 
-											this.$delete(this.errors.warehouse.containers[containerIndex], 'unit_selling_price_'+ rentPeriod.name);
-											this.$delete(this.errors.warehouse.containers[containerIndex], 'unit_storing_price_'+ rentPeriod.name);
+											this.$delete(this.errors.warehouse.containers[containerIndex], 'unit_rent_'+ rentPeriod.name);
+											
+											// this.$delete(this.errors.warehouse.containers[containerIndex], 'unit_storing_price_'+ rentPeriod.name);
 
-											// this.errors.warehouse.containers[index]['unit_selling_price_' + rentPeriod.name] = null;
+											// this.errors.warehouse.containers[index]['unit_rent_' + rentPeriod.name] = null;
 											// this.errors.warehouse.containers[index]['unit_storing_price_' + rentPeriod.name] = null;
 										}
 									}
@@ -3535,6 +3590,7 @@
 						);
 
 						break;
+					*/
 
 				}
 	 

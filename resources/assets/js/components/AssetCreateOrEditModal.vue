@@ -202,7 +202,10 @@
 
 					case 'name' :
 
-						if (!this.singleAssetData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						if (! this.singleAssetData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.asset.name = 'No space or special character';
+						}
+						else if (this.currentRouteName=='rent-periods' && ! this.singleAssetData.name.match(/^[a-zA-Z0-9-_]+$/)) {
 							this.errors.asset.name = 'No space or special character';
 						}
 						else{

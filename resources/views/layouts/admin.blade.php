@@ -196,7 +196,7 @@
 							<div class="main-friend-list">
 								<div class="media userlist-box waves-effect waves-light" data-id="1" data-status="online" data-username="Josephin Doe">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius img-radius" src="{{asset('jpg/avatar-3.jpg')}}" alt="Generic placeholder image ">
+										<img class="media-object img-radius img-radius" src="{{asset('')}}" alt="Generic placeholder image ">
 										<div class="live-status bg-success"></div>
 									</a>
 									<div class="media-body">
@@ -205,7 +205,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="2" data-status="online" data-username="Lary Doe">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-success"></div>
 									</a>
 									<div class="media-body">
@@ -214,7 +214,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="3" data-status="online" data-username="Alice">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-4.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-success"></div>
 									</a>
 									<div class="media-body">
@@ -223,7 +223,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="4" data-status="offline" data-username="Alia">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-3.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-default"></div>
 									</a>
 									<div class="media-body">
@@ -232,7 +232,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="5" data-status="offline" data-username="Suzen">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-default"></div>
 									</a>
 									<div class="media-body">
@@ -254,7 +254,7 @@
 				<div class="main-friend-chat">
 					<div class="media chat-messages">
 						<a class="media-left photo-table" href="#!">
-							<img class="media-object img-radius img-radius m-t-5" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+							<img class="media-object img-radius img-radius m-t-5" src="{{asset('')}}" alt="Generic placeholder image">
 						</a>
 						<div class="media-body chat-menu-content">
 							<div class="">
@@ -273,7 +273,7 @@
 					</div>
 					<div class="media chat-messages">
 						<a class="media-left photo-table" href="#!">
-							<img class="media-object img-radius img-radius m-t-5" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+							<img class="media-object img-radius img-radius m-t-5" src="{{asset('')}}" alt="Generic placeholder image">
 						</a>
 						<div class="media-body chat-menu-content">
 							<div class="">

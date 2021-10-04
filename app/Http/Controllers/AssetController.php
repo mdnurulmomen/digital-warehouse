@@ -281,7 +281,7 @@ class AssetController extends Controller
 
     public function searchAllContainers($search, $perPage)
     {
-        $columnsToSearch = ['name', 'length', 'width', 'height'];
+        $columnsToSearch = ['name', 'code', 'length', 'width', 'height'];
 
         $query = Container::with(['shelf.unit'])->withTrashed();
 
@@ -366,7 +366,7 @@ class AssetController extends Controller
 
     public function searchAllRentPeriods($search, $perPage)
     {
-        $columnsToSearch = ['name'];
+        $columnsToSearch = ['name', 'number_days'];
 
         $query = RentPeriod::withTrashed();
 

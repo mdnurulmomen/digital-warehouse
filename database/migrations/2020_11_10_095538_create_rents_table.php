@@ -15,8 +15,9 @@ class CreateRentsTable extends Migration
     {
         Schema::create('rents', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedSmallInteger('storing_price')->default(100);
-            $table->unsignedSmallInteger('selling_price')->default(100);
+            $table->unsignedSmallInteger('rent')->default(0);
+            // $table->unsignedSmallInteger('storing_price')->default(100);
+            // $table->unsignedSmallInteger('selling_price')->default(100);
             $table->unsignedTinyInteger('rent_period_id');
             $table->string('warehouse_storer_type', 100);
             $table->unsignedInteger('warehouse_storer_id');

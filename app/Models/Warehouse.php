@@ -467,31 +467,31 @@ class Warehouse extends Authenticatable
         foreach ($allRentPeriods as $rentPeriod) {
 
             // container rents 
-            if (!empty($inputedContainer->rents->{'container_storing_price_'.$rentPeriod->name}) && !empty($inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name})) {
+            if (! empty($inputedContainer->rents->{'container_rent_'.$rentPeriod->name}) && $inputedContainer->rents->{'container_rent_'.$rentPeriod->name} > 0 /* && !empty($inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name}) */) {
                 
                 $warehouseContainer->rents()->create([
-                    'storing_price' => $inputedContainer->rents->{'container_storing_price_'.$rentPeriod->name},
-                    'selling_price' => $inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name},
+                    'rent' => $inputedContainer->rents->{'container_rent_'.$rentPeriod->name},
+                    // 'selling_price' => $inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name},
                     'rent_period_id' => $rentPeriod->id,
                 ]);
 
             }
 
             // shelf rents
-            if ($inputedContainer->container->has_shelve && !empty($inputedContainer->rents->{'shelf_storing_price_'.$rentPeriod->name}) && !empty($inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name})) {
+            if ($inputedContainer->container->has_shelve && ! empty($inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name}) && $inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name} > 0 /* && !empty($inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name}) */) {
                 
                 $warehouseContainer->shelf->rents()->create([
-                    'storing_price' => $inputedContainer->rents->{'shelf_storing_price_'.$rentPeriod->name},
-                    'selling_price' => $inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name},
+                    'rent' => $inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name},
+                    // 'selling_price' => $inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name},
                     'rent_period_id' => $rentPeriod->id,
                 ]);
 
                 // unit rents
-                if ($inputedContainer->container->shelf->has_units && !empty($inputedContainer->rents->{'unit_storing_price_'.$rentPeriod->name}) && !empty($inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name})) {
+                if ($inputedContainer->container->shelf->has_units && ! empty($inputedContainer->rents->{'unit_rent_'.$rentPeriod->name}) && $inputedContainer->rents->{'unit_rent_'.$rentPeriod->name} > 0 /* && !empty($inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name}) */) {
                     
                     $warehouseContainer->shelf->unit->rents()->create([
-                        'storing_price' => $inputedContainer->rents->{'unit_storing_price_'.$rentPeriod->name},
-                        'selling_price' => $inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name},
+                        'rent' => $inputedContainer->rents->{'unit_rent_'.$rentPeriod->name},
+                        // 'selling_price' => $inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name},
                         'rent_period_id' => $rentPeriod->id,
                     ]);
 
@@ -541,12 +541,14 @@ class Warehouse extends Authenticatable
     {
         for($i=0; $i<$inputedContainer->quantity; $i++) {
 
+            $containerToAdd = Container::findOrFail($inputedContainer->container->id);
+
             // container statuses
             $warehouseContainerStatus = $warehouseContainer->containerStatuses()->create([
-                'name' => 'cnt'.$inputedContainer->container->id.'-'.($i+1),
+                'name' => (($containerToAdd->code ?? 'cnt'.$containerToAdd->id).'-'.($i+1)),
             ]);
 
-            if ($inputedContainer->container->has_shelve) {
+            if ($containerToAdd->has_shelve) {
                 
                 // shelves per container
                 for($j=0; $j<$inputedContainer->container->shelf->quantity; $j++) {
@@ -556,7 +558,7 @@ class Warehouse extends Authenticatable
                         'warehouse_container_id' => $warehouseContainer->id,
                     ]);
 
-                    if ($inputedContainer->container->shelf->has_units) {
+                    if ($containerToAdd->shelf->has_units) {
                         
                         // units per shelf
                         for($k=0; $k<$inputedContainer->container->shelf->unit->quantity; $k++){

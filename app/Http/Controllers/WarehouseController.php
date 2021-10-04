@@ -213,8 +213,12 @@ class WarehouseController extends Controller
             'storages.*.storage_type' => 'required',
 
             'containers' => 'required|array',
+            
+            'containers.*.container.has_shelve' => 'required|boolean',
+            'containers.*.container.shelf' => 'required_if:containers.*.container.has_shelve,1',
+
             'containers.*.container.id' => 'required|exists:containers,id',
-            'containers.*.quantity' => 'required|integer|min:0',
+            'containers.*.quantity' => 'required|numeric|min:1',
             'containers.*.rents' => 'required',
         ]);
 
@@ -281,8 +285,12 @@ class WarehouseController extends Controller
             'storages.*.storage_type' => 'required',
 
             'containers' => 'required|array',
+
+            'containers.*.container.has_shelve' => 'required|boolean',
+            'containers.*.container.shelf' => 'required_if:containers.*.container.has_shelve,1',
+
             'containers.*.container.id' => 'required|exists:containers,id',
-            'containers.*.quantity' => 'required|numeric',
+            'containers.*.quantity' => 'required|numeric|min:1',
             'containers.*.rents' => 'required',
         ]);
 
@@ -307,7 +315,6 @@ class WarehouseController extends Controller
         $warehouseToUpdate->warehouse_owner_id = $request->warehouse_owner_id;
 
         $warehouseToUpdate->save();
-
 
         $warehouseToUpdate->feature()->updateOrCreate(
             [ 'warehouse_id' => $warehouseToUpdate->id ],
