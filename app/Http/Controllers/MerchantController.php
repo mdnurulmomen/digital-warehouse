@@ -48,15 +48,15 @@ class MerchantController extends Controller
             
             return response()->json([
 
-        		'approved' => Merchant::with(['roles', 'permissions'])->where('active', 1)->paginate($perPage),
-                'pending' => Merchant::with(['roles', 'permissions'])->where('active', 0)->paginate($perPage),
-        		'trashed' => Merchant::with(['roles', 'permissions'])->onlyTrashed()->paginate($perPage),
+        		'approved' => Merchant::with(['roles', 'permissions'])->where('active', 1)->latest()->paginate($perPage),
+                'pending' => Merchant::with(['roles', 'permissions'])->where('active', 0)->latest()->paginate($perPage),
+        		'trashed' => Merchant::with(['roles', 'permissions'])->onlyTrashed()->latest()->paginate($perPage),
 
         	], 200);
 
         }
 
-        return Merchant::all();
+        return Merchant::latest()->get();
     }
 
     public function storeNewMerchant(Request $request, $perPage)
@@ -161,6 +161,7 @@ class MerchantController extends Controller
         ], 200);
     }
 
+    /*
     // Current User
     public function currentMerchant()
     {
@@ -173,6 +174,7 @@ class MerchantController extends Controller
             ], 200);
         }
     }
+    */
 
     // Merchant-Products (web.php) 
     public function showMyAllProducts($perPage=false)
@@ -215,7 +217,7 @@ class MerchantController extends Controller
         return MyProductResource::collection(
             MerchantProduct::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
                 $query->where('available_quantity', '>', 0);
-            })->get()
+            })->latest()->get()
         );
 
     }
@@ -254,7 +256,7 @@ class MerchantController extends Controller
 
         return RequisitionAgent::whereHas('requisition', function ($query) use ($currentMerchant) {
             $query->where('merchant_id', $currentMerchant->id);
-        })->get()->unique('name');
+        })->latest('id')->get()->unique('name');
     }
 
     // My-Requisition (web.php)
@@ -274,7 +276,7 @@ class MerchantController extends Controller
 
         }
 
-        return Requisition::with('products.merchantProduct')->where('merchant_id', $currentMerchant->id)->get();
+        return Requisition::with('products.merchantProduct')->where('merchant_id', $currentMerchant->id)->latest()->get();
 
     }
 
@@ -450,6 +452,7 @@ class MerchantController extends Controller
                 $query->where('available_quantity', '>', 0);
             })
             ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+            ->latest()
             ->get()
         );
 

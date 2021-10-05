@@ -292,8 +292,8 @@ class WarehouseController extends Controller
             'containers.*.container.id' => 'required|exists:containers,id',
             'containers.*.container.name' => 'string',
 
-            'containers.*.engaged_quantity' => 'required|numeric|min:0',
-            'containers.*.partially_engaged' => 'required|numeric|min:0',
+            'containers.*.engaged_quantity' => 'required_with:container_id|numeric|min:0',
+            'containers.*.partially_engaged' => 'required_with:container_id|numeric|min:0',
 
             'containers.*.quantity' => 'required|numeric|min:1',
 
@@ -302,7 +302,7 @@ class WarehouseController extends Controller
 
         foreach (json_decode(json_encode($request->containers)) as $warehouseContainerIndex => $warehouseContainer) {
             
-            if ($warehouseContainer->quantity < ($warehouseContainer->partially_engaged + $warehouseContainer->engaged_quantity)) {
+            if (property_exists($warehouseContainer, 'container_id') && ($warehouseContainer->quantity < ($warehouseContainer->partially_engaged + $warehouseContainer->engaged_quantity))) {
                 
                 return response()->json([
                     'errors'=>[

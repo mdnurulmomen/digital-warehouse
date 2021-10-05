@@ -263,7 +263,8 @@ Route::name('merchant.')->group(function () {
 			$access_token = Illuminate\Support\Str::random(60);
         	$roles = \Auth::guard('merchant')->user()->roles;
         	$permissions = Auth::guard('merchant')->user()->permissions;
-			return view('layouts.merchant', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
+			return view('layouts.merchant', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		    
 		});
 

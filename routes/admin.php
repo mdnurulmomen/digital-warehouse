@@ -240,7 +240,8 @@ Route::name('admin.')->group(function () {
 			$access_token = Illuminate\Support\Str::random(60);
         	$roles = \Auth::guard('admin')->user()->roles;
         	$permissions = Auth::guard('admin')->user()->permissions;
-			return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
+			return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		});
 
 	});

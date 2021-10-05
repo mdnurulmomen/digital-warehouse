@@ -92,7 +92,7 @@ class WarehouseOwner extends Authenticatable
                 return;
             }
 
-            $img = $img->resize(100, 100);
+            // $img = $img->resize(100, 100);
             $img->save($imagePath.$this->id.'.jpg');
 
             $this->profilePreview()->updateOrCreate(

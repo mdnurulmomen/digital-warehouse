@@ -24,15 +24,15 @@ class ManagerController extends Controller
             
             return response()->json([
 
-        		'approved' => Manager::with(['roles', 'permissions'])->where('active', 1)->paginate($perPage),
-                'pending' => Manager::with(['roles', 'permissions'])->where('active', 0)->paginate($perPage),
-        		'trashed' => Manager::with(['roles', 'permissions'])->onlyTrashed()->paginate($perPage),
+        		'approved' => Manager::with(['roles', 'permissions'])->where('active', 1)->latest()->paginate($perPage),
+                'pending' => Manager::with(['roles', 'permissions'])->where('active', 0)->latest()->paginate($perPage),
+        		'trashed' => Manager::with(['roles', 'permissions'])->onlyTrashed()->latest()->paginate($perPage),
 
         	], 200);
 
         }
 
-        return Manager::where('active', 1)->get();
+        return Manager::latest()->where('active', 1)->get();
     }
 
     public function storeNewManager(Request $request, $perPage)
@@ -126,18 +126,11 @@ class ManagerController extends Controller
     {
         $columnsToSearch = ['first_name', 'last_name', 'user_name', 'mobile', 'email'];
 
-        $query = Manager::with(['warehouses', 'roles', 'permissions'])->withTrashed();
+        $query = Manager::with(['roles', 'permissions'])->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");
         }
-
-        $query->orWhereHas('warehouses.warehouse', function($q) use ($search){
-            $q->where('name', 'like', "%$search%")
-              ->orWhere('user_name', 'like', "%$search%")
-              ->orWhere('email', 'like', "%$search%")
-              ->orWhere('mobile', 'like', "%$search%");
-        });
 
         return response()->json([
             'all' => $query->paginate($perPage),    
@@ -145,6 +138,7 @@ class ManagerController extends Controller
     }
 
     // Warehouse
+    /*
     public function showManagerAllWarehouses($perPage)
     {
         $currentManager = \Auth::guard('manager')->user();
@@ -196,5 +190,6 @@ class ManagerController extends Controller
             'all' => new WarehouseCollection($query->paginate($perPage)),    
         ], 200);
     }
+    */
     
 }

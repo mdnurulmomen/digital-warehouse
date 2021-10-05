@@ -242,7 +242,8 @@ Route::name('manager.')->group(function () {
 			$access_token = Illuminate\Support\Str::random(60);
         	$roles = \Auth::guard('manager')->user()->roles;
         	$permissions = Auth::guard('manager')->user()->permissions;
-			return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
+			return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		    
 		});
 

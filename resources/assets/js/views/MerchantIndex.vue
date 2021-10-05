@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="'merchants'" 
-			:message="'All our warehouse merchants'"
+			:message="'All our warehouse-merchants'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -28,6 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'merchant'" 
 											  		:required-permission = "'merchant'" 
+											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -53,7 +54,8 @@
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission = "'merchant'"
+										  			:required-permission = "'merchant'" 
+										  			:form-submitted="formSubmitted" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -79,10 +81,11 @@
 
 		<user-profile-create-or-edit-modal 
 			v-if="userHasPermissionTo('create-merchant') || userHasPermissionTo('update-merchant')" 
+			:csrf="csrf" 
 			:create-mode="createMode" 
 			:user="'merchant'" 
+			:form-submitted="formSubmitted" 
 			:single-user-details="singleUserDetails" 
-			:csrf="csrf"
 
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
@@ -91,6 +94,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-merchant')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteUser'" 
 			:content-to-delete="singleUserDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -101,6 +105,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-merchant')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreUser'" 
 			:content-to-restore="singleUserDetails"
 			:restoration-message="'This will restore all related items !'" 
@@ -141,6 +146,7 @@
 	        	currentTab : 'approved',
 
 	        	createMode : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -246,6 +252,7 @@
 			},
 			showContentCreateForm() {
 				this.createMode = true;
+				this.formSubmitted = false;	
 				this.singleUserDetails = {
 					active : false,
 					profile_preview : {},
@@ -256,19 +263,24 @@
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
+				this.formSubmitted = false;	
 				this.singleUserDetails = object;
 				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
+				this.formSubmitted = false;	
 				this.singleUserDetails = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
-			openContentRestoreForm(object) {	
+			openContentRestoreForm(object) { 
+				this.formSubmitted = false;	
 				this.singleUserDetails = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.post('/merchants/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -285,11 +297,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.put('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -306,11 +323,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.delete('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -327,11 +349,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.patch('/merchants/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -348,6 +375,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},

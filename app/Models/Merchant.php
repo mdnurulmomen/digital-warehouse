@@ -60,13 +60,17 @@ class Merchant extends Authenticatable
     {
         return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
     }
+    
+    public function deals()
+    {
+        return $this->hasMany(MerchantDeal::class, 'merchant_id', 'id');
+    }
 
-    /*
-        public function deals()
-        {
-            return $this->hasMany(MerchantDeal::class, 'merchant_id', 'id');
-        }
-    */
+    public function products()
+    {
+        return $this->hasMany(MerchantProduct::class, 'merchant_id', 'id');
+    }
+    
 
     /**
      * Set the user's first name.
@@ -94,7 +98,7 @@ class Merchant extends Authenticatable
                 return;
             }
 
-            $img = $img->resize(100, 100);
+            // $img = $img->resize(100, 100);
             $img->save($imagePath.$this->id.'.jpg');
 
             $this->profilePreview()->updateOrCreate(

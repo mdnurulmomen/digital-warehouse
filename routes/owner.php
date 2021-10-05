@@ -248,7 +248,8 @@ Route::name('owner.')->group(function () {
 			$access_token = Illuminate\Support\Str::random(60);
         	$roles = \Auth::guard('owner')->user()->roles;
         	$permissions = Auth::guard('owner')->user()->permissions;
-			return view('layouts.owner', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
+			return view('layouts.owner', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		    
 		});
 	

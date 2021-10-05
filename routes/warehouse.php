@@ -268,7 +268,8 @@ Route::name('warehouse.')->group(function () {
 			$access_token = Illuminate\Support\Str::random(60);
         	$roles = \Auth::guard('warehouse')->user()->roles;
         	$permissions = Auth::guard('warehouse')->user()->permissions;
-			return view('layouts.warehouse', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
+			return view('layouts.warehouse', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		    
 		});
 	

@@ -28,7 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'deals'" 
 											  		:required-permission="'merchant-deal'" 
-											  		:disable-add-button="allAvailableWarehouseAndSpaces.length==0 ? true : false" 									  
+											  		:disable-add-button="(allAvailableWarehouseAndSpaces.length==0 || formSubmitted) ? true : false" 									  
 											  		@showContentCreateForm="showDealCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllMerchantDeals"
@@ -111,6 +111,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				:disabled="formSubmitted"  
 																				@click="goToDealPayments(merchantDeal)" 
 																				v-if="userHasPermissionTo('view-merchant-payment-index')" 
 																			>
@@ -432,7 +433,7 @@
 																					:allow-empty="false" 
 																					class="form-control p-0" 
 																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || warehouseContainer.occupied != 0"
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
 																					@close="validateFormInput('containers')" 
 																				>
 																				</multiselect>
@@ -458,7 +459,7 @@
 																					:allow-empty="false" 
 																					class="form-control p-0" 
 																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || warehouseContainer.occupied != 0"
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
 																					@close="validateFormInput('rent_period')" 
 																				>
 																				</multiselect>
@@ -479,12 +480,17 @@
 																	<div class="col-md-12 card-footer mt-2">
 																		<div class="form-row text-center">
 																			<div class="col-md-6 text-success">
-																				<i class="fa fa-plus" aria-hidden="true" @click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"></i>
+																				<i 
+																					class="fa fa-plus fa-lg" 
+																					aria-hidden="true" 
+																					@click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
+																				>	
+																				</i>
 																			</div>
 
 																			<div class="col-md-6 text-danger">
 																				<i 
-																					class="fa fa-minus" 
+																					class="fa fa-minus fa-lg" 
 																					aria-hidden="true" 
 																					:disabled="warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1])" 
 																					@click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
@@ -932,6 +938,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-merchant-deal')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted" 
 			:submit-method-name="'deleteDeal'" 
 			:content-to-delete="singleMerchantDealData"
 			:restoration-message="'You can not restore this deal again !'" 
@@ -1123,7 +1130,7 @@
 																						Status :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						<span :class="[warehouseContainer.occupied==1 ? 'badge-danger' : warehouseContainer.occupied==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																						<span :class="[warehouseContainer.occupied==1 ? 'badge-danger' : warehouseContainer.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																							{{ warehouseContainer.occupied==1 ? 'Packed' : warehouseContainer.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
 																						</span>
 																					</label>
@@ -1172,7 +1179,7 @@
 
 																								{{ shelf.name ? shelf.name.substring(shelf.name.lastIndexOf("-")+1) : 'NA' }}
 																								
-																								<span :class="[shelf.occupied==1 ? 'badge-danger' : shelf.occupied==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																								<span :class="[shelf.occupied==1 ? 'badge-danger' : shelf.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																									{{ shelf.occupied==1 ? 'Packed' : shelf.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
 																								</span>	
 																							</li>	
@@ -1229,7 +1236,7 @@
 
 																								{{ unit.name ? unit.name.substring(unit.name.lastIndexOf("-")+1) : 'NA' }}
 																								
-																								<span :class="[unit.occupied==1 ? 'badge-danger' : unit.occupied==0.5 ? 'badge-primary' : 'badge-success', 'badge']">
+																								<span :class="[unit.occupied==1 ? 'badge-danger' : unit.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																									{{ unit.occupied==1 ? 'Packed' : unit.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
 																								</span>
 																							</li>
@@ -2534,6 +2541,7 @@
 							this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers.push({});
 							this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex], 'containers');
 
+
 						} else {
 							
 						}
@@ -2545,9 +2553,9 @@
 			},
 			removeWarehouseContainers(merchantWarehouseIndex, selectedSpaceIndex) {
 				
-				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.payments.length < 2){
+				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.payments.length < 2) {
 
-					if(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && ! this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex])){
+					if(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex])){
 
 						this.emptyContainers.push(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers[this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers.length-1]);
 
@@ -2599,17 +2607,17 @@
 			},
 			removableSpace(warehouseSpace) {
 
-				if (warehouseSpace.type=='containers' && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.some(warehouseContainer => warehouseContainer.occupied != 0)) {
+				if (warehouseSpace.type=='containers' && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.some(warehouseContainer => warehouseContainer.occupied == 0.5 || warehouseContainer.occupied == 1.0)) {
 
 					return false;
 
 				}
-				else if (warehouseSpace.type=='shelves' && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.some(warehouseShelf => warehouseShelf.occupied != 0)) {
+				else if (warehouseSpace.type=='shelves' && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.some(warehouseShelf => warehouseShelf.occupied == 0.5 || warehouseShelf.occupied == 1.0)) {
 
 					return false;
 
 				}
-				else if (warehouseSpace.type=='units' && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.some(warehouseUnit => warehouseUnit.occupied != 0)) {
+				else if (warehouseSpace.type=='units' && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.some(warehouseUnit => warehouseUnit.occupied == 1.0)) {
 
 					return false;
 
@@ -2643,9 +2651,16 @@
 			removableDeal(merchantDeal) {
 
 				const warehouseIsEngaged = (merchantWarehouse) => {
+					/*
 					return merchantWarehouse.spaces.some(
 						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealSpace.containers.some(dealtContainer => dealtContainer.occupied != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.occupied != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.occupied != 0))
-					)
+					);
+					*/
+					
+					return merchantWarehouse.spaces.some(
+						dealtSpace => ! this.removableSpace(dealtSpace)
+					);
+
 				};
 
 				return merchantDeal.payments.length < 2 || ! merchantDeal.warehouses.some(warehouseIsEngaged)
@@ -2655,8 +2670,14 @@
 
 				if (merchantWarehouse.hasOwnProperty('spaces') && merchantWarehouse.spaces.length) {
 
+					/*
 					return merchantWarehouse.spaces.some(
 						dealtSpace =>  (dealtSpace.type=='containers' && dealtSpace.hasOwnProperty('containers') && dealtSpace.containers.some(dealtContainer => dealtContainer.occupied != 0)) || (dealtSpace.type=='shelves' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelves') && dealtSpace.container.shelves.some(dealtShelf => dealtShelf.occupied != 0)) || (dealtSpace.type=='units' && dealtSpace.hasOwnProperty('container') && dealtSpace.container.hasOwnProperty('shelf') && dealtSpace.container.shelf.hasOwnProperty('units') && dealtSpace.container.shelf.units.some(dealtUnit => dealtUnit.occupied != 0))
+					);
+					*/
+
+					return merchantWarehouse.spaces.some(
+						dealtSpace => ! this.removableSpace(dealtSpace)
 					);
 
 				}
@@ -2668,7 +2689,7 @@
 
 				if (warehouseContainer) {
 
-					return warehouseContainer.occupied != 0;
+					return warehouseContainer.occupied == 0.5 || warehouseContainer.occupied == 1.0;
 
 				}
 
@@ -2679,7 +2700,7 @@
 
 				if (warehouseContainer && warehouseContainer.hasOwnProperty('shelves') && warehouseContainer.shelves.length) {
 
-					return warehouseContainer.shelves.some(warehouseShelf => warehouseShelf.occupied != 0);
+					return warehouseContainer.shelves.some(warehouseShelf => warehouseShelf.occupied == 0.5 || warehouseShelf.occupied == 1.0);
 
 				}
 
@@ -2690,7 +2711,7 @@
 
 				if (warehouseContainer && warehouseContainer.hasOwnProperty('shelf') && warehouseContainer.shelf.hasOwnProperty('units') && warehouseContainer.shelf.units.length) {
 
-					return warehouseContainer.shelf.units.some(warehouseUnit => warehouseUnit.occupied != 0);
+					return warehouseContainer.shelf.units.some(warehouseUnit => warehouseUnit.occupied == 0.5 || warehouseUnit.occupied == 1.0);
 
 				}
 
@@ -2863,8 +2884,6 @@
 
 			},
 			setContainerAvailableShelves(merchantWarehouseIndex, selectedSpaceIndex) {
-
-				// console.log('container if has been triggered');
 				
 				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex) {
 
@@ -2882,7 +2901,6 @@
 			},
 			setContainerAvailableUnitShelves(merchantWarehouseIndex, selectedSpaceIndex) {
 				
-				// console.log('container if has been triggered');
 				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex){
 
 					if (this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container && Object.keys(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container).length > 0) {
@@ -2896,8 +2914,6 @@
 
 			},
 			setContainerShelfAvailableUnits(merchantWarehouseIndex, selectedSpaceIndex) {
-				
-				// console.log('shelf if has been triggered');
 				
 				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex) {
 
@@ -2929,7 +2945,7 @@
 					}
 
 				}
-
+				
 				if(this.errors.warehouses.length > merchantWarehouseIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > warehouseSpaceIndex){
 
 					this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex] = {};
