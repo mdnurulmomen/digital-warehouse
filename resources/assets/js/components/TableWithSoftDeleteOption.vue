@@ -46,6 +46,7 @@
 
 							<button type="button" 
 									class="btn btn-grd-primary btn-icon" 
+									:disabled="formSubmitted"
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentEditForm', content)" 
 									v-if="userHasPermissionTo('update-' + requiredPermission)"
@@ -58,13 +59,14 @@
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentDeleteForm', content)" 
 									v-if="userHasPermissionTo('delete-' + requiredPermission)" 
-									:disabled="$route.name=='warehouses' && immuteableWarehouse(content)"
+									:disabled="formSubmitted || ($route.name=='warehouses' && immuteableWarehouse(content))"
 							>
 								<i class="fa fa-trash"></i>
 							</button>
 
 							<button type="button" 
 									class="btn btn-grd-warning btn-icon" 
+									:disabled="formSubmitted"
 									v-show="content.deleted_at" 
 									@click="$emit('openContentRestoreForm', content)" 
 									v-if="userHasPermissionTo('delete-' + requiredPermission)"
@@ -199,6 +201,10 @@
 			requiredPermission: {
 				type: String,
 				required: true
+			},
+			formSubmitted : {
+				type : Boolean,
+				default: false
 			},
 		},
 

@@ -26,6 +26,7 @@
 											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
 											  		:query="query" 
 											  		:caller-page="'container'" 
+											  		:disable-add-button="formSubmitted" 
 											  		:required-permission="'warehouse-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
@@ -47,7 +48,8 @@
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
-										  			:per-page="perPage"  
+										  			:per-page="perPage" 
+										  			:form-submitted="formSubmitted"
 										  			:column-names="['name', 'Recognizing Code']" 
 										  			:column-values-to-show="['name', 'code']" 
 										  			:contents-to-show = "contentsToShow" 
@@ -435,7 +437,11 @@
 								<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 									Close
 								</button>
-								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+								<button 
+									type="submit" 
+									class="btn btn-primary float-right" 
+									:disabled="!submitForm || formSubmitted"
+								>
 									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
@@ -572,6 +578,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -582,6 +589,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
 			:restoration-message="'This will automatically be added to all related items !'" 
@@ -623,6 +631,7 @@
 
 	        	submitForm : true,
 	        	createMode : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -749,6 +758,7 @@
 			showContentCreateForm() {
 				this.submitForm = true;
 				this.createMode = true;
+				this.formSubmitted = false;
 				
 				this.singleAssetData = {
 					shelf : {
@@ -769,6 +779,7 @@
 			openContentEditForm(object) {
 				this.submitForm = true;
 				this.createMode = false;
+				this.formSubmitted = false;
 
 				this.singleAssetData = object;
 				
@@ -783,14 +794,18 @@
 				$('#container-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
+				this.formSubmitted = false;
 				this.singleAssetData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
-			openContentRestoreForm(object) {	
+			openContentRestoreForm(object) {
+				this.formSubmitted = false;
 				this.singleAssetData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeContainer() {
+				
+				this.formSubmitted = true;
 				
 				axios
 					.post('/containers/' + this.perPage, this.singleAssetData)
@@ -808,11 +823,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateContainer() {
 				
+				this.formSubmitted = true;
+
 				axios
 					.put('/containers/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
 					.then(response => {
@@ -829,11 +849,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/containers/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -850,11 +875,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.patch('/containers/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -871,6 +901,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},

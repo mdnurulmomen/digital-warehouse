@@ -88,7 +88,7 @@
 							<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 								Close
 							</button>
-							<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+							<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
 								{{ createMode ? 'Save' : 'Update' }}
 							</button>
 						</div>
@@ -122,6 +122,10 @@
 			singleAssetData : {
 				type : Object,
 				required : true
+			},
+			formSubmitted : {
+				type : Boolean,
+				default : false
 			},
 
 		},

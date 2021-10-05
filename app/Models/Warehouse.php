@@ -436,6 +436,7 @@ class Warehouse extends Authenticatable
     }
 */
 
+/*
     public function setManagersAttribute($managers = [])
     {
         if (count($managers)) {
@@ -445,6 +446,7 @@ class Warehouse extends Authenticatable
 
         }
     }
+*/
 
     protected function createContainerUpdatedRents($warehouseContainer, $inputedContainer)
     {          

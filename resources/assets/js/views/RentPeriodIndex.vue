@@ -26,6 +26,7 @@
 											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
 											  		:query="query" 
 											  		:caller-page="'rent period'" 
+											  		:disable-add-button="formSubmitted" 
 											  		:required-permission="'warehouse-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
@@ -117,6 +118,7 @@
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
+																				:disabled="formSubmitted" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-warehouse-asset')" 
 																		>
@@ -126,6 +128,7 @@
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
 																				v-show="!content.deleted_at" 
+																				:disabled="formSubmitted" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-warehouse-asset')" 
 																		>
@@ -135,6 +138,7 @@
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
 																				v-show="content.deleted_at" 
+																				:disabled="formSubmitted" 
 																				@click="openContentRestoreForm(content)" 
 																				v-if="userHasPermissionTo('delete-warehouse-asset')" 
 																		>
@@ -272,10 +276,11 @@
 
 		<asset-create-or-edit-modal 
 			v-if="userHasPermissionTo('create-warehouse-asset') || userHasPermissionTo('update-warehouse-asset')" 
+			:csrf="csrf" 
 			:create-mode="createMode" 
 			:caller-page="'rent period'" 
+			:form-submitted="formSubmitted"
 			:single-asset-data="singleAssetData" 
-			:csrf="csrf"
 
 			@storeAsset="storeAsset($event)" 
 			@updateAsset="updateAsset($event)" 
@@ -284,6 +289,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -294,6 +300,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
 			:restoration-message="'This will restore all related items !'" 
@@ -337,6 +344,7 @@
 	      		descending : false,
 
 	        	createMode : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -452,24 +460,30 @@
 			},
 			showContentCreateForm() {
 				this.createMode = true;
+				this.formSubmitted = false;
 				this.singleAssetData = {};
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
+				this.formSubmitted = false;
 				this.singleAssetData = object;
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
+				this.formSubmitted = false;
 				this.singleAssetData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
-			openContentRestoreForm(object) {	
+			openContentRestoreForm(object) {
+				this.formSubmitted = false;	
 				this.singleAssetData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.post('/rent-periods/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -486,11 +500,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.put('/rent-periods/' + this.singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -507,11 +526,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/rent-periods/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
@@ -528,11 +552,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.patch('/rent-periods/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
@@ -549,6 +578,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},

@@ -29,6 +29,7 @@
 											  		:query="query" 
 											  		:caller-page="'manager'" 
 											  		:required-permission = "'manager'" 
+											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -56,6 +57,7 @@
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission = "'manager'" 
+										  			:form-submitted="formSubmitted" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -82,10 +84,11 @@
 
 		<user-profile-create-or-edit-modal 
 			v-if="userHasPermissionTo('create-manager') || userHasPermissionTo('update-manager')" 
+			:csrf="csrf" 
 			:create-mode="createMode" 
 			:user="'manager'" 
+			:form-submitted="formSubmitted"
 			:single-user-details="singleUserDetails" 
-			:csrf="csrf"
 
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
@@ -94,6 +97,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-manager')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteUser'" 
 			:content-to-delete="singleUserDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -104,6 +108,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-manager')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreUser'" 
 			:content-to-restore="singleUserDetails"
 			:restoration-message="'This will restore all related items !'" 
@@ -145,6 +150,7 @@
 	        	currentTab : 'approved',
 
 	        	createMode : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -238,6 +244,7 @@
 			},
 			showContentCreateForm() {
 				this.createMode = true;
+				this.formSubmitted = false;	
 				this.singleUserDetails = {
 					active : false,
 					profile_preview : {},
@@ -248,19 +255,24 @@
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
+				this.formSubmitted = false;	
 				this.singleUserDetails = object;
 				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
+				this.formSubmitted = false;	
 				this.singleUserDetails = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
-			openContentRestoreForm(object) {	
+			openContentRestoreForm(object) {
+				this.formSubmitted = false;		
 				this.singleUserDetails = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.post('/managers/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -277,11 +289,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.put('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -298,11 +315,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.delete('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -319,11 +341,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreUser(singleUserDetails) {
 				
+				this.formSubmitted = true;	
+
 				axios
 					.patch('/managers/' + singleUserDetails.id + '/' + this.perPage, singleUserDetails)
 					.then(response => {
@@ -340,6 +367,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},

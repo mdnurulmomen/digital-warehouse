@@ -28,6 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'owner'" 
 											  		:required-permission="'warehouse-owner'" 
+											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -49,6 +50,7 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage" 
+										  			:form-submitted="formSubmitted"
 										  			:required-permission="'warehouse-owner'" 
 										  			:column-names="['name', 'username', 'email', 'mobile', '# warehouses']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'owner_total_warehouses']" 
@@ -78,10 +80,11 @@
 
 		<user-profile-create-or-edit-modal 
 			v-if="userHasPermissionTo('create-warehouse-owner') || userHasPermissionTo('update-warehouse-owner')"
-			:create-mode="createMode" 
-			:user="'owner'" 
-			:single-user-details="singleOwnerDetails" 
 			:csrf="csrf"
+			:user="'owner'" 
+			:create-mode="createMode" 
+			:form-submitted="formSubmitted"
+			:single-user-details="singleOwnerDetails" 
 
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
@@ -90,6 +93,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse-owner')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteUser'" 
 			:content-to-delete="singleOwnerDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -100,6 +104,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse-owner')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreUser'" 
 			:content-to-restore="singleOwnerDetails"
 			:restoration-message="'This will restore all related items !'" 
@@ -141,6 +146,7 @@
 	        	currentTab : 'approved',
 
 	        	createMode : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -234,16 +240,20 @@
 			},
 			showContentCreateForm() {
 				this.createMode = true;
+				this.formSubmitted = false;
+				
 				this.singleOwnerDetails = {
 					active : false,
 					profile_preview : {},
 					roles : [],
 					permissions : []
 				};
+
 				$('#user-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
+				this.formSubmitted = false;
 				this.singleOwnerDetails = object;
 				$('#user-createOrEdit-modal').modal('show');
 			},
@@ -257,6 +267,8 @@
 			},
 			storeUser(singleOwnerDetails) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.post('/owners/' + this.perPage, singleOwnerDetails)
 					.then(response => {
@@ -273,11 +285,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateUser(singleOwnerDetails) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.put('/owners/' + singleOwnerDetails.id + '/' + this.perPage, singleOwnerDetails)
 					.then(response => {
@@ -294,11 +311,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteUser(singleOwnerDetails) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/owners/' + singleOwnerDetails.id + '/' + this.perPage)
 					.then(response => {
@@ -315,11 +337,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreUser(singleOwnerDetails) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.patch('/owners/' + singleOwnerDetails.id + '/' + this.perPage)
 					.then(response => {
@@ -336,6 +363,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},

@@ -544,7 +544,7 @@
 											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="step--">
 						                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -587,6 +587,10 @@
 			singleUserDetails : {
 				type : Object,
 				required : true
+			},
+			formSubmitted : {
+				type : Boolean,
+				default: false
 			},
 
 		},

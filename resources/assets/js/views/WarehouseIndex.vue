@@ -128,6 +128,7 @@
 						<form 
 							class="form-horizontal" 
 							v-on:submit.prevent="createMode ? storeWarehouse() : updateWarehouse()" 
+							novalidate
 						>
 
 							<input type="hidden" name="_token" :value="csrf">

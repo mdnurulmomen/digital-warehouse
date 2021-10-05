@@ -290,9 +290,29 @@ class WarehouseController extends Controller
             'containers.*.container.shelf' => 'required_if:containers.*.container.has_shelve,1',
 
             'containers.*.container.id' => 'required|exists:containers,id',
+            'containers.*.container.name' => 'string',
+
+            'containers.*.engaged_quantity' => 'required|numeric|min:0',
+            'containers.*.partially_engaged' => 'required|numeric|min:0',
+
             'containers.*.quantity' => 'required|numeric|min:1',
+
             'containers.*.rents' => 'required',
         ]);
+
+        foreach (json_decode(json_encode($request->containers)) as $warehouseContainerIndex => $warehouseContainer) {
+            
+            if ($warehouseContainer->quantity < ($warehouseContainer->partially_engaged + $warehouseContainer->engaged_quantity)) {
+                
+                return response()->json([
+                    'errors'=>[
+                        'quantityError' => ucfirst($warehouseContainer->container->name)." quantity is less than engaged quantity",
+                    ],
+                ], 422); 
+
+            }
+
+        }
 
         $warehouseToUpdate->name = $request->name;
         // $warehouseToUpdate->code = $request->code;
