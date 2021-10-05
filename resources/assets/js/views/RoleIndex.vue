@@ -29,7 +29,7 @@
 											  		:query="query" 
 											  		:caller-page="'role'" 
 											  		:required-permission = "'role'" 
-											  		:disable-add-button="allPermissions.length==0 ? true : false" 
+											  		:disable-add-button="(allPermissions.length==0 || formSubmitted) ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -96,6 +96,7 @@
  																		
 
 																		<button type="button" 
+																				:disabled="formSubmitted"
 																				class="btn btn-grd-primary btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentEditForm(content)" 
@@ -105,6 +106,7 @@
 																		</button>
 
 																		<button type="button" 
+																				:disabled="formSubmitted"
 																				class="btn btn-grd-danger btn-icon" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
@@ -575,7 +577,11 @@
 								<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 									Close
 								</button>
-								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+								<button 
+									type="submit" 
+									class="btn btn-primary float-right" 
+									:disabled="! submitForm || formSubmitted"
+								>
 									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
@@ -588,6 +594,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-role')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteRole'" 
 			:content-to-delete="singleRoleData"
 			:restoration-message="'You can not retrieve this role again !'" 
@@ -948,6 +955,7 @@
 
 	        	createMode : true,
 	        	submitForm : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -1153,16 +1161,26 @@
 				$('#asset-view-modal').modal('show');
 			},
 			showContentCreateForm() {
+				
 				this.createMode = true;
+				this.formSubmitted = false;
+
 				this.singleRoleData = {
 					permissions : [],
 				};
+				
 				$('#role-createOrEdit-modal').modal('show');
+
 			},
 			openContentEditForm(object) {
+				
 				this.createMode = false;
+				this.formSubmitted = false;
+
 				this.singleRoleData = object;
+				
 				$('#role-createOrEdit-modal').modal('show');
+
 			},
 			openContentDeleteForm(object) {	
 				this.singleRoleData = object;
@@ -1181,6 +1199,8 @@
 					return;
 				}
 
+				this.formSubmitted = true;
+
 				axios
 					.post('/roles/' + this.perPage, this.singleRoleData)
 					.then(response => {
@@ -1197,6 +1217,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -1206,6 +1229,8 @@
 					this.submitForm = false;
 					return;
 				}
+
+				this.formSubmitted = true;
 
 				axios
 					.put('/roles/' + this.singleRoleData.id + '/' + this.perPage, this.singleRoleData)
@@ -1223,11 +1248,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteRole(singleRoleData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/roles/' + this.singleRoleData.id + '/' + this.perPage)
 					.then(response => {
@@ -1244,6 +1274,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -1511,6 +1544,12 @@
 
 					}
 
+					if (! this.$refs['view-warehouse-owner-index'][0].checked) {
+
+						this.$refs['view-warehouse-owner-index'][0].click();
+
+					}
+
 				}
 				else if (permissionRefName === 'create-product-stock' || permissionRefName === 'update-product-stock') {
 
@@ -1571,6 +1610,16 @@
 					if (! this.$refs['view-requisition-index'][0].checked) {
 
 						this.$refs['view-requisition-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-role' || permissionRefName === 'update-role' || permissionRefName === 'delete-role' || permissionRefName === 'view-role-index') {
+
+					if (! this.$refs['view-permission-index'][0].checked) {
+
+						this.$refs['view-permission-index'][0].click();
 
 					}
 

@@ -28,7 +28,7 @@
 											  		:query="query" 
 											  		:caller-page="'warehouse'" 
 											  		:required-permission="'warehouse'" 
-											  		:disable-add-button="(allContainers.length==0 || allRentPeriods.length==0 || allStorageTypes.length==0 || allWarehouseOwners.length==0) ? true : false" 
+											  		:disable-add-button="(allContainers.length==0 || allRentPeriods.length==0 || allStorageTypes.length==0 || allWarehouseOwners.length==0 || formSubmitted) ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -1846,6 +1846,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse')"
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteWarehouse'" 
 			:content-to-delete="singleWarehouseData"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -1856,6 +1857,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse')"
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreWarehouse'" 
 			:content-to-restore="singleWarehouseData"
 			:restoration-message="'This will restore all related items !'" 
@@ -2588,7 +2590,7 @@
 			},
 			storeWarehouse() {
 
-				this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
+				// this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
 
 				this.formSubmitted = true;
 
@@ -2618,7 +2620,7 @@
 			},
 			updateWarehouse() {
 
-				this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
+				// this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
 
 				this.formSubmitted = true;
 				
@@ -2648,6 +2650,15 @@
 			},
 			deleteWarehouse() {
 				
+				if (this.singleWarehouseData.containers.some(warehouseContainer => warehouseContainer.partially_engaged || warehouseContainer.engaged_quantity)) {
+
+					this.$toastr.e("Warehouse is in use", "Error");
+					return;
+
+				}
+
+				this.formSubmitted = true;
+
 				axios
 					.delete('/warehouses/' + this.singleWarehouseData.id + '/' + this.perPage)
 					.then(response => {
@@ -2666,11 +2677,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreWarehouse() {
 				
+				this.formSubmitted = true;
+
 				axios
 					.patch('/warehouses/' + this.singleWarehouseData.id + '/' + this.perPage)
 					.then(response => {
@@ -2689,6 +2705,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -3046,6 +3065,7 @@
 				}
 
 			},
+			/*
 			insertDefaultPermissions(array = []) {
 				
 				if (array.length) {
@@ -3068,6 +3088,7 @@
 				}
 
 			},
+			*/
 			setRelatedPermissions(permissionName) {
 
 				let permissionRefName = permissionName.toLowerCase();
@@ -3086,6 +3107,12 @@
 					if (! this.$refs['view-warehouse-asset-index'][0].checked) {
 
 						this.$refs['view-warehouse-asset-index'][0].click();
+
+					}
+
+					if (! this.$refs['view-warehouse-owner-index'][0].checked) {
+
+						this.$refs['view-warehouse-owner-index'][0].click();
 
 					}
 
@@ -3149,6 +3176,16 @@
 					if (! this.$refs['view-requisition-index'][0].checked) {
 
 						this.$refs['view-requisition-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-role' || permissionRefName === 'update-role' || permissionRefName === 'delete-role' || permissionRefName === 'view-role-index') {
+
+					if (! this.$refs['view-permission-index'][0].checked) {
+
+						this.$refs['view-permission-index'][0].click();
 
 					}
 

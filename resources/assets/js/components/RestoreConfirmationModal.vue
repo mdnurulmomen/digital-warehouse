@@ -24,7 +24,13 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-						<button type="submit" class="btn btn-warning">Restore</button>
+						<button 
+							type="submit" 
+							class="btn btn-warning" 
+							:disabled="formSubmitted"
+						>
+							Restore
+						</button>
 					</div>
 					
 				</form>
@@ -43,6 +49,10 @@
 			csrf : {
 				type : String,
 				required : true
+			},
+			formSubmitted : {
+				type : Boolean,
+				default: false
 			},
 			submitMethodName : {
 				type : String,

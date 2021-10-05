@@ -1095,6 +1095,12 @@
 
 					}
 
+					if (! this.$refs['view-warehouse-owner-index'][0].checked) {
+
+						this.$refs['view-warehouse-owner-index'][0].click();
+
+					}
+
 				}
 				else if (permissionRefName === 'create-product-stock' || permissionRefName === 'update-product-stock') {
 
@@ -1155,6 +1161,16 @@
 					if (! this.$refs['view-requisition-index'][0].checked) {
 
 						this.$refs['view-requisition-index'][0].click();
+
+					}
+
+				}
+
+				else if (permissionRefName === 'create-role' || permissionRefName === 'update-role' || permissionRefName === 'delete-role' || permissionRefName === 'view-role-index') {
+
+					if (! this.$refs['view-permission-index'][0].checked) {
+
+						this.$refs['view-permission-index'][0].click();
 
 					}
 
