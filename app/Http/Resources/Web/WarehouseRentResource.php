@@ -20,25 +20,39 @@ class WarehouseRentResource extends JsonResource
 
         foreach (RentPeriod::all() as $rentPeriod) {
             
-            ${'container_'.$rentPeriod->name.'_price'} = $this->rents()->where('rent_period_id', $rentPeriod->id)->first();
+            ${'container_rent_'.$rentPeriod->name} = $this->rents()->where('rent_period_id', $rentPeriod->id)->first();
 
-            $collection->put("container_rent_$rentPeriod->name", ${'container_'.$rentPeriod->name.'_price'}->rent ?? NULL);
+            $collection->put("container_rent_$rentPeriod->name", [ 
+                'rent' => ${'container_rent_'.$rentPeriod->name}->rent ?? NULL, 
+                'rent_period_id' => ${'container_rent_'.$rentPeriod->name}->rent_period_id ?? NULL, 
+                'active' =>  ${'container_rent_'.$rentPeriod->name}->active ?? false 
+            ]);
+
             // $collection->put("container_selling_price_$rentPeriod->name", ${'container_'.$rentPeriod->name.'_price'}->selling_price ?? NULL);
 
             if ($this->container->has_shelve) {
                 
-                ${'shelf_'.$rentPeriod->name.'_price'} = $this->shelf->rents()->where('rent_period_id', $rentPeriod->id)->first();
+                ${'shelf_rent_'.$rentPeriod->name} = $this->shelf->rents()->where('rent_period_id', $rentPeriod->id)->first();
 
-                $collection->put("shelf_rent_$rentPeriod->name", ${'shelf_'.$rentPeriod->name.'_price'}->rent ?? NULL);
+                $collection->put("shelf_rent_$rentPeriod->name", [ 
+                    'rent' => ${'shelf_rent_'.$rentPeriod->name}->rent ?? NULL, 
+                    'rent_period_id' => ${'shelf_rent_'.$rentPeriod->name}->rent_period_id ?? NULL, 
+                    'active' =>  ${'shelf_rent_'.$rentPeriod->name}->active ?? false 
+                ]);
+
                 // $collection->put("shelf_selling_price_$rentPeriod->name", ${'shelf_'.$rentPeriod->name.'_price'}->selling_price ?? NULL);
 
                 if ($this->container->shelf->has_units) {
                     
-                    ${'unit_'.$rentPeriod->name.'_price'} = $this->shelf->unit->rents()->where('rent_period_id', $rentPeriod->id)->first();
+                    ${'unit_rent_'.$rentPeriod->name} = $this->shelf->unit->rents()->where('rent_period_id', $rentPeriod->id)->first();
 
-                    $collection->put("unit_rent_$rentPeriod->name", ${'unit_'.$rentPeriod->name.'_price'}->rent ?? NULL);
+                    $collection->put("unit_rent_$rentPeriod->name", [ 
+                        'rent' => ${'unit_rent_'.$rentPeriod->name}->rent ?? NULL, 
+                        'rent_period_id' => ${'unit_rent_'.$rentPeriod->name}->rent_period_id ?? NULL, 
+                        'active' =>  ${'unit_rent_'.$rentPeriod->name}->active ?? false 
+                    ]);
+                    
                     // $collection->put("unit_selling_price_$rentPeriod->name", ${'unit_'.$rentPeriod->name.'_price'}->selling_price ?? NULL);
-
 
                 }
 

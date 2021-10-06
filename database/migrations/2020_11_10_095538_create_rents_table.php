@@ -21,6 +21,8 @@ class CreateRentsTable extends Migration
             $table->unsignedTinyInteger('rent_period_id');
             $table->string('warehouse_storer_type', 100);
             $table->unsignedInteger('warehouse_storer_id');
+            $table->boolean('active')->default(false);      // whether this rent is in-use or not 
+            $table->softDeletes();
         });
     }
 

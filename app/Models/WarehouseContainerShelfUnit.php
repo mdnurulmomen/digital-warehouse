@@ -30,7 +30,7 @@ class WarehouseContainerShelfUnit extends Model
 
     public function rents()
     {
-        return $this->morphMany(Rent::class, 'warehouse_storer');
+        return $this->morphMany(Rent::class, 'warehouse_storer')->withTrashed();
     }
 
 }

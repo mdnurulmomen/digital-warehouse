@@ -450,6 +450,7 @@ class Warehouse extends Authenticatable
 
     protected function createContainerUpdatedRents($warehouseContainer, $inputedContainer)
     {          
+        // primary deletion
         if ($inputedContainer->container->has_shelve) {
             
             if ($inputedContainer->container->shelf->has_units) {
@@ -469,33 +470,42 @@ class Warehouse extends Authenticatable
         foreach ($allRentPeriods as $rentPeriod) {
 
             // container rents 
-            if (! empty($inputedContainer->rents->{'container_rent_'.$rentPeriod->name}) && $inputedContainer->rents->{'container_rent_'.$rentPeriod->name} > 0 /* && !empty($inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name}) */) {
+            if (! empty($inputedContainer->rents->{'container_rent_'.$rentPeriod->name}->rent) && $inputedContainer->rents->{'container_rent_'.$rentPeriod->name}->rent > 0 /* && !empty($inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name}) */) {
                 
-                $warehouseContainer->rents()->create([
-                    'rent' => $inputedContainer->rents->{'container_rent_'.$rentPeriod->name},
-                    // 'selling_price' => $inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name},
-                    'rent_period_id' => $rentPeriod->id,
-                ]);
+                $warehouseContainer->rents()->updateOrCreate(
+                    [ 'rent_period_id' => $rentPeriod->id ],
+                    [
+                        'rent' => $inputedContainer->rents->{'container_rent_'.$rentPeriod->name}->rent,
+                        'deleted_at' => NULL
+                        // 'selling_price' => $inputedContainer->rents->{'container_selling_price_'.$rentPeriod->name},
+                    ]
+                );
 
             }
 
             // shelf rents
-            if ($inputedContainer->container->has_shelve && ! empty($inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name}) && $inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name} > 0 /* && !empty($inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name}) */) {
+            if ($inputedContainer->container->has_shelve && ! empty($inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name}->rent) && $inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name}->rent > 0 /* && !empty($inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name}) */) {
                 
-                $warehouseContainer->shelf->rents()->create([
-                    'rent' => $inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name},
-                    // 'selling_price' => $inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name},
-                    'rent_period_id' => $rentPeriod->id,
-                ]);
+                $warehouseContainer->shelf->rents()->updateOrCreate(
+                    [ 'rent_period_id' => $rentPeriod->id ],
+                    [
+                        'rent' => $inputedContainer->rents->{'shelf_rent_'.$rentPeriod->name}->rent,
+                        'deleted_at' => NULL
+                        // 'selling_price' => $inputedContainer->rents->{'shelf_selling_price_'.$rentPeriod->name},
+                    ]
+                );
 
                 // unit rents
-                if ($inputedContainer->container->shelf->has_units && ! empty($inputedContainer->rents->{'unit_rent_'.$rentPeriod->name}) && $inputedContainer->rents->{'unit_rent_'.$rentPeriod->name} > 0 /* && !empty($inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name}) */) {
+                if ($inputedContainer->container->shelf->has_units && ! empty($inputedContainer->rents->{'unit_rent_'.$rentPeriod->name}->rent) && $inputedContainer->rents->{'unit_rent_'.$rentPeriod->name}->rent > 0 /* && !empty($inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name}) */) {
                     
-                    $warehouseContainer->shelf->unit->rents()->create([
-                        'rent' => $inputedContainer->rents->{'unit_rent_'.$rentPeriod->name},
-                        // 'selling_price' => $inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name},
-                        'rent_period_id' => $rentPeriod->id,
-                    ]);
+                    $warehouseContainer->shelf->unit->rents()->updateOrCreate(
+                        [  'rent_period_id' => $rentPeriod->id ],
+                        [
+                            'rent' => $inputedContainer->rents->{'unit_rent_'.$rentPeriod->name}->rent,
+                            'deleted_at' => NULL
+                            // 'selling_price' => $inputedContainer->rents->{'unit_selling_price_'.$rentPeriod->name},
+                        ]
+                    );
 
                 }
                 
@@ -503,6 +513,24 @@ class Warehouse extends Authenticatable
 
         }
 
+        $this->deleteTrashedRents($warehouseContainer);
+
+    }
+
+    protected function deleteTrashedRents($warehouseContainer)
+    {
+        if ($warehouseContainer->shelf) {
+            
+            if ($warehouseContainer->shelf->unit) {
+                
+                $warehouseContainer->shelf->unit->rents()->onlyTrashed()->forcedelete();
+            
+            }
+
+            $warehouseContainer->shelf->rents()->onlyTrashed()->forcedelete();
+        }
+
+        $warehouseContainer->rents()->onlyTrashed()->forcedelete();
     }
 
     protected function updateContainerQuantityStatus($warehouseContainer, $inputedContainer)
@@ -669,19 +697,19 @@ class Warehouse extends Authenticatable
 
                     if ($warehouseTrashedContainer->container->shelf->has_units) {
                         
-                        $warehouseTrashedContainer->unit->rents()->delete();
+                        $warehouseTrashedContainer->unit->rents()->forcedelete();
                         $warehouseTrashedContainer->containerShelfUnitStatuses()->delete();
                         $warehouseTrashedContainer->shelf->unit->delete();
 
                     }
                     
-                    $warehouseTrashedContainer->shelf->rents()->delete();
+                    $warehouseTrashedContainer->shelf->rents()->forcedelete();
                     $warehouseTrashedContainer->containerShelfStatuses()->delete();
                     $warehouseTrashedContainer->shelf->delete();
 
                 }
 
-                $warehouseTrashedContainer->rents()->delete();
+                $warehouseTrashedContainer->rents()->forcedelete();
                 $warehouseTrashedContainer->containerStatuses()->delete();
                 $warehouseTrashedContainer->forceDelete();
 

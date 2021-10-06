@@ -23,10 +23,12 @@ class DealtSpace extends Model
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
 
+    /*
     public function rent()
     {
         return $this->belongsTo(Rent::class, 'rent_id', 'id');
     }
+    */
 
     public function deal()
     {

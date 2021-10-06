@@ -757,6 +757,7 @@
 												    		<div class="form-row">
 												    			<div class="form-group col-sm-6">
 												    				<label>Container Type</label>
+
 												    				<multiselect 
 							                                  			v-model="singleWarehouseData.containers[containerIndex].container"
 							                                  			placeholder="Container Type" 
@@ -786,6 +787,7 @@
 
 												    			<div class="col-sm-6 form-group">	
 												    				<label for="phone">Quantity</label>
+
 																	<input type="number" 
 																		class="form-control" 
 																		v-model.number="singleWarehouseData.containers[containerIndex].quantity" 
@@ -795,6 +797,7 @@
 																		@blur="validateFormInput('container_quantity')" 
 																		required="true" 
 																	>
+
 																	<div class="invalid-feedback">
 															        	{{ errors.warehouse.containers[containerIndex].container_quantity }}
 															  		</div>
@@ -841,7 +844,10 @@
 																    				<div class="form-row">
 																    					<div class="sub-title">Container</div>
 																    				</div>
-																		    		<div class="form-row">
+
+																		    		<div 
+																			    		class="form-row" 
+																			    		v-if="singleWarehouseData.containers[containerIndex].rents.hasOwnProperty('container_rent_' + rentPeriod.name)">
 																		    			<!-- 
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Storing Price</label>
@@ -860,14 +866,16 @@
 																		    			-->
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Rent</label>
+
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]['rent']" 
 																								placeholder="Rent price" 
-																								:class="!errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																								:class="! errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
+
 																							<div class="invalid-feedback">
 																					        	{{ errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] }}
 																					  		</div>
@@ -884,7 +892,10 @@
 																    					<div class="sub-title">Shelf</div>
 																    				</div>
 
-																		    		<div class="form-row">
+																		    		<div 
+																			    		class="form-row" 
+																			    		v-if="singleWarehouseData.containers[containerIndex].rents.hasOwnProperty('shelf_rent_' + rentPeriod.name)"
+																		    		>
 																		    			<!-- 
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Storing Price</label>
@@ -906,11 +917,12 @@
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]['rent']" 
 																								placeholder="Rent price" 
 																								:class="!errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
+
 																							<div class="invalid-feedback">
 																					        	{{ errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] }}
 																					  		</div>
@@ -927,7 +939,10 @@
 																    					<div class="sub-title">Unit</div>
 																    				</div>
 
-																		    		<div class="form-row">
+																		    		<div 
+																			    		class="form-row" 
+																			    		v-if="singleWarehouseData.containers[containerIndex].rents.hasOwnProperty('unit_rent_' + rentPeriod.name)"
+																		    		>
 																		    			<!-- 
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Storing Price</label>
@@ -946,14 +961,16 @@
 																		    			-->
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Rent</label>
+
 																							<input 
 																								type="number" 
 																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]" 
+																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]['rent']" 
 																								placeholder="Rent price" 
 																								:class="!errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																								min="0" 
 																							>
+
 																							<div class="invalid-feedback">
 																					        	{{ errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] }}
 																					  		</div>
@@ -1010,7 +1027,7 @@
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
 															@click="removeContainer" 
-															:disabled="singleWarehouseData.containers.length<2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
+															:disabled="singleWarehouseData.containers.length < 2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
 														>
 															Remove Container
 														</button>	
@@ -1708,7 +1725,10 @@
 													    				<div class="form-row">
 													    					<div class="sub-title">Container</div>
 													    				</div>
-															    		<div class="form-row">
+															    		<div 
+																    		class="form-row" 
+																    		v-if="singleWarehouseData.containers[containerIndex].rents.hasOwnProperty('container_rent_' + rentPeriod.name)"
+															    		>
 															    			<!-- 
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Storing Price : </label>
@@ -1720,7 +1740,7 @@
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
-																					{{ singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name] || 'NA' }}
+																					{{ singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]['rent'] || 'NA' }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -1734,7 +1754,10 @@
 													    					<div class="sub-title">Shelf</div>
 													    				</div>
 
-															    		<div class="form-row">
+															    		<div 
+																    		class="form-row" 
+																    		v-if="singleWarehouseData.containers[containerIndex].rents.hasOwnProperty('shelf_rent_' + rentPeriod.name)"
+															    		>
 															    			<!-- 
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Storing Price : </label>
@@ -1746,7 +1769,7 @@
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
-																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name] || 'NA' }}
+																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]['rent'] || 'NA' }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -1760,7 +1783,10 @@
 													    					<div class="sub-title">Unit</div>
 													    				</div>
 
-															    		<div class="form-row">
+															    		<div 
+																    		class="form-row" 
+																    		v-if="singleWarehouseData.containers[containerIndex].rents.hasOwnProperty('unit_rent_' + rentPeriod.name)"
+															    		>
 															    			<!-- 
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Storing Price : </label>
@@ -1772,7 +1798,7 @@
 															    			<div class="col-sm-12 form-group">	
 															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
-																					{{ singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name] || 'NA' }}
+																					{{ singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]['rent'] || 'NA' }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -2439,6 +2465,7 @@
 
 					})
 					.finally(response => {
+						this.resetContainersRentProperties();
 						this.loading = false;
 					});
 
@@ -2540,6 +2567,8 @@
 			    	roles : [],
     				permissions : []
 				};
+
+				this.resetContainersRentProperties();
 
 				this.resetAllPermissions();
 
@@ -3193,6 +3222,35 @@
 				}
 
 			},
+			resetContainersRentProperties() {
+
+				this.singleWarehouseData.containers.forEach(
+					warehouseContainer => {
+
+						this.allRentPeriods.forEach(
+							rentPeriod => {
+								
+								this.$set(warehouseContainer.rents, `container_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+
+								if (warehouseContainer.container.has_shelve && warehouseContainer.container.shelf) {
+									
+									this.$set(warehouseContainer.rents, `shelf_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+
+									if (warehouseContainer.container.shelf.has_units && warehouseContainer.container.shelf.unit) {
+
+										this.$set(warehouseContainer.rents, `unit_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+
+									}
+
+								}
+
+							}
+						);
+
+					}
+				);
+
+			},
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
@@ -3528,16 +3586,45 @@
 
 						this.singleWarehouseData.containers.forEach(
 							
-							(container, containerIndex) => {
+							(warehouseContainer, containerIndex) => {
 
-								if (! container.hasOwnProperty('rents') || Object.keys(container.rents).length === 0 || (Object.keys(container.rents).length === 1 && container.rents[Object.keys(container.rents)[0]] < 1)) {
+								if (! warehouseContainer.hasOwnProperty('rents') || Object.keys(warehouseContainer.rents).length === 0 || (Object.keys(warehouseContainer.rents).length === 1 && warehouseContainer.rents[Object.keys(warehouseContainer.rents)[0]]['rent'] < 1)) {
 
 									this.errors.warehouse.containers[containerIndex]['rent'] = 'One rent is required';
 
 								}
-								else if (Object.values(container.rents).indexOf(-1) > -1) {
+								else if (Object.values(warehouseContainer.rents).some(object => object.rent < 0)) {
 
 									this.errors.warehouse.containers[containerIndex]['rent'] = 'Negative rent is invalid';
+
+								}
+								else if (Object.values(warehouseContainer.rents).some(object => object.active && (! object.rent || object.rent < 1 || object.rent == ''))) {
+
+									this.allRentPeriods.some(
+										rentPeriod => {
+
+											if (warehouseContainer.rents[`container_rent_${rentPeriod.name}`]['active'] && (! warehouseContainer.rents[`container_rent_${rentPeriod.name}`]['rent'] || warehouseContainer.rents[`container_rent_${rentPeriod.name}`]['rent']=='')) {
+
+												this.errors.warehouse.containers[containerIndex]['rent'] = `Container ${rentPeriod.name} rent is required`;
+
+											}
+											else if (warehouseContainer.container.has_shelve && warehouseContainer.rents[`shelf_rent_${rentPeriod.name}`]['active'] && (! warehouseContainer.rents[`shelf_rent_${rentPeriod.name}`]['rent'] || warehouseContainer.rents[`shelf_rent_${rentPeriod.name}`]['rent']=='')) {
+												
+												this.errors.warehouse.containers[containerIndex]['rent'] = `Shelf ${rentPeriod.name} rent is required`;
+
+											}
+											else if (warehouseContainer.container.has_shelve && warehouseContainer.container.shelf.has_units && warehouseContainer.rents[`unit_rent_${rentPeriod.name}`]['active'] && (! warehouseContainer.rents[`unit_rent_${rentPeriod.name}`]['rent'] || warehouseContainer.rents[`unit_rent_${rentPeriod.name}`]['rent']=='')) {
+
+												this.errors.warehouse.containers[containerIndex]['rent'] = `Unit ${rentPeriod.name} rent is required`;
+
+											}
+										}
+									);
+
+								}
+								else if (Object.values(warehouseContainer.rents).every(item=> ! item.rent || item.rent == '' || item.rent == 0)) {
+
+									this.errors.warehouse.containers[containerIndex]['rent'] = 'One rent is required';
 
 								}
 								else {
