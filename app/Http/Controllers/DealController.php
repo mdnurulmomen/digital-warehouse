@@ -423,7 +423,7 @@ class DealController extends Controller
 
             $payementNewRent = $dealNewPayment->rents()->create([
                 'issued_from' => $dealRecentPaymentExpectedRent->expired_at,
-                'expired_at' => $this->getRentExpiredDate(NULL, $rentPeriod->name, $dealRecentPaymentExpectedRent),
+                'expired_at' => $dealRecentPaymentExpectedRent->expired_at->addDays($rentPeriod->number_days),
                 'rent' => $dealSpace->rent->rent,
                 'dealt_space_id' => $dealSpace->id
             ]);
@@ -524,7 +524,7 @@ class DealController extends Controller
                
             $addedContainer = WarehouseContainerStatus::find($merchantContainer->space_id);
 
-            if (!empty($addedContainer) && $merchantContainer->engaged==0.0) {
+            if (!empty($addedContainer) && $addedContainer->occupied==0.0) {
                 
                 $addedContainer->update([
                     'engaged' => 0
@@ -547,7 +547,7 @@ class DealController extends Controller
                
                 $addedShelf = WarehouseContainerShelfStatus::find($merchantShelf->space_id);
 
-                if (! empty($addedShelf) && $merchantShelf->engaged==0.0) {
+                if (! empty($addedShelf) && $addedShelf->occupied==0.0) {
 
                     $addedShelf->update([
                         'engaged' => 0
@@ -574,7 +574,7 @@ class DealController extends Controller
                
                 $addedUnit = WarehouseContainerShelfUnitStatus::find($merchantUnit->space_id);
 
-                if (! empty($addedUnit) && $merchantUnit->engaged==0.0) {
+                if (! empty($addedUnit) && $addedUnit->occupied==0.0) {
 
                     $addedUnit->update([
                         'engaged' => 0
@@ -601,7 +601,7 @@ class DealController extends Controller
                
             $addedContainer = WarehouseContainerStatus::find($merchantContainer->space_id);
 
-            if (!empty($addedContainer) && $merchantContainer->engaged==0.0) {
+            if (!empty($addedContainer) && $addedContainer->occupied==0.0) {
                 
                 $addedContainer->update([
                     'engaged' => 0
@@ -624,7 +624,7 @@ class DealController extends Controller
                
                 $addedShelf = WarehouseContainerShelfStatus::find($merchantShelf->space_id);
 
-                if (! empty($addedShelf) && $merchantShelf->engaged==0.0) {
+                if (! empty($addedShelf) && $addedShelf->occupied==0.0) {
 
                     $addedShelf->update([
                         'engaged' => 0
@@ -651,7 +651,7 @@ class DealController extends Controller
                
                 $addedUnit = WarehouseContainerShelfUnitStatus::find($merchantUnit->space_id);
 
-                if (! empty($addedUnit) && $merchantUnit->engaged==0.0) {
+                if (! empty($addedUnit) && $addedUnit->occupied==0.0) {
 
                     $addedUnit->update([
                         'engaged' => 0
@@ -682,7 +682,7 @@ class DealController extends Controller
                 if (!empty($expectedContainer) && $expectedContainer->engaged==0.0) {
                     
                     $newSpaces = $expectedContainer->deals()->create([
-                        'rent_id' => $warehouseContainer->selected_rent->id,
+                        'rent_period_id' => $warehouseContainer->selected_rent->rent_period_id,
                         'warehouse_id' => $expectedContainer->warehouseContainer->warehouse_id,
                         'merchant_deal_id' => $deal->id,
                     ]);
@@ -698,7 +698,7 @@ class DealController extends Controller
                     
                     $containerNewRent = $payment->rents()->create([
                         'issued_from' => $deal->created_at,
-                        'expired_at' => $this->getRentExpiredDate($deal, $rentPeriod->name),
+                        'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                         'rent' => $warehouseContainer->selected_rent->rent,
                         'dealt_space_id' => $newSpaces->id
                     ]);
@@ -731,7 +731,7 @@ class DealController extends Controller
                     if (!empty($containerExpectedShelf) && $containerExpectedShelf->engaged==0.0) {
                         
                         $dealtNewShelf = $containerExpectedShelf->deals()->create([
-                            'rent_id' => $warehouseSpace->container->selected_rent->id,
+                            'rent_period_id' => $warehouseSpace->container->selected_rent->rent_period_id,
                             'warehouse_id' => $containerExpectedShelf->warehouseContainer->warehouse_id,
                             'merchant_deal_id' => $deal->id
                         ]);
@@ -744,7 +744,7 @@ class DealController extends Controller
                         
                         $shelfNewRent = $payment->rents()->create([
                             'issued_from' => now(),
-                            'expired_at' => $this->getRentExpiredDate($deal, $rentPeriod->name),
+                            'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
                             'dealt_space_id' => $dealtNewShelf->id
                         ]);
@@ -783,7 +783,7 @@ class DealController extends Controller
                     if (!empty($warehouseContainerShelfExpectedUnit) && $warehouseContainerShelfExpectedUnit->engaged==0.0) {
 
                         $dealtNewUnit = $warehouseContainerShelfExpectedUnit->deals()->create([
-                            'rent_id' => $warehouseSpace->container->selected_rent->id,
+                            'rent_period_id' => $warehouseSpace->container->selected_rent->rent_period_id,
                             'warehouse_id' => $warehouseContainerShelfExpectedUnit->warehouseContainer->warehouse_id,
                             'merchant_deal_id' => $deal->id
                         ]);
@@ -794,7 +794,7 @@ class DealController extends Controller
 
                         $unitNewRent = $payment->rents()->create([
                             'issued_from' => now(),
-                            'expired_at' => $this->getRentExpiredDate($deal, $rentPeriod->name),
+                            'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
                             'dealt_space_id' => $dealtNewUnit->id
                         ]);
@@ -842,31 +842,6 @@ class DealController extends Controller
 
         }
 
-    }
-
-    protected function getRentExpiredDate(MerchantDeal $deal = NULL, $rentName, MerchantPaymentDetail $paymentRent = NULL) 
-    {   
-        $dateToStart = $deal ? Carbon::parse($deal->created_at) : Carbon::parse($paymentRent->expired_at);
-
-        if (strpos($rentName,"daily") !== false) {
-            
-            return $dateToStart->addDay();
-        }
-        else if (strpos($rentName,"week") !== false) {
-            
-            return $dateToStart->addDays(7);
-        }
-        else if (strpos($rentName,"month") !== false) {
-            
-            return $dateToStart->addDays(30);
-        }
-        else if (strpos($rentName,"year") !== false) {
-            
-            return $dateToStart->addYear();
-        }
-        else {
-            return now();
-        }
     }
 
 }
