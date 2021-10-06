@@ -86,7 +86,6 @@
 			:user="'merchant'" 
 			:form-submitted="formSubmitted" 
 			:single-user-details="singleUserDetails" 
-
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
 		></user-profile-create-or-edit-modal>
@@ -98,7 +97,6 @@
 			:submit-method-name="'deleteUser'" 
 			:content-to-delete="singleUserDetails"
 			:restoration-message="'But once you think, you can restore this item !'" 
-			
 			@deleteUser="deleteUser($event)" 
 		></delete-confirmation-modal>
 
@@ -109,7 +107,6 @@
 			:submit-method-name="'restoreUser'" 
 			:content-to-restore="singleUserDetails"
 			:restoration-message="'This will restore all related items !'" 
-
 			@restoreUser="restoreUser($event)" 
 		></restore-confirmation-modal>
 

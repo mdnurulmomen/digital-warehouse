@@ -64,12 +64,12 @@
 																				{{ merchantDeal.e_commerce_fulfillment ? 'Enabled' : 'NA' }}
 																			</span>
 																		</td>
-
+																		 
 																		<td>
 																			<span :class="[merchantDeal.auto_renewal ? 'badge-warning' : 'badge-secondary', 'badge']">
 																				{{ merchantDeal.auto_renewal ? 'Enabled' : 'NA' }}
 																			</span>
-																		</td>
+																		</td>	
 
 																		<td>
 																			{{ merchantDeal.payments.length ? merchantDeal.payments[merchantDeal.payments.length-1].paid_amount : 'No Payment' }}
@@ -261,7 +261,7 @@
 													:labels="{checked: 'Auto Renew', unchecked: 'No Renew'}"  
 												/>
 											</div>
-										</div>
+										</div> 
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1038,7 +1038,7 @@
 													{{ singleMerchantDealData.auto_renewal ? 'Enabled' : 'Disabled' }}
 												</span>
 											</label>
-										</div>
+										</div> 
 
 										<div class="form-row" v-show="singleMerchantDealData.e_commerce_fulfillment">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1481,7 +1481,7 @@
 										{
 											id: null,
 											name : null, // daily / monthly
-											storing_price : 1,
+											rent : 1,
 											selling_price :1
 										}
 									]
@@ -1505,7 +1505,7 @@
 										{
 											id:null,
 											name:null,   // daily / monthly
-											storing_price:null,
+											rent:null,
 											selling_price:null
 										}
 									]
@@ -1533,7 +1533,7 @@
 										{
 											id : null,
 											name : null,	   // daily / monthly
-											storing_price : null,
+											rent : null,
 											selling_price : null
 										}
 									]
@@ -1561,7 +1561,7 @@
 	        	singleMerchantDealData : {
 
 	        		active : true,
-	        		auto_renewal : false,
+	        		auto_renewal : true, // Renting is normally auto-renewal
 	        		e_commerce_fulfillment : false,
 	        		sale_percentage : 0,
 					merchant_id : null,
@@ -1581,7 +1581,7 @@
 												{
 													id: null,
 													name : null, // daily / monthly
-													storing_price : 1,
+													rent : 1,
 													selling_price :1
 												}
 											]
@@ -1604,7 +1604,7 @@
 												{
 													id:null,
 													name:null,   // daily / monthly
-													storing_price:null,
+													rent:null,
 													selling_price:null
 												}
 											]
@@ -1631,7 +1631,7 @@
 												{
 													id : null,
 													name : null,	   // daily / monthly
-													storing_price : null,
+													rent : null,
 													selling_price : null
 												}
 											]
@@ -1651,14 +1651,14 @@
 													{
 														id : null,
 														name : null,
-														storing_price : null,
+														rent : null,
 														selling_price : null
 													},
 												],
 												selected_rent:{
 													id : null,
 													name : null,
-													storing_price : null,
+													rent : null,
 													selling_price : null
 												},
 												rent_period_id : null,
@@ -1680,14 +1680,14 @@
 												{
 													id : null,
 													name : null,
-													storing_price : null,
+													rent : null,
 													selling_price : null
 												}
 											],
 											selected_rent:{
 												id : null,
 												name : null,
-												storing_price : null,
+												rent : null,
 												selling_price : null
 											},
 											rent_period_id : null
@@ -1712,14 +1712,14 @@
 												{
 													id:null,
 													name:null,
-													storing_price:null,
+													rent:null,
 													selling_price :null
 												}
 											],
 											selected_rent : {
 												id:null,
 												name:null,
-												storing_price:null,
+												rent:null,
 												selling_price:null
 											},
 											rent_period_id : 1
@@ -2036,7 +2036,7 @@
 				this.singleMerchantDealData = {
 
 	        		active : true,
-	        		auto_renewal : false,
+	        		auto_renewal : true, // Renting is normally auto-renewal
 	        		e_commerce_fulfillment : false,
 	        		sale_percentage : 0,
 					merchant_id : this.merchant.id,
@@ -2056,7 +2056,7 @@
 												{
 													id: null,
 													name : null, // daily / monthly
-													storing_price : 1,
+													rent : 1,
 													selling_price :1
 												}
 											]
@@ -2079,7 +2079,7 @@
 												{
 													id:null,
 													name:null,   // daily / monthly
-													storing_price:null,
+													rent:null,
 													selling_price:null
 												}
 											]
@@ -2106,7 +2106,7 @@
 												{
 													id : null,
 													name : null,	   // daily / monthly
-													storing_price : null,
+													rent : null,
 													selling_price : null
 												}
 											]
@@ -2126,14 +2126,14 @@
 													{
 														id : null,
 														name : null,
-														storing_price : null,
+														rent : null,
 														selling_price : null
 													},
 												],
 												selected_rent:{
 													id : null,
 													name : null,
-													storing_price : null,
+													rent : null,
 													selling_price : null
 												},
 												rent_period_id : null,
@@ -2155,14 +2155,14 @@
 												{
 													id : null,
 													name : null,
-													storing_price : null,
+													rent : null,
 													selling_price : null
 												}
 											],
 											selected_rent:{
 												id : null,
 												name : null,
-												storing_price : null,
+												rent : null,
 												selling_price : null
 											},
 											rent_period_id : null
@@ -2187,14 +2187,14 @@
 												{
 													id:null,
 													name:null,
-													storing_price:null,
+													rent:null,
 													selling_price :null
 												}
 											],
 											selected_rent : {
 												id:null,
 												name:null,
-												storing_price:null,
+												rent:null,
 												selling_price:null
 											},
 											rent_period_id : 1
@@ -3238,7 +3238,7 @@
 
 												(selectedContainer) => {
 
-													totalRent += selectedContainer.selected_rent.storing_price ?? 0;
+													totalRent += selectedContainer.selected_rent.rent ?? 0;
 													// console.log('Containers index : ' + warehouseSpaceIndex + ' rent : ' + totalRent);
 
 												}
@@ -3249,14 +3249,14 @@
 										else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length) {
 
 											// for every selected shelves
-											totalRent += warehouseSpace.container.shelves.length * warehouseSpace.container.selected_rent.storing_price ?? 0
+											totalRent += warehouseSpace.container.shelves.length * warehouseSpace.container.selected_rent.rent ?? 0
 											// console.log('Shelves : ' + totalRent);
 
 										}
 										else if (warehouseSpace.type=='units' && warehouseSpace.container && warehouseSpace.container.shelf && warehouseSpace.container.shelf.units && warehouseSpace.container.shelf.units.length) {
 
 											// for every selected shelves
-											totalRent += warehouseSpace.container.shelf.units.length * warehouseSpace.container.selected_rent.storing_price ?? 0
+											totalRent += warehouseSpace.container.shelf.units.length * warehouseSpace.container.selected_rent.rent ?? 0
 											// console.log('Units : ' + totalRent);
 
 										}
@@ -3418,6 +3418,9 @@
 
 										if (warehouseSpace.type=='containers' && (! warehouseSpace.containers || warehouseSpace.containers.length == 0 || warehouseSpace.containers.some(warehouseContainer => ! warehouseContainer || Object.keys(warehouseContainer).length==0))) {
 											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers = 'Container is required';
+										}
+										else if (warehouseSpace.containers.some((warehouseContainer, warehouseContainerIndex) => warehouseSpace.containers.some((selectedContainer, selectedContainerIndex) => selectedContainer.id==warehouseContainer.id && warehouseContainerIndex != selectedContainerIndex))) {
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers = 'Same container is selected';
 										}
 										else{
 											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers');

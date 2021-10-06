@@ -829,9 +829,9 @@
 																	<div class="tab-content tabs card-block">
 																		<div 
 																			class="tab-pane" 
-																			:id="rentPeriod.name + containerIndex" 
 																			role="tabpanel" 
 																			v-for="(rentPeriod, rentIndex) in allRentPeriods" 
+																			:id="rentPeriod.name + containerIndex" 
 																			:key="'x-' + rentPeriod.id + rentPeriod.name" 
 																			:class="{'active': rentIndex === 0}"
 																		>

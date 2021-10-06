@@ -65,7 +65,7 @@ class DealController extends Controller
             // 'warehouses.*.spaces.*.containers.*.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id',
             'warehouses.*.spaces.*.containers.*.selected_rent' => 'required_if:warehouses.*.spaces.*.type,containers',
             'warehouses.*.spaces.*.containers.*.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rents,id',
-            // 'warehouses.*.spaces.*.containers.*.selected_rent.storing_price' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
+            // 'warehouses.*.spaces.*.containers.*.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
             
             'warehouses.*.spaces.*.container' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_statuses,id',
@@ -73,7 +73,7 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.shelves.*.id' => 'required_if:warehouses.*.spaces.*.type,shelves|exists:warehouse_container_shelf_statuses,id',
             'warehouses.*.spaces.*.container.selected_rent' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:rents,id',
-            // 'warehouses.*.spaces.*.container.selected_rent.storing_price' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
+            // 'warehouses.*.spaces.*.container.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
 
             'warehouses.*.spaces.*.container.shelf' => 'required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.shelf.id' => 'required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_shelf_statuses,id',
@@ -195,7 +195,7 @@ class DealController extends Controller
             // 'warehouses.*.spaces.*.containers.*.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id',
             'warehouses.*.spaces.*.containers.*.selected_rent' => 'required_if:warehouses.*.spaces.*.type,containers',
             'warehouses.*.spaces.*.containers.*.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rents,id',
-            // 'warehouses.*.spaces.*.containers.*.selected_rent.storing_price' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
+            // 'warehouses.*.spaces.*.containers.*.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
             
             'warehouses.*.spaces.*.container' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_statuses,id',
@@ -203,7 +203,7 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.shelves.*.id' => 'required_if:warehouses.*.spaces.*.type,shelves|exists:warehouse_container_shelf_statuses,id',
             'warehouses.*.spaces.*.container.selected_rent' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:rents,id',
-            // 'warehouses.*.spaces.*.container.selected_rent.storing_price' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
+            // 'warehouses.*.spaces.*.container.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
 
             'warehouses.*.spaces.*.container.shelf' => 'required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.shelf.id' => 'required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_shelf_statuses,id',
@@ -424,7 +424,7 @@ class DealController extends Controller
             $payementNewRent = $dealNewPayment->rents()->create([
                 'issued_from' => $dealRecentPaymentExpectedRent->expired_at,
                 'expired_at' => $this->getRentExpiredDate(NULL, $rentPeriod->name, $dealRecentPaymentExpectedRent),
-                'rent' => $dealSpace->rent->storing_price,
+                'rent' => $dealSpace->rent->rent,
                 'dealt_space_id' => $dealSpace->id
             ]);
 
@@ -699,7 +699,7 @@ class DealController extends Controller
                     $containerNewRent = $payment->rents()->create([
                         'issued_from' => $deal->created_at,
                         'expired_at' => $this->getRentExpiredDate($deal, $rentPeriod->name),
-                        'rent' => $warehouseContainer->selected_rent->storing_price,
+                        'rent' => $warehouseContainer->selected_rent->rent,
                         'dealt_space_id' => $newSpaces->id
                     ]);
     
@@ -745,7 +745,7 @@ class DealController extends Controller
                         $shelfNewRent = $payment->rents()->create([
                             'issued_from' => now(),
                             'expired_at' => $this->getRentExpiredDate($deal, $rentPeriod->name),
-                            'rent' => $warehouseSpace->container->selected_rent->storing_price,
+                            'rent' => $warehouseSpace->container->selected_rent->rent,
                             'dealt_space_id' => $dealtNewShelf->id
                         ]);
         
@@ -795,7 +795,7 @@ class DealController extends Controller
                         $unitNewRent = $payment->rents()->create([
                             'issued_from' => now(),
                             'expired_at' => $this->getRentExpiredDate($deal, $rentPeriod->name),
-                            'rent' => $warehouseSpace->container->selected_rent->storing_price,
+                            'rent' => $warehouseSpace->container->selected_rent->rent,
                             'dealt_space_id' => $dealtNewUnit->id
                         ]);
 

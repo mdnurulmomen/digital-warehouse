@@ -3,7 +3,6 @@
 namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Web\WarehouseRentResource;
 
 class WarehouseContainerResource extends JsonResource
 {

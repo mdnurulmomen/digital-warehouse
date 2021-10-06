@@ -17,7 +17,7 @@ class RentResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->rentPeriod->name,
-            'storing_price' => $this->storing_price,
+            'rent' => $this->rent,
             'rent_period_id' => $this->rent_period_id,
         ];
     }

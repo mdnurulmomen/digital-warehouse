@@ -429,7 +429,6 @@ class WarehouseController extends Controller
         if($warehouse){
 
             /*
-            
                 $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {
                     $query->where('id', $warehouse)->where('active', 1);
                 })
@@ -477,7 +476,6 @@ class WarehouseController extends Controller
                     'emptyShelfContainers' => $emptyShelfContainers, 
                     'emptyUnitContainers' => $emptyUnitContainers, 
                 ];
-
             */
 
         }
