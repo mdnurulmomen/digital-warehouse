@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class MerchantDeal extends Model
 {
+    public $timestamps = false;
+    protected $guarded = ['id'];
+    protected $dates = ['created_at'];
+
     /**
      * The attributes that should be cast.
      *
@@ -13,12 +17,9 @@ class MerchantDeal extends Model
      */
     protected $casts = [
         'active' => 'boolean',
-        'e_commerce_fulfillment' => 'boolean',
-        'auto_renewal' => 'boolean'
+        'auto_renewal' => 'boolean',
+        'e_commerce_fulfillment' => 'boolean'
     ];
-
-    public $timestamps = false;
-    protected $guarded = ['id'];
     
     public function spaces() 
     {

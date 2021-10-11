@@ -105,10 +105,12 @@ class Warehouse extends Authenticatable
         return $this->hasMany(WarehouseContainer::class, 'warehouse_id')->withTrashed();
     }
 
+    /*
     public function deals()
     {
         return $this->hasMany(DealtSpace::class, 'warehouse_id');
     }
+    */
 
     public function containerStatuses()
     {
@@ -381,7 +383,7 @@ class Warehouse extends Authenticatable
                 }
 
                 // else inputed container is new for this warehouse
-                else if(is_null($warehouseExistingContainer) && $this->inputedContainerHasValidRent($inputedContainer->rents)) {
+                else if(is_null($warehouseExistingContainer)) {
                     
                     // add currently working container to warehouse
                     $warehouseContainer = $this->createNewContainerToWarehouse($inputedContainer);
@@ -718,6 +720,7 @@ class Warehouse extends Authenticatable
         }
     }
 
+    /*
     protected function inputedContainerHasValidRent($inputedContainerRent)
     {
         foreach ($inputedContainerRent as $key => $value) {
@@ -730,5 +733,6 @@ class Warehouse extends Authenticatable
 
         return false;
     }
+    */
 
 }

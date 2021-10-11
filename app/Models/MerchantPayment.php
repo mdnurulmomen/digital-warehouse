@@ -8,6 +8,7 @@ class MerchantPayment extends Model
 {
     public $timestamps = false;
     protected $guarded = ['id'];
+    protected $dates = ['paid_at'];
     
     public function rents() 
     {

@@ -1670,19 +1670,18 @@
 
 												<div class="form-group form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Completely Engaged:
+														Rented Quantity:
 													</label>
 													<label class="col-sm-6 col-form-label">
-														{{ warehouseContainer.engaged_quantity }}
-													</label>
-												</div>
+														<ul>
+															<li>
+																Full : {{ warehouseContainer.engaged_quantity }}
+															</li>
 
-												<div class="form-group form-row">
-													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Partially Engaged:
-													</label>
-													<label class="col-sm-6 col-form-label">
-														{{ warehouseContainer.partially_engaged }}
+															<li>
+																Partial : {{ warehouseContainer.partially_engaged }}
+															</li>
+														</ul>
 													</label>
 												</div>
 												

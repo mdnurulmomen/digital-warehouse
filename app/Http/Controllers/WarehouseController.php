@@ -222,6 +222,16 @@ class WarehouseController extends Controller
             'containers.*.rents' => 'required',
         ]);
 
+        foreach (json_decode(json_encode($request->containers)) as $warehouseContainerIndex => $warehouseContainer) {
+            
+            if ($this->inputedContainerRentIsInvalid($warehouseContainer)) {
+
+                return $this->inputedContainerRentIsInvalid($warehouseContainer);
+
+            }
+
+        }
+
         $newWarehouse = new Warehouse();
 
         $newWarehouse->name = $request->name;
@@ -311,25 +321,9 @@ class WarehouseController extends Controller
                 ], 422); 
 
             }
-            else {
+            else if ($this->inputedContainerRentIsInvalid($warehouseContainer)) {
 
-                $totalRent = 0;
-                
-                foreach ($warehouseContainer->rents as $warehouseContainerRentIndex => $warehouseContainerRent) {
-                    
-                    $totalRent += $warehouseContainerRent->rent;
-
-                }
-
-                if ($totalRent <= 0) {
-                    
-                    return response()->json([
-                        'errors'=>[
-                            'rentError' => ucfirst($warehouseContainer->container->name)." rent is required",
-                        ],
-                    ], 422);
-                    
-                }
+                return $this->inputedContainerRentIsInvalid($warehouseContainer);
 
             }
 
@@ -744,7 +738,9 @@ class WarehouseController extends Controller
             }
             else {
 
-                if ($warehouseContainer->containerStatuses()->where('engaged', 0.5)->orWhere('engaged', 1)->count() > $existingInputedContainer->quantity) {
+                if ($warehouseContainer->containerStatuses()->where(function ($query) {
+                    $query->where('engaged', 0.5)->orWhere('engaged', 1);
+                })->count() > $existingInputedContainer->quantity) {
                     
                     return response()->json([
                         'errors'=>[
@@ -757,7 +753,7 @@ class WarehouseController extends Controller
 
                     foreach ($warehouseContainer->rents()->where('active', 1)->get() as $containerActiveRentIndex => $containerActiveRent) {
                         
-                        if ($existingInputedContainer->rents->{"container_rent_$containerActiveRent->rentPeriod->name"}->rent_period_id != $containerActiveRent->rent_period_id) {
+                        if ($existingInputedContainer->rents->{'container_rent_'.$containerActiveRent->rentPeriod->name}->rent_period_id != $containerActiveRent->rent_period_id) {
                             
                             return response()->json([
                                 'errors'=>[
@@ -774,7 +770,7 @@ class WarehouseController extends Controller
                         
                         foreach ($warehouseContainer->shelf->rents()->where('active', 1)->get() as $shelfActiveRentIndex => $shelfActiveRent) {
                         
-                            if ($existingInputedContainer->rents->{"shelf_rent_$shelfActiveRent->rentPeriod->name"}->rent_period_id != $shelfActiveRent->rent_period_id) {
+                            if ($existingInputedContainer->rents->{'shelf_rent_'.$shelfActiveRent->rentPeriod->name}->rent_period_id != $shelfActiveRent->rent_period_id) {
                                 
                                 return response()->json([
                                     'errors'=>[
@@ -791,7 +787,7 @@ class WarehouseController extends Controller
                         
                             foreach ($warehouseContainer->shelf->unit->rents()->where('active', 1)->get() as $unitActiveRentIndex => $unitActiveRent) {
                             
-                                if ($existingInputedContainer->rents->{"unit_rent_$unitActiveRent->rentPeriod->name"}->rent_period_id != $unitActiveRent->rent_period_id) {
+                                if ($existingInputedContainer->rents->{'unit_rent_'.$unitActiveRent->rentPeriod->name}->rent_period_id != $unitActiveRent->rent_period_id) {
                                     
                                     return response()->json([
                                         'errors'=>[
@@ -812,6 +808,29 @@ class WarehouseController extends Controller
 
             }
 
+        }
+
+        return false;
+    }
+
+    protected function inputedContainerRentIsInvalid($warehouseContainer) 
+    {
+        $totalRent = 0;
+                
+        foreach ($warehouseContainer->rents as $warehouseContainerRentIndex => $warehouseContainerRent) {
+            
+            $totalRent += $warehouseContainerRent->rent;
+
+        }
+
+        if ($totalRent <= 0) {
+            
+            return response()->json([
+                'errors'=>[
+                    'rentError' => ucfirst($warehouseContainer->container->name)." one rent is required",
+                ],
+            ], 422);
+            
         }
 
         return false;

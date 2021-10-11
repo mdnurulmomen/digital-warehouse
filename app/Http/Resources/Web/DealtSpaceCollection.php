@@ -59,15 +59,15 @@ class DealtSpaceCollection extends ResourceCollection
 
                     'name' => $warehouseExpectedContainer->name,
 
-                    'warehouse_container_id' => $warehouseExpectedContainer->warehouse_container_id,
-
                     'occupied' => $warehouseExpectedContainer->occupied,
+
+                    'warehouse_container_id' => $warehouseExpectedContainer->warehouse_container_id,
 
                     'warehouse_container' => $warehouseExpectedContainer->warehouseContainer->loadMissing(['container']),
 
                     'rents' => RentResource::collection($warehouseExpectedContainer->warehouseContainer->rents),
 
-                    'selected_rent' => new RentResource($dealtSpace->rent),
+                    'selected_rent' => new RentResource($warehouseExpectedContainer->warehouseContainer->rents()->where('rent_period_id', $dealtSpace->rent_period_id)->first()),
 
                 ];
 
@@ -109,7 +109,7 @@ class DealtSpaceCollection extends ResourceCollection
 
                         'rents' => RentResource::collection($warehouseExpectedShelf->warehouseContainer->shelf->rents),
 
-                        'selected_rent' => new RentResource($dealtSpace->rent),
+                        'selected_rent' => new RentResource($warehouseExpectedShelf->warehouseContainer->shelf->rents()->where('rent_period_id', $dealtSpace->rent_period_id)->first()),
 
                     ],
 
@@ -162,7 +162,7 @@ class DealtSpaceCollection extends ResourceCollection
 
                         'rents' => RentResource::collection($dealtSpace->space->warehouseContainer->shelf->unit->rents),
 
-                        'selected_rent' => new RentResource($dealtSpace->rent)
+                        'selected_rent' => new RentResource($dealtSpace->space->warehouseContainer->shelf->unit->rents()->where('rent_period_id', $dealtSpace->rent_period_id)->first())
 
                     ],
 

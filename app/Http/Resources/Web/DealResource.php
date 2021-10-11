@@ -22,12 +22,14 @@ class DealResource extends JsonResource
             'auto_renewal' => $this->auto_renewal,
             'sale_percentage' => $this->sale_percentage,
             'merchant_id' => $this->merchant_id,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('Y-M-d H:i:s'),
             'warehouses' => DealtWarehouseResource::collection(
-                Warehouse::whereHas('deals', function ($query) {
-                    $query->where('merchant_deal_id', $this->id);
+                Warehouse::whereHas('containers', function ($query) {
+                    $query->whereHas('deals', function ($query1) {
+                        $query1->where('merchant_deal_id', $this->id);
+                    });
                 })
-                ->with(['deals' => function ($query) {
+                ->with(['containers.deals' => function ($query) {
                     $query->where('merchant_deal_id', $this->id);
                 }])
                 ->get()

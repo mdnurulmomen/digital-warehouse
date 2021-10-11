@@ -4,8 +4,8 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="merchant.first_name + ' ' + merchant.last_name + ' deals'" 
-			:message="'All our deals with ' + merchant.first_name + ' ' + merchant.last_name"
+			:title="fullName + ' deals'" 
+			:message="'All our deals with ' + fullName"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -229,7 +229,7 @@
 												Merchant Name :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ merchant ? (merchant.first_name + ' ' + merchant.last_name) : 'NA' | capitalize }}
+												{{ merchant ? fullName : 'NA' | capitalize }}
 											</label>
 										</div>
 
@@ -404,7 +404,7 @@
 																</div>														
 															</div>
 
-															<div class="col-md-12">
+															<div class="col-md-12 mt-1">
 																<div 
 																	class="form-row ml-3 mr-3" 
 																	v-show="warehouseSpace.type=='containers'"
@@ -479,30 +479,39 @@
 
 																	<div class="col-md-12 card-footer mt-2">
 																		<div class="form-row text-center">
-																			<div class="col-md-6 text-success">
-																				<i 
-																					class="fa fa-plus fa-lg" 
-																					aria-hidden="true" 
+																			<div class="col-md-6">
+																				<button 
+																					class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
+																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)" 
 																					@click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
-																				>	
-																				</i>
+																				>
+																					<i 
+																						class="fa fa-plus fa-lg" 
+																						aria-hidden="true"
+																					>	
+																					</i>
+																				</button>
 																			</div>
 
-																			<div class="col-md-6 text-danger">
-																				<i 
-																					class="fa fa-minus fa-lg" 
-																					aria-hidden="true" 
-																					:disabled="warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1])" 
+																			<div class="col-md-6">
+																				<button 
+																					class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
+																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1]) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)" 
 																					@click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
-																				>	
-																				</i>
+																				>
+																					<i 
+																						class="fa fa-minus fa-lg" 
+																						aria-hidden="true" 
+																					>	
+																					</i>
+																				</button>
 																			</div>
 																		</div>
 																	</div>
 																</div>
 															</div>
 
-															<div class="col-md-12">
+															<div class="col-md-12 mt-1">
 																<div 
 																	class="form-row ml-3 mr-3" 
 																	v-show="warehouseSpace.type=='shelves'"
@@ -600,7 +609,7 @@
 																</div>
 															</div>
 
-															<div class="col-md-12">
+															<div class="col-md-12 mt-1">
 																<div class="form-row ml-3 mr-3" v-show="warehouseSpace.type=='units'">
 																	<div class="form-group col-md-6">
 																		<label for="inputFirstName">Parent Container</label>
@@ -736,7 +745,12 @@
 													<div class="col-md-12 card-footer mt-2">
 														<div class="form-row text-center">
 															<div class="col-md-6 text-success">
-																<button type="button" class="btn btn-outline-primary btn-sm btn-block" @click="addWarehouseSpace(merchantWarehouseIndex)">
+																<button 
+																	type="button" 
+																	class="btn btn-outline-primary btn-sm btn-block" 
+																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1" 
+																	@click="addWarehouseSpace(merchantWarehouseIndex)"
+																>
 																	Add Space
 																</button>
 															</div>
@@ -744,7 +758,7 @@
 																<button 
 																	type="button" 
 																	class="btn btn-outline-info btn-sm btn-block" 
-																	:disabled="! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
+																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || ! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
 																	@click="removeWarehouseSpace(merchantWarehouseIndex)"
 																>
 																	Remove Space
@@ -1000,7 +1014,7 @@
 											</label>
 
 											<label class="col-sm-6 col-form-label">
-												{{ merchant ? (merchant.first_name + ' ' + merchant.last_name) : 'NA' | capitalize }}
+												{{ merchant ? fullName : 'NA' | capitalize }}
 											</label>
 										</div>
 										
@@ -1121,7 +1135,7 @@
 																						Container # :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.indexOf("-")+1) : 'NA' }}
+																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
 																					</label>
 																				</div>
 
@@ -1159,7 +1173,7 @@
 																						Container # :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
 																					</label>
 																				</div>
 
@@ -1210,7 +1224,7 @@
 																						Container # :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
 																					</label>
 																				</div>
 
@@ -1469,7 +1483,7 @@
 	        	allAvailableWarehouseAndSpaces : [
 	        		{
 						// warehouse
-						id:1,
+						id:null,
 						name: null,
 
 						emptyContainers : [
@@ -1792,6 +1806,14 @@
 
 	        }
 
+		},
+
+		computed: {
+			// a computed getter
+			fullName: function () {
+				
+				return `${this.merchant.first_name} ${this.merchant.last_name} ( ${this.merchant.user_name} )`;
+			}
 		},
 		
 		filters: {
@@ -2627,12 +2649,26 @@
 
 			},
 			addMoreWarehouse() {
-				if (this.singleMerchantDealData.warehouses.length < this.allAvailableWarehouseAndSpaces.length && this.singleMerchantDealData.payments.length < 2) {
+
+				if (this.singleMerchantDealData.warehouses.length && this.singleMerchantDealData.warehouses.some(merchantWarehouse => merchantWarehouse.hasOwnProperty('spaces') && merchantWarehouse.spaces.length)) {
+					
+					this.validateFormInput('space_type');
+					this.validateFormInput('containers');
+					this.validateFormInput('parent_container');
+					this.validateFormInput('parent_shelf');
+					this.validateFormInput('shelves');
+					this.validateFormInput('units');
+					this.validateFormInput('rent_period');
+
+				}
+
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && ! this.errorInWarehousesArray(this.errors.warehouses) && this.singleMerchantDealData.warehouses.length < this.allAvailableWarehouseAndSpaces.length && this.singleMerchantDealData.payments.length < 2) {
 
 					this.singleMerchantDealData.warehouses.push({});
 					this.errors.warehouses.push({ spaces : [ {} ] });
 
 				}
+
 			},
 			removeWarehouse() {
 					
@@ -2720,7 +2756,13 @@
 			},
 			resetWarehouseSpaces(merchantWarehouseIndex){
 				
-				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex) {
+				if (this.singleMerchantDealData.warehouses.some((merchantWarehouse, mrchntWarehouseIndex) => this.singleMerchantDealData.warehouses.some((selectedWarehouse, selectedWarehouseIndex) => selectedWarehouse.id==merchantWarehouse.id && selectedWarehouse.name==merchantWarehouse.name && mrchntWarehouseIndex!=selectedWarehouseIndex))) {
+
+					return;
+
+				}
+
+				else if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex) {
 
 					this.$set(this.singleMerchantDealData.warehouses[merchantWarehouseIndex], 'spaces', [ {} ]);
 
@@ -2729,8 +2771,8 @@
 				// Reset Error Object
 				// if (this.errors.warehouses.length > merchantWarehouseIndex) {
 
-					this.errors.warehouses[merchantWarehouseIndex].spaces = [ {} ];
-					this.$delete(this.errors.warehouses[merchantWarehouseIndex], 'warehouse');
+				this.errors.warehouses[merchantWarehouseIndex].spaces = [ {} ];
+				this.$delete(this.errors.warehouses[merchantWarehouseIndex], 'warehouse');
 
 				// }				
 
@@ -2746,7 +2788,7 @@
 
 							if (merchantWarehouse.spaces.length) {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 
 									(dealtSpace, dealtSpaceIndex) => {
 
@@ -2938,9 +2980,14 @@
 						
 						this.$set(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers', [ {} ]);
 
+						this.$delete(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'container');
+
+
 					} else {
 
 						this.$set(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'container', {});
+
+						this.$delete(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers');
 						
 					}
 
@@ -3227,7 +3274,7 @@
 							
 							if (merchantWarehouse.spaces.length > 0) {
 								
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 
 									(warehouseSpace, warehouseSpaceIndex) => {
 										
@@ -3333,6 +3380,11 @@
 							this.errors.warehouses[ this.singleMerchantDealData.warehouses.findIndex(merchantWarehouse => ! merchantWarehouse || Object.keys(merchantWarehouse).length === 0) ].warehouse = 'Warehouse is required';
 
 						}
+						else if (this.step==2 && this.singleMerchantDealData.warehouses.some((merchantWarehouse, merchantWarehouseIndex) => this.singleMerchantDealData.warehouses.some((selectedWarehouse, selectedWarehouseIndex) => selectedWarehouse.id==merchantWarehouse.id && selectedWarehouse.name==merchantWarehouse.name && merchantWarehouseIndex!=selectedWarehouseIndex))) {
+
+							this.errors.warehouses[this.errors.warehouses.length-1].warehouse = 'Same warehouse is selected';
+
+						}
 						else {
 
 							this.submitForm = true;
@@ -3377,7 +3429,7 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 
 									(warehouseSpace, warehouseSpaceIndex) => {
 
@@ -3413,16 +3465,19 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 									(warehouseSpace, warehouseSpaceIndex) => {
 
 										if (warehouseSpace.type=='containers' && (! warehouseSpace.containers || warehouseSpace.containers.length == 0 || warehouseSpace.containers.some(warehouseContainer => ! warehouseContainer || Object.keys(warehouseContainer).length==0))) {
+											
 											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers = 'Container is required';
 										}
-										else if (warehouseSpace.containers.some((warehouseContainer, warehouseContainerIndex) => warehouseSpace.containers.some((selectedContainer, selectedContainerIndex) => selectedContainer.id==warehouseContainer.id && warehouseContainerIndex != selectedContainerIndex))) {
+										else if (warehouseSpace.type=='containers' && warehouseSpace.containers.some((warehouseContainer, warehouseContainerIndex) => warehouseSpace.containers.some((selectedContainer, selectedContainerIndex) => selectedContainer.id==warehouseContainer.id && warehouseContainerIndex != selectedContainerIndex))) {
+											
 											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers = 'Same container is selected';
 										}
 										else{
+											
 											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers');
 										}
 
@@ -3445,7 +3500,7 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 									(warehouseSpace, warehouseSpaceIndex) => {
 
 										if ((warehouseSpace.type=='shelves' || warehouseSpace.type=='units') && (! warehouseSpace.container || Object.keys(warehouseSpace.container).length==0)) {
@@ -3474,7 +3529,7 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 									(warehouseSpace, warehouseSpaceIndex) => {
 
 										if (warehouseSpace.type=='shelves' && (! warehouseSpace.container || ! warehouseSpace.container.shelves || warehouseSpace.container.shelves.length == 0)) {
@@ -3503,7 +3558,7 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 									(warehouseSpace, warehouseSpaceIndex) => {
 
 										if (warehouseSpace.type=='units' && (! warehouseSpace.container || ! warehouseSpace.container.shelf || Object.keys(warehouseSpace.container.shelf).length==0)) {
@@ -3532,7 +3587,7 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 									(warehouseSpace, warehouseSpaceIndex) => {
 
 										if (warehouseSpace.type=='units' && (! warehouseSpace.container || ! warehouseSpace.container.shelf || ! warehouseSpace.container.shelf.units || warehouseSpace.container.shelf.units.length == 0)) {
@@ -3561,7 +3616,7 @@
 							
 							(merchantWarehouse, merchantWarehouseIndex) => {
 
-								merchantWarehouse.spaces.forEach(
+								merchantWarehouse.spaces?.forEach(
 
 									(warehouseSpace, warehouseSpaceIndex) => {
 

@@ -51,4 +51,9 @@ class WarehouseContainer extends Model
     {
         return $this->hasMany(WarehouseContainerShelfUnitStatus::class, 'warehouse_container_id');
     }
+
+    public function deals()
+    {
+        return $this->hasMany(DealtSpace::class, 'warehouse_container_id');
+    }
 }
