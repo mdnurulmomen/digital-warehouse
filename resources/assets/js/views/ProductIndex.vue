@@ -127,7 +127,7 @@
 																<tfoot>
 																	<tr>	
 																		<th>Name</th>
-																		<!-- <th>SKU</th> -->
+																		<th># Merchants</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>

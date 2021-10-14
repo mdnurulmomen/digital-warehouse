@@ -48,9 +48,9 @@ class MerchantController extends Controller
             
             return response()->json([
 
-        		'approved' => Merchant::with(['roles', 'permissions'])->where('active', 1)->latest()->paginate($perPage),
-                'pending' => Merchant::with(['roles', 'permissions'])->where('active', 0)->latest()->paginate($perPage),
-        		'trashed' => Merchant::with(['roles', 'permissions'])->onlyTrashed()->latest()->paginate($perPage),
+        		'approved' => Merchant::with(['roles', 'permissions'])->withCount('deals')->where('active', 1)->latest()->paginate($perPage),
+                'pending' => Merchant::with(['roles', 'permissions'])->withCount('deals')->where('active', 0)->latest()->paginate($perPage),
+        		'trashed' => Merchant::with(['roles', 'permissions'])->withCount('deals')->onlyTrashed()->latest()->paginate($perPage),
 
         	], 200);
 

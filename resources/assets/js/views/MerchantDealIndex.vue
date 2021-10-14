@@ -13,16 +13,90 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
+						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">			
-											<div class="col-sm-12 sub-title">
+											<div class="col-sm-12">
+												<div class="row form-group">
+											  		<div class="col-sm-6 d-flex align-items-center form-group">
+											  			<div class="mr-2">
+											  				<span>
+													  			{{ 
+													  				( searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Deals List' : 'Deals List'
+													  			}}
+											  				</span>
+											  			</div>
+
+											  			<div class="ml-auto ml-sm-0">
+											  				<div class="dropdown">
+										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+											  					
+											  					<div class="dropdown-menu">
+										  							<download-excel 
+														  				class="btn btn-default p-1 dropdown-item active"
+																		:data="merchantAllDeals"
+																		:fields="dataToExport" 
+																		worksheet="Deals Sheet"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-deals-' : 'deals-list-') + currentTime + '-page-' + pagination.current_page + '.xls'"
+														  			>
+														  				Excel
+																	</download-excel>
+											  					</div>
+											  				</div>
+											  			</div>
+											  		</div>
+
+											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
+											  			<div class="ml-sm-auto mr-3">
+										  					<input 	
+																type="text" 
+														  		class="form-control" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		v-model="searchAttributes.search" 
+														  		placeholder="Search Deals"
+													  		>
+
+													  		<div class="invalid-feedback">
+														  		Please search with releavant input
+														  	</div>
+											  			</div>
+
+														<div class="ml-auto ml-sm-0">
+															<ul class="nav nav-pills">
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-1"
+																		@click="setTodayDate()" 
+																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
+																	>
+																		Today
+																	</a>
+																</li>
+
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-0" 
+																		data-toggle="modal" 
+																		data-target="#deal-custom-search"
+																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
+																	>
+																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
+																	</a>
+																</li>
+															</ul>
+													  	</div>
+													</div>
+											  	</div>
+
+											  	<!-- 
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-merchant-deal-index') || userHasPermissionTo('create-merchant-deal')"
 											  		:query="query" 
@@ -32,7 +106,8 @@
 											  		@showContentCreateForm="showDealCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllMerchantDeals"
-											  	></search-and-addition-option>
+											  	></search-and-addition-option> 
+											  	-->
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -971,6 +1046,51 @@
 		></restore-confirmation-modal>
  	-->
 
+ 		<!-- Modal -->
+		<div class="modal fade" id="deal-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-row">
+							<div class="col-12 text-center">
+								<p>
+									Timelaps
+								</p>
+								 
+								<v-date-picker 
+									v-model="searchAttributes.dates" 
+									color="red" 
+									is-dark
+									is-range 
+									is-inline
+									:max-date="new Date()" 
+									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
+									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+									@input="setSearchingDates()"
+								/> 
+							</div>					
+						</div>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+	                  		Reset
+	                  	</button>
+
+						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+	                  		See Results
+	                  	</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
  		<!-- View Modal -->
 		<div class="modal fade" id="merchantDeal-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
@@ -1479,6 +1599,22 @@
 	        	submitForm : true,
 	        	formSubmitted : false,
 
+	        	searchAttributes : {
+
+	        		dates : {},
+	        		search : '',
+		        	dateTo : null,
+		        	dateFrom : null,
+		        	
+		        	/*
+			        	showPendingRequisitions : false,
+			        	showCancelledRequisitions : false,
+			        	showDispatchedRequisitions : false,
+			        	showProduct : null,
+		        	*/
+
+	        	},
+
 	        	// allContainers : [],
 	        	allAvailableWarehouseAndSpaces : [
 	        		{
@@ -1802,6 +1938,230 @@
 					
 				},
 
+				dataToExport: {
+
+					"Deal": {
+						
+						field: "id",
+						
+						callback: (idValue) => {
+							
+							return `DL-${idValue}`;
+
+						},
+
+					},
+
+					"Status": {
+						
+						field: "active",
+						
+						callback: (value) => {
+							
+							if (value) {
+								return 'Active';
+							}
+							else {
+								return 'Deactive';
+							}
+
+						},
+
+					},
+
+					"E-Commerce": {
+						
+						field: "e_commerce_fulfillment",
+						
+						callback: (value) => {
+							
+							if (value) {
+								return 'Enabled';
+							}
+							else {
+								return 'Disabled';
+							}
+
+						},
+
+					},
+
+					"Renewal": {
+						
+						field: "auto_renewal",
+						
+						callback: (value) => {
+							
+							if (value) {
+								return 'Auto-Renewal';
+							}
+							else {
+								return 'NA';
+							}
+
+						},
+
+					},
+
+					"Sale Percentage": {
+						
+						field: "sale_percentage",
+						
+						callback: (value) => {
+							
+							if (value) {
+								return sale_percentage;
+							}
+							else {
+								return 'NA';
+							}
+
+						},
+
+					},
+
+					"Spaces": {
+
+						field: "warehouses",
+
+						callback: (warehouses) => {
+
+							if (warehouses) {
+								
+								var infosToReturn = '';
+
+								warehouses.forEach(
+					
+									(merchantWarehouse, merchantWarehouseIndex) => {
+
+										infosToReturn += "Warehouse : " + merchantWarehouse.name + "\n";
+
+										if (merchantWarehouse.hasOwnProperty('spaces') && merchantWarehouse.spaces.length) {
+
+											merchantWarehouse.spaces.forEach(
+						
+												(warehouseSpace, paymentRentIndex) => {
+
+													if (warehouseSpace.type=='containers') {
+														
+														infosToReturn +=  "Space Type : Containers\n";
+
+														warehouseSpace.containers.forEach(
+															(warehouseContainer, warehouseContainerIndex) => {
+
+																infosToReturn +=  "Containers: " + warehouseContainer.name + "\n";
+
+															}
+														);
+
+													}
+													else if (warehouseSpace.type=='shelves') {
+														
+														infosToReturn +=  "Space Type : Shelves\n";
+														infosToReturn +=  "Container Name : " + warehouseSpace.container.name + "\n";
+
+														warehouseSpace.container.shelves.forEach(
+															(warehouseShelf, warehouseContainerIndex) => {
+
+																infosToReturn +=  "Shelves: " + warehouseShelf.name + "\n";
+
+															}
+														);
+
+													}
+													else if (warehouseSpace.type=='units') {
+														
+														infosToReturn +=  "Space Type : Units\n";
+														infosToReturn +=  "Container Name : " + warehouseSpace.container.name + "\n";
+														infosToReturn +=  "Shelf Name : " + warehouseSpace.container.shelf.name + "\n";
+
+														warehouseSpace.container.shelf.units.forEach(
+															(warehouseUnit, warehouseContainerIndex) => {
+
+																infosToReturn +=  "Units: " + warehouseUnit.name + "\n";
+
+															}
+														);
+
+													}				
+
+												}
+												
+											);
+
+										}
+
+									}
+									
+								);
+
+								return infosToReturn;
+
+							}
+							else {
+								return 'No Payment.'
+							}
+
+						},
+
+					},
+
+					"Payments": {
+
+						field: "payments",
+
+						callback: (payments) => {
+
+							if (payments) {
+								
+								var infosToReturn = '';
+
+								payments.forEach(
+					
+									(dealPayment, dealPaymentIndex) => {
+
+										infosToReturn += "Invoice:" + dealPayment.invoice_no + "\n";
+										infosToReturn += "Due:" + dealPayment.previous_due + "\n";
+										infosToReturn += "Total Rent:" + dealPayment.total_rent + "\n";
+										infosToReturn += "Discount:" + dealPayment.discount + "\n";
+										infosToReturn += "Payeble:" + dealPayment.net_payable + "\n";
+										infosToReturn += "Paid:" + dealPayment.paid_amount + "\n";
+
+										if (dealPayment.hasOwnProperty('rents') && dealPayment.rents.length) {
+
+											infosToReturn +=  '( ';
+
+											dealPayment.rents.forEach(
+						
+												(paymentRent, paymentRentIndex) => {
+
+													infosToReturn +=  "Space:" + paymentRent.dealt_space ? paymentRent.dealt_space.name : '' + ', Rent:' + paymentRent.rent;					
+
+												}
+												
+											);
+
+											infosToReturn +=  ').' + "\n";
+
+										}
+
+									}
+									
+								);
+
+								return infosToReturn;
+
+							}
+							else {
+								return 'No Payment.'
+							}
+
+						},
+
+					},
+					
+				},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -1813,7 +2173,13 @@
 			fullName: function () {
 				
 				return `${this.merchant.first_name} ${this.merchant.last_name} ( ${this.merchant.user_name} )`;
-			}
+			},
+			currentTime: function() {
+
+				let date = new Date();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+
+			},
 		},
 		
 		filters: {
@@ -1840,6 +2206,61 @@
 
 		},
 
+		watch : {
+
+			'searchAttributes.search' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllMerchantDeals();
+
+				}
+				else {
+
+					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
+
+					if (! format.test(val)) {
+
+						this.searchData();
+					
+					}
+
+				}
+
+			},
+			
+			'searchAttributes.dateFrom' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllMerchantDeals();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
+
+			'searchAttributes.dateTo' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllMerchantDeals();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
+
+		},
+
 		created() {
 			
 			this.fetchAllWarehouseContainers();
@@ -1861,6 +2282,7 @@
 				this.query = '';
 				this.error = '';
 				// this.loading = true;
+				this.searchAttributes.search = '';
 				this.allAvailableWarehouseAndSpaces = [];
 
 				axios
@@ -2342,7 +2764,8 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New deal has been stored", "Success");
-							this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							// this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
 							$('#merchantDeal-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2373,7 +2796,8 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Deal has been updated", "Success");
-							this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							// this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
 							$('#merchantDeal-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2404,7 +2828,8 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Deal has been deleted", "Success");
-							this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							// this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -2421,20 +2846,21 @@
 					});
 
 			},
-			searchData(emittedValue) {
+			searchData() {
 
-				if (emittedValue) {
-					this.query = emittedValue;
-				}
 
 				this.error = '';
 				this.merchantAllDeals = [];
 				this.pagination.current_page = 1;
+				this.searchAttributes.merchant_id = this.merchant.id;
 				
 				axios
+				.post('/search-merchant-deals/' + this.perPage, this.searchAttributes)
+				/*
 				.get(
 					"/api/search-merchant-deals/" + this.merchant.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
+				*/
 				.then(response => {
 					this.merchantAllDeals = response.data.all.data;
 					this.pagination = response.data.all;
@@ -2810,7 +3236,7 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.query === '') {
+				if (this.searchAttributes.search === '') {
 
 					this.fetchAllMerchantDeals();
 
@@ -2822,6 +3248,45 @@
 				}
 
     		},
+    		resetSearchingDates(){
+
+            	this.searchAttributes.dates = {};
+				this.searchAttributes.dateTo = null;
+				this.searchAttributes.dateFrom = null;				
+
+            },
+            setSearchingDates(){
+
+            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
+
+					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
+					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
+						
+				}
+				else {
+
+					this.resetSearchingDates();
+
+				}
+
+            },
+            setTodayDate() {
+            	
+            	if (this.searchAttributes.dateFrom != this.currentTime || this.searchAttributes.dateTo) {
+	            	
+	            	// this.searchAttributes.dateTo = null; 
+	            	this.searchAttributes.dates = {};
+	            	this.searchAttributes.dateTo = null;
+	            	this.searchAttributes.dateFrom = this.currentTime;
+
+            	}
+            	else {
+
+	            	this.searchAttributes.dateFrom = null
+
+            	}
+
+            },
     		objectNameWithCapitalized ({ name }) {
 		      	
 		      	if (name) {

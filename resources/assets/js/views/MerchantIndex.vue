@@ -50,8 +50,8 @@
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name', 'username', 'email', 'mobile']" 
-										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile']" 
+										  			:column-names="['name', 'username', 'email', 'mobile', '# deals']" 
+										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'number_deals']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission = "'merchant'" 

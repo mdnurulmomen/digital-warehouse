@@ -216,7 +216,7 @@ Route::name('admin.')->group(function () {
 		Route::post('/merchant-deals/{perPage}','DealController@storeMerchantDeal')->name('merchant-deals');	
 		Route::put('/merchant-deals/{deal}/{perPage}','DealController@updateMerchantDeal')->name('merchant-deals');	
 		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals');
-		Route::get('/api/search-merchant-deals/{merchant}/{search}/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
+		Route::post('/search-merchant-deals/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
 
 		// deal-payments
 		Route::get('/api/deal-payments/{deal}/{perPage?}', 'DealController@showDealAllPayments')->name('deal-payments');

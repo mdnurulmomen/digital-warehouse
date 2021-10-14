@@ -285,6 +285,9 @@
 				else if (columnValue.match(/code/gi)) {
 					return this.$options.filters.capitalize(object.code);
 				}
+				else if (columnValue.match(/number_deals/gi)) {
+					return object.deals_count;
+				}
 
 			},
 			immuteableWarehouse(warehouse) {

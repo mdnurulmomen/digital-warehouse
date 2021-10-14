@@ -36,7 +36,7 @@ class DealController extends Controller
     // Product-Stock
     public function showMerchantAllDeals($merchant, $perPage)
     {
-        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces'])->paginate($perPage));
+        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces', 'payments'])->paginate($perPage));
     }
 
     public function storeMerchantDeal(Request $request, $perPage)
@@ -369,30 +369,67 @@ class DealController extends Controller
         return $this->showMerchantAllDeals($merchantId, $perPage);
     }
 
-    public function searchMerchantAllDeals($merchant, $search, $perPage)
+    public function searchMerchantAllDeals(Request $request, $perPage)
     {
-        $query = MerchantDeal::with([ 'spaces', 'payments' ])
-                ->where('merchant_id', $merchant)
-                ->where(function($query5) use ($search) {
-                    $query5->whereHas('spaces', function ($query2) use ($search) {
-                        $query2->whereHasMorph(
-                            'space',
-                            [ WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class ],
-                            function ($query3) use ($search) {
-                                $query3->where('name', 'like', "%$search%");
-                            }
-                        );
-                    })
-                    ->orWhereHas('payments', function ($query4) use ($search) {
-                        $query4->where('invoice_no', 'like', "%$search%")
-                        ->orWhere('previous_due', 'like', "%$search%")
-                        ->orWhere('total_rent', 'like', "%$search%")
-                        ->orWhere('discount', 'like', "%$search%")
-                        ->orWhere('net_payable', 'like', "%$search%")
-                        ->orWhere('paid_amount', 'like', "%$search%")
-                        ->orWhere('current_due', 'like', "%$search%");
-                    });
+        $request->validate([
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+
+        $query = MerchantDeal::with(['spaces', 'payments'])->where('merchant_id', $request->merchant_id);
+
+        if ($request->search) {
+            
+            $query->where(function($query5) use ($request) {
+                $query5->whereHas('merchant', function ($query6) use ($request) {
+                    $query6->where('first_name', 'like', "%$request->search%")
+                    ->orWhere('last_name', 'like', "%$request->search%")
+                    ->orWhere('user_name', 'like', "%$request->search%")
+                    ->orWhere('email', 'like', "%$request->search%")
+                    ->orWhere('mobile', 'like', "%$request->search%");
+                })
+                ->orWhereHas('spaces', function ($query2) use ($request) {
+                    $query2->whereHasMorph(
+                        'space',
+                        [ WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class ],
+                        function ($query3) use ($request) {
+                            $query3->where('name', 'like', "%$request->search%")
+                            ->orWhereHas('warehouseContainer.container', function ($query8) use ($request) {
+                                $query8->where('name', 'like', "%$request->search%");
+                            });
+                        }
+                    );
+                })
+                ->orWhereHas('payments', function ($query4) use ($request) {
+                    $query4->where('invoice_no', 'like', "%$request->search%")
+                    ->orWhere('previous_due', 'like', "%$request->search%")
+                    ->orWhere('total_rent', 'like', "%$request->search%")
+                    ->orWhere('discount', 'like', "%$request->search%")
+                    ->orWhere('net_payable', 'like', "%$request->search%")
+                    ->orWhere('paid_amount', 'like', "%$request->search%")
+                    ->orWhere('current_due', 'like', "%$request->search%");
                 });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->where('created_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->where('created_at', '<=', $request->dateTo);
+
+        }
 
         return response()->json([
             'all' => new DealCollection($query->paginate($perPage)),  

@@ -45,4 +45,9 @@ class MerchantDeal extends Model
     {
     	return $this->hasMany(MerchantPayment::class, 'merchant_deal_id', 'id');
     }
+
+    public function merchant() 
+    {
+        return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
+    }
 }

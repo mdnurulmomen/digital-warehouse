@@ -2253,9 +2253,9 @@
 
 			fetchAllRequisitions() {
 
-				this.searchAttributes.search = '';
 				this.error = '';
 				this.loading = true;
+				this.searchAttributes.search = '';
 				this.allFetchedRequisitions = [];
 				
 				axios
@@ -2292,9 +2292,9 @@
 			},
 			fetchAvailableRequisitions() {
 
-				this.searchAttributes.search = '';
 				this.error = '';
 				this.loading = true;
+				// this.searchAttributes.search = '';
 				this.availableRequisitions = [];
 				
 				axios
@@ -2330,9 +2330,9 @@
 			},
 			fetchAllPackagingPackages() {
 				
-				this.searchAttributes.search = '';
 				this.error = '';
 				this.loading = true;
+				// this.searchAttributes.search = '';
 				this.allPackagingPackages = [];
 				
 				axios
