@@ -32,7 +32,7 @@
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllPayments"
+											  		@fetchAllContents="setDealAllPayments()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -158,7 +158,7 @@
 
 															<tbody>
 																<tr 
-																	v-for="(content, contentIndex) in contentsToShow" 
+																	v-for="(content, contentIndex) in dealAllPayments" 
 																	:key="'content-key-' + contentIndex + '-content-' + content.id" 
 																>
 																	<td>
@@ -215,7 +215,7 @@
 																</tr>
 
 																<tr 
-															  		v-show="! contentsToShow.length"
+															  		v-show="! dealAllPayments.length"
 															  	>
 														    		<td colspan="7">
 															      		<div class="alert alert-danger" role="alert">
@@ -362,7 +362,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? fetchAllPayments() : searchData()"
+																@click="query === '' ? setDealAllPayments() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -374,7 +374,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllPayments() : searchData()"
+																@paginate="query === '' ? setDealAllPayments() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -465,6 +465,15 @@
 
 																				<div class="form-row">
 																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Container Name :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseContainer.name | capitalize }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																						Container Type :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
@@ -483,11 +492,27 @@
 																				 
 																				<div class="form-row" v-show="createMode">
 																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Rent :
+																						Current Rent :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 'NA' }}
+																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 'NA' }}
 																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Rent Period :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.name : 'NA' | capitalize }}
+																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						# Installment :
+																					</label>
+																					
 																				</div>
 																			</div>
 																		</div>
@@ -537,14 +562,30 @@
 																						</ul>
 																					</label>
 																				</div>
-																				 
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Rent Period :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ (warehouseSpace.container && warehouseSpace.container.selected_rent) ? warehouseSpace.container.selected_rent.name : 'NA' | capitalize }}
+																					</label>
+																				</div>
+
 																				<div class="form-row" v-show="createMode">
 																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																						Current Rent :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
+																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
 																					</label>
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						# Installment :
+																					</label>
+																					
 																				</div>
 																			</div>
 																		</div>
@@ -600,15 +641,31 @@
 																						</ul>
 																					</label>
 																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						Rent Period :
+																					</label>
+																					<label class="col-sm-6 col-form-label">
+																						{{ (warehouseSpace.container && warehouseSpace.container.selected_rent) ? warehouseSpace.container.selected_rent.name : 'NA' | capitalize }}
+																					</label>
+																				</div>
 																				 
 																				<div class="form-row" v-show="createMode">
 																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																						Current Rent :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
+																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
 																					</label>
-																				</div> 
+																				</div>
+
+																				<div class="form-row">
+																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																						# Installment :
+																					</label>
+																					
+																				</div>
 																			</div>
 																		</div>
 																	</div>
@@ -915,10 +972,21 @@
 											{{ paymentRent.expired_at }}
 										</label>	
 									</div>
+
+									<div class="form-row">
+										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											# Installments :
+										</label>
+
+										<label class="col-sm-6 col-form-label">
+											{{ paymentRent.number_installment }}
+										</label>	
+									</div>
 								</div>
 							</div>
 						</div>
 
+						<!-- 
 						<div class="form-row">
 							<div class="col-md-12 text-center">
 								<label class="font-weight-bold">
@@ -984,17 +1052,6 @@
 																		{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
 																	</label>
 																</div>
-
-																<!-- 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Current Rent :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 'NA' }}
-																	</label>
-																</div>
-																 -->
 															</div>
 														</div>
 
@@ -1043,17 +1100,6 @@
 																		</ul>
 																	</label>
 																</div>
-																 
-																<!-- 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Current Rent :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
-																	</label>
-																</div> 
-																-->
 															</div>
 														</div>
 
@@ -1108,17 +1154,6 @@
 																		</ul>
 																	</label>
 																</div>
-
-																<!-- 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Current Rent :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.storing_price : 'NA' }}
-																	</label>
-																</div> 
-																-->
 															</div>
 														</div>
 													</div>
@@ -1128,7 +1163,8 @@
 									</div>
 								</div>
 							</div>
-						</div>	
+						</div>	 
+						-->
 					</div>
 
 					<div class="modal-footer">
@@ -1172,6 +1208,7 @@
 				// issued_from : null,
 				// expired_at : null,
 				// rent : 0,
+				// number_installment : 0,
 				// dealt_space_id : null,
 				// merchant_payment_id : null
 			},
@@ -1217,7 +1254,8 @@
 	        	createMode : true,
 
 	        	// allFetchedContents : [],
-	        	contentsToShow : [],
+	        	dealAllPayments : [],
+	        	// dealtSpacesAndRents : [],
 
 	        	pagination: {
 		        	current_page: 1
@@ -1227,9 +1265,9 @@
 
 		      	},
 
-	        	singlePaymentData : singlePaymentData,
-
 	        	dealTotalCurrentRent : 0,
+
+	        	singlePaymentData : singlePaymentData,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -1239,13 +1277,17 @@
 		
 		created(){
 
-			this.fetchAllPayments();			
+			// this.fetchAllPayments();			
+			
+			// this.fetchDealtSpaceLatestRents();
+
+			this.setDealAllPayments();
 
 		},
 
 		mounted(){
 
-			this.setDealTotalPayments();
+			// this.setDealTotalPayments();
 
 		},
 
@@ -1280,7 +1322,7 @@
 				this.query = '';
 				this.error = '';
 				this.loading = true;
-				this.contentsToShow = [];
+				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
 				
 				axios
@@ -1315,6 +1357,47 @@
 					});
 
 			},
+			/*
+			fetchDealtSpaceLatestRents() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.dealtSpacesAndRents = [];
+				
+				axios
+					.get('/api/deal-payments/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.then(response => {
+						if (response.status == 200) {
+							this.dealtSpacesAndRents = response.data;
+							// this.setContentPagination(response);
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			*/
 			setDealTotalPayments() {
 
 				this.dealTotalCurrentRent = 0;
@@ -1330,7 +1413,7 @@
 										warehouseSpace.containers.forEach(
 											(warehouseContainer, warehouseContainerIndex) => {
 												
-												this.dealTotalCurrentRent += warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 0;
+												this.dealTotalCurrentRent += warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 0;
 
 											}
 										);
@@ -1339,13 +1422,13 @@
 
 									else if (warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length) {
 
-										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.storing_price : 0;
+										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
 
 									}
 
 									else if (warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length) {
 
-										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.storing_price : 0;
+										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
 
 									}
 								}
@@ -1363,7 +1446,7 @@
 				}
 
 				this.error = '';
-				this.contentsToShow = [];
+				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
 				this.pagination.current_page = 1;
 				
@@ -1373,7 +1456,7 @@
 				)
 				.then(response => {
 					// this.allFetchedContents = response.data;
-					this.contentsToShow = response.data.all.data;
+					this.dealAllPayments = response.data.all.data;
 					this.pagination = response.data.all;
 				})
 				.catch(e => {
@@ -1392,15 +1475,15 @@
 
 				this.singlePaymentData = {
 					
-					previous_due : this.contentsToShow[this.contentsToShow.length-1].current_due,
+					previous_due : this.dealAllPayments[this.dealAllPayments.length-1].current_due,
 					total_rent : this.dealTotalCurrentRent, // generated from selected spaces
 					discount : 0,	// percentage 
-					net_payable : this.contentsToShow[this.contentsToShow.length-1].current_due + this.dealTotalCurrentRent,
+					net_payable : this.dealAllPayments[this.dealAllPayments.length-1].current_due + this.dealTotalCurrentRent,
 					paid_amount : 0,
 					current_due : 0,
 					merchant_deal_id : this.deal.id,
 
-					// rents : this.contentsToShow[this.contentsToShow.length-1].rents,
+					// rents : this.dealAllPayments[this.dealAllPayments.length-1].rents,
 
 				};
 
@@ -1526,13 +1609,19 @@
 				return false;
 		
 			},
+			setDealAllPayments() {
+
+				this.dealAllPayments = this.deal.payments;
+
+			},
             changeNumberContents() {
 
 				this.pagination.current_page = 1;
 				// this.perPage = expectedContentsPerPage;
 
 				if (this.query === '') {
-					this.fetchAllPayments();
+					// this.fetchAllPayments();
+					this.setDealAllPayments();
 				}
 				else {
 					this.searchData();
@@ -1541,7 +1630,7 @@
     		},
     		setContentPagination(response) {
 
-    			this.contentsToShow = response.data.data;
+    			this.dealAllPayments = response.data.data;
 				this.pagination = response.data;
 
 			},
@@ -1625,7 +1714,7 @@
 			},
 			ascendingAlphabets(columnValue) {
 
-				this.contentsToShow.sort(
+				this.dealAllPayments.sort(
 			 		function(a, b){
 						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
 						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
@@ -1638,7 +1727,7 @@
 			},
 			descendingAlphabets(columnValue) {
 
-				this.contentsToShow.sort(
+				this.dealAllPayments.sort(
 			 		function(a, b){
 						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
 						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
@@ -1651,7 +1740,7 @@
 			},
 			ascendingIntegers(columnValue) {
 
-				this.contentsToShow.sort(
+				this.dealAllPayments.sort(
 			 		function(a, b){
 						return a[columnValue] - b[columnValue];
 					}
@@ -1660,7 +1749,7 @@
 			},
 			descendingIntegers(columnValue) {
 
-				this.contentsToShow.sort(
+				this.dealAllPayments.sort(
 			 		function(a, b){
 						return b[columnValue] - a[columnValue];
 					}

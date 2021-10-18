@@ -18,9 +18,14 @@ class DealtSpace extends Model
         return $this->morphTo();
     }
 
-    public function warehouse()
+    public function rentPeriod()
     {
-        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+        return $this->belongsTo(RentPeriod::class, 'rent_period_id', 'id');
+    }
+
+    public function warehouseContainer()
+    {
+        return $this->belongsTo(WarehouseContainer::class, 'warehouse_container_id', 'id');
     }
 
     /*

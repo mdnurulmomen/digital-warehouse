@@ -140,7 +140,7 @@ class DealController extends Controller
         $request['payments'] = json_decode(json_encode($request->payments)); 
 
         $dealNewPayment = $newDeal->payments()->create([
-            'invoice_no' => $newDeal->name.'-PY-'.($newDeal->payments->count() + 1),
+            'invoice_no' => $newDeal->name.'-PY-1',
             'previous_due' => 0,
             'total_rent' => $request->payments[0]->total_rent,
             'discount' => $request->payments[0]->discount,
@@ -276,18 +276,18 @@ class DealController extends Controller
             'merchant_id' => $request->merchant_id
         ]);
 
-        $request['payments'] = json_decode(json_encode($request->payments)); 
-
-        $dealRecentPaymentUpdated = $dealRecentPayment->update([
-            'previous_due' => $dealToUpdate->payments()->latest('paid_at')->skip(1)->take(1)->first()->previous_due ?? 0,
-            'total_rent' => $request->payments[0]->total_rent,
-            'discount' => $request->payments[0]->discount,
-            'net_payable' => $request->payments[0]->net_payable,
-            'paid_amount' => $request->payments[0]->paid_amount,
-            'current_due' => ($request->payments[0]->net_payable - $request->payments[0]->paid_amount),
-        ]);
-
         if ($dealToUpdate->payments->count() < 2 && $dealToUpdate->active) {
+
+            $request['payments'] = json_decode(json_encode($request->payments)); 
+
+            $dealRecentPaymentUpdated = $dealRecentPayment->update([
+                'previous_due' => $dealToUpdate->payments()->latest('paid_at')->skip(1)->take(1)->first()->previous_due ?? 0,
+                'total_rent' => $request->payments[0]->total_rent,
+                'discount' => $request->payments[0]->discount,
+                'net_payable' => $request->payments[0]->net_payable,
+                'paid_amount' => $request->payments[0]->paid_amount,
+                'current_due' => ($request->payments[0]->net_payable - $request->payments[0]->paid_amount),
+            ]);
             
             // Reseting current spaces
             $this->resetDealtSpaces($dealToUpdate, $dealRecentPayment);
@@ -319,6 +319,7 @@ class DealController extends Controller
             }
            
         }
+        
         // Deactivated
         else if (! $dealToUpdate->active) {
 
@@ -462,7 +463,37 @@ class DealController extends Controller
             'net_payable' => 'required|numeric',
             'paid_amount' => 'required|numeric',
             'previous_due' => 'required|numeric',
-            'total_rent' => 'required|numeric'
+            'total_rent' => 'required|numeric',
+
+            'rents' => [
+                
+                'required', 'array', 'min:1',
+                
+                function ($attribute, $value, $fail) {
+                    
+                    foreach ($value as $rentIndex => $rent) {
+                        if ($rent->number_installment > 0) {
+                            return true;
+                        }
+                    }
+
+                    $fail('The '.$attribute.' is invalid.');
+
+                },
+                
+            ],
+            
+            'rents.*.dealt_space_id' => [
+                'required', 'numeric',
+                Rule::exists('dealt_spaces', 'id')->where(function ($query) use ($request) {
+                    return $query->where('merchant_deal_id', $request->merchant_deal_id);
+                }),
+            ],
+
+            'rents.*.issued_from' => 'required|date',
+            'rents.*.expired_at' => 'required|date',
+            'rents.*.rent' => 'required|numeric',
+            'rents.*.number_installment' => 'required|numeric|min:0'
         ],
 
         [
@@ -473,6 +504,11 @@ class DealController extends Controller
             'paid_amount' => 'Paid amount is invalid',
             'previous_due' => 'Previous due is invalid',
             'total_rent' => 'Total rent is invalid',
+            'rents.*.dealt_space_id' => 'Invalid space',
+            'rents.*.issued_from' => 'Rent issue date is required',
+            'rents.*.expired_at' => 'Rent expiry date is required',
+            'rents.*.rent' => 'Space rent is required',
+            'rents.*.number_installment' => 'Space rent installment is required',
         ]);
 
         $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
@@ -480,7 +516,7 @@ class DealController extends Controller
         $dealRecentPayment = $paymentDeal->payments()->has('rents')->latest('id')->first();
 
         $dealNewPayment = $paymentDeal->payments()->create([
-            'invoice_no' => $paymentDeal->deal->name.'-PY-'.($paymentDeal->deal->payments->count() + 1),
+            'invoice_no' => $paymentDeal->name.'-PY-'.($paymentDeal->payments->count() + 1),
             'previous_due' => $dealRecentPayment->current_due,
             'total_rent' => $request->total_rent,
             'discount' => $request->discount,
@@ -489,17 +525,22 @@ class DealController extends Controller
             'current_due' => ($request->net_payable - $request->paid_amount),
         ]);
 
-        foreach ($paymentDeal->spaces as $dealSpaceIndex => $dealSpace) {
+        foreach (json_decode(json_encode($request->rents)) as $paymentDetailIndex => $paymentDetail) {
             
-            $rentPeriod = RentPeriod::find($dealSpace->rent->rent_period_id);
-            $dealRecentPaymentExpectedRent = $dealRecentPayment->rents()->where('dealt_space_id', $dealSpace->id)->first();
+            if ($paymentDetail->number_installment > 0 && $paymentDetail->rent > 0) {
+                
+                $dealSpace = DealtSpace::find($paymentDetail->dealt_space_id);
+                $rentPeriod = RentPeriod::find($dealSpace->rent_period_id);
+                $dealRecentPaymentExpectedRent = $dealRecentPayment->rents()->where('dealt_space_id', $dealSpace->id)->first();
 
-            $payementNewRent = $dealNewPayment->rents()->create([
-                'issued_from' => $dealRecentPaymentExpectedRent->expired_at,
-                'expired_at' => $dealRecentPaymentExpectedRent->expired_at->addDays($rentPeriod->number_days),
-                'rent' => $dealSpace->rent->rent,
-                'dealt_space_id' => $dealSpace->id
-            ]);
+                $payementNewRent = $dealNewPayment->rents()->create([
+                    'issued_from' => $dealRecentPaymentExpectedRent->expired_at,
+                    'expired_at' => $dealRecentPaymentExpectedRent->expired_at->addDays($rentPeriod->number_days * $paymentDetail->number_installment),
+                    'rent' => $paymentDetail->rent,
+                    'dealt_space_id' => $dealSpace->id
+                ]);
+
+            }
 
         }
 
@@ -838,6 +879,7 @@ class DealController extends Controller
                         'issued_from' => $deal->created_at,
                         'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                         'rent' => $warehouseContainer->selected_rent->rent,
+                        'number_installment' => 1,
                         'dealt_space_id' => $newSpaces->id
                     ]);
 
@@ -889,6 +931,7 @@ class DealController extends Controller
                             'issued_from' => $deal->created_at,
                             'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
+                            'number_installment' => 1,
                             'dealt_space_id' => $dealtNewShelf->id
                         ]);
         
@@ -944,6 +987,7 @@ class DealController extends Controller
                             'issued_from' => $deal->created_at,
                             'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
+                            'number_installment' => 1,
                             'dealt_space_id' => $dealtNewUnit->id
                         ]);
 
