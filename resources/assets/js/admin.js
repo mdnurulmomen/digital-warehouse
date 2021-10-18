@@ -377,7 +377,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/deal-payments/:merchantName/:dealDate',
+            path: '/deal-payments/:merchantName/:dealName',
             name: 'deal-payments',
             component: DealPaymentIndex,
             props: true,
@@ -386,7 +386,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-payment-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchantName && to.params.dealDate && to.params.deal) {
+                if (to.params.merchantName && to.params.dealName && to.params.deal) {
                     next(); // <-- everything good, proceed
                 }
                 else {

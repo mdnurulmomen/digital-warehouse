@@ -24,7 +24,7 @@
 										<div class="row">			
 											<div class="col-sm-12">
 												<div class="row form-group">
-											  		<div class="col-sm-6 d-flex align-items-center form-group">
+											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
@@ -52,8 +52,8 @@
 											  			</div>
 											  		</div>
 
-											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
-											  			<div class="ml-sm-auto mr-3">
+											  		<div class="col-md-6 col-sm-4 was-validated d-flex align-items-center form-group">
+											  			<div class="mr-3">
 										  					<input 	
 																type="text" 
 														  		class="form-control" 
@@ -94,6 +94,15 @@
 															</ul>
 													  	</div>
 													</div>
+
+													<div class="col-md-2 col-sm-2 form-group text-center text-md-right">
+														<button 
+															class="btn btn-success btn-outline-success btn-sm" 
+															@click="showDealCreateForm()" 
+														>
+															New Deal
+														</button>
+													</div>
 											  	</div>
 
 											  	<!-- 
@@ -111,7 +120,7 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
- 												<div class="tab-content card-block">
+ 												<div class="tab-content">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -911,7 +920,7 @@
 								>
 									<h2 class="mx-auto mb-4 lead">Payment {{ createMode ? '' : '(most recent)' }}</h2>
 									<!-- last payment -->
-									<div class="col-md-12">
+									<div class="col-md-12" v-if="singleMerchantDealData.payments.length">
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">Total Rent</label>
@@ -1096,7 +1105,7 @@
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">{{ merchant.name }} Deal ({{ singleMerchantDealData.created_at }}) Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">{{ merchant.name }} Deal ({{ singleMerchantDealData.name | capitalize }}) Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -1135,6 +1144,16 @@
 
 											<label class="col-sm-6 col-form-label">
 												{{ merchant ? fullName : 'NA' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Deal Name :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ singleMerchantDealData.name | capitalize }}
 											</label>
 										</div>
 										
@@ -1940,17 +1959,7 @@
 
 				dataToExport: {
 
-					"Deal": {
-						
-						field: "id",
-						
-						callback: (idValue) => {
-							
-							return `DL-${idValue}`;
-
-						},
-
-					},
+					Deal: 'name',
 
 					"Status": {
 						
@@ -2747,7 +2756,7 @@
 			goToDealPayments(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'deal-payments', params: { merchantName:this.merchant.user_name.replace(/ /g,"-"), dealDate:object.created_at.replace(/\s+/g, '-'), deal:object }});
+				this.$router.push({ name: 'deal-payments', params: { merchantName:this.merchant.user_name.replace(/ /g,"-"), dealName:object.name ? object.name.replace(/\s+/g, '-') : object.created_at.replace(/\s+/g, '-'), deal:object }});
 
 			},
 			createMerchantDeal() {

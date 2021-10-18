@@ -20,6 +20,19 @@ class MerchantDeal extends Model
         'auto_renewal' => 'boolean',
         'e_commerce_fulfillment' => 'boolean'
     ];
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::created(function ($deal) {
+            $deal->name = 'MR-'.$deal->merchant_id.'-DL-'.$deal->id;
+            $deal->save();
+        });
+    }
     
     public function spaces() 
     {

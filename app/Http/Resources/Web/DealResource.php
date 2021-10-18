@@ -17,6 +17,7 @@ class DealResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'active' => $this->active,
             'e_commerce_fulfillment' => $this->e_commerce_fulfillment,
             'auto_renewal' => $this->auto_renewal,

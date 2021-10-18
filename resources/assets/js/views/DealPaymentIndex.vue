@@ -5,7 +5,7 @@
 
 		<breadcrumb 
 			:title="'payment'" 
-			:message="'All payments of ' + merchantName + ' for the deal ' + dealDate"
+			:message="'All payments of ' + merchantName + ' for the deal ' + dealName"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -477,13 +477,13 @@
 																						Container # :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.indexOf("-")+1) : 'NA' }}
+																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
 																					</label>
 																				</div>
 																				 
 																				<div class="form-row" v-show="createMode">
 																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Current Rent :
+																						Rent :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
 																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.storing_price : 'NA' }}
@@ -513,7 +513,7 @@
 																						Container # :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
 																					</label>
 																				</div>
 
@@ -570,7 +570,7 @@
 																						Container # :
 																					</label>
 																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
 																					</label>
 																				</div>
 
@@ -872,7 +872,7 @@
 										</label>
 
 										<label class="col-sm-6 col-form-label">
-											{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shef' : 'Unit')) : 'NA' }}
+											{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA' }}
 										</label>	
 									</div>
 
@@ -882,7 +882,7 @@
 										</label>
 
 										<label class="col-sm-6 col-form-label">
-											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' }}
+											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
 										</label>	
 									</div>
 								
@@ -981,7 +981,7 @@
 																		Container # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.indexOf("-")+1) : 'NA' }}
+																		{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
 																	</label>
 																</div>
 
@@ -1019,7 +1019,7 @@
 																		Container # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
 																	</label>
 																</div>
 
@@ -1078,7 +1078,7 @@
 																		Container # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.indexOf("-")+1) : 'NA' }}
+																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
 																	</label>
 																</div>
 
@@ -1187,7 +1187,7 @@
 				type: Object,
 				required: true,
 			},
-			dealDate:{
+			dealName:{
 				type: String,
 				required: true,
 			},

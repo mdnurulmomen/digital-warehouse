@@ -16,6 +16,7 @@ class CreateMerchantDealsTable extends Migration
         // first step to store at any warehouse
         Schema::create('merchant_deals', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name')->nullable();
             $table->boolean('active')->default(1); // whether deal is still active or not
             $table->boolean('e_commerce_fulfillment')->default(0); // whether merchant wants to delvery services or not
             $table->boolean('auto_renewal')->default(true); // If auto-renew, generate bill for next month automatically  

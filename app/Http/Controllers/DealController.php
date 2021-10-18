@@ -140,7 +140,7 @@ class DealController extends Controller
         $request['payments'] = json_decode(json_encode($request->payments)); 
 
         $dealNewPayment = $newDeal->payments()->create([
-            'invoice_no' => 'MR-'.$request->merchant_id.'-DL-'.$newDeal->id.'-PY-'.($newDeal->payments->count() + 1),
+            'invoice_no' => $newDeal->name.'-PY-'.($newDeal->payments->count() + 1),
             'previous_due' => 0,
             'total_rent' => $request->payments[0]->total_rent,
             'discount' => $request->payments[0]->discount,
@@ -356,12 +356,16 @@ class DealController extends Controller
 
             $merchantId = $dealToDelete->merchant_id;
             
-            $dealRecentPayment = $dealToDelete->payments()->latest('id')->first();
+            $dealRecentPayment = $dealToDelete->payments()->first();
 
-            $this->resetDealtSpaces($dealToDelete, $dealRecentPayment);
+            if ($dealRecentPayment) {
+               
+                $this->resetDealtSpaces($dealToDelete, $dealRecentPayment);
+                $dealRecentPayment->rents()->delete();
+                $dealRecentPayment->delete();
 
-            $dealRecentPayment->rents()->delete();
-            $dealRecentPayment->delete();
+            }
+
             $dealToDelete->delete();
 
         }
@@ -476,7 +480,7 @@ class DealController extends Controller
         $dealRecentPayment = $paymentDeal->payments()->has('rents')->latest('id')->first();
 
         $dealNewPayment = $paymentDeal->payments()->create([
-            'invoice_no' => 'inv-'.$paymentDeal->id.'-#-'.($paymentDeal->payments->count() + 1),
+            'invoice_no' => $paymentDeal->deal->name.'-PY-'.($paymentDeal->deal->payments->count() + 1),
             'previous_due' => $dealRecentPayment->current_due,
             'total_rent' => $request->total_rent,
             'discount' => $request->discount,
@@ -711,6 +715,16 @@ class DealController extends Controller
 
                 $addedContainer->updateContainerStatus(0);
 
+                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantContainer->rent_period_id)->where('warehouse_container_id', $addedContainer->warehouse_container_id)->where('id', '!=', $merchantContainer->id)->exists();
+
+                if (! $sameTypeContainerUsingSameRentPeriod) {
+                    
+                   Rent::find($addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->rent_period_id))->first()->update([
+                        'active' => 0
+                   ]); 
+
+                }
+
                 $payment->rents()->where('dealt_space_id', $merchantContainer->id)->delete();
 
                 $merchantContainer->delete();   // delete dealt space
@@ -733,6 +747,16 @@ class DealController extends Controller
                     ]);
 
                     $addedShelf->parentContainer->updateChildUnits($addedShelf, 0);
+
+                    $sameTypeContainerShelfUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantShelf->rent_period_id)->where('warehouse_container_id', $addedShelf->warehouse_container_id)->where('id', '!=', $merchantShelf->id)->exists();
+
+                    if (! $sameTypeContainerShelfUsingSameRentPeriod) {
+                        
+                       Rent::find($addedShelf->warehouseContainer->shelf->rents->where('rent_period_id', $merchantShelf->rent_period_id))->first()->update([
+                            'active' => 0
+                       ]); 
+
+                    }
 
                     $payment->rents()->where('dealt_space_id', $merchantShelf->id)->delete();
 
@@ -759,6 +783,16 @@ class DealController extends Controller
                     $addedUnit->update([
                         'engaged' => 0
                     ]);
+
+                    $unitOfSameContainerShelfUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantUnit->rent_period_id)->where('warehouse_container_id', $addedUnit->warehouse_container_id)->where('id', '!=', $merchantUnit->id)->exists();
+
+                    if (! $unitOfSameContainerShelfUsingSameRentPeriod) {
+                        
+                       Rent::find($addedUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $merchantUnit->rent_period_id))->first()->update([
+                            'active' => 0
+                       ]); 
+
+                    }
 
                     $payment->rents()->where('dealt_space_id', $merchantUnit->id)->delete();
 
