@@ -379,6 +379,7 @@
 																      		:value="csrf"
 															      		>
 															            
+														              	<!-- 
 														              	<div class="form-group row">
 															              	<div class="col-6">
 															              		<div class="row">
@@ -403,6 +404,7 @@
 																	                </div>
 															              		</div>
 															              	</div>
+
 															                <div class="col-6">
 															              		<div class="row">
 																              		<label class="col-sm-4 col-form-label text-right">
@@ -426,7 +428,8 @@
 																	                </div>
 															              		</div>
 															              	</div>
-														              	</div>
+														              	</div> 
+														              	-->
 
 														              	<div class="form-group row">
 															              	<div class="col-sm-6">
@@ -803,15 +806,15 @@
 			},
 			updateWarehouseSetting() {
 
-				this.validateFormInput('default_selling_price');
-				this.validateFormInput('default_storing_price');
+				// this.validateFormInput('default_selling_price');
+				// this.validateFormInput('default_storing_price');
 				this.validateFormInput('default_length');
 				this.validateFormInput('default_width');
 				this.validateFormInput('default_height');
 				this.validateFormInput('default_measure_unit');
 
 
-				if (this.errors.applicationSettings.default_selling_price || this.errors.applicationSettings.default_storing_price || this.errors.applicationSettings.default_length || this.errors.applicationSettings.default_width || this.errors.applicationSettings.default_height || this.errors.applicationSettings.default_measure_unit) {
+				if (/* this.errors.applicationSettings.default_selling_price /* || this.errors.applicationSettings.default_storing_price  || */ this.errors.applicationSettings.default_length || this.errors.applicationSettings.default_width || this.errors.applicationSettings.default_height || this.errors.applicationSettings.default_measure_unit) {
 
 					this.submitForm = false;
 					return false;
@@ -1045,7 +1048,7 @@
 
 						break;
 
-					case 'default_selling_price' :
+					/*case 'default_selling_price' :
 
 						if (!this.applicationSettings.default_selling_price) {
 							this.errors.applicationSettings.default_selling_price = 'Selling price is required';
@@ -1058,9 +1061,9 @@
 							this.$delete(this.errors.applicationSettings, 'default_selling_price');
 						}
 
-						break;
+						break;*/
 
-					case 'default_storing_price' :
+					/*case 'default_storing_price' :
 
 						if (!this.applicationSettings.default_storing_price) {
 							this.errors.applicationSettings.default_storing_price = 'Storing price is required';
@@ -1073,7 +1076,7 @@
 							this.$delete(this.errors.applicationSettings, 'default_storing_price');
 						}
 
-						break;
+						break;*/
 
 					case 'default_length' :
 

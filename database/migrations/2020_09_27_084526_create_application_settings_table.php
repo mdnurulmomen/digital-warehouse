@@ -15,8 +15,8 @@ class CreateApplicationSettingsTable extends Migration
     {
         Schema::create('application_settings', function (Blueprint $table) {
             $table->tinyIncrements('id');
-            $table->unsignedSmallInteger('default_selling_price')->default(100);
-            $table->unsignedSmallInteger('default_storing_price')->default(100);
+            // $table->unsignedSmallInteger('default_selling_price')->default(100);
+            // $table->unsignedSmallInteger('default_storing_price')->default(100);
             $table->unsignedSmallInteger('default_length')->default(10);
             $table->unsignedSmallInteger('default_width')->default(10);
             $table->unsignedSmallInteger('default_height')->default(10);
