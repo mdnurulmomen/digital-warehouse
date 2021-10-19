@@ -166,15 +166,6 @@
 									-->
 
 									<li 
-										:class="['products', 'product-merchants', 'product-stocks'].includes(currentRouteName) ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-product-index')"
-									>
-										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">All Products</span>
-										</router-link>
-									</li>
-
-									<li 
 										class="pcoded-hasmenu" 
 										:class="['product-categories', 'category-products', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-product-asset-index')"
@@ -209,7 +200,16 @@
 												</router-link>
 											</li>
 										</ul>
-									</li>									
+									</li>
+
+									<li 
+										:class="['products', 'product-merchants', 'product-stocks'].includes(currentRouteName) ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-product-index')"
+									>
+										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">All Products</span>
+										</router-link>
+									</li>								
 								</ul>
 							</li>
 

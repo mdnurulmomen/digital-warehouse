@@ -901,12 +901,23 @@
 												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
+
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round float-right" 
-													v-on:click="nextPage"
+													v-on:click="nextPage" 
+													v-show="singleMerchantDealData.payments.length == 1"
 												>
 													<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+												</button>
+
+												<button 
+													type="submit" 
+													class="btn btn-primary float-right" 
+													v-show="singleMerchantDealData.payments.length > 1"
+													:disabled="!submitForm || formSubmitted"
+												>
+													{{ createMode ? 'Make ' : 'Update ' }} Deal
 												</button>
 											</div>
 										</div>
@@ -916,11 +927,11 @@
 								<div 
 									class="row" 
 									v-bind:key="'merchant-deal-modal-step-' + 3" 
-									v-show="!loading && step==3" 
+									v-show="! loading && step==3 && singleMerchantDealData.payments.length==1" 
 								>
-									<h2 class="mx-auto mb-4 lead">Payment {{ createMode ? '' : '(most recent)' }}</h2>
+									<h2 class="mx-auto mb-4 lead">{{ createMode ? 'Payment' : 'Last Payment' }}</h2>
 									<!-- last payment -->
-									<div class="col-md-12" v-if="singleMerchantDealData.payments.length">
+									<div class="col-md-12">
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">Total Rent</label>

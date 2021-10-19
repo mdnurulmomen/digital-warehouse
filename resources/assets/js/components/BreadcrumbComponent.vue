@@ -6,7 +6,7 @@
 					<i class="feather icon-clipboard bg-c-blue"></i>
 					<div class="d-inline">
 						<h5>{{ title | capitalize }}</h5>
-						<span>{{ message }}</span>
+						<span>{{ message | capitalize }}</span>
 					</div>
 				</div>
 			</div>

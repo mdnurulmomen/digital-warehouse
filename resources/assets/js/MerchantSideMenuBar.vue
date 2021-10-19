@@ -153,21 +153,6 @@
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
 								</a>
 								<ul class="pcoded-submenu">
-									<li :class="currentRouteName=='my-products' ? 'active' : ''">
-										<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">My Products</span>
-										</router-link>
-									</li> 
-
-									<li 
-										:class="['products', 'product-merchants', 'product-stocks'].includes(currentRouteName) ? 'active' : ''" 
-										v-if="userHasPermissionTo('view-product-index')"
-									>
-										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">All Products</span>
-										</router-link>
-									</li>
-
 									<li 
 										class="pcoded-hasmenu" 
 										:class="['product-categories', 'category-products', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
@@ -203,6 +188,21 @@
 												</router-link>
 											</li>
 										</ul>
+									</li>
+
+									<li :class="currentRouteName=='my-products' ? 'active' : ''">
+										<router-link :to="{ name: 'my-products' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">My Products</span>
+										</router-link>
+									</li> 
+
+									<li 
+										:class="['products', 'product-merchants', 'product-stocks'].includes(currentRouteName) ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-product-index')"
+									>
+										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">All Products</span>
+										</router-link>
 									</li>									
 								</ul>
 							</li>
