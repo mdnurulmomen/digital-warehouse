@@ -18,11 +18,6 @@ class DealtSpace extends Model
         return $this->morphTo();
     }
 
-    public function rentPeriod()
-    {
-        return $this->belongsTo(RentPeriod::class, 'rent_period_id', 'id');
-    }
-
     public function warehouseContainer()
     {
         return $this->belongsTo(WarehouseContainer::class, 'warehouse_container_id', 'id');
@@ -40,7 +35,7 @@ class DealtSpace extends Model
         return $this->belongsTo(MerchantDeal::class, 'merchant_deal_id', 'id');
     }
 
-    public function validities()
+    public function rents()
     {
         return $this->hasMany(MerchantPaymentDetail::class, 'dealt_space_id', 'id');
     }

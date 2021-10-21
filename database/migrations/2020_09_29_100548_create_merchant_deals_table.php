@@ -23,6 +23,7 @@ class CreateMerchantDealsTable extends Migration
             $table->unsignedTinyInteger('sale_percentage')->nullable();  // sale percentage if e-commerce-fulfillment enabled
             // $table->unsignedMediumInteger('issued_amount')->default(0); // issued rent to warehouse authority
             // $table->unsignedMediumInteger('paid_amount')->default(0); // paid price for this product to warehouse authority
+            $table->unsignedTinyInteger('rent_period_id');
             $table->unsignedInteger('merchant_id');
             $table->timestamp('created_at')->useCurrent();
         });

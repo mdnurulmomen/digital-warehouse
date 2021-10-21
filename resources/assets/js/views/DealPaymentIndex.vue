@@ -13,7 +13,7 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
+						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
 				
@@ -21,9 +21,9 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">											
-
-											<div class="col-sm-12 sub-title">
+										<div class="row">
+											<div class="col-sm-12">
+											  	<!-- 
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('create-merchant-payment')" 
 											  		:query="query" 
@@ -33,11 +33,120 @@
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="setDealAllPayments()"
-											  	></search-and-addition-option>
+											  	></search-and-addition-option> 
+											  	-->
+
+											  	<div class="row form-group">
+											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
+											  			<div class="mr-2">
+											  				<span>
+													  			{{ 
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Payments List' : 'Payments List'
+													  			}}
+											  				</span>
+											  			</div>
+
+											  			<div class="dropdown">
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+										  					
+										  					<div class="dropdown-menu">
+									  							<download-excel 
+													  				class="btn btn-default p-1 dropdown-item active"
+																	:data="dealAllPayments"
+																	:fields="dataToExport" 
+																	worksheet="Payments sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-payments-' : ('payments-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				Excel
+																</download-excel>
+										  						
+										  						<!-- 
+										  						<download-excel 
+										  							type="csv"
+													  				class="btn btn-default p-1 dropdown-item disabled"
+																	:data="dealAllPayments"
+																	:fields="dataToExport" 
+																	worksheet="Payments sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-payments-' : (currentTab + '-payments-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				CSV
+																</download-excel> 
+																-->
+										  					</div>
+										  				</div>
+
+											  			<div class="ml-auto d-sm-none">
+											  				<button 
+											  					v-if="userHasPermissionTo('create-merchant-payment')"
+													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			@click="showContentCreateForm()"
+												  			>
+												  				<i class="fa fa-plus"></i>
+												  				New Payment
+												  			</button>
+											  			</div>
+											  		</div>
+
+											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
+											  			<div class="mx-sm-auto w-75">
+										  					<input 	
+																type="text" 
+														  		class="form-control" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		v-model="searchAttributes.search" 
+														  		placeholder="Search Payments"
+													  		>
+
+													  		<div class="invalid-feedback">
+														  		Please search with releavant input
+														  	</div>
+											  			</div>
+
+														<div class="ml-auto ml-sm-0">
+															<ul class="nav nav-pills">
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-1"
+																		@click="setTodayDate()" 
+																		:class="{ 'active': searchAttributes.dateFrom == today && ! searchAttributes.dateTo }"
+																	>
+																		Today
+																	</a>
+																</li>
+
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-0" 
+																		data-toggle="modal" 
+																		data-target="#payment-custom-search"
+																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
+																	>
+																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
+																	</a>
+																</li>
+															</ul>
+													  	</div>
+													</div>
+
+													<div class="col-md-4 text-right d-none d-md-block">
+														<button 
+										  					v-if="userHasPermissionTo('create-merchant-payment')"
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="showContentCreateForm()"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Payment
+											  			</button>
+													</div>
+											  	</div>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-										  		<div class="tab-content card-block">
+												<loading v-show="loading"></loading>	
+
+										  		<div v-show="!loading">
 											  		<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
 															<thead>
@@ -362,7 +471,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																@click="query === '' ? setDealAllPayments() : searchData()"
+																@click="searchAttributes.search === '' ? setDealAllPayments() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -374,7 +483,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? setDealAllPayments() : searchData()"
+																@paginate="searchAttributes.search === '' ? setDealAllPayments() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -507,13 +616,6 @@
 																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.name : 'NA' | capitalize }}
 																					</label>
 																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						# Installment :
-																					</label>
-																					
-																				</div>
 																			</div>
 																		</div>
 
@@ -579,13 +681,6 @@
 																					<label class="col-sm-6 col-form-label">
 																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
 																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						# Installment :
-																					</label>
-																					
 																				</div>
 																			</div>
 																		</div>
@@ -659,13 +754,6 @@
 																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
 																					</label>
 																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						# Installment :
-																					</label>
-																					
-																				</div>
 																			</div>
 																		</div>
 																	</div>
@@ -709,87 +797,161 @@
 								>
 									<!-- payment -->
 									<div class="col-md-12">
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Total Rent</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													v-model.number="singlePaymentData.total_rent" 
-													placeholder="Total Rent" 
-													:disabled="true"
-												>
-											</div>
+										<div class="card">
+											<div class="card-block">
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Current Rent / installment</label>
+														<div class="input-group">
+															<input 
+																type="text" 
+																class="form-control" 
+																v-model="dealTotalCurrentRent" 
+																:disabled="true"
+																aria-label="Amount Per Installment" 
+															>
+															<div class="input-group-append">
+																<span class="input-group-text">taka</span>
+															</div>
+														</div>
+													</div>
 
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Discount</label>
-												<div class="input-group mb-1">
-													<input type="number" 
-														class="form-control" 
-														v-model.number="singlePaymentData.discount" 
-														placeholder="Discount" 
-														:min="0" 
-														:max="100" 
-														:class="! errors.discount ? 'is-valid' : 'is-invalid'" 
-														@change="resetTotalRent()"
-													>
-													<div class="input-group-append">
-														<span class="input-group-text"> % </span>
+													<div class="form-group col-md-6">
+														<label for="inputFirstName"># Installment</label>
+														<div class="input-group mb-1">
+															<input type="number" 
+																class="form-control" 
+																v-model.number="singlePaymentData.number_installment" 
+																placeholder="Number Installment" 
+																:min="1" 
+																:class="! errors.number_installment ? 'is-valid' : 'is-invalid'" 
+																@change="resetTotalRent();setRentExpiryDate()"
+															>
+															<div class="input-group-append">
+																<span class="input-group-text"> {{ (deal.rent_period && deal.rent_period.name) ? deal.rent_period.name : 'NA' }} </span>
+															</div>
+														</div>
+														<div class="invalid-feedback" style="display:block" v-show="errors.number_installment">
+													    	{{ errors.number_installment }}
+													    </div>
 													</div>
 												</div>
-												<div class="invalid-feedback" style="display:block" v-show="errors.discount">
-											    	{{ errors.discount }}
-											    </div>
+
+												<div class="form-row">
+													<div class="col-sm-6 form-group">
+														<label for="inputFirstName">Issue From</label>
+														<div class="date">
+															<datepicker 
+																v-model="singlePaymentData.date_from" 
+																:initialView="'month'"
+																:minimumView="'day'" 
+																:maximumView="'year'" 
+																placeholder="Start Date" 
+																:disabled="true" 
+																@input="setRentExpiryDate" 
+															>	
+															</datepicker>
+														</div>
+													</div>
+
+													<div class="col-sm-6 form-group">
+														<label for="inputFirstName">Expired at</label>
+														<div class="date">
+															<datepicker 
+																v-model="singlePaymentData.date_to" 
+																:disabled="true"
+															>	
+															</datepicker>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="card-body">
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Total Rent</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singlePaymentData.total_rent" 
+															placeholder="Total Rent" 
+															:disabled="true"
+														>
+													</div>
+
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Discount</label>
+														<div class="input-group mb-1">
+															<input type="number" 
+																class="form-control" 
+																v-model.number="singlePaymentData.discount" 
+																placeholder="Discount" 
+																:min="0" 
+																:max="100" 
+																:class="! errors.discount ? 'is-valid' : 'is-invalid'" 
+																@change="resetTotalRent()"
+															>
+															<div class="input-group-append">
+																<span class="input-group-text"> % </span>
+															</div>
+														</div>
+														<div class="invalid-feedback" style="display:block" v-show="errors.discount">
+													    	{{ errors.discount }}
+													    </div>
+													</div>
+												</div>
+
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Last Due</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singlePaymentData.previous_due" 
+															placeholder="Previous Due" 
+															:disabled="true"
+														>
+													</div>
+
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Net Payable</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singlePaymentData.net_payable" 
+															placeholder="Net Payable" 
+															:disabled="true"
+														>
+													</div>
+												</div>
+
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Paid Amount</label>
+														<input type="number" 
+															class="form-control" 
+															v-model.number="singlePaymentData.paid_amount" 
+															placeholder="Paid Amount" 
+															:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('paid_amount')" 
+															required="true" 
+														>
+														<div class="invalid-feedback">
+													    	{{ errors.paid_amount }}
+													    </div>
+													</div>
+
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Current Due</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															:value="singlePaymentData.net_payable - singlePaymentData.paid_amount" 
+															placeholder="Previous Dues" 
+															:disabled="true"
+														>
+													</div>
+												</div>
 											</div>
 										</div>
 
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Last Due</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													v-model.number="singlePaymentData.previous_due" 
-													placeholder="Previous Due" 
-													:disabled="true"
-												>
-											</div>
-
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Net Payable</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													v-model.number="singlePaymentData.net_payable" 
-													placeholder="Net Payable" 
-													:disabled="true"
-												>
-											</div>
-										</div>
-
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Paid Amount</label>
-												<input type="number" 
-													class="form-control" 
-													v-model.number="singlePaymentData.paid_amount" 
-													placeholder="Paid Amount" 
-													:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
-													@change="validateFormInput('paid_amount')" 
-													required="true" 
-												>
-												<div class="invalid-feedback">
-											    	{{ errors.paid_amount }}
-											    </div>
-											</div>
-
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Current Due</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													:value="singlePaymentData.net_payable - singlePaymentData.paid_amount" 
-													placeholder="Previous Dues" 
-													:disabled="true"
-												>
-											</div>
-										</div>
 									</div>
 
 									<div class="col-sm-12 card-footer">
@@ -834,81 +996,111 @@
 
 					<div class="modal-body">
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Invoice No :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.invoice_no | capitalize }}
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
-								Previous Due :
+							<label class="col-6 col-form-label font-weight-bold text-right">
+								# Installment :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
-								{{ singlePaymentData.previous_due }}
+							<label class="col-6 col-form-label">
+								{{ singlePaymentData.number_installment }}
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
+								Date From :
+							</label>
+
+							<label class="col-6 col-form-label">
+								{{ singlePaymentData.date_from }}
+							</label>
+						</div>
+
+						<div class="form-row">
+							<label class="col-6 col-form-label font-weight-bold text-right">
+								Date To :
+							</label>
+
+							<label class="col-6 col-form-label">
+								{{ singlePaymentData.date_to }}
+							</label>
+						</div>
+
+						<div class="form-row">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Total Rent :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.total_rent }}
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Discount :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.discount }} %
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
+								Last Due :
+							</label>
+
+							<label class="col-6 col-form-label">
+								{{ singlePaymentData.previous_due }}
+							</label>
+						</div>
+
+						<div class="form-row">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Net Payeble :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.net_payable }}
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Paid Amount :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.paid_amount }}
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Due :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.current_due }}
 							</label>
 						</div>
 
 						<div class="form-row">
-							<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							<label class="col-6 col-form-label font-weight-bold text-right">
 								Paid at :
 							</label>
 
-							<label class="col-sm-6 col-form-label">
+							<label class="col-6 col-form-label">
 								{{ singlePaymentData.paid_at }}
 							</label>
 						</div>
@@ -918,68 +1110,38 @@
 							v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length"
 						>
 							<div 
-								class="col-md-6" 
+								class="col-sm-6" 
 								v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
 								:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
 							>
 								<div class="card card-body">
 									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										<label class="col-6 col-form-label font-weight-bold text-right">
 											Space Type :
 										</label>
 
-										<label class="col-sm-6 col-form-label">
+										<label class="col-6 col-form-label">
 											{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA' }}
 										</label>	
 									</div>
 
 									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										<label class="col-6 col-form-label font-weight-bold text-right">
 											Space Name :
 										</label>
 
-										<label class="col-sm-6 col-form-label">
+										<label class="col-6 col-form-label">
 											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
 										</label>	
 									</div>
 								
 									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										<label class="col-6 col-form-label font-weight-bold text-right">
 											Rent :
 										</label>
 
-										<label class="col-sm-6 col-form-label">
+										<label class="col-6 col-form-label">
 											{{ paymentRent.rent }}
-										</label>	
-									</div>
-								
-									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
-											Issued from :
-										</label>
-
-										<label class="col-sm-6 col-form-label">
-											{{ paymentRent.issued_from }}
-										</label>	
-									</div>
-								
-									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
-											Expired At :
-										</label>
-
-										<label class="col-sm-6 col-form-label">
-											{{ paymentRent.expired_at }}
-										</label>	
-									</div>
-
-									<div class="form-row">
-										<label class="col-sm-6 col-form-label font-weight-bold text-right">
-											# Installments :
-										</label>
-
-										<label class="col-sm-6 col-form-label">
-											{{ paymentRent.number_installment }}
 										</label>	
 									</div>
 								</div>
@@ -1168,9 +1330,216 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">
-							Close
+						<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-danger btn-sm ml-auto" @click="print">Print</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Printing Modal -->
+		<div id="sectionToPrint" class="d-none">
+			<div class="card">
+				<div class="card-title">Payment ({{ singlePaymentData.invoice_no }}) Details</div>
+				
+				<div class="card-body">
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Invoice No :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.invoice_no | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							# Installment :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.number_installment }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Date From :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.date_from }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Date To :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.date_to }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Total Rent :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.total_rent }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Discount :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.discount }} %
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Last Due :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.previous_due }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Net Payeble :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.net_payable }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Paid Amount :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.paid_amount }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Due :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.current_due }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Paid at :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singlePaymentData.paid_at }}
+						</label>
+					</div>
+
+					<div 
+						class="form-row" 
+						v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length"
+					>
+						<div 
+							class="col-sm-6" 
+							v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
+							:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
+						>
+							<div class="card card-body">
+								<div class="form-row">
+									<label class="col-6 col-form-label font-weight-bold text-right">
+										Space Type :
+									</label>
+
+									<label class="col-6 col-form-label">
+										{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA' }}
+									</label>	
+								</div>
+
+								<div class="form-row">
+									<label class="col-6 col-form-label font-weight-bold text-right">
+										Space Name :
+									</label>
+
+									<label class="col-6 col-form-label">
+										{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
+									</label>	
+								</div>
+							
+								<div class="form-row">
+									<label class="col-6 col-form-label font-weight-bold text-right">
+										Rent :
+									</label>
+
+									<label class="col-6 col-form-label">
+										{{ paymentRent.rent }}
+									</label>	
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Printing Modal Ends -->
+
+		<!-- Filter Modal -->
+		<div class="modal fade" id="payment-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
 						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-row">
+							<div class="col-12 text-center">
+								<p>
+									Timelaps
+								</p>
+								 
+								<v-date-picker 
+									v-model="searchAttributes.dates" 
+									color="red" 
+									is-dark
+									is-range 
+									is-inline
+									:max-date="new Date()" 
+									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
+									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+									@input="setSearchingDates()"
+								/> 
+							</div>					
+						</div>
+					</div>
+					
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+	                  		Reset
+	                  	</button>
+
+						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+	                  		See Results
+	                  	</button>
 					</div>
 				</div>
 			</div>
@@ -1192,12 +1561,16 @@
 <script type="text/javascript">
 
 	import axios from 'axios';
+	import Datepicker from 'vuejs-datepicker';
 
     let singlePaymentData = {
     	
-    	previous_due : 0,
+		number_installment : 1,
+		date_from : 1,
+		date_to : 1,
 		total_rent : 0, // generated from selected spaces
 		discount : 0,	// percentage 
+    	previous_due : 0,
 		net_payable : 0,
 		paid_amount : 0,
 		current_due : 0,
@@ -1205,10 +1578,7 @@
 		// paid_at : null,
 		rents : [
 			{
-				// issued_from : null,
-				// expired_at : null,
 				// rent : 0,
-				// number_installment : 0,
 				// dealt_space_id : null,
 				// merchant_payment_id : null
 			},
@@ -1217,6 +1587,10 @@
     };
 
 	export default {
+
+		components: { 
+	    	Datepicker,
+		},
 
 		props: {
 
@@ -1240,7 +1614,6 @@
 	        return {
 
 	        	step : 1,
-	        	query : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
@@ -1267,7 +1640,97 @@
 
 	        	dealTotalCurrentRent : 0,
 
-	        	singlePaymentData : singlePaymentData,
+	        	singlePaymentData : singlePaymentData, 
+
+	        	searchAttributes : {
+
+	        		dates : {},
+	        		search : '',
+		        	dateTo : null,
+		        	dateFrom : null,
+		        	
+		        	/*
+			        	showPendingRequisitions : false,
+			        	showCancelledRequisitions : false,
+			        	showDispatchedRequisitions : false,
+			        	showProduct : null,
+		        	*/
+
+	        	},
+
+	        	dataToExport: {
+
+					Invoice: 'invoice_no',
+
+					"# Installment": 'number_installment',
+
+					"Issued From": 'date_from',
+
+					"Expired At": 'date_to',
+
+					"Total Rent": 'total_rent',
+
+					Discount: 'discount',
+
+					"Prev. Due": 'previous_due',
+
+					"Net Payable": 'net_payable',
+
+					"Paid": 'paid_amount',
+
+					Due: 'current_due',
+
+					"Paid at": 'paid_at',
+
+					"Rents": {
+						field: "rents",
+						callback: (rents) => {
+
+							if (rents && rents.length) {
+								
+								var infosToReturn = '';
+
+								rents.forEach(
+					
+									(paymentRent, paymentRentIndex) => {
+
+										infosToReturn += "Space Type: " + (paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + ', Space Name: ' + paymentRent.dealt_space.name + ' , Rent: ' + paymentRent.rent + "\n";
+
+									}
+									
+								);
+
+								return infosToReturn;
+
+							}
+							else {
+								return 'No Rents Found.'
+							}
+
+						},
+					},
+					
+				},
+
+				printingStyles : {
+				    
+				    // name: 'Test Name',
+				    
+				    specs: [
+				        'fullscreen=yes',
+				        // 'titlebar=yes',
+				        'scrollbars=yes'
+				    ],
+
+				    styles: [
+				    	"/css/bootstrap.min.css",
+				    ],
+
+				    timeout: 1000, // default timeout before the print window appears
+					autoClose: true, // if false, the window will not close after printing
+					windowTitle: 'Payment Details' 
+
+				},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -1287,7 +1750,73 @@
 
 		mounted(){
 
-			// this.setDealTotalPayments();
+			this.getDealTotalRents();
+
+		},
+
+		computed: {
+			// a computed getter
+			today: function() {
+
+				let date = new Date();
+
+				return date.getFullYear() + '-' +  (date.getMonth() + 1) + '-' + date.getDate();
+
+			},
+		},
+
+		watch : {
+
+			'searchAttributes.search' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllPayments();
+
+				}
+				else {
+
+					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
+
+					if (! format.test(val)) {
+
+						this.searchData();
+					
+					}
+
+				}
+
+			},
+			
+			'searchAttributes.dateFrom' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllPayments();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
+
+			'searchAttributes.dateTo' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllPayments();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
 
 		},
 
@@ -1319,10 +1848,10 @@
 
 			fetchAllPayments() {
 				
-				this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.dealAllPayments = [];
+				this.searchAttributes.search = '';
 				// this.allFetchedContents = [];
 				
 				axios
@@ -1360,7 +1889,6 @@
 			/*
 			fetchDealtSpaceLatestRents() {
 				
-				this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.dealtSpacesAndRents = [];
@@ -1398,7 +1926,7 @@
 
 			},
 			*/
-			setDealTotalPayments() {
+			getDealTotalRents() {
 
 				this.dealTotalCurrentRent = 0;
 				
@@ -1439,21 +1967,16 @@
 				}
 
 			},
-			searchData(emitedValue=false) {
-
-				if (emitedValue) {
-					this.query=emitedValue;
-				}
+			searchData() {
 
 				this.error = '';
 				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
 				this.pagination.current_page = 1;
+				this.searchAttributes.merchant_deal_id = this.deal.id;
 				
 				axios
-				.get(
-					"/api/search-deal-payments/" + this.deal.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
+				.post("/api/search-deal-payments/" + this.perPage, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
 					this.dealAllPayments = response.data.all.data;
@@ -1473,23 +1996,40 @@
 				this.step = 1;
 				this.createMode = true;
 
+				let dealLastPayment = this.dealAllPayments.length ? this.dealAllPayments[this.dealAllPayments.length-1] : {};
+
 				this.singlePaymentData = {
-					
-					previous_due : this.dealAllPayments[this.dealAllPayments.length-1].current_due,
+
+					number_installment : 1,
+					date_from : dealLastPayment.date_to ?? this.today,
+					date_to : null,
 					total_rent : this.dealTotalCurrentRent, // generated from selected spaces
 					discount : 0,	// percentage 
-					net_payable : this.dealAllPayments[this.dealAllPayments.length-1].current_due + this.dealTotalCurrentRent,
+					previous_due : dealLastPayment.current_due ?? 0,	// as new deal
+					net_payable : this.dealTotalCurrentRent + (dealLastPayment.current_due ?? 0),
 					paid_amount : 0,
 					current_due : 0,
 					merchant_deal_id : this.deal.id,
-
-					// rents : this.dealAllPayments[this.dealAllPayments.length-1].rents,
+					// paid_at : null,
+					
+					/*
+					// gonna get from table when creating at server
+					rents : [
+						{
+							rent : 0,
+							// dealt_space_id : null,
+							// merchant_payment_id : null
+						},
+					]
+					*/
 
 				};
 
 				this.errors = {
 		      		
 		      	};
+
+		      	this.setRentExpiryDate();
 
 				$('#merchant-payment-createOrEdit-modal').modal('show');
 
@@ -1525,7 +2065,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New payment has been added", "Success");
 							// this.allFetchedContents = response.data;
-							this.query !== '' ? this.searchData() : this.setContentPagination(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1558,7 +2098,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Payment has been updated", "Success");
 							// this.allFetchedContents = response.data;
-							this.query !== '' ? this.searchData() : this.setContentPagination(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1582,7 +2122,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Storage type has been deleted", "Success");
 							// this.allFetchedContents = response.data;
-							this.query !== '' ? this.searchData() : this.setContentPagination(response);
+							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -1599,6 +2139,7 @@
 
 				this.validateFormInput('discount');
 				this.validateFormInput('paid_amount');
+				this.validateFormInput('number_installment');
 
 				if (this.errors.constructor === Object && Object.keys(this.errors).length < 1) {
 
@@ -1619,7 +2160,7 @@
 				this.pagination.current_page = 1;
 				// this.perPage = expectedContentsPerPage;
 
-				if (this.query === '') {
+				if (this.searchAttributes.search === '') {
 					// this.fetchAllPayments();
 					this.setDealAllPayments();
 				}
@@ -1640,16 +2181,33 @@
 					return;
 				}
 
+				// this.getDealTotalRents();
+
 				this.step++;
 
+			},
+			setRentExpiryDate() {
+
+				var moment = require('moment');
+
+				let daysToIncrease = this.singlePaymentData.number_installment * this.deal.rent_period.number_days;
+
+				this.singlePaymentData.date_from = moment(this.singlePaymentData.date_from).format('YYYY-MM-DD');
+
+				this.singlePaymentData.date_to = moment(this.singlePaymentData.date_from).add(daysToIncrease, 'days').format('YYYY-MM-DD');
+				
+				
 			},
 			resetTotalRent() {
 				
 				this.validateFormInput('discount');
+				this.validateFormInput('number_installment');
 				
-				if (! this.errors.discount) {
+				if (! this.errors.discount && ! this.errors.number_installment) {
 
-					this.singlePaymentData.total_rent = this.dealTotalCurrentRent - (this.dealTotalCurrentRent * this.singlePaymentData.discount / 100);
+					this.singlePaymentData.total_rent = this.dealTotalCurrentRent * this.singlePaymentData.number_installment;
+
+					this.singlePaymentData.total_rent = this.singlePaymentData.total_rent - (this.singlePaymentData.total_rent * this.singlePaymentData.discount / 100);
 
 					this.singlePaymentData.net_payable = this.singlePaymentData.previous_due + this.singlePaymentData.total_rent;
 
@@ -1756,6 +2314,55 @@
 				);
 
 			},
+			resetSearchingDates(){
+
+            	this.searchAttributes.dates = {};
+				this.searchAttributes.dateTo = null;
+				this.searchAttributes.dateFrom = null;				
+
+            },
+            setSearchingDates(){
+
+            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
+
+					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
+					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
+						
+				}
+				else {
+
+					this.resetSearchingDates();
+
+				}
+
+            },
+            setTodayDate() {
+            	
+            	if (this.searchAttributes.dateFrom != this.today || this.searchAttributes.dateTo) {
+	            	
+	            	// this.searchAttributes.dateTo = null; 
+	            	this.searchAttributes.dates = {};
+	            	this.searchAttributes.dateTo = null;
+	            	this.searchAttributes.dateFrom = this.today;
+
+            	}
+            	else {
+
+	            	this.searchAttributes.dateFrom = null
+
+            	}
+
+            },
+            print() {
+
+				// this.printingStyles.name = `${ this.singlePaymentData.invoice_no } Details`;
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singlePaymentData.invoice_no } Details`);
+
+				this.$htmlToPaper('sectionToPrint', this.printingStyles);
+
+				$('#merchant-payment-view-modal').modal('hide');
+
+			},
 			validateFormInput(formInputName) {
 
 				this.submitForm = false;
@@ -1773,6 +2380,22 @@
 
 							this.submitForm = true;
 							this.$delete(this.errors, 'paid_amount');
+
+						}
+
+						break;
+
+					case 'number_installment' : 
+						
+						if(! this.singlePaymentData.number_installment || this.singlePaymentData.number_installment < 1){
+							
+							this.errors.number_installment = 'Rent installment number is required';
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'number_installment');
 
 						}
 
@@ -1814,5 +2437,10 @@
 	.fade-enter, .fade-leave-to {
   		transform: translateX(10px);
   		opacity: 0;
+	}
+	.date {
+		background: #f2f2f2;
+		border: 1px solid #ddd;
+		padding: 1em 1em 1em;
 	}
 </style>

@@ -15,10 +15,7 @@ class CreateMerchantPaymentDetailsTable extends Migration
     {
         Schema::create('merchant_payment_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamp('issued_from')->useCurrent();
-            $table->timestamp('expired_at')->useCurrent();
             $table->unsignedMediumInteger('rent')->default(0); // current rent of space to calculate total rent
-            $table->unsignedTinyInteger('number_installment'); // number of installment * rent-period (number of days)
             $table->unsignedInteger('dealt_space_id');
             $table->unsignedInteger('merchant_payment_id');
         });

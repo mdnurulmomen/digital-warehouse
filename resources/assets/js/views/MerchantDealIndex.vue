@@ -28,32 +28,54 @@
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
-													  				( searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Deals List' : 'Deals List'
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Deals List' : 'Deals List'
 													  			}}
 											  				</span>
 											  			</div>
 
-											  			<div class="ml-auto ml-sm-0">
-											  				<div class="dropdown">
-										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
-											  					
-											  					<div class="dropdown-menu">
-										  							<download-excel 
-														  				class="btn btn-default p-1 dropdown-item active"
-																		:data="merchantAllDeals"
-																		:fields="dataToExport" 
-																		worksheet="Deals Sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-deals-' : 'deals-list-') + currentTime + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				Excel
-																	</download-excel>
-											  					</div>
-											  				</div>
+											  			<div class="dropdown">
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+										  					
+										  					<div class="dropdown-menu">
+									  							<download-excel 
+													  				class="btn btn-default p-1 dropdown-item active"
+																	:data="merchantAllDeals"
+																	:fields="dataToExport" 
+																	worksheet="Deals sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-deals-' : ('deals-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				Excel
+																</download-excel>
+										  						
+										  						<!-- 
+										  						<download-excel 
+										  							type="csv"
+													  				class="btn btn-default p-1 dropdown-item disabled"
+																	:data="merchantAllDeals"
+																	:fields="dataToExport" 
+																	worksheet="Deals sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-deals-' : (currentTab + '-deals-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				CSV
+																</download-excel> 
+																-->
+										  					</div>
+										  				</div>
+
+											  			<div class="ml-auto d-sm-none">
+											  				<button 
+											  					v-if="userHasPermissionTo('create-merchant-deal')"
+													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			@click="showContentCreateForm()"
+												  			>
+												  				<i class="fa fa-plus"></i>
+												  				New Deal
+												  			</button>
 											  			</div>
 											  		</div>
 
-											  		<div class="col-md-6 col-sm-4 was-validated d-flex align-items-center form-group">
-											  			<div class="mr-3">
+											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
+											  			<div class="mx-sm-auto w-75">
 										  					<input 	
 																type="text" 
 														  		class="form-control" 
@@ -74,7 +96,7 @@
 																		href="javascript:void(0)"
 																		class="nav-link p-1"
 																		@click="setTodayDate()" 
-																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
+																		:class="{ 'active': searchAttributes.dateFrom == today && ! searchAttributes.dateTo }"
 																	>
 																		Today
 																	</a>
@@ -85,7 +107,7 @@
 																		href="javascript:void(0)"
 																		class="nav-link p-0" 
 																		data-toggle="modal" 
-																		data-target="#deal-custom-search"
+																		data-target="#payment-custom-search"
 																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
 																	>
 																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
@@ -95,13 +117,15 @@
 													  	</div>
 													</div>
 
-													<div class="col-md-2 col-sm-2 form-group text-center text-md-right">
+													<div class="col-md-4 text-right d-none d-md-block">
 														<button 
-															class="btn btn-success btn-outline-success btn-sm" 
-															@click="showDealCreateForm()" 
-														>
-															New Deal
-														</button>
+										  					v-if="userHasPermissionTo('create-merchant-deal')"
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="showDealCreateForm()"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Deal
+											  			</button>
 													</div>
 											  	</div>
 
@@ -111,7 +135,7 @@
 											  		:query="query" 
 											  		:caller-page="'deals'" 
 											  		:required-permission="'merchant-deal'" 
-											  		:disable-add-button="(allAvailableWarehouseAndSpaces.length==0 || formSubmitted) ? true : false" 									  
+											  		:disable-add-button="(allWarehouseSpaces.length==0 || formSubmitted) ? true : false" 									  
 											  		@showContentCreateForm="showDealCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllMerchantDeals"
@@ -120,23 +144,27 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
- 												<div class="tab-content">
+												<loading v-show="loading"></loading>	
+
+ 												<div v-show="! loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
 																<thead>
 																	<tr>
+																		<th>Name</th>
 																		<th>Status</th>
 																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
-																		<th>Last Payment</th>
-																		<th>Last Due</th>
+																		<th>Rent Package</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
 																<tbody>
 																	<tr v-for="merchantDeal in merchantAllDeals" :key="'merchant-deal-' + merchantDeal.id"
 																	>
+																		<td>{{ merchantDeal.name | capitalize }}</td>
+
 																		<td>
 																			<span :class="[merchantDeal.active ? 'badge-primary' : 'badge-secondary', 'badge']">
 																				{{ merchantDeal.active ? 'Active' : 'Inactive' }}
@@ -156,11 +184,7 @@
 																		</td>	
 
 																		<td>
-																			{{ merchantDeal.payments.length ? merchantDeal.payments[merchantDeal.payments.length-1].paid_amount : 'No Payment' }}
-																		</td>
-
-																		<td>
-																			{{ merchantDeal.payments.length ? (merchantDeal.payments[merchantDeal.payments.length-1].net_payable - merchantDeal.payments[merchantDeal.payments.length-1].paid_amount) : 'No Payment' }}
+																			{{ (merchantDeal.rent_period && merchantDeal.rent_period.name) ? merchantDeal.rent_period.name : 'No Package' }}
 																		</td>
 																		
 																		<td>
@@ -216,17 +240,18 @@
 																</tbody>
 																<tfoot>
 																	<tr>	
+																		<th>Name</th>
 																		<th>Status</th>
 																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
-																		<th>Last Payment</th>
-																		<th>Last Due</th>
+																		<th>Rent Package</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
 															</table>
 														</div>
 													</div>
+
 													<div class="row d-flex align-items-center align-content-center">
 														<div class="col-sm-2 col-4">
 															<select 
@@ -399,9 +424,24 @@
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+
+									          	<button 
+										          	type="button" 
+										          	v-on:click="nextPage"
+										          	class="btn btn-outline-secondary btn-sm btn-round" 
+										          	v-show="singleMerchantDealData.payments.length < 2"
+									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
+
+							                  	<button 
+													type="submit" 
+													class="btn btn-primary float-right" 
+													:disabled="!submitForm || formSubmitted"
+													v-show="! createMode && singleMerchantDealData.payments.length > 1"
+												>
+													{{ createMode ? 'Make ' : 'Update ' }} Deal
+												</button>
 								          	</div>
 								    	</div>
 									</div>
@@ -410,9 +450,38 @@
 							    <div 
 									class="row" 
 									v-bind:key="'merchant-deal-modal-step-' + 2" 
-									v-show="!loading && step==2" 
+									v-show="! loading && step==2 && singleMerchantDealData.payments.length==1" 
 								>
 									<h2 class="mx-auto mb-4 lead">Rent Space</h2>
+
+									<div class="col-md-12">
+										<div class="form-row">
+											<div class="col-md-12 form-group">
+												<label for="inputFirstName">
+													Rent Package
+												</label>
+
+												<multiselect 
+													v-model="singleMerchantDealData.rent_period"
+													:options="allRentPeriods" 
+													:custom-label="objectNameWithCapitalized" 
+													:required="true" 
+													:allow-empty="false" 
+													placeholder="Select Rent Period" 
+													class="form-control p-0" 
+													:class="! errors.rent_period ? 'is-valid' : 'is-invalid'"  
+													@close="validateFormInput('rent_period')" 
+													@input="resetRentPackage()" 
+													:disabled="singleMerchantDealData.payments.length > 1"
+												>
+												</multiselect>
+
+												<div class="invalid-feedback">
+													{{ errors.rent_period }}
+												</div>
+											</div>
+										</div>
+									</div>
 
 									<div 
 										class="col-md-12"
@@ -420,7 +489,7 @@
 										:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id"
 									>
 										<div 
-											class="card"
+											class="card ml-3 mr-3"
 											v-if="merchantWarehouse && errors.warehouses[merchantWarehouseIndex]"
 										>
 											<div class="card-body">
@@ -430,7 +499,7 @@
 
 														<multiselect 
 															v-model="singleMerchantDealData.warehouses[merchantWarehouseIndex]"
-															:options="allAvailableWarehouseAndSpaces" 
+															:options="availableWarehouseSpaces" 
 															:custom-label="objectNameWithCapitalized" 
 															:required="true" 
 															:allow-empty="false" 
@@ -439,7 +508,7 @@
 															:class="! errors.warehouses[merchantWarehouseIndex].warehouse ? 'is-valid' : 'is-invalid'"  
 															@close="validateFormInput('warehouse')" 
 															@input="resetWarehouseSpaces(merchantWarehouseIndex)" 
-															:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableWarehouse(merchantWarehouse)"
+															:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableWarehouse(merchantWarehouse) || ! singleMerchantDealData.hasOwnProperty('rent_period') || Object.keys(singleMerchantDealData.rent_period).length < 1"
 														>
 														</multiselect>
 
@@ -502,7 +571,7 @@
 																			v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers"
 																			:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-container-id-' + warehouseContainer.id"
 																		>
-																			<div class="form-group col-md-6">
+																			<div class="form-group col-md-12">
 																				<label for="inputFirstName">Container {{ warehouseContainerIndex + 1 }}</label>
 
 																				<multiselect 
@@ -517,7 +586,8 @@
 																					:allow-empty="false" 
 																					class="form-control p-0" 
 																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
+																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)" 
+																					@input="setContainerRentPeriod(warehouseSpace.containers[warehouseContainerIndex])" 
 																					@close="validateFormInput('containers')" 
 																				>
 																				</multiselect>
@@ -527,6 +597,7 @@
 																				</div>
 																			</div>
 
+																			<!-- 
 																			<div class="form-group col-md-6" v-if="warehouseContainer && Array.isArray(warehouseContainer.rents)">
 																				<label for="inputFirstName">Rent Package</label>
 
@@ -542,16 +613,17 @@
 																					:required="true" 
 																					:allow-empty="false" 
 																					class="form-control p-0" 
-																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
+																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period ? 'is-valid' : 'is-invalid'" 
 																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
-																					@close="validateFormInput('rent_period')" 
+																					@close="validateFormInput('space_rent_period')" 
 																				>
 																				</multiselect>
 																				
 																				<div class="invalid-feedback">
-																					{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period }}
+																					{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period }}
 																				</div>
-																			</div>
+																			</div> 
+																			-->
 																		</div>
 																	</div>
 
@@ -580,7 +652,7 @@
 																			<div class="col-md-6">
 																				<button 
 																					class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
-																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1]) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)" 
+																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || ! warehouseSpace.spaces || (warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1]))|| merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || (warehouseSpace.containers && warehouseSpace.containers.length==1)" 
 																					@click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
 																				>
 																					<i 
@@ -600,7 +672,7 @@
 																	class="form-row ml-3 mr-3" 
 																	v-show="warehouseSpace.type=='shelves'"
 																>
-																	<div class="form-group col-md-4">
+																	<div class="form-group col-md-6">
 																		<label for="inputFirstName">Parent Container</label>
 
 																		<multiselect 
@@ -625,7 +697,7 @@
 																	</div>
 
 																	<div 
-																		class="form-group col-md-4" 
+																		class="form-group col-md-6" 
 																		v-if="warehouseSpace.container"
 																	>
 																		<label for="inputFirstName">Select Shelves</label>
@@ -644,7 +716,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].shelves ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableShelf(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableShelf(warehouseSpace.container)" 
 																			@close="validateFormInput('shelves')" 
 																		>
 																		</multiselect>
@@ -655,13 +727,14 @@
 																	</div>
 
 																	<div 
-																		class="form-group col-md-4" 
+																		class="form-group col-md-6" 
 																		v-else
 																	>
 																		<label for="inputFirstName">Select Shelves</label>
 																		<p class="text-danger">No Container Selected</p>
 																	</div>
 
+																	<!-- 
 																	<div 
 																		class="form-group col-md-4" 
 																		v-if="warehouseSpace.container && Array.isArray(warehouseSpace.container.rents)"
@@ -680,22 +753,23 @@
 																			:required="true" 
 																			:allow-empty="false" 
 																			class="form-control p-0" 
-																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period  ? 'is-valid' : 'is-invalid'" 
 																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableShelf(warehouseSpace.container)"
-																			@close="validateFormInput('rent_period')" 
+																			@close="validateFormInput('space_rent_period')" 
 																		>
 																		</multiselect>
 
 																		<div class="invalid-feedback">
-																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period }}
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period }}
 																		</div>
-																	</div>
+																	</div> 
+																	-->
 																</div>
 															</div>
 
 															<div class="col-md-12 mt-1">
 																<div class="form-row ml-3 mr-3" v-show="warehouseSpace.type=='units'">
-																	<div class="form-group col-md-6">
+																	<div class="form-group col-md-4">
 																		<label for="inputFirstName">Parent Container</label>
 
 																		<multiselect 
@@ -720,7 +794,7 @@
 																	</div>
 
 																	<div 
-																		class="form-group col-md-6" 
+																		class="form-group col-md-4" 
 																		v-if="warehouseSpace.container"
 																	>
 																		<label for="inputFirstName">Parent Shelf</label>
@@ -747,7 +821,7 @@
 																	</div>
 
 																	<div 
-																		class="form-group col-md-6" 
+																		class="form-group col-md-4" 
 																		v-if="warehouseSpace.container && warehouseSpace.container.shelf"
 																	>
 																		<label for="inputFirstName">
@@ -778,13 +852,36 @@
 																	</div>
 
 																	<div 
-																		class="form-group col-md-6" 
+																		class="form-group col-md-4" 
 																		v-else
 																	>
-																		<label for="inputFirstName">Select Units</label>
-																		<p class="text-danger">No container or shelf selected</p>
+																		<label for="inputFirstName">
+																			Select Units
+																		</label>
+																		
+																		<multiselect 
+																			placeholder="Select Units" 
+																			label="name" 
+																			track-by="id" 
+																			:options="[]" 
+																			:multiple="true" 
+																			:close-on-select="false" 
+																			:clear-on-select="false" 
+																			:preserve-search="true" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableUnit(warehouseSpace.container)"
+																			@close="validateFormInput('units')" 
+																		>
+																		</multiselect>
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units }}
+																		</div>
 																	</div>
 
+																	<!-- 
 																	<div 
 																		class="form-group col-md-6" 
 																		v-if="warehouseSpace.container && Array.isArray(warehouseSpace.container.rents)"
@@ -802,15 +899,16 @@
 																			:required="true" 
 																			:allow-empty="false" 
 																			class="form-control p-0" 
-																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period  ? 'is-valid' : 'is-invalid'" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period  ? 'is-valid' : 'is-invalid'" 
 																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1 || immutableUnit(warehouseSpace.container)"
-																			@close="validateFormInput('rent_period')" 
+																			@close="validateFormInput('space_rent_period')" 
 																		>
 																		</multiselect>
 																		<div class="invalid-feedback">
-																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period }}
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period }}
 																		</div>
-																	</div>
+																	</div> 
+																	-->
 																</div>
 															</div>
 														</div>
@@ -842,7 +940,7 @@
 																<button 
 																	type="button" 
 																	class="btn btn-outline-info btn-sm btn-block" 
-																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || ! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
+																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length == 1 || ! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
 																	@click="removeWarehouseSpace(merchantWarehouseIndex)"
 																>
 																	Remove Space
@@ -870,7 +968,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-													:disabled="singleMerchantDealData.warehouses.length >= allAvailableWarehouseAndSpaces.length" 
+													:disabled="singleMerchantDealData.warehouses.length >= availableWarehouseSpaces.length" 
 													@click="addMoreWarehouse()"
 												>
 													Add Warehouse
@@ -910,15 +1008,6 @@
 												>
 													<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 												</button>
-
-												<button 
-													type="submit" 
-													class="btn btn-primary float-right" 
-													v-show="singleMerchantDealData.payments.length > 1"
-													:disabled="!submitForm || formSubmitted"
-												>
-													{{ createMode ? 'Make ' : 'Update ' }} Deal
-												</button>
 											</div>
 										</div>
 									</div>
@@ -929,90 +1018,158 @@
 									v-bind:key="'merchant-deal-modal-step-' + 3" 
 									v-show="! loading && step==3 && singleMerchantDealData.payments.length==1" 
 								>
-									<h2 class="mx-auto mb-4 lead">{{ createMode ? 'Payment' : 'Last Payment' }}</h2>
+									<h2 class="mx-auto mb-4 lead">{{ createMode ? 'Deal' : 'Last Deal' }}</h2>
 									<!-- last payment -->
 									<div class="col-md-12">
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Total Rent</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].total_rent" 
-													placeholder="Total Rent" 
-													:disabled="true"
-												>
-											</div>
+										<div class="card">
+											<div class="card-block">
+												<div class="form-row">
+													<div class="form-group col-md-12">
+														<label for="inputFirstName"># Installment</label>
 
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Discount</label>
-												<div class="input-group mb-1">
-													<input type="number" 
-														class="form-control" 
-														v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].discount" 
-														placeholder="Discount" 
-														:min="0" 
-														:max="100" 
-														:class="! errors.payment.discount ? 'is-valid' : 'is-invalid'" 
-														@change="resetTotalRent()"
-													>
-													<div class="input-group-append">
-														<span class="input-group-text"> % </span>
+														<div class="input-group">
+															<input 
+																type="number" 
+																class="form-control is-valid" 
+																v-model.number="singleMerchantDealData.payments[0].number_installment" 
+																min:1
+																placeholder="# rent period to pay" 
+																:class="! errors.payment.number_installment ? 'is-valid' : 'is-invalid'" 
+																@change="resetTotalRent()"
+															>
+
+															<div class="input-group-append">
+																<span class="input-group-text">
+																	{{ singleMerchantDealData.rent_period.name }}
+																</span>
+															</div>
+														</div>
+
+														<div 
+															class="invalid-feedback" 
+															style="display: block;"
+															v-show="errors.payment.number_installment" 
+														>
+													    	{{ errors.payment.number_installment }}
+													    </div>
 													</div>
 												</div>
-												<div class="invalid-feedback" style="display:block" v-show="errors.payment.discount">
-											    	{{ errors.payment.discount }}
-											    </div>
+
+												<div class="form-row">
+													<div class="col-sm-6 form-group">
+														<label for="inputFirstName">Date From</label>
+														<div class="date">
+															<datepicker 
+																v-model="singleMerchantDealData.payments[0].date_from" 
+																:initialView="'month'"
+																:minimumView="'day'" 
+																:maximumView="'year'" 
+																:disabled="singleMerchantDealData.payments.length > 1"
+																placeholder="Start Date" 
+																@input="changeRentExpiryDate"
+															>	
+															</datepicker>
+														</div>
+													</div>
+
+													<div class="col-sm-6 form-group">
+														<label for="inputFirstName">Date To</label>
+														<div class="date">
+															<datepicker 
+																v-model="singleMerchantDealData.payments[0].date_to" 
+																:disabled="true"
+															>	
+															</datepicker>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="card-body">
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Total Rent</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singleMerchantDealData.payments[0].total_rent" 
+															placeholder="Total Rent" 
+															:disabled="true"
+														>
+													</div>
+
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Discount</label>
+														<div class="input-group mb-1">
+															<input type="number" 
+																class="form-control" 
+																v-model.number="singleMerchantDealData.payments[0].discount" 
+																placeholder="Discount" 
+																:min="0" 
+																:max="100" 
+																:class="! errors.payment.discount ? 'is-valid' : 'is-invalid'" 
+																@change="resetTotalRent()"
+															>
+															<div class="input-group-append">
+																<span class="input-group-text"> % </span>
+															</div>
+														</div>
+														<div class="invalid-feedback" style="display:block" v-show="errors.payment.discount">
+													    	{{ errors.payment.discount }}
+													    </div>
+													</div>
+												</div>
+
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Last Due</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singleMerchantDealData.payments[0].previous_due" 
+															placeholder="Previous Due" 
+															:disabled="true"
+														>
+													</div>
+
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Net Payable</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singleMerchantDealData.payments[0].net_payable" 
+															placeholder="Net Payable" 
+															:disabled="true"
+														>
+													</div>
+												</div>
+
+												<div class="form-row">
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Paid Amount</label>
+														<input type="number" 
+															class="form-control" 
+															v-model.number="singleMerchantDealData.payments[0].paid_amount" 
+															placeholder="Paid Amount" 
+															:class="! errors.payment.paid_amount ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('paid_amount')" 
+															required="true" 
+														>
+														<div class="invalid-feedback">
+													    	{{ errors.payment.paid_amount }}
+													    </div>
+													</div>
+
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">Current Due</label>
+														<input type="number" 
+															class="form-control is-valid" 
+															:value="singleMerchantDealData.payments[0].net_payable - singleMerchantDealData.payments[0].paid_amount" 
+															placeholder="Previous Dues" 
+															:disabled="true"
+														>
+													</div>
+												</div>
 											</div>
 										</div>
-
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Last Due</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].previous_due" 
-													placeholder="Previous Due" 
-													:disabled="true"
-												>
-											</div>
-
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Net Payable</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].net_payable" 
-													placeholder="Net Payable" 
-													:disabled="true"
-												>
-											</div>
-										</div>
-
-										<div class="form-row">
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Paid Amount</label>
-												<input type="number" 
-													class="form-control" 
-													v-model.number="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].paid_amount" 
-													placeholder="Paid Amount" 
-													:class="! errors.payment.paid_amount ? 'is-valid' : 'is-invalid'" 
-													@change="validateFormInput('paid_amount')" 
-													required="true" 
-												>
-												<div class="invalid-feedback">
-											    	{{ errors.payment.paid_amount }}
-											    </div>
-											</div>
-
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Current Due</label>
-												<input type="number" 
-													class="form-control is-valid" 
-													:value="singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].net_payable - singleMerchantDealData.payments[singleMerchantDealData.payments.length-1].paid_amount" 
-													placeholder="Previous Dues" 
-													:disabled="true"
-												>
-											</div>
-										</div>
+										
 									</div>
 
 									<div class="col-sm-12 card-footer">
@@ -1030,6 +1187,7 @@
 													type="submit" 
 													class="btn btn-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
+													v-show="singleMerchantDealData.payments.length < 2"
 												>
 													{{ createMode ? 'Make ' : 'Update ' }} Deal
 												</button>
@@ -1112,7 +1270,7 @@
 		</div>
 
  		<!-- View Modal -->
-		<div class="modal fade" id="merchantDeal-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="merchant-deal-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1141,7 +1299,7 @@
 
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#merchant-deal-payments" role="tab">
-											Payments
+											Deals
 										</a>
 									</li>
 								</ul>
@@ -1165,6 +1323,16 @@
 
 											<label class="col-sm-6 col-form-label">
 												{{ singleMerchantDealData.name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Rent Package :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ (singleMerchantDealData.rent_period && singleMerchantDealData.rent_period.name) ? singleMerchantDealData.rent_period.name : 'NA' | capitalize }}
 											</label>
 										</div>
 										
@@ -1447,11 +1615,31 @@
 
 												<div class="form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Previous Due :
+														# Installment :
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.previous_due }}
+														{{ dealPayment.number_installment }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Issued From :
+													</label>
+
+													<label class="col-sm-6 col-form-label">
+														{{ dealPayment.date_from }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Expired At :
+													</label>
+
+													<label class="col-sm-6 col-form-label">
+														{{ dealPayment.date_to }}
 													</label>
 												</div>
 
@@ -1472,6 +1660,16 @@
 
 													<label class="col-sm-6 col-form-label">
 														{{ dealPayment.discount }} %
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-right">
+														Previous Due :
+													</label>
+
+													<label class="col-sm-6 col-form-label">
+														{{ dealPayment.previous_due }}
 													</label>
 												</div>
 
@@ -1530,26 +1728,6 @@
 
 															<div class="form-row">
 																<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																	Issued From :
-																</label>
-
-																<label class="col-sm-6 col-form-label">
-																	{{ rent.issued_from }}
-																</label>
-															</div>
-
-															<div class="form-row">
-																<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																	Expired At :
-																</label>
-
-																<label class="col-sm-6 col-form-label">
-																	{{ rent.expired_at }}
-																</label>
-															</div>
-
-															<div class="form-row">
-																<label class="col-sm-6 col-form-label font-weight-bold text-right">
 																	Rent :
 																</label>
 
@@ -1568,7 +1746,7 @@
 												class="col-md-12 text-center" 
 											>
 												<p class="text-danger">
-													No Payment Found.
+													No Deal Found.
 												</p>
 											</div>
 										</div>
@@ -1595,10 +1773,12 @@
 
 	import axios from 'axios';
 	import Multiselect from 'vue-multiselect';
+	import Datepicker from 'vuejs-datepicker';
 
 	export default {
 
 	    components: { 
+	    	Datepicker,
 			multiselect : Multiselect,
 		},
 
@@ -1645,8 +1825,12 @@
 
 	        	},
 
+	        	allRentPeriods : [],
 	        	// allContainers : [],
-	        	allAvailableWarehouseAndSpaces : [
+	        	
+	        	availableWarehouseSpaces : [],
+
+	        	allWarehouseSpaces : [
 	        		{
 						// warehouse
 						id:null,
@@ -1744,6 +1928,8 @@
 	        		auto_renewal : true, // Renting is normally auto-renewal
 	        		e_commerce_fulfillment : false,
 	        		sale_percentage : 0,
+	        		rent_period : {},
+	        		rent_period_id : null,
 					merchant_id : null,
 					// created_at : null,
 
@@ -1912,6 +2098,9 @@
 
 					payments : [
 						{
+							number_installment : 1,	
+							date_from : null,
+							date_to : null,
 							previous_due : 0,
 							total_rent : 0, // generated from selected spaces
 							discount : 0,	// percentage 
@@ -1920,10 +2109,9 @@
 							current_due : 0,
 							merchant_deal_id : null,
 							paid_at : null,
+							
 							rents : [
 								{
-									issued_from : null,
-									expired_at : null,
 									rent : 0,
 									dealt_space_id : null,
 									merchant_payment_id : null
@@ -1937,6 +2125,7 @@
 	
 					// sale_percentage : null,
 					// warehouse : null 	// when no warehouse is found
+					// rent_period : null,
 					
 					warehouses : [
 						{
@@ -2033,7 +2222,24 @@
 								return sale_percentage;
 							}
 							else {
-								return 'NA';
+								return '';
+							}
+
+						},
+
+					},
+
+					"Rent Package": {
+						
+						field: "rent_period",
+						
+						callback: (rent_period) => {
+							
+							if (rent_period && rent_period.name) {
+								return rent_period.name;
+							}
+							else {
+								return 'No Package';
 							}
 
 						},
@@ -2119,14 +2325,14 @@
 
 							}
 							else {
-								return 'No Payment.'
+								return 'No Deal.'
 							}
 
 						},
 
 					},
 
-					"Payments": {
+					Payments: {
 
 						field: "payments",
 
@@ -2141,9 +2347,12 @@
 									(dealPayment, dealPaymentIndex) => {
 
 										infosToReturn += "Invoice:" + dealPayment.invoice_no + "\n";
-										infosToReturn += "Due:" + dealPayment.previous_due + "\n";
+										infosToReturn += "# Installment:" + dealPayment.number_installment + "\n";
+										infosToReturn += "Date From:" + dealPayment.date_from + "\n";
+										infosToReturn += "Date To:" + dealPayment.date_to + "\n";
 										infosToReturn += "Total Rent:" + dealPayment.total_rent + "\n";
 										infosToReturn += "Discount:" + dealPayment.discount + "\n";
+										infosToReturn += "Due:" + dealPayment.previous_due + "\n";
 										infosToReturn += "Payeble:" + dealPayment.net_payable + "\n";
 										infosToReturn += "Paid:" + dealPayment.paid_amount + "\n";
 
@@ -2165,6 +2374,8 @@
 
 										}
 
+										infosToReturn +=  "\n\n"
+
 									}
 									
 								);
@@ -2173,7 +2384,7 @@
 
 							}
 							else {
-								return 'No Payment.'
+								return 'No Deal.'
 							}
 
 						},
@@ -2194,10 +2405,10 @@
 				
 				return `${this.merchant.first_name} ${this.merchant.last_name} ( ${this.merchant.user_name} )`;
 			},
-			currentTime: function() {
+			today: function() {
 
 				let date = new Date();
-				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate();
 
 			},
 		},
@@ -2283,6 +2494,8 @@
 
 		created() {
 			
+			this.fetchAllRentPeriods();
+
 			this.fetchAllWarehouseContainers();
 
 			// this.fetchWarehouseAllContainers();
@@ -2297,20 +2510,61 @@
 		
 		methods: {
 
+			fetchAllRentPeriods() {
+				
+				this.query = '';
+				this.error = '';
+				// this.loading = true;
+				this.searchAttributes.search = '';
+				this.allRentPeriods = [];
+
+				axios
+					.get('/api/rent-periods/')
+					.then(response => {
+						if (response.status == 200) {
+							
+							this.allRentPeriods = response.data;
+					
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						// this.loading = false;
+					});
+
+			},
 			fetchAllWarehouseContainers() {
 				
 				this.query = '';
 				this.error = '';
 				// this.loading = true;
 				this.searchAttributes.search = '';
-				this.allAvailableWarehouseAndSpaces = [];
+				this.allWarehouseSpaces = [];
 
 				axios
 					.get('/api/warehouse-containers/')
 					.then(response => {
 						if (response.status == 200) {
 							
-							this.allAvailableWarehouseAndSpaces = response.data.data;
+							this.allWarehouseSpaces = response.data.data;
 					
 						}
 					})
@@ -2487,7 +2741,7 @@
     		showDealDetails(object) {		
 				// this.singleMerchantDealData = { ...object };
 				this.singleMerchantDealData = Object.assign({}, this.singleMerchantDealData, object);
-				$('#merchantDeal-view-modal').modal('show');
+				$('#merchant-deal-view-modal').modal('show');
 			},
 			showDealCreateForm() {
 
@@ -2503,6 +2757,8 @@
 	        		auto_renewal : true, // Renting is normally auto-renewal
 	        		e_commerce_fulfillment : false,
 	        		sale_percentage : 0,
+	        		rent_period : {},
+	        		rent_period_id : null,
 					merchant_id : this.merchant.id,
 					// created_at : null,
 
@@ -2671,6 +2927,9 @@
 
 					payments : [
 						{
+							number_installment : 1,
+							date_from : this.today,
+							date_to : null,
 							previous_due : 0,	// as new deal
 							total_rent : 0, // generated from selected spaces
 							discount : 0,	// percentage 
@@ -2681,8 +2940,6 @@
 							// paid_at : null,
 							rents : [
 								{
-									issued_from : null,
-									expired_at : null,
 									rent : 0,
 									// dealt_space_id : null,
 									// merchant_payment_id : null
@@ -2695,7 +2952,8 @@
 	        	this.errors = {
 	
 					// sale_percentage : null,
-					// warehouse : null 	// when no warehouse is found
+					// warehouse : null, 	// when no warehouse is found
+					// rent_period : null
 					
 					warehouses : [
 						{
@@ -2876,11 +3134,6 @@
 				
 				axios
 				.post('/search-merchant-deals/' + this.perPage, this.searchAttributes)
-				/*
-				.get(
-					"/api/search-merchant-deals/" + this.merchant.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
-				*/
 				.then(response => {
 					this.merchantAllDeals = response.data.all.data;
 					this.pagination = response.data.all;
@@ -2894,6 +3147,7 @@
 
 				this.validateFormInput('discount');
 				this.validateFormInput('paid_amount');
+				this.validateFormInput('number_installment');
 
 				if (this.errors.constructor === Object && Object.keys(this.errors.payment).length < 1) {
 
@@ -2938,7 +3192,6 @@
 
 				else if (this.step == 1) {
 
-					this.validateFormInput('warehouse');
 					this.validateFormInput('sale_percentage');
 
 					if (this.errors.constructor === Object && Object.keys(this.errors).length < 3) {
@@ -2957,6 +3210,7 @@
 
 				else if (this.step == 2) {
 
+					this.validateFormInput('rent_period');
 					this.validateFormInput('warehouse');
 					this.validateFormInput('space');
 
@@ -2968,7 +3222,7 @@
 						this.validateFormInput('parent_shelf');
 						this.validateFormInput('shelves');
 						this.validateFormInput('units');
-						this.validateFormInput('rent_period');
+						this.validateFormInput('space_rent_period');
 
 					}
 
@@ -3044,9 +3298,9 @@
 
 					// const expectedWarehouse = (warehouse) => warehouse.id == this.singleMerchantDealData.warehouses[merchantWarehouseIndex].id && warehouse.name == this.singleMerchantDealData.warehouses[merchantWarehouseIndex].name;
 
-					// let warehouseIndex = this.allAvailableWarehouseAndSpaces.findIndex(expectedWarehouse);
+					// let warehouseIndex = this.allWarehouseSpaces.findIndex(expectedWarehouse);
 
-					// if (warehouseIndex > -1 && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length < (Object.keys(this.allAvailableWarehouseAndSpaces[warehouseIndex]).length - 2) && this.singleMerchantDealData.payments.length < 2) {
+					// if (warehouseIndex > -1 && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length < (Object.keys(this.allWarehouseSpaces[warehouseIndex]).length - 2) && this.singleMerchantDealData.payments.length < 2) {
 
 						this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.push( {} );
 						this.errors.warehouses[merchantWarehouseIndex].spaces.push( {} );
@@ -3104,11 +3358,11 @@
 					this.validateFormInput('parent_shelf');
 					this.validateFormInput('shelves');
 					this.validateFormInput('units');
-					this.validateFormInput('rent_period');
+					this.validateFormInput('space_rent_period');
 
 				}
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && ! this.errorInWarehousesArray(this.errors.warehouses) && this.singleMerchantDealData.warehouses.length < this.allAvailableWarehouseAndSpaces.length && this.singleMerchantDealData.payments.length < 2) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && ! this.errorInWarehousesArray(this.errors.warehouses) && this.singleMerchantDealData.warehouses.length < this.availableWarehouseSpaces.length && this.singleMerchantDealData.payments.length < 2) {
 
 					this.singleMerchantDealData.warehouses.push({});
 					this.errors.warehouses.push({ spaces : [ {} ] });
@@ -3145,7 +3399,7 @@
 
 				};
 
-				return merchantDeal.payments.length < 2 || ! merchantDeal.warehouses.some(warehouseIsEngaged)
+				return merchantDeal.payments.length < 2 && ! merchantDeal.warehouses.some(warehouseIsEngaged)
 
 			},
 			immutableWarehouse(merchantWarehouse) {
@@ -3200,6 +3454,18 @@
 				return false;
 
 			},
+			resetRentPackage() {
+
+				if (this.singleMerchantDealData.rent_period && Object.keys(this.singleMerchantDealData.rent_period).length > 0) {
+
+					this.$set(this.singleMerchantDealData, 'warehouses', [ {} ]);
+					this.singleMerchantDealData.rent_period_id = this.singleMerchantDealData.rent_period.id;
+
+					this.setAvailableWarehouses();
+
+				}
+
+			},
 			resetWarehouseSpaces(merchantWarehouseIndex){
 				
 				if (this.singleMerchantDealData.warehouses.some((merchantWarehouse, mrchntWarehouseIndex) => this.singleMerchantDealData.warehouses.some((selectedWarehouse, selectedWarehouseIndex) => selectedWarehouse.id==merchantWarehouse.id && selectedWarehouse.name==merchantWarehouse.name && mrchntWarehouseIndex!=selectedWarehouseIndex))) {
@@ -3252,6 +3518,79 @@
 				}
 
 			},
+			setAvailableWarehouses() {
+
+				this.availableWarehouseSpaces = [];
+
+				this.allWarehouseSpaces.forEach(
+					(warehouse, warehouseIndex) => {
+
+						if (warehouse.emptyContainers.some(emptyContainer=>emptyContainer.rents.some(containerRent=>containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id)) || warehouse.emptyShelfContainers.some(emptyShelfContainer=>emptyShelfContainer.rents.some(containerRent=>containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id)) || warehouse.emptyUnitContainers.some(emptyUnitContainer=>emptyUnitContainer.rents.some(containerRent=>containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id))) {
+
+							let newWarehouse = {
+
+								id : warehouse.id,
+								name : warehouse.name,
+
+								emptyContainers : [],
+								emptyShelfContainers : [],
+								emptyUnitContainers : []
+
+							}
+
+							this.availableWarehouseSpaces.push(newWarehouse);
+
+						}
+
+						// containers
+						warehouse.emptyContainers.forEach(
+
+							(emptyContainer, warehouseContainerIndex) => {
+
+								if (emptyContainer.rents.some(containerRent=>containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id)) {
+
+									this.availableWarehouseSpaces[this.availableWarehouseSpaces.length-1].emptyContainers.push(emptyContainer);
+
+								}
+
+							}
+
+						);
+
+						// shelf containers
+						warehouse.emptyShelfContainers.forEach(
+
+							(emptyShelfContainer, emptyShelfContainerIndex) => {
+
+								if (emptyShelfContainer.rents.some(containerRent=>containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id)) {
+
+									this.availableWarehouseSpaces[this.availableWarehouseSpaces.length-1].emptyShelfContainers.push(emptyShelfContainer);
+
+								}
+
+							}
+
+						);
+
+						// unit containers
+						warehouse.emptyUnitContainers.forEach(
+
+							(emptyUnitContainer, emptyShelfContainerIndex) => {
+
+								if (emptyUnitContainer.rents.some(containerRent=>containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id)) {
+
+									this.availableWarehouseSpaces[this.availableWarehouseSpaces.length-1].emptyUnitContainers.push(emptyUnitContainer);
+
+								}
+
+							}
+
+						);
+
+					}
+				);
+
+			},
 			changeNumberContents() {
 				
 				this.pagination.current_page = 1;
@@ -3292,12 +3631,12 @@
             },
             setTodayDate() {
             	
-            	if (this.searchAttributes.dateFrom != this.currentTime || this.searchAttributes.dateTo) {
+            	if (this.searchAttributes.dateFrom != this.today || this.searchAttributes.dateTo) {
 	            	
 	            	// this.searchAttributes.dateTo = null; 
 	            	this.searchAttributes.dates = {};
 	            	this.searchAttributes.dateTo = null;
-	            	this.searchAttributes.dateFrom = this.currentTime;
+	            	this.searchAttributes.dateFrom = this.today;
 
             	}
             	else {
@@ -3418,6 +3757,8 @@
 
 					this.emptyShelves = this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container.container_shelf_statuses;
 
+					this.setShelfOrUnitRentPeriod(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container);
+
 				}
 				else {
 
@@ -3435,6 +3776,9 @@
 						this.$delete(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container, 'shelf');
 
 						this.emptyUnitShelves = this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container.container_shelf_statuses;
+
+						this.setShelfOrUnitRentPeriod(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].container)
+						
 					}
 
 				}
@@ -3489,15 +3833,15 @@
 			},
 			resetWarehouseContainers(merchantWarehouseIndex) {
 				
-				let expectedWarehouseIndex = this.allAvailableWarehouseAndSpaces.findIndex(
+				let expectedWarehouseIndex = this.availableWarehouseSpaces.findIndex(
 					(warehouse) => (warehouse.id == this.singleMerchantDealData.warehouses[merchantWarehouseIndex].id && warehouse.name == this.singleMerchantDealData.warehouses[merchantWarehouseIndex].name)
 				);
 
 				if (expectedWarehouseIndex > -1) {
 
-					this.emptyContainers = JSON.parse( JSON.stringify( this.allAvailableWarehouseAndSpaces[expectedWarehouseIndex].emptyContainers ) );
-					this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allAvailableWarehouseAndSpaces[expectedWarehouseIndex].emptyShelfContainers ) );
-					this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allAvailableWarehouseAndSpaces[expectedWarehouseIndex].emptyUnitContainers ) );
+					this.emptyContainers = JSON.parse( JSON.stringify( this.availableWarehouseSpaces[expectedWarehouseIndex].emptyContainers ) );
+					this.emptyShelfContainers = JSON.parse( JSON.stringify( this.availableWarehouseSpaces[expectedWarehouseIndex].emptyShelfContainers ) );
+					this.emptyUnitContainers = JSON.parse( JSON.stringify( this.availableWarehouseSpaces[expectedWarehouseIndex].emptyUnitContainers ) );
 
 				}
 
@@ -3770,7 +4114,10 @@
 
 												(selectedContainer) => {
 
-													totalRent += selectedContainer.selected_rent.rent ?? 0;
+													// totalRent += selectedContainer.selected_rent.rent ?? 0;
+													
+													totalRent += selectedContainer.rents.find(rent => rent.rent_period_id==this.singleMerchantDealData.rent_period_id).rent ?? 0;
+													
 													// console.log('Containers index : ' + warehouseSpaceIndex + ' rent : ' + totalRent);
 
 												}
@@ -3781,14 +4128,20 @@
 										else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length) {
 
 											// for every selected shelves
-											totalRent += warehouseSpace.container.shelves.length * warehouseSpace.container.selected_rent.rent ?? 0
+											// totalRent += warehouseSpace.container.shelves.length * warehouseSpace.container.selected_rent.rent ?? 0
+											
+											totalRent += warehouseSpace.container.shelves.length * warehouseSpace.container.rents.find(rent => rent.rent_period_id==this.singleMerchantDealData.rent_period_id).rent ?? 0;
+
 											// console.log('Shelves : ' + totalRent);
 
 										}
 										else if (warehouseSpace.type=='units' && warehouseSpace.container && warehouseSpace.container.shelf && warehouseSpace.container.shelf.units && warehouseSpace.container.shelf.units.length) {
 
 											// for every selected shelves
-											totalRent += warehouseSpace.container.shelf.units.length * warehouseSpace.container.selected_rent.rent ?? 0
+											// totalRent += warehouseSpace.container.shelf.units.length * warehouseSpace.container.selected_rent.rent ?? 0
+											
+											totalRent += warehouseSpace.container.shelf.units.length * warehouseSpace.container.rents.find(rent => rent.rent_period_id==this.singleMerchantDealData.rent_period_id).rent ?? 0;
+
 											// console.log('Units : ' + totalRent);
 
 										}
@@ -3797,6 +4150,8 @@
 										}
 									}
 								);
+
+								totalRent = totalRent * this.singleMerchantDealData.payments[0].number_installment;
 
 							}
 							else {
@@ -3811,19 +4166,22 @@
 
 				// console.log('Out of warehouses length');
 
-				this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].total_rent = totalRent - (totalRent * this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount / 100);
+				this.changeRentExpiryDate();
+				
+				this.singleMerchantDealData.payments[0].total_rent = totalRent - (totalRent * this.singleMerchantDealData.payments[0].discount / 100);
 
 			},
 			setNetPayable() {
 
-				this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].net_payable = this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].previous_due + this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].total_rent;
+				this.singleMerchantDealData.payments[0].net_payable = this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].previous_due + this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].total_rent;
 
 			},
 			resetTotalRent() {
 				
 				this.validateFormInput('discount');
+				this.validateFormInput('number_installment');
 				
-				if (! this.errors.payment.discount) {
+				if (! this.errors.payment.discount && ! this.errors.payment.number_installment) {
 
 					this.setTotalRent();
 					this.setNetPayable();	
@@ -3831,6 +4189,45 @@
 				}
 				
 			},	
+			setContainerRentPeriod(merchantContainer) {
+
+				this.$set(merchantContainer, 'selected_rent', {});
+
+				if (merchantContainer && Object.keys(merchantContainer).length > 0 && merchantContainer.rents) {
+
+					merchantContainer.selected_rent = merchantContainer.rents.find(containerRent => containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id);
+
+				}
+
+			},
+			setShelfOrUnitRentPeriod(merchantContainer) {
+
+				this.$set(merchantContainer, 'selected_rent', {});
+
+				if (merchantContainer && Object.keys(merchantContainer).length > 0 && merchantContainer.rents) {
+
+					merchantContainer.selected_rent = merchantContainer.rents.find(containerRent => containerRent.rent_period_id==this.singleMerchantDealData.rent_period_id);
+
+				}
+
+			},
+			changeRentExpiryDate() {
+
+				var moment = require('moment');
+
+				let daysToIncrease = this.singleMerchantDealData.payments[0].number_installment * this.singleMerchantDealData.rent_period.number_days;
+
+				this.singleMerchantDealData.payments[0].date_from = moment(this.singleMerchantDealData.payments[0].date_from).format('YYYY-MM-DD');
+
+				this.singleMerchantDealData.payments[0].date_to = moment(this.singleMerchantDealData.payments[0].date_from).add(daysToIncrease, 'days').format('YYYY-MM-DD');
+				
+				
+			},
+			customFormatter(date) {
+				var moment = require('moment');
+				date = moment(date).format('YYYY-MM-DD');
+		      	return date;
+		    },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -3847,6 +4244,21 @@
 							
 							this.submitForm = true;
 							this.$delete(this.errors, 'sale_percentage');
+							
+						}
+
+						break;
+
+					case 'rent_period' :
+
+						if(! this.singleMerchantDealData.rent_period || Object.keys(this.singleMerchantDealData.rent_period).length === 0){
+
+							this.errors.rent_period = 'Rent period is required';
+						}
+						else {
+							
+							this.submitForm = true;
+							this.$delete(this.errors, 'rent_period');
 							
 						}
 
@@ -4095,7 +4507,7 @@
 
 						break;
 						
-					case 'rent_period' : 
+					case 'space_rent_period' : 
 
 						this.singleMerchantDealData.warehouses.forEach(
 							
@@ -4106,16 +4518,16 @@
 									(warehouseSpace, warehouseSpaceIndex) => {
 
 										if (warehouseSpace.type=='containers' && warehouseSpace.containers && warehouseSpace.containers.length && warehouseSpace.containers.some(warehouseContainer => ! warehouseContainer.selected_rent || Object.keys(warehouseContainer.selected_rent).length==0)) {
-											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period = 'Rent package is required';
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period = 'Rent package is required';
 										}
 										else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length && (! warehouseSpace.container.selected_rent || Object.keys(warehouseSpace.container.selected_rent).length==0)) {
-											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period = 'Rent package is required';
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period = 'Rent package is required';
 										}
 										else if (warehouseSpace.type=='units' && warehouseSpace.container && warehouseSpace.container.shelf && warehouseSpace.container.shelf.units && warehouseSpace.container.shelf.units.length && (! warehouseSpace.container.selected_rent || Object.keys(warehouseSpace.container.selected_rent).length==0)) {
-											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].rent_period = 'Rent package is required';
+											this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period = 'Rent package is required';
 										}
 										else{
-											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'rent_period');
+											this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'space_rent_period');
 										}
 
 									}
@@ -4134,7 +4546,7 @@
 
 					case 'paid_amount' : 
 						
-						if(! this.singleMerchantDealData.payments || ! this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].paid_amount || this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].paid_amount < 1){
+						if(! this.singleMerchantDealData.payments || ! this.singleMerchantDealData.payments[0].paid_amount || this.singleMerchantDealData.payments[0].paid_amount < 1){
 							
 							this.errors.payment.paid_amount = 'Paid amount is required';
 
@@ -4150,7 +4562,7 @@
 
 					case 'discount' : 
 						
-						if(this.singleMerchantDealData.payments && this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount && (this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount < 0 || this.singleMerchantDealData.payments[this.singleMerchantDealData.payments.length-1].discount > 100)){
+						if(this.singleMerchantDealData.payments && this.singleMerchantDealData.payments[0].discount && (this.singleMerchantDealData.payments[0].discount < 0 || this.singleMerchantDealData.payments[0].discount > 100)){
 
 							this.errors.payment.discount = 'Rate should be between 0 to 100';
 						}
@@ -4158,6 +4570,21 @@
 
 							this.submitForm = true;
 							this.$delete(this.errors.payment, 'discount');
+
+						}
+
+						break;
+
+					case 'number_installment' : 
+						
+						if(this.singleMerchantDealData.payments && (! this.singleMerchantDealData.payments[0].number_installment || this.singleMerchantDealData.payments[0].number_installment < 1)){
+
+							this.errors.payment.number_installment = 'Number should be positive';
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors.payment, 'number_installment');
 
 						}
 
@@ -4184,5 +4611,10 @@
 	.fade-enter, .fade-leave-to {
   		transform: translateX(10px);
   		opacity: 0;
+	}
+	.date {
+		background: #f2f2f2;
+		border: 1px solid #ddd;
+		padding: 1em 1em 1em;
 	}
 </style>

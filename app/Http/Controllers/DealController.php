@@ -9,6 +9,7 @@ use App\Models\RentPeriod;
 use App\Models\MerchantDeal;
 use Illuminate\Http\Request;
 use App\Models\MerchantPayment;
+use Illuminate\Validation\Rule;
 use App\Models\MerchantPaymentDetail;
 use App\Models\WarehouseContainerStatus;
 use App\Http\Resources\Web\DealCollection;
@@ -33,10 +34,10 @@ class DealController extends Controller
         $this->middleware("permission:delete-merchant-payment")->only('deleteDealPayment');       
     }
 
-    // Product-Stock
+    // Merchant-Deal
     public function showMerchantAllDeals($merchant, $perPage)
     {
-        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces', 'payments'])->paginate($perPage));
+        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces', 'payments'])->latest()->paginate($perPage));
     }
 
     public function storeMerchantDeal(Request $request, $perPage)
@@ -48,14 +49,18 @@ class DealController extends Controller
             'e_commerce_fulfillment' => 'required|boolean',
             'merchant_id' => 'required|exists:merchants,id',
             'sale_percentage' => 'required_if:e_commerce_fulfillment,1|min:0|max:100',
+            'rent_period_id' => 'required|exists:rent_periods,id|exists:rents,rent_period_id',
             
             'payments' => 'required|array|min:1',
-            'payments.*.current_due' => 'required|numeric',
+            'payments.*.number_installment' => 'required|numeric',
+            'payments.*.date_from' => 'required|date',
+            'payments.*.date_to' => 'required|date',
+            'payments.*.total_rent' => 'required|numeric',
             'payments.*.discount' => 'required|numeric|between:0,100',
+            'payments.*.previous_due' => 'numeric|min:0',
             'payments.*.net_payable' => 'required|numeric',
             'payments.*.paid_amount' => 'required|numeric',
-            'payments.*.previous_due' => 'required|numeric',
-            'payments.*.total_rent' => 'required|numeric',
+            // 'payments.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
             'warehouses.*.id' => 'required|exists:warehouses',
@@ -67,8 +72,25 @@ class DealController extends Controller
             'warehouses.*.spaces.*.containers.*.engaged' => 'required_if:warehouses.*.spaces.*.type,containers|numeric|max:0',
             // 'warehouses.*.spaces.*.containers.*.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id',
             'warehouses.*.spaces.*.containers.*.selected_rent' => 'required_if:warehouses.*.spaces.*.type,containers',
-            'warehouses.*.spaces.*.containers.*.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rents,id',
-            'warehouses.*.spaces.*.containers.*.selected_rent.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id|exists:rents,rent_period_id',
+
+            'warehouses.*.spaces.*.containers.*.selected_rent.id' => [
+                'required_if:warehouses.*.spaces.*.type,containers',
+                Rule::exists('rents', 'id')->where(function ($query) use ($request) {
+                    return $query->where('rent_period_id', $request->rent_period_id);
+                }),
+            ],
+
+            'warehouses.*.spaces.*.containers.*.selected_rent.rent_period_id' => [
+                'required_if:warehouses.*.spaces.*.type,containers', 
+                'exists:rent_periods,id', 
+                'exists:rents,rent_period_id',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value != $request->rent_period_id) {
+                        $fail('The '.$attribute.' is invalid.');
+                    }
+                },
+            ],
+
             'warehouses.*.spaces.*.containers.*.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
             
             'warehouses.*.spaces.*.container' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
@@ -77,8 +99,27 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.shelves.*.id' => 'required_if:warehouses.*.spaces.*.type,shelves|exists:warehouse_container_shelf_statuses,id',
             'warehouses.*.spaces.*.container.shelves.*.engaged' => 'required_if:warehouses.*.spaces.*.type,shelves|numeric|max:0',
             'warehouses.*.spaces.*.container.selected_rent' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
-            'warehouses.*.spaces.*.container.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:rents,id',
-            'warehouses.*.spaces.*.container.selected_rent.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:rent_periods,id|exists:rents,rent_period_id',
+            
+            'warehouses.*.spaces.*.container.selected_rent.id' => [
+                'required_if:warehouses.*.spaces.*.type,shelves', 
+                'required_if:warehouses.*.spaces.*.type,units', 
+                Rule::exists('rents', 'id')->where(function ($query) use ($request) {
+                    return $query->where('rent_period_id', $request->rent_period_id);
+                }),
+            ],
+
+            'warehouses.*.spaces.*.container.selected_rent.rent_period_id' => [
+                'required_if:warehouses.*.spaces.*.type,shelves', 
+                'required_if:warehouses.*.spaces.*.type,units',
+                'exists:rent_periods,id', 
+                'exists:rents,rent_period_id',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value != $request->rent_period_id) {
+                        $fail('The '.$attribute.' is invalid.');
+                    }
+                },
+            ],
+
             'warehouses.*.spaces.*.container.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|numeric',
 
             'warehouses.*.spaces.*.container.shelf' => 'required_if:warehouses.*.spaces.*.type,units',
@@ -92,6 +133,9 @@ class DealController extends Controller
         [
             'payments' => 'Payment is required !',
             // 'payments.*.current_due' => 'Stock quantity is required !',
+            'payments.*.number_installment' => 'Number installment is required',
+            'payments.*.date_from' => 'Rent counting date is required',
+            'payments.*.date_to' => 'Rent ending date is required',
             'payments.*.discount' => 'Discount rate should be between 0 to 100',
             'payments.*.net_payable' => 'Net payable is invalid',
             'payments.*.paid_amount' => 'Paid amount is invalid',
@@ -133,6 +177,7 @@ class DealController extends Controller
             'e_commerce_fulfillment' => $request->e_commerce_fulfillment,
             'auto_renewal' => $request->auto_renewal,
             'sale_percentage' => $request->e_commerce_fulfillment ? $request->sale_percentage : NULL,
+            'rent_period_id' => $request->rent_period_id,
             'merchant_id' => $request->merchant_id,
             'created_at' => now()
         ]);
@@ -141,9 +186,12 @@ class DealController extends Controller
 
         $dealNewPayment = $newDeal->payments()->create([
             'invoice_no' => $newDeal->name.'-PY-1',
-            'previous_due' => 0,
+            'number_installment' => $request->payments[0]->number_installment,
+            'date_from' => $request->payments[0]->date_from,
+            'date_to' => $request->payments[0]->date_to,
             'total_rent' => $request->payments[0]->total_rent,
             'discount' => $request->payments[0]->discount,
+            'previous_due' => 0,
             'net_payable' => $request->payments[0]->net_payable,
             'paid_amount' => $request->payments[0]->paid_amount,
             'current_due' => ($request->payments[0]->net_payable - $request->payments[0]->paid_amount),
@@ -191,14 +239,18 @@ class DealController extends Controller
             'e_commerce_fulfillment' => 'required|boolean',
             'merchant_id' => 'required|exists:merchants,id',
             'sale_percentage' => 'required_if:e_commerce_fulfillment,1|min:0|max:100',
+            'rent_period_id' => 'required|exists:rent_periods,id|exists:rents,rent_period_id',
             
             'payments' => 'required|array|min:1',
-            'payments.*.current_due' => 'required|numeric',
+            'payments.*.number_installment' => 'required|numeric',
+            'payments.*.date_from' => 'required|date',
+            'payments.*.date_to' => 'required|date',
+            'payments.*.total_rent' => 'required|numeric',
             'payments.*.discount' => 'required|numeric|between:0,100',
+            'payments.*.previous_due' => 'required|numeric',
             'payments.*.net_payable' => 'required|numeric',
             'payments.*.paid_amount' => 'required|numeric',
-            'payments.*.previous_due' => 'required|numeric',
-            'payments.*.total_rent' => 'required|numeric',
+            // 'payments.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
             'warehouses.*.id' => 'required|exists:warehouses',
@@ -207,31 +259,73 @@ class DealController extends Controller
 
             'warehouses.*.spaces.*.containers' => 'required_if:warehouses.*.spaces.*.type,containers|array|min:1',
             'warehouses.*.spaces.*.containers.*.id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:warehouse_container_statuses,id',
+            'warehouses.*.spaces.*.containers.*.engaged' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
             // 'warehouses.*.spaces.*.containers.*.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id',
             'warehouses.*.spaces.*.containers.*.selected_rent' => 'required_if:warehouses.*.spaces.*.type,containers',
-            'warehouses.*.spaces.*.containers.*.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rents,id',
-            'warehouses.*.spaces.*.containers.*.selected_rent.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id|exists:rents,rent_period_id',
+
+            'warehouses.*.spaces.*.containers.*.selected_rent.id' => [
+                'required_if:warehouses.*.spaces.*.type,containers',
+                Rule::exists('rents', 'id')->where(function ($query) use ($request) {
+                    return $query->where('rent_period_id', $request->rent_period_id);
+                }),
+            ],
+
+            'warehouses.*.spaces.*.containers.*.selected_rent.rent_period_id' => [
+                'required_if:warehouses.*.spaces.*.type,containers', 
+                'exists:rent_periods,id', 
+                'exists:rents,rent_period_id',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value != $request->rent_period_id) {
+                        $fail('The '.$attribute.' is invalid.');
+                    }
+                },
+            ],
+
             'warehouses.*.spaces.*.containers.*.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
             
             'warehouses.*.spaces.*.container' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_statuses,id',
             'warehouses.*.spaces.*.container.shelves' => 'required_if:warehouses.*.spaces.*.type,shelves|array|min:1',
             'warehouses.*.spaces.*.container.shelves.*.id' => 'required_if:warehouses.*.spaces.*.type,shelves|exists:warehouse_container_shelf_statuses,id',
+            // 'warehouses.*.spaces.*.container.shelves.*.engaged' => 'required_if:warehouses.*.spaces.*.type,shelves|numeric',
             'warehouses.*.spaces.*.container.selected_rent' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units',
-            'warehouses.*.spaces.*.container.selected_rent.id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:rents,id',
-            'warehouses.*.spaces.*.container.selected_rent.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|exists:rent_periods,id|exists:rents,rent_period_id',
+            
+            'warehouses.*.spaces.*.container.selected_rent.id' => [
+                'required_if:warehouses.*.spaces.*.type,shelves', 
+                'required_if:warehouses.*.spaces.*.type,units', 
+                Rule::exists('rents', 'id')->where(function ($query) use ($request) {
+                    return $query->where('rent_period_id', $request->rent_period_id);
+                }),
+            ],
+
+            'warehouses.*.spaces.*.container.selected_rent.rent_period_id' => [
+                'required_if:warehouses.*.spaces.*.type,shelves', 
+                'required_if:warehouses.*.spaces.*.type,units',
+                'exists:rent_periods,id', 
+                'exists:rents,rent_period_id',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value != $request->rent_period_id) {
+                        $fail('The '.$attribute.' is invalid.');
+                    }
+                },
+            ],
+
             'warehouses.*.spaces.*.container.selected_rent.rent' => 'required_if:warehouses.*.spaces.*.type,shelves|required_if:warehouses.*.spaces.*.type,units|numeric',
 
             'warehouses.*.spaces.*.container.shelf' => 'required_if:warehouses.*.spaces.*.type,units',
             'warehouses.*.spaces.*.container.shelf.id' => 'required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_shelf_statuses,id',
             'warehouses.*.spaces.*.container.shelf.units' => 'required_if:warehouses.*.spaces.*.type,units|array|min:1',
             'warehouses.*.spaces.*.container.shelf.units.*.id' => 'required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_shelf_unit_statuses,id',
+            'warehouses.*.spaces.*.container.shelf.units.*.engaged' => 'required_if:warehouses.*.spaces.*.type,units|numeric',
         
         ],
 
         [
             'payments' => 'Payment is required !',
             // 'payments.*.current_due' => 'Stock quantity is required !',
+            'payments.*.number_installment' => 'Number installment is required',
+            'payments.*.date_from' => 'Rent counting date is required',
+            'payments.*.date_to' => 'Rent ending date is required',
             'payments.*.discount' => 'Discount rate should be between 0 to 100',
             'payments.*.net_payable' => 'Net payable is invalid',
             'payments.*.paid_amount' => 'Paid amount is invalid',
@@ -245,6 +339,7 @@ class DealController extends Controller
 
             'warehouses.*.spaces.*.containers.*' => 'Containers is required',
             'warehouses.*.spaces.*.containers.*.id.*' => 'Container id is invalid',
+            'warehouses.*.spaces.*.containers.*.engaged.*' => 'Selected container should be vacant',
             'warehouses.*.spaces.*.containers.*.selected_rent.*' => 'Container rent is required',
             'warehouses.*.spaces.*.containers.*.selected_rent.id.*' => 'Container rent is invalid',
             'warehouses.*.spaces.*.containers.*.selected_rent.rent_period_id.*' => 'Container rent is invalid',
@@ -254,6 +349,7 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.id.*' => 'Invalid container id',
             'warehouses.*.spaces.*.container.shelves.*' => 'Shelves are required',
             'warehouses.*.spaces.*.container.shelves.*.id.*' => 'Shelf id is invalid',
+            // 'warehouses.*.spaces.*.container.shelves.*.engaged.*' => 'Selected shelf should be vacant',
             'warehouses.*.spaces.*.container.selected_rent.*' => 'Shelf or Unit rent is required',
             'warehouses.*.spaces.*.container.selected_rent.id.*' => 'Shelf or Unit rent is invalid',
             'warehouses.*.spaces.*.container.selected_rent.rent_period_id.*' => 'Shelf or Unit rent is invalid',
@@ -263,6 +359,7 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.shelf.id.*' => 'Shelf id is invalid',
             'warehouses.*.spaces.*.container.shelf.units.*' => 'Units are required',
             'warehouses.*.spaces.*.container.shelf.units.*.id.*' => 'Unit id is invalid',
+            'warehouses.*.spaces.*.container.shelf.units.*.engaged.*' => 'Selected unit should be vacant',
         ]);
 
         $dealToUpdate = MerchantDeal::findOrFail($deal);
@@ -273,7 +370,8 @@ class DealController extends Controller
             'e_commerce_fulfillment' => $request->e_commerce_fulfillment,
             'auto_renewal' => $request->active ? $request->auto_renewal : false,
             'sale_percentage' => $request->e_commerce_fulfillment ? $request->sale_percentage : NULL,
-            'merchant_id' => $request->merchant_id
+            'rent_period_id' => $request->rent_period_id,
+            'merchant_id' => $request->merchant_id,
         ]);
 
         if ($dealToUpdate->payments->count() < 2 && $dealToUpdate->active) {
@@ -281,9 +379,12 @@ class DealController extends Controller
             $request['payments'] = json_decode(json_encode($request->payments)); 
 
             $dealRecentPaymentUpdated = $dealRecentPayment->update([
-                'previous_due' => $dealToUpdate->payments()->latest('paid_at')->skip(1)->take(1)->first()->previous_due ?? 0,
+                'number_installment' => $request->payments[0]->number_installment,
+                'date_from' => $request->payments[0]->date_from,
+                'date_to' => $request->payments[0]->date_to,
                 'total_rent' => $request->payments[0]->total_rent,
                 'discount' => $request->payments[0]->discount,
+                'previous_due' => 0,
                 'net_payable' => $request->payments[0]->net_payable,
                 'paid_amount' => $request->payments[0]->paid_amount,
                 'current_due' => ($request->payments[0]->net_payable - $request->payments[0]->paid_amount),
@@ -413,9 +514,12 @@ class DealController extends Controller
                 })
                 ->orWhereHas('payments', function ($query4) use ($request) {
                     $query4->where('invoice_no', 'like', "%$request->search%")
-                    ->orWhere('previous_due', 'like', "%$request->search%")
+                    ->orWhere('number_installment', 'like', "%$request->search%")
+                    ->orWhere('date_from', 'like', "%$request->search%")
+                    ->orWhere('date_to', 'like', "%$request->search%")
                     ->orWhere('total_rent', 'like', "%$request->search%")
                     ->orWhere('discount', 'like', "%$request->search%")
+                    ->orWhere('previous_due', 'like', "%$request->search%")
                     ->orWhere('net_payable', 'like', "%$request->search%")
                     ->orWhere('paid_amount', 'like', "%$request->search%")
                     ->orWhere('current_due', 'like', "%$request->search%");
@@ -426,18 +530,18 @@ class DealController extends Controller
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->whereDate('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->whereDate('created_at', '<=', $request->dateTo);
 
         }
 
         return response()->json([
-            'all' => new DealCollection($query->paginate($perPage)),  
+            'all' => new DealCollection($query->latest()->paginate($perPage)),  
         ], 200);
     }
 
@@ -448,7 +552,7 @@ class DealController extends Controller
             return new DealPaymentCollection(
                 MerchantPayment::with(['rents'])->whereHas('deal', function ($query) use ($deal) {
                     $query->where('merchant_deal_id', $deal);
-                })->paginate($perPage)
+                })->latest('paid_at')->paginate($perPage)
             );
 
         }
@@ -458,57 +562,28 @@ class DealController extends Controller
     {
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
-            'current_due' => 'required|numeric',
-            'discount' => 'required|numeric|between:0,100',
-            'net_payable' => 'required|numeric',
-            'paid_amount' => 'required|numeric',
-            'previous_due' => 'required|numeric',
+            'number_installment' => 'required|numeric|min:1',
+            'date_from' => 'required|date',
+            'date_to' => 'required|date',
             'total_rent' => 'required|numeric',
-
-            'rents' => [
-                
-                'required', 'array', 'min:1',
-                
-                function ($attribute, $value, $fail) {
-                    
-                    foreach ($value as $rentIndex => $rent) {
-                        if ($rent->number_installment > 0) {
-                            return true;
-                        }
-                    }
-
-                    $fail('The '.$attribute.' is invalid.');
-
-                },
-                
-            ],
-            
-            'rents.*.dealt_space_id' => [
-                'required', 'numeric',
-                Rule::exists('dealt_spaces', 'id')->where(function ($query) use ($request) {
-                    return $query->where('merchant_deal_id', $request->merchant_deal_id);
-                }),
-            ],
-
-            'rents.*.issued_from' => 'required|date',
-            'rents.*.expired_at' => 'required|date',
-            'rents.*.rent' => 'required|numeric',
-            'rents.*.number_installment' => 'required|numeric|min:0'
+            'discount' => 'required|numeric|between:0,100',
+            'previous_due' => 'numeric',
+            'net_payable' => 'numeric',
+            'paid_amount' => 'required|numeric',
+            // 'current_due' => 'required|numeric',
         ],
 
         [
-            // 'payments.*.current_due' => 'Stock quantity is required !',
+            // 'current_due' => 'Stock quantity is required !',
             'merchant_deal_id.*' => 'Payment deal is required',
+            'number_installment' => 'Rent installment number is required',
+            'date_from' => 'Rent issueing date is required',
+            'date_to' => 'Rent expiring date is required',
+            'total_rent' => 'Total rent is invalid',
             'discount' => 'Discount rate should be between 0 to 100',
+            'previous_due' => 'Previous due is invalid',
             'net_payable' => 'Net payable is invalid',
             'paid_amount' => 'Paid amount is invalid',
-            'previous_due' => 'Previous due is invalid',
-            'total_rent' => 'Total rent is invalid',
-            'rents.*.dealt_space_id' => 'Invalid space',
-            'rents.*.issued_from' => 'Rent issue date is required',
-            'rents.*.expired_at' => 'Rent expiry date is required',
-            'rents.*.rent' => 'Space rent is required',
-            'rents.*.number_installment' => 'Space rent installment is required',
         ]);
 
         $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
@@ -517,30 +592,48 @@ class DealController extends Controller
 
         $dealNewPayment = $paymentDeal->payments()->create([
             'invoice_no' => $paymentDeal->name.'-PY-'.($paymentDeal->payments->count() + 1),
-            'previous_due' => $dealRecentPayment->current_due,
+            'number_installment' => $request->number_installment,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
             'total_rent' => $request->total_rent,
             'discount' => $request->discount,
-            'net_payable' => $request->net_payable,
+            'previous_due' => $dealRecentPayment->current_due ?? 0,
+            'net_payable' => $request->net_payable ?? 0,
             'paid_amount' => $request->paid_amount,
             'current_due' => ($request->net_payable - $request->paid_amount),
         ]);
 
-        foreach (json_decode(json_encode($request->rents)) as $paymentDetailIndex => $paymentDetail) {
+        foreach ($paymentDeal->containers as $dealContainerIndex => $dealContainer) {
             
-            if ($paymentDetail->number_installment > 0 && $paymentDetail->rent > 0) {
-                
-                $dealSpace = DealtSpace::find($paymentDetail->dealt_space_id);
-                $rentPeriod = RentPeriod::find($dealSpace->rent_period_id);
-                $dealRecentPaymentExpectedRent = $dealRecentPayment->rents()->where('dealt_space_id', $dealSpace->id)->first();
+            $currentRent = $dealContainer->warehouseContainer->rents->where('rent_period_id', $paymentDeal->rent_period_id)->first();
 
-                $payementNewRent = $dealNewPayment->rents()->create([
-                    'issued_from' => $dealRecentPaymentExpectedRent->expired_at,
-                    'expired_at' => $dealRecentPaymentExpectedRent->expired_at->addDays($rentPeriod->number_days * $paymentDetail->number_installment),
-                    'rent' => $paymentDetail->rent,
-                    'dealt_space_id' => $dealSpace->id
-                ]);
+            $payementNewRent = $dealNewPayment->rents()->create([
+                'rent' => $currentRent->rent ?? 0,
+                'dealt_space_id' => $dealContainer->id
+            ]);
 
-            }
+        }
+
+        foreach ($paymentDeal->shelves as $dealShelfIndex => $dealShelf) {
+            
+            $currentRent = $dealShelf->warehouseContainer->shelf->rents->where('rent_period_id', $paymentDeal->rent_period_id)->first();
+
+            $payementNewRent = $dealNewPayment->rents()->create([
+                'rent' => $currentRent->rent ?? 0,
+                'dealt_space_id' => $dealShelf->id
+            ]);
+
+        }
+
+
+        foreach ($paymentDeal->units as $dealUnitIndex => $dealUnit) {
+            
+            $currentRent = $dealUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $paymentDeal->rent_period_id)->first();
+
+            $payementNewRent = $dealNewPayment->rents()->create([
+                'rent' => $currentRent->rent ?? 0,
+                'dealt_space_id' => $dealUnit->id
+            ]);
 
         }
 
@@ -551,22 +644,28 @@ class DealController extends Controller
     {
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
-            'current_due' => 'required|numeric',
+            'number_installment' => 'required|numeric|min:1',
+            'date_from' => 'required|date',
+            'date_to' => 'required|date',
+            'total_rent' => 'required|numeric',
             'discount' => 'required|numeric|between:0,100',
-            'net_payable' => 'required|numeric',
+            'previous_due' => 'numeric',
+            'net_payable' => 'numeric',
             'paid_amount' => 'required|numeric',
-            'previous_due' => 'required|numeric',
-            'total_rent' => 'required|numeric'
+            // 'current_due' => 'required|numeric',
         ],
 
         [
-            // 'payments.*.current_due' => 'Stock quantity is required !',
+            // 'current_due' => 'Stock quantity is required !',
             'merchant_deal_id.*' => 'Payment deal is required',
+            'number_installment' => 'Rent installment number is required',
+            'date_from' => 'Rent issueing date is required',
+            'date_to' => 'Rent expiring date is required',
+            'total_rent' => 'Total rent is invalid',
             'discount' => 'Discount rate should be between 0 to 100',
+            'previous_due' => 'Previous due is invalid',
             'net_payable' => 'Net payable is invalid',
             'paid_amount' => 'Paid amount is invalid',
-            'previous_due' => 'Previous due is invalid',
-            'total_rent' => 'Total rent is invalid',
         ]);
 
         $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
@@ -584,9 +683,14 @@ class DealController extends Controller
         }
 
         $dealNewPayment = $paymentToUpdate->update([
+            // 'invoice_no' => $paymentDeal->name.'-PY-'.($paymentDeal->payments->count() + 1),
+            'number_installment' => $request->number_installment,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
             'total_rent' => $request->total_rent,
             'discount' => $request->discount,
-            'net_payable' => $request->net_payable,
+            // 'previous_due' => $dealRecentPayment->current_due,
+            'net_payable' => $request->net_payable ?? 0,
             'paid_amount' => $request->paid_amount,
             'current_due' => ($request->net_payable - $request->paid_amount),
         ]);
@@ -599,6 +703,12 @@ class DealController extends Controller
         $dealPaymentToDelete = MerchantPayment::findOrFail($payment);
         $paymentDeal = $dealPaymentToDelete->deal;
 
+        if ($paymentDeal->payments->count() < 2) {
+            
+            return response()->json(['errors'=>["undeletableDeal" => "One payment is required"]], 422);
+
+        }
+
         $this->decreaseNextPaymentDues($dealPaymentToDelete->current_due, $dealPaymentToDelete->paid_at);
         $dealPaymentToDelete->rents()->delete();
         $dealPaymentToDelete->delete();
@@ -606,28 +716,57 @@ class DealController extends Controller
         return $this->showDealAllPayments($paymentDeal->id, $perPage);
     }
 
-    public function searchDealAllPayments($deal, $search, $perPage)
+    public function searchDealAllPayments(Request $request, $perPage)
     {
-        $query = MerchantPayment::with(['rents'])->whereHas('deal', function ($query1) use ($deal) {
-            $query1->where('merchant_deal_id', $deal);
-        })
-        ->where(function($query2) use ($search) {
-            $query2->where('invoice_no', 'like', "%$search%")
-            ->orWhere('previous_due', 'like', "%$search%")
-            ->orWhere('total_rent', 'like', "%$search%")
-            ->orWhere('discount', 'like', "%$search%")
-            ->orWhere('net_payable', 'like', "%$search%")
-            ->orWhere('paid_amount', 'like', "%$search%")
-            ->orWhere('current_due', 'like', "%$search%")
-            ->orWhereHas('rents', function ($query3) use ($search) {
-                $query3->where('issued_from', 'like', "%$search%")
-                ->orWhere('expired_at', 'like', "%$search%")
-                ->orWhere('rent', 'like', "%$search%");
-            });
+        $request->validate([
+            'merchant_deal_id' => 'required|exists:merchant_deals,id',
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+        $query = MerchantPayment::with(['rents'])->whereHas('deal', function ($query1) use ($request) {
+            $query1->where('merchant_deal_id', $request->merchant_deal_id);
         });
 
+        if ($request->search) {
+            
+            $query->where(function($query2) use ($request) {
+                $query2->where('invoice_no', 'like', "%$request->search%")
+                ->orWhere('number_installment', 'like', "%$request->search%")
+                ->orWhere('date_from', 'like', "%$request->search%")
+                ->orWhere('date_to', 'like', "%$request->search%")
+                ->orWhere('total_rent', 'like', "%$request->search%")
+                ->orWhere('discount', 'like', "%$request->search%")
+                ->orWhere('previous_due', 'like', "%$request->search%")
+                ->orWhere('net_payable', 'like', "%$request->search%")
+                ->orWhere('paid_amount', 'like', "%$request->search%")
+                ->orWhere('current_due', 'like', "%$request->search%")
+                ->orWhereHas('rents', function ($query3) use ($request) {
+                    $query3->where('rent', 'like', "%$request->search%");
+                });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereDate('paid_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereDate('paid_at', '<=', $request->dateTo);
+
+        }
+
         return response()->json([
-            'all' => new DealPaymentCollection($query->paginate($perPage)),  
+            'all' => new DealPaymentCollection($query->latest('paid_at')->paginate($perPage)),  
         ], 200);
     }
 
@@ -647,11 +786,15 @@ class DealController extends Controller
 
                 $addedContainer->updateContainerStatus(0);
 
-                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantContainer->rent_period_id)->where('warehouse_container_id', $addedContainer->warehouse_container_id)->where('id', '!=', $merchantContainer->id)->exists();
+                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedContainer->warehouse_container_id)->where('id', '!=', $merchantContainer->id)
+                ->whereHas('deal', function ($query) use ($merchantContainer) {
+                    $query->where('rent_period_id', $merchantContainer->deal->rent_period_id);
+                })
+                ->exists();
 
                 if (! $sameTypeContainerUsingSameRentPeriod) {
                     
-                   Rent::find($addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->rent_period_id))->first()->update([
+                   Rent::find($addedContainer->warehouseContainer->rents()->where('rent_period_id', $merchantContainer->deal->rent_period_id))->first()->update([
                         'active' => 0
                    ]); 
 
@@ -681,11 +824,15 @@ class DealController extends Controller
 
                     $addedShelf->parentContainer->updateChildUnits($addedShelf, 0);
 
-                    $sameTypeContainerShelfUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantShelf->rent_period_id)->where('warehouse_container_id', $addedShelf->warehouse_container_id)->where('id', '!=', $merchantShelf->id)->exists();
+                    $sameTypeContainerShelfUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedShelf->warehouse_container_id)->where('id', '!=', $merchantShelf->id)
+                    ->whereHas('deal', function ($query) use ($merchantShelf) {
+                        $query->where('rent_period_id', $merchantShelf->deal->rent_period_id);
+                    })
+                    ->exists();
 
                     if (! $sameTypeContainerShelfUsingSameRentPeriod) {
                         
-                       Rent::find($addedShelf->warehouseContainer->shelf->rents->where('rent_period_id', $merchantShelf->rent_period_id))->first()->update([
+                       Rent::find($addedShelf->warehouseContainer->shelf->rents()->where('rent_period_id', $merchantShelf->deal->rent_period_id))->first()->update([
                             'active' => 0
                        ]); 
 
@@ -717,11 +864,15 @@ class DealController extends Controller
                         'engaged' => 0
                     ]);
 
-                    $unitOfSameContainerShelfUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantUnit->rent_period_id)->where('warehouse_container_id', $addedUnit->warehouse_container_id)->where('id', '!=', $merchantUnit->id)->exists();
+                    $unitOfSameContainerShelfUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedUnit->warehouse_container_id)->where('id', '!=', $merchantUnit->id)
+                    ->whereHas('deal', function ($query) use ($merchantUnit) {
+                        $query->where('rent_period_id', $merchantUnit->deal->rent_period_id);
+                    })
+                    ->exists();
 
                     if (! $unitOfSameContainerShelfUsingSameRentPeriod) {
                         
-                       Rent::find($addedUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $merchantUnit->rent_period_id))->first()->update([
+                       Rent::find($addedUnit->warehouseContainer->shelf->unit->rents()->where('rent_period_id', $merchantUnit->deal->rent_period_id))->first()->update([
                             'active' => 0
                        ]); 
 
@@ -756,11 +907,15 @@ class DealController extends Controller
 
                 $addedContainer->updateContainerStatus(0);
 
-                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantContainer->rent_period_id)->where('warehouse_container_id', $addedContainer->warehouse_container_id)->where('id', '!=', $merchantContainer->id)->exists();
+                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedContainer->warehouse_container_id)->where('id', '!=', $merchantContainer->id)
+                ->whereHas('deal', function ($query) use ($merchantContainer) {
+                    $query->where('rent_period_id', $merchantContainer->deal->rent_period_id);
+                })
+                ->exists();
 
                 if (! $sameTypeContainerUsingSameRentPeriod) {
                     
-                   Rent::find($addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->rent_period_id))->first()->update([
+                   Rent::find($addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->deal->rent_period_id))->first()->update([
                         'active' => 0
                    ]); 
 
@@ -789,11 +944,15 @@ class DealController extends Controller
 
                     $addedShelf->parentContainer->updateChildUnits($addedShelf, 0);
 
-                    $sameTypeContainerShelfUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantShelf->rent_period_id)->where('warehouse_container_id', $addedShelf->warehouse_container_id)->where('id', '!=', $merchantShelf->id)->exists();
+                    $sameTypeContainerShelfUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedShelf->warehouse_container_id)->where('id', '!=', $merchantShelf->id)
+                    ->whereHas('deal', function ($query) use ($merchantShelf) {
+                        $query->where('rent_period_id', $merchantShelf->deal->rent_period_id);
+                    })
+                    ->exists();
 
                     if (! $sameTypeContainerShelfUsingSameRentPeriod) {
                         
-                       Rent::find($addedShelf->warehouseContainer->shelf->rents->where('rent_period_id', $merchantShelf->rent_period_id))->first()->update([
+                       Rent::find($addedShelf->warehouseContainer->shelf->rents->where('rent_period_id', $merchantShelf->deal->rent_period_id))->first()->update([
                             'active' => 0
                        ]); 
 
@@ -825,11 +984,15 @@ class DealController extends Controller
                         'engaged' => 0
                     ]);
 
-                    $unitOfSameContainerShelfUsingSameRentPeriod = DealtSpace::where('rent_period_id', $merchantUnit->rent_period_id)->where('warehouse_container_id', $addedUnit->warehouse_container_id)->where('id', '!=', $merchantUnit->id)->exists();
+                    $unitOfSameContainerShelfUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedUnit->warehouse_container_id)->where('id', '!=', $merchantUnit->id)
+                    ->whereHas('deal', function ($query) use ($merchantUnit) {
+                        $query->where('rent_period_id', $merchantUnit->deal->rent_period_id);
+                    })
+                    ->exists();
 
                     if (! $unitOfSameContainerShelfUsingSameRentPeriod) {
                         
-                       Rent::find($addedUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $merchantUnit->rent_period_id))->first()->update([
+                       Rent::find($addedUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $merchantUnit->deal->rent_period_id))->first()->update([
                             'active' => 0
                        ]); 
 
@@ -860,7 +1023,7 @@ class DealController extends Controller
                 if (!empty($expectedContainer) && $expectedContainer->engaged==0.0) {
                     
                     $newSpaces = $expectedContainer->deals()->create([
-                        'rent_period_id' => $warehouseContainer->selected_rent->rent_period_id,
+                        // 'rent_period_id' => $warehouseContainer->selected_rent->rent_period_id,
                         // 'warehouse_id' => $expectedContainer->warehouseContainer->warehouse_id,
                         'warehouse_container_id' => $expectedContainer->warehouse_container_id,
                         'merchant_deal_id' => $deal->id,
@@ -876,10 +1039,9 @@ class DealController extends Controller
                     // $lastPayment = $payment->rents()->where('dealt_space_id', )->latest()->first();
                     
                     $containerNewRent = $payment->rents()->create([
-                        'issued_from' => $deal->created_at,
-                        'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
+                        // 'issued_from' => $deal->created_at,
+                        // 'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                         'rent' => $warehouseContainer->selected_rent->rent,
-                        'number_installment' => 1,
                         'dealt_space_id' => $newSpaces->id
                     ]);
 
@@ -915,7 +1077,7 @@ class DealController extends Controller
                     if (!empty($containerExpectedShelf) && $containerExpectedShelf->engaged==0.0) {
                         
                         $dealtNewShelf = $containerExpectedShelf->deals()->create([
-                            'rent_period_id' => $warehouseSpace->container->selected_rent->rent_period_id,
+                            // 'rent_period_id' => $warehouseSpace->container->selected_rent->rent_period_id,
                             // 'warehouse_id' => $containerExpectedShelf->warehouseContainer->warehouse_id,
                             'warehouse_container_id' => $containerExpectedShelf->warehouse_container_id,
                             'merchant_deal_id' => $deal->id
@@ -928,10 +1090,9 @@ class DealController extends Controller
                         $containerExpectedShelf->parentContainer->updateChildUnits($containerExpectedShelf, 1);
                         
                         $shelfNewRent = $payment->rents()->create([
-                            'issued_from' => $deal->created_at,
-                            'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
+                            // 'issued_from' => $deal->created_at,
+                            // 'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
-                            'number_installment' => 1,
                             'dealt_space_id' => $dealtNewShelf->id
                         ]);
         
@@ -973,7 +1134,7 @@ class DealController extends Controller
                     if (!empty($warehouseContainerShelfExpectedUnit) && $warehouseContainerShelfExpectedUnit->engaged==0.0) {
 
                         $dealtNewUnit = $warehouseContainerShelfExpectedUnit->deals()->create([
-                            'rent_period_id' => $warehouseSpace->container->selected_rent->rent_period_id,
+                            // 'rent_period_id' => $warehouseSpace->container->selected_rent->rent_period_id,
                             // 'warehouse_id' => $warehouseContainerShelfExpectedUnit->warehouseContainer->warehouse_id,
                             'warehouse_container_id' => $warehouseContainerShelfExpectedUnit->warehouse_container_id,
                             'merchant_deal_id' => $deal->id
@@ -984,10 +1145,9 @@ class DealController extends Controller
                         ]);
 
                         $unitNewRent = $payment->rents()->create([
-                            'issued_from' => $deal->created_at,
-                            'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
+                            // 'issued_from' => $deal->created_at,
+                            // 'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
-                            'number_installment' => 1,
                             'dealt_space_id' => $dealtNewUnit->id
                         ]);
 
@@ -1008,32 +1168,32 @@ class DealController extends Controller
 
     }
 
-    protected function decreaseNextPaymentDues($dueAmount, $date)
+    protected function decreaseNextPaymentDues($amountToDeduct, $date)
     {
         $nextPaymentsToUpdate = MerchantPayment::where('paid_at', '>', $date)->get();
 
         foreach ($nextPaymentsToUpdate as $merchantPaymentKey => $nextPaymentToUpdate) {
             
             $nextPaymentToUpdate->update([
-                'previous_due' => $nextPaymentToUpdate->previous_due - $dueAmount,
-                'net_payable' => $nextPaymentToUpdate->net_payable - $dueAmount,
-                'current_due' => $nextPaymentToUpdate->current_due - $dueAmount,
+                'previous_due' => $nextPaymentToUpdate->previous_due - $amountToDeduct,
+                'net_payable' => $nextPaymentToUpdate->net_payable - $amountToDeduct,
+                'current_due' => $nextPaymentToUpdate->current_due - $amountToDeduct
             ]);
 
         }
 
     }
 
-    protected function increaseNextPaymentDues($dueAmount, $date)
+    protected function increaseNextPaymentDues($amountToAdd, $date)
     {
         $nextPaymentsToUpdate = MerchantPayment::where('paid_at', '>', $date)->get();
 
         foreach ($nextPaymentsToUpdate as $merchantPaymentKey => $nextPaymentToUpdate) {
             
             $nextPaymentToUpdate->update([
-                'previous_due' => $nextPaymentToUpdate->previous_due + $dueAmount,
-                'net_payable' => $nextPaymentToUpdate->net_payable + $dueAmount,
-                'current_due' => $nextPaymentToUpdate->current_due + $dueAmount,
+                'previous_due' => $nextPaymentToUpdate->previous_due + $amountToAdd,
+                'net_payable' => $nextPaymentToUpdate->net_payable + $amountToAdd,
+                'current_due' => $nextPaymentToUpdate->current_due + $amountToAdd,
             ]);
 
         }

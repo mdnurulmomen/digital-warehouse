@@ -18,7 +18,7 @@
 					</div>
 
 					<div class="modal-body text-center">
-						<h4 class="text-danger">Want to delete '{{ (contentToDelete.user_name || contentToDelete.name || (contentToDelete.hasOwnProperty('e_commerce_fulfillment') ? 'the deal' : 'stock')) | capitalize }}' ?</h4>
+						<h4 class="text-danger">Want to delete '{{ (contentToDelete.user_name || contentToDelete.name || (contentToDelete.hasOwnProperty('e_commerce_fulfillment') ? 'the deal' : contentToDelete.hasOwnProperty('number_installment') ? 'the payment' : 'stock' )) | capitalize }}' ?</h4>
 						<h6 class="sub-heading text-secondary">{{ restorationMessage }}</h6>
 					</div>
 

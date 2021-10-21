@@ -20,7 +20,6 @@ class CreateDealtSpacesTable extends Migration
             $table->increments('id');
             // $table->unsignedTinyInteger('rent_id');
             // $table->unsignedSmallInteger('rent')->default(0);
-            $table->unsignedTinyInteger('rent_period_id');
             $table->string('space_type', 100);  // warehouse_container_shelf_units / warehouse_container_shelfs / warehouse_container_shelf_units
             $table->unsignedInteger('space_id');
             // $table->float('engaged', $precision = 2, $scale = 1)->default(0);  // 1 for full, .5 for partial

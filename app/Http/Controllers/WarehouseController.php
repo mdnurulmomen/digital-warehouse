@@ -429,12 +429,15 @@ class WarehouseController extends Controller
 
         return MerchantWarehouseResource::customCollection(
 
-            Warehouse::where('active', true)->whereHas('deals', function ($query) use ($merchant) {
-                $query->whereHas('deal', function ($query1) use ($merchant) {
-                    $query1->where('merchant_id', $merchant);
-                })
-                ->whereHas('validities', function ($query2) {
-                    $query2->where('expired_at', '>', now());
+            Warehouse::where('active', true)->whereHas('containers', function ($query) use ($merchant) {
+                $query->whereHas('deals', function ($query1) use ($merchant) {
+                    $query1->whereHas('deal', function ($query2) use ($merchant) {
+                        $query2->where('merchant_id', $merchant)
+                                ->where('active', 1)
+                                ->whereHas('payments', function ($query3) {
+                                    $query3->whereDate('date_to', '>=', today());
+                                });
+                    });
                 });
             })
             ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])

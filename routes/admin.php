@@ -223,7 +223,7 @@ Route::name('admin.')->group(function () {
 		Route::post('/deal-payments/{perPage}', 'DealController@storeDealNewPayment')->name('deal-payments');	
 		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments');	
 		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments');
-		Route::get('/api/search-deal-payments/{deal}/{search}/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+		Route::post('/api/search-deal-payments/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');

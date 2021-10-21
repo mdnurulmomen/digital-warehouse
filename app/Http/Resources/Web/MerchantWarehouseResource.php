@@ -15,7 +15,7 @@ class MerchantWarehouseResource extends JsonResource
         self::$merchant = $merchant;
         return parent::collection($resource);
     }
-
+    
     //I made custom function that returns resource type
     public function customResource($merchant)
     {
@@ -41,10 +41,10 @@ class MerchantWarehouseResource extends JsonResource
                 
                 $this->containerStatuses()->where('occupied', 0.0)->whereHas('deals', function ($query1) {
                     $query1->whereHas('deal', function ($query2) {
-                        $query2->where('merchant_id', self::$merchant);
-                    })
-                    ->whereHas('validities', function ($query3) {
-                        $query3->where('expired_at', '>', now());
+                        $query2->where('merchant_id', self::$merchant)
+                        ->whereHas('payments', function ($query3) {
+                            $query3->whereDate('date_to', '>=', today());
+                        });
                     });
                 })
                 ->get(),
@@ -54,10 +54,10 @@ class MerchantWarehouseResource extends JsonResource
                 $this->containerStatuses()->whereHas('containerShelfStatuses', function ($query1) {
                     $query1->where('occupied', 0.0)->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
-                            $query3->where('merchant_id', self::$merchant);
-                        })
-                        ->whereHas('validities', function ($query4) {
-                            $query4->where('expired_at', '>', now());
+                            $query3->where('merchant_id', self::$merchant)
+                            ->whereHas('payments', function ($query4) {
+                                $query4->whereDate('date_to', '>=', today());
+                            });
                         });
                     });
                 })
@@ -66,10 +66,10 @@ class MerchantWarehouseResource extends JsonResource
                         function ($query1) {
                             $query1->where('occupied', 0.0)->whereHas('deals', function ($query2) {
                                 $query2->whereHas('deal', function ($query3) {
-                                    $query3->where('merchant_id', self::$merchant);
-                                })
-                                ->whereHas('validities', function ($query4) {
-                                    $query4->where('expired_at', '>', now());
+                                    $query3->where('merchant_id', self::$merchant)
+                                    ->whereHas('payments', function ($query4) {
+                                        $query4->whereDate('date_to', '>=', today());
+                                    });
                                 });
                             });
                         }
@@ -79,12 +79,13 @@ class MerchantWarehouseResource extends JsonResource
             'emptyUnitContainers' => 
                 
                 $this->containerStatuses()->whereHas('containerShelfUnitStatuses', function ($query1) {
-                    $query1->where('warehouse_container_shelf_unit_statuses.occupied', 0.0)->whereHas('deals', function ($query2) {
+                    $query1->where('warehouse_container_shelf_unit_statuses.occupied', 0.0)
+                    ->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
-                            $query3->where('merchant_id', self::$merchant);
-                        })
-                        ->whereHas('validities', function ($query4) {
-                            $query4->where('expired_at', '>', now());
+                            $query3->where('merchant_id', self::$merchant)
+                            ->whereHas('payments', function ($query4) {
+                                $query4->whereDate('date_to', '>=', today());
+                            });
                         });
                     });
                 })
@@ -92,12 +93,13 @@ class MerchantWarehouseResource extends JsonResource
                     'containerShelfStatuses' => 
                         function ($query) {
                             $query->whereHas('containerShelfUnitStatuses', function ($query1) {
-                                $query1->where('warehouse_container_shelf_unit_statuses.occupied', 0.0)->whereHas('deals', function ($query2) {
+                                $query1->where('warehouse_container_shelf_unit_statuses.occupied', 0.0)
+                                ->whereHas('deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
-                                        $query3->where('merchant_id', self::$merchant);
-                                    })
-                                    ->whereHas('validities', function ($query4) {
-                                        $query4->where('expired_at', '>', now());
+                                        $query3->where('merchant_id', self::$merchant)
+                                        ->whereHas('payments', function ($query4) {
+                                            $query4->whereDate('date_to', '>=', today());
+                                        });
                                     });
                                 });
                             });
@@ -105,12 +107,13 @@ class MerchantWarehouseResource extends JsonResource
     
                     'containerShelfStatuses.containerShelfUnitStatuses' => 
                         function ($query1) {
-                            $query1->where('occupied', 0.0)->whereHas('deals', function ($query2) {
+                            $query1->where('occupied', 0.0)
+                            ->whereHas('deals', function ($query2) {
                                 $query2->whereHas('deal', function ($query3) {
-                                    $query3->where('merchant_id', self::$merchant);
-                                })
-                                ->whereHas('validities', function ($query4) {
-                                    $query4->where('expired_at', '>', now());
+                                    $query3->where('merchant_id', self::$merchant)
+                                    ->whereHas('payments', function ($query4) {
+                                        $query4->whereDate('date_to', '>=', now());
+                                    });
                                 });
                             });
                         },

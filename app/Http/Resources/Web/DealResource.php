@@ -22,8 +22,10 @@ class DealResource extends JsonResource
             'e_commerce_fulfillment' => $this->e_commerce_fulfillment,
             'auto_renewal' => $this->auto_renewal,
             'sale_percentage' => $this->sale_percentage,
+            'rent_period_id' => $this->rent_period_id,
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at->format('Y-M-d H:i:s'),
+            'rent_period' => $this->rentPeriod,
             'warehouses' => DealtWarehouseResource::collection(
                 Warehouse::whereHas('containers', function ($query) {
                     $query->whereHas('deals', function ($query1) {

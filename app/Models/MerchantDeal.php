@@ -63,4 +63,9 @@ class MerchantDeal extends Model
     {
         return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
     }
+
+    public function rentPeriod()
+    {
+        return $this->belongsTo(RentPeriod::class, 'rent_period_id', 'id');
+    }
 }

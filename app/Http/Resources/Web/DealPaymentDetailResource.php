@@ -16,10 +16,10 @@ class DealPaymentDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'issued_from' => $this->issued_from,
-            'expired_at' => $this->expired_at,
+            // 'issued_from' => $this->issued_from,
+            // 'expired_at' => $this->expired_at,
             'rent' => $this->rent,
-            'number_installment' => $this->number_installment,
+            // 'number_installment' => $this->number_installment,
             'dealt_space_id' => $this->dealt_space_id,
             'dealt_space' => new DealtSpaceResource($this->space->space)
         ];
