@@ -25,7 +25,7 @@
 											  		v-if="userHasPermissionTo('create-product-asset-index') || userHasPermissionTo('create-product-asset')" 
 											  		:query="query" 
 											  		:caller-page="'variation'" 
-											  		:required-permission = "'asset'" 
+											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -51,7 +51,7 @@
 										  			:column-values-to-show="['name', 'variation_type_name', 'variation_parent_name']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission = "'asset'" 
+										  			:required-permission = "'product-asset'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -75,13 +75,13 @@
 																			@click="changeContentsOrder('name')"
 																		> 
 																			Variation
-																			<span v-show="currentSorting==='variation' && ascending">
+																			<span v-show="currentSorting==='name' && ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
-																			<span v-show="currentSorting==='variation' && descending">
+																			<span v-show="currentSorting==='name' && descending">
 																				<i class="fa fa-sort-down" aria-hidden="true"></i>
 																			</span>
-																			<span v-show="currentSorting!=='variation'">
+																			<span v-show="currentSorting!=='name'">
 																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
 																			</span>
 																		</a>
@@ -169,13 +169,13 @@
 																			@click="changeContentsOrder('name')"
 																		> 
 																			Variation
-																			<span v-show="currentSorting==='variation' && ascending">
+																			<span v-show="currentSorting==='name' && ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
-																			<span v-show="currentSorting==='variation' && descending">
+																			<span v-show="currentSorting==='name' && descending">
 																				<i class="fa fa-sort-down" aria-hidden="true"></i>
 																			</span>
-																			<span v-show="currentSorting!=='variation'">
+																			<span v-show="currentSorting!=='name'">
 																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
 																			</span>
 																		</a>
@@ -757,6 +757,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchAllVariationTypes();
 					});
 
 			},
@@ -783,6 +786,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchAllVariationTypes();
 					});
 
 			},
@@ -804,6 +810,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchAllVariationTypes();
 					});
 
 			},
@@ -825,6 +834,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.fetchAllVariationTypes();
 					});
 
 			},

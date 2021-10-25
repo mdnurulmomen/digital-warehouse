@@ -27,7 +27,7 @@
 											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')" 
 											  		:query="query" 
 											  		:caller-page="'product category'" 
-											  		:required-permission = "'product-category'" 
+											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -53,7 +53,7 @@
 										  			:column-values-to-show="['name', 'parents', 'products_count']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'product-category'" 
+										  			:required-permission="'product-asset'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 

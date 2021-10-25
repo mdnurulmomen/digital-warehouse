@@ -1370,7 +1370,7 @@
 			},
 			fetchAllManufacturers() {
 				
-				if (! this.userHasPermissionTo('view-product-manufacturer-index')) {
+				if (! this.userHasPermissionTo('view-product-asset-index')) {
 
 					this.error = 'You do not have permission to view manufacturers';
 					return;

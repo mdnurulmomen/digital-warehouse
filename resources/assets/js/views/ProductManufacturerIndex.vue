@@ -52,7 +52,7 @@
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'product-manufacturer'" 
+										  			:required-permission="'product-asset'" 
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 

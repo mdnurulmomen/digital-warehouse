@@ -26,7 +26,7 @@
 											  		v-if="userHasPermissionTo('create-product-asset-index') || userHasPermissionTo('create-product-asset')"
 											  		:query="query" 
 											  		:caller-page="'variation type'" 
-											  		:required-permission="'asset'" 
+											  		:required-permission="'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -221,8 +221,7 @@
 								</div>
 							</div>
 						</div>
-					</div> 
-				
+					</div> 	
 				</div>
 			</div>
 		</div>

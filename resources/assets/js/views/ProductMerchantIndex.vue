@@ -55,7 +55,7 @@
 																	<tr v-for="productMerchant in productAllMerchants" :key="'product-id' + product.id + '-product-merchant-id-' + productMerchant.id"
 																	>
 																		<td>
-																			{{ productMerchant.merchant.first_name + ' ' + productMerchant.merchant.last_name + ' ( ' + productMerchant.merchant.user_name + ' )' | capitalize }}
+																			{{ getMerchantFullName(productMerchant) }}
 																		</td>
 																		
 																		<td>
@@ -1653,7 +1653,7 @@
 			},
 			fetchAllManufacturers() {
 				
-				if (! this.userHasPermissionTo('view-product-manufacturer-index')) {
+				if (! this.userHasPermissionTo('view-product-asset-index')) {
 
 					this.error = 'You do not have permission to view manufacturers';
 					return;
@@ -2241,6 +2241,17 @@
 				}
 
 			},
+			getMerchantFullName(productMerchant) {
+
+				if (productMerchant.merchant && (productMerchant.merchant.first_name || productMerchant.merchant.last_name)) {
+
+					return this.$options.filters.capitalize(productMerchant.merchant.first_name + ' ' + productMerchant.merchant.last_name);
+
+				}
+
+				return this.$options.filters.capitalize(productMerchant.merchant.user_name);
+
+			},
 		/*
 			resetEmptyContainers({engaged, id, name, container_shelf_statuses, warehouse_container_id}) {
 
@@ -2611,7 +2622,10 @@
 			},
 			showPreview(imagePath = 'default') {
 				
-				if (imagePath.startsWith('data:')) {
+				if (! imagePath || imagePath == '') {
+					return '/' + this.product.preview;
+				}
+				else if (imagePath.startsWith('data:')) {
 					return imagePath;
 				}
 				else {

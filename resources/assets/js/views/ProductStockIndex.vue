@@ -21,10 +21,24 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">			
-										  	<div class="col-sm-12">
- 												<div class="row form-group">
-											  		<div class="col-sm-6 d-flex align-items-center form-group">
+										<div class="row">
+
+											<div class="col-sm-12">
+											  	<!-- 
+											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('create-merchant-payment')" 
+											  		:query="query" 
+											  		:caller-page="'payment'" 
+											  		:required-permission="'merchant-payment'"
+											  		
+											  		@showContentCreateForm="showContentCreateForm" 
+											  		@searchData="searchData($event)" 
+											  		@fetchAllContents="setDealAllPayments()"
+											  	></search-and-addition-option> 
+											  	-->
+
+											  	<div class="row form-group">
+											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
@@ -33,66 +47,56 @@
 											  				</span>
 											  			</div>
 
-											  			<div class="d-flex align-items-center ml-auto ml-sm-0">
-											  				<!-- 
-											  				<div>
-											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
-											  				</div> 
-											  				-->
-
-											  				<div class="dropdown">
-										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
-											  					
-											  					<div class="dropdown-menu">
-										  							<download-excel 
-														  				class="btn btn-default p-1 dropdown-item active"
-																		:data="allStocks"
-																		:fields="dataToExport" 
-																		worksheet="Stocks sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				Excel
-																	</download-excel>
-											  						
-											  						<!-- 
-											  						<download-excel 
-											  							type="csv"
-														  				class="btn btn-default p-1 dropdown-item disabled"
-																		:data="allStocks"
-																		:fields="dataToExport" 
-																		worksheet="Stocks sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				CSV
-																	</download-excel> 
-																	-->
-											  					</div>
-											  				</div>
-
-											  				<div 
-											  					class="ml-2"
-											  					v-if="userHasPermissionTo('create-product-stock')"
-											  				>
-													  			<button 
-														  			class="btn btn-success btn-outline-success btn-sm" 
-														  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
-														  			@click="showStockCreateForm"
+											  			<div class="dropdown">
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+										  					
+										  					<div class="dropdown-menu">
+									  							<download-excel 
+													  				class="btn btn-default p-1 dropdown-item active"
+																	:data="allStocks"
+																	:fields="dataToExport" 
+																	worksheet="Stocks sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
 													  			>
-													  				<i class="fa fa-plus"></i>
-													  				New Stock
-													  			</button>
-													  		</div>
+													  				Excel
+																</download-excel>
+										  						
+										  						<!-- 
+										  						<download-excel 
+										  							type="csv"
+													  				class="btn btn-default p-1 dropdown-item disabled"
+																	:data="allStocks"
+																	:fields="dataToExport" 
+																	worksheet="Stocks sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				CSV
+																</download-excel> 
+																-->
+										  					</div>
+										  				</div>
+
+											  			<div class="ml-auto d-sm-none">
+											  				<button 
+											  					v-if="userHasPermissionTo('create-product-stock')"
+													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			@click="showStockCreateForm()" 
+													  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
+												  			>
+												  				<i class="fa fa-plus"></i>
+												  				New Stock
+												  			</button>
 											  			</div>
 											  		</div>
 
-											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
-											  			<div class="ml-sm-auto mr-3">
+											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
+											  			<div class="mx-sm-auto w-75">
 										  					<input 	
 																type="text" 
 														  		class="form-control" 
 														  		pattern="[^'!#$%^()\x22]+" 
 														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Stocks"
+														  		placeholder="Search Payments"
 													  		>
 
 													  		<div class="invalid-feedback">
@@ -126,6 +130,18 @@
 																</li>
 															</ul>
 													  	</div>
+													</div>
+
+													<div class="col-md-4 text-right d-none d-md-block">
+											  			<button 
+										  					v-if="userHasPermissionTo('create-product-stock')"
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			@click="showStockCreateForm()" 
+												  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Stock
+											  			</button>
 													</div>
 											  	</div>
 											</div>
@@ -189,11 +205,11 @@
 																		</td>
 
 																		<td>
-																			{{ stock.stock_quantity }}
+																			{{ stock.stock_quantity + ' ' + product.quantity_type }}
 																		</td>
 
 																		<td>
-																			{{ stock.available_quantity }}
+																			{{ stock.available_quantity + ' ' + product.quantity_type }}
 																		</td>
 
 																		<td>
@@ -362,10 +378,10 @@
 									<h2 class="mx-auto mb-4 lead">Product Profile</h2>
 
 									<div class="col-md-12">
-										<div class="row">
-											<div class="col-md-4 align-self-center text-center">
+										<div class="row d-flex">
+											<div class="col-md-4 text-center align-self-center">
 												<img 
-													:src="'/' + productMerchant.preview" 
+													:src="showPreview(productMerchant.preview)" 
 													class="img-fluid" 
 													alt="Product Preview" 
 													width="150px"
@@ -423,7 +439,7 @@
 														Warning Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ productMerchant.warning_quantity }}
+														{{ productMerchant.warning_quantity + ' ' + product.quantity_type }}
 													</label>
 												</div>
 
@@ -432,7 +448,7 @@
 														Available Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ productMerchant.available_quantity }}
+														{{ productMerchant.available_quantity + ' ' + product.quantity_type }}
 													</label>
 												</div>
 
@@ -846,6 +862,33 @@
 													    	{{ errors.stock.addresses[spaceIndex].product_shelves }}
 													    </div>
 													</div>
+
+													<div 
+														class="form-group col-md-6" 
+														v-else 
+													>
+														<label for="inputFirstName">Select Shelves</label>
+														<multiselect 
+					                              			placeholder="Select Shelves" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@close="validateFormInput('product_shelves')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div class="invalid-feedback">
+													    	{{ errors.stock.addresses[spaceIndex].product_shelves }}
+													    </div>
+													</div>
 												</div>
 
 												<div class="form-row" v-show="stockSpace.type=='units'">
@@ -898,6 +941,30 @@
 
 													<div 
 														class="form-group col-md-4" 
+														v-else
+													>
+														<label for="inputFirstName">Select Parent Shelf</label>
+														<multiselect 
+					                              			placeholder="Parent Shelf" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@input="setAvailableUnits(spaceIndex)" 
+					                                  		@close="validateFormInput('product_shelf')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div class="invalid-feedback">
+													    	{{ errors.stock.addresses[spaceIndex].product_shelf }}
+													    </div>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
 														v-if="stockSpace.container && stockSpace.container.shelf"
 													>
 														<label for="inputFirstName">Select Units</label>
@@ -907,6 +974,33 @@
 					                              			label="name" 
 					                                  		track-by="id" 
 					                                  		:options="emptyUnits" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false" 
+					                                  		class="form-control p-0" 
+					                                  		:class="!errors.stock.addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
+					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+					                                  		@close="validateFormInput('product_units')" 
+					                              		>
+					                                	</multiselect>
+					                                	<div class="invalid-feedback">
+													    	{{ errors.stock.addresses[spaceIndex].product_units }}
+													    </div>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-else
+													>
+														<label for="inputFirstName">Select Units</label>
+														<multiselect 
+					                              			placeholder="Select Units" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
 					                                  		:multiple="true" 
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
@@ -1214,7 +1308,7 @@
 
 											<div class="col-sm-6 col-form-label">
 												
-												{{ singleStockData.stock_quantity }}
+												{{ singleStockData.stock_quantity + ' ' + product.quantity_type }}
 												
 												<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
 													<div 
@@ -1228,7 +1322,7 @@
 															</label>
 
 															<label class="col-form-label">
-																{{ stockVariation.stock_quantity }}
+																{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
 															</label>
 														</div>
 														
@@ -1253,7 +1347,7 @@
 											</label>
 											
 											<label class="col-sm-6 col-form-label">
-												{{ singleStockData.available_quantity }}
+												{{ singleStockData.available_quantity + ' ' + product.quantity_type }}
 											</label>
 										</div>
 
@@ -1347,7 +1441,7 @@
 															</label>
 
 															<label class="col-form-label">
-																{{ stockVariation.stock_quantity }}
+																{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
 																<ol 
 																	v-if="singleStockData.has_serials && stockVariation.serials.length"
 																>
@@ -1636,7 +1730,7 @@
 
 						<div class="col-6 col-form-label">
 							
-							{{ singleStockData.stock_quantity }}
+							{{ singleStockData.stock_quantity + ' ' + product.quantity_type }}
 							
 							<div class="form-row" v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
 								<div 
@@ -1650,7 +1744,7 @@
 										</label>
 
 										<label class="col-form-label">
-											{{ stockVariation.stock_quantity }}
+											{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
 										</label>
 									</div>
 								</div>
@@ -1664,7 +1758,7 @@
 						</label>
 						
 						<label class="col-6 col-form-label">
-							{{ singleStockData.available_quantity }}
+							{{ singleStockData.available_quantity + ' ' + product.quantity_type }}
 						</label>
 					</div>
 
@@ -1730,7 +1824,7 @@
 						</label>
 					</div>
 
-					<div class="form-row">
+					<div class="form-row" v-show="singleStockData.has_serials">
 						<label class="col-6 col-form-label font-weight-bold text-right">
 							Serials :
 						</label>
@@ -1756,7 +1850,7 @@
 										</label>
 
 										<label class="col-form-label">
-											{{ stockVariation.stock_quantity }}
+											{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
 											<ol 
 												v-if="singleStockData.has_serials && stockVariation.serials.length"
 											>
@@ -1914,7 +2008,9 @@
 						field: "stock_quantity",
 						callback: (stock_quantity) => {
 							
-							return this.productMerchant.hasOwnProperty('merchant') ? `${this.productMerchant.merchant.first_name} ${this.productMerchant.merchant.last_name}` : 'NA';
+							// return this.productMerchant.hasOwnProperty('merchant') ? `${this.productMerchant.merchant.first_name} ${this.productMerchant.merchant.last_name}` : 'NA';
+							
+							return this.productMerchant.hasOwnProperty('merchant') ? this.$options.filters.capitalize(this.productMerchant.merchant.user_name) : 'NA';
 							
 						},
 					},
@@ -1925,8 +2021,8 @@
 
 							var stockDetailToReturn = '';
 
-							stockDetailToReturn += `${object.stock_quantity} (Available:${object.available_quantity})
-							` ;
+							stockDetailToReturn += `${object.stock_quantity} ${this.product.quantity_type} (Available:${object.available_quantity} ${this.product.quantity_type})
+							`;
 
 							if (object.hasOwnProperty('variations') && object.variations.length) {
 
@@ -1936,7 +2032,7 @@
 
 										if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
 
-											stockDetailToReturn +=  `(Variation: ${stockedProductVariation.variation.name}, Qty: ${stockedProductVariation.stock_quantity})
+											stockDetailToReturn +=  `(Variation: ${stockedProductVariation.variation.name}, Qty: ${stockedProductVariation.stock_quantity}  ${this.product.quantity_type})
 											`;
 
 										}
@@ -1960,9 +2056,9 @@
 									
 								);
 
-								return stockDetailToReturn;
-
 							}
+
+							return stockDetailToReturn;
 
 						},
 
@@ -1972,10 +2068,9 @@
 						callback: (object) => {
 							var stockInfosToReturn = '';
 
-							stockInfosToReturn += 'Warehouse:' + (object.hasOwnProperty('warehouse') ? object.warehouse.name : 'NA') + '(' + object.created_at + ')' + "\n";
+							stockInfosToReturn += 'Warehouse:' + (object.hasOwnProperty('warehouse') ? this.$options.filters.capitalize(object.warehouse.name) : 'NA') + '(' + object.created_at + ')' + "\n";
 
-							stockInfosToReturn += `Keeper: ${object.keeper.first_name} ${object.keeper.last_name}
-							` 
+							stockInfosToReturn += 'Keeper:' + this.$options.filters.capitalize(object.keeper.first_name + ' ' + object.keeper.last_name) + '\n'
 
 							return stockInfosToReturn;
 							
@@ -1986,7 +2081,7 @@
 						callback: (object) => {
 							
 							if (object.has_approval==1) {
-								return "Approved (" + object.updated_at + ').' + "\n" + (object.approver ? object.approver.first_name + ' ' + object.approver.last_name : '');
+								return "Approved (" + object.updated_at + ').' + "\n" + 'Approver:' + (object.approver ? this.$options.filters.capitalize(object.approver.first_name + ' ' + object.approver.last_name) : '');
 							}
 							else {
 								return 'Pending.';
@@ -3229,6 +3324,18 @@
             	}
 
             },
+            showPreview(imagePath = 'default') {
+				
+				if (! imagePath || imagePath == '') {
+					return '/' + this.product.preview;
+				}
+				else {
+					return '/' + imagePath || '';
+				}
+
+				// return '';
+
+			},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;

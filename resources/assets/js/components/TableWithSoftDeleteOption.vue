@@ -75,7 +75,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-warning btn-icon" 
+									class="btn btn-dark btn-icon" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
 							>
@@ -247,8 +247,8 @@
 		methods : {
 			
 			getFullName(object) {
-				if (!object.first_name && !object.last_name) {
-					return 'NA';
+				if (! object.first_name && ! object.last_name) {
+					return this.$options.filters.capitalize(object.user_name) || 'NA' ;
 				}
 
 				return this.$options.filters.capitalize(object.first_name) + ' ' + this.$options.filters.capitalize(object.last_name);

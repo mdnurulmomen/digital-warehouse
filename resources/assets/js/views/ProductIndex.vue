@@ -270,7 +270,7 @@
 												:valueFormat="'object'" 
 												:required="true" 
 												:disabled="productMode=='bulk product'" 
-												@select="setProductCategory"
+												@input="setProductCategory"
 											/>
 
 		                                	<div class="invalid-feedback">
@@ -550,10 +550,9 @@
 																	:valueFormat="'object'" 
 																	:required="true" 
 																	:disabled="productVariation.variation_immutability" 
-																	@select="validateFormInput('variation_parent_id')"
-																	@close="validateFormInput('product_variation_id')"  
+																	@input="validateFormInput('product_variation_id')"  
 																	class="form-control p-0" 
-							                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
+							                                  		:class="! errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
 																	placeholder="Select Variation" 
 																/>
 
@@ -1268,7 +1267,7 @@
 
 			// this.fetchAllContainers();
 			
-			if (this.userHasPermissionTo('view-asset-index')) {
+			if (this.userHasPermissionTo('view-product-asset-index')) {
 
 				this.fetchAllVariationTypes();
 				this.fetchProductAllCategories();
@@ -1342,7 +1341,7 @@
 			},
 			fetchProductAllCategories() {
 
-				if (! this.userHasPermissionTo('view-asset-index')) {
+				if (! this.userHasPermissionTo('view-product-asset-index')) {
 
 					this.error = 'You do not have permission to view product-categories';
 					return;
@@ -1434,7 +1433,7 @@
 			*/
 			fetchAllVariationTypes() {
 
-				if (! this.userHasPermissionTo('view-asset-index')) {
+				if (! this.userHasPermissionTo('view-product-asset-index')) {
 
 					this.error = 'You do not have permission to view variation types';
 					return;
@@ -1915,6 +1914,8 @@
 				if (this.singleProductData.category && Object.keys(this.singleProductData.category).length > 0) {
 					this.singleProductData.product_category_id = this.singleProductData.category.id;
 				}
+
+				this.validateFormInput('product_category');
 			},
 			setProductMerchant() {
 				// console.log('merchant has been triggered');
@@ -2468,12 +2469,12 @@
 							
 							this.singleProductData.variations.forEach(
 								(productVariation, index) => {
-									if (! productVariation.hasOwnProperty('variation') || ! productVariation.variation || Object.keys(productVariation.variation).length == 0) {
+									if (! productVariation.variation || Object.keys(productVariation.variation).length == 0) {
 										
 										this.errors.product.variations[index].product_variation_id = 'Variation is required';
 
 									}
-									else if (this.singleProductData.variations.filter((obj) => (obj.hasOwnProperty('variation') && obj.variation.id) === productVariation.variation.id).length > 1) {
+									else if (this.singleProductData.variations.filter(obj => obj.variation && obj.variation.id == productVariation.variation.id).length > 1) {
 
 										this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 									}
