@@ -3715,31 +3715,22 @@
 							
 							if (this.singleStockData.serials.some(productSerial=>! productSerial.serial_no) && (! this.productNewSerial || this.productNewSerial == '')) {
 
-								// this.errors.stock.product_serial[i] = 'Product serial is required';
-								// this.$set(this.errors.stock.product_serial, i, 'Product serial is required');
-								// this.$set(this.errors.stock.product_serial, 'Product serial is required');
-								this.errors.stock.product_serial = 'Product serial is required';
+								this.errors.stock.product_serial ? this.errors.stock.product_serial = 'Product serial is required' : this.$set(this.errors.stock, 'product_serial', 'Product serial is required');
 							
 							}
 							else if (this.productNewSerial && this.productNewSerial.length < 4) {
 
-								// this.$set(this.errors.stock.product_serial, 'Product serial length should be minimum 4');
-								this.errors.stock.product_serial = 'Product serial length should be minimum 4';
+								this.errors.stock.product_serial ? this.errors.stock.product_serial = 'Product serial length should be minimum 4' : this.$set(this.errors.stock, 'product_serial', 'Product serial length should be minimum 4');
 
 							}
 							else if (this.productNewSerial && ! this.productNewSerial.match(/^[a-zA-Z0-9-_]+$/)) {
 
-								// this.errors.stock.product_serial[i] = 'Invalide serial number';
-								// this.$set(this.errors.stock.product_serial, i, 'Invalide serial number');
-								// this.$set(this.errors.stock.product_serial, 'Invalide serial number');
-								this.errors.stock.product_serial = 'Invalide serial number';
+								this.errors.stock.product_serial ? this.errors.stock.product_serial = 'Invalide serial number' : this.$set(this.errors.stock, 'product_serial', 'Invalide serial number');
 
 							}
 							else if (this.singleStockData.serials.some((productSerial) => productSerial.serial_no == this.productNewSerial)) {
 
-								// this.$set(this.errors.stock.product_serial, i, 'Duplicate serial number');
-								// this.$set(this.errors.stock.product_serial, 'Duplicate serial number');
-								this.errors.stock.product_serial = 'Duplicate serial number';
+								this.errors.stock.product_serial ? this.errors.stock.product_serial = 'Duplicate serial number' : this.$set(this.errors.stock, 'product_serial', 'Duplicate serial number');
 
 							}
 							else {
@@ -3784,7 +3775,7 @@
 
 											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, stockVariationIndex, 'Variation serial is required');
 
-											this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Variation serial is required';
+											this.errors.stock.variations[stockVariationIndex].product_variation_serial ? this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Variation serial is required' : this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial', 'Variation serial is required');
 
 											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, 'Variation serial is required');
 
@@ -3795,7 +3786,7 @@
 
 											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, stockVariationIndex, 'Invalid serial number');
 
-											this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Invalid serial number';
+											this.errors.stock.variations[stockVariationIndex].product_variation_serial ? this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Invalid serial number' : this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial', 'Invalid serial number');
 
 											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, 'Invalid serial number');
 
@@ -3804,7 +3795,7 @@
 
 											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, stockVariationIndex, 'Duplicate serial number');
 											
-											this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Duplicate serial number';
+											this.errors.stock.variations[stockVariationIndex].product_variation_serial ? this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Duplicate serial number' : this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial', 'Duplicate serial number');
 											
 											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, 'Duplicate serial number');
 
