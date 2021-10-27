@@ -78,8 +78,9 @@
 
 											  			<div class="ml-auto d-sm-none">
 											  				<button 
-											  					v-if="userHasPermissionTo('create-product-stock')"
+											  					type="button" 
 													  			class="btn btn-success btn-outline-success btn-sm" 
+											  					v-if="userHasPermissionTo('create-product-stock')"
 													  			@click="showStockCreateForm()" 
 													  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
 												  			>
@@ -134,8 +135,9 @@
 
 													<div class="col-md-4 text-right d-none d-md-block">
 											  			<button 
-										  					v-if="userHasPermissionTo('create-product-stock')"
+											  				type="button" 
 												  			class="btn btn-success btn-outline-success btn-sm" 
+										  					v-if="userHasPermissionTo('create-product-stock')"
 												  			@click="showStockCreateForm()" 
 												  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
 											  			>
@@ -648,37 +650,75 @@
 										<div 
 											class="form-row" 
 											v-for="(stockedVariation, stockedVariationIndex) in singleStockData.variations" 
-											:key="'product-variation-index-' + stockedVariationIndex + 'B'"
+											:key="'product-variation-index-' + stockedVariationIndex + '-B'"
 										>	
-											<div class="card col-md-12" v-if="stockedVariation.stock_quantity > 0 && stockedVariation.hasOwnProperty('serials')">
-												<div class="card-header">
+											<div 
+												class="card col-md-12" 
+												v-if="stockedVariation.stock_quantity > 0 && stockedVariation.hasOwnProperty('serials')"
+											>
+												<div class="card-header text-center">
 													{{ stockedVariation.variation.name | capitalize }} Serials
 												</div>
 												
 												<div class="card-body">
-													<div 
-														class="form-group" 
-														v-for="productVariationStockIndex in stockedVariation.stock_quantity" 
-														:key="'product-variation-' + stockedVariation.variation.name + '-serial-' + productVariationStockIndex"
-													>	
-														<label for="inputFirstName">
-															# {{ stockedVariation.variation.name + ' Serial ' + productVariationStockIndex | capitalize }}
-														</label>
+													<div class="form-row">
+														<div class="col-sm-12 form-group">
+															<label for="inputFirstName">
+																Serial No.
+															</label>
 
-														<input 
-															type="text" 
-															class="form-control" 
-															v-model="stockedVariation.serials[productVariationStockIndex-1].serial_no" 
-															placeholder="Variation Serial number" 
-															:class="!errors.stock.variations[stockedVariationIndex].product_variation_serials[productVariationStockIndex-1] ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('product_variation_serials')" 
-															required="true" 
-															:readonly="stockedVariation.serials[productVariationStockIndex-1].has_requisitions || stockedVariation.serials[productVariationStockIndex-1].has_dispatched"
-														>
+															<div class="input-group mb-0">
+																<input 
+																	type="text" 
+																	class="form-control" 
+																	placeholder="Variation Serial number" 
+																	v-model="variationNewSerial[stockedVariationIndex]"
+																	:class="! errors.stock.variations[stockedVariationIndex].product_variation_serial ? 'is-valid' : 'is-invalid'" 
+																	@keyup.enter="addVariationSerial(stockedVariationIndex)" 
+																	@change="validateFormInput('product_variation_serial')" 
+																	required="true" 
+																	:disabled="stockedVariation.serials.length>=stockedVariation.stock_quantity && stockedVariation.serials.every(variationSerial=>variationSerial.serial_no)"
+																>
 
-														<div class="invalid-feedback">
-												        	{{ errors.stock.variations[stockedVariationIndex].product_variation_serials[productVariationStockIndex-1] }}
-												  		</div>
+																<div class="input-group-append">
+																	<span class="input-group-text" id="basic-addon2">
+																		<button 
+																			type="button" 
+																			class="btn btn-primary"
+																			@click="addVariationSerial(stockedVariationIndex)"
+																		>
+																			Enlist
+																		</button>
+																	</span>
+																</div>
+															</div>
+
+															<div 
+																class="invalid-feedback" 
+																style="display: block;" 
+																v-show="errors.stock.variations[stockedVariationIndex].product_variation_serial"
+															>
+													        	{{ errors.stock.variations[stockedVariationIndex].product_variation_serial }}
+													  		</div>
+														</div>
+
+														<div class="col-sm-12 form-group border border-success p-4 rounded-sm">
+															<ul id="merchant-product-variation-serials">
+																<li 
+																	v-for="(productVariationSerial, productVariationSerialIndex) in stockedVariation.serials"
+																	:key="'product-variation-index-' + stockedVariationIndex + '-product-variation-' + stockedVariation.variation.name + '-serial-' + productVariationSerialIndex"
+																>	
+																	{{ productVariationSerial.serial_no }}
+
+																	<i class="fa fa-close text-danger p-2"
+																		v-show="productVariationSerial.serial_no"
+																		:disabled="productVariationSerial.has_requisitions || productVariationSerial.has_dispatched" 
+																		@click="removeVariationSerial(stockedVariationIndex, productVariationSerialIndex)"
+																	>	
+																	</i>
+																</li>
+															</ul>
+														</div>
 													</div>
 												</div>
 											</div>
@@ -688,31 +728,64 @@
 									<div 
 										class="col-md-12"
 										v-else-if="productMerchant.has_serials && ! productMerchant.has_variations && singleStockData.stock_quantity > 0 && step==2"
-									>
-										<div 
-											class="form-row" 
-											v-for="stockedProductIndex in singleStockData.stock_quantity" 
-											:key="'product-serial-' + stockedProductIndex"
-										>
+									>		
+										<div class="form-row">
 											<div class="col-sm-12 form-group">
 												<label for="inputFirstName">
-													# Serial {{ stockedProductIndex }}
+													Serial No.
 												</label>
-												
-												<input 
-													type="text" 
-													class="form-control" 
-													v-model="singleStockData.serials[stockedProductIndex-1].serial_no" 
-													placeholder="Product Serial number" 
-													:class="!errors.stock.product_serials[stockedProductIndex-1] ? 'is-valid' : 'is-invalid'" 
-													@change="validateFormInput('product_serials')" 
-													required="true" 
-													:readonly="singleStockData.serials[stockedProductIndex-1].has_requisitions || singleStockData.serials[stockedProductIndex-1].has_dispatched"
-												>
 
-												<div class="invalid-feedback">
-										        	{{ errors.stock.product_serials[stockedProductIndex-1] }}
+												<div class="input-group mb-0">
+													<input 
+														type="text" 
+														required="true" 
+														class="form-control" 
+														v-model="productNewSerial" 
+														placeholder="Product Serial number" 
+														:class="! errors.stock.product_serial ? 'is-valid' : 'is-invalid'" 
+														@keyup.enter="addProductSerial()" 
+														@change="validateFormInput('product_serial')" 
+														:disabled="singleStockData.serials.length >= singleStockData.stock_quantity && singleStockData.serials.every(productSerial=>productSerial.serial_no)"
+													>
+
+													<div class="input-group-append">
+														<span class="input-group-text" id="basic-addon2">
+															<button 
+																type="button" 
+																class="btn btn-primary"
+																@click="addProductSerial()"
+															>
+																Enlist
+															</button>
+														</span>
+													</div>
+												</div>
+
+												<div 
+													class="invalid-feedback" 
+													style="display: block;" 
+													v-show="errors.stock.product_serial"
+												>
+										        	{{ errors.stock.product_serial }}
 										  		</div>
+											</div>
+
+											<div class="col-sm-12 form-group border border-success p-4 rounded-sm">
+												<ul id="merchant-product-variation-serials">
+													<li 
+														v-for="(productSerial, productSerialIndex) in singleStockData.serials"
+														:key="'product-' + productMerchant.product.name + '-serial-' + productSerialIndex"
+													>	
+														{{ productSerial.serial_no }}
+
+														<i class="fa fa-close text-danger p-2"
+															v-show="productSerial.serial_no"
+															:disabled="productSerial.has_requisitions || productSerial.has_dispatched" 
+															@click="removeProductSerial(productSerialIndex)"
+														>	
+														</i>
+													</li>
+												</ul>
 											</div>
 										</div>
 									</div>
@@ -1868,7 +1941,6 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 </template>
@@ -1915,11 +1987,13 @@
 	        	submitForm : true,
 	        	formSubmitted : false,
 
-	        	allDealtEmptyWarehouses : [],
-
 	        	allStocks : [],
 
+	        	productNewSerial : '',
+	        	variationNewSerial : [],
+
 	        	// allContainers : [],
+	        	allDealtEmptyWarehouses : [],
 	        	
 	        	emptyContainers : [],
 	        	emptyShelfContainers : [],
@@ -1951,7 +2025,7 @@
 						// warehouse : {},
 						variations : [],
 						addresses : [],
-						product_serials : [],
+						// product_serial : [],
 					},
 				},
 
@@ -2103,7 +2177,7 @@
 			currentTime: function() {
 
 				let date = new Date();
-				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate();
 
 			},
 
@@ -2339,7 +2413,7 @@
 					stock : {
 						variations : [],
 						addresses : [],
-						product_serials : [],
+						product_serial : [],
 					},
 				};
 
@@ -2469,7 +2543,7 @@
 			},
 			storeStock() {
 				
-				if (!this.verifyUserInput()) {
+				if (! this.verifyUserInput()) {
 					this.submitForm = false;
 					return;
 				}
@@ -2585,7 +2659,7 @@
 				this.validateFormInput('product_shelves');
 				this.validateFormInput('product_units');
 
-				if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && !this.errorInVariationsArray(this.errors.stock.variations) && !this.errorInAddressesArray(this.errors.stock.addresses)) {
+				if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && !this.errorInVariationsArray(this.errors.stock.variations) && !this.errorInAddressesArray(this.errors.stock.addresses)) {
 
 					return true;
 				
@@ -2594,28 +2668,11 @@
 				return false;
 		
 			},
-			errorInProductSerialsArray(array = []) {
-
-				const serialError = (serial) => {
-					return serial && serial.length > 0
-				}; 
-
-				if (array.length) {
-					return array.some(serialError);
-				}
-
-				return false;
-
-			},
 			errorInVariationsArray(array = []) {
-
-				const variationSerialError = (serial) => {
-					return serial != null
-				};
 
 				const variationError = (variation) => {
 
-					return (! this.productMerchant.has_serials && this.productMerchant.has_variations && Object.keys(variation).length > 0) || (this.productMerchant.has_serials && ! this.productMerchant.has_variations && Object.keys(variation).length > 0) || (this.productMerchant.has_serials && this.productMerchant.has_variations && Object.keys(variation).length > 1) || (variation.hasOwnProperty('product_variation_serials') && variation.product_variation_serials.length && variation.product_variation_serials.some(variationSerialError))
+					return Object.keys(variation).length > 0
 
 				}; 
 
@@ -2651,7 +2708,7 @@
 
 					}
 
-					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
 						if (this.productMerchant.has_serials) {
 
@@ -2664,7 +2721,7 @@
 
 								this.setProductSerialObjects();
 								
-							}
+							}							
 
 							this.step += 1;
 
@@ -2694,18 +2751,18 @@
 
 						if (this.productMerchant.has_variations) {
 							
-							this.validateFormInput('product_variation_serials');
+							this.validateFormInput('product_variation_serial');
 
 						}
 						else {
 							
-							this.validateFormInput('product_serials');
+							this.validateFormInput('product_serial');
 
 						}
 
 					}
 
-					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 4 && ! this.errorInProductSerialsArray(this.errors.stock.product_serials) && ! this.errorInVariationsArray(this.errors.stock.variations)) {
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
 						this.step += 1;
 						this.submitForm = true;
@@ -2753,9 +2810,9 @@
 				// new errors initialization
 				this.errors = {
 					stock : {
-						variations : [],
 						addresses : [],
-						product_serials : [],
+						variations : [],
+						// product_serial : [],
 					},
 				};
 
@@ -2798,19 +2855,31 @@
 						(productVariation, stockVariationIndex) => {
 
 							this.errors.stock.variations.push({});
-
+							
+							/*
 							if (this.productMerchant.has_serials) {
 
-								// this.errors.stock.variations[stockVariationIndex].product_variation_serials = [];
-								this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serials', []);
+								// this.errors.stock.variations[stockVariationIndex].product_variation_serial = [];
+								this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial', []);
+								// this.$delete(this.errors.stock, 'product_serial');
 
 							}
+							*/	
 
 						}
 
-					);				
+					);
+					
 
 				}
+
+				/*
+				if (! this.productMerchant.has_serials || (this.productMerchant.has_variations && this.productMerchant.has_serials)) {
+
+					this.$delete(this.errors.stock, 'product_serial');
+
+				}
+				*/
 
 			},
 			setAvailableShelvesAndUnits() {
@@ -3177,6 +3246,64 @@
 					}
 				);
 			},
+			addProductSerial() {
+
+				this.validateFormInput('product_serial');
+
+				if (! this.errors.stock.product_serial && this.singleStockData.serials.some(productSerial=>! productSerial.serial_no || productSerial.serial_no == '')) {
+
+					let emptyIndex = this.singleStockData.serials.findIndex(productSerial=> ! productSerial.serial_no || productSerial.serial_no == '');
+
+					if (emptyIndex > -1) {
+
+						this.singleStockData.serials[emptyIndex].serial_no = this.productNewSerial;
+						
+						this.productNewSerial = '';
+
+					}
+				
+				}
+
+			},
+			addVariationSerial(stockedVariationIndex) {
+
+				this.validateFormInput('product_variation_serial');
+
+				if (! this.errors.stock.variations[stockedVariationIndex].product_variation_serial && this.singleStockData.variations[stockedVariationIndex].serials.some(variationSerial => ! variationSerial.serial_no || variationSerial.serial_no == '')) {
+
+					let emptyIndex = this.singleStockData.variations[stockedVariationIndex].serials.findIndex(variationSerial => ! variationSerial.serial_no || variationSerial.serial_no == '');				
+
+					if (emptyIndex > -1) {
+
+						// this.singleStockData.variations[stockedVariationIndex].serials[emptyIndex].serial_no = this.variationNewSerial[stockedVariationIndex];
+						
+						this.$set(this.singleStockData.variations[stockedVariationIndex].serials[emptyIndex], 'serial_no', this.variationNewSerial[stockedVariationIndex]);
+
+						this.variationNewSerial[stockedVariationIndex] = '';
+
+					}
+				
+				}
+
+			},
+			removeVariationSerial(stockedVariationIndex, productVariationSerialIndex) {
+
+				if (this.singleStockData.variations.length > stockedVariationIndex && this.singleStockData.variations[stockedVariationIndex].serials.length > productVariationSerialIndex) {
+
+					this.$delete(this.singleStockData.variations[stockedVariationIndex].serials[productVariationSerialIndex], 'serial_no');
+
+				}
+
+			},
+			removeProductSerial(productSerialIndex) {
+
+				if (this.singleStockData.serials.length > productSerialIndex) {
+
+					this.$delete(this.singleStockData.serials[productSerialIndex], 'serial_no');
+
+				}
+
+			},
 			setProductSerialObjects() {
 
 				if (this.singleStockData.stock_quantity > 0 && this.singleStockData.serials.length < this.singleStockData.stock_quantity) {
@@ -3191,7 +3318,7 @@
 				else if (this.singleStockData.stock_quantity > 0 && this.singleStockData.serials.length > this.singleStockData.stock_quantity) {
 
 					this.singleStockData.serials.splice(this.singleStockData.stock_quantity, );
-					this.errors.stock.product_serials.splice(this.singleStockData.stock_quantity, );
+					// this.errors.stock.product_serial.splice(this.singleStockData.stock_quantity, );
 
 				}
 
@@ -3202,19 +3329,24 @@
 					
 					(productVariation, index) => {
 
-						if (productVariation.stock_quantity > 0 && productVariation.serials.length < productVariation.stock_quantity) {
-							
-							let difference = productVariation.stock_quantity - productVariation.serials.length;
+						if (productVariation.stock_quantity > 0) {
 
-							for (let i = 0; i < difference; i++) {
-						  		productVariation.serials.push({});
+							if (productVariation.serials.length < productVariation.stock_quantity) {
+
+								let difference = productVariation.stock_quantity - productVariation.serials.length;
+
+								for (let i = 0; i < difference; i++) {
+							  		productVariation.serials.push({});
+								}
+
 							}
+							else if (productVariation.serials.length > productVariation.stock_quantity) {
 
-						}
-						else if (productVariation.stock_quantity > 0 && productVariation.serials.length > productVariation.stock_quantity) {
+								productVariation.serials.splice(productVariation.stock_quantity, );
+								// this.errors.stock.variations[index].product_variation_serial.splice(productVariation.stock_quantity, );
 
-							productVariation.serials.splice(productVariation.stock_quantity, );
-							this.errors.stock.variations[index].product_variation_serials.splice(productVariation.stock_quantity, );
+							}
+							
 
 						}
 
@@ -3577,39 +3709,48 @@
 
 						break;
 
-					case 'product_serials' :
+					case 'product_serial' :
 
 						if (this.productMerchant.has_serials && ! this.productMerchant.has_variations) {
 							
-							for (let i = 0; i < this.singleStockData.stock_quantity; i++) {
-								
-								if (! this.singleStockData.serials[i] || Object.keys(this.singleStockData.serials[i]).length < 1 || ! this.singleStockData.serials[i].hasOwnProperty('serial_no')  || this.singleStockData.serials[i].serial_no.length < 1) {
+							if (this.singleStockData.serials.some(productSerial=>! productSerial.serial_no) && (! this.productNewSerial || this.productNewSerial == '')) {
 
-									// this.errors.stock.product_serials[i] = 'Serial number is required';
-									this.$set(this.errors.stock.product_serials, i, 'Serial number is required');
-								
-								}
-								else if (! this.singleStockData.serials[i].serial_no.match(/^[a-zA-Z0-9-_]+$/)) {
+								// this.errors.stock.product_serial[i] = 'Product serial is required';
+								// this.$set(this.errors.stock.product_serial, i, 'Product serial is required');
+								// this.$set(this.errors.stock.product_serial, 'Product serial is required');
+								this.errors.stock.product_serial = 'Product serial is required';
+							
+							}
+							else if (this.productNewSerial && this.productNewSerial.length < 4) {
 
-									// this.errors.stock.product_serials[i] = 'Invalide serial number';
-									this.$set(this.errors.stock.product_serials, i, 'Invalide serial number');
+								// this.$set(this.errors.stock.product_serial, 'Product serial length should be minimum 4');
+								this.errors.stock.product_serial = 'Product serial length should be minimum 4';
 
-								}
-								else if (this.singleStockData.serials.filter((value) => value.serial_no === this.singleStockData.serials[i].serial_no).length > 1) {
+							}
+							else if (this.productNewSerial && ! this.productNewSerial.match(/^[a-zA-Z0-9-_]+$/)) {
 
-									this.$set(this.errors.stock.product_serials, i, 'Duplicate serial number');
+								// this.errors.stock.product_serial[i] = 'Invalide serial number';
+								// this.$set(this.errors.stock.product_serial, i, 'Invalide serial number');
+								// this.$set(this.errors.stock.product_serial, 'Invalide serial number');
+								this.errors.stock.product_serial = 'Invalide serial number';
 
-								}
-								else {
+							}
+							else if (this.singleStockData.serials.some((productSerial) => productSerial.serial_no == this.productNewSerial)) {
 
-									// this.errors.stock.product_serials[i] = null;
-									this.$set(this.errors.stock.product_serials, i, null);
+								// this.$set(this.errors.stock.product_serial, i, 'Duplicate serial number');
+								// this.$set(this.errors.stock.product_serial, 'Duplicate serial number');
+								this.errors.stock.product_serial = 'Duplicate serial number';
 
-								}
+							}
+							else {
+
+								// this.errors.stock.product_serial[i] = null;
+								// this.$set(this.errors.stock.product_serial, i, null);
+								this.$delete(this.errors.stock, 'product_serial');
 
 							}
 
-							if (! this.errorInProductSerialsArray(this.errors.stock.product_serials)) {
+							if (Object.keys(this.errors.stock).length < 3) {
 
 								this.submitForm = true;
 
@@ -3619,13 +3760,14 @@
 						else {
 
 							this.submitForm = true;
-							this.errors.stock.product_serials = [];
+							// this.errors.stock.product_serial = [];
+							this.$delete(this.errors.stock, 'product_serial');
 						
 						}
 
 						break;
 					
-					case 'product_variation_serials' :
+					case 'product_variation_serial' :
 
 
 						if (this.productMerchant.has_serials && this.productMerchant.has_variations && this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
@@ -3634,36 +3776,52 @@
 							
 								(stockVariation, stockVariationIndex) => {
 
-									this.$set(this.errors.stock.variations[stockVariationIndex], 'product_variation_serials', []);
+									if (stockVariation.stock_quantity > 0) {
 
-									for (let i = 0; i < stockVariation.stock_quantity; i++) {
-										
-										if (! stockVariation.serials[i] || Object.keys(stockVariation.serials[i]).length < 1 || ! stockVariation.serials[i].hasOwnProperty('serial_no') || stockVariation.serials[i].serial_no.length < 1) {
+										if (stockVariation.serials.some(variationSerial=>! variationSerial.serial_no || variationSerial.serial_no == '') && (! this.variationNewSerial[stockVariationIndex] || this.variationNewSerial[stockVariationIndex].length < 4)) {
 
-											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = 'Serial number is required';
+											// this.errors.stock.variations[stockVariationIndex].product_variation_serial[i] = 'Variation serial is required';
 
-											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Serial number is required');
+											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, stockVariationIndex, 'Variation serial is required');
 
-										}
-										else if (! stockVariation.serials[i].serial_no.match(/^[a-zA-Z0-9-_]+$/)) {
+											this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Variation serial is required';
 
-											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = 'Invalide serial number';
-
-											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Invalide serial number');
+											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, 'Variation serial is required');
 
 										}
-										else if (stockVariation.serials.filter((value) => value.serial_no === stockVariation.serials[i].serial_no).length > 1) {
+										else if (this.variationNewSerial[stockVariationIndex] && ! this.variationNewSerial[stockVariationIndex].match(/^[a-zA-Z0-9-_]+$/)) {
 
-											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, 'Duplicate serial number');
+											// this.errors.stock.variations[stockVariationIndex].product_variation_serial[i] = 'Invalid serial number';
+
+											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, stockVariationIndex, 'Invalid serial number');
+
+											this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Invalid serial number';
+
+											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, 'Invalid serial number');
+
+										}
+										else if (this.variationNewSerial[stockVariationIndex] && stockVariation.serials.some((variationSerial) => variationSerial.serial_no == this.variationNewSerial[stockVariationIndex])) {
+
+											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, stockVariationIndex, 'Duplicate serial number');
+											
+											this.errors.stock.variations[stockVariationIndex].product_variation_serial = 'Duplicate serial number';
+											
+											// this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serial, 'Duplicate serial number');
 
 										}
 										else {
 
-											// this.errors.stock.variations[stockVariationIndex].product_variation_serials[i] = null;
+											// this.errors.stock.variations[stockVariationIndex].product_variation_serial[stockVariationIndex] = null;
 
-											this.$set(this.errors.stock.variations[stockVariationIndex].product_variation_serials, i, null);
+											this.$delete(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial');
 
 										}
+										
+									}
+									else {
+
+										// this.errors.stock.variations = [];
+										this.$delete(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial');
 
 									}
 
@@ -3681,11 +3839,13 @@
 						else {
 
 							this.submitForm = true;
+
 							this.singleStockData.variations.forEach(
 							
 								(stockVariation, stockVariationIndex) => {
 
-									this.errors.stock.variations[stockVariationIndex].product_variation_serials = [];
+									// this.errors.stock.variations[stockVariationIndex].product_variation_serial = [];
+									this.$delete(this.errors.stock.variations[stockVariationIndex], 'product_variation_serial');
 
 								}
 
