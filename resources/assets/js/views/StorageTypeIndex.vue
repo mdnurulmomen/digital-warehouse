@@ -97,6 +97,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Edit" 
 																				:disabled="formSubmitted"
 																				v-show="!content.deleted_at" 
 																				@click="openContentEditForm(content)" 
@@ -106,7 +107,8 @@
 																		</button>
 
 																		<button type="button" 
-																				class="btn btn-grd-danger btn-icon"
+																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				:disabled="formSubmitted" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
@@ -117,6 +119,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Restore" 
 																				v-show="content.deleted_at" 
 																				:disabled="formSubmitted"
 																				@click="openContentRestoreForm(content)" 
@@ -185,6 +188,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload

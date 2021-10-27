@@ -42,6 +42,7 @@
 											  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-logistic-asset')">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -124,6 +125,7 @@
 																	<td> 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
+																				data-toggle="tooltip" data-placement="top" title="View Details" 
 																				@click="showContentDetails(content)"
 																		>
 																			<i class="fa fa-eye"></i>
@@ -131,6 +133,7 @@
  																		
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Edit" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-logistic-asset')" 
@@ -140,6 +143,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-logistic-asset')" 
@@ -149,6 +153,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Restore" 
 																				v-show="content.deleted_at" 
 																				@click="openContentRestoreForm(content)" 
 																				v-if="userHasPermissionTo('delete-logistic-asset')" 
@@ -160,7 +165,7 @@
 																</tr>
 
 																<tr 
-															  		v-show="!contentsToShow.length"
+															  		v-show="! contentsToShow.length"
 															  	>
 														    		<td colspan="3">
 															      		<div class="alert alert-danger" role="alert">
@@ -234,6 +239,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload

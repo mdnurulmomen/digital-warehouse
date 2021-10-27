@@ -87,20 +87,24 @@
 																	</td>
 																	
 																	<td> 
-																		<button type="button" 
-																				class="btn btn-grd-info btn-icon"  
-																				@click="showContentDetails(content)" 
+																		<button 
+																			type="button" 
+																			class="btn btn-grd-info btn-icon" 
+																			data-toggle="tooltip" data-placement="top" title="View Details"  
+																			@click="showContentDetails(content)" 
 																		>
 																			<i class="fa fa-eye"></i>
 																		</button>
  																		
 
-																		<button type="button" 
-																				:disabled="formSubmitted"
-																				class="btn btn-grd-primary btn-icon" 
-																				v-show="!content.deleted_at" 
-																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('update-role')"
+																		<button 
+																			type="button" 
+																			:disabled="formSubmitted"
+																			class="btn btn-grd-primary btn-icon" 
+																			data-toggle="tooltip" data-placement="top" title="Edit" 
+																			v-show="!content.deleted_at" 
+																			@click="openContentEditForm(content)" 
+																			v-if="userHasPermissionTo('update-role')"
 																		>
 																			<i class="fa fa-edit"></i>
 																		</button>
@@ -108,6 +112,7 @@
 																		<button type="button" 
 																				:disabled="formSubmitted"
 																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				v-show="!content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-role')"
@@ -173,6 +178,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllRoles() : searchData()"
 															>
 																Reload

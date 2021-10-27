@@ -100,7 +100,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -147,6 +148,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload

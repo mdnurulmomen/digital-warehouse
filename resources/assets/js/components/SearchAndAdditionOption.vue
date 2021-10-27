@@ -18,6 +18,7 @@
   		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
   			<button 
 	  			class="btn btn-success btn-outline-success btn-sm" 
+	  			data-toggle="tooltip" data-placement="top" title="Create New" 
 	  			:disabled="disableAddButton" 
 	  			@click="$emit('showContentCreateForm')"
   			>

@@ -117,7 +117,8 @@
 																    	
 																    	<td>
 																    		<button type="button" 
-																					class="btn btn-grd-info btn-icon"  
+																					class="btn btn-grd-info btn-icon" 
+																					data-toggle="tooltip" data-placement="top" title="View Details" 
 																					v-show="content.product" 
 																					@click="showUnitDetails(content)"
 																			>
@@ -172,6 +173,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchShelfAllUnits() : searchData()"
 															>
 																Reload

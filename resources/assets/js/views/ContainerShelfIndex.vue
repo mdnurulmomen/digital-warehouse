@@ -117,7 +117,8 @@
 																		
 																		<td>
 																			<button type="button" 
-																					class="btn btn-grd-info btn-icon"  
+																					class="btn btn-grd-info btn-icon" 
+																					data-toggle="tooltip" data-placement="top" title="View Details"  
 																					v-show="content.product" 
 																					@click="showShelfDetails(content)"
 																			>
@@ -125,7 +126,8 @@
 																			</button>
 
 																			<button type="button" 
-																					class="btn btn-grd-info btn-icon"  
+																					class="btn btn-grd-info btn-icon" 
+																					data-toggle="tooltip" data-placement="top" title="View Details"  
 																					v-show="content.container_shelf_unit_statuses.length" 
 																					@click="showShelfUnitDetails(content)"
 																			>
@@ -179,6 +181,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchContainerAllShelves() : searchData()"
 															>
 																Reload

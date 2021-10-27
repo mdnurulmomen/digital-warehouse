@@ -78,7 +78,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -86,7 +87,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon"  
+																				class="btn btn-grd-primary btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Edit"  
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-product')"
 																			>
@@ -95,7 +97,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-success btn-icon"  
+																				class="btn btn-grd-success btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Merchants"  
 																				@click="goProductMerchants(content)" 
 																				v-if="userHasPermissionTo('view-merchant-product-index')"
 																			>
@@ -144,6 +147,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload
@@ -624,6 +628,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															data-toggle="tooltip" data-placement="top" title="Add Variation" 
 															@click="addMoreVariation()"
 														>
 															Add Variation
@@ -633,6 +638,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															data-toggle="tooltip" data-placement="top" title="Remove Variation" 
 															:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
 															@click="removeVariation()"
 														>

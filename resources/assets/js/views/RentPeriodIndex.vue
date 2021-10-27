@@ -106,9 +106,11 @@
 																	</td>
 																	
 																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
+																		
 																		<!-- 
 																		<button type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="$emit('showContentDetails', content)"
 																		>
 																			<i class="fa fa-eye"></i>
@@ -117,7 +119,8 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				v-show="!content.deleted_at" 
+																				data-toggle="tooltip" data-placement="top" title="Edit" 
+																				v-show="! content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-warehouse-asset')" 
@@ -127,6 +130,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				v-show="!content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentDeleteForm(content)" 
@@ -137,6 +141,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Restore" 
 																				v-show="content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentRestoreForm(content)" 
@@ -223,6 +228,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload

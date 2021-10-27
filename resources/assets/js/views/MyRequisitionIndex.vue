@@ -55,6 +55,7 @@
 											  		<div class="col-sm-3 form-group">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
 												  			:disabled="merchantAllProducts.length==0" 
 												  			@click="showContentCreateForm()"
 											  			>
@@ -117,7 +118,8 @@
 																			
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -127,6 +129,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Receive" 
 																				v-if="unconfirmed(content)"
 																				@click="receiveDispatchedProducts(content)"
 																			>
@@ -186,6 +189,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
@@ -277,6 +281,7 @@
 									          	<button 
 									          	type="button" 
 									          	class="btn btn-outline-secondary btn-sm btn-round" 
+									          	data-toggle="tooltip" data-placement="top" title="Next" 
 									          	v-on:click="nextPage"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -448,6 +453,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Add Product" 
 													:disabled="singleRequisitionData.products.length >= merchantAllProducts.length"
 													@click="addMoreProduct()"
 												>
@@ -458,6 +464,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Remove Product" 
 													:disabled="singleRequisitionData.products.length < 2"
 													@click="removeProduct()"
 												>
@@ -485,10 +492,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -633,10 +640,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>

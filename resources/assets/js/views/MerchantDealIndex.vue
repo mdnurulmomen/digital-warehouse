@@ -66,6 +66,7 @@
 											  				<button 
 											  					v-if="userHasPermissionTo('create-merchant-deal')"
 													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			data-toggle="tooltip" data-placement="top" title="Create New" 
 													  			@click="showContentCreateForm()"
 												  			>
 												  				<i class="fa fa-plus"></i>
@@ -121,6 +122,7 @@
 														<button 
 										  					v-if="userHasPermissionTo('create-merchant-deal')"
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
 												  			@click="showDealCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -190,7 +192,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showDealDetails(merchantDeal)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -198,7 +201,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon"  
+																				class="btn btn-grd-primary btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Edit"  
 																				@click="openDealEditForm(merchantDeal)" 
 																				v-if="userHasPermissionTo('update-merchant-deal')" 
 																				:disabled="formSubmitted"  
@@ -209,6 +213,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				:disabled="formSubmitted || ! removableDeal(merchantDeal)"  
 																				@click="openDealDeleteForm(merchantDeal)" 
 																				v-if="userHasPermissionTo('delete-merchant-deal')" 
@@ -219,6 +224,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Payments" 
 																				:disabled="formSubmitted"  
 																				@click="goToDealPayments(merchantDeal)" 
 																				v-if="userHasPermissionTo('view-merchant-payment-index')" 
@@ -274,6 +280,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllMerchantDeals() : searchData()"
 															>
 																Reload
@@ -429,6 +436,7 @@
 										          	type="button" 
 										          	v-on:click="nextPage"
 										          	class="btn btn-outline-secondary btn-sm btn-round" 
+										          	data-toggle="tooltip" data-placement="top" title="Next" 
 										          	v-show="singleMerchantDealData.payments.length < 2"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -637,7 +645,8 @@
 																		<div class="form-row text-center">
 																			<div class="col-md-6">
 																				<button 
-																					class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
+																					class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon"
+																					data-toggle="tooltip" data-placement="top" title="Add Container"  
 																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)" 
 																					@click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
 																				>
@@ -652,6 +661,7 @@
 																			<div class="col-md-6">
 																				<button 
 																					class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
+																					data-toggle="tooltip" data-placement="top" title="Remove Container" 
 																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || ! warehouseSpace.spaces || (warehouseSpace.containers && immutableContainer(warehouseSpace.containers[warehouseSpace.containers.length-1]))|| merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || (warehouseSpace.containers && warehouseSpace.containers.length==1)" 
 																					@click="removeWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
 																				>
@@ -930,6 +940,7 @@
 																<button 
 																	type="button" 
 																	class="btn btn-outline-primary btn-sm btn-block" 
+																	data-toggle="tooltip" data-placement="top" title="Add Space" 
 																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1" 
 																	@click="addWarehouseSpace(merchantWarehouseIndex)"
 																>
@@ -940,6 +951,7 @@
 																<button 
 																	type="button" 
 																	class="btn btn-outline-info btn-sm btn-block" 
+																	data-toggle="tooltip" data-placement="top" title="Remove Space" 
 																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length == 1 || ! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
 																	@click="removeWarehouseSpace(merchantWarehouseIndex)"
 																>
@@ -968,6 +980,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Add Warehouse" 
 													:disabled="singleMerchantDealData.warehouses.length >= availableWarehouseSpaces.length" 
 													@click="addMoreWarehouse()"
 												>
@@ -979,6 +992,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Remove Warehouse" 
 													:disabled="singleMerchantDealData.warehouses.length < 2" 
 													@click="removeWarehouse()"
 												>
@@ -996,13 +1010,14 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round float-right" 
+													data-toggle="tooltip" data-placement="top" title="Next" 
 													v-on:click="nextPage" 
 													v-show="singleMerchantDealData.payments.length == 1"
 												>
@@ -1180,9 +1195,10 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
+
 												<button 
 													type="submit" 
 													class="btn btn-primary float-right" 
@@ -1257,7 +1273,7 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+						<button type="button" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="Reset"  @click="resetSearchingDates()">
 	                  		Reset
 	                  	</button>
 

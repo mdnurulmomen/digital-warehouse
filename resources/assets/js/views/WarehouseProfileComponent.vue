@@ -372,9 +372,10 @@
 																>
 																	<button 
 																		type="button" 
-																		class="close position-absolute text-danger" 
 																		style="right:0;z-index:99;" 
-																		@click="removeWarehousePreview(index)"
+																		class="close position-absolute text-danger" 
+																		@click="removeWarehousePreview(index)" 
+																		data-toggle="tooltip" data-placement="top" title="Remove Preview"
 																	>
 																		<i class="fa fa-times-circle" aria-hidden="true"></i>
 																	</button>
@@ -513,8 +514,9 @@
 																>	
 																	<button 
 																		type="button" 
-																		class="close position-absolute text-danger" 
 																		style="right:0;z-index:9;" 
+																		class="close position-absolute text-danger" 
+																		data-toggle="tooltip" data-placement="top" title="Remove Preview"
 																		@click="removeStoragePreview(index, index2)"
 																	>
 																		<i class="fa fa-times-circle" aria-hidden="true"></i>

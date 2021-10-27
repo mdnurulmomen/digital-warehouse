@@ -79,6 +79,7 @@
 											  				<button 
 											  					v-if="userHasPermissionTo('create-merchant-payment')"
 													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			data-toggle="tooltip" data-placement="top" title="Create New" 
 													  			@click="showContentCreateForm()"
 												  			>
 												  				<i class="fa fa-plus"></i>
@@ -107,7 +108,7 @@
 																<li class="nav-item">
 																	<a 
 																		href="javascript:void(0)"
-																		class="nav-link p-1"
+																		class="nav-link p-1" 
 																		@click="setTodayDate()" 
 																		:class="{ 'active': searchAttributes.dateFrom == today && ! searchAttributes.dateTo }"
 																	>
@@ -134,6 +135,7 @@
 														<button 
 										  					v-if="userHasPermissionTo('create-merchant-payment')"
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -296,7 +298,8 @@
 																	
 																	<td>
 																		<button type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showContentDetails(content)"
 																		>
 																			<i class="fa fa-eye"></i>
@@ -305,7 +308,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				
+																				data-toggle="tooltip" data-placement="top" title="Edit" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-merchant-payment')" 
 																		>
@@ -314,7 +317,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-merchant-payment')" 
 																		>
@@ -471,6 +474,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="searchAttributes.search === '' ? setDealAllPayments() : searchData()"
 															>
 																Reload
@@ -782,7 +786,7 @@
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -962,9 +966,10 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
+
 												<button 
 													type="submit" 
 													class="btn btn-primary float-right" 
@@ -1331,7 +1336,7 @@
 
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-danger btn-sm ml-auto" @click="print">Print</button>
+						<button type="button" class="btn btn-danger btn-sm ml-auto" data-toggle="tooltip" data-placement="top" title="Print" @click="print">Print</button>
 					</div>
 				</div>
 			</div>
@@ -1533,7 +1538,7 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+						<button type="button" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="Reset"  @click="resetSearchingDates()">
 	                  		Reset
 	                  	</button>
 

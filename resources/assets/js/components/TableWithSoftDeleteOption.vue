@@ -37,7 +37,8 @@
 						
 						<td>
 							<button type="button" 
-									class="btn btn-grd-info btn-icon"  
+									class="btn btn-grd-info btn-icon" 
+									data-toggle="tooltip" data-placement="top" title="View Details"  
 									@click="$emit('showContentDetails', content)" 
 								 	v-show="$route.name!='variations' && $route.name!='product-manufacturers'"
 							>
@@ -46,6 +47,7 @@
 
 							<button type="button" 
 									class="btn btn-grd-primary btn-icon" 
+									data-toggle="tooltip" data-placement="top" title="Edit" 
 									:disabled="formSubmitted"
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentEditForm', content)" 
@@ -56,6 +58,7 @@
 
 							<button type="button" 
 									class="btn btn-grd-danger btn-icon" 
+									data-toggle="tooltip" data-placement="top" title="Delete" 
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentDeleteForm', content)" 
 									v-if="userHasPermissionTo('delete-' + requiredPermission)" 
@@ -66,6 +69,7 @@
 
 							<button type="button" 
 									class="btn btn-grd-warning btn-icon" 
+									data-toggle="tooltip" data-placement="top" title="Restore" 
 									:disabled="formSubmitted"
 									v-show="content.deleted_at" 
 									@click="$emit('openContentRestoreForm', content)" 
@@ -76,6 +80,7 @@
 
 							<button type="button" 
 									class="btn btn-dark btn-icon" 
+									data-toggle="tooltip" data-placement="top" title="Merchant-Deals" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
 							>
@@ -84,6 +89,7 @@
 
 							<button type="button" 
 									class="btn btn-grd-success btn-icon" 
+									data-toggle="tooltip" data-placement="top" title="Products" 
 									@click="$emit('goMerchantProducts', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-product-index')"
 							>
@@ -147,6 +153,7 @@
 				<button 
 					type="button" 
 					class="btn btn-primary btn-sm" 
+					data-toggle="tooltip" data-placement="top" title="Reload" 
 					@click="query === '' ? $emit('fetchAllContents') : $emit('searchData')"
 				>
 					Reload

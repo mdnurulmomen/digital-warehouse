@@ -156,7 +156,7 @@
 									<div class="form-row">
 										<div class="form-group col-sm-12 text-right">
 											<a data-toggle="collapse" href="#user-password">
-												<i class="fa fa-2x" :class="createMode ? 'fa-angle-up' : 'fa-angle-down'" @click="changeArrow"></i>
+												<i class="fa fa-2x" :class="createMode ? 'fa-angle-up' : 'fa-angle-down'" data-toggle="tooltip" data-placement="top" title="Password" @click="changeArrow"></i>
 											</a>
 										</div>
 									</div>
@@ -203,7 +203,8 @@
 					          		<div class="text-danger small mb-1" v-show="!submitForm">
 								  		Please input required fields
 						          	</div>
-						          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+						          	
+						          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
 				                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 				                  	</button>
 					          	</div>
@@ -541,7 +542,7 @@
 										  	</span>
 										</div>
 										<div class="col-sm-12">
-											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="step--">
+											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Previous" v-on:click="step--">
 						                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 						                  	</button>
 											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">

@@ -3,7 +3,8 @@
 
 	<li>
 		<div
-			:class="{'font-weight-bold': ! hasParent}"
+			:class="{'font-weight-bold': ! hasParent}" 
+			data-toggle="tooltip" data-placement="top" title="Parents" 
 			@click="toggle"
 		>
 			{{ item.name | capitalize }}

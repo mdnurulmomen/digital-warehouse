@@ -80,6 +80,7 @@
 											  				<button 
 											  					type="button" 
 													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			data-toggle="tooltip" data-placement="top" title="Create New" 
 											  					v-if="userHasPermissionTo('create-product-stock')"
 													  			@click="showStockCreateForm()" 
 													  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
@@ -137,6 +138,7 @@
 											  			<button 
 											  				type="button" 
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
 										  					v-if="userHasPermissionTo('create-product-stock')"
 												  			@click="showStockCreateForm()" 
 												  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
@@ -223,7 +225,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showStockDetails(stock)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -231,7 +234,8 @@
 																			<!-- Approve -->
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
+																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Approve Stock"  
 																				@click="openStockEditForm(stock)" 
 																				v-if="! stock.has_approval && userHasPermissionTo('update-product-stock')"
 																			>
@@ -240,7 +244,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon"  
+																				class="btn btn-grd-primary btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Edit"  
 																				@click="openStockEditForm(stock)" 
 																				v-if="stock.has_approval==1 && userHasPermissionTo('update-product-stock')"
 																			>
@@ -250,6 +255,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
 																				:disabled="formSubmitted || stock.stock_quantity > stock.available_quantity || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
 																				@click="openStockDeleteForm(stock)" 
 																				v-if="userHasPermissionTo('delete-product-stock')" 
@@ -307,6 +313,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="searchAttributes.search === '' ? fetchProductAllStocks() : searchData()"
 															>
 																Reload
@@ -626,7 +633,7 @@
 										          		<div class="text-danger small mb-1" v-show="!submitForm">
 													  		Please input required fields
 											          	</div>
-											          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+											          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" data-toggle="tooltip" data-placement="top" title="Next">
 									                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 									                  	</button>
 										          	</div>
@@ -684,7 +691,8 @@
 																	<span class="input-group-text" id="basic-addon2">
 																		<button 
 																			type="button" 
-																			class="btn btn-primary"
+																			class="btn btn-primary" 
+																			data-toggle="tooltip" data-placement="top" title="Insert Serial" 
 																			@click="addVariationSerial(stockedVariationIndex)"
 																		>
 																			Enlist
@@ -710,7 +718,9 @@
 																>	
 																	{{ productVariationSerial.serial_no }}
 
-																	<i class="fa fa-close text-danger p-2"
+																	<i 
+																		class="fa fa-close text-danger p-2" 
+																		data-toggle="tooltip" data-placement="top" title="Remove" 
 																		v-show="productVariationSerial.serial_no"
 																		:disabled="productVariationSerial.has_requisitions || productVariationSerial.has_dispatched" 
 																		@click="removeVariationSerial(stockedVariationIndex, productVariationSerialIndex)"
@@ -752,7 +762,8 @@
 														<span class="input-group-text" id="basic-addon2">
 															<button 
 																type="button" 
-																class="btn btn-primary"
+																class="btn btn-primary" 
+																data-toggle="tooltip" data-placement="top" title="Insert Serial" 
 																@click="addProductSerial()"
 															>
 																Enlist
@@ -778,7 +789,9 @@
 													>	
 														{{ productSerial.serial_no }}
 
-														<i class="fa fa-close text-danger p-2"
+														<i 
+															class="fa fa-close text-danger p-2" 
+															data-toggle="tooltip" data-placement="top" title="Remove" 
 															v-show="productSerial.serial_no"
 															:disabled="productSerial.has_requisitions || productSerial.has_dispatched" 
 															@click="removeProductSerial(productSerialIndex)"
@@ -798,10 +811,21 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12 d-flex justify-content-between">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="step-=1">
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round" 
+													data-toggle="tooltip" data-placement="top" title="Previous" 
+													v-on:click="step-=1"
+												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round" 
+													data-toggle="tooltip" data-placement="top" title="Next" 
+													v-on:click="nextPage"
+												>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 											</div>
@@ -1115,6 +1139,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="More Space" 
 													@click="addMoreSpace()"
 												>
 													Add Space
@@ -1124,6 +1149,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Remove Space" 
 													:disabled="createMode ? singleStockData.addresses.length < 2 : singleStockData.addresses.length < 1" 
 													@click="removeSpace()"
 												>
@@ -1141,9 +1167,17 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="productMerchant.has_serials ? step-=1 : step-=2">
+												<button 
+													type="button" 
+													title="Previous"  
+													data-placement="top" 
+													data-toggle="tooltip" 
+													class="btn btn-outline-secondary btn-sm btn-round float-left" 
+													v-on:click="productMerchant.has_serials ? step-=1 : step-=2"
+												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
+
 												<button 
 													type="submit" 
 													:class="[singleStockData.has_approval ? 'btn-primary' : 'btn-warning', 'btn', 'float-right']" 
@@ -1730,7 +1764,12 @@
 							Close
 						</button>
 
-						<button type="button" class="btn btn-danger" @click="print()">
+						<button 
+							type="button" 
+							class="btn btn-danger" 
+							data-toggle="tooltip" data-placement="top" title="Print"  
+							@click="print()"
+						>
 							Print
 						</button>
 					</div>
@@ -1771,7 +1810,12 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+						<button 
+						type="button" 
+						class="btn btn-success" 
+						data-toggle="tooltip" data-placement="top" title="Reset"  
+						@click="resetSearchingDates()"
+						>
 	                  		Reset
 	                  	</button>
 

@@ -292,7 +292,7 @@
 				                        <div class="form-row">
 											<div class="form-group col-sm-12 text-right">
 												<a data-toggle="collapse" href="#user-password">
-													<i class="fa fa-2x" :class="createMode ? 'fa-angle-up' : 'fa-angle-down'" @click="changeArrow"></i>
+													<i class="fa fa-2x" :class="createMode ? 'fa-angle-up' : 'fa-angle-down'" @click="changeArrow" data-toggle="tooltip" data-placement="top" title="Show Password"></i>
 												</a>
 											</div>
 										</div>
@@ -340,7 +340,12 @@
 						          		<div class="text-danger small" v-show="!submitForm">
 									  		Please input required fields
 							          	</div>
-							          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+							          	<button 
+							          	type="button" 
+							          	v-on:click="nextPage" 
+							          	class="btn btn-outline-secondary btn-sm btn-round" 
+							          	data-toggle="tooltip" data-placement="top" title="Next"
+							          	>
 					                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 					                  	</button>
 						          	</div>
@@ -418,9 +423,11 @@
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 					          				<div class="col-6">
-							                  	<button type="button" 
+							                  	<button 
+							                  		type="button" 
+							                  		v-on:click="step-=1" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		v-on:click="step-=1"
+							                  		data-toggle="tooltip" data-placement="top" title="Previous"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -432,9 +439,11 @@
 							                	>
 											  		Please input required fields
 									          	</div>
-							                  	<button type="button" 
+							                  	<button 
+							                  		type="button" 
+							                  		v-on:click="nextPage" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		v-on:click="nextPage"
+							                  		data-toggle="tooltip" data-placement="top" title="Next"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -463,8 +472,9 @@
 													>
 														<button 
 															type="button" 
-															class="close position-absolute text-danger" 
 															style="right:0;z-index:99;" 
+															class="close position-absolute text-danger" 
+															data-toggle="tooltip" data-placement="top" title="Remove Preview"
 															@click="removeWarehousePreview(index)"
 														>
 															<i class="fa fa-times-circle" aria-hidden="true"></i>
@@ -526,9 +536,11 @@
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 					          				<div class="col-6">
-							                  	<button type="button" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  	<button 
+							                  		type="button" 
 							                  		v-on:click="step-=1"
+							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		data-toggle="tooltip" data-placement="top" title="Previous"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -540,9 +552,11 @@
 							                	>
 											  		Please input required fields
 									          	</div>
-							                  	<button type="button" 
+							                  	<button 
+							                  		type="button" 
+							                  		v-on:click="nextPage" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		v-on:click="nextPage"
+							                  		data-toggle="tooltip" data-placement="top" title="Next"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -614,9 +628,10 @@
 																>	
 																	<button 
 																		type="button" 
-																		class="close position-absolute text-danger" 
 																		style="right:0;z-index:9;" 
-																		@click="removeStoragePreview(index, index2)"
+																		class="close position-absolute text-danger" 
+																		@click="removeStoragePreview(index, index2)" 
+																		data-toggle="tooltip" data-placement="top" title="Remove Preview"
 																	>
 																		<i class="fa fa-times-circle" aria-hidden="true"></i>
 																	</button>
@@ -683,8 +698,9 @@
 													<div class="form-group col-sm-6">
 														<button 
 															type="button"  
+															@click="addStorage" 
 															class="btn btn-success btn-block btn-sm" 
-															@click="addStorage"
+															data-toggle="tooltip" data-placement="top" title="More Storage"
 														>
 															More Storage
 														</button>	
@@ -693,9 +709,10 @@
 													<div class="form-group col-sm-6">
 														<button 
 															type="button" 
-															class="btn btn-danger btn-block btn-sm" 
 															@click="removeStorage" 
-															:disabled="singleWarehouseData.storages.length<=1"
+															class="btn btn-danger btn-block btn-sm" 
+															:disabled="singleWarehouseData.storages.length<=1" 
+															data-toggle="tooltip" data-placement="top" title="Remove Storage"
 														>
 															Remove Storage
 														</button>	
@@ -709,8 +726,9 @@
 						          		<div class="row">
 					          				<div class="col-6">
 							                  	<button type="button" 
+							                  		v-on:click="step-=1" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		v-on:click="step-=1"
+							                  		data-toggle="tooltip" data-placement="top" title="Previous"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -723,8 +741,9 @@
 											  		Please input required fields
 									          	</div>
 							                  	<button type="button" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
 							                  		v-on:click="nextPage"
+							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		data-toggle="tooltip" data-placement="top" title="Next"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -1016,8 +1035,9 @@
 													<div class="form-group col-sm-6">
 														<button 
 															type="button"  
+															@click="addContainer" 
 															class="btn btn-success btn-block btn-sm" 
-															@click="addContainer"
+															data-toggle="tooltip" data-placement="top" title="Add Container"
 														>
 															More Container
 														</button>	
@@ -1026,6 +1046,7 @@
 														<button 
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
+															data-toggle="tooltip" data-placement="top" title="Remove Container"
 															@click="removeContainer" 
 															:disabled="singleWarehouseData.containers.length < 2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
 														>
@@ -1040,9 +1061,11 @@
 						          	<div class="col-sm-12 p-3 border">
 						          		<div class="row">
 					          				<div class="col-6">
-							                  	<button type="button" 
+							                  	<button 
+							                  		type="button" 
+							                  		v-on:click="step-=1" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		v-on:click="step-=1"
+							                  		data-toggle="tooltip" data-placement="top" title="Previous"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -1054,9 +1077,11 @@
 							                	>
 											  		Please input required fields
 									          	</div>
-							                  	<button type="button" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  	<button 
+							                  		type="button" 
 							                  		v-on:click="nextPage"
+							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		data-toggle="tooltip" data-placement="top" title="Next"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -1397,7 +1422,8 @@
 					          				<div class="col-6">
 							                  	<button type="button" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		v-on:click="step-=1"
+							                  		v-on:click="step-=1" 
+							                  		data-toggle="tooltip" data-placement="top" title="Previous"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>

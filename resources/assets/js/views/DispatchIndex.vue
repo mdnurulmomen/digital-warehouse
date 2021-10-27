@@ -56,6 +56,7 @@
 											  		>
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="New Dispatch" 
 												  			@click="showDispatchCreateForm"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -101,7 +102,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showDispatchDetails(dispatchedReq)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -148,6 +150,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchAllDispatches() : searchData()"
 															>
 																Reload
@@ -264,6 +267,7 @@
 									          	<button 
 									          	type="button" 
 									          	class="btn btn-outline-secondary btn-sm btn-round" 
+									          	data-toggle="tooltip" data-placement="top" title="Next" 
 									          	v-on:click="nextPage"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -457,10 +461,11 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -648,6 +653,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															data-toggle="tooltip" data-placement="top" title="Remove Space" 
 															:disabled="requiredProduct.addresses.length==1" 
 															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 															@click="removeSpace(productIndex)" 
@@ -669,10 +675,11 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -848,9 +855,10 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
+							                  	
 												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
 													Dispatch
 												</button>

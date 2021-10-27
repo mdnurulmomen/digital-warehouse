@@ -172,7 +172,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -180,7 +181,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
+																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Recommended Dispatch" 
 																				@click="showDispatchRecommendationForm(content)" 
 																				v-show="content.status==0" 
 																				v-if="userHasPermissionTo('recommend-dispatch')"
@@ -190,7 +192,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
+																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Approve Dispatch"  
 																				@click="showDispatchApprovalForm(content)" 
 																				v-show="content.status==1 && content.dispatch.has_approval==0" 
 																				v-if="userHasPermissionTo('approve-dispatch')"
@@ -200,7 +203,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon"  
+																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Cancel Requisition" 
 																				@click="openRequisitionCancelForm(content)" 
 																				v-show="content.status==0" 
 																				v-if="userHasPermissionTo('update-requisition')"
@@ -252,6 +256,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
@@ -344,9 +349,10 @@
 											  		Please input required fields
 									          	</div>
 									          	<button 
-									          	type="button" 
-									          	class="btn btn-outline-secondary btn-sm btn-round" 
-									          	v-on:click="nextPage"
+										          	type="button" 
+										          	class="btn btn-outline-secondary btn-sm btn-round" 
+										          	data-toggle="tooltip" data-placement="top" title="Next" 
+										          	v-on:click="nextPage"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -676,10 +682,21 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+								          		<button 
+									          		type="button" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
+									          		data-toggle="tooltip" data-placement="top" title="Previous"
+									          		v-on:click="step-=1" 
+								          		>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+
+								          		<button 
+									          		type="button" 
+									          		v-on:click="nextPage" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          		data-toggle="tooltip" data-placement="top" title="Next"
+								          		>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -867,6 +884,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															data-toggle="tooltip" data-placement="top" title="Remove Space" 
 															:disabled="requiredProduct.addresses.length==1" 
 															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 															@click="removeSpace(productIndex)"
@@ -888,10 +906,20 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
+								          		<button 
+									          		type="button" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
+									          		data-toggle="tooltip" data-placement="top" title="Previous"
+									          		v-on:click="step-=1" 
+								          		>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-on:click="nextPage">
+								          		<button 
+									          		type="button" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          		data-toggle="tooltip" data-placement="top" title="Next"
+									          		v-on:click="nextPage" 
+								          		>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -1070,15 +1098,29 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12 d-flex justify-content-between">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="(userHasPermissionTo('approve-dispatch') && singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0 )) ? step-=1 : step-=2">
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round" 
+													data-toggle="tooltip" data-placement="top" title="Previous" 
+													v-on:click="(userHasPermissionTo('approve-dispatch') && singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0 )) ? step-=1 : step-=2"
+												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 							                  	
-							                  	<button type="button" class="btn btn-danger btn-sm btn-round" @click="openRequisitionCancelForm(singleDispatchData.requisition)">
+							                  	<button 
+								                  	type="button" 
+								                  	class="btn btn-danger btn-sm btn-round" 
+								                  	data-toggle="tooltip" data-placement="top" title="Cancel Requisition" 
+								                  	@click="openRequisitionCancelForm(singleDispatchData.requisition)"
+							                  	>
 													{{ singleDispatchData.requisition.status==0 ? 'Cancel Requisition' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Cancel Dispatch' : '' }} 
 												</button>
 
-												<button type="submit" class="btn btn-primary btn-sm btn-round" :disabled="!submitForm || nondispatchable">
+												<button 
+													type="submit" 
+													class="btn btn-primary btn-sm btn-round" 
+													:disabled="!submitForm || nondispatchable"
+												>
 													{{ singleDispatchData.requisition.status==0 ? 'Recommend Dispatch' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve Dispatch' : '' }}
 												</button>
 											</div>
@@ -1469,7 +1511,14 @@
 
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-danger" @click="print">Print</button>
+						<button 
+							type="button" 
+							class="btn btn-danger" 
+							data-toggle="tooltip" data-placement="top" title="Print"  
+							@click="print"
+						>
+							Print
+						</button>
 					</div>
 				</div>
 			</div>
@@ -1508,7 +1557,12 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" @click="resetSearchingDates()">
+						<button 
+							type="button" 
+							class="btn btn-success" 
+							@click="resetSearchingDates()" 
+							data-toggle="tooltip" data-placement="top" title="Reset"
+						>
 	                  		Reset
 	                  	</button>
 

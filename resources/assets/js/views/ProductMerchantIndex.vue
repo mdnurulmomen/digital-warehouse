@@ -69,7 +69,8 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon"  
+																				class="btn btn-grd-info btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="View Details"  
 																				@click="showProductMerchantDetails(productMerchant)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -77,7 +78,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon"  
+																				class="btn btn-grd-primary btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Edit"  
 																				@click="openProductMerchantEditForm(productMerchant)" 
 																				v-if="userHasPermissionTo('update-merchant-product')"
 																			>
@@ -86,7 +88,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon"  
+																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete"  
 																				@click="openProductMerchantDeleteForm(productMerchant)" 
 																				v-if="userHasPermissionTo('delete-merchant-product')" 
 																				:disabled="productMerchant.product_immutability"
@@ -96,7 +99,8 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon"  
+																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Stock"  
 																				@click="goProductStore(productMerchant)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
@@ -148,6 +152,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
+																data-toggle="tooltip" data-placement="top" title="Reload" 
 																@click="query === '' ? fetchProductAllMerchants() : searchData()"
 															>
 																Reload
@@ -552,6 +557,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															data-toggle="tooltip" data-placement="top" title="Create New" 
 															:disabled="singleMerchantProductData.variations.length >= product.variations.length" 
 															@click="addMoreVariation()"
 														>
@@ -563,6 +569,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															data-toggle="tooltip" data-placement="top" title="Remove Variation" 
 															:disabled="singleMerchantProductData.variations[singleMerchantProductData.variations.length-1].variation_immutability || singleMerchantProductData.variations.length < 2"
 															@click="removeVariation()"
 														>
@@ -597,7 +604,7 @@
 							          		<div class="text-danger small mb-1" v-show="!submitForm">
 										  		Please input required fields
 								          	</div>
-								          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage">
+								          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" data-toggle="tooltip" data-placement="top" title="Next">
 						                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 						                  	</button>
 							          	</div>
