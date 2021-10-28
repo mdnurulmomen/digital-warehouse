@@ -259,7 +259,7 @@ class DealController extends Controller
 
             'warehouses.*.spaces.*.containers' => 'required_if:warehouses.*.spaces.*.type,containers|array|min:1',
             'warehouses.*.spaces.*.containers.*.id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:warehouse_container_statuses,id',
-            'warehouses.*.spaces.*.containers.*.engaged' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
+            // 'warehouses.*.spaces.*.containers.*.engaged' => 'required_if:warehouses.*.spaces.*.type,containers|numeric',
             // 'warehouses.*.spaces.*.containers.*.rent_period_id' => 'required_if:warehouses.*.spaces.*.type,containers|exists:rent_periods,id',
             'warehouses.*.spaces.*.containers.*.selected_rent' => 'required_if:warehouses.*.spaces.*.type,containers',
 
@@ -316,7 +316,7 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.shelf.id' => 'required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_shelf_statuses,id',
             'warehouses.*.spaces.*.container.shelf.units' => 'required_if:warehouses.*.spaces.*.type,units|array|min:1',
             'warehouses.*.spaces.*.container.shelf.units.*.id' => 'required_if:warehouses.*.spaces.*.type,units|exists:warehouse_container_shelf_unit_statuses,id',
-            'warehouses.*.spaces.*.container.shelf.units.*.engaged' => 'required_if:warehouses.*.spaces.*.type,units|numeric',
+            // 'warehouses.*.spaces.*.container.shelf.units.*.engaged' => 'required_if:warehouses.*.spaces.*.type,units|numeric',
         
         ],
 
@@ -339,7 +339,7 @@ class DealController extends Controller
 
             'warehouses.*.spaces.*.containers.*' => 'Containers is required',
             'warehouses.*.spaces.*.containers.*.id.*' => 'Container id is invalid',
-            'warehouses.*.spaces.*.containers.*.engaged.*' => 'Selected container should be vacant',
+            // 'warehouses.*.spaces.*.containers.*.engaged.*' => 'Selected container should be vacant',
             'warehouses.*.spaces.*.containers.*.selected_rent.*' => 'Container rent is required',
             'warehouses.*.spaces.*.containers.*.selected_rent.id.*' => 'Container rent is invalid',
             'warehouses.*.spaces.*.containers.*.selected_rent.rent_period_id.*' => 'Container rent is invalid',
@@ -359,7 +359,7 @@ class DealController extends Controller
             'warehouses.*.spaces.*.container.shelf.id.*' => 'Shelf id is invalid',
             'warehouses.*.spaces.*.container.shelf.units.*' => 'Units are required',
             'warehouses.*.spaces.*.container.shelf.units.*.id.*' => 'Unit id is invalid',
-            'warehouses.*.spaces.*.container.shelf.units.*.engaged.*' => 'Selected unit should be vacant',
+            // 'warehouses.*.spaces.*.container.shelf.units.*.engaged.*' => 'Selected unit should be vacant',
         ]);
 
         $dealToUpdate = MerchantDeal::findOrFail($deal);

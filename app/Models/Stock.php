@@ -22,10 +22,12 @@ class Stock extends Model
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
 
+    /*
     public function merchant()
     {
         return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
     }
+    */
 
     /**
      * Get the model who kept the stock.

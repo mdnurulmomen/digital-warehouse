@@ -16,7 +16,7 @@ class ProductStockResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'warehouse' => (new MerchantWarehouseResource($this->stock->warehouse))->customResource($this->stock->merchant->id),
+            'warehouse' => (new MerchantWarehouseResource($this->stock->warehouse))->customResource($this->merchantProduct->merchant_id),
             // 'name' => $this->product->name,
             'stock_quantity' => $this->stock_quantity ?? 0,
             // 'warehouse' => $this->warehouse,

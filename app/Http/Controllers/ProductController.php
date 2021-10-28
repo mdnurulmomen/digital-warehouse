@@ -504,7 +504,7 @@ class ProductController extends Controller
         $product = $merchantProduct->product;
 
         $request->validate([
-            'merchant_id' => 'required|exists:merchants,id',
+            // 'merchant_id' => 'required|exists:merchants,id',
             'stock_quantity' => 'required|numeric|min:1',
             'warehouse.id' => 'required|exists:warehouses,id',
             // 'product_id' => 'required|numeric|exists:products,id',
@@ -601,7 +601,7 @@ class ProductController extends Controller
             'approver_type' => $userHasUpdatingPermission ? get_class($currentUser) : NULL,
             'approver_id' => $userHasUpdatingPermission ? $currentUser->id : NULL,
             'warehouse_id' => $request['warehouse']['id'],
-            'merchant_id' => $request->merchant_id,
+            // 'merchant_id' => $request->merchant_id,
         ]);
 
         $productNewStock = $newStock->stocks()->create([
@@ -850,17 +850,17 @@ class ProductController extends Controller
 
     public function deleteProductStock($stock, $perPage)
     {
-        $stockToDelete = ProductStock::findOrFail($stock);
-        $merchantProduct = $stockToDelete->merchantProduct;
+        $productStockToDelete = ProductStock::findOrFail($stock);
+        $merchantProduct = $productStockToDelete->merchantProduct;
         $product = $merchantProduct->product;
 
-        if ($product->has_serials && ! $product->has_variations && $stockToDelete->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
+        if ($product->has_serials && ! $product->has_variations && $productStockToDelete->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
             
            return response()->json(['errors'=>["undeletableSerial" => "Stock serial has requisition"]], 422);
             
         }
 
-        else if ($product->has_serials && $product->has_variations && $stockToDelete->variations()->whereHas('serials', function ($query) {
+        else if ($product->has_serials && $product->has_variations && $productStockToDelete->variations()->whereHas('serials', function ($query) {
             $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
         })->exists()) {
             
@@ -868,29 +868,35 @@ class ProductController extends Controller
 
         }
 
-        else if ($stockToDelete->stock_quantity > $stockToDelete->available_quantity || $stockToDelete->stock_quantity > $merchantProduct->latestStock->available_quantity) {
+        else if ($productStockToDelete->stock_quantity > $productStockToDelete->available_quantity || $productStockToDelete->stock_quantity > $merchantProduct->latestStock->available_quantity) {
             
             return response()->json(['errors'=>["undeletableStock" => "Stock available-quantity is less than stock-quantity"]], 422);
 
         }
 
-        else if ($product->has_variations && $stockToDelete->variations()->whereRaw('stock_quantity > available_quantity')->exists()) {
+        else if ($product->has_variations && $productStockToDelete->variations()->whereRaw('stock_quantity > available_quantity')->exists()) {
             
             return response()->json(['errors'=>["undeletableStockVariation" => "Stock variation available-quantity is less than stock-quantity"]], 422);
 
         }
 
-        $this->decreaseStockAvailableQuantity($stockToDelete, $stockToDelete->stock_quantity);
+        $this->decreaseStockAvailableQuantity($productStockToDelete, $productStockToDelete->stock_quantity);
             
-        $stockToDelete->deleteStockVariations();
+        $productStockToDelete->deleteStockVariations();
 
-        $stockToDelete->deleteStockSerials();
+        $productStockToDelete->deleteStockSerials();
 
-        $stockToDelete->deleteOldAddresses();
+        $productStockToDelete->deleteOldAddresses();
 
-        $stockToDelete->delete();
+        if ($productStockToDelete->stock->stocks->count() < 2) {
+            
+            $productStockToDelete->stock->delete();
 
-        return $this->showProductAllStocks($stockToDelete->merchant_product_id, $perPage);
+        }
+
+        $productStockToDelete->delete();
+
+        return $this->showProductAllStocks($productStockToDelete->merchant_product_id, $perPage);
     }
 
     public function searchProductAllStocks(Request $request, $merchantProduct, $perPage)
