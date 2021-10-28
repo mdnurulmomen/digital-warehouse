@@ -62,7 +62,7 @@
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentDeleteForm', content)" 
 									v-if="userHasPermissionTo('delete-' + requiredPermission)" 
-									:disabled="formSubmitted || ($route.name=='warehouses' && immuteableWarehouse(content))"
+									:disabled="formSubmitted || ($route.name=='warehouses' && immuteableWarehouse(content)) /* || ($route.name == 'merchants' && content.deals_count)*/"
 							>
 								<i class="fa fa-trash"></i>
 							</button>
