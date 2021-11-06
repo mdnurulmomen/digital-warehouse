@@ -15,11 +15,11 @@ class WarehouseManagerResource extends JsonResource
     public function toArray($request)
     {
         return [
-
+            /*
             'id' => $this->id,
             'name' => $this->name,
             'managers' => $this->managers,
-
+            */
         ];
     }
 }

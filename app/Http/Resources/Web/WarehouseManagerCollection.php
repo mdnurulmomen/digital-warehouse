@@ -15,7 +15,7 @@ class WarehouseManagerCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-
+            /*
             'current_page' => $this->currentPage(),
             'data' => WarehouseManagerResource::collection($this->collection),
             'first_page_url' => $this->url(1),
@@ -28,7 +28,7 @@ class WarehouseManagerCollection extends ResourceCollection
             'prev_page_url' => $this->previousPageUrl(),
             'to' => $this->lastPage(),
             // 'total' => $this->total(),
-            
+            */
         ];
     }
 }
