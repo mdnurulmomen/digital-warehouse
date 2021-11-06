@@ -17,6 +17,7 @@
 							<img class="profile-user-img img-fluid img-circle" 
 								:src="profileToView.profile_preview.preview || ''"
 								alt="Profile Picture" 
+								style="max-width: 125px;" 
 							>
 						</div>
 					</div>

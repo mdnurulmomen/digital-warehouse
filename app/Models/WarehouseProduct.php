@@ -17,8 +17,8 @@ class WarehouseProduct extends Model
         return $this->morphTo();
     }
 
-    public function product()
+    public function merchantProduct()
     {
-    	return $this->belongsTo(Product::class, 'product_id', 'id');
+    	return $this->belongsTo(MerchantProduct::class, 'merchant_product_id', 'id');
     }
 }

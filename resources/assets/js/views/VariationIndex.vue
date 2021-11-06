@@ -105,7 +105,7 @@
 																	<td>{{ content.name | capitalize }}</td>
 
 																	<td>
-																		{{ content.type ? content.type.name : 'NA' }}
+																		{{ content.type ? content.type.name : 'NA' | capitalize }}
 																	</td>
 																		
 																	<td>

@@ -152,8 +152,15 @@ Route::name('admin.')->group(function () {
 		Route::post('/product-stocks/{perPage}', 'ProductController@storeProductStock')->name('product-stocks');
 		Route::put('/product-stocks/{stock}/{perPage}', 'ProductController@updateProductStock')->name('product-stocks');
 		Route::delete('/product-stocks/{stock}/{perPage}', 'ProductController@deleteProductStock')->name('product-stocks');
-		Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
+		// Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
 		Route::post('/api/search-product-stocks/{productMerchant}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
+
+		// stock
+		Route::get('/api/stocks/{perPage?}', 'ProductController@showAllStocks')->name('stocks');
+		Route::post('/stocks/{perPage}', 'ProductController@storeStock')->name('stocks');
+		Route::put('/stocks/{stock}/{perPage}', 'ProductController@updateStock')->name('stocks');
+		Route::delete('/stocks/{stock}/{perPage}', 'ProductController@deleteStock')->name('stocks');
+		Route::post('/api/search-stocks/{perPage}', 'ProductController@searchAllStocks')->name('search-stocks');
 
 		// requisition
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');
@@ -205,7 +212,8 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-product-merchants/{product}/{search}/{perPage}', 'ProductController@searchProductAllMerchants')->name('search-product-merchants');
 
 		// merchant-products
-		Route::get('/api/merchant-products/{merchant}/{perPage}', 'MerchantController@showMerchantAllProducts')->name('merchant-products');
+		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products');
+		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products');
 		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products');

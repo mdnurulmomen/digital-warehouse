@@ -344,8 +344,7 @@
 										    		<div class="form-row d-flex align-items-center text-center">
 														<div class="form-group col-md-6">
 															<img 
-																class="img-fluid" 
-																ref="merchantProductPreview" 
+																class="img-fluid"  
 																:src="showPreview(singleMerchantProductData.preview)"
 																alt="Product Preview" 
 															>
@@ -527,7 +526,7 @@
 																	<div class="col-md-6 form-group">
 																		<img 
 																			class="img-fluid" 
-																			:src="showPreview(singleMerchantProductData.variations[index].preview)"
+																			:src="showPreview(merchantProductVariation.preview)"
 																			alt="Variation Preview" 
 																			:ref="'merchantProductVariationPreview-' + index" 
 																		>
@@ -950,7 +949,7 @@
 										<div class="form-row d-flex">
 											<div class="col-md-4 align-self-center text-center">
 												<img 
-													:src="'/' + singleMerchantProductData.preview" 
+													:src="showPreview(singleMerchantProductData.preview)" 
 													class="img-fluid" 
 													alt="Product Preview" 
 													width="150px"
@@ -1088,7 +1087,7 @@
 																			<div class="col-sm-12 text-center">
 																				<img 
 																					class="img-fluid" 
-																					:src="'/' + merchantProductVariation.preview || ''"
+																					:src="showPreview(merchantProductVariation.preview)"
 																					:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
 																					width="100px"
 																				>
@@ -2629,14 +2628,14 @@
 			},
 			showPreview(imagePath = 'default') {
 				
-				if (! imagePath || imagePath == '') {
-					return '/' + this.product.preview;
+				if (! imagePath) {
+					return this.product.preview ? '/' + this.product.preview : '';
 				}
 				else if (imagePath.startsWith('data:')) {
 					return imagePath;
 				}
 				else {
-					return '/' + imagePath || '';
+					return '/' + imagePath;
 				}
 
 				// return '';

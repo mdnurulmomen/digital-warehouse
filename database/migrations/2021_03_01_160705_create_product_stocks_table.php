@@ -15,8 +15,8 @@ class CreateProductStocksTable extends Migration
     {
         Schema::create('product_stocks', function (Blueprint $table) {
             $table->increments('id');
-            $table->mediumInteger('stock_quantity');    // quantity including all variations
-            $table->mediumInteger('available_quantity');
+            $table->unsignedMediumInteger('stock_quantity');    // quantity including all variations
+            $table->unsignedMediumInteger('available_quantity');
             // $table->boolean('has_variations')->default(false);
             // $table->boolean('has_serials')->default(false);
             $table->unsignedInteger('merchant_product_id');

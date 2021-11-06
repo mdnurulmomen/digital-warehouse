@@ -423,29 +423,54 @@ class WarehouseController extends Controller
             return;
         }
 
-        else if ($warehouse) {
-            return;   
+        else if ($warehouse && $merchant) {
+            
+            return MerchantWarehouseResource::customCollection(
+
+                Warehouse::where('active', true)->where('id', $warehouse)->whereHas('containers', function ($query) use ($merchant) {
+                    $query->whereHas('deals', function ($query1) use ($merchant) {
+                        $query1->whereHas('deal', function ($query2) use ($merchant) {
+                            $query2->where('merchant_id', $merchant)
+                                    ->where('active', 1)
+                                    ->whereHas('payments', function ($query3) {
+                                        $query3->whereDate('date_to', '>=', today());
+                                    });
+                        });
+                    });
+                })
+                ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
+                ->get(),
+
+                $merchant
+
+            );
+
+        }
+        else if ($merchant) {
+            
+            return MerchantWarehouseResource::customCollection(
+
+                Warehouse::where('active', true)->whereHas('containers', function ($query) use ($merchant) {
+                    $query->whereHas('deals', function ($query1) use ($merchant) {
+                        $query1->whereHas('deal', function ($query2) use ($merchant) {
+                            $query2->where('merchant_id', $merchant)
+                                    ->where('active', 1)
+                                    ->whereHas('payments', function ($query3) {
+                                        $query3->whereDate('date_to', '>=', today());
+                                    });
+                        });
+                    });
+                })
+                ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
+                ->get(),
+
+                $merchant
+
+            );
+
         }
 
-        return MerchantWarehouseResource::customCollection(
-
-            Warehouse::where('active', true)->whereHas('containers', function ($query) use ($merchant) {
-                $query->whereHas('deals', function ($query1) use ($merchant) {
-                    $query1->whereHas('deal', function ($query2) use ($merchant) {
-                        $query2->where('merchant_id', $merchant)
-                                ->where('active', 1)
-                                ->whereHas('payments', function ($query3) {
-                                    $query3->whereDate('date_to', '>=', today());
-                                });
-                    });
-                });
-            })
-            ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
-            ->get(),
-
-            $merchant
-
-        );
+        return;
     
     }
 

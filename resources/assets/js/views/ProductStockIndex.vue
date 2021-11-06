@@ -80,7 +80,7 @@
 											  				<button 
 											  					type="button" 
 													  			class="btn btn-success btn-outline-success btn-sm" 
-													  			data-toggle="tooltip" data-placement="top" title="Create New" 
+													  			data-toggle="tooltip" data-placement="top" :title="allDealtEmptyWarehouses.length==0 ? 'No Space' : 'Create New'" 
 											  					v-if="userHasPermissionTo('create-product-stock')"
 													  			@click="showStockCreateForm()" 
 													  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
@@ -138,7 +138,7 @@
 											  			<button 
 											  				type="button" 
 												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			data-toggle="tooltip" data-placement="top" title="Create New" 
+												  			data-toggle="tooltip" data-placement="top" :title="allDealtEmptyWarehouses.length==0 ? 'No Space' : 'Create New'" 
 										  					v-if="userHasPermissionTo('create-product-stock')"
 												  			@click="showStockCreateForm()" 
 												  			:disabled="allDealtEmptyWarehouses.length==0 ? true : false" 
@@ -520,7 +520,7 @@
 																:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
 																@change="validateFormInput('product_stock_quantity')" 
 																required="true" 
-																:readonly="! createMode && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
+																:readonly="! createMode && allStocks.length && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
 																:min="createMode ? 1 : singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity"
 															>
 															<div class="input-group-append">

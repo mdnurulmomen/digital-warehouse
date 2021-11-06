@@ -159,6 +159,7 @@
 																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
 																		<th>Rent Package</th>
+																		<th>Exp Date</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -186,7 +187,17 @@
 																		</td>	
 
 																		<td>
-																			{{ (merchantDeal.rent_period && merchantDeal.rent_period.name) ? merchantDeal.rent_period.name : 'No Package' }}
+																			{{ (merchantDeal.rent_period && merchantDeal.rent_period.name) ? merchantDeal.rent_period.name : 'No Package' | capitalize }}
+																		</td>
+
+																		<td>
+																			{{ merchantDeal.payments[merchantDeal.payments.length-1].date_to }}
+																			<span 
+																			v-show="checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to)"
+																			:class="[checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to) ? 'badge-danger' : 'badge-success', 'badge']"
+																			>
+																				{{ checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to) ? 'Expired' : '' }}
+																			</span>
 																		</td>
 																		
 																		<td>
@@ -251,6 +262,7 @@
 																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
 																		<th>Rent Package</th>
+																		<th>Exp Date</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -425,7 +437,7 @@
 										</div>
 									</div>
 
-									<div class="col-md-12 card-footer mt-4">
+									<div class="col-md-12 card-footer mt-4 pb-0">
 										<div class="form-row">
 									    	<div class="form-group col-sm-12 text-right">
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
@@ -3621,6 +3633,14 @@
 					this.searchData();
 
 				}
+
+    		},
+    		checkExpiryDate(date){
+
+    			var givenDate = new Date(date);
+				var currentDate = new Date(this.today);
+
+    			return givenDate < currentDate;
 
     		},
     		resetSearchingDates(){

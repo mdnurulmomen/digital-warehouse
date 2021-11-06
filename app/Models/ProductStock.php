@@ -28,7 +28,7 @@ class ProductStock extends Model
     public function addresses()
     {
         return $this->hasMany(WarehouseProduct::class, 'product_stock_id', 'id');
-    }
+    }    
 
     public function serials()
     {
@@ -89,7 +89,7 @@ class ProductStock extends Model
                         $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
 
                     }
-                    else {
+                    else if(empty($variationExistingStock)) {
 
                         $productVariationStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,

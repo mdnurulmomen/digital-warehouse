@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductVariationSerialResource extends JsonResource
+class StockApproverResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,11 @@ class ProductVariationSerialResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'serial_no' => $this->serial_no,
-            'has_requisitions' => $this->has_requisitions,
-            'has_dispatched' => $this->has_dispatched,
-            'has_approval' => $this->variationStock->productStock->stock->has_approval,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'user_name' => $this->user_name,
+            'email' => $this->email,
+            'mobile' => $this->mobile
         ];
     }
 }

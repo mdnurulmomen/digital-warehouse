@@ -23,11 +23,16 @@ class Stock extends Model
     }
 
     /*
+    public function addresses()
+    {
+        return $this->hasMany(WarehouseProduct::class, 'product_stock_id', 'id');
+    }
+    */
+
     public function merchant()
     {
         return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
     }
-    */
 
     /**
      * Get the model who kept the stock.

@@ -36,7 +36,7 @@ class MerchantController extends Controller
         $this->middleware("permission:delete-merchant")->only(['deleteMerchant', 'restoreMerchant']);
 
         // Merchant-Products
-        $this->middleware("permission:view-merchant-product-index")->only(['showMerchantAllProducts', 'searchMerchantAllProducts']);
+        $this->middleware("permission:view-merchant-product-index")->only(['showMerchantAllProducts', 'showMerchantAvailableProducts', 'searchMerchantAllProducts']);
         $this->middleware("permission:create-merchant-product")->only('storeMerchantNewProduct');
         $this->middleware("permission:update-merchant-product")->only('updateMerchantProduct');
         $this->middleware("permission:delete-merchant-product")->only('deleteMerchantProduct');  
@@ -420,8 +420,21 @@ class MerchantController extends Controller
         return $this->showMyAllRequisitions($perPage);
     }
 
-    // Merchant-Products of specific merchant 
-    public function showMerchantAllProducts($merchant, $perPage=false)
+    // Merchant-Products for Admin (stocks) only
+    public function showMerchantAllProducts($merchant)
+    {
+        $expectedMerchant = Merchant::findOrFail($merchant);
+       
+        return MerchantProductResource::collection(
+            MerchantProduct::where('merchant_id', $expectedMerchant->id)
+            ->with(['variations'])
+            ->latest()
+            ->get()
+        );
+    }
+
+    // Merchant-Products for Admin && Merchant 
+    public function showMerchantAvailableProducts($merchant, $perPage=false)
     {
         $expectedMerchant = Merchant::findOrFail($merchant);
         
@@ -433,7 +446,7 @@ class MerchantController extends Controller
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'variations', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                         ->paginate($perPage)),
                 
                 'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)
@@ -441,7 +454,7 @@ class MerchantController extends Controller
                                                             $query->whereNull('product_category_id')
                                                                 ->orWhere('product_category_id', 0);
                                                         })
-                                                        ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'variations', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                        ->paginate($perPage)),
             ];
 
@@ -451,11 +464,10 @@ class MerchantController extends Controller
             MerchantProduct::where('merchant_id', $expectedMerchant->id)->whereHas('latestStock', function ($query) {
                 $query->where('available_quantity', '>', 0);
             })
-            ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+            ->with(['merchant', 'variations', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
             ->latest()
             ->get()
         );
-
     }
 
     public function storeMerchantNewProduct(Request $request, $perPage)
@@ -563,7 +575,7 @@ class MerchantController extends Controller
 
         }
 
-        return $this->showMerchantAllProducts($request->merchant_id, $perPage);
+        return $this->showMerchantAvailableProducts($request->merchant_id, $perPage);
     }
 
     public function updateMerchantProduct(Request $request, $productMerchant, $perPage)
@@ -673,7 +685,7 @@ class MerchantController extends Controller
 
         }
 
-        return $this->showMerchantAllProducts($request->merchant_id, $perPage);
+        return $this->showMerchantAvailableProducts($request->merchant_id, $perPage);
     }
 
     public function deleteMerchantProduct($productMerchant, $perPage)
@@ -703,7 +715,7 @@ class MerchantController extends Controller
         $merchantProductToDelete->variations()->delete();
         $merchantProductToDelete->delete();
 
-        return $this->showMerchantAllProducts($merchant, $perPage);
+        return $this->showMerchantAvailableProducts($merchant, $perPage);
     }
 
     public function searchMerchantAllProducts($merchant, $search, $perPage)
@@ -711,7 +723,7 @@ class MerchantController extends Controller
         $expectedMerchant = Merchant::findOrFail($merchant);
 
         $query = MerchantProduct::where('merchant_id', $expectedMerchant->id)
-                ->with(['merchant', 'variations', 'requests', 'addresses', 'stocks', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                ->with(['merchant', 'variations', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
                 ->where(function ($query1) use ($search) {
                     $query1->where('sku', 'like', "%$search%")
                     ->orWhere('description', 'like', "%$search%")
