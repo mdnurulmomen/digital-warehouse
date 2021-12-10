@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMerchantPaymentDetailsTable extends Migration
+class CreateMerchantPaymentRentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateMerchantPaymentDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('merchant_payment_details', function (Blueprint $table) {
+        Schema::create('merchant_payment_rents', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedMediumInteger('rent')->default(0); // current rent of space to calculate total rent
             $table->unsignedInteger('dealt_space_id');
@@ -28,6 +28,6 @@ class CreateMerchantPaymentDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('merchant_payment_details');
+        Schema::dropIfExists('merchant_payment_rents');
     }
 }

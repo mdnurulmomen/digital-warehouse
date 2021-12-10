@@ -12,7 +12,7 @@ class MerchantPayment extends Model
     
     public function rents() 
     {
-    	return $this->hasMany(MerchantPaymentDetail::class, 'merchant_payment_id', 'id');
+    	return $this->hasMany(MerchantPaymentRent::class, 'merchant_payment_id', 'id');
     }
 
     public function deal()

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MerchantPaymentDetail extends Model
+class MerchantPaymentRent extends Model
 {
     public $timestamps = false;
     protected $guarded = [ 'id' ];
