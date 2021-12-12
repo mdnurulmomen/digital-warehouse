@@ -420,7 +420,7 @@
 												>
 													<h5 class="mb-0">
 														<button type="button" class="btn btn-link" data-toggle="collapse" :data-target="'#stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id" aria-expanded="true" :aria-controls="'stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id">
-															{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product Name' }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Manufacturer' }})
+															{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product Name' }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' }})
 														</button>
 													</h5>
 												</div>
@@ -663,7 +663,7 @@
 												>
 													<h5 class="mb-0">
 														<button type="button" class="btn btn-link" data-toggle="collapse" :data-target="'#stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id" aria-expanded="true" :aria-controls="'stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id">
-															{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product Name' }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Manufacturer' }}) Serials
+															{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product Name' }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' }}) Serials
 														</button>
 													</h5>
 												</div>
@@ -822,7 +822,7 @@
 																					data-toggle="tooltip" data-placement="top" title="Remove" 
 																					v-show="productSerial.serial_no"
 																					:disabled="productSerial.has_requisitions || productSerial.has_dispatched" 
-																					@click="removeProductSerial(stockedProductIndex, stockedProductSerialIndex)"
+																					@click="removeProductSerial(stockedProductIndex, productSerialIndex)"
 																				>	
 																				</i>
 																			</li>
@@ -887,7 +887,7 @@
 												<div class="card-header" :id="'heading-store-product-stock-index-' + stockedProductIndex + '-product-stock-' + stockedProduct.id">	
 													<h5 class="mb-0">
 														<button type="button" class="btn btn-link" data-toggle="collapse" :data-target="'#collapse-store-product-stock-index-' + stockedProductIndex + '-product-stock-' + stockedProduct.id" aria-expanded="true" :aria-controls="'collapse-store-product-stock-index-' + stockedProductIndex + '-product-stock-' + stockedProduct.id">
-															{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product Name' }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Manufacturer' }}) Store
+															{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product Name' }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' }}) Store
 														</button>
 													</h5>
 												</div>
@@ -1609,7 +1609,7 @@
 												</div> 
 												-->
 
-												<div class="form-row">
+												<div class="form-row" v-show="stockedProduct.has_serials">
 													<label class="col-6 col-form-label font-weight-bold text-md-right">
 														Serials :
 													</label>
@@ -2089,7 +2089,7 @@
 							</div> 
 							-->
 
-							<div class="form-row">
+							<div class="form-row" v-show="stockedProduct.has_serials">
 								<label class="col-6 col-form-label font-weight-bold text-md-right">
 									Serials :
 								</label>
@@ -2484,7 +2484,9 @@
 							object.products.forEach(
 								stockedProduct => {
 
-									productNames += this.$options.filters.capitalize(`${stockedProduct.merchant_product.product.name} (${stockedProduct.merchant_product.manufacturer} ? ${stockedProduct.merchant_product.manufacturer.name} : 'Own Product')`)
+									productNames += stockedProduct.merchant_product.product.name + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product)');
+
+									// productNames += this.$options.filters.capitalize(`${stockedProduct.merchant_product.product.name} (${stockedProduct.merchant_product.manufacturer} ? ${stockedProduct.merchant_product.manufacturer.name} : Own Product)`);
 
 								}
 							);
@@ -3832,7 +3834,7 @@
 
 						this.emptyShelfContainers.forEach(
 							(emptyShelfContainer, emptyShelfContainerIndex) => {
-								if (emptyShelfContainer.container_shelf_statuses[0].hasOwnProperty('container_shelf_unit_statuses') && emptyShelfContainer.container_shelf_statuses[0].container_shelf_unit_statuses.length) {
+								if (emptyShelfContainer.container_shelf_statuses[0] && emptyShelfContainer.container_shelf_statuses[0].hasOwnProperty('container_shelf_unit_statuses') && emptyShelfContainer.container_shelf_statuses[0].container_shelf_unit_statuses.length) {
 
 									! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyShelfContainer.id && unitContainer.name==emptyShelfContainer.name && unitContainer.warehouse_container_id==emptyShelfContainer.warehouse_container_id) ? this.emptyUnitContainers.push(emptyShelfContainer) : '';
 
@@ -4134,7 +4136,7 @@
 
 						// this.$set(this.errors.products[stockedProductIndex].variations[stockedVariationIndex], 'product_variation_serial', 'Duplicate serial number');
 
-						this.singleStockData.products[stockedProductIndex].serials[emptyIndex].serial_no = this.productNewSerial;
+						this.singleStockData.products[stockedProductIndex].serials[emptyIndex].serial_no ? this.singleStockData.products[stockedProductIndex].serials[emptyIndex].serial_no = this.productNewSerial : this.$set(this.singleStockData.products[stockedProductIndex].serials[emptyIndex], 'serial_no', this.productNewSerial);
 						
 						this.productNewSerial = '';
 
@@ -4177,7 +4179,7 @@
 			},
 			removeProductSerial(stockedProductIndex, stockedProductSerialIndex) {
 
-				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_serials && this.singleStockData.products[stockedProductIndex].serials.length > stockedProductSerialIndex) {
+				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_serials && ! this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].serials.length > stockedProductSerialIndex) {
 
 					this.$delete(this.singleStockData.products[stockedProductIndex].serials[stockedProductSerialIndex], 'serial_no');
 
