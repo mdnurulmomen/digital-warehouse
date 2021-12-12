@@ -3836,7 +3836,13 @@
 							(emptyShelfContainer, emptyShelfContainerIndex) => {
 								if (emptyShelfContainer.container_shelf_statuses[0] && emptyShelfContainer.container_shelf_statuses[0].hasOwnProperty('container_shelf_unit_statuses') && emptyShelfContainer.container_shelf_statuses[0].container_shelf_unit_statuses.length) {
 
-									! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyShelfContainer.id && unitContainer.name==emptyShelfContainer.name && unitContainer.warehouse_container_id==emptyShelfContainer.warehouse_container_id) ? this.emptyUnitContainers.push(emptyShelfContainer) : '';
+									// ! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyShelfContainer.id && unitContainer.name==emptyShelfContainer.name && unitContainer.warehouse_container_id==emptyShelfContainer.warehouse_container_id) ? this.emptyUnitContainers.push(emptyShelfContainer) : '';
+
+									if (! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyShelfContainer.id && unitContainer.name==emptyShelfContainer.name && unitContainer.warehouse_container_id==emptyShelfContainer.warehouse_container_id)) {
+
+										this.emptyUnitContainers.push(emptyShelfContainer);
+
+									}
 
 								}
 							}

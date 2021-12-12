@@ -521,7 +521,7 @@
 																@change="validateFormInput('product_stock_quantity')" 
 																required="true" 
 																:readonly="! createMode && allStocks.length && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
-																:min="createMode ? 1 : singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity"
+																:min="createMode ? 1 : allStocks.length ? singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity : 0"
 															>
 															<div class="input-group-append">
 																<span class="input-group-text">
@@ -1225,7 +1225,7 @@
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">{{ product.name }} Stock Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">{{ product.name | capitalize }} Stock Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -1404,7 +1404,17 @@
 											</label>
 
 											<label class="col-sm-6 col-form-label">
-												{{ product.name | capitalize }}
+												{{ product.name | capitalize }} ({{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Mr. Manufacturer' | capitalize }})
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant Name :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ productMerchant.merchant ? productMerchant.merchant.first_name + ' ' + productMerchant.merchant.last_name : 'Mr. Merchant' | capitalize }}
 											</label>
 										</div>
 
@@ -3046,6 +3056,38 @@
 						this.emptyContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyContainers ) );
 						this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyShelfContainers ) );
 						this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyUnitContainers ) );
+
+						this.emptyContainers.forEach(
+							(emptyContainer, emptyContainerIndex) => {
+								if (emptyContainer.hasOwnProperty('container_shelf_statuses') && emptyContainer.container_shelf_statuses.length) {
+
+									! this.emptyShelfContainers.some(shelfContainer => shelfContainer.id==emptyContainer.id && shelfContainer.name==emptyContainer.name && shelfContainer.warehouse_container_id==emptyContainer.warehouse_container_id) ? this.emptyShelfContainers.push(emptyContainer) : '';
+
+									if (emptyContainer.container_shelf_statuses[0].hasOwnProperty('container_shelf_unit_statuses') && emptyContainer.container_shelf_statuses[0].container_shelf_unit_statuses.length) {
+
+										! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyContainer.id && unitContainer.name==emptyContainer.name && unitContainer.warehouse_container_id==emptyContainer.warehouse_container_id) ? this.emptyUnitContainers.push(emptyContainer) : '';
+
+									}
+
+								}
+							}
+						);
+
+						this.emptyShelfContainers.forEach(
+							(emptyShelfContainer, emptyShelfContainerIndex) => {
+								if (emptyShelfContainer.container_shelf_statuses[0] && emptyShelfContainer.container_shelf_statuses[0].hasOwnProperty('container_shelf_unit_statuses') && emptyShelfContainer.container_shelf_statuses[0].container_shelf_unit_statuses.length) {
+
+									// ! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyShelfContainer.id && unitContainer.name==emptyShelfContainer.name && unitContainer.warehouse_container_id==emptyShelfContainer.warehouse_container_id) ? this.emptyUnitContainers.push(emptyShelfContainer) : '';
+
+									if (! this.emptyUnitContainers.some(unitContainer => unitContainer.id==emptyShelfContainer.id && unitContainer.name==emptyShelfContainer.name && unitContainer.warehouse_container_id==emptyShelfContainer.warehouse_container_id)) {
+
+										this.emptyUnitContainers.push(emptyShelfContainer);
+
+									}
+
+								}
+							}
+						);	
 
 					}
 
