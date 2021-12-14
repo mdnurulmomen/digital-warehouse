@@ -248,7 +248,7 @@
 																	<tr 
 																  		v-show="!merchantAllDeals.length"
 																  	>
-															    		<td colspan="6">
+															    		<td colspan="7">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>

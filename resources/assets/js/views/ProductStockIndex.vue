@@ -98,7 +98,7 @@
 														  		class="form-control" 
 														  		pattern="[^'!#$%^()\x22]+" 
 														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Payments"
+														  		placeholder="Search Stocks"
 													  		>
 
 													  		<div class="invalid-feedback">
