@@ -1327,7 +1327,7 @@
 
 									<li class="nav-item">
 										<a class="nav-link" data-toggle="tab" href="#merchant-deal-payments" role="tab">
-											Deals
+											Payments
 										</a>
 									</li>
 								</ul>
@@ -1491,7 +1491,7 @@
 																					</label>
 																					<label class="col-sm-6 col-form-label">
 																						<span :class="[warehouseContainer.occupied==1 ? 'badge-danger' : warehouseContainer.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
-																							{{ warehouseContainer.occupied==1 ? 'Packed' : warehouseContainer.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
+																							{{ warehouseContainer.occupied==1 ? 'Packed' : warehouseContainer.occupied==0.5 ? 'Used Partially' : 'Empty' }}
 																						</span>
 																					</label>
 																				</div>
@@ -1540,7 +1540,7 @@
 																								{{ shelf.name ? shelf.name.substring(shelf.name.lastIndexOf("-")+1) : 'NA' }}
 																								
 																								<span :class="[shelf.occupied==1 ? 'badge-danger' : shelf.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
-																									{{ shelf.occupied==1 ? 'Packed' : shelf.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
+																									{{ shelf.occupied==1 ? 'Packed' : shelf.occupied==0.5 ? 'Used Partially' : 'Empty' }}
 																								</span>	
 																							</li>	
 																						</ul>
@@ -1597,7 +1597,7 @@
 																								{{ unit.name ? unit.name.substring(unit.name.lastIndexOf("-")+1) : 'NA' }}
 																								
 																								<span :class="[unit.occupied==1 ? 'badge-danger' : unit.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
-																									{{ unit.occupied==1 ? 'Packed' : unit.occupied==0.5 ? 'Packed Partially' : 'Empty' }}
+																									{{ unit.occupied==1 ? 'Packed' : unit.occupied==0.5 ? 'Used Partially' : 'Empty' }}
 																								</span>
 																							</li>
 																						</ul>
