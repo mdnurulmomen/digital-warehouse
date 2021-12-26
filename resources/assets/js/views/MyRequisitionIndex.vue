@@ -677,16 +677,16 @@
 											v-if="! singleRequisitionData.delivery_service && singleRequisitionData.agent"
 										>	
 											<div class="form-group col-md-12" v-show="merchantAllAgents.length">
-												<label for="inputFirstName">Select Previous Agent</label>
+												<label for="inputFirstName">Select From Previous Agent</label>
 												<multiselect 
-			                              			v-model="singleRequisitionData.agent" 
+			                              			v-model="singleRequisitionData.previous_agent" 
 			                              			class="form-control p-0 is-valid" 
 			                              			placeholder="Agent Name" 
 			                              			label="name" 
 			                                  		track-by="id" 
 			                                  		:custom-label="objectNameWithCapitalized" 
 			                                  		:options="merchantAllAgents" 
-			                                  		@input="verifyUserInput()"
+			                                  		@input="resetMerchantAgent()"
 			                              		>
 			                                	</multiselect>
 											</div>
@@ -697,8 +697,9 @@
 													class="form-control" 
 													v-model="singleRequisitionData.agent.name" 
 													placeholder="Agent Name" 
-													:class="!errors.agent.agent_name  ? 'is-valid' : 'is-invalid'" 
+													:class="!errors.agent.agent_name ? 'is-valid' : 'is-invalid'" 
 													@input="validateFormInput('agent_name')" 
+													@change="resetSelectedAgent()"
 												>
 
 												<div class="invalid-feedback">
@@ -714,6 +715,7 @@
 													placeholder="Agent Name" 
 													:class="!errors.agent.agent_mobile  ? 'is-valid' : 'is-invalid'" 
 													@input="validateFormInput('agent_mobile')" 
+													@change="resetSelectedAgent()"
 												>
 
 												<div class="invalid-feedback">
@@ -729,6 +731,7 @@
 													placeholder="Secret Code" 
 													:class="!errors.agent.agent_code  ? 'is-valid' : 'is-invalid'" 
 													@input="validateFormInput('agent_code')" 
+													@change="resetSelectedAgent()"
 												>
 
 												<div class="invalid-feedback">
@@ -1160,6 +1163,7 @@
 		products : [
 			{
 				// product : {},
+				// total_quantity : 0
 			}
 		],
 
@@ -1457,7 +1461,8 @@
 					
 					products : [
 						{
-							// product : {},
+							product : {},
+							total_quantity : 0
 						}
 					],
 
@@ -1606,6 +1611,20 @@
 				}
 
 			},
+			resetMerchantAgent() {
+
+				if (!this.singleRequisitionData.previous_agent || Object.keys(this.singleRequisitionData.previous_agent).length == 0) {
+
+					this.singleRequisitionData.agent = {};
+
+				}
+				else {
+
+					this.singleRequisitionData.agent = {...this.singleRequisitionData.previous_agent};
+
+				}
+
+			},
 			verifyUserInput() {
 
 				this.validateFormInput('agent_name');
@@ -1632,6 +1651,11 @@
 					this.searchData();
 				}
 				
+    		},
+    		resetSelectedAgent() {
+
+    			this.singleRequisitionData.previous_agent = {};
+
     		},
 			showSelectedTabProducts() {
 				
@@ -1713,7 +1737,7 @@
 			addMoreProduct() {
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
-					this.singleRequisitionData.products.push({});
+					this.singleRequisitionData.products.push({ product : {}, total_quantity : 0 });
 					
 					this.errors.products.push({
 						variation_serials : [],
@@ -1969,7 +1993,7 @@
 									requiredProduct.product.variations.forEach(
 										(requiredProductVariation, variationIndex) => {
 
-											if (! requiredProductVariation.hasOwnProperty('required_serials') || requiredProductVariation.required_serials.length != requiredProductVariation.required_quantity) {
+											if (requiredProductVariation.required_quantity > 0 && (! requiredProductVariation.hasOwnProperty('required_serials') || requiredProductVariation.required_serials.length != requiredProductVariation.required_quantity)) {
 
 												this.errors.products[productIndex].variation_serials[variationIndex] = 'Variation serial is required';
 											}

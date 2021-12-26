@@ -47,7 +47,7 @@
 																		:data="requisitionsToShow"
 																		:fields="dataToExport" 
 																		worksheet="Requisitions sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
 														  			>
 														  				Excel
 																	</download-excel>
@@ -59,7 +59,7 @@
 																		:data="requisitionsToShow"
 																		:fields="dataToExport" 
 																		worksheet="Requisitions sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
 														  			>
 														  				CSV
 																	</download-excel> 
@@ -92,7 +92,7 @@
 																		href="javascript:void(0)"
 																		class="nav-link p-1"
 																		@click="setTodayDate()" 
-																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
+																		:class="{ 'active': searchAttributes.dateFrom == currentDate && ! searchAttributes.dateTo }"
 																	>
 																		Today
 																	</a>
@@ -339,6 +339,34 @@
 											    	{{ errors.requisition_id }}
 											    </div>
 											</div>
+										</div>
+
+										<div class="form-row" v-show="singleDispatchData.requisition.status==0">
+											<label class="form-group col-md-4">
+												Recommendation Date
+											</label>
+
+											<div class="form-group col-md-8">
+												<v-date-picker 
+													v-model="singleDispatchData.requisition.updated_at" 
+													color="red" 
+													is-dark
+													is-inline
+													:max-date="new Date()" 
+													:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+													:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+												/>
+											</div>
+										</div>
+
+										<div class="form-row" v-show="singleDispatchData.requisition.status==1">
+											<label class="col-sm-4 col-form-label">
+												Recommended On
+											</label>
+
+											<label class="col-sm-8 col-form-label">
+												{{ singleDispatchData.requisition.updated_at }}
+											</label>
 										</div>
 									</div>
 
@@ -2215,10 +2243,10 @@
 
 			},
 
-			currentTime: function() {
+			currentDate: function() {
 
 				let date = new Date();
-				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+				return date.getFullYear() + '-' +  (date.getMonth() + 1) + '-' + date.getDate();
 
 			},
 
@@ -2447,6 +2475,8 @@
 					// agent : {}
 							
 			    };
+
+			    this.singleDispatchData.requisition.updated_at = this.currentDate;
 
 				if (object.delivery && ! object.agent) {
 
@@ -2985,12 +3015,12 @@
             },
             setTodayDate() {
             	
-            	if (this.searchAttributes.dateFrom != this.currentTime || this.searchAttributes.dateTo) {
+            	if (this.searchAttributes.dateFrom != this.currentDate || this.searchAttributes.dateTo) {
 	            	
 	            	// this.searchAttributes.dateTo = null; 
 	            	this.searchAttributes.dates = {};
 	            	this.searchAttributes.dateTo = null;
-	            	this.searchAttributes.dateFrom = this.currentTime;
+	            	this.searchAttributes.dateFrom = this.currentDate;
 
             	}
             	else {

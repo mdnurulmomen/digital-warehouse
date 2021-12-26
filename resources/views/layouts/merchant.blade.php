@@ -306,7 +306,7 @@
 	<script type="text/javascript">
 		window.localStorage.setItem("roles", JSON.stringify(@json($roles)));
 		window.localStorage.setItem("permissions", JSON.stringify(@json($permissions)));
-		window.localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));
+		/*window.localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));*/
 		/* window.localStorage.setItem("access_token", JSON.stringify(@json($access_token))); */
 	</script>
     <script src="{{ mix('js/merchant.js') }}"></script>

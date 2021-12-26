@@ -145,7 +145,7 @@ class DispatchController extends Controller
             $userHasApprovingPermission = $currentUser->hasPermissionTo('approve-dispatch');
 
             $newDispatch = new Dispatch();
-            // $newDispatch->released_at = now();
+            // $newDispatch->released_at = $request->released_at ? $request->released_at : now();
             $newDispatch->has_approval = $userHasApprovingPermission ? 1 : 0;
             $newDispatch->updater_type = $userHasApprovingPermission ? get_class($currentUser) : NULL;
             $newDispatch->updater_id = $userHasApprovingPermission ? $currentUser->id : NULL;
@@ -157,6 +157,7 @@ class DispatchController extends Controller
                 'status' => true,
                 'updater_type' => get_class($currentUser),
                 'updater_id' => $currentUser->id,
+                'updated_at' => $request->requisition['updated_at'] ? $request->requisition['updated_at'] : now(),
             ]);
 
             if ($newDispatch->has_approval == 1) {

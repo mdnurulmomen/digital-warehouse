@@ -16,7 +16,7 @@ class RequisitionDispatchResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'released_at' => $this->released_at->format('Y.m.d H:i:s'),
+            // 'released_at' => $this->released_at->format('Y.m.d H:i:s'),
             'has_approval' => $this->has_approval,
             'updater' => $this->when($this->has_approval, $this->updater),
             'updated_at' => $this->when($this->has_approval, $this->updated_at ? $this->updated_at->format('Y.m.d H:i:s') : NULL),
