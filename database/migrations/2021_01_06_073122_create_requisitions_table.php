@@ -18,6 +18,8 @@ class CreateRequisitionsTable extends Migration
             $table->string('subject');
             $table->string('description')->nullable();
             // $table->string('product_note')->nullable();
+            $table->string('creator_type')->nullable();     // who created the requisition
+            $table->unsignedInteger('creator_id')->nullable();
             $table->tinyInteger('status')->default(0);      // pending / dispatched / cancelled
             $table->string('updater_type')->nullable();     // who cancelled / dispatched the requisition
             $table->unsignedInteger('updater_id')->nullable();

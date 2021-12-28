@@ -26,6 +26,7 @@ class PermissionSeeder extends Seeder
             	'Manager',
             	'Merchant',
                 'Warehouse',
+                'Requisition',
             	'Product-Asset',
                 'Product-Stock',
             	'Warehouse-Owner',
@@ -46,7 +47,6 @@ class PermissionSeeder extends Seeder
             ];            
 
             $modelsViewableAndUpdatable = [
-                'Requisition', // view / update(cancel)
                 'Application-Setting',  // view / update
             ];
 

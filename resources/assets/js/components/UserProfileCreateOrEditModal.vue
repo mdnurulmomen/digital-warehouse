@@ -621,6 +621,7 @@
 	            	'Manager',
 	            	'Merchant',
 	                'Warehouse',
+	                'Requisition',
 	            	'Product-Asset',
 	                // 'Product-Stock',
 	                'Merchant-Deal',
@@ -635,7 +636,6 @@
 	            ],
 
 	        	modelsViewableAndUpdatable : [
-                	'Requisition', // view / update(cancel)
 	        		'Application-Setting',  // view / update
 	        	],
 
