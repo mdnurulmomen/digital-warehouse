@@ -214,7 +214,7 @@
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Delete" 
-																				:disabled="formSubmitted || stock.stock_quantity > stock.available_quantity || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
+																				:disabled="formSubmitted || stock.products.some(stockedProduct=>stockedProduct.stock_quantity > stockedProduct.available_quantity) || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
 																				@click="openStockDeleteForm(stock)" 
 																				v-if="userHasPermissionTo('delete-product-stock')" 
 																			>
@@ -747,11 +747,18 @@
 																										<i 
 																											class="fa fa-close text-danger p-2" 
 																											data-toggle="tooltip" data-placement="top" title="Remove" 
-																											v-show="stockedVariationSerial.serial_no"
+																											v-show="stockedVariationSerial.serial_no && ! stockedVariationSerial.has_requisitions && ! stockedVariationSerial.has_dispatched"
 																											:disabled="stockedVariationSerial.has_requisitions || stockedVariationSerial.has_dispatched" 
 																											@click="removeVariationSerial(stockedProductIndex, stockedVariationIndex, stockedVariationSerialIndex)"
 																										>	
 																										</i>
+
+																										<span 
+																										v-show="stockedVariationSerial.has_requisitions || stockedVariationSerial.has_dispatched"
+																										:class="[stockedVariationSerial.has_requisitions ? 'badge badge-warning' : stockedVariationSerial.has_dispatched ? 'badge badge-danger' : '']"
+																										>
+																											{{ stockedVariationSerial.has_requisitions ? 'Requested' : stockedVariationSerial.has_dispatched ? 'Dispatched' : '' }}
+																										</span>
 																									</li>
 																								</ul>
 																							</div>
@@ -820,11 +827,18 @@
 																				<i 
 																					class="fa fa-close text-danger p-2" 
 																					data-toggle="tooltip" data-placement="top" title="Remove" 
-																					v-show="productSerial.serial_no"
+																					v-show="productSerial.serial_no && ! productSerial.has_requisitions && ! productSerial.has_dispatched"
 																					:disabled="productSerial.has_requisitions || productSerial.has_dispatched" 
 																					@click="removeProductSerial(stockedProductIndex, productSerialIndex)"
 																				>	
 																				</i>
+
+																				<span 
+																					v-show="productSerial.has_requisitions || productSerial.has_dispatched"
+																					:class="[productSerial.has_requisitions ? 'badge badge-warning' : productSerial.has_dispatched ? 'badge badge-danger' : '']"
+																					>
+																					{{ productSerial.has_requisitions ? 'Requested' : productSerial.has_dispatched ? 'Dispatched' : '' }}
+																				</span>
 																			</li>
 																		</ul>
 																	</div>
@@ -1619,6 +1633,11 @@
 														>
 															<li v-for="(stockedProductSerial, stockedProductIndex) in stockedProduct.serials">
 																{{ stockedProductSerial.serial_no }}
+
+																<span :class="[stockedProductSerial.has_dispatched ? 'badge badge-danger' : stockedProductSerial.has_requisitions ? 'badge badge-warning' : '']">
+																	{{ stockedProductSerial.has_dispatched ? 'Dispatched' : stockedProductSerial.has_requisitions ? 'Requested' : '' }}
+																</span>
+
 																<span v-show="(stockedProductIndex + 1) < stockedProduct.serials.length">
 																	, 
 																</span> 
@@ -1646,6 +1665,11 @@
 																		>
 																			<li v-for="(stockedProductVariationSerial, stockedProductVariationIndex) in stockedProductVariation.serials">
 																				{{ stockedProductVariationSerial.serial_no }}
+																				
+																				<span :class="[stockedProductVariationSerial.has_dispatched ? 'badge badge-danger' : stockedProductVariationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																					{{ stockedProductVariationSerial.has_dispatched ? 'Dispatched' : stockedProductVariationSerial.has_requisitions ? 'Requested' : '' }}
+																				</span>
+
 																				<span v-show="(stockedProductVariationIndex + 1) < stockedProductVariation.serials.length">
 																					, 
 																				</span> 
@@ -2099,6 +2123,11 @@
 									>
 										<li v-for="(stockedProductSerial, stockedProductIndex) in stockedProduct.serials">
 											{{ stockedProductSerial.serial_no }}
+
+											<span :class="[stockedProductSerial.has_dispatched ? 'badge badge-danger' : stockedProductSerial.has_requisitions ? 'badge badge-warning' : '']">
+												{{ stockedProductSerial.has_dispatched ? 'Dispatched' : stockedProductSerial.has_requisitions ? 'Requested' : '' }}
+											</span>
+
 											<span v-show="(stockedProductIndex + 1) < stockedProduct.serials.length">
 												, 
 											</span> 
@@ -2126,6 +2155,11 @@
 													>
 														<li v-for="(stockedProductVariationSerial, stockedProductVariationIndex) in stockedProductVariation.serials">
 															{{ stockedProductVariationSerial.serial_no }}
+
+															<span :class="[stockedProductVariationSerial.has_dispatched ? 'badge badge-danger' : stockedProductVariationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																{{ stockedProductVariationSerial.has_dispatched ? 'Dispatched' : stockedProductVariationSerial.has_requisitions ? 'Requested' : '' }}
+															</span>
+
 															<span v-show="(stockedProductVariationIndex + 1) < stockedProductVariation.serials.length">
 																, 
 															</span> 
@@ -2164,7 +2198,7 @@
 								class="form-row" 
 								v-if="stockedProduct.hasOwnProperty('addresses') && stockedProduct.addresses.length"
 							>
-								<label class="col-sm-4 col-form-label font-weight-bold text-right">
+								<label class="col-sm-4 col-form-label font-weight-bold">
 									{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product Name' | capitalize }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }}) Address Detail :
 								</label>
 								<div class="col-sm-12">
@@ -2484,7 +2518,7 @@
 							object.products.forEach(
 								stockedProduct => {
 
-									productNames += stockedProduct.merchant_product.product.name + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product)');
+									productNames += stockedProduct.merchant_product.product.name + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' + ')');
 
 									// productNames += this.$options.filters.capitalize(`${stockedProduct.merchant_product.product.name} (${stockedProduct.merchant_product.manufacturer} ? ${stockedProduct.merchant_product.manufacturer.name} : Own Product)`);
 
@@ -2508,7 +2542,27 @@
 									stockDetailToReturn += `${stockedProduct.stock_quantity} ${stockedProduct.merchant_product.product.quantity_type} (Available:${stockedProduct.available_quantity} ${stockedProduct.merchant_product.product.quantity_type})
 									`;
 
-									if (stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length) {
+									if (stockedProduct.has_serials && ! stockedProduct.has_variations && stockedProduct.serials.length) {
+
+										stockDetailToReturn +=  "Serials:\n";
+
+										stockedProduct.serials.forEach(
+								
+											(stockedProductSerial, stockedProductSerialIndex) => {
+
+												if (stockedProductSerial.serial_no) {
+
+													stockDetailToReturn +=  `${stockedProductSerial.serial_no}` + stockedProductSerial.has_dispatched ? '(Dispatched)' : '' + "\n";
+
+												}
+
+											}
+											
+										);
+
+									}
+
+									if (stockedProduct.has_variations && stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length) {
 
 										stockedProduct.variations.forEach(
 							
@@ -2517,24 +2571,29 @@
 												if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
 
 													stockDetailToReturn +=  this.$options.filters.capitalize(`(Variation: ${stockedProductVariation.variation.name}, Qty: ${stockedProductVariation.stock_quantity}  ${stockedProduct.merchant_product.product.quantity_type})
-																										`);
+													`);
 
 												}
 
-												stockedProductVariation.serials.forEach(
-							
-													(stockedProductVariationSerial, stockedProductVariationSerialIndex) => {
+												if (stockedProduct.has_serials && stockedProductVariation.hasOwnProperty('serials') && stockedProductVariation.serials.length) {
 
-														if (stockedProductVariationSerial.serial_no) {
+													stockDetailToReturn +=  "Serials:\n";
 
-															stockDetailToReturn +=  `(Serial: ${stockedProductVariationSerial.serial_no})
-															`;
+													stockedProductVariation.serials.forEach(
+								
+														(stockedProductVariationSerial, stockedProductVariationSerialIndex) => {
+
+															if (stockedProductVariationSerial.serial_no) {
+
+																stockDetailToReturn +=  `${stockedProductVariationSerial.serial_no}` + stockedProductVariationSerial.has_dispatched ? '(Dispatched)' : '' + "\n";
+
+															}
 
 														}
+														
+													);
 
-													}
-													
-												);
+												}
 
 											}
 											
@@ -4176,7 +4235,7 @@
 			},
 			removeVariationSerial(stockedProductIndex, stockedVariationIndex, stockedVariationSerialIndex) {
 
-				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].variations.length > stockedVariationIndex && this.singleStockData.products[stockedProductIndex].has_serials && this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials.length > stockedVariationSerialIndex) {
+				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].variations.length > stockedVariationIndex && this.singleStockData.products[stockedProductIndex].has_serials && this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials.length > stockedVariationSerialIndex && ! this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials[stockedVariationSerialIndex].has_requisitions) {
 
 					this.$delete(this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials[stockedVariationSerialIndex], 'serial_no');
 
@@ -4185,7 +4244,7 @@
 			},
 			removeProductSerial(stockedProductIndex, stockedProductSerialIndex) {
 
-				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_serials && ! this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].serials.length > stockedProductSerialIndex) {
+				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_serials && ! this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].serials.length > stockedProductSerialIndex && ! this.singleStockData.products[stockedProductIndex].serials[stockedProductSerialIndex].has_requisitions) {
 
 					this.$delete(this.singleStockData.products[stockedProductIndex].serials[stockedProductSerialIndex], 'serial_no');
 

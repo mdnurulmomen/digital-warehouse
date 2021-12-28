@@ -428,7 +428,7 @@ class WarehouseController extends Controller
             return MerchantWarehouseResource::customCollection(
 
                 Warehouse::where('active', true)->where('id', $warehouse)
-                ->where(function ($query) {
+                ->where(function ($query) use ($merchant) {
                     $query->whereHas('containers', function ($query1) use ($merchant) {
                         $query1->whereHas('deals', function ($query2) use ($merchant) {
                             $query2->whereHas('deal', function ($query3) use ($merchant) {

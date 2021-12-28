@@ -600,8 +600,8 @@
 																	:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 																	@change="validateFormInput('product_variation_quantity')" 
 																	required="true" 
-																	:readonly="! createMode && allStocks.length && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
-																	:min="createMode ? 1 : stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity"
+																	:readonly="! createMode && allStocks.length && allStocks[allStocks.length-1].variations.length > variationIndex && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
+																	:min="createMode ? 1 : allStocks[allStocks.length-1].variations.length > variationIndex ? (stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity) : 1"
 																>
 
 																<div class="invalid-feedback">
@@ -721,11 +721,18 @@
 																	<i 
 																		class="fa fa-close text-danger p-2" 
 																		data-toggle="tooltip" data-placement="top" title="Remove" 
-																		v-show="productVariationSerial.serial_no"
+																		v-show="productVariationSerial.serial_no && ! productVariationSerial.has_requisitions && ! productVariationSerial.has_dispatched"
 																		:disabled="productVariationSerial.has_requisitions || productVariationSerial.has_dispatched" 
 																		@click="removeVariationSerial(stockedVariationIndex, productVariationSerialIndex)"
 																	>	
 																	</i>
+
+																	<span 
+																		v-show="productVariationSerial.has_requisitions || productVariationSerial.has_dispatched"
+																		:class="[productVariationSerial.has_requisitions ? 'badge badge-warning' : productVariationSerial.has_dispatched ? 'badge badge-danger' : '']"
+																	>
+																		{{ productVariationSerial.has_requisitions ? 'Requested' : productVariationSerial.has_dispatched ? 'Dispatched' : '' }}
+																	</span>
 																</li>
 															</ul>
 														</div>
@@ -792,11 +799,18 @@
 														<i 
 															class="fa fa-close text-danger p-2" 
 															data-toggle="tooltip" data-placement="top" title="Remove" 
-															v-show="productSerial.serial_no"
+															v-show="productSerial.serial_no && ! productSerial.has_requisitions && ! productSerial.has_dispatched"
 															:disabled="productSerial.has_requisitions || productSerial.has_dispatched" 
 															@click="removeProductSerial(productSerialIndex)"
 														>	
 														</i>
+
+														<span 
+															v-show="productSerial.has_requisitions || productSerial.has_dispatched"
+															:class="[productSerial.has_requisitions ? 'badge badge-warning' : productSerial.has_dispatched ? 'badge badge-danger' : '']"
+															>
+															{{ productSerial.has_requisitions ? 'Requested' : productSerial.has_dispatched ? 'Dispatched' : '' }}
+														</span>
 													</li>
 												</ul>
 											</div>
@@ -1540,8 +1554,13 @@
 												<ol 
 													v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
 												>
-													<li v-for="(productSerial,productIndex) in singleStockData.serials">
+													<li v-for="(productSerial, productIndex) in singleStockData.serials">
 														{{ productSerial.serial_no }}
+
+														<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
+
 														<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -1564,6 +1583,11 @@
 																>
 																	<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
 																		{{ variationSerial.serial_no }}
+
+																		<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+																		</span>
+
 																		<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
 																	</li>	
 																</ol>
@@ -1961,6 +1985,11 @@
 							>
 								<li v-for="(productSerial,productIndex) in singleStockData.serials">
 									{{ productSerial.serial_no }}
+
+									<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+										{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+									</span>
+
 									<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
 								</li>	
 							</ol>
@@ -1983,6 +2012,11 @@
 											>
 												<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
 													{{ variationSerial.serial_no }}
+
+													<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+														{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+													</span>
+
 													<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
 												</li>	
 											</ol>
@@ -2150,7 +2184,27 @@
 							var stockDetailToReturn = '';
 
 							stockDetailToReturn += `${object.stock_quantity} ${this.product.quantity_type} (Available:${object.available_quantity} ${this.product.quantity_type})
-							`;
+							` + "\n\n";
+
+							if (object.has_serials && ! object.has_variations && object.serials.length) {
+
+								stockDetailToReturn += "Serials: \n";
+
+								object.serials.forEach(
+					
+									(stockedProductSerial, stockedProductSerialIndex) => {
+
+										if (stockedProductSerial.serial_no) {
+
+											stockDetailToReturn +=  `${stockedProductSerialIndex}. ${stockedProductSerial.serial_no} ` + (stockedProductSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
+
+										}
+
+									}
+									
+								);
+
+							}
 
 							if (object.hasOwnProperty('variations') && object.variations.length) {
 
@@ -2165,20 +2219,25 @@
 
 										}
 
-										stockedProductVariation.serials.forEach(
-					
-											(stockedProductVariationSerial, stockedProductVariationSerialIndex) => {
+										if (object.has_serials && stockedProductVariation.hasOwnProperty('serials') && stockedProductVariation.serials.length) {
 
-												if (stockedProductVariationSerial.serial_no) {
+											stockDetailToReturn += "Serials: \n";
 
-													stockDetailToReturn +=  `(Serial: ${stockedProductVariationSerial.serial_no})
-													`;
+											stockedProductVariation.serials.forEach(
+						
+												(stockedProductVariationSerial, stockedProductVariationSerialIndex) => {
+
+													if (stockedProductVariationSerial.serial_no) {
+
+														stockDetailToReturn +=  `${stockedProductVariationSerialIndex}. ${stockedProductVariationSerial.serial_no} ` + (stockedProductVariationSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
+
+													}
 
 												}
+												
+											);
 
-											}
-											
-										);
+										}
 
 									}
 									
@@ -3586,7 +3645,7 @@
 									if (productVariation.stock_quantity < 0) {
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is invalid';
 									}
-									else if(! this.createMode && ((productVariation.primary_quantity - productVariation.stock_quantity) > this.allStocks[this.allStocks.length-1].variations[index].available_quantity)){
+									else if(! this.createMode && this.allStocks[this.allStocks.length-1].variations.length > index && ((productVariation.primary_quantity - productVariation.stock_quantity) > this.allStocks[this.allStocks.length-1].variations[index].available_quantity)){
 
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is less than minimum ' + (productVariation.primary_quantity-this.allStocks[this.allStocks.length-1].variations[index].available_quantity);
 									}

@@ -602,10 +602,11 @@ class ProductController extends Controller
             
         }
 
+        $numberStock = Stock::where('merchant_id', $request->merchant['id'])->count();
         $userHasUpdatingPermission = $currentUser->hasPermissionTo('update-product-stock');
 
         $newStock = Stock::create([
-            'invoice_no' => 'GudamInvoice'.now()->year.now()->month.'_#'.$request->merchant_id,
+            'invoice_no' => 'GudamStockInvoice'.now()->year.now()->month.'M'.$request->merchant_id.'_#'.($numberStock+1),
             'keeper_type' => get_class($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
             'has_approval' => $userHasUpdatingPermission ? true : false, 
@@ -960,7 +961,7 @@ class ProductController extends Controller
     // Stock
     public function showAllStocks($perPage)
     {
-        return new StockCollection(Stock::with(['stocks.variations', 'stocks.serials', 'warehouse', 'keeper', 'approver'])->paginate($perPage));
+        return new StockCollection(Stock::with(['stocks.variations', 'stocks.serials', 'warehouse', 'keeper', 'approver'])->latest()->paginate($perPage));
     }
 
     public function storeStock(StockRequest $request, $perPage)
@@ -978,7 +979,7 @@ class ProductController extends Controller
         $numberStock = Stock::where('merchant_id', $request->merchant['id'])->count();
 
         $newStock = Stock::create([
-            'invoice_no' => 'GudamInvoice'.now()->year.now()->format('M').$request->merchant['id'].'_#'.($numberStock+1),
+            'invoice_no' => 'GudamStockInvoice'.now()->year.now()->month.'M'.$request->merchant['id'].'_#'.($numberStock+1),
             'keeper_type' => get_class($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
             'has_approval' => $userHasUpdatingPermission ? true : false, 
@@ -1018,7 +1019,7 @@ class ProductController extends Controller
 
         }
 
-        return $this->showAllStocks($request->merchant_product_id, $perPage);
+        return $this->showAllStocks($perPage);
     }
 
     public function updateStock(StockRequest $request, $stock, $perPage)
@@ -1028,57 +1029,63 @@ class ProductController extends Controller
         // validation
         foreach ($request->products as $productIndex => $stockingProduct) {
             
-            $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
-            $product = $stockToUpdate->merchantProduct->product;
-
-            if (! $product->has_variations && $stockToUpdate->stock_quantity > $stockingProduct->stock_quantity) {
+            // already stocked product
+            if (! empty($stockingProduct->id)) {
                 
-                $difference = $stockToUpdate->stock_quantity - $stockingProduct->stock_quantity;
+                $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
+                $product = $stockToUpdate->merchantProduct->product;
 
-                if ($difference > $stockToUpdate->merchantProduct->latestStock->available_quantity) {
-
-                    return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
+                // reducing stock quantity
+                if (! $product->has_variations && $stockToUpdate->stock_quantity > $stockingProduct->stock_quantity) {
                     
+                    $difference = $stockToUpdate->stock_quantity - $stockingProduct->stock_quantity;
+
+                    if ($difference > $stockToUpdate->merchantProduct->latestStock->available_quantity) {
+
+                        return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
+                        
+                    }
+
+                }
+                else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $stockToUpdate)) {
+
+                    return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
+
                 }
 
-            }
-            else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $stockToUpdate)) {
+                if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials))) || $this->checkProductDuplicateSerial($stockingProduct))) {
 
-                return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
+                    if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
+                        
+                        $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)));
+                        return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
-            }
+                    }
+                    else {
 
-            if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials))) || $this->checkProductDuplicateSerial($stockingProduct))) {
+                        $duplicateValue = $this->checkProductDuplicateSerial($stockingProduct);
+                        return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
 
-                if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
+                    }
+
+                }
+                else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations))) || $this->checkVariationDuplicateSerial($stockingProduct))) {
                     
-                    $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)));
-                    return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
+                    if ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
+                        
+                        $serialNotFound = $this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)));
+                        return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
-                }
-                else {
+                    }
+                    else {
 
-                    $duplicateValue = $this->checkProductDuplicateSerial($stockingProduct);
-                    return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+                        $duplicateValue = $this->checkVariationDuplicateSerial($stockingProduct);
+                        return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
 
-                }
-
-            }
-            else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations))) || $this->checkVariationDuplicateSerial($stockingProduct))) {
-                
-                if ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
+                    }
                     
-                    $serialNotFound = $this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)));
-                    return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
+                }    
 
-                }
-                else {
-
-                    $duplicateValue = $this->checkVariationDuplicateSerial($stockingProduct);
-                    return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
-
-                }
-                
             }
 
         }
@@ -1173,7 +1180,7 @@ class ProductController extends Controller
 
         }            
 
-        return $this->showAllStocks($stockToUpdate->merchant_product_id, $perPage);
+        return $this->showAllStocks($perPage);
     }
 
     public function deleteStock($stock, $perPage)
@@ -1230,7 +1237,7 @@ class ProductController extends Controller
         }
 
 
-        return $this->showAllStocks($productStockToDelete->merchant_product_id, $perPage);
+        return $this->showAllStocks($perPage);
     }
 
     public function searchAllStocks(Request $request, $perPage)
@@ -1794,7 +1801,7 @@ class ProductController extends Controller
             
             foreach ($productStock->variations()->whereHas('serials', function ($query) {
                 $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
-            })->exists() as $productStockVariationKey => $productStockVariation) {
+            })->get() as $productStockVariationKey => $productStockVariation) {
                 
                 foreach ($productStockVariation->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
                     
@@ -1802,6 +1809,7 @@ class ProductController extends Controller
                         return $object->serial_no == $productStockVariationSerial->serial_no;
                     });
 
+                    // if variation expected serial not found
                     if (empty($productVariationSerialExists)) {
                         
                         // return true;
@@ -1824,21 +1832,40 @@ class ProductController extends Controller
             $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
         })->exists()) {
 
-            $stockingProductVariationCollection = collect($stockingProductVariations);
+            // $stockingProductVariationCollection = collect($stockingProductVariations);
             
             foreach ($productStock->variations()->whereHas('serials', function ($query) {
                 $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
-            })->exists() as $productStockVariationKey => $productStockVariation) {
+            })->get() as $productStockVariationKey => $productStockVariation) {
                 
                 foreach ($productStockVariation->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
                     
+                    foreach ($stockingProductVariations as $stockingProductVariationKey => $stockingProductVariation) {
+                        
+                        $stockingProductVariationSerialCollection = collect($stockingProductVariation->serials);
+
+                        $productVariationSerialExists = $stockingProductVariationSerialCollection->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
+                            return $variationSerial->serial_no == $productStockVariationSerial->serial_no;
+                        });
+
+                        if (! empty($productVariationSerialExists)) {
+                            break;
+                        }
+
+                    }
+
+                    /*
                     $productVariationSerialExists = $stockingProductVariationCollection->first(function ($stockingProductVariation, $stockingProductVariationKey) use ($productStockVariationSerial) {
 
-                        $stockingProductVariation->serials->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
+                        $stockingProductVariationSerialCollection = collect($stockingProductVariation->serials);
+
+                        $stockingProductVariationSerialCollection->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
                             return $variationSerial->serial_no == $productStockVariationSerial->serial_no;
                         });
                     });
+                    */
 
+                    // if variation serial not found
                     if (empty($productVariationSerialExists)) {
                         
                         // return true;
@@ -1885,16 +1912,17 @@ class ProductController extends Controller
 
     protected function checkProductSerialInValidity(ProductStock $productStock, $productSerials)
     {
-        if ($productStock->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->exists()) {
+        if ($productStock->serials()->where(function ($query) {$query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);})->exists()) {
             
             $productSerialCollection = collect($productSerials);
 
-            foreach ($productStock->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productSerialKey => $productSerial) {
+            foreach ($productStock->serials()->where(function ($query) {$query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);})->get() as $productSerialKey => $productSerial) {
                 
                 $productSerialExists = $productSerialCollection->first(function ($object, $key) use ($productSerial) {
                     return $object->serial_no == $productSerial->serial_no;
                 });
 
+                // if product expected serial not found
                 if (empty($productSerialExists)) {
                     
                     // return true;
