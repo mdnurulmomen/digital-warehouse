@@ -33,8 +33,9 @@ class HomeController extends Controller
         $access_token = Str::random(60);
         $roles = Auth::user()->roles;
         $permissions = Auth::user()->permissions;
+        $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.merchant', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token]);
+        return view('layouts.merchant', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
     }
 
     /**

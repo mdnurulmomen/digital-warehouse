@@ -214,7 +214,7 @@
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Delete" 
-																				:disabled="formSubmitted || stock.stock_quantity > stock.available_quantity || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
+																				:disabled="formSubmitted || stock.products.some(stockedProduct=>stockedProduct.stock_quantity > stockedProduct.available_quantity) || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
 																				@click="openStockDeleteForm(stock)" 
 																				v-if="userHasPermissionTo('delete-product-stock')" 
 																			>
@@ -2164,7 +2164,7 @@
 								class="form-row" 
 								v-if="stockedProduct.hasOwnProperty('addresses') && stockedProduct.addresses.length"
 							>
-								<label class="col-sm-4 col-form-label font-weight-bold text-right">
+								<label class="col-sm-4 col-form-label font-weight-bold">
 									{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product Name' | capitalize }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }}) Address Detail :
 								</label>
 								<div class="col-sm-12">
@@ -4176,7 +4176,7 @@
 			},
 			removeVariationSerial(stockedProductIndex, stockedVariationIndex, stockedVariationSerialIndex) {
 
-				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].variations.length > stockedVariationIndex && this.singleStockData.products[stockedProductIndex].has_serials && this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials.length > stockedVariationSerialIndex) {
+				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].variations.length > stockedVariationIndex && this.singleStockData.products[stockedProductIndex].has_serials && this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials.length > stockedVariationSerialIndex && ! this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials[stockedVariationSerialIndex].has_requisitions) {
 
 					this.$delete(this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials[stockedVariationSerialIndex], 'serial_no');
 
@@ -4185,7 +4185,7 @@
 			},
 			removeProductSerial(stockedProductIndex, stockedProductSerialIndex) {
 
-				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_serials && ! this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].serials.length > stockedProductSerialIndex) {
+				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].has_serials && ! this.singleStockData.products[stockedProductIndex].has_variations && this.singleStockData.products[stockedProductIndex].serials.length > stockedProductSerialIndex && ! this.singleStockData.products[stockedProductIndex].serials[stockedProductSerialIndex].has_requisitions) {
 
 					this.$delete(this.singleStockData.products[stockedProductIndex].serials[stockedProductSerialIndex], 'serial_no');
 

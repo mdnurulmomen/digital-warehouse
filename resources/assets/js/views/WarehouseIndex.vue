@@ -1621,7 +1621,9 @@
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
 														Storage Name:
 													</label>
-													<label class="col-sm-6 col-form-label" v-html="warehouseStorageType.storage_type.name"></label>
+													<label class="col-sm-6 col-form-label">
+														{{ warehouseStorageType.storage_type.name | capitalize }}
+													</label>
 												</div>
 
 												<!-- 

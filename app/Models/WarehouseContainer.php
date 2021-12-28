@@ -22,6 +22,11 @@ class WarehouseContainer extends Model
     	return $this->hasOneThrough(WarehouseContainerShelfUnit::class, WarehouseContainerShelf::class, 'warehouse_container_id', 'warehouse_container_shelf_id');
     }
 
+    public function deals()
+    {
+        return $this->hasMany(DealtSpace::class, 'warehouse_container_id');
+    }
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
@@ -50,10 +55,5 @@ class WarehouseContainer extends Model
     public function containerShelfUnitStatuses()
     {
         return $this->hasMany(WarehouseContainerShelfUnitStatus::class, 'warehouse_container_id');
-    }
-
-    public function deals()
-    {
-        return $this->hasMany(DealtSpace::class, 'warehouse_container_id');
     }
 }

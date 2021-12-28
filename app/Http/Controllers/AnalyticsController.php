@@ -42,12 +42,9 @@ class AnalyticsController extends Controller
 
         $limitedStockProducts = MerchantProduct::with(['product', 'merchant', 'manufacturer', 'latestStock'])
         ->doesntHave('stocks')
-        ->orWhere(
-            ProductStock::select('available_quantity')
-                ->whereColumn('product_stocks.merchant_product_id', 'merchant_products.id')
-                ->latest()
-                ->take(1), '<=', 'merchant_products.warning_quantity'
-        )
+        ->orWhereHas('latestStock', function ($query) {
+            $query->whereColumn('product_stocks.available_quantity', '<=', 'merchant_products.warning_quantity');
+        })
         ->get();
 
         $numberUnreceivedDispatches = ProductDelivery::where('receiving_confirmation', false)->count() + ProductReturn::where('receiving_confirmation', false)->count();

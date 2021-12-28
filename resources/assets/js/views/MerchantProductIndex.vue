@@ -4,7 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'merchants'" 
+			:title="merchant.first_name + ' ' + merchant.last_name + ' products'" 
 			:message="'All our products for ' + merchant.first_name + ' ' + merchant.last_name + ' (' + merchant.user_name + ')' | capitalize"
 		></breadcrumb>			
 
@@ -737,7 +737,7 @@
 										</a>
 									</li>
 
-									<li class="nav-item" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
+									<li class="nav-item" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials">
 										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
 											Serials
 										</a>
@@ -764,124 +764,124 @@
 
 											<div class="col-md-8">
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Merchant Name :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Manufacturer/Brand Name :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Product Code/SKU :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.sku }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Description :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														<span v-html="singleMerchantProductData.description"></span>
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Warning Quantity :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.warning_quantity }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Available Quantity :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.available_quantity }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Dispatched Quantity :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.dispatched_quantity }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Pending Requested Quantity :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.requested_quantity }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>	
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Selling Price (unit) :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.selling_price }}
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Discount :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.discount || 0 }} %
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">Has Serials :</label>
+													<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
 													<label class="col-sm-6 form-control-plaintext">
 														<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">Has Variation :</label>
+													<label class="col-4 col-form-label font-weight-bold">Has Variation :</label>
 													<label class="col-sm-6 form-control-plaintext">
 														<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Created on :
 													</label>
-													<label class="col-sm-8 col-form-label">
+													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.created_at }}
 													</label>
 												</div>
 
 												<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
-													<label class="col-sm-4 col-form-label font-weight-bold">
+													<label class="col-4 col-form-label font-weight-bold">
 														Variations :
 													</label>
 													<div class="col-sm-12">
@@ -909,28 +909,28 @@
 																		</div>
 
 																		<div class="form-row">
-																			<label class="col-sm-4 col-form-label font-weight-bold">
+																			<label class="col-4 col-form-label font-weight-bold">
 																				Variation :
 																			</label>
-																			<label class="col-sm-8 col-form-label">
+																			<label class="col-8 col-form-label">
 																				{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
 																			</label>
 																		</div>
 
 																		<div class="form-row">
-																			<label class="col-sm-4 col-form-label font-weight-bold">
+																			<label class="col-4 col-form-label font-weight-bold">
 																				SKU :
 																			</label>
-																			<label class="col-sm-8 col-form-label">
+																			<label class="col-8 col-form-label">
 																				{{ merchantProductVariation.sku }}
 																			</label>
 																		</div>
 
 																		<div class="form-row">
-																			<label class="col-sm-4 col-form-label font-weight-bold">
+																			<label class="col-4 col-form-label font-weight-bold">
 																				Selling Price (unit) :
 																			</label>
-																			<label class="col-sm-8 col-form-label">
+																			<label class="col-8 col-form-label">
 																				{{ merchantProductVariation.selling_price }}
 																			</label>
 																		</div>
@@ -944,17 +944,22 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials">
 										<div class="form-row">
-											<label class="col-sm-4 col-form-label font-weight-bold">
+											<label class="col-4 col-form-label font-weight-bold">
 												Serials :
 											</label>
-											<div class="col-sm-8 col-form-label">
+											<div class="col-8 col-form-label">
 												<ol 
 													v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
 												>
 													<li v-for="(productSerial, productIndex) in singleMerchantProductData.serials">
 														{{ productSerial.serial_no }}
+
+														<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
+
 														<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -977,6 +982,11 @@
 																>
 																	<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
 																		{{ variationSerial.serial_no }}
+
+																		<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+																		</span>
+
 																		<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
 																	</li>	
 																</ol>
@@ -1004,7 +1014,7 @@
 											class="form-row" 
 											v-if="singleMerchantProductData.hasOwnProperty('addresses') && singleMerchantProductData.addresses.length"
 										>
-											<label class="col-sm-4 col-form-label font-weight-bold">
+											<label class="col-4 col-form-label font-weight-bold">
 												Address Detail :
 											</label>
 											<div class="col-sm-12">
@@ -1026,28 +1036,28 @@
 																<h6>Container Address</h6>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Warehouse :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.container.name) : 'NA' }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Container # :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ containerAddress.name.substring(containerAddress.name.indexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1064,19 +1074,19 @@
 																<h6>Shelves Address</h6>
 																
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Container # :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
 																	</label>
 																</div>
@@ -1084,10 +1094,10 @@
 																<div 
 																	class="form-row"
 																>
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Shelf # :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 
 																		<ul id="shelf-addresses">
 																			<li 
@@ -1115,37 +1125,37 @@
 																<h6>Units Address</h6>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Container Type :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ stockAddress.container.warehouse_container.container.name | capitalize }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Container # :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ stockAddress.container.name.substring(stockAddress.container.name.indexOf("-")+1) }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Shelf # :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 																		{{ stockAddress.container.shelf.name.substring(stockAddress.container.shelf.name.lastIndexOf("-")+1) }}
 																	</label>
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-4 col-form-label font-weight-bold">
+																	<label class="col-4 col-form-label font-weight-bold">
 																		Unit # :
 																	</label>
-																	<label class="col-sm-8 col-form-label">
+																	<label class="col-8 col-form-label">
 
 																		<ul id="unit-addresses">
 																			<li 
@@ -1185,7 +1195,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
 						<button 
 							type="button" 
 							class="btn btn-danger" 
@@ -1204,124 +1214,124 @@
 			<div class="card">
 				<div class="card-body">
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Merchant Name :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Manufacturer/Brand Name :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Product Code/SKU :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.sku }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Description :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							<span v-html="singleMerchantProductData.description"></span>
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Warning Quantity :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.warning_quantity }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Available Quantity :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.available_quantity }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Dispatched Quantity :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.dispatched_quantity }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Pending Requested Quantity :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.requested_quantity }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
 					</div>	
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Selling Price (unit) :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.selling_price }}
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Discount :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.discount || 0 }} %
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">Has Serials :</label>
-						<label class="col-sm-6 form-control-plaintext">
+						<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
+						<label class="col-8 form-control-plaintext">
 							<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">Has Variation :</label>
-						<label class="col-sm-6 form-control-plaintext">
+						<label class="col-4 col-form-label font-weight-bold">Has Variation :</label>
+						<label class="col-8 form-control-plaintext">
 							<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
 						</label>
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Created on :
 						</label>
-						<label class="col-sm-8 col-form-label">
+						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.created_at }}
 						</label>
 					</div>
 
 					<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Variations :
 						</label>
 						<div class="col-sm-12">
@@ -1333,6 +1343,7 @@
 								>
 									<div class="card">
 										<div class="card-body">
+											<!-- 
 											<div class="form-row">
 												<div class="col-sm-12 text-center">
 													<img 
@@ -1346,31 +1357,32 @@
 														{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
 													</p>
 												</div>
-											</div>
+											</div> 
+											-->
 
 											<div class="form-row">
-												<label class="col-sm-4 col-form-label font-weight-bold">
+												<label class="col-4 col-form-label font-weight-bold">
 													Variation :
 												</label>
-												<label class="col-sm-8 col-form-label">
+												<label class="col-8 col-form-label">
 													{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
 												</label>
 											</div>
 
 											<div class="form-row">
-												<label class="col-sm-4 col-form-label font-weight-bold">
+												<label class="col-4 col-form-label font-weight-bold">
 													SKU :
 												</label>
-												<label class="col-sm-8 col-form-label">
+												<label class="col-8 col-form-label">
 													{{ merchantProductVariation.sku }}
 												</label>
 											</div>
 
 											<div class="form-row">
-												<label class="col-sm-4 col-form-label font-weight-bold">
+												<label class="col-4 col-form-label font-weight-bold">
 													Selling Price (unit) :
 												</label>
-												<label class="col-sm-8 col-form-label">
+												<label class="col-8 col-form-label">
 													{{ merchantProductVariation.selling_price }}
 												</label>
 											</div>
@@ -1382,15 +1394,20 @@
 					</div>
 
 					<div class="form-row">
-						<label class="col-sm-4 col-form-label font-weight-bold">
+						<label class="col-4 col-form-label font-weight-bold">
 							Serials :
 						</label>
-						<div class="col-sm-8 col-form-label">
+						<div class="col-8 col-form-label">
 							<ol 
 								v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
 							>
 								<li v-for="(productSerial, productIndex) in singleMerchantProductData.serials">
 									{{ productSerial.serial_no }}
+
+									<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+										{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+									</span>
+																		
 									<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span> 
 								</li>	
 							</ol>
@@ -1413,6 +1430,11 @@
 											>
 												<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
 													{{ variationSerial.serial_no }}
+
+													<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+														{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+													</span>
+
 													<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
 												</li>	
 											</ol>
@@ -1701,13 +1723,13 @@
 
 							let infosToReturn = '';
 
-							infosToReturn += object.available_quantity ?? 0 + ' ';
+							infosToReturn += (object.available_quantity ?? 0) + ' ';
 
-							infosToReturn += object.product ? object.product.quantity_type : 'Unit' + "\n";
+							infosToReturn += object.product ? object.product.quantity_type : 'Unit' + "\n\n";
 
 							if (object.has_serials && ! object.has_variations && object.serials.length) {
 
-								infosToReturn += "\n Serials: \n";
+								infosToReturn += "Serials: \n";
 
 								object.serials.forEach(
 			
@@ -1731,13 +1753,13 @@
 
 										if (object.has_serials && objectVariation.serials.length) {
 
-											infosToReturn += "\n Serials: \n";
+											infosToReturn += "Serials: \n";
 
 											objectVariation.serials.forEach(
 						
 												(variationSerial, variationSerialIndex) => {
 
-													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + "\n";					
+													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + (variationSerial.has_dispatched ? '(Dispatched)' : '') + "\n";					
 
 												}
 												
@@ -2852,7 +2874,7 @@
 									
 									(merchantProductVariation, index) => {
 										
-										if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
+										if (merchantProductVariation.hasOwnProperty('product_variation_id') && /* this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0 */ this.singleMerchantProductData.variations.filter(productVariation => productVariation.product_variation_id === merchantProductVariation.product_variation_id).length > 1) {
 
 											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 

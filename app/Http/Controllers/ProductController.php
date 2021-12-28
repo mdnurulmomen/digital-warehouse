@@ -602,10 +602,11 @@ class ProductController extends Controller
             
         }
 
+        $numberStock = Stock::where('merchant_id', $request->merchant['id'])->count();
         $userHasUpdatingPermission = $currentUser->hasPermissionTo('update-product-stock');
 
         $newStock = Stock::create([
-            'invoice_no' => 'GudamInvoice'.now()->year.now()->month.'_#'.$request->merchant_id,
+            'invoice_no' => 'GudamStockInvoice'.now()->year.now()->month.'M'.$request->merchant_id.'_#'.($numberStock+1),
             'keeper_type' => get_class($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
             'has_approval' => $userHasUpdatingPermission ? true : false, 
@@ -978,7 +979,7 @@ class ProductController extends Controller
         $numberStock = Stock::where('merchant_id', $request->merchant['id'])->count();
 
         $newStock = Stock::create([
-            'invoice_no' => 'GudamInvoice'.now()->year.now()->format('M').$request->merchant['id'].'_#'.($numberStock+1),
+            'invoice_no' => 'GudamStockInvoice'.now()->year.now()->month.'M'.$request->merchant['id'].'_#'.($numberStock+1),
             'keeper_type' => get_class($currentUser), // who stores the stock
             'keeper_id' => $currentUser->id,
             'has_approval' => $userHasUpdatingPermission ? true : false, 
@@ -1794,7 +1795,7 @@ class ProductController extends Controller
             
             foreach ($productStock->variations()->whereHas('serials', function ($query) {
                 $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
-            })->exists() as $productStockVariationKey => $productStockVariation) {
+            })->get() as $productStockVariationKey => $productStockVariation) {
                 
                 foreach ($productStockVariation->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
                     
@@ -1802,6 +1803,7 @@ class ProductController extends Controller
                         return $object->serial_no == $productStockVariationSerial->serial_no;
                     });
 
+                    // if variation expected serial not found
                     if (empty($productVariationSerialExists)) {
                         
                         // return true;
@@ -1824,21 +1826,40 @@ class ProductController extends Controller
             $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
         })->exists()) {
 
-            $stockingProductVariationCollection = collect($stockingProductVariations);
+            // $stockingProductVariationCollection = collect($stockingProductVariations);
             
             foreach ($productStock->variations()->whereHas('serials', function ($query) {
                 $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
-            })->exists() as $productStockVariationKey => $productStockVariation) {
+            })->get() as $productStockVariationKey => $productStockVariation) {
                 
                 foreach ($productStockVariation->serials()->where('has_requisitions', 1)->orWhere('has_dispatched', 1)->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
                     
+                    foreach ($stockingProductVariations as $stockingProductVariationKey => $stockingProductVariation) {
+                        
+                        $stockingProductVariationSerialCollection = collect($stockingProductVariation->serials);
+
+                        $productVariationSerialExists = $stockingProductVariationSerialCollection->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
+                            return $variationSerial->serial_no == $productStockVariationSerial->serial_no;
+                        });
+
+                        if (! empty($productVariationSerialExists)) {
+                            break;
+                        }
+
+                    }
+
+                    /*
                     $productVariationSerialExists = $stockingProductVariationCollection->first(function ($stockingProductVariation, $stockingProductVariationKey) use ($productStockVariationSerial) {
 
-                        $stockingProductVariation->serials->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
+                        $stockingProductVariationSerialCollection = collect($stockingProductVariation->serials);
+
+                        $stockingProductVariationSerialCollection->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
                             return $variationSerial->serial_no == $productStockVariationSerial->serial_no;
                         });
                     });
+                    */
 
+                    // if variation serial not found
                     if (empty($productVariationSerialExists)) {
                         
                         // return true;
@@ -1895,6 +1916,7 @@ class ProductController extends Controller
                     return $object->serial_no == $productSerial->serial_no;
                 });
 
+                // if product expected serial not found
                 if (empty($productSerialExists)) {
                     
                     // return true;
