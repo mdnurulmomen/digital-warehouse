@@ -230,7 +230,7 @@
 
                                                         <td>
                                                             <span :class="[! merchantProduct.latest_stock || merchantProduct.latest_stock.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']">
-                                                                {{ ! merchantProduct.latest_stock || merchantProduct.latest_stock.available_quantity == 0 ? 'Stock Out' : product.latest_stock.available_quantity }}
+                                                                {{ ! merchantProduct.latest_stock || merchantProduct.latest_stock.available_quantity == 0 ? 'Stock Out' : merchantProduct.latest_stock.available_quantity }}
                                                             </span>
                                                         </td>
                                                     </tr>

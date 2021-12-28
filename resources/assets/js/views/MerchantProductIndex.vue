@@ -4,7 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'merchants'" 
+			:title="merchant.first_name + ' ' + merchant.last_name + ' products'" 
 			:message="'All our products for ' + merchant.first_name + ' ' + merchant.last_name + ' (' + merchant.user_name + ')' | capitalize"
 		></breadcrumb>			
 
@@ -737,7 +737,7 @@
 										</a>
 									</li>
 
-									<li class="nav-item" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
+									<li class="nav-item" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials">
 										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
 											Serials
 										</a>
@@ -944,7 +944,7 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials">
 										<div class="form-row">
 											<label class="col-4 col-form-label font-weight-bold">
 												Serials :
@@ -955,6 +955,11 @@
 												>
 													<li v-for="(productSerial, productIndex) in singleMerchantProductData.serials">
 														{{ productSerial.serial_no }}
+
+														<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
+
 														<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -977,6 +982,11 @@
 																>
 																	<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
 																		{{ variationSerial.serial_no }}
+
+																		<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+																		</span>
+
 																		<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
 																	</li>	
 																</ol>
@@ -1185,7 +1195,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
 						<button 
 							type="button" 
 							class="btn btn-danger" 
@@ -1393,6 +1403,11 @@
 							>
 								<li v-for="(productSerial, productIndex) in singleMerchantProductData.serials">
 									{{ productSerial.serial_no }}
+
+									<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+										{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+									</span>
+																		
 									<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span> 
 								</li>	
 							</ol>
@@ -1415,6 +1430,11 @@
 											>
 												<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
 													{{ variationSerial.serial_no }}
+
+													<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+														{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+													</span>
+
 													<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
 												</li>	
 											</ol>
@@ -1739,7 +1759,7 @@
 						
 												(variationSerial, variationSerialIndex) => {
 
-													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + "\n";					
+													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + (variationSerial.has_dispatched ? '(Dispatched)' : '') + "\n";					
 
 												}
 												
@@ -2854,7 +2874,7 @@
 									
 									(merchantProductVariation, index) => {
 										
-										if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
+										if (merchantProductVariation.hasOwnProperty('product_variation_id') && /* this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0 */ this.singleMerchantProductData.variations.filter(productVariation => productVariation.product_variation_id === merchantProductVariation.product_variation_id).length > 1) {
 
 											 this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
 

@@ -4,7 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
-			:title="'merchants'" 
+			:title="product.name + ' merchants'" 
 			:message="'All our merchants for ' + product.name | capitalize"
 		></breadcrumb>			
 
@@ -931,7 +931,7 @@
 										</a>
 									</li>
 
-									<li class="nav-item" v-show="product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
+									<li class="nav-item" v-show="product.has_serials">
 										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
 											Serials
 										</a>
@@ -1135,7 +1135,7 @@
 
 									</div>
 
-									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="product.has_serials && singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length">
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="product.has_serials">
 										<div class="form-row">
 											<label class="col-sm-4 col-form-label font-weight-bold">
 												Serials :
@@ -1146,6 +1146,11 @@
 												>
 													<li v-for="(productSerial, productIndex) in singleMerchantProductData.serials">
 														{{ productSerial.serial_no }}
+
+														<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
+														
 														<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -1168,6 +1173,11 @@
 																>
 																	<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
 																		{{ variationSerial.serial_no }}
+
+																		<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+																		</span>
+
 																		<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
 																	</li>	
 																</ol>
