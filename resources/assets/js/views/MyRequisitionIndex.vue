@@ -1769,7 +1769,12 @@
 		      		return ''
 		    },
 		    customPackagingPackageName ({ name, price, description, preview }) {
-		      	return name.charAt(0).toUpperCase() + name.slice(1) + ' - Each Price (BDT) ' + price 
+		    	
+		    	if (name && price) {
+		      		return name.charAt(0).toUpperCase() + name.slice(1) + ' - Each Price (BDT) ' + price 
+		    	}
+		    	return '';
+
 		    },
 			setRequiredProduct(index) {
 				if (this.singleRequisitionData.products[index].product && Object.keys(this.singleRequisitionData.products[index].product).length > 0) {

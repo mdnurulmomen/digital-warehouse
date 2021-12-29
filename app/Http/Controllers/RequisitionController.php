@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use App\Models\ProductSerial;
+use Illuminate\Validation\Rule;
+use App\Jobs\BroadcastNewRequisition;
+use App\Models\ProductVariationSerial;
 use App\Http\Resources\Web\RequisitionResource;
 use App\Http\Resources\Web\RequisitionCollection;
 
@@ -23,15 +27,17 @@ class RequisitionController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->latest()->paginate($perPage)),  
+
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'cancellation'])->where('status', 1)->latest()->paginate($perPage)),  
+                
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'cancellation'])->where('status', -1)->latest()->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
+        return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->latest()->get());
 
     }
 
@@ -94,6 +100,7 @@ class RequisitionController extends Controller
         $newRequisition->creator_type = get_class($currentUser);
         $newRequisition->creator_id = $currentUser->id;
         $newRequisition->merchant_id = $request->merchant_id;
+        $newRequisition->created_at = $request->created_at ? $request->created_at : now();
 
         $newRequisition->save();
 
@@ -120,7 +127,7 @@ class RequisitionController extends Controller
 
         BroadcastNewRequisition::dispatch($newRequisition);
 
-        return $this->showMyAllRequisitions($perPage);
+        return $this->showAllRequisitions($perPage);
     }
 
     public function cancelRequisition(Request $request, $requisition, $perPage)
@@ -286,7 +293,7 @@ class RequisitionController extends Controller
                         
                 foreach ($requiredProduct->serials as $requiredProductSerialIndex => $requiredProductSerial) {
                     
-                    if (! ProductSerial::where('serial_no', $requiredProductSerial)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
+                    if (! ProductSerial::where('serial_no', $requiredProductSerial->serial_no)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
                         
                         return response()->json(['errors'=>["productSerial" => "Product serial has already requisition"]], 422);
 
@@ -310,9 +317,9 @@ class RequisitionController extends Controller
                         
                         foreach ($requiredProductVariation->required_serials as $requiredProductVariationSerialIndex => $requiredProductVariationSerial) {
                             
-                            if (! ProductVariationSerial::where('serial_no', $requiredProductVariationSerial)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
+                            if (! ProductVariationSerial::where('serial_no', $requiredProductVariationSerial->serial_no)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
                                 
-                                return response()->json(['errors'=>["variationSerial" => "Variation serial has already requisition"]], 422);
+                                return response()->json(['errors'=>["variationSerial" => "Variation serial has already requisition or dispatched"]], 422);
 
                             }
 

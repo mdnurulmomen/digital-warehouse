@@ -52,6 +52,14 @@ class Requisition extends Model
     /**
      * Get the model who dispatched the requisition.
      */
+    public function creator()
+    {
+        return $this->morphTo(__FUNCTION__, 'creator_type', 'creator_id');
+    }
+
+    /**
+     * Get the model who dispatched the requisition.
+     */
     public function updater()
     {
         return $this->morphTo(__FUNCTION__, 'updater_type', 'updater_id');
@@ -118,15 +126,34 @@ class Requisition extends Model
 
                 if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && count($requiredProduct->serials)) {
 
-                    foreach (ProductSerial::whereIn('serial_no', $requiredProduct->serials)->get() as $productSerial) {
+                    if (! empty($requiredProduct->serials[0]->serial_no)) {
                         
-                        $requisitionedProduct->serials()->create([
-                            'product_serial_id' => $productSerial->id,
-                        ]);
+                        foreach ($requiredProduct->serials as $requiredProductSerial) {
+                            
+                            $requisitionedProduct->serials()->create([
+                                'product_serial_id' => $requiredProductSerial->id,
+                            ]);
 
-                        $productSerial->update([
-                            'has_requisitions' => true,
-                        ]);
+                            ProductSerial::findOrFail($requiredProductSerial->id)->update([
+                                'has_requisitions' => true,
+                            ]);
+
+                        }
+
+                    }
+                    else {
+
+                        foreach (ProductSerial::whereIn('serial_no', $requiredProduct->serials)->get() as $productSerial) {
+                            
+                            $requisitionedProduct->serials()->create([
+                                'product_serial_id' => $productSerial->id,
+                            ]);
+
+                            $productSerial->update([
+                                'has_requisitions' => true,
+                            ]);
+
+                        }
 
                     }
 
@@ -146,15 +173,34 @@ class Requisition extends Model
 
                             if ($requiredProduct->product->has_serials && count($requiredProductVariation->required_serials)) {
 
-                                foreach (ProductVariationSerial::whereIn('serial_no', $requiredProductVariation->required_serials)->get() as $productVariationSerial) {
+                                if (! empty($requiredProductVariation->required_serials[0]->serial_no)) {
                         
-                                    $requisitionedProductVariation->serials()->create([
-                                        'product_variation_serial_id' => $productVariationSerial->id,
-                                    ]);
+                                    foreach ($requiredProductVariation->required_serials as $requiredProductVariationSerial) {
+                                        
+                                        $requisitionedProductVariation->serials()->create([
+                                            'product_variation_serial_id' => $requiredProductVariationSerial->id,
+                                        ]);
 
-                                    $productVariationSerial->update([
-                                        'has_requisitions' => true,
-                                    ]);
+                                        ProductVariationSerial::findOrFail($requiredProductVariationSerial->id)->update([
+                                            'has_requisitions' => true,
+                                        ]);
+
+                                    }
+
+                                }
+                                else {
+
+                                    foreach (ProductVariationSerial::whereIn('serial_no', $requiredProductVariation->required_serials)->get() as $productVariationSerial) {
+                            
+                                        $requisitionedProductVariation->serials()->create([
+                                            'product_variation_serial_id' => $productVariationSerial->id,
+                                        ]);
+
+                                        $productVariationSerial->update([
+                                            'has_requisitions' => true,
+                                        ]);
+
+                                    }
 
                                 }
 

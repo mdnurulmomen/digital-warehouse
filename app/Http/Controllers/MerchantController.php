@@ -42,7 +42,7 @@ class MerchantController extends Controller
         $this->middleware("permission:delete-merchant-product")->only('deleteMerchantProduct'); 
 
         // Merchant-Agents
-        $this->middleware("permission:create-requisition-index")->only(['showMerchantAllAgents']); 
+        $this->middleware("permission:view-merchant-index")->only(['showMerchantAllAgents']); 
     }
 
     public function showAllMerchants($perPage = false)

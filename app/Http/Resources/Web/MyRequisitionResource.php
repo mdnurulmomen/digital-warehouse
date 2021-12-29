@@ -18,6 +18,7 @@ class MyRequisitionResource extends JsonResource
             'id' => $this->id,
             'subject' => $this->subject,
             'description' => $this->description,
+            'creator' => $this->creator,
             'status' => $this->status,
             'updater' =>  $this->when($this->status, $this->updater),
             'merchant_id' => $this->merchant_id,

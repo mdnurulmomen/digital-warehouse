@@ -149,7 +149,7 @@ class DispatchController extends Controller
             $newDispatch->has_approval = $userHasApprovingPermission ? 1 : 0;
             $newDispatch->updater_type = $userHasApprovingPermission ? get_class($currentUser) : NULL;
             $newDispatch->updater_id = $userHasApprovingPermission ? $currentUser->id : NULL;
-            $newDispatch->updated_at = $userHasApprovingPermission ? now() : NULL;
+            $newDispatch->updated_at = $userHasApprovingPermission ? $request->requisition['updated_at'] ? $request->requisition['updated_at'] : now() : NULL;
             $newDispatch->requisition_id = $request->requisition['id'];
             $newDispatch->save();
 

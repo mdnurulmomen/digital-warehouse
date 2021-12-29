@@ -65,11 +65,10 @@
 											  					type="button" 
 													  			class="btn btn-success btn-outline-success btn-sm" 
 													  			data-toggle="tooltip" data-placement="top" title="Create New" 
-											  					v-if="userHasPermissionTo('create-product-stock')"
-													  			@click="showStockCreateForm()" 
+													  			@click="showContentCreateForm()"
 												  			>
 												  				<i class="fa fa-plus"></i>
-												  				New Stock
+												  				New Requisition
 												  			</button>
 											  			</div>
 											  		</div>
@@ -121,7 +120,6 @@
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
 												  			data-toggle="tooltip" data-placement="top" title="Create New" 
-												  			:disabled="merchantAllProducts.length==0" 
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -334,7 +332,33 @@
 								>								  	
 									<h2 class="mx-auto mb-4 lead">Requisition Profile</h2>
 
-							        <div class="col-md-12">	
+							        <div class="col-md-12">
+							        	<div class="form-row">
+							        		<div class="form-group col-md-12">
+							        			<label for="inputFirstName">Select Merchant</label>
+													
+												<multiselect 
+			                              			v-model="singleRequisitionData.merchant"
+			                              			placeholder="Merchant Name" 
+			                              			label="name" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="allMerchants" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false" 
+			                                  		class="form-control p-0" 
+			                                  		:class="!errors.merchant_id ? 'is-valid' : 'is-invalid'" 
+			                                  		@input="setRequisitionMerchant()"
+			                                  		@close="validateFormInput('merchant_id')" 
+			                              		>
+			                                	</multiselect>
+			                                	
+			                                	<div class="invalid-feedback">
+											    	{{ errors.merchant_id }}
+											    </div>
+							        		</div>
+							        	</div>
+
 										<div class="form-row">
 											<div class="form-group col-md-12">
 												<label for="inputFirstName">Subject</label>
@@ -351,6 +375,24 @@
 												<div class="invalid-feedback">
 										        	{{ errors.subject }}
 										  		</div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<label class="form-group col-md-4">
+												Requisition Date
+											</label>
+
+											<div class="form-group col-md-8">
+												<v-date-picker 
+													v-model="singleRequisitionData.created_at" 
+													color="red" 
+													is-dark
+													is-inline
+													:max-date="new Date()" 
+													:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+													:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+												/>
 											</div>
 										</div>
 							        </div>
@@ -438,7 +480,7 @@
 												</div>
 											</div>
 
-											<div class="card" v-if="requiredProduct.product && requiredProduct.product.has_variations">
+											<div class="card" v-if="requiredProduct.product && requiredProduct.product.has_variations && requiredProduct.product.variations.length">
 												<div class="card-body">
 													<div 
 														class="form-row" 
@@ -636,6 +678,9 @@
 				                              			:multiple="true" 
 				                              			:close-on-select="false" 
 				                              			:max="requiredProduct.total_quantity" 
+				                              			label="name" 
+				                                  		track-by="id" 
+				                                  		:custom-label="objectNameWithCapitalized" 
 				                                  		:options="requiredProduct.product.serials" 
 				                                  		@close="validateFormInput('product_serials')"
 				                              		>
@@ -677,7 +722,6 @@
 								                              			label="name" 
 								                                  		track-by="id" 
 								                                  		:options="[]" 
-								                                  		:custom-label="objectNameWithCapitalized" 
 								                                  		:disabled="true"
 								                              		>
 								                                	</multiselect>
@@ -696,6 +740,9 @@
 								                              			:multiple="true" 
 								                              			:close-on-select="false" 
 								                              			:max="productVariation.required_quantity" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:custom-label="objectNameWithCapitalized" 
 								                                  		:options="requiredProduct.product.variations[variationIndex].serials" 
 								                                  		@close="validateFormInput('product_serials')"
 								                              		>
@@ -940,12 +987,22 @@
 											</div>
 										</div>
 
-										<div class="form-row" v-show="singleDispatchData.requisition.status==0">
-											<label class="form-group col-md-4">
-												Recommendation Date
+										<div class="form-row">
+											<label class="col-sm-4 col-form-label form-group">
+												Requested On
 											</label>
 
-											<div class="form-group col-md-8">
+											<label class="col-sm-8 col-form-label form-group">
+												{{ singleDispatchData.requisition.created_at }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleDispatchData.requisition.status==0">
+											<label class="form-group col-md-3">
+												{{ userHasPermissionTo('approve-dispatch') ? 'Dispatch' : 'Recommendation' }} Date
+											</label>
+
+											<div class="form-group col-md-9">
 												<v-date-picker 
 													v-model="singleDispatchData.requisition.updated_at" 
 													color="red" 
@@ -959,11 +1016,11 @@
 										</div>
 
 										<div class="form-row" v-show="singleDispatchData.requisition.status==1">
-											<label class="col-sm-4 col-form-label">
+											<label class="col-sm-4 col-form-label form-group">
 												Recommended On
 											</label>
 
-											<label class="col-sm-8 col-form-label">
+											<label class="col-sm-8 col-form-label form-group">
 												{{ singleDispatchData.requisition.updated_at }}
 											</label>
 										</div>
@@ -1129,7 +1186,7 @@
 																type="number" 
 																class="form-control" 
 																v-model.number="productVariation.available_quantity" 
-																placeholder="Dispatched Quantity" 
+																placeholder="Dispatch Quantity" 
 																readonly="true" 
 															>
 														</div>
@@ -1438,7 +1495,7 @@
 					                                  		:close-on-select="false" 
 					                                  		:clear-on-select="false" 
 					                                  		:preserve-search="true" 
-					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelves.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelves.length < 2 && requiredProduct.addresses.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
 					                              		>
 					                                	</multiselect>
 													</div>
@@ -1821,6 +1878,18 @@
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
 											<label class="col-sm-6 col-form-label">
 												<span v-html="singleRequisitionData.cancellation_reason"></span>
+											</label>
+										</div>
+
+										<div 
+											class="form-row" 
+											v-if="singleRequisitionData.creator"
+										>
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Created By :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.creator.user_name | capitalize }}
 											</label>
 										</div>
 
@@ -2292,6 +2361,18 @@
 						</label>
 					</div>
 
+					<div 
+						class="form-row" 
+						v-if="singleRequisitionData.creator"
+					>
+						<label class="col-sm-6 col-form-label font-weight-bold text-right">
+							Created By :
+						</label>
+						<label class="col-sm-6 col-form-label">
+							{{ singleRequisitionData.creator.user_name | capitalize }}
+						</label>
+					</div>
+
 					<div class="form-row">
 						<label class="col-6 col-form-label font-weight-bold text-right">
 							Requested on :
@@ -2589,12 +2670,15 @@
     let singleRequisitionData = {
 
 		products : [
-			{}
+			{
+				// product : {},
+				// total_quantity : 0
+			}
 		],
 
-		// agent : {},
+		agent : {},
 
-		// delivery : {},
+		delivery : {},
 				
     };
 
@@ -2648,6 +2732,7 @@
 	        	editor: ClassicEditor,
 
 	        	submitForm : true,
+	        	createRequisition : true,
 
 	        	requisitionsToShow : [],
 	        	allFetchedRequisitions : [],
@@ -2662,6 +2747,7 @@
 		        	current_page: 1
 		      	},
 
+		      	allMerchants : [],
 		      	merchantAllProducts : [],
 	        	merchantAllAgents : [],
 
@@ -2669,6 +2755,9 @@
 	        	singleRequisitionData : singleRequisitionData,
 
 		   		errors : {
+		   			
+		   			// subject : '',
+					// description : '',
 					// products : [],
 					
 					products : [
@@ -2683,8 +2772,10 @@
 
 					],
 
-					// delivery : {},
-					// agent : {}
+					agent : {},
+
+					delivery : {}
+
 				},
 
 				dataToExport: {
@@ -2834,6 +2925,7 @@
 			this.fetchAllRequisitions();
 			this.fetchAllPackagingPackages();
 			this.fetchAvailableRequisitions();
+			this.fetchAllMerchants();
 
 		},
 
@@ -2950,6 +3042,13 @@
 
 			fetchAllRequisitions() {
 
+				if (! this.userHasPermissionTo('view-requisition-index')) {
+
+					this.error = 'You do not have permission to view requisition-list';
+					return;
+
+				}
+
 				this.error = '';
 				this.loading = true;
 				this.searchAttributes.search = '';
@@ -2989,6 +3088,13 @@
 			},
 			fetchAvailableRequisitions() {
 
+				if (! this.userHasPermissionTo('view-requisition-index')) {
+
+					this.error = 'You do not have permission to view requisition-list';
+					return;
+
+				}
+
 				this.error = '';
 				this.loading = true;
 				// this.searchAttributes.search = '';
@@ -3025,15 +3131,67 @@
 					});
 
 			},
+			fetchAllMerchants() {
+
+				if (! this.userHasPermissionTo('view-merchant-index')) {
+
+					this.error = 'You do not have permission to view merchant-list';
+					return;
+
+				}
+
+				this.error = '';
+				this.loading = true;
+				this.searchAttributes.search = '';
+				this.allMerchants = [];
+				
+				axios
+					.get('/api/merchants/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allMerchants = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 			fetchMerchantAllProducts() {
 				
+				if (! this.userHasPermissionTo('view-merchant-product-index')) {
+
+					this.error = 'You do not have permission to view merchant product list';
+					return;
+
+				}
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.merchantAllProducts = [];
 				
 				axios
-					.get('/api/merchant-all-products/' + this.singleRequisitionData.merchant_id)
+					.get('/api/merchant-products/' + this.singleRequisitionData.merchant_id)
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllProducts = response.data.data;
@@ -3065,13 +3223,20 @@
 			},
 			fetchMerchantAllAgents() {
 				
+				if (! this.userHasPermissionTo('view-merchant-index')) {
+
+					this.error = 'You do not have permission to view merchant agent list';
+					return;
+
+				}
+
 				this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.merchantAllAgents = [];
 				
 				axios
-					.get('/api/my-agents/')
+					.get('/api/merchant-agents/' + this.singleRequisitionData.merchant_id)
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllAgents = Object.values(response.data);
@@ -3102,6 +3267,13 @@
 
 			},
 			fetchAllPackagingPackages() {
+
+				if (! this.userHasPermissionTo('view-logistic-asset-index')) {
+
+					this.error = 'You do not have permission to view packaging packages';
+					return;
+
+				}
 				
 				this.error = '';
 				this.loading = true;
@@ -3143,6 +3315,7 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.createRequisition = true;
 	        	
 				this.singleRequisitionData = {
 
@@ -3201,6 +3374,7 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.createRequisition = false;
 	        	
 				this.configureErrorObject(object);
 
@@ -3213,8 +3387,6 @@
 					// agent : {}
 							
 			    };
-
-			    this.singleDispatchData.requisition.updated_at = this.currentDate;
 
 				if (object.delivery && ! object.agent) {
 
@@ -3243,6 +3415,7 @@
 				
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.createRequisition = false;
 	        	
 			/*
 				this.singleDispatchData = {
@@ -3297,9 +3470,40 @@
 				$('#dispatch-createOrEdit-modal').modal('show');
 
 			},
+			storeRequisition() {
+				
+				if (!this.verifyRequisitionInput()) {
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.post('/requisitions/' + this.perPage, this.singleRequisitionData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New requisition has been stored", "Success");
+							
+							this.allFetchedRequisitions = response.data;
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+
+							$('#requisition-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.fetchMerchantAllProducts();
+					});
+
+			},
 			makeDispatch() {
 				
-				if (!this.verifyUserInput()) {
+				if (!this.verifyDispatchInput()) {
 
 					this.submitForm = false;
 					return;
@@ -3389,7 +3593,7 @@
 				});
 
 			},
-			verifyUserInput() {
+			verifyDispatchInput() {
 
 				// this.validateFormInput('delivery_address');
 				this.validateFormInput('delivery_price');
@@ -3406,14 +3610,29 @@
 
 				return false;
 			},
+			verifyRequisitionInput() {
+
+				this.validateFormInput('agent_name');
+				this.validateFormInput('agent_mobile');
+				this.validateFormInput('agent_code');
+				this.validateFormInput('delivery_address');
+
+				if (this.errors.constructor === Object && Object.keys(this.errors.agent).length == 0 && Object.keys(this.errors.delivery).length == 0) {
+
+					return true;
+				
+				}
+
+				return false;
+			},
 			configureErrorObject(object) {
 
 				this.errors = {
 					
 					products : [],
 					
-					// agent : {},
-					// delivery : {},
+					agent : {},
+					delivery : {},
 					// cancellation : {}
 				
 				};
@@ -3423,7 +3642,12 @@
 					(requiredProduct, requiredProductIndex) => {
 
 						// if (requiredProduct.packaging_service) {
-							this.errors.products.push({});
+							this.errors.products.push(
+								{
+									variation_serials : [],
+									variation_quantities : []
+								}
+							);
 						// }
 
 					}
@@ -3487,52 +3711,109 @@
 				
 			},
 			*/
+			errorInArray(array = []) {
+				
+				if (array.length) {
+
+					return array.some(
+						product => Object.keys(product).length > 2 || product.variation_quantities.some(productVariation => productVariation != null) || (product.variation_serials.some(productVariation => productVariation != null))
+					);
+
+				}
+
+				return false;
+			},
 			nextPage() {
 				
-				if (this.step==1) {
-					this.validateFormInput('requisition_id');
-				}
+				if (this.createRequisition) {
 
-				if (!this.errors.requisition_id && this.step < 4) {
-					
-					if (this.step==2) {
+					if (this.step==1) {
+						this.validateFormInput('subject');
+						this.validateFormInput('merchant_id');
+						this.validateFormInput('description');
+					}
+					else if (this.step == 2) {
+						this.validateFormInput('product_id');
+						this.validateFormInput('product_quantity');
+						this.validateFormInput('variations_total_quantity');
+					}
+					else if (this.step == 3) {
+						this.validateFormInput('product_serials');
+					}
 
-						this.validateFormInput('dispatched_package');
-						this.validateFormInput('dispatched_package_quantity');
 
-						if (this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 0)) {
+					if (! this.errors.subject && !this.errorInArray(this.errors.products) && this.step < 4) {
+						
+						this.fetchMerchantAllAgents();
+						this.fetchMerchantAllProducts();
 
-							this.submitForm = false;
-							return;
-						}
+						if (this.step != 2 || this.requisitionHasSerialProduct()) {
 
-						if (! this.userHasPermissionTo('approve-dispatch')) {
-							this.step += 2;
+							this.step += 1;
+						
 						}
 						else {
-							const productRemains = this.singleDispatchData.requisition.products.some(
-								requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0
-							);
 
-							if (productRemains) {
-								this.step += 1;
-							}
-							else {
-								this.setProductReleasedAddresses();
-								this.step += 2;
-							}
-						}
+							this.step += 2;
 
-					}
-					else{
-						this.step += 1;
-					}
+						}	
 
-					this.submitForm = true;
+						this.submitForm = true;
 					
+					}
+					else {
+						this.submitForm = false;
+					}
+
 				}
 				else {
-					this.submitForm = false;
+
+					if (this.step==1) {
+						this.validateFormInput('requisition_id');
+					}
+
+					if (!this.errors.requisition_id && this.step < 4) {
+						
+						if (this.step==2) {
+
+							this.validateFormInput('dispatched_package');
+							this.validateFormInput('dispatched_package_quantity');
+
+							if (this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 2)) {
+
+								this.submitForm = false;
+								return;
+							}
+
+							if (! this.userHasPermissionTo('approve-dispatch')) {
+								this.step += 2;
+							}
+							else {
+								const productRemains = this.singleDispatchData.requisition.products.some(
+									requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0
+								);
+
+								if (productRemains) {
+									this.step += 1;
+								}
+								else {
+									this.setProductReleasedAddresses();
+									this.step += 2;
+								}
+							}
+
+						}
+						else{
+							this.step += 1;
+						}
+
+						this.submitForm = true;
+						
+					}
+					else {
+						this.submitForm = false;
+					}
+
 				}
 
 			},
@@ -3612,18 +3893,41 @@
 			    name = name.toString()
 			    return name.charAt(0).toUpperCase() + name.slice(1)
 		    },
-			objectNameWithCapitalized ({ subject, product_name, variation_name }) {
+			objectNameWithCapitalized ({ subject, product_name, first_name, last_name, user_name, name, variation, serial_no }) {
 		      	if (subject) {
 				    subject = subject.toString()
 				    return subject.charAt(0).toUpperCase() + subject.slice(1)
 		      	}
 		      	else if (product_name) {
-		      		product_name = product_name.toString()
+				    product_name = product_name.toString()
 				    return product_name.charAt(0).toUpperCase() + product_name.slice(1)
 		      	}
-		      	else if (variation_name) {
-		      		variation_name = variation_name.toString()
-				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
+		      	else if (first_name || last_name || user_name) {
+
+		      		if (first_name) {
+		      			first_name = first_name.toString();
+		      		}
+		      		if (last_name) {
+		      			last_name = last_name.toString();
+		      		}
+		      		if (user_name) {
+		      			user_name = user_name.toString();
+		      		}
+
+		      		return first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '' + ' ' + last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '' + ' ' + user_name ? (user_name.charAt(0).toUpperCase() + user_name.slice(1)) : '';
+
+		      	}
+		      	else if (name) {
+				    name = name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else if (variation) {
+		      		name = variation.name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else if (serial_no) {
+		      		serial_no = serial_no.toString()
+				    return serial_no.charAt(0).toUpperCase() + serial_no.slice(1)
 		      	}
 		      	else 
 		      		return ''
@@ -3768,6 +4072,107 @@
             	}
 
             },
+            setRequisitionMerchant() {
+
+            	if (Object.keys(this.singleRequisitionData.merchant).length > 0) {
+
+            		this.singleRequisitionData.merchant_id = this.singleRequisitionData.merchant.id;
+
+            	}
+
+            },
+            setRequiredProduct(index) {
+				if (this.singleRequisitionData.products[index].product && Object.keys(this.singleRequisitionData.products[index].product).length > 0) {
+					this.singleRequisitionData.products[index].id = this.singleRequisitionData.products[index].product.id;
+				}
+			},
+            setRequisitionAgent() {
+				if (! this.singleRequisitionData.delivery_service) {
+					this.singleRequisitionData.agent = {};
+					this.$delete(this.singleRequisitionData, 'delivery');
+				}
+				else {
+					this.singleRequisitionData.delivery = {};
+					this.$delete(this.singleRequisitionData, 'agent');
+				}
+			},
+			setPackagingService(productIndex) {
+				
+				if (this.singleRequisitionData.hasOwnProperty('products') && this.singleRequisitionData.products.length && ! this.singleRequisitionData.products[productIndex].packaging_service) {
+
+					this.singleRequisitionData.products[productIndex].preferred_package = {};
+
+
+				}
+
+			},
+			addMoreProduct() {
+				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
+
+					this.singleRequisitionData.products.push({ product : {}, total_quantity : 0 });
+					
+					this.errors.products.push({
+						variation_serials : [],
+						variation_quantities : []
+					});
+
+				}
+			},
+			removeProduct() {
+					
+				if (this.singleRequisitionData.products.length > 1) {
+
+					this.singleRequisitionData.products.pop();
+					this.errors.products.pop();
+				
+				}
+				
+			},
+			customPackagingPackageName ({ name, price, description, preview }) {
+		      	if (name && price) {
+		      		return name.charAt(0).toUpperCase() + name.slice(1) + ' - Each Price (BDT) ' + price 
+		    	}
+		    	return '';
+		    },
+			/*
+			unconfirmed(object) {
+
+				if (object.status==1 && object.dispatch.has_approval==1 && ((object.dispatch.hasOwnProperty('agent') && !object.dispatch.agent.receiving_confirmation) || (object.dispatch.hasOwnProperty('delivery') && !object.dispatch.delivery.receiving_confirmation))) {
+
+					return true; 	// not confirmed
+
+				}
+
+				return false;  // confirmed
+				
+			},
+			*/
+			resetMerchantAgent() {
+
+				if (!this.singleRequisitionData.previous_agent || Object.keys(this.singleRequisitionData.previous_agent).length == 0) {
+
+					this.singleRequisitionData.agent = {};
+
+				}
+				else {
+
+					this.singleRequisitionData.agent = {...this.singleRequisitionData.previous_agent};
+
+				}
+
+			},
+			requisitionHasSerialProduct() {
+
+				return this.singleRequisitionData.products.some(
+					currentProduct => currentProduct.product.has_serials
+				);
+
+			},
+			resetSelectedAgent() {
+
+    			this.singleRequisitionData.previous_agent = {};
+
+    		},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -3963,6 +4368,311 @@
 
 						break;
 					*/
+				
+					case 'merchant_id' :
+
+						if (! this.singleRequisitionData.merchant || Object.keys(this.singleRequisitionData.merchant).length==0) {
+							this.errors.merchant_id = 'Merchant is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'merchant_id');
+						}
+
+						break;
+				
+					case 'subject' :
+
+						if (!this.singleRequisitionData.subject) {
+							this.errors.subject = 'Subject is required';
+						}
+						else if (!this.singleRequisitionData.subject.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.subject = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'subject');
+						}
+
+						break;
+				/*
+					case 'description' :
+
+						if (this.singleRequisitionData.description && !this.singleRequisitionData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.description = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'description');
+						}
+
+						break;
+				*/
+
+					case 'product_id' :
+
+						this.singleRequisitionData.products.forEach(
+							
+							(requiredProduct, productIndex) => {
+
+								if (! requiredProduct.id || ! requiredProduct.product || Object.keys(requiredProduct.product).length==0) {
+									this.errors.products[productIndex].product_id = 'Product is required';
+								}
+								else if (this.singleRequisitionData.products.filter(current => current.id == requiredProduct.id).length > 1) {
+
+									this.errors.products[productIndex].product_id = 'Same product is selected';
+
+								}
+								else{
+									// this.errors.products[productIndex].product_id = null;
+									this.$delete(this.errors.products[productIndex], 'product_id');
+								}
+
+								if (!this.errorInArray(this.errors.products)) {
+									this.submitForm = true;
+								}
+
+							}
+						);
+
+						break;
+
+					case 'product_quantity' :
+
+						this.singleRequisitionData.products.forEach(
+							
+							(requiredProduct, productIndex) => {
+
+								if (!requiredProduct.total_quantity || requiredProduct.total_quantity < 1) {
+									this.errors.products[productIndex].product_quantity = 'Quantity is required';
+								}
+								else if (requiredProduct.total_quantity > (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity)) {
+									this.errors.products[productIndex].product_quantity = 'Quantity is more than available (max : ' + (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity) + ').';
+								}
+								else{
+									// this.errors.products[productIndex].product_quantity = null;
+									this.$delete(this.errors.products[productIndex], 'product_quantity');
+								}
+
+							}
+
+						);
+
+						this.validateFormInput('variations_total_quantity');
+								
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'variations_total_quantity' :
+
+						this.singleRequisitionData.products.forEach(
+
+							(requiredProduct, productIndex) => {
+
+								if (requiredProduct.product && requiredProduct.product.has_variations) {
+
+									let variationTotalQuantity = 0;
+
+									requiredProduct.product.variations.forEach(current => variationTotalQuantity += current.required_quantity ?? 0);
+
+									// console.log(variationTotalQuantity);
+
+									if (requiredProduct.total_quantity != variationTotalQuantity) {
+										this.errors.products[productIndex].variations_total_quantity = 'Total quantity should be equal to variations quantity';
+									}
+									else{
+
+										requiredProduct.product.variations.forEach(
+
+											(productVariation, variationIndex) => {
+
+												if (productVariation.required_quantity < 0) {
+
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity cant be negative';
+
+												}
+												else if (productVariation.required_quantity > 0 && (productVariation.required_quantity > (productVariation.available_quantity - productVariation.requested_quantity))) {
+
+													this.errors.products[productIndex].variation_quantities[variationIndex] = 'Quantity is more than available (max : ' + (productVariation.available_quantity - productVariation.requested_quantity) + ').';
+
+												}
+												else {
+
+													this.errors.products[productIndex].variation_quantities[variationIndex] = null;
+
+													// this.errors.products[productIndex].variation_quantities.splice(variationIndex, 1);
+													
+												}
+
+											}
+
+										);
+										
+										// this.submitForm = true;
+										this.$delete(this.errors.products[productIndex], 'variations_total_quantity');
+
+									}
+
+								}
+								else {
+
+									// this.submitForm = true;
+									this.errors.products[productIndex].variation_quantities = [];
+									this.$delete(this.errors.products[productIndex], 'variations_total_quantity');
+
+								}
+
+							}
+
+						);
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_serials' :
+
+						this.singleRequisitionData.products.forEach(
+							
+							(requiredProduct, productIndex) => {
+
+								if (requiredProduct.product.has_serials && ! requiredProduct.product.has_variations && requiredProduct.total_quantity > 0 && (! requiredProduct.hasOwnProperty('serials') || requiredProduct.serials.length != requiredProduct.total_quantity)) {
+
+									this.errors.products[productIndex].product_serials = 'Product serial is required';
+								}
+								else if (requiredProduct.product.has_serials &&  requiredProduct.product.has_variations && requiredProduct.total_quantity > 0) {
+									
+									this.$delete(this.errors.products[productIndex], 'product_serials');
+
+									this.$delete(this.singleRequisitionData.products[productIndex], 'serials');
+
+									requiredProduct.product.variations.forEach(
+										(requiredProductVariation, variationIndex) => {
+
+											if (requiredProductVariation.required_quantity > 0 && (! requiredProductVariation.hasOwnProperty('required_serials') || requiredProductVariation.required_serials.length != requiredProductVariation.required_quantity)) {
+
+												this.errors.products[productIndex].variation_serials[variationIndex] = 'Variation serial is required';
+											}
+											else {
+												
+												// this.errors.products[productIndex].variation_serials[variationIndex] = null;
+
+												this.$set(this.errors.products[productIndex].variation_serials, variationIndex, null);
+											}
+
+										}
+									);
+
+								}
+								else{
+									this.errors.products[productIndex].variation_serials = [];
+									this.$delete(this.errors.products[productIndex], 'product_serials');
+								}
+
+							}
+							
+						);
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'agent_name' :
+
+						if (!this.singleRequisitionData.delivery_service) {
+							if (!this.singleRequisitionData.agent || !this.singleRequisitionData.agent.name) {
+								this.errors.agent.agent_name = 'Agent name is required';
+							}
+							else if (!this.singleRequisitionData.agent.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+								this.errors.agent.agent_name = 'No special character';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.agent, 'agent_name');
+							}
+						}
+						else {
+							this.submitForm = true;
+							this.errors.agent = {};
+						}
+
+
+						break;
+
+					case 'agent_mobile' :
+
+						if (!this.singleRequisitionData.delivery_service) {
+							
+							if (!this.singleRequisitionData.agent || !this.singleRequisitionData.agent.mobile) {
+								this.errors.agent.agent_mobile = 'Agent mobile is required';
+							}
+							else if (!this.singleRequisitionData.agent.mobile.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
+								this.errors.agent.agent_mobile = 'Invalid mobile number';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.agent, 'agent_mobile');
+							}
+
+						}
+						else {
+							this.submitForm = true;
+							this.errors.agent = {};
+						}
+
+						break;
+
+					case 'agent_code' :
+
+						if (!this.singleRequisitionData.delivery_service) {
+							
+							if (!this.singleRequisitionData.agent || !this.singleRequisitionData.agent.code) {
+								this.errors.agent.agent_code = 'Agent code is required';
+							}
+							else if (this.singleRequisitionData.agent.code.length < 4 || this.singleRequisitionData.agent.code.length > 8) {
+								this.errors.agent.agent_code = 'Code length should be between 4 to 8';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.agent, 'agent_code');
+							}
+
+						}
+						else {
+							this.submitForm = true;
+							this.errors.agent = {};
+						}
+
+						break;
+
+					case 'delivery_address' :
+
+						if (this.singleRequisitionData.delivery_service) {
+
+							// console.log('delivery_address');
+
+							if (!this.singleRequisitionData.delivery || !this.singleRequisitionData.delivery.address) {
+								this.errors.delivery.delivery_address = 'Delivery address is required';
+							}
+							else{
+								this.submitForm = true;
+								this.$delete(this.errors.delivery, 'delivery_address');
+							}
+
+						}
+						else {
+							this.submitForm = true;
+							this.errors.delivery = {};
+						}
+
+						break;
 
 				}
 	 
