@@ -164,6 +164,7 @@ Route::name('admin.')->group(function () {
 
 		// requisition
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');
+		Route::post('/requisitions/{perPage}', 'RequisitionController@makeNewRequisition')->name('requisitions');
 		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions');
 		Route::post('/search-requisitions/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
 
@@ -232,6 +233,9 @@ Route::name('admin.')->group(function () {
 		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments');	
 		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments');
 		Route::post('/api/search-deal-payments/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+
+		// merchant-agents
+		Route::get('/api/merchant-agents/{merchant}/{perPage?}', 'MerchantController@showMerchantAllAgents')->name('merchant-agents');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');

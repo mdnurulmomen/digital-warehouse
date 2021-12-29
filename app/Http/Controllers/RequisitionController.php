@@ -12,6 +12,7 @@ class RequisitionController extends Controller
     public function __construct()
     {
         $this->middleware("permission:view-requisition-index")->only(['showAllRequisitions', 'searchAllRequisitions']);
+        $this->middleware("permission:create-requisition")->only(['makeNewRequisition']);
         $this->middleware("permission:update-requisition")->only('cancelRequisition');
     }
 
@@ -32,6 +33,94 @@ class RequisitionController extends Controller
 
         return RequisitionResource::collection(Requisition::with(['products.merchantProduct', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->get());
 
+    }
+
+    public function makeNewRequisition(Request $request, $perPage)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'merchant_id' => 'required|exists:merchants,id',
+            
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|numeric|exists:merchant_products,id',
+            'products.*.total_quantity' => 'required|numeric|min:1',
+            'products.*.packaging_service' => 'boolean',
+            // 'products.*.package' => 'required_if:products.*.packaging_service,true',
+            'products.*.product' => 'required',
+            'products.*.product.has_serials' => 'required|boolean',
+            'products.*.product.has_variations' => 'required|boolean',
+
+            'products.*.serials' => 'exclude_if:products.*.product.has_variations,true|required_if:products.*.product.has_serials,true|array',
+            'products.*.serials.*' => [
+                    Rule::exists('product_serials', 'serial_no')->where(function ($query) {
+                        return $query->where('has_requisitions', false)->where('has_dispatched', false);
+                    }),
+            ],
+
+            'products.*.product.variations' => 'required_if:products.*.product.has_variations,true|array',
+            'products.*.product.variations.*.required_serials' => 'required_with:products.*.product.variations.*.required_quantity|array',
+            'products.*.product.variations.*.required_serials.*' => [
+                    Rule::exists('product_variation_serials', 'serial_no')->where(function ($query) {
+                        return $query->where('has_requisitions', false)->where('has_dispatched', false);
+                    }),
+            ],
+
+            'delivery_service' => 'boolean',
+
+            'agent' => 'required_if:delivery_service,false,',
+            'agent.name' => 'required_if:delivery_service,false,',
+            'agent.mobile' => 'required_if:delivery_service,false,',
+            'agent.code' => 'required_if:delivery_service,false,|string',
+            // 'agent.presence_confirmation' => 'nullable|boolean',
+            'delivery' => 'required_if:delivery_service,true',
+            'delivery.address' => 'required_if:delivery_service,true',
+        ]);
+
+        $serialError = $this->validateProductSerials(json_decode(json_encode($request->products)));
+
+        if (! empty($serialError)) {
+
+            return $serialError;
+
+        }
+
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+
+        $newRequisition = new Requisition();
+
+        $newRequisition->subject = strtolower($request->subject);
+        $newRequisition->description = strtolower($request->description);
+        $newRequisition->creator_type = get_class($currentUser);
+        $newRequisition->creator_id = $currentUser->id;
+        $newRequisition->merchant_id = $request->merchant_id;
+
+        $newRequisition->save();
+
+        $newRequisition->required_products = json_decode(json_encode($request->products));
+
+        if ($request->delivery_service) {
+            
+            $newRequisition->delivery()->create([
+                'address' => $request->delivery['address'],
+            ]);
+        
+        }
+
+        else {
+
+           $newRequisition->agent()->create([
+                'name' => $request->agent['name'],
+                'mobile' => $request->agent['mobile'],
+                'code' => $request->agent['code'],
+                // 'presence_confirmation' => $request->agent['presence_confirmation'] ?? false,
+            ]); 
+
+        }
+
+        BroadcastNewRequisition::dispatch($newRequisition);
+
+        return $this->showMyAllRequisitions($perPage);
     }
 
     public function cancelRequisition(Request $request, $requisition, $perPage)
@@ -182,4 +271,60 @@ class RequisitionController extends Controller
             'all' => new RequisitionCollection($query->paginate($perPage)),  
         ];
     }
+
+    protected function validateProductSerials($products = [])
+    {
+        foreach ($products as $requiredProduct) {
+            
+            if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && (empty($requiredProduct->serials) || $requiredProduct->total_quantity != count($requiredProduct->serials))) {
+                
+                return response()->json(['errors'=>["productSerial" => "Product serial is required"]], 422);
+
+            }
+
+            else if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && count($requiredProduct->serials)) {
+                        
+                foreach ($requiredProduct->serials as $requiredProductSerialIndex => $requiredProductSerial) {
+                    
+                    if (! ProductSerial::where('serial_no', $requiredProductSerial)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
+                        
+                        return response()->json(['errors'=>["productSerial" => "Product serial has already requisition"]], 422);
+
+                    }
+
+                }
+
+            }
+
+            else if ($requiredProduct->product->has_serials && $requiredProduct->product->has_variations) {
+                
+                foreach ($requiredProduct->product->variations as $requiredProductVariation) {
+                    
+                    if (! empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0 && (empty($requiredProductVariation->required_serials) || $requiredProductVariation->required_quantity != count($requiredProductVariation->required_serials))) {
+                
+                        return response()->json(['errors'=>["variationSerial" => "Variation serial is required"]], 422);
+
+                    }
+
+                    else if (! empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0 && count($requiredProductVariation->required_serials)) {
+                        
+                        foreach ($requiredProductVariation->required_serials as $requiredProductVariationSerialIndex => $requiredProductVariationSerial) {
+                            
+                            if (! ProductVariationSerial::where('serial_no', $requiredProductVariationSerial)->where('has_requisitions', false)->where('has_dispatched', false)->exists()) {
+                                
+                                return response()->json(['errors'=>["variationSerial" => "Variation serial has already requisition"]], 422);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
 }

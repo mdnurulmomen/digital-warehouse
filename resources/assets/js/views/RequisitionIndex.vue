@@ -21,8 +21,8 @@
 									<div class="card-block">
 										<div class="row">
 											<div class="col-sm-12">
- 												<div class="row form-group">
-											  		<div class="col-sm-6 d-flex align-items-center form-group">
+											  	<div class="row form-group">
+											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
@@ -31,46 +31,51 @@
 											  				</span>
 											  			</div>
 
-											  			<div class="ml-auto ml-sm-0">
-											  				<!-- 
-											  				<div>
-											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
-											  				</div> 
-											  				-->
+											  			<div class="dropdown">
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+										  					
+										  					<div class="dropdown-menu">
+									  							<download-excel 
+													  				class="btn btn-default p-1 dropdown-item active"
+																	:data="requisitionsToShow"
+																	:fields="dataToExport" 
+																	worksheet="Requisitions sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				Excel
+																</download-excel>
+										  						
+										  						<!-- 
+										  						<download-excel 
+										  							type="csv"
+													  				class="btn btn-default p-1 dropdown-item disabled"
+																	:data="requisitionsToShow"
+																	:fields="dataToExport" 
+																	worksheet="Requisitions sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				CSV
+																</download-excel> 
+																-->
+										  					</div>
+										  				</div>
 
-											  				<div class="dropdown">
-										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
-											  					
-											  					<div class="dropdown-menu">
-										  							<download-excel 
-														  				class="btn btn-default p-1 dropdown-item active"
-																		:data="requisitionsToShow"
-																		:fields="dataToExport" 
-																		worksheet="Requisitions sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				Excel
-																	</download-excel>
-											  						
-											  						<!-- 
-											  						<download-excel 
-											  							type="csv"
-														  				class="btn btn-default p-1 dropdown-item disabled"
-																		:data="requisitionsToShow"
-																		:fields="dataToExport" 
-																		worksheet="Requisitions sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				CSV
-																	</download-excel> 
-																	-->
-											  					</div>
-											  				</div>
+											  			<div class="ml-auto d-sm-none">
+											  				<button 
+											  					type="button" 
+													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			data-toggle="tooltip" data-placement="top" title="Create New" 
+											  					v-if="userHasPermissionTo('create-product-stock')"
+													  			@click="showStockCreateForm()" 
+												  			>
+												  				<i class="fa fa-plus"></i>
+												  				New Stock
+												  			</button>
 											  			</div>
 											  		</div>
 
-											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
-											  			<div class="ml-sm-auto mr-3">
+											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
+											  			<div class="mx-sm-auto w-75">
 										  					<input 	
 																type="text" 
 														  		class="form-control" 
@@ -85,7 +90,6 @@
 											  			</div>
 
 														<div class="ml-auto ml-sm-0">
-															
 															<ul class="nav nav-pills">
 																<li class="nav-item">
 																	<a 
@@ -111,6 +115,18 @@
 																</li>
 															</ul>
 													  	</div>
+													</div>
+
+													<div class="col-md-4 text-right d-none d-md-block">
+											  			<button 
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
+												  			:disabled="merchantAllProducts.length==0" 
+												  			@click="showContentCreateForm()"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Requisition
+											  			</button>
 													</div>
 											  	</div>
 											</div>
@@ -286,7 +302,590 @@
 			</div>
 		</div>
 
- 		<!--Create Or Edit Modal -->
+		<!--Create Or Edit Modal -->
+		<div class="modal fade" id="requisition-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							Make Requisition
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+						
+					<form 	
+						class="form-horizontal" 
+						v-on:submit.prevent="storeRequisition()" 
+						autocomplete="off" 
+						novalidate="true" 
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-body">
+
+							<transition-group name="fade">
+
+								<div 
+									class="row" 
+									v-bind:key="'requisition-modal-step-' + 1" 
+									v-show="!loading && step==1"
+								>								  	
+									<h2 class="mx-auto mb-4 lead">Requisition Profile</h2>
+
+							        <div class="col-md-12">	
+										<div class="form-row">
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">Subject</label>
+												
+												<input type="text" 
+													class="form-control" 
+													v-model="singleRequisitionData.subject" 
+													placeholder="Relevant Subject" 
+													:class="!errors.subject  ? 'is-valid' : 'is-invalid'" 
+													@input="validateFormInput('subject')" 
+													required="true" 
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.subject }}
+										  		</div>
+											</div>
+										</div>
+							        </div>
+
+							        <div class="col-md-12 card-footer">
+								    	<div class="form-row">
+									    	<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+
+									          	<button 
+									          	type="button" 
+									          	class="btn btn-outline-secondary btn-sm btn-round" 
+									          	data-toggle="tooltip" data-placement="top" title="Next" 
+									          	v-on:click="nextPage"
+									          	>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+								    	</div>
+							        </div>
+							    </div>
+
+							    <div 
+									class="row" 
+									v-bind:key="'requisition-modal-step' + 2" 
+									v-show="!loading && step==2"
+								>
+									<h2 class="mx-auto mb-4 lead">Required Products</h2>
+
+									<div 
+										class="card col-md-12" 
+										v-if="singleRequisitionData.products.length && singleRequisitionData.products.length==errors.products.length"
+									>
+										<div 
+											class="card-body" 
+											v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
+											:key="'required-product-' + productIndex"
+										>
+											<div class="form-row">
+												<div class="form-group col-md-6">
+													<label for="inputFirstName">Select Product</label>
+													
+													<multiselect 
+				                              			v-model="requiredProduct.product"
+				                              			placeholder="Product Name" 
+				                              			label="name" 
+				                                  		track-by="id" 
+				                                  		:custom-label="objectNameWithCapitalized" 
+				                                  		:options="merchantAllProducts" 
+				                                  		:required="true" 
+				                                  		:allow-empty="false" 
+				                                  		class="form-control p-0" 
+				                                  		:class="!errors.products[productIndex].product_id ? 'is-valid' : 'is-invalid'" 
+				                                  		:disabled="singleRequisitionData.products.length > (productIndex+1)"
+				                                  		@input="setRequiredProduct(productIndex)"
+				                                  		@close="validateFormInput('product_id')" 
+				                              		>
+				                                	</multiselect>
+				                                	
+				                                	<div class="invalid-feedback">
+												    	{{ errors.products[productIndex].product_id }}
+												    </div>
+												</div>
+
+												<div 
+													class="form-group col-md-6" 
+													v-if="requiredProduct.product"
+												>
+													<label for="inputFirstName">Total Quantity</label>
+													<input type="number" 
+														class="form-control" 
+														v-model.number="requiredProduct.total_quantity" 
+														placeholder="Product Total Quantity" 
+														:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
+														@change="validateFormInput('product_quantity')" 
+														required="true" 
+														min="0" 
+														:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
+													>
+													<div class="invalid-feedback">
+											        	{{ errors.products[productIndex].product_quantity }}
+											  		</div>
+												</div>
+											</div>
+
+											<div class="card" v-if="requiredProduct.product && requiredProduct.product.has_variations">
+												<div class="card-body">
+													<div 
+														class="form-row" 
+														v-for="(productVariation, variationIndex) in requiredProduct.product.variations" 
+														:key="'required-product-variation-' + productIndex + variationIndex"
+													>	
+														<div class="form-group col-md-6">
+															<label for="inputFirstName">Select Variation</label>
+															<multiselect 
+						                              			v-model="requiredProduct.product.variations[variationIndex]"
+						                              			class="form-control p-0 is-valid" 
+						                              			placeholder="Variation Name" 
+						                              			label="name" 
+						                                  		track-by="id" 
+						                                  		:custom-label="objectNameWithCapitalized" 
+						                                  		:options="requiredProduct.product.variations" 
+						                                  		:required="true" 
+						                                  		:allow-empty="false" 
+						                                  		:disabled="true"
+						                              		>
+						                                	</multiselect>
+														</div>
+														<div class="form-group col-md-6">
+															<label for="inputFirstName">
+																Variation Quantity
+															</label>
+															<input type="number" 
+																class="form-control" 
+																v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
+																placeholder="Variation Quantity" 
+																:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
+																min="0" 
+																:max="productVariation.available_quantity - productVariation.requested_quantity" 
+																@change="validateFormInput('variations_total_quantity')" 
+															>
+															<div 
+																class="invalid-feedback" 
+															>
+													        	{{ errors.products[productIndex].variation_quantities[variationIndex] }}
+													  		</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div 
+												class="form-row" 
+												v-if="requiredProduct.product && requiredProduct.total_quantity"
+											>
+												<div class="form-group col-md-12 text-center">
+													<toggle-button 
+														v-model="requiredProduct.packaging_service" 
+														:value="false" 
+														:width=200 
+														:color="{checked: 'green', unchecked: 'red'}"
+														:labels="{checked: 'Want Packaging', unchecked: 'No Packaging'}" 
+														@change="setPackagingService(productIndex)"
+													/>
+												</div>
+
+												<div class="col-md-12" v-if="requiredProduct.packaging_service">
+													<div class="form-row">
+														<div class="col-md-3"></div>
+														<div class="col-md-6">
+															<multiselect 
+						                              			v-model="requiredProduct.preferred_package" 
+						                              			class="form-control p-0 is-valid" 
+						                              			placeholder="Choose Package" 
+						                              			label="name" 
+						                                  		track-by="id" 
+						                                  		:options="allPackagingPackages" 
+						                                  		:custom-label="customPackagingPackageName" 
+						                              		>
+						                                	</multiselect>
+														</div>
+														<div class="col-md-3"></div>
+													</div>
+												</div>
+											</div>
+
+											<div class="form-row">
+												<div class="form-group col-md-12 text-center">
+													<div 
+														class="invalid-feedback" 
+														style="display: block;" 
+														v-show="errors.products[productIndex].variations_total_quantity"
+													>
+											        	{{ errors.products[productIndex].variations_total_quantity }}
+											  		</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Add Product" 
+													:disabled="singleRequisitionData.products.length >= merchantAllProducts.length"
+													@click="addMoreProduct()"
+												>
+													More Product
+												</button>
+											</div>
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+													data-toggle="tooltip" data-placement="top" title="Remove Product" 
+													:disabled="singleRequisitionData.products.length < 2"
+													@click="removeProduct()"
+												>
+													Remove Product
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="form-group col-md-12">
+										<label for="inputFirstName">Short Note</label>
+										<ckeditor 
+			                              	class="form-control" 
+			                              	:editor="editor" 
+			                              	v-model="singleRequisitionData.description"
+			                            >
+		                              	</ckeditor>
+									</div>
+
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+								          	</div>
+								          	<div class="col-md-12">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+										</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'requisition-modal-step' + 3" 
+									v-show="!loading && step==3"
+								>
+									<h2 class="mx-auto mb-4 lead">Product Serials</h2>
+
+									<div 
+										class="col-md-12"  
+										v-if="singleRequisitionData.products.length"
+									>
+										<div 
+											class="card card-body" 
+											v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
+											:key="'required-product-' + productIndex + '-serials'"
+										>
+											<div 
+												class="form-row"
+												v-if="requiredProduct.product && requiredProduct.product.has_serials && ! requiredProduct.product.has_variations && requiredProduct.total_quantity > 0"
+											>
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">Selected Product</label>
+													
+													<multiselect 
+				                              			v-model="requiredProduct.product" 
+				                              			class="form-control p-0 is-valid" 
+				                              			placeholder="Product Name" 
+				                              			label="name" 
+				                                  		track-by="id" 
+				                                  		:custom-label="objectNameWithCapitalized" 
+				                                  		:options="[]" 
+				                                  		:required="true" 
+				                                  		:allow-empty="false"
+				                                  		:disabled="true"
+				                              		>
+				                                	</multiselect>
+												</div>
+
+												<div class="form-group col-md-8">
+													<label for="inputFirstName">Product Serials</label>
+													
+													<multiselect 
+				                              			v-model="requiredProduct.serials" 
+				                              			class="form-control p-0" 
+				                              			:class="errors.products[productIndex].product_serials ? 'is-invalid' : 'is-valid'" 
+				                              			placeholder="Product Serials" 
+				                              			:multiple="true" 
+				                              			:close-on-select="false" 
+				                              			:max="requiredProduct.total_quantity" 
+				                                  		:options="requiredProduct.product.serials" 
+				                                  		@close="validateFormInput('product_serials')"
+				                              		>
+				                                	</multiselect>
+
+				                                	 
+				                                	<div 
+														class="invalid-feedback" 
+													>
+											        	{{ errors.products[productIndex].product_serials }}
+											  		</div>
+												</div>
+											</div>
+
+											<div 
+												class="form-row"
+												v-else-if="requiredProduct.product && requiredProduct.product.has_serials && requiredProduct.product.has_variations && requiredProduct.total_quantity > 0"
+											>
+												<div class="form-group col-md-12">
+													<div class="card">
+														<div class="card-header">
+															{{ requiredProduct.product.name | capitalize }} Serials
+														</div>
+
+														<div class="card-body">
+															<div 
+																class="form-row" 
+																v-for="(productVariation, variationIndex) in requiredProduct.product.variations" 
+																:key="'required-product-' + productIndex + '-variation-' + variationIndex + '-serials'" 
+																v-show="productVariation.required_quantity > 0"
+															>	
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">Selected Variation</label>
+																	
+																	<multiselect 
+								                              			v-model="productVariation.variation" 
+								                              			class="form-control p-0 is-valid" 
+								                              			placeholder="Variation Name" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:options="[]" 
+								                                  		:custom-label="objectNameWithCapitalized" 
+								                                  		:disabled="true"
+								                              		>
+								                                	</multiselect>
+																</div>
+
+																<div class="form-group col-md-8">
+																	<label for="inputFirstName">
+																		Variation Serials
+																	</label>
+
+																	<multiselect 
+								                              			v-model="requiredProduct.product.variations[variationIndex].required_serials" 
+								                              			class="form-control p-0 is-valid" 
+								                              			:class="errors.products[productIndex].variation_serials[variationIndex] ? 'is-invalid' : 'is-valid'"
+								                              			placeholder="Variation Serials" 
+								                              			:multiple="true" 
+								                              			:close-on-select="false" 
+								                              			:max="productVariation.required_quantity" 
+								                                  		:options="requiredProduct.product.variations[variationIndex].serials" 
+								                                  		@close="validateFormInput('product_serials')"
+								                              		>
+								                                	</multiselect>
+
+																	 
+																	<div 
+																		class="invalid-feedback" 
+																	>
+															        	{{ errors.products[productIndex].variation_serials[variationIndex]}}
+															  		</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+								          	</div>
+								          	<div class="col-md-12">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+										</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'requisition-modal-step-' + 4" 
+									v-show="!loading && step==4"
+								>	
+									<h2 class="mx-auto mb-4 lead">Delivery Details</h2>
+
+							        <div class="col-md-12">
+										<div class="form-row">
+											<div class="form-group col-md-12 text-center">
+												<toggle-button 
+													v-model="singleRequisitionData.delivery_service" 
+													:value="false" 
+													:width=200 
+													:color="{checked: 'green', unchecked: 'blue'}"
+													:labels="{checked: 'Delivery Service', unchecked: 'Self Agent'}" 
+													@change="setRequisitionAgent"
+												/>
+											</div>
+										</div>
+
+										<div 
+											class="form-row" 
+											v-if="! singleRequisitionData.delivery_service && singleRequisitionData.agent"
+										>	
+											<div class="form-group col-md-12" v-show="merchantAllAgents.length">
+												<label for="inputFirstName">Select From Previous Agent</label>
+												<multiselect 
+			                              			v-model="singleRequisitionData.previous_agent" 
+			                              			class="form-control p-0 is-valid" 
+			                              			placeholder="Agent Name" 
+			                              			label="name" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="merchantAllAgents" 
+			                                  		@input="resetMerchantAgent()"
+			                              		>
+			                                	</multiselect>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Name</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleRequisitionData.agent.name" 
+													placeholder="Agent Name" 
+													:class="!errors.agent.agent_name ? 'is-valid' : 'is-invalid'" 
+													@input="validateFormInput('agent_name')" 
+													@change="resetSelectedAgent()"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.agent.agent_name }}
+										  		</div>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Mobile</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleRequisitionData.agent.mobile" 
+													placeholder="Agent Name" 
+													:class="!errors.agent.agent_mobile  ? 'is-valid' : 'is-invalid'" 
+													@input="validateFormInput('agent_mobile')" 
+													@change="resetSelectedAgent()"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.agent.agent_mobile }}
+										  		</div>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Code</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleRequisitionData.agent.code" 
+													placeholder="Secret Code" 
+													:class="!errors.agent.agent_code  ? 'is-valid' : 'is-invalid'" 
+													@input="validateFormInput('agent_code')" 
+													@change="resetSelectedAgent()"
+												>
+
+												<div class="invalid-feedback">
+										        	{{ errors.agent.agent_code }}
+										  		</div>
+											</div>
+											<!-- 
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Present</label>
+												<toggle-button 
+													v-model="singleRequisitionData.agent.presence_confirmation" 
+													:width=200 
+													:color="{checked: 'red', unchecked: 'green'}"
+													:labels="{checked: 'Now', unchecked: 'Later'}" 
+												/>
+											</div>
+											-->
+										</div>
+
+										<div class="form-row" v-else-if="singleRequisitionData.delivery_service">
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">Address</label>
+												<ckeditor 
+					                              	class="form-control" 
+					                              	:editor="editor" 
+					                              	v-model="singleRequisitionData.delivery.address" 
+					                              	@blur="validateFormInput('delivery_address')"
+					                            >
+				                              	</ckeditor>
+
+				                              	<div 
+					                              	class="invalid-feedback" 
+					                              	style="display : block" 
+					                              	v-show="errors.delivery.delivery_address"
+				                              	>
+										        	{{ errors.delivery.delivery_address }}
+										  		</div>
+											</div>
+										</div>
+							        </div>
+
+							        <div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+													Request
+												</button>
+											</div>
+								    	</div>
+							        </div>
+							    </div>
+
+							</transition-group>
+
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+
+ 		<!--Dispatch Modal -->
 		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-requisition') || userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
@@ -2063,11 +2662,27 @@
 		        	current_page: 1
 		      	},
 
+		      	merchantAllProducts : [],
+	        	merchantAllAgents : [],
+
 	        	singleDispatchData : singleDispatchData,
 	        	singleRequisitionData : singleRequisitionData,
 
 		   		errors : {
 					// products : [],
+					
+					products : [
+						
+						{
+							// product_id : '',
+							// product_quantity : '',
+							// variations_total_quantity : ''
+							variation_serials : [],
+							variation_quantities : [],
+						}
+
+					],
+
 					// delivery : {},
 					// agent : {}
 				},
@@ -2410,6 +3025,82 @@
 					});
 
 			},
+			fetchMerchantAllProducts() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.merchantAllProducts = [];
+				
+				axios
+					.get('/api/merchant-all-products/' + this.singleRequisitionData.merchant_id)
+					.then(response => {
+						if (response.status == 200) {
+							this.merchantAllProducts = response.data.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchMerchantAllAgents() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.merchantAllAgents = [];
+				
+				axios
+					.get('/api/my-agents/')
+					.then(response => {
+						if (response.status == 200) {
+							this.merchantAllAgents = Object.values(response.data);
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 			fetchAllPackagingPackages() {
 				
 				this.error = '';
@@ -2447,6 +3138,53 @@
 						this.loading = false;
 					});
 
+			},
+			showContentCreateForm() {
+
+				this.step = 1;
+	        	this.submitForm = true;
+	        	
+				this.singleRequisitionData = {
+
+					
+					products : [
+						{
+							product : {},
+							total_quantity : 0
+						}
+					],
+
+					agent : {},
+
+					delivery : {},
+							
+			    };
+
+				this.errors = {
+					
+	        		// subject : '',
+					// description : '',
+					
+					products : [
+						
+						{
+							// product_id : '',
+							// product_quantity : '',
+							// variations_total_quantity : ''
+							variation_serials : [],
+							variation_quantities : []
+						}
+						
+					],
+
+					agent : {},
+
+					delivery : {},
+
+				};
+
+				$('#requisition-createOrEdit-modal').modal('show');
+				
 			},
 			openRequisitionCancelForm(object) {
 

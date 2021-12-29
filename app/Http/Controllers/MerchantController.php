@@ -39,7 +39,10 @@ class MerchantController extends Controller
         $this->middleware("permission:view-merchant-product-index")->only(['showMerchantAllProducts', 'showMerchantAvailableProducts', 'searchMerchantAllProducts']);
         $this->middleware("permission:create-merchant-product")->only('storeMerchantNewProduct');
         $this->middleware("permission:update-merchant-product")->only('updateMerchantProduct');
-        $this->middleware("permission:delete-merchant-product")->only('deleteMerchantProduct');  
+        $this->middleware("permission:delete-merchant-product")->only('deleteMerchantProduct'); 
+
+        // Merchant-Agents
+        $this->middleware("permission:create-requisition-index")->only(['showMerchantAllAgents']); 
     }
 
     public function showAllMerchants($perPage = false)
@@ -159,6 +162,18 @@ class MerchantController extends Controller
         return response()->json([
             'all' => $query->paginate($perPage),    
         ], 200);
+    }
+
+    // Merchant-Agents (admin.php)
+    public function showMerchantAllAgents($merchant, $perPage = false)
+    {
+        if ($perPage) {
+            
+        }
+        
+        return RequisitionAgent::whereHas('requisition', function ($query) use ($merchant) {
+            $query->where('merchant_id', $merchant);
+        })->latest('id')->get()->unique('name');
     }
 
     /*
@@ -335,6 +350,8 @@ class MerchantController extends Controller
 
         $newRequisition->subject = strtolower($request->subject);
         $newRequisition->description = strtolower($request->description);
+        $newRequisition->creator_type = get_class($currentMerchant);
+        $newRequisition->creator_id = $currentMerchant->id;
         $newRequisition->merchant_id = $currentMerchant->id;
 
         $newRequisition->save();

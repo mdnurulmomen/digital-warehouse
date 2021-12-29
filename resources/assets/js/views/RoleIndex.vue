@@ -978,6 +978,7 @@
 	            	'Manager',
 	            	'Merchant',
 	                'Warehouse',
+	                'Requisition',
 	            	'Product-Asset',
 	                // 'Product-Stock',
 	            	'Warehouse-Owner',
@@ -992,7 +993,6 @@
 	            ],            
 
 	            modelsViewableAndUpdatable : [
-	                'Requisition', // view / update(cancel)
 	                'Application-Setting'  // view / update
 	            ],
 

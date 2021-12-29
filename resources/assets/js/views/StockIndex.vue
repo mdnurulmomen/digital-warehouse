@@ -22,9 +22,7 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
-
 											<div class="col-sm-12">
-
 											  	<div class="row form-group">
 											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
 											  			<div class="mr-2">
