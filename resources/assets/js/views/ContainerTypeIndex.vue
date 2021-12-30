@@ -54,7 +54,8 @@
 										  			:column-values-to-show="['name', 'code']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'warehouse-asset'"
+										  			:required-permission="'warehouse-asset'" 
+										  			:current-content="singleAssetData"
 
 										  			@showContentDetails="showContentDetails" 
 										  			@openContentEditForm="openContentEditForm" 

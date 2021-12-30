@@ -91,7 +91,10 @@
 																</thead>
 																<tbody>
 
-																	<tr v-for="(content, contentIndex) in requisitionsToShow" :key="'content-index-' + contentIndex + 'content-' + content.id"
+																	<tr 
+																		v-for="(content, contentIndex) in requisitionsToShow" 
+																		:key="'content-index-' + contentIndex + 'content-' + content.id" 
+																		:class="content.id==singleRequisitionData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ content.subject | capitalize }}</td>
 																		

@@ -131,7 +131,8 @@
 															<tbody>
 																<tr 
 																	v-for="(content, contentIndex) in contentsToShow" 
-																	:key="'category-index-' + contentIndex + '-category-' + content.id"
+																	:key="'category-index-' + contentIndex + '-category-' + content.id" 
+																	:class="content.id==singleAssetData.id ? 'highlighted' : ''"
 																>
 																	<td> {{ content.name | capitalize }} </td>
 																	

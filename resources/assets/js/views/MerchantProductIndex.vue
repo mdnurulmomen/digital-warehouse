@@ -159,7 +159,8 @@
 
 																<tbody>
 																	<tr v-for="merchantProduct in productsToShow" 
-																		:key="'merchant-product-id' + merchantProduct.id + '-product-id-' + merchantProduct.product.id + '-merchant-id-' + merchantProduct.merchant.id"
+																		:key="'merchant-product-id' + merchantProduct.id + '-product-id-' + merchantProduct.product.id + '-merchant-id-' + merchantProduct.merchant.id" 
+																		:class="merchantProduct.id==singleMerchantProductData.id ? 'highlighted' : ''"
 																	>
 																		<td>
 																			{{ merchantProduct.product ? merchantProduct.product.name : 'NA' | capitalize }}

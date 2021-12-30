@@ -1,8 +1,6 @@
 
 <template>
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'warehouses'" 
 			:message="'All our warehouses'"
@@ -105,7 +103,8 @@
 
 																<tr 
 																v-for="(warehouse, warehouseIndex) in contentsToShow" 
-																:key="'my-warehouses-index-' + warehouseIndex + '-warehouse-' + warehouse.id"
+																:key="'my-warehouses-index-' + warehouseIndex + '-warehouse-' + warehouse.id" 
+																:class="warehouse.id==singleWarehouseData.id ? 'highlighted' : ''"
 																>
 																	<td>
 																		{{ warehouse.name }}

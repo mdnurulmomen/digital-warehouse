@@ -202,7 +202,10 @@
 																	</tr>
 																</thead>
 																<tbody>
-																	<tr v-for="stock in allStocks" :key="'merchant-product-stock-' + stock.id"
+																	<tr 
+																		v-for="stock in allStocks" 
+																		:key="'merchant-product-stock-' + stock.id" 
+																		:class="stock.id==singleStockData.id ? 'highlighted' : ''"
 																	>
 																		<td>
 																			{{ stock.created_at }}

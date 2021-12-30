@@ -55,7 +55,8 @@
 										  			:column-names="['name', 'username', 'email', 'mobile', '# warehouses']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'owner_total_warehouses']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:current-content="singleOwnerDetails"
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 

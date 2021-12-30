@@ -58,6 +58,7 @@
 										  			:pagination = "pagination" 
 										  			:required-permission = "'manager'" 
 										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleUserDetails"
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 

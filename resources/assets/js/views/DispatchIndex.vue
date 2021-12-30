@@ -85,7 +85,8 @@
 
 																	<tr 
 																		v-for="dispatchedReq in allDispatchedRequisition" 
-																		:key="'dispatch-' + dispatchedReq.id"
+																		:key="'dispatch-' + dispatchedReq.id" 
+																		:class="dispatchedReq.id==singleDispatchedReqData.id ? 'highlighted' : ''"
 																	>
 																		<td>
 																			{{ dispatchedReq.subject | capitalize }}

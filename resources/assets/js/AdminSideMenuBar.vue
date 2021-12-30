@@ -256,10 +256,8 @@
 			<router-view></router-view>
 
 			<div id="styleSelector"></div>
-
 		</div>
 	</div>
-
 </template>
 
 <script>
@@ -344,3 +342,8 @@
     }
 
 </script>
+
+<style type="text/css">
+	/*importing global css*/
+	@import "./../css/global.css"
+</style>

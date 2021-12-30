@@ -271,6 +271,7 @@
 																<tr 
 																	v-for="(content, contentIndex) in dealAllPayments" 
 																	:key="'content-key-' + contentIndex + '-content-' + content.id" 
+																	:class="content.id==singlePaymentData.id ? 'highlighted' : ''"
 																>
 																	<td>
 																		{{ content.invoice_no | capitalize }}

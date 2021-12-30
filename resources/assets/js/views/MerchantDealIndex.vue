@@ -164,7 +164,10 @@
 																	</tr>
 																</thead>
 																<tbody>
-																	<tr v-for="merchantDeal in merchantAllDeals" :key="'merchant-deal-' + merchantDeal.id"
+																	<tr 
+																	v-for="merchantDeal in merchantAllDeals" 
+																	:key="'merchant-deal-' + merchantDeal.id" 
+																	:class="merchantDeal.id==singleMerchantDealData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ merchantDeal.name | capitalize }}</td>
 

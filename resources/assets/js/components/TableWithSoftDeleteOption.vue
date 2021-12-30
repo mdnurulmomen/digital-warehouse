@@ -29,7 +29,10 @@
 				</thead>
 				<tbody>
 
-					<tr v-for="content in currentContents" :key="content.id"
+					<tr 
+						v-for="content in currentContents" 
+						:key="content.id" 
+						:class="content.id==currentContent.id ? 'highlighted' : ''"
 					>
 						<td v-for="columnValue in columnValuesToShow" :key="columnValue">
 							{{ getColumnValue(content, columnValue) }}
@@ -212,6 +215,10 @@
 			formSubmitted : {
 				type : Boolean,
 				default: false
+			},
+			currentContent: {
+				type: Object,
+				default: {}
 			},
 		},
 

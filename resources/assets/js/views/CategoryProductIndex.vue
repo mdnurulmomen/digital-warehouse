@@ -69,7 +69,10 @@
 																</thead>
 
 																<tbody>
-																	<tr v-for="content in productsToShow" :key="'content-' + content.id"
+																	<tr 
+																		v-for="content in productsToShow" 
+																		:key="'content-' + content.id" 
+																		:class="content.id==singleProductData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ content.name | capitalize }}</td>
 																		

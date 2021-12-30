@@ -77,6 +77,7 @@
 																<tr 
 																	v-for="content in contentsToShow" 
 																	:key="'content-key-' + content.id" 
+																	:class="content.id==singleAssetData.id ? 'highlighted' : ''"
 																>
 																	<td>
 																		{{ content.name | capitalize }}

@@ -52,7 +52,10 @@
 																</thead>
 
 																<tbody>
-																	<tr v-for="productMerchant in productAllMerchants" :key="'product-id' + product.id + '-product-merchant-id-' + productMerchant.id"
+																	<tr 
+																		v-for="productMerchant in productAllMerchants" 
+																		:key="'product-id' + product.id + '-product-merchant-id-' + productMerchant.id" 
+																		:class="productMerchant.id==singleMerchantProductData.id ? 'highlighted' : ''"
 																	>
 																		<td>
 																			{{ getMerchantFullName(productMerchant) }}

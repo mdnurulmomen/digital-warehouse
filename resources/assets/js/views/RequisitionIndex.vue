@@ -156,7 +156,9 @@
 																</thead>
 																<tbody>
 
-																	<tr v-for="content in requisitionsToShow" :key="'content-' + content.id"
+																	<tr 
+																		v-for="content in requisitionsToShow" :key="'content-' + content.id" 
+																		:class="content.id==singleRequisitionData.id ? 'highlighted' : ''" 
 																	>
 																		<td>
 																			{{ content.subject | capitalize }}
@@ -2727,7 +2729,6 @@
 		        	*/
 
 	        	},
-
 	        	
 	        	editor: ClassicEditor,
 

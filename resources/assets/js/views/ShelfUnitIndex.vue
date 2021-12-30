@@ -103,7 +103,10 @@
 																</thead>
 																<tbody>
 
-																	<tr v-for="content in contentsToShow" :key="content.id"
+																	<tr 
+																	v-for="content in contentsToShow" 
+																	:key="content.id" 
+																	:class="content.id==singleUnitData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ content.name }}</td>
 																		

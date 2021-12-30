@@ -100,7 +100,8 @@
 															<tbody>
 																<tr 
 																	v-for="(content, contentIndex) in contentsToShow" 
-																	:key="'variation-index-' + contentIndex + 'variation-id-' + content.id"
+																	:key="'variation-index-' + contentIndex + 'variation-id-' + content.id" 
+																	:class="content.id==singleAssetData.id ? 'highlighted' : ''"
 																>
 																	<td>{{ content.name | capitalize }}</td>
 

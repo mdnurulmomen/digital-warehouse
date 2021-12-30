@@ -55,6 +55,7 @@
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission="'warehouse'" 
+										  			:current-content="singleWarehouseData"
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 

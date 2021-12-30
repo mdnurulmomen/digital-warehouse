@@ -81,6 +81,7 @@
 																<tr 
 																	v-for="content in contentsToShow" 
 																	:key="'content-key-' + content.id" 
+																	:class="content.id==singleRoleData.id ? 'highlighted' : ''" 
 																>
 																	<td>
 																		{{ content.name | capitalize }}
