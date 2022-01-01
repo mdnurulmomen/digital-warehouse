@@ -12,16 +12,15 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
 											<div class="col-sm-12 sub-title">
+											  	<!-- 
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('create-product')" 
 											  		:query="query" 
@@ -32,7 +31,75 @@
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchAllProducts"
-											  	></search-and-addition-option>
+											  	></search-and-addition-option> 
+											  	-->
+
+											  	<div class="row form-group">
+											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
+											  			<div class="mr-2">
+											  				<span>
+													  			{{ 
+													  				query != '' ? 'Searched Products List' : 'Products List'
+													  			}}
+											  				</span>
+											  			</div>
+
+											  			<div class="dropdown">
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+										  					
+										  					<div class="dropdown-menu">
+									  							<download-excel 
+													  				class="btn btn-default p-1 dropdown-item active"
+																	:data="allProducts"
+																	:fields="dataToExport" 
+																	:worksheet="category.name + 'Products Sheet'"
+																	:name="query != '' ? (category.name + 'searched-product-') : (category.name + '-product-list-') + currentDate + '-page-' + pagination.current_page + '.xls'"
+													  			>
+													  				Excel
+																</download-excel>
+										  					</div>
+										  				</div>
+
+											  			<div class="ml-auto d-sm-none">
+											  				<button 
+											  					type="button" 
+													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			data-toggle="tooltip" data-placement="top" title="Create New" 
+													  			@click="showContentCreateForm()"
+												  			>
+												  				<i class="fa fa-plus"></i>
+												  				New Product
+												  			</button>
+											  			</div>
+											  		</div>
+
+											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
+											  			<div class="mx-sm-auto w-100">
+										  					<input 	
+																type="text" 
+														  		class="form-control" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		v-model="query" 
+														  		placeholder="Search Products"
+													  		>
+
+													  		<div class="invalid-feedback">
+														  		Please search with releavant input
+														  	</div>
+											  			</div>
+													</div>
+
+													<div class="col-md-4 text-right d-none d-md-block">
+											  			<button 
+												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			data-toggle="tooltip" data-placement="top" title="Create New" 
+												  			@click="showContentCreateForm()"
+											  			>
+											  				<i class="fa fa-plus"></i>
+											  				New Product
+											  			</button>
+													</div>
+											  	</div>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -42,7 +109,7 @@
 										  			:per-page="perPage"  
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
-										  			:contents-to-show = "productsToShow" 
+										  			:contents-to-show = "allProducts" 
 										  			:pagination = "pagination"
 
 										  			@showContentDetails="showContentDetails($event)" 
@@ -56,7 +123,9 @@
 										  		</table-with-soft-delete-option>
  											-->
 
- 												<div class="tab-content card-block pl-0 pr-0">
+ 												<loading v-show="loading"></loading>	
+
+ 												<div class="tab-content" v-show="!loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -70,7 +139,7 @@
 
 																<tbody>
 																	<tr 
-																		v-for="content in productsToShow" 
+																		v-for="content in allProducts" 
 																		:key="'content-' + content.id" 
 																		:class="content.id==singleProductData.id ? 'highlighted' : ''"
 																	>
@@ -111,7 +180,7 @@
 																	</tr>
 
 																	<tr 
-																  		v-show="!productsToShow.length"
+																  		v-show="!allProducts.length"
 																  	>
 															    		<td colspan="3">
 																      		<div class="alert alert-danger" role="alert">
@@ -1161,8 +1230,7 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
-	        	
-	        	// currentTab : 'retail',
+
 	        	productMode : 'retail product',
 
 	        	createMode : true,
@@ -1174,7 +1242,7 @@
 	        	availableVariations : [],
 	        	allProductCategories : [],
 
-	        	productsToShow : [],
+	        	allProducts : [],
 	        	// allFetchedProducts : [],
 
 	        	// allContainers : [],
@@ -1206,6 +1274,68 @@
 					},
 				},
 
+				dataToExport: {
+					
+					"Name": {
+						field: "name",
+						callback: (name) => {
+							if (name) {
+								return this.$options.filters.capitalize(name) + "\n";
+							}
+							else{
+								return 'No Name'
+							}
+						},
+					},
+
+					"Quantity Type": {
+						field: "quantity_type",
+						callback: (quantity_type) => {
+							if (quantity_type) {
+								return this.$options.filters.capitalize(quantity_type) + "\n";
+							}
+							else{
+								return 'No Type'
+							}
+						},
+					},
+
+					"Serials": {
+						field: "has_serials",
+						callback: (has_serials) => {
+							if (has_serials) {
+								return "Available\n";
+							}
+							else{
+								return "NA\n"
+							}
+						},
+					},
+
+					"Variations": {
+						callback: (object) => {
+							if (object.has_variations) {
+								
+								let infoToReturn = '';
+
+								object.variations.forEach(
+									(productVariation, productVariationIndex) => {
+										infoToReturn += this.$options.filters.capitalize(productVariation.variation ? `${productVariation.variation.name}
+											` : 'NA')
+									}
+								);
+
+								return infoToReturn;
+
+							}
+							else{
+								return 'NA'
+							}
+						},
+					},
+					
+				},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -1230,6 +1360,30 @@
 				this.fetchProductAllCategories();
 
 			}
+
+		},
+
+		computed: {
+
+			currentDate: function() {
+
+				let date = new Date();
+				return date.getFullYear() + '-' +  (date.getMonth() + 1) + '-' + date.getDate();
+
+			},
+
+		},
+
+		watch : {
+
+			query : function(val){
+				if (val==='') {
+					this.fetchAllProducts();
+				}
+				else {
+					this.searchData();
+				}
+			},
 
 		},
 
@@ -1268,7 +1422,7 @@
 					.get('/api/category-products/' + this.category.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
-							this.productsToShow = response.data.data;
+							this.allProducts = response.data.data;
 							// this.showSelectedTabProducts();
 						}
 					})
@@ -1456,23 +1610,17 @@
 
 				},
 			*/
-			searchData(emitedValue=false) {
-
-				if (emitedValue) {
-					this.query=emitedValue;
-				}
+			searchData() {
 
 				this.error = '';
 				// this.allFetchedProducts = [];
 				this.pagination.current_page = 1;
 				
 				axios
-				.get(
-					"/api/search-category-products/" + this.category.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
+				.get("/api/search-category-products/" + this.category.id + '/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
 				.then(response => {
 					// this.allFetchedProducts = response.data;
-					this.productsToShow = response.data.all.data;
+					this.allProducts = response.data.all.data;
 					this.pagination = response.data.all;
 				})
 				.catch(e => {
@@ -1602,7 +1750,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New product has been stored", "Success");
 							// this.allFetchedProducts = response.data;
-							this.query !== '' ? this.searchData() : this.productsToShow = response.data.data;
+							this.query !== '' ? this.searchData() : this.allProducts = response.data.data;
 							$('#product-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1636,7 +1784,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Product has been updated", "Success");
 							// this.allFetchedProducts = response.data;
-							this.query !== '' ? this.searchData() : this.productsToShow = response.data.data;
+							this.query !== '' ? this.searchData() : this.allProducts = response.data.data;
 							$('#product-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1671,11 +1819,11 @@
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='retail') {
-					this.productsToShow = this.allFetchedProducts.retail.data;
+					this.allProducts = this.allFetchedProducts.retail.data;
 					this.pagination = this.allFetchedProducts.retail;
 				}
 				else {
-					this.productsToShow = this.allFetchedProducts.bulk.data;
+					this.allProducts = this.allFetchedProducts.bulk.data;
 					this.pagination = this.allFetchedProducts.bulk;
 				}
 
@@ -1895,6 +2043,7 @@
 					this.availableVariations = [];
 				}
 			},
+
 		/*
 			setProductMode() {
 				if (this.productMode=='bulk product') {

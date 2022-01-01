@@ -3098,7 +3098,7 @@
 
 				this.error = '';
 				this.loading = true;
-				// this.searchAttributes.search = '';
+				this.searchAttributes.search = '';
 				this.availableRequisitions = [];
 				
 				axios
@@ -3186,7 +3186,7 @@
 
 				}
 
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.merchantAllProducts = [];
@@ -3231,7 +3231,7 @@
 
 				}
 
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.merchantAllAgents = [];
