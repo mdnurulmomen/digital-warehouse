@@ -143,7 +143,10 @@
 										  			@showBulkContents="showBulkContents" 
 										  		></tab>
 
- 												<div class="tab-content card-block" v-show="!loading">
+ 												<div 
+ 													class="tab-content card-block pl-0 pr-0" 
+ 													v-show="!loading"
+ 												>
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">

@@ -82,7 +82,7 @@
 										  		</table-with-soft-delete-option>
  											-->
 
- 												<div class="tab-content card-block">
+ 												<div class="tab-content card-block pl-0 pr-0">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">

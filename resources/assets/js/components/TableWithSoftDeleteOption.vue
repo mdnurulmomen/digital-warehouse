@@ -1,6 +1,6 @@
 <template v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
 	
-	<div class="tab-content card-block">
+	<div class="tab-content card-block pl-0 pr-0">
 		<div class="table-responsive">
 			<table class="table table-striped table-bordered nowrap text-center">
 				<thead>

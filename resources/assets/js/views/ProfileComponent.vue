@@ -64,7 +64,7 @@
 						      				</li>
 						      			</ul>
 
-						      			<div class="tab-content card-block">
+						      			<div class="tab-content card-block pl-0 pr-0">
 						      				<div class="tab-pane active show" id="profile" role="tabpanel">
 						      					
 						      					<!-- form start -->

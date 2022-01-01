@@ -46,7 +46,6 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-
 						      			<ul class="nav nav-tabs md-tabs" role="tablist">
 						      				<li class="nav-item">
 						      					<a class="nav-link active show" data-toggle="tab" href="#profile" role="tab" aria-selected="true">
@@ -86,7 +85,7 @@
 						      				</li>
 						      			</ul>
 
-						      			<div class="tab-content card-block">
+						      			<div class="tab-content card-block pl-0 pr-0">
 						      					
 						      				<div class="tab-pane active show" id="profile" role="tabpanel">
 						      					

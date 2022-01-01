@@ -1,10 +1,23 @@
 <template v-if="userHasPermissionTo('view-' + requiredPermission + '-index') || userHasPermissionTo('create-' + requiredPermission)">
 	
-	<div class="row d-flex align-items-center text-center">										  	
-  		<div class="col-sm-3 form-group">	
-				{{ callerPage | capitalize }} List
+	<div class="row d-flex align-items-center">										  	
+  		<div class="col-sm-6 col-md-3 form-group d-flex align-items-center">	
+				<span>
+					{{ callerPage | capitalize }} List
+				</span>
+
+				<button 
+		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
+		  			data-toggle="tooltip" data-placement="top" title="Create New" 
+		  			:disabled="disableAddButton" 
+		  			@click="$emit('showContentCreateForm')" 
+		  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+	  			>
+	  				<i class="fa fa-plus"></i>
+	  				New {{ callerPage | capitalize }}
+	  			</button>
   		</div>
-  		<div class="col-sm-6 was-validated form-group" v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
+  		<div class="col-sm-6 col-md-6 was-validated form-group" v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
   			<input 	type="text" 
 			  		v-model="search" 
 			  		pattern="[^'!#$%^()\x22]+" 
@@ -15,9 +28,9 @@
 		  		Please search with releavant input
 		  	</div>
   		</div>
-  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
+  		<div class="col-sm-6 col-md-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
   			<button 
-	  			class="btn btn-success btn-outline-success btn-sm" 
+	  			class="btn btn-success btn-outline-success btn-sm ml-auto d-none d-sm-none d-md-block d-lg-block" 
 	  			data-toggle="tooltip" data-placement="top" title="Create New" 
 	  			:disabled="disableAddButton" 
 	  			@click="$emit('showContentCreateForm')"
