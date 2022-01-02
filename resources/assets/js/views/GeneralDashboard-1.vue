@@ -4,7 +4,7 @@
 			<div class="row align-items-end">
 				<div class="col-lg-8">
 					<div class="page-header-title">
-						<i class="feather icon-home bg-c-blue"></i>
+						<i class="fa fa-home bg-c-blue" aria-hidden="true"></i>
 						<div class="d-inline">
 							<h5>Dashboard</h5>
 							<span>You may view basic analytics here</span>

@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-hdd-o'"
 			:title="'storage-types'" 
 			:message="'All our warehouse storage-types'"
 		></breadcrumb>			

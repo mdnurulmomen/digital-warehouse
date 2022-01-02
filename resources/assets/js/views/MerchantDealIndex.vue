@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-handshake-o'"
 			:title="fullName + ' deals'" 
 			:message="'All our deals with ' + fullName"
 		></breadcrumb>			

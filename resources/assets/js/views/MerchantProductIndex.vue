@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fab fa-product-hunt'"
 			:title="merchant.first_name + ' ' + merchant.last_name + ' products'" 
 			:message="'All our products for ' + merchant.first_name + ' ' + merchant.last_name + ' (' + merchant.user_name + ')' | capitalize"
 		></breadcrumb>			

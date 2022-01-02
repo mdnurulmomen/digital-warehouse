@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-users'"
 			:title="'merchants'" 
 			:message="'All our warehouse-merchants'"
 		></breadcrumb>			

@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fab fa-product-hunt'"
 			:title="'products'" 
 			:message="'All our products'"
 		></breadcrumb>			

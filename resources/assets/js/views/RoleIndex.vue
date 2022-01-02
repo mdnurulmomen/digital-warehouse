@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-tasks'"
 			:title="'roles'" 
 			:message="'All our roles'"
 		></breadcrumb>			

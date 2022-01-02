@@ -3,7 +3,7 @@
 		<div class="row align-items-end">
 			<div class="col-lg-8">
 				<div class="page-header-title">
-					<i class="feather icon-clipboard bg-c-blue"></i>
+					<i class="bg-c-blue" :class="icon" aria-hidden="true"></i>
 					<div class="d-inline">
 						<h5>{{ title | capitalize }}</h5>
 						<span>{{ message | capitalize }}</span>
@@ -34,7 +34,7 @@
 	
 	export default {
 
-		props : ['title', 'message'],
+		props : ['title', 'message', 'icon'],
 
 		filters : {
 			capitalize: function (value) {

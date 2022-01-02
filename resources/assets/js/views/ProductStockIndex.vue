@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-store'"
 			:title="product.name + ' stocks'" 
 			:message="'All ' + product.name + ' stocks for ' + productMerchant.merchant ? productMerchant.merchant.name : ''"
 		></breadcrumb>			

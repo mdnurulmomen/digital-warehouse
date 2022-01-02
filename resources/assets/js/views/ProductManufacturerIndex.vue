@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-industry'"
 			:title="'product manufacturers'" 
 			:message="'All our product-manufacturers'"
 		></breadcrumb>			

@@ -2,6 +2,7 @@
 <template>
 	<div class="pcoded-content">
 		<breadcrumb 
+			:icon="'fas fa-shipping-fast'"
 			:title="'delivery company'" 
 			:message="'All our companies for delivery'"
 		></breadcrumb>			

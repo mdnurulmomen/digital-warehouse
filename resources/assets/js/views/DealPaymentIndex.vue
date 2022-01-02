@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-money'"
 			:title="'payment'" 
 			:message="'All payments of ' + merchantName + ' for the deal ' + dealName"
 		></breadcrumb>			

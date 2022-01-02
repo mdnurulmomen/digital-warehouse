@@ -4,7 +4,7 @@
 			<div class="row align-items-end">
 				<div class="col-lg-8">
 					<div class="page-header-title">
-						<i class="feather icon-home bg-c-blue"></i>
+						<i class="fa fa-bar-chart bg-c-blue" aria-hidden="true"></i>
 						<div class="d-inline">
 							<h5>Dashboard</h5>
 							<span>You may view individual analytics here</span>
@@ -78,7 +78,7 @@
                                             <div class="col-xl-3 col-md-6" v-for="(warehouse, warehouseIndex) in dashboard.warehouses" :key="'warehouse-unused-container-percentage-' + warehouseIndex + '-warehouse-' + warehouse.id">
                                                 <h6 class="text-center">{{ warehouse.name }} Not Rented Spaces (%)</h6>
                                                 <!-- Pie Chart -->
-		                                        <pie-chart :data="warehouse" :styles="{ height: '300px', width: '50%', position: 'relative' }" v-if="warehouse.hasOwnProperty('datasets') && warehouse.datasets[0].data && warehouse.datasets[0].data.every(item => item != 0)" />
+		                                        <pie-chart :data="warehouse" :styles="{ height: '300px', width: '90%', position: 'relative' }" v-if="warehouse.hasOwnProperty('datasets') && warehouse.datasets[0].data && warehouse.datasets[0].data.every(item => item != 0)" />
 		                                        <p class="text-center text-success" v-else>NA</p>
                                             </div>
                                         </div>

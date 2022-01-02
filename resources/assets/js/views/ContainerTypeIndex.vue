@@ -2,6 +2,7 @@
 <template v-if="userHasPermissionTo('view-warehouse-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
+			:icon="'fas fa-th-list'"
 			:title="'containers'" 
 			:message="'All our containers'"
 		></breadcrumb>			

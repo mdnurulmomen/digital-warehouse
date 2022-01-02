@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-users'"
 			:title="product.name + ' merchants'" 
 			:message="'All our merchants for ' + product.name | capitalize"
 		></breadcrumb>			

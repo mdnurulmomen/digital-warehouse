@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-truck'"
 			:title="'requisitions'" 
 			:message="'All our requisitions'"
 		></breadcrumb>			

@@ -3,6 +3,7 @@
 
 	<div class="pcoded-content">
 		<breadcrumb 
+			:icon="'fab fa-product-hunt'"
 			:title="category.name + ' products'" 
 			:message="'All products of ' + category.name"
 		></breadcrumb>			

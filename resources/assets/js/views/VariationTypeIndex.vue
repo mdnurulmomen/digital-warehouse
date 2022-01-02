@@ -2,6 +2,7 @@
 <template v-if="userHasPermissionTo('view-product-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
+			:icon="'fa fa-list-alt'"
 			:title="'variation-types'" 
 			:message="'All our variation types'"
 		></breadcrumb>			

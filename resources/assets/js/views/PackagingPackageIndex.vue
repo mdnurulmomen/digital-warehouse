@@ -2,6 +2,7 @@
 <template>
 	<div class="pcoded-content">
 		<breadcrumb 
+			:icon="'fa fa-gift'"
 			:title="'packaging packages'" 
 			:message="'All our packages for packaging'"
 		></breadcrumb>			

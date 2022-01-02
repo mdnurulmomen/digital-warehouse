@@ -4,6 +4,7 @@
 	<div class="pcoded-content">
 
 		<breadcrumb 
+			:icon="'fa fa-list-alt'"
 			:title="'product categories'" 
 			:message="'All our product categories'"
 		></breadcrumb>			
