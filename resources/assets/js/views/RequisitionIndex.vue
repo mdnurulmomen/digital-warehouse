@@ -2782,7 +2782,17 @@
 
 				dataToExport: {
 
-					Subject: 'subject',
+					"Subject": {
+						field: "subject",
+						callback: (subject) => {
+							if (subject) {
+								return this.$options.filters.capitalize(subject);
+							}
+							else{
+								return 'No Subject'
+							}
+						},
+					},
 
 					"Requested On": 'created_at',
 
@@ -2798,7 +2808,9 @@
 					
 									(requiredProduct, requiredProductIndex) => {
 
-										infosToReturn += "Product:" + requiredProduct.product_name + ' , Qty:' + requiredProduct.quantity + "\n";
+										infosToReturn += "Product " + (requiredProductIndex+1) + " : " + this.$options.filters.capitalize(requiredProduct.product_name) + ",\n";
+
+										infosToReturn += "Qty : " + requiredProduct.quantity + "\n";
 
 										if (requiredProduct.hasOwnProperty('variations') && requiredProduct.variations.length) {
 
@@ -2806,13 +2818,17 @@
 						
 												(requiredProductVariation, requiredProductVariationIndex) => {
 
-													infosToReturn +=  "(Variation:" + requiredProductVariation.variation_name + ' , Qty:' + requiredProductVariation.quantity + ').' + "\n";					
+													infosToReturn +=  "Selected Variation: " + this.$options.filters.capitalize(requiredProductVariation.variation_name) + ",\n";	
+
+													infosToReturn +=  "Qty: " + requiredProductVariation.quantity + "\n";					
 
 												}
 												
 											);
 
 										}
+
+										infosToReturn += "\n";
 
 									}
 									
@@ -2833,7 +2849,9 @@
 						callback: (agent) => {
 							if (agent) {
 								return `Agent Service.
-										Agent: ${agent.name}, Mobile: ${agent.mobile}, Code: ${agent.code}`;
+										Agent: ${agent.name}, 
+										Mobile: ${agent.mobile}, 
+										Code: ${agent.code}`;
 							}
 							else{
 								return 'Delivery Service.'

@@ -47,7 +47,7 @@
 																		<th>Merchant</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
-																		<th>Stock</th>
+																		<th>Available Stock</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -104,6 +104,16 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Requisitions"  
+																				@click="goProductRequisitions(productMerchant)" 
+																				v-if="userHasPermissionTo('view-requisition-index')"
+																			>
+																				<i class="fa fa-truck" aria-hidden="true"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-success btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Stock"  
 																				@click="goProductStore(productMerchant)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
@@ -1973,6 +1983,12 @@
 				}
 
     		},
+    		goProductRequisitions(object) {
+
+				// console.log(object);
+				this.$router.push({ name: 'product-requisitions', params: { product: this.product, productId: this.product.id , merchantId: object.merchant ? object.merchant.id : null }});
+
+			},
 			goProductStore(object) {
 
 				// console.log(object);

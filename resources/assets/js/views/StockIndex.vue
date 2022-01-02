@@ -2512,6 +2512,7 @@
 						},
 					},
 
+					/*
 					"Products": {
 						
 						callback: (object) => {
@@ -2520,7 +2521,7 @@
 							object.products.forEach(
 								stockedProduct => {
 
-									productNames += stockedProduct.merchant_product.product.name + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' + ')');
+									productNames += this.$options.filters.capitalize(stockedProduct.merchant_product.product.name) + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product') + ')' + "\n";
 
 									// productNames += this.$options.filters.capitalize(`${stockedProduct.merchant_product.product.name} (${stockedProduct.merchant_product.manufacturer} ? ${stockedProduct.merchant_product.manufacturer.name} : Own Product)`);
 
@@ -2531,8 +2532,9 @@
 							
 						},
 					},
+					*/
 
-					"Stock Quantity": {
+					"Stocked Products": {
 						
 						callback: (object) => {
 
@@ -2541,12 +2543,15 @@
 							object.products.forEach(
 								(stockedProduct, stockedProductIndex) => {
 
-									stockDetailToReturn += `${stockedProduct.stock_quantity} ${stockedProduct.merchant_product.product.quantity_type} (Available:${stockedProduct.available_quantity} ${stockedProduct.merchant_product.product.quantity_type})
+									stockDetailToReturn += "Product:" + this.$options.filters.capitalize(stockedProduct.merchant_product.product.name) + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product') + ')' + "\n";
+
+									stockDetailToReturn += `Qty:${stockedProduct.stock_quantity} ${stockedProduct.merchant_product.product.quantity_type}
 									`;
 
 									if (stockedProduct.has_serials && ! stockedProduct.has_variations && stockedProduct.serials.length) {
 
-										stockDetailToReturn +=  "Serials:\n";
+										stockDetailToReturn +=  this.$options.filters.capitalize(`${stockedProduct.merchant_product.product.name} Serials:
+																							`);
 
 										stockedProduct.serials.forEach(
 								
@@ -2554,7 +2559,7 @@
 
 												if (stockedProductSerial.serial_no) {
 
-													stockDetailToReturn +=  `${stockedProductSerial.serial_no}` + stockedProductSerial.has_dispatched ? '(Dispatched)' : '' + "\n";
+													stockDetailToReturn +=  (`${stockedProductSerialIndex +1}. ${stockedProductSerial.serial_no}` + (stockedProductSerial.has_dispatched ? ' (Dispatched)' : '') + "\n");
 
 												}
 
@@ -2566,20 +2571,25 @@
 
 									if (stockedProduct.has_variations && stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length) {
 
+										stockDetailToReturn +=  `Variations:
+													`;
+
 										stockedProduct.variations.forEach(
 							
 											(stockedProductVariation, stockedProductVariationIndex) => {
 
 												if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
 
-													stockDetailToReturn +=  this.$options.filters.capitalize(`(Variation: ${stockedProductVariation.variation.name}, Qty: ${stockedProductVariation.stock_quantity}  ${stockedProduct.merchant_product.product.quantity_type})
+													stockDetailToReturn +=  this.$options.filters.capitalize(`${stockedProductVariationIndex+1}. Variation: ${stockedProductVariation.variation.name}, 
+														Qty: ${stockedProductVariation.stock_quantity}  ${stockedProduct.merchant_product.product.quantity_type}
 													`);
 
 												}
 
 												if (stockedProduct.has_serials && stockedProductVariation.hasOwnProperty('serials') && stockedProductVariation.serials.length) {
 
-													stockDetailToReturn +=  "Serials:\n";
+													stockDetailToReturn +=  `${stockedProductVariation.variation.name} Serials:
+													`;
 
 													stockedProductVariation.serials.forEach(
 								
@@ -2587,7 +2597,7 @@
 
 															if (stockedProductVariationSerial.serial_no) {
 
-																stockDetailToReturn +=  `${stockedProductVariationSerial.serial_no}` + stockedProductVariationSerial.has_dispatched ? '(Dispatched)' : '' + "\n";
+																stockDetailToReturn +=  (`${stockedProductVariationSerialIndex +1}. ${stockedProductVariationSerial.serial_no}` + (stockedProductVariationSerial.has_dispatched ? ' (Dispatched)' : '') + "\n");
 
 															}
 
@@ -2596,6 +2606,8 @@
 													);
 
 												}
+
+												stockDetailToReturn +=  "\n"
 
 											}
 											
@@ -2613,7 +2625,7 @@
 
 					},
 
-					"Stocked": {
+					"Stock Details": {
 						callback: (object) => {
 							var stockInfosToReturn = '';
 

@@ -56,8 +56,8 @@
 													  				class="btn btn-default p-1 dropdown-item active"
 																	:data="allStocks"
 																	:fields="dataToExport" 
-																	worksheet="Stocks sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-stocks-' : ('stocks-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+																	:worksheet="product.name + ' (' + productMerchant.merchant.user_name + ') ' + 'Sheet'"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? ('searched-' + productMerchant.merchant.user_name + '-' + product.name + '-stock-list-') : (productMerchant.merchant.user_name + '-' + product.name + '-stock-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
 													  			>
 													  				Excel
 																</download-excel>
@@ -1438,6 +1438,16 @@
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stock Invoice :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.invoice_no | capitalize }})
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Stock Quantity :
 											</label>
 
@@ -1880,6 +1890,26 @@
 
 					<div class="form-row">
 						<label class="col-6 col-form-label font-weight-bold text-right">
+							Merchant Name :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ productMerchant.merchant ? productMerchant.merchant.first_name + ' ' + productMerchant.merchant.last_name : 'Mr. Merchant' | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stock Invoice :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.invoice_no | capitalize }})
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-6 col-form-label font-weight-bold text-right">
 							Stock Quantity :
 						</label>
 
@@ -2152,11 +2182,13 @@
 
 	        	dataToExport: {
 
+					"Invoice": 'invoice_no',
+
 					"Product": {
 						field: "stock_quantity",
 						callback: (stock_quantity) => {
 							
-							return this.productMerchant.hasOwnProperty('product') ? this.productMerchant.product.name : 'NA';
+							return this.productMerchant.hasOwnProperty('product') ? this.$options.filters.capitalize(`${this.productMerchant.product.name}`) : 'NA';
 							
 						},
 					},
@@ -2165,7 +2197,7 @@
 						field: "stock_quantity",
 						callback: (stock_quantity) => {
 							
-							return this.productMerchant.manufacturer ? this.productMerchant.manufacturer.name : 'Own Product';
+							return this.productMerchant.manufacturer ? this.$options.filters.capitalize(this.productMerchant.manufacturer.name) : 'Own Product';
 							
 						},
 					},
@@ -2181,18 +2213,29 @@
 						},
 					},
 
-					"Stock Quantity": {
+					"Stock Quantity": 'stock_quantity',
+
+					"Qty Type" : {
+
+						field: "stock_quantity",
+						callback: (stock_quantity) => {
+							
+							return `${this.product.quantity_type}`;
+							
+						},
+
+					},
+
+					"Variations & Serials": {
 						
 						callback: (object) => {
 
 							var stockDetailToReturn = '';
 
-							stockDetailToReturn += `${object.stock_quantity} ${this.product.quantity_type} (Available:${object.available_quantity} ${this.product.quantity_type})
-							` + "\n\n";
-
 							if (object.has_serials && ! object.has_variations && object.serials.length) {
 
-								stockDetailToReturn += "Serials: \n";
+								stockDetailToReturn += `Product Serials
+											`;
 
 								object.serials.forEach(
 					
@@ -2200,7 +2243,7 @@
 
 										if (stockedProductSerial.serial_no) {
 
-											stockDetailToReturn +=  `${stockedProductSerialIndex}. ${stockedProductSerial.serial_no} ` + (stockedProductSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
+											stockDetailToReturn +=  `${stockedProductSerialIndex+1}. ${stockedProductSerial.serial_no} ` + (stockedProductSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
 
 										}
 
@@ -2218,14 +2261,16 @@
 
 										if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
 
-											stockDetailToReturn +=  `(Variation: ${stockedProductVariation.variation.name}, Qty: ${stockedProductVariation.stock_quantity}  ${this.product.quantity_type})
+											stockDetailToReturn +=  `Variation ${stockedProductVariationIndex+1}: ${stockedProductVariation.variation.name}, 
+											Qty: ${stockedProductVariation.stock_quantity}  ${this.product.quantity_type}
 											`;
 
 										}
 
 										if (object.has_serials && stockedProductVariation.hasOwnProperty('serials') && stockedProductVariation.serials.length) {
 
-											stockDetailToReturn += "Serials: \n";
+											stockDetailToReturn += `Serials:
+											`;
 
 											stockedProductVariation.serials.forEach(
 						
@@ -2233,7 +2278,7 @@
 
 													if (stockedProductVariationSerial.serial_no) {
 
-														stockDetailToReturn +=  `${stockedProductVariationSerialIndex}. ${stockedProductVariationSerial.serial_no} ` + (stockedProductVariationSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
+														stockDetailToReturn +=  `${stockedProductVariationSerialIndex+1}. ${stockedProductVariationSerial.serial_no} ` + (stockedProductVariationSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
 
 													}
 
@@ -2243,9 +2288,17 @@
 
 										}
 
+										stockDetailToReturn += "\n";
+
 									}
 									
 								);
+
+							}
+
+							if (! object.has_serials && ! object.has_variations) {
+
+								stockDetailToReturn += 'NA';
 
 							}
 
@@ -2255,11 +2308,13 @@
 
 					},
 
-					"Stocked": {
+					"Stock": {
 						callback: (object) => {
 							var stockInfosToReturn = '';
 
-							stockInfosToReturn += 'Warehouse:' + (object.hasOwnProperty('warehouse') ? this.$options.filters.capitalize(object.warehouse.name) : 'NA') + '(' + object.created_at + ')' + "\n";
+							stockInfosToReturn += 'Stocked at:' + (object.hasOwnProperty('warehouse') ? this.$options.filters.capitalize(object.warehouse.name) : 'NA') + "\n";
+
+							stockInfosToReturn +=  'Stocked on:' + object.created_at + "\n";
 
 							stockInfosToReturn += 'Keeper:' + this.$options.filters.capitalize(object.keeper.first_name + ' ' + object.keeper.last_name) + '\n'
 
@@ -2272,7 +2327,7 @@
 						callback: (object) => {
 							
 							if (object.has_approval==1) {
-								return "Approved (" + object.updated_at + ').' + "\n" + 'Approver:' + (object.approver ? this.$options.filters.capitalize(object.approver.first_name + ' ' + object.approver.last_name) : '');
+								return "Approved on: " + object.updated_at + ".\n" + 'Approver:' + (object.approver ? this.$options.filters.capitalize(object.approver.first_name + ' ' + object.approver.last_name) : '');
 							}
 							else {
 								return 'Pending.';

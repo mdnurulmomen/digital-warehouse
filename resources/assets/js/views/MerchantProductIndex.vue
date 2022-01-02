@@ -1722,19 +1722,62 @@
 						},
 					},
 
-					"Available Qty": {
+					"Available Qty": 'available_quantity',
+
+					"Qty Type": {
+						callback: (object) => {
+							if (object) {
+								return object.product ? object.product.quantity_type : 'Unit'
+							}
+							else{
+								return;
+							}
+						},
+					},
+
+					"Variations": {
 
 						callback: (object) => {
 
 							let infosToReturn = '';
 
-							infosToReturn += (object.available_quantity ?? 0) + ' ';
+							if (object.has_variations && object.variations.length) {
 
-							infosToReturn += object.product ? object.product.quantity_type : 'Unit' + "\n\n";
+								object.variations.forEach(
+					
+									(objectVariation, variationIndex) => {
+
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'SKU: ' + objectVariation.sku + ", \n" + 'Price: ' + objectVariation.selling_price + "\n\n");
+
+									}
+									
+								);
+
+
+							}
+							else {
+
+								infosToReturn += 'NA';
+
+							}
+							
+							return infosToReturn;
+
+						},
+					},
+
+					"Serials": {
+
+						callback: (object) => {
+
+							let infosToReturn = '';
+
+							// infosToReturn += (object.available_quantity ?? 0) + ' ';
 
 							if (object.has_serials && ! object.has_variations && object.serials.length) {
 
-								infosToReturn += "Serials: \n";
+								infosToReturn += `Serials:
+								`;
 
 								object.serials.forEach(
 			
@@ -1754,11 +1797,9 @@
 					
 									(objectVariation, variationIndex) => {
 
-										infosToReturn += "\n Variation: " + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'SKU: ' + objectVariation.sku + ", \n" + 'Price: ' + objectVariation.selling_price + "\n";
-
 										if (object.has_serials && objectVariation.serials.length) {
 
-											infosToReturn += "Serials: \n";
+											infosToReturn += this.$options.filters.capitalize(objectVariation.variation.name) + " Serials:\n";
 
 											objectVariation.serials.forEach(
 						
@@ -1772,10 +1813,18 @@
 
 										}
 
+										infosToReturn += "\n";
+
 									}
 									
 								);
 
+							}
+
+							else {
+
+								infosToReturn += "NA";	
+							
 							}
 							
 							return infosToReturn;
