@@ -86,7 +86,9 @@
 																	>
 																		<td>{{ content.name | capitalize }}</td>
 																		
-																		<td>{{ content.merchants_count || 0 }}</td>
+																		<td @click="goProductMerchants(content)">
+																			{{ content.merchants_count || 0 }}
+																		</td>
 																		
 																		<td>
 																			<button 

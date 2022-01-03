@@ -1986,7 +1986,7 @@
     		goProductRequisitions(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-requisitions', params: { product: this.product, productId: this.product.id , merchantId: object.merchant ? object.merchant.id : null }});
+				this.$router.push({ name: 'product-requisitions', params: { productId: this.product.id , merchantId: object.merchant ? object.merchant.id : null, merchantProduct: object }});
 
 			},
 			goProductStore(object) {

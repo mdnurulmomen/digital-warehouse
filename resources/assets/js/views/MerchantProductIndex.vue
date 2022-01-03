@@ -217,6 +217,16 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Requisitions"  
+																				@click="goProductRequisitions(merchantProduct)" 
+																				v-if="userHasPermissionTo('view-requisition-index')"
+																			>
+																				<i class="fa fa-truck" aria-hidden="true"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-success btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Stocks"  
 																				@click="goProductStore(merchantProduct)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
@@ -2389,6 +2399,12 @@
 					this.productsToShow = this.merchantAllProducts.bulk.data;
 					this.pagination = this.merchantAllProducts.bulk;
 				}
+
+			},
+			goProductRequisitions(object) {
+
+				// console.log(object);
+				this.$router.push({ name: 'product-requisitions', params: { productId: object.product ? object.product.id : null , merchantId: this.merchant.id, merchantProduct: object }});
 
 			},
 			goProductStore(object) {

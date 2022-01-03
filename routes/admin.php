@@ -168,6 +168,10 @@ Route::name('admin.')->group(function () {
 		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions');
 		Route::post('/search-requisitions/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
 
+		// Merchant-Requisitions
+		Route::get('/api/merchant-product-requisitions/{merchantProduct}/{perPage?}', 'RequisitionController@showMerchantProductAllRequisitions')->name('merchant-product-requisitions');
+		Route::post('/search-merchant-product-requisitions/{perPage?}', 'RequisitionController@searchMerchantProductAllRequisitions')->name('search-merchant-product-requisitions');
+
 		// dispatch
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches');

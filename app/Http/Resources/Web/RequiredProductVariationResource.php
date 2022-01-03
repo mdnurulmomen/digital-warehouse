@@ -14,14 +14,18 @@ class RequiredProductVariationResource extends JsonResource
      */
     public function toArray($request)
     {
+        $merchantProductVariation = $this->merchantProductVariation;
+        $requiredProduct = $this->requiredProduct;
+        $product = $requiredProduct->merchantProduct->product;
+
         return [
             'id' => $this->id,
             'merchant_product_variation_id' => $this->merchant_product_variation_id,
-            'variation_name' => $this->merchantProductVariation->productVariation->variation->name,
+            'variation_name' => $merchantProductVariation->productVariation->variation->name,
             'quantity' => $this->quantity,
-            'has_serials' => $this->requiredProduct->merchantProduct->product->has_serials,
-            'serials' => $this->when($this->requiredProduct->merchantProduct->product->has_serials, $this->serials->loadMissing('serial')),
-            'available_quantity' => $this->merchantProductVariation->latestStock->available_quantity,
+            'has_serials' => $product->has_serials,
+            'serials' => $this->when($product->has_serials, $this->serials->loadMissing('serial')),
+            'available_quantity' => $merchantProductVariation->latestStock->available_quantity,
         ];
     }
 }
