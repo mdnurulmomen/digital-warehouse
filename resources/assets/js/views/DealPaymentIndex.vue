@@ -1701,7 +1701,7 @@
 					
 									(paymentRent, paymentRentIndex) => {
 
-										infosToReturn += "Space Type: " + (paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + ', Space Name: ' + paymentRent.dealt_space.name + ' , Rent: ' + paymentRent.rent + "\n";
+										infosToReturn += "Space Type: " + (paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + "\n Space Name: "  + this.$options.filters.capitalize(paymentRent.dealt_space.name) + "\n Rent: " + paymentRent.rent + "\n";
 
 									}
 									

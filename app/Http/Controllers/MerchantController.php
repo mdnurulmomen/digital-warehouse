@@ -463,7 +463,7 @@ class MerchantController extends Controller
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->with(['merchant', 'variations', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'variations.latestStock', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                         ->paginate($perPage)),
                 
                 'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)

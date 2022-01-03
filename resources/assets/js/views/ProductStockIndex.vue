@@ -197,7 +197,7 @@
 																	<tr>
 																		<th>Date</th>
 																		<th>Stock Qty</th>
-																		<th>Available Qty</th>
+																		<!-- <th>Available Qty</th> -->
 																		<th>Approved</th>
 																		<th>Actions</th>
 																	</tr>
@@ -216,9 +216,11 @@
 																			{{ stock.stock_quantity + ' ' + product.quantity_type }}
 																		</td>
 
+																		<!-- 
 																		<td>
 																			{{ stock.available_quantity + ' ' + product.quantity_type }}
-																		</td>
+																		</td> 
+																		-->
 
 																		<td>
 																			<span :class="[stock.has_approval==1 ? 'badge-success' : stock.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
@@ -272,7 +274,7 @@
 																	<tr 
 																  		v-show="! allStocks.length"
 																  	>
-															    		<td colspan="5">
+															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -285,7 +287,7 @@
 
 																		<th>Stock Qty</th>
 
-																		<th>Available Qty</th>
+																		<!-- <th>Available Qty</th> -->
 
 																		<th>Approved</th>
 
@@ -2243,7 +2245,7 @@
 
 										if (stockedProductSerial.serial_no) {
 
-											stockDetailToReturn +=  `${stockedProductSerialIndex+1}. ${stockedProductSerial.serial_no} ` + (stockedProductSerial.has_dispatched ? '(Dispatched)' : '') + "\n" ;
+											stockDetailToReturn +=  `${stockedProductSerialIndex+1}. ${stockedProductSerial.serial_no} ` + (stockedProductSerial.has_dispatched ? ' (Dispatched)' : '') + "\n" ;
 
 										}
 
@@ -2261,9 +2263,9 @@
 
 										if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
 
-											stockDetailToReturn +=  `Variation ${stockedProductVariationIndex+1}: ${stockedProductVariation.variation.name}, 
+											stockDetailToReturn +=  this.$options.filters.capitalize(`Variation ${stockedProductVariationIndex+1}: ${stockedProductVariation.variation.name}, 
 											Qty: ${stockedProductVariation.stock_quantity}  ${this.product.quantity_type}
-											`;
+											`);
 
 										}
 

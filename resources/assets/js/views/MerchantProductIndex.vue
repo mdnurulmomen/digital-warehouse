@@ -5,8 +5,8 @@
 
 		<breadcrumb 
 			:icon="'fab fa-product-hunt'"
-			:title="merchant.first_name + ' ' + merchant.last_name + ' products'" 
-			:message="'All our products for ' + merchant.first_name + ' ' + merchant.last_name + ' (' + merchant.user_name + ')' | capitalize"
+			:title="merchantFullName + ' products'" 
+			:message="'All our products for ' + merchantFullName + ' (' + merchant.user_name + ')' | capitalize"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -49,8 +49,8 @@
 														  				class="btn btn-default p-1 dropdown-item active"
 																		:data="productsToShow"
 																		:fields="dataToExport" 
-																		worksheet="Products sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-products-' : (currentTab + '-products-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+																		:worksheet="merchant.user_name + '-products-sheet'"
+																		:name="merchant.user_name + '-' + ((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-products-' : (currentTab + '-products-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
 														  			>
 														  				Excel
 																	</download-excel>
@@ -315,7 +315,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ merchant.first_name + ' ' + merchant.last_name | capitalize }} {{ createMode ? ' New ' : ' Update ' | capitalize }} Product
+							{{ merchantFullName | capitalize }} {{ createMode ? ' New ' : ' Update ' | capitalize }} Product
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -949,6 +949,15 @@
 																				{{ merchantProductVariation.selling_price }}
 																			</label>
 																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Available Qty :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.available_quantity }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+																			</label>
+																		</div>
 																	</div>
 																</div>
 															</div>
@@ -1401,6 +1410,15 @@
 													{{ merchantProductVariation.selling_price }}
 												</label>
 											</div>
+
+											<div class="form-row">
+												<label class="col-4 col-form-label font-weight-bold">
+													Available Qty :
+												</label>
+												<label class="col-8 col-form-label">
+													{{ merchantProductVariation.available_quantity }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
+												</label>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -1757,7 +1775,7 @@
 					
 									(objectVariation, variationIndex) => {
 
-										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'SKU: ' + objectVariation.sku + ", \n" + 'Price: ' + objectVariation.selling_price + "\n\n");
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + (objectVariation.available_quantity + ' ' + (object.product ? object.product.quantity_type : 'unit')) + "\n\n");
 
 									}
 									
@@ -1793,7 +1811,7 @@
 			
 									(objectSerial, objectSerialIndex) => {
 
-										infosToReturn +=  (objectSerialIndex + 1) + ". " + objectSerial.serial_no + (objectSerial.has_dispatched ? '(Dispatched)' : '')  + "\n";					
+										infosToReturn +=  (objectSerialIndex + 1) + ". " + objectSerial.serial_no + (objectSerial.has_dispatched ? ' (Dispatched)' : '')  + "\n";					
 
 									}
 									
@@ -1815,7 +1833,7 @@
 						
 												(variationSerial, variationSerialIndex) => {
 
-													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + (variationSerial.has_dispatched ? '(Dispatched)' : '') + "\n";					
+													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + (variationSerial.has_dispatched ? ' (Dispatched)' : '') + "\n";					
 
 												}
 												
@@ -1895,6 +1913,12 @@
 		},
 
 		computed: {
+
+			merchantFullName: function() {
+
+				return this.merchant ? (this.merchant.first_name + ' ' + this.merchant.last_name) : 'No Name';
+
+			},
 
 			currentTime: function() {
 

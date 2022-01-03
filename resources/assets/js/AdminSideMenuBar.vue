@@ -203,7 +203,7 @@
 								</ul>
 							</li>
 
-							<li :class="currentRouteName=='requisitions' ? 'active' : ''" 
+							<li :class="(currentRouteName=='requisitions' || currentRouteName=='product-requisitions') ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-requisition-index')"
 							>
 								<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">

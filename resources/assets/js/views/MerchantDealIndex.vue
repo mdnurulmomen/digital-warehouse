@@ -2254,7 +2254,7 @@
 								return sale_percentage;
 							}
 							else {
-								return '';
+								return 'NA';
 							}
 
 						},
@@ -2268,7 +2268,7 @@
 						callback: (rent_period) => {
 							
 							if (rent_period && rent_period.name) {
-								return rent_period.name;
+								return this.$options.filters.capitalize(rent_period.name);
 							}
 							else {
 								return 'No Package';
@@ -2307,7 +2307,8 @@
 														warehouseSpace.containers.forEach(
 															(warehouseContainer, warehouseContainerIndex) => {
 
-																infosToReturn +=  "Containers: " + warehouseContainer.name + "\n";
+																infosToReturn +=  "Containers: " + "\n";
+																infosToReturn +=  (warehouseContainerIndex+1) + '. ' + this.$options.filters.capitalize(warehouseContainer.name) + ", \n"
 
 															}
 														);
@@ -2316,12 +2317,14 @@
 													else if (warehouseSpace.type=='shelves') {
 														
 														infosToReturn +=  "Space Type : Shelves\n";
-														infosToReturn +=  "Container Name : " + warehouseSpace.container.name + "\n";
+														infosToReturn +=  "Container Name : " + this.$options.filters.capitalize(warehouseSpace.container.name) + "\n";
 
+														infosToReturn +=  "Shelves: \n";
+														
 														warehouseSpace.container.shelves.forEach(
-															(warehouseShelf, warehouseContainerIndex) => {
+															(warehouseShelf, warehouseShelfIndex) => {
 
-																infosToReturn +=  "Shelves: " + warehouseShelf.name + "\n";
+																infosToReturn +=  (warehouseShelfIndex+1) + '. ' + this.$options.filters.capitalize(warehouseShelf.name) + ", \n";
 
 															}
 														);
@@ -2330,13 +2333,14 @@
 													else if (warehouseSpace.type=='units') {
 														
 														infosToReturn +=  "Space Type : Units\n";
-														infosToReturn +=  "Container Name : " + warehouseSpace.container.name + "\n";
-														infosToReturn +=  "Shelf Name : " + warehouseSpace.container.shelf.name + "\n";
+														infosToReturn +=  "Container Name : " + this.$options.filters.capitalize(warehouseSpace.container.name) + "\n";
+														infosToReturn +=  "Shelf Name : " + this.$options.filters.capitalize(warehouseSpace.container.shelf.name) + "\n";
+														infosToReturn +=  "Units: " + "\n";
 
 														warehouseSpace.container.shelf.units.forEach(
-															(warehouseUnit, warehouseContainerIndex) => {
+															(warehouseUnit, warehouseUnitIndex) => {
 
-																infosToReturn +=  "Units: " + warehouseUnit.name + "\n";
+																infosToReturn +=  (warehouseUnitIndex+1) + '. ' + this.$options.filters.capitalize(warehouseUnit.name) + ", \n";
 
 															}
 														);
@@ -2364,6 +2368,19 @@
 
 					},
 
+					"Expiring Date" : {
+
+						field: "payments",
+						
+						callback: (payments) => {
+
+							return payments[payments.length-1].date_to;
+
+						}
+
+					},
+
+					/*
 					Payments: {
 
 						field: "payments",
@@ -2422,6 +2439,7 @@
 						},
 
 					},
+					*/
 					
 				},
 

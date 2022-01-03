@@ -2543,7 +2543,7 @@
 							object.products.forEach(
 								(stockedProduct, stockedProductIndex) => {
 
-									stockDetailToReturn += "Product:" + this.$options.filters.capitalize(stockedProduct.merchant_product.product.name) + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product') + ')' + "\n";
+									stockDetailToReturn += "Product: " + this.$options.filters.capitalize(stockedProduct.merchant_product.product.name) + '(' + this.$options.filters.capitalize(stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product') + ')' + "\n";
 
 									stockDetailToReturn += `Qty:${stockedProduct.stock_quantity} ${stockedProduct.merchant_product.product.quantity_type}
 									`;
@@ -2551,7 +2551,7 @@
 									if (stockedProduct.has_serials && ! stockedProduct.has_variations && stockedProduct.serials.length) {
 
 										stockDetailToReturn +=  this.$options.filters.capitalize(`${stockedProduct.merchant_product.product.name} Serials:
-																							`);
+										`);
 
 										stockedProduct.serials.forEach(
 								
@@ -2572,7 +2572,7 @@
 									if (stockedProduct.has_variations && stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length) {
 
 										stockDetailToReturn +=  `Variations:
-													`;
+										`;
 
 										stockedProduct.variations.forEach(
 							
@@ -2580,7 +2580,7 @@
 
 												if (stockedProductVariation.hasOwnProperty('variation') && stockedProductVariation.variation.hasOwnProperty('name')) {
 
-													stockDetailToReturn +=  this.$options.filters.capitalize(`${stockedProductVariationIndex+1}. Variation: ${stockedProductVariation.variation.name}, 
+													stockDetailToReturn +=  this.$options.filters.capitalize(`Variation ${stockedProductVariationIndex+1} : ${stockedProductVariation.variation.name}, 
 														Qty: ${stockedProductVariation.stock_quantity}  ${stockedProduct.merchant_product.product.quantity_type}
 													`);
 
@@ -2588,8 +2588,8 @@
 
 												if (stockedProduct.has_serials && stockedProductVariation.hasOwnProperty('serials') && stockedProductVariation.serials.length) {
 
-													stockDetailToReturn +=  `${stockedProductVariation.variation.name} Serials:
-													`;
+													stockDetailToReturn +=  this.$options.filters.capitalize(`${stockedProductVariation.variation.name} Serials:
+													`);
 
 													stockedProductVariation.serials.forEach(
 								
@@ -2614,6 +2614,8 @@
 										);
 
 									}
+
+									stockDetailToReturn +=  "\n"
 
 								}
 
