@@ -14,28 +14,32 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
+						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
 
-											<div class="col-sm-12 sub-title">
-											  	<!-- 
-											  	<search-and-addition-option 
-											  		:query="query" 
-											  		:caller-page="'requisition'" 
-											  		
-											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllRequisitions"
-											  	></search-and-addition-option>
-											  	-->
+											<my-requisition-addition-search-export-option 
+												:search-attributes="searchAttributes" 
+										  		:caller-page="'my-requisition'" 
+										  		:disable-add-button="(merchantAllProducts.length==0 || formSubmitted) ? true : false" 
+										  		:data-to-export="dataToExport" 
+										  		:contents-to-download="requisitionsToShow" 
+										  		:pagination="pagination" 
+										  		:current-tab="currentTab"
+										  		
+										  		@showContentCreateForm="showContentCreateForm" 
+										  		@searchData="searchData($event)" 
+										  		@fetchAllContents="fetchAllRequisitions"
+											/>
 
+											<!-- 
+											<div class="col-sm-12 sub-title">
 											  	<div class="row d-flex align-items-center text-center">		  	
 											  		<div class="col-sm-3 form-group">	
 															My Requisition List
@@ -65,11 +69,14 @@
 											  			</button>
 											  		</div>
 											  	</div>
-											</div>
+											</div> 
+											-->
 											
-											<div class="col-sm-12 col-lg-12">	
+											<div class="col-sm-12 col-lg-12">
+												<loading v-show="loading"></loading>
+												
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
 										  			:current-tab="'pending'" 
 
@@ -78,7 +85,7 @@
 										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
 
- 												<div class="tab-content card-block pl-0 pr-0">
+ 												<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -194,7 +201,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																data-toggle="tooltip" data-placement="top" title="Reload" 
-																@click="query === '' ? fetchAllRequisitions() : searchData()"
+																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -205,7 +212,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllRequisitions() : searchData()"
+																@paginate="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -788,7 +795,11 @@
 												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+												<button 
+													type="submit" 
+													class="btn btn-primary float-right" 
+													:disabled="!submitForm || formSubmitted"
+												>
 													Request
 												</button>
 											</div>
@@ -1189,7 +1200,7 @@
 	        return {
 
 	        	step : 1,
-	        	query : '',
+	        	// query : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
@@ -1197,9 +1208,26 @@
 	        	currentTab : 'pending',
 	        	// currentMerchant : null,
 
+	        	searchAttributes : {
+
+	        		dates : {},
+	        		search : '',
+		        	dateTo : null,
+		        	dateFrom : null,
+		        	
+		        	/*
+			        	showPendingRequisitions : false,
+			        	showCancelledRequisitions : false,
+			        	showDispatchedRequisitions : false,
+			        	showProduct : null,
+		        	*/
+
+	        	},
+
 	        	editor: ClassicEditor,
 
 	        	submitForm : true,
+	        	formSubmitted : false,
 
 	        	requisitionsToShow : [],
 	        	allFetchedRequisitions : [],
@@ -1238,6 +1266,139 @@
 
 				},
 
+				dataToExport: {
+
+					"Subject": {
+						field: "subject",
+						callback: (subject) => {
+							if (subject) {
+								return this.$options.filters.capitalize(subject);
+							}
+							else{
+								return 'No Subject'
+							}
+						},
+					},
+
+					"Requested On": 'created_at',
+
+					"Products": {
+						field: "products",
+						callback: (products) => {
+
+							if (products) {
+								
+								var infosToReturn = '';
+
+								products.forEach(
+					
+									(requiredProduct, requiredProductIndex) => {
+
+										infosToReturn += "Product " + (requiredProductIndex+1) + " : " + this.$options.filters.capitalize(requiredProduct.product_name) + ",\n";
+
+										infosToReturn += "Qty : " + requiredProduct.quantity + "\n";
+
+										if (requiredProduct.hasOwnProperty('variations') && requiredProduct.variations.length) {
+
+											requiredProduct.variations.forEach(
+						
+												(requiredProductVariation, requiredProductVariationIndex) => {
+
+													infosToReturn +=  "Selected Variation: " + this.$options.filters.capitalize(requiredProductVariation.variation_name) + ",\n";	
+
+													infosToReturn +=  "Qty: " + requiredProductVariation.quantity + "\n";					
+
+												}
+												
+											);
+
+										}
+
+										infosToReturn += "\n";
+
+									}
+									
+								);
+
+								return infosToReturn;
+
+							}
+							else {
+								return 'No Products.'
+							}
+
+						},
+					},
+					
+					"Service": {
+						field: "agent",
+						callback: (agent) => {
+							if (agent) {
+								return `Agent Service.
+										Agent: ${agent.name}, 
+										Mobile: ${agent.mobile}, 
+										Code: ${agent.code}`;
+							}
+							else{
+								return 'Delivery Service.'
+							}
+						},
+					},
+
+					"Status": {
+						callback: (object) => {
+							
+							if (object.status==1) {
+								return "Recommended.\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ').') : '');
+							}
+							else if (object.status==-1) {
+								return "Cancelled.\n" + (object.updater ? (object.updater.first_name + ' ' + object.updater.last_name + ' (' + object.updated_at + ').') : '');
+							}
+							else {
+								return 'Pending.';
+							}
+
+						},
+					},
+
+					"Approval": {
+						field: "dispatch",
+						callback: (dispatch) => {
+							if (dispatch) {
+								return (dispatch.has_approval==1 ? 'Approved.' : 'Cancelled.') + "\n" + dispatch.updater.first_name + ' ' + dispatch.updater.last_name + '(' + dispatch.updated_at + ').';
+							}
+							else {
+								return 'NA'
+							}
+						},
+					},
+
+					"Collection Point": {
+						field: "dispatch",
+						callback: (dispatch) => {
+							if (dispatch && dispatch.hasOwnProperty('agent')) {
+								return dispatch.agent.collection_point;
+							}
+							else {
+								return 'NA'
+							}
+						},
+					},
+
+					"Received": {
+						field: "dispatch",
+						callback: (dispatch) => {
+							if (dispatch) {
+								return (dispatch.hasOwnProperty('delivery') && dispatch.delivery.receiving_confirmation==1) ? 'Received.' : (dispatch.hasOwnProperty('agent') && dispatch.agent.receiving_confirmation==1) ?  'Received.' : 'Not Confirmed.';
+							}
+							else {
+								return 'NA'
+							}
+						},
+					},
+					
+				},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -1274,6 +1435,7 @@
 			}
 		},
 
+		/*
 		watch : {
 
 			query : function(val){
@@ -1286,15 +1448,17 @@
 			},
 
 		},
+		*/
 		
 		methods : {
 		
 			fetchAllRequisitions() {
 				
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.allFetchedRequisitions = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/my-requisitions/' + this.perPage + "?page=" + this.pagination.current_page)
@@ -1331,10 +1495,11 @@
 			},
 			fetchMerchantAllProducts() {
 				
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.merchantAllProducts = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/my-products/')
@@ -1369,10 +1534,11 @@
 			},
 			fetchMerchantAllAgents() {
 				
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.merchantAllAgents = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/my-agents/')
@@ -1407,10 +1573,11 @@
 			},
 			fetchAllPackagingPackages() {
 				
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.allPackagingPackages = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/packaging-packages/')
@@ -1459,6 +1626,7 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	
 				this.singleRequisitionData = {
 
@@ -1509,6 +1677,8 @@
 					return;
 				}
 
+				this.formSubmitted = true;
+
 				axios
 					.post('/requisitions/' + this.perPage, this.singleRequisitionData)
 					.then(response => {
@@ -1516,7 +1686,7 @@
 							this.$toastr.s("New requisition has been stored", "Success");
 							
 							this.allFetchedRequisitions = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
 							$('#requisition-createOrEdit-modal').modal('hide');
 						}
@@ -1544,7 +1714,7 @@
 							this.$toastr.s("Dispatched products has been received", "Success");
 
 							this.allFetchedRequisitions = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
 						}
 					})
@@ -1560,10 +1730,10 @@
 					});
 
     		},
-			searchData(emitedValue=false) {
+			searchData(emitedObject=false) {
 
-				if (emitedValue) {
-					this.query=emitedValue;
+				if (emitedObject) {
+					this.searchAttributes=emitedObject;
 				}
 
 				this.error = '';
@@ -1571,9 +1741,7 @@
 				this.pagination.current_page = 1;
 				
 				axios
-				.get(
-					"/api/search-my-requisitions/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
-				)
+				.post("/api/search-my-requisitions/" + this.perPage, this.searchAttributes)
 				.then(response => {
 					this.allFetchedRequisitions = response.data;
 					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
@@ -1648,7 +1816,7 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.query === '') {
+				if (this.searchAttributes.search === '') {
 					this.fetchAllRequisitions();
 				}
 				else {

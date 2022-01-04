@@ -49,9 +49,13 @@ Vue.component('user-profile-view-modal', require('./components/UserProfileViewMo
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/SearchAndAdditionOption.vue').default);
+Vue.component('addition-search-export-option', require('./components/AdditionSearchExportOption.vue').default);
 Vue.component('restore-confirmation-modal', require('./components/RestoreConfirmationModal.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
+
+// Special Components
+Vue.component('my-requisition-addition-search-export-option', require('./components/MyRequisitionAdditionSearchExportOption.vue').default);
 
 import MerchantSideMenuBar from './MerchantSideMenuBar'
 

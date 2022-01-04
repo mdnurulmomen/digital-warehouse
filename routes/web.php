@@ -52,7 +52,7 @@ Route::name('merchant.')->group(function () {
 
 		Route::get('/api/my-requisitions/{perPage?}', 'MerchantController@showMyAllRequisitions')->name('my-requisitions');
 		Route::post('/requisitions/{perPage}', 'MerchantController@makeNewRequisition')->name('my-requisitions');
-		Route::get('/api/search-my-requisitions/{search}/{perPage?}', 'MerchantController@searchMyAllRequisitions')->name('search-my-requisitions');
+		Route::post('/api/search-my-requisitions/{perPage}', 'MerchantController@searchMyAllRequisitions')->name('search-my-requisitions');
 
 		// Receive products
 		Route::post('/receive-dispatched-products/{perPage}', 'MerchantController@receiveDispatchedProducts')->name('receive-dispatched-products');

@@ -283,9 +283,11 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct.variations.productVariation', 'delivery', 'agent'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'dispatched' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
-                'cancelled' => new MyRequisitionCollection(Requisition::with(['products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+
+                'dispatched' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+
+                'cancelled' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
@@ -382,27 +384,56 @@ class MerchantController extends Controller
         return $this->showMyAllRequisitions($perPage);
     }
 
-    public function searchMyAllRequisitions($search, $perPage)
+    public function searchMyAllRequisitions(Request $request, $perPage)
     {
+        $request->validate([
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]); 
+
         $currentMerchant = \Auth::user();
 
-        $query = Requisition::with(['products.merchantProduct.product', 'products.merchantProduct.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where(function ($query) use ($search) {
-                                    $query->where('subject', 'like', "%$search%")
-                                            ->orWhere('description', 'like', "%$search%")
-                                            ->orWhereHas('products.merchantProduct.product', function ($q) use ($search) {
-                                                $q->where('name', 'like', "%$search%");
-                                            })
-                                            ->orWhereHasMorph(
-                                                'updater',
-                                                [Admin::class, Manager::class, Warehouse::class],
-                                                function ($query) use ($search) {
-                                                    $query->where('user_name', 'like', "%$search%");
-                                                }
-                                            );
-                                })
-                                ->where(function ($query) use ($currentMerchant) {
-                                    $query->where('merchant_id', $currentMerchant->id);
-                                });
+        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+        ->where(function ($query) use ($currentMerchant) {
+            $query->where('merchant_id', $currentMerchant->id);
+        });
+
+        if ($request->search) {
+            
+            $query->where(function ($query1) use ($request) {
+                $query1->where('subject', 'like', "%$request->search%")
+                ->orWhere('description', 'like', "%$request->search%")
+                ->orWhereHas('products.merchantProduct.product', function ($q) use ($request) {
+                    $q->where('name', 'like', "%$request->search%");
+                })
+                ->orWhereHasMorph(
+                    'updater',
+                    [Admin::class, Manager::class, Warehouse::class],
+                    function ($query2) use ($request) {
+                        $query2->where('user_name', 'like', "%$request->search%");
+                    }
+                );
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->where('created_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->where('created_at', '<=', $request->dateTo);
+
+        }
+
 
         return [
             'all' => new MyRequisitionCollection($query->paginate($perPage)),  

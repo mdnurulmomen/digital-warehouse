@@ -21,114 +21,21 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
-											<div class="col-sm-12">
-											  	<div class="row form-group">
-											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
-											  			<div class="mr-2">
-											  				<span>
-													  			{{ 
-													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Requisitions List' : 'Requisitions List'
-													  			}}
-											  				</span>
-											  			</div>
-
-											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
-										  					
-										  					<div class="dropdown-menu">
-									  							<download-excel 
-													  				class="btn btn-default p-1 dropdown-item active"
-																	:data="requisitionsToShow"
-																	:fields="dataToExport" 
-																	worksheet="Requisitions sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
-													  			>
-													  				Excel
-																</download-excel>
-										  						
-										  						<!-- 
-										  						<download-excel 
-										  							type="csv"
-													  				class="btn btn-default p-1 dropdown-item disabled"
-																	:data="requisitionsToShow"
-																	:fields="dataToExport" 
-																	worksheet="Requisitions sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
-													  			>
-													  				CSV
-																</download-excel> 
-																-->
-										  					</div>
-										  				</div>
-
-											  			<div class="ml-auto d-sm-none">
-											  				<button 
-											  					type="button" 
-													  			class="btn btn-success btn-outline-success btn-sm" 
-													  			data-toggle="tooltip" data-placement="top" title="Create New" 
-													  			@click="showContentCreateForm()"
-												  			>
-												  				<i class="fa fa-plus"></i>
-												  				New Requisition
-												  			</button>
-											  			</div>
-											  		</div>
-
-											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
-											  			<div class="mx-sm-auto w-75">
-										  					<input 	
-																type="text" 
-														  		class="form-control" 
-														  		pattern="[^'!#$%^()\x22]+" 
-														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Requisitions"
-													  		>
-
-													  		<div class="invalid-feedback">
-														  		Please search with releavant input
-														  	</div>
-											  			</div>
-
-														<div class="ml-auto ml-sm-0">
-															<ul class="nav nav-pills">
-																<li class="nav-item">
-																	<a 
-																		href="javascript:void(0)"
-																		class="nav-link p-1"
-																		@click="setTodayDate()" 
-																		:class="{ 'active': searchAttributes.dateFrom == currentDate && ! searchAttributes.dateTo }"
-																	>
-																		Today
-																	</a>
-																</li>
-
-																<li class="nav-item">
-																	<a 
-																		href="javascript:void(0)"
-																		class="nav-link p-0" 
-																		data-toggle="modal" 
-																		data-target="#requisition-custom-search"
-																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
-																	>
-																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
-																	</a>
-																</li>
-															</ul>
-													  	</div>
-													</div>
-
-													<div class="col-md-4 text-right d-none d-md-block">
-											  			<button 
-												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			data-toggle="tooltip" data-placement="top" title="Create New" 
-												  			@click="showContentCreateForm()"
-											  			>
-											  				<i class="fa fa-plus"></i>
-											  				New Requisition
-											  			</button>
-													</div>
-											  	</div>
-											</div>
+											<addition-search-export-option
+												v-if="userHasPermissionTo('view-requisition-index') || userHasPermissionTo('create-requisition')" 
+										  		:search-attributes="searchAttributes" 
+										  		:caller-page="'requisition'" 
+										  		:required-permission = "'requisition'" 
+										  		:disable-add-button="formSubmitted ? true : false" 
+										  		:data-to-export="dataToExport" 
+										  		:contents-to-download="requisitionsToShow" 
+										  		:pagination="pagination" 
+										  		:current-tab="currentTab"
+										  		
+										  		@showContentCreateForm="showContentCreateForm" 
+										  		@searchData="searchData($event)" 
+										  		@fetchAllContents="fetchAllRequisitions"
+											/>
 											
 											<div class="col-sm-12 col-lg-12">
 												<loading v-show="loading"></loading>	
@@ -918,7 +825,7 @@
 												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
 													Request
 												</button>
 											</div>
@@ -1806,7 +1713,7 @@
 												<button 
 													type="submit" 
 													class="btn btn-primary btn-sm btn-round" 
-													:disabled="!submitForm || nondispatchable"
+													:disabled="!submitForm || nondispatchable || formSubmitted"
 												>
 													{{ singleDispatchData.requisition.status==0 ? 'Recommend Dispatch' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve Dispatch' : '' }}
 												</button>
@@ -2223,56 +2130,6 @@
 			</div>
 		</div>
 
-		<!-- Filter Modal -->
-		<div class="modal fade" id="requisition-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="form-row">
-							<div class="col-12 text-center">
-								<p>
-									Timelaps
-								</p>
-								 
-								<v-date-picker 
-									v-model="searchAttributes.dates" 
-									color="red" 
-									is-dark
-									is-range 
-									is-inline
-									:max-date="new Date()" 
-									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
-									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
-									@input="setSearchingDates()"
-								/> 
-							</div>					
-						</div>
-					</div>
-					
-					<div class="modal-footer">
-						<button 
-							type="button" 
-							class="btn btn-success" 
-							@click="resetSearchingDates()" 
-							data-toggle="tooltip" data-placement="top" title="Reset"
-						>
-	                  		Reset
-	                  	</button>
-
-						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
-	                  		See Results
-	                  	</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<!-- Cancel Requisitions -->
 		<div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" v-if="userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -2368,10 +2225,10 @@
 						class="form-row" 
 						v-if="singleRequisitionData.creator"
 					>
-						<label class="col-sm-6 col-form-label font-weight-bold text-right">
+						<label class="col-6 col-form-label font-weight-bold text-right">
 							Created By :
 						</label>
-						<label class="col-sm-6 col-form-label">
+						<label class="col-6 col-form-label">
 							{{ singleRequisitionData.creator.user_name | capitalize }}
 						</label>
 					</div>
@@ -2734,6 +2591,7 @@
 	        	editor: ClassicEditor,
 
 	        	submitForm : true,
+	        	formSubmitted : false,
 	        	createRequisition : true,
 
 	        	requisitionsToShow : [],
@@ -2974,61 +2832,6 @@
 
 				let date = new Date();
 				return date.getFullYear() + '-' +  (date.getMonth() + 1) + '-' + date.getDate();
-
-			},
-
-		},
-
-		watch : {
-
-			'searchAttributes.search' : function(val){
-				
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllRequisitions();
-
-				}
-				else {
-
-					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
-
-					if (! format.test(val)) {
-
-						this.searchData();
-					
-					}
-
-				}
-
-			},
-			
-			'searchAttributes.dateFrom' : function(val){
-				
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllRequisitions();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
-
-			},
-
-			'searchAttributes.dateTo' : function(val){
-				
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllRequisitions();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
 
 			},
 
@@ -3335,6 +3138,7 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	this.createRequisition = true;
 	        	
 				this.singleRequisitionData = {
@@ -3381,6 +3185,9 @@
 			},
 			openRequisitionCancelForm(object) {
 
+				this.submitForm = true;
+				this.formSubmitted = false;
+
 				this.singleRequisitionData = { ...object };
 
 				this.errors.cancellation = {
@@ -3394,6 +3201,7 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	this.createRequisition = false;
 	        	
 				this.configureErrorObject(object);
@@ -3435,6 +3243,7 @@
 				
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	this.createRequisition = false;
 	        	
 			/*
@@ -3497,6 +3306,8 @@
 					return;
 				}
 
+				this.formSubmitted = true;
+
 				axios
 					.post('/requisitions/' + this.perPage, this.singleRequisitionData)
 					.then(response => {
@@ -3517,6 +3328,7 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						this.fetchMerchantAllProducts();
 					});
 
@@ -3529,6 +3341,8 @@
 					return;
 
 				}
+
+				this.formSubmitted = true;
 
 				axios
 					.post('/dispatches/' + this.perPage, this.singleDispatchData)
@@ -3551,13 +3365,12 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllRequisitions();
 					});
 
 			},
 			cancelRequisition() {
-
-				this.submitForm = true;
 
 				if (! this.singleRequisitionData.hasOwnProperty('cancellation_reason') || ! this.singleRequisitionData.cancellation_reason) {
 
@@ -3567,6 +3380,7 @@
 
 				}
 
+				this.formSubmitted = true;
 				this.$delete(this.errors, 'cancellation');
 
 				axios
@@ -3591,11 +3405,16 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllRequisitions();
 					});
 
 			},
-			searchData() {
+			searchData(emitedObject=false) {
+
+				if (emitedObject) {
+					this.searchAttributes=emitedObject;
+				}
 
 				this.error = '';
 				this.allFetchedRequisitions = [];
@@ -4052,45 +3871,6 @@
                 };
 
                 reader.readAsDataURL(file);
-            },
-            resetSearchingDates(){
-
-            	this.searchAttributes.dates = {};
-				this.searchAttributes.dateTo = null;
-				this.searchAttributes.dateFrom = null;				
-
-            },
-            setSearchingDates(){
-
-            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
-
-					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
-					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
-						
-				}
-				else {
-
-					this.resetSearchingDates();
-
-				}
-
-            },
-            setTodayDate() {
-            	
-            	if (this.searchAttributes.dateFrom != this.currentDate || this.searchAttributes.dateTo) {
-	            	
-	            	// this.searchAttributes.dateTo = null; 
-	            	this.searchAttributes.dates = {};
-	            	this.searchAttributes.dateTo = null;
-	            	this.searchAttributes.dateFrom = this.currentDate;
-
-            	}
-            	else {
-
-	            	this.searchAttributes.dateFrom = null
-
-            	}
-
             },
             setRequisitionMerchant() {
 

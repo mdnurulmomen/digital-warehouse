@@ -14,12 +14,15 @@ class MyRequiredProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $merchantProduct = $this->merchantProduct;
+        $product = $this->merchantProduct->product;
+
         return [
             'id' => $this->id,
-            'product_id' => $this->merchantProduct->product_id,
-            'product_name' => $this->merchantProduct->product->name,
+            'product_id' => $merchantProduct->product_id,
+            'product_name' => $product->name,
             'quantity' => $this->quantity,
-            'available_quantity' => $this->merchantProduct->latestStock->available_quantity ?? 0,
+            'available_quantity' => $merchantProduct->latestStock->available_quantity ?? 0,
             'has_variations' => $this->has_variations,
             'has_serials' => $this->has_serials,
             'packaging_service' => $this->packaging_service,
