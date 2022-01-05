@@ -324,7 +324,7 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="createMode ? storeProductMerchant() : updateProductMerchant()" 
+						v-on:submit.prevent="createMode ? storeMerchantProduct() : updateMerchantProduct()" 
 						autocomplete="off" 
 						novalidate="true" 
 					>
@@ -2059,10 +2059,11 @@
 
 				}
 
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.allProducts = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/products/')
@@ -2104,10 +2105,11 @@
 
 				}
 
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.allManufacturers = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/manufacturers/')
@@ -2240,7 +2242,7 @@
 
 				$('#product-createOrEdit-modal').modal('show');
 			},
-			storeProductMerchant() {
+			storeMerchantProduct() {
 				
 				if (!this.verifyUserInput()) {
 					// this.submitForm = false;
@@ -2262,11 +2264,11 @@
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
-							if (this.query) {
+							/*if (this.searchAttributes.search) {
 
 								this.searchData();
 
-							}
+							}*/
 
 							$('#product-createOrEdit-modal').modal('hide');
 						}
@@ -2285,7 +2287,7 @@
 					});
 
 			},
-			updateProductMerchant() {
+			updateMerchantProduct() {
 				
 				if (!this.verifyUserInput()) {
 					// this.submitForm = false;
@@ -2307,11 +2309,11 @@
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
-							if (this.query) {
+							/*if (this.query) {
 
 								this.searchData();
 
-							}
+							}*/
 
 							$('#product-createOrEdit-modal').modal('hide');
 							
@@ -2346,11 +2348,11 @@
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
-							if (this.query) {
+							/*if (this.query) {
 
 								this.searchData();
 
-							}
+							}*/
 
 							$('#delete-confirmation-modal').modal('hide');
 							

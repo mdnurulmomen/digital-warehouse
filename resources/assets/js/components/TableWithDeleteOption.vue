@@ -22,13 +22,14 @@
 								</span>
 							</a>
 						</th>
+						
 						<th>
 							Actions
 						</th>
 					</tr>
 				</thead>
-				<tbody>
 
+				<tbody>
 					<tr 
 						v-for="content in currentContents" 
 						:key="content.id" 
@@ -43,7 +44,7 @@
 									class="btn btn-grd-info btn-icon" 
 									data-toggle="tooltip" data-placement="top" title="View Details"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-show="$route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types'"
+								 	v-show="$route.name!='rent-periods'"
 							>
 								<i class="fa fa-eye"></i>
 							</button>
@@ -70,6 +71,7 @@
 								<i class="fa fa-trash"></i>
 							</button>
 
+							<!-- 
 							<button type="button" 
 									class="btn btn-grd-warning btn-icon" 
 									data-toggle="tooltip" data-placement="top" title="Restore" 
@@ -97,7 +99,8 @@
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-product-index')"
 							>
 								<i aria-hidden="true" class="fab fa-product-hunt"></i>
-							</button>
+							</button> 
+							-->
 						</td>
 					</tr>
 					<tr 
@@ -269,41 +272,11 @@
 			},
 			getColumnValue(object, columnValue) {
 				
-				if (columnValue.match(/full_name/gi)) {
-					return this.getFullName(object);
-				}
-				else if (columnValue.match(/user_name/gi)) {
-					return this.$options.filters.capitalize(object.user_name);
-				}
-				else if (columnValue.match(/email/gi)) {
-					return object.email;
-				}
-				else if (columnValue.match(/mobile/gi)) {
-					return object.mobile;
-				}
-				else if (columnValue.match(/status/gi)) {
-					return object.active ? 'Approved' : 'Pending';
-				}
-				else if (columnValue.match(/owner_total_warehouses/gi)) {
-					return object.warehouses_count;
-				}
-				else if (columnValue.match(/variation_type_name/gi)) {
-					return object.variation_type ? this.$options.filters.capitalize(object.variation_type.name) : '';
-				}
-				else if (columnValue.match(/variation_parent_name/gi)) {
-					return object.variation_parent ? this.$options.filters.capitalize(object.variation_parent.name) : '';
-				}
-				else if (columnValue.match(/name/gi)) {
+				if (columnValue.match(/name/gi)) {
 					return this.$options.filters.capitalize(object.name);
 				}
 				else if (columnValue.match(/code/gi)) {
 					return this.$options.filters.capitalize(object.code);
-				}
-				else if (columnValue.match(/number_deals/gi)) {
-					return object.deals_count;
-				}
-				else if (columnValue.match(/number_days/gi)) {
-					return object.number_days;
 				}
 
 			},

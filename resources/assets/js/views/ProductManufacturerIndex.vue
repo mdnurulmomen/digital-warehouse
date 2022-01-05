@@ -28,6 +28,7 @@
 											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')" 
 											  		:query="query" 
 											  		:caller-page="'product manufacturer'" 
+											  		:disable-add-button="formSubmitted" 
 											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
@@ -54,9 +55,9 @@
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission="'product-asset'" 
+										  			:form-submitted="formSubmitted" 
 										  			:current-content="singleAssetData"
 
-										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
@@ -75,21 +76,22 @@
 				</div>
 			</div>
 		</div>
-
-	<!-- 
-		<product-manufacturer-create-or-edit-modal 
+		 
+		<asset-create-or-edit-modal 
+			v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')" 
+			:csrf="csrf" 
 			:create-mode="createMode" 
-			:caller-page="'variation'" 
-			:single-product-manufacturer-data="singleAssetData" 
-			:csrf="csrf"
+			:caller-page="'menufacturer'" 
+			:form-submitted="formSubmitted"
+			:single-asset-data="singleAssetData" 
 
 			@storeAsset="storeAsset($event)" 
 			@updateAsset="updateAsset($event)" 
-		></product-manufacturer-create-or-edit-modal>
- 	-->
+		></asset-create-or-edit-modal>
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="product-manufacturer-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')">
+		<!-- 
+		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -147,11 +149,13 @@
 					</form>
 				</div>
 			</div>
-		</div>
+		</div> 
+		-->
 
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -162,22 +166,24 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
 			:restoration-message="'This will restore all related items !'" 
 
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
-
-	<!-- 
-		<product-manufacturer-view-modal 
-			:caller-page="'variation'" 
-			:product-manufacturer-to-view="singleAssetData" 
+ 
+		<!-- 
+		<asset-view-modal 
+			:caller-page="'manufacturer'" 
+			:asset-to-view="singleAssetData" 
 			:properties-to-show="['name']"
-		></product-manufacturer-view-modal>
- 	-->
+		></asset-view-modal> 
+		-->	
 
  		<!-- View Modal -->
+		<!-- 
 		<div class="modal fade" id="product-manufacturer-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -204,10 +210,9 @@
 					</div>
 				</div>
 			</div>
-		</div>
-
+		</div> 
+		-->
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -237,9 +242,7 @@
 
 	        	createMode : true,
 	        	submitForm : true,
-
-	        	allCategories : [],
-	        	categoriesToShow : [],
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -250,10 +253,6 @@
 
 	        	singleAssetData : singleAssetData,
 
-	        	errors : {
-					manufacturer : {},
-				},
-
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -262,17 +261,8 @@
 		
 		created(){
 
-			this.fetchAllContents();
-			this.fetchProductAllCategories();			
+			this.fetchAllContents();		
 
-		},
-
-		watch: {
-			'singleAssetData.manufacturer': function (object) {
-				if (object && Object.keys(object).length > 0) {
-					this.singleAssetData.parent_category_id = object.id;
-				}
-			},
 		},
 
 		filters: {
@@ -338,44 +328,6 @@
 					});
 
 			},
-			fetchProductAllCategories() {
-				
-				this.query = '';
-				this.error = '';
-				this.loading = true;
-				this.allCategories = [];
-				
-				axios
-					.get('/api/manufacturers/')
-					.then(response => {
-						if (response.status == 200) {
-							this.allCategories = response.data;
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
-						}
-
-					})
-					.finally(response => {
-						this.loading = false;
-					});
-
-			},
 			searchData(emitedValue=false) {
 
 				if (emitedValue) {
@@ -400,40 +352,31 @@
 				});
 
 			},
+			/*
 			showContentDetails(object) {	
 				this.singleAssetData = object;
 				$('#product-manufacturer-view-modal').modal('show');
 			},
+			*/
 			showContentCreateForm() {
 				this.createMode = true;
 	        	this.submitForm = true;
-	        	
-				this.categoriesToShow = [ ...this.allCategories ];
-
-				this.errors = {
-					manufacturer : {},
-				};
+	        	this.formSubmitted = false;
 
 				this.singleAssetData = {
 					// manufacturer : {},
 				};
 
-				$('#product-manufacturer-createOrEdit-modal').modal('show');
+				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
 				this.submitForm = true;
 				this.createMode = false;
-
-				this.categoriesToShow = [ ...this.allCategories ];
-				this.categoriesToShow.splice(this.categoriesToShow.findIndex(manufacturer=>manufacturer.id==object.id), 1);
-
-				this.errors = {
-					manufacturer : {},
-				};
+				this.formSubmitted = false;
 
 				this.singleAssetData = object;
 
-				$('#product-manufacturer-createOrEdit-modal').modal('show');
+				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
 				this.singleAssetData = object;
@@ -443,12 +386,9 @@
 				this.singleAssetData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
-			storeAsset() {
+			storeAsset(singleAssetData) {
 				
-				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					return;
-				}
+				this.formSubmitted = true;
 
 				axios
 					.post('/manufacturers/' + this.perPage, this.singleAssetData)
@@ -459,7 +399,7 @@
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							$('#product-manufacturer-createOrEdit-modal').modal('hide');
+							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -470,16 +410,13 @@
 				      	}
 					})
 					.finally(response => {
-						this.fetchProductAllCategories();
+						this.formSubmitted = false;
 					});
 
 			},
-			updateAsset() {
-				
-				if (!this.verifyUserInput()) {
-					this.submitForm = false;
-					return;
-				}
+			updateAsset(singleAssetData) {
+
+				this.formSubmitted = true;
 
 				axios
 					.put('/manufacturers/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
@@ -490,7 +427,7 @@
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							$('#product-manufacturer-createOrEdit-modal').modal('hide');
+							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -501,12 +438,14 @@
 				      	}
 					})
 					.finally(response => {
-						this.fetchProductAllCategories();
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/manufacturers/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -527,12 +466,14 @@
 				      	}
 					})
 					.finally(response => {
-						this.fetchProductAllCategories();
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.patch('/manufacturers/' + singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -553,15 +494,15 @@
 				      	}
 					})
 					.finally(response => {
-						this.fetchProductAllCategories();
+						this.formSubmitted = false;
 					});
 
 			},
 			/*
-				goCategoryProducts(productCategory) {
-					
-					this.$router.push({ name: 'manufacturer-products', params: { manufacturer: productCategory, categoryName: productCategory.name.replace(/ /g,"-") }});
-				},
+			goCategoryProducts(productCategory) {
+				
+				this.$router.push({ name: 'manufacturer-products', params: { manufacturer: productCategory, categoryName: productCategory.name.replace(/ /g,"-") }});
+			},
 			*/
             changeNumberContents(expectedContentsPerPage) {
 				this.pagination.current_page = 1;
@@ -594,6 +535,7 @@
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
 			},
+			/*
 			verifyUserInput() {
 				this.validateFormInput('name');
 
@@ -603,16 +545,14 @@
 
 				return false;
 			},
-			/*
-				objectNameWithCapitalized ({ name }) {
-			      	if (name) {
-					    name = name.toString()
-					    return name.charAt(0).toUpperCase() + name.slice(1)
-			      	}
-			      	else 
-			      		return ''
-			    },
-			*/
+			objectNameWithCapitalized ({ name }) {
+		      	if (name) {
+				    name = name.toString()
+				    return name.charAt(0).toUpperCase() + name.slice(1)
+		      	}
+		      	else 
+		      		return ''
+		    },
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
@@ -634,6 +574,7 @@
 				}
 	 
 			}
+			*/
             
 		}
   	}

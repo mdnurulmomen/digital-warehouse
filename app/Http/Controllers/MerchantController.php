@@ -237,27 +237,56 @@ class MerchantController extends Controller
 
     }
 
-    public function searchMyAllProducts($search, $perPage)
+    public function searchMyAllProducts(Request $request, $perPage)
     {
+        $request->validate([
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
         $currentMerchant = \Auth::user();
 
-        $query = MerchantProduct::where('merchant_id', $currentMerchant->id)
-                ->where(function ($query1) use ($search) {
-                    $query1->where('sku', 'like', "%$search%")
-                    ->orWhere('description', 'like', "%$search%")
-                    ->orWhere('warning_quantity', 'like', "%$search%")
-                    ->orWhere('selling_price', 'like', "%$search%")
-                    ->orWhereHas('manufacturer', function ($query2) use ($search) {
-                        $query2->where('name', 'like', "%$search%");
-                    })
-                    ->orWhereHas('product', function ($query3) use ($search) {
-                        $query3->where('name', 'like', "%$search%")
-                            ->orWhere('quantity_type', 'like', "%$search%")
-                            ->orWhereHas('category', function ($q) use ($search) {
-                                $q->where('name', 'like', "%$search%");
-                            });
-                    });
+        $query = MerchantProduct::where('merchant_id', $currentMerchant->id);
+
+
+        if ($request->search) {
+            
+            $query->where(function ($query1) use ($request) {
+                $query1->where('sku', 'like', "%$request->search%")
+                ->orWhere('description', 'like', "%$request->search%")
+                ->orWhere('warning_quantity', 'like', "%$request->search%")
+                ->orWhere('selling_price', 'like', "%$request->search%")
+                ->orWhereHas('manufacturer', function ($query2) use ($request) {
+                    $query2->where('name', 'like', "%$request->search%");
+                })
+                ->orWhereHas('product', function ($query3) use ($request) {
+                    $query3->where('name', 'like', "%$request->search%")
+                        ->orWhere('quantity_type', 'like', "%$request->search%")
+                        ->orWhereHas('category', function ($q) use ($request) {
+                            $q->where('name', 'like', "%$request->search%");
+                        });
                 });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->where('created_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->where('created_at', '<=', $request->dateTo);
+
+        }
+
 
         return [
             'all' => new MyProductCollection($query->paginate($perPage)),  

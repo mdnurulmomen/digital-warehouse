@@ -322,15 +322,15 @@
 		</div>
 
 		<!-- 
-			<asset-create-or-edit-modal 
-				:create-mode="createMode" 
-				:caller-page="'variation'" 
-				:single-asset-data="singleAssetData" 
-				:csrf="csrf"
+		<asset-create-or-edit-modal 
+			:create-mode="createMode" 
+			:caller-page="'variation'" 
+			:single-asset-data="singleAssetData" 
+			:csrf="csrf"
 
-				@storeAsset="storeAsset($event)" 
-				@updateAsset="updateAsset($event)" 
-			></asset-create-or-edit-modal>
+			@storeAsset="storeAsset($event)" 
+			@updateAsset="updateAsset($event)" 
+		></asset-create-or-edit-modal>
 	 	-->
 
  		<!--Create Or Edit Modal -->

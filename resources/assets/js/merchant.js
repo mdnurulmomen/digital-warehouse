@@ -55,6 +55,7 @@ Vue.component('table-with-soft-delete-option', require('./components/TableWithSo
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
 
 // Special Components
+Vue.component('my-product-search-export-option', require('./components/MyProductSearchExportOption.vue').default);
 Vue.component('my-requisition-addition-search-export-option', require('./components/MyRequisitionAdditionSearchExportOption.vue').default);
 
 import MerchantSideMenuBar from './MerchantSideMenuBar'

@@ -46,6 +46,7 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">
 											  		<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
@@ -107,18 +108,7 @@
 																		{{ content.number_days }} Days
 																	</td>
 																	
-																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
-																		
-																		<!-- 
-																		<button type="button" 
-																				class="btn btn-grd-info btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"  
-																				@click="$emit('showContentDetails', content)"
-																		>
-																			<i class="fa fa-eye"></i>
-																		</button>
- 																		-->
-
+																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">	
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Edit" 
@@ -154,6 +144,7 @@
 																	</td>
 															    
 																</tr>
+
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
@@ -163,7 +154,6 @@
 															      		</div>
 															    	</td>
 															  	</tr>
-
 															</tbody>
 															<tfoot>
 																<tr>	
@@ -248,18 +238,20 @@
 															</pagination>
 														</div>
 													</div>
-										  		</div>
-
-										  		<!-- 
+										  		</div> 
+										  		-->
+										  		 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
+										  			:column-names="['name', '# days']" 
+										  			:column-values-to-show="['name', 'number_days']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission = "'warehouse-asset'" 
+										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleAssetData"
 
-										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
@@ -268,9 +260,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
- 												-->
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -462,10 +452,12 @@
 				});
 
 			},
+			/*
 			showContentDetails(object) {	
 				this.singleAssetData = object;
 				$('#asset-view-modal').modal('show');
 			},
+			*/
 			showContentCreateForm() {
 				this.createMode = true;
 				this.formSubmitted = false;
@@ -651,6 +643,7 @@
 				}
 				
 			},
+			/*
 			changeDaysOrder() {
 
 				if (this.ascending) {
@@ -706,6 +699,7 @@
 					}
 				);
 			},
+			*/
             
 		}
   	}

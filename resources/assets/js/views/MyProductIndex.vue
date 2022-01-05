@@ -14,63 +14,31 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">											
+										<div class="row">	
 
-											<div class="col-sm-12 sub-title">
-										  	<!-- 
-											  	<search-and-addition-option 
-											  		:query="query" 
-											  		:caller-page="'product'" 
-											  		
-											  		@showContentCreateForm="showRequestCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllProducts"
-											  	></search-and-addition-option>
- 											-->
- 												
- 												<div class="row d-flex align-items-center">
-											  		<div class="col-sm-3 text-left">	
-															Product List
-											  		</div>
-
-											  		<div class="col-sm-9 was-validated text-center">
-											  			<input 	type="text" 
-														  		v-model="query" 
-														  		pattern="[^'!#$%^()\x22]+" 
-														  		class="form-control" 
-														  		placeholder="Search"
-													  	>
-													  	<div class="invalid-feedback">
-													  		Please search with releavant input
-													  	</div>
-											  		</div>
-
-												<!-- 
-											  		<div class="col-sm-3 text-right">
-											  			<button 
-												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			@click="$emit('showContentCreateForm')"
-											  			>
-											  				<i class="fa fa-plus"></i>
-											  				New {{ callerPage | capitalize }}
-											  			</button>
-											  		</div>
-										  		-->
-											  	</div>
-
-											</div>
+											<my-product-search-export-option
+										  		:search-attributes="searchAttributes" 
+										  		:caller-page="'my-products'" 
+										  		:data-to-export="dataToExport" 
+										  		:contents-to-download="productsToShow" 
+										  		:pagination="pagination" 
+										  		:current-tab="currentTab"
+										  		
+										  		@searchData="searchData($event)" 
+										  		@fetchAllContents="fetchAllProducts"
+											/>
 											
 											<div class="col-sm-12 col-lg-12">
+												<loading v-show="loading"></loading>
+
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading" 
 										  			:tab-names="['retail', 'bulk']" 
 										  			:current-tab="'retail'" 
 
@@ -78,7 +46,10 @@
 										  			@showBulkContents="showBulkContents" 
 										  		></tab>
 
- 												<div class="tab-content card-block pl-0 pr-0">
+ 												<div 
+	 												class="tab-content card-block pl-0 pr-0" 
+	 												v-show="!loading"
+ 												>
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -153,7 +124,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																data-toggle="tooltip" data-placement="top" title="Reload" 
-																@click="query === '' ? fetchAllProducts() : searchData()"
+																@click="searchAttributes.search === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -164,7 +135,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllProducts() : searchData()"
+																@paginate="searchAttributes.search === '' ? fetchAllProducts() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -246,7 +217,7 @@
 										Price :
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.price || 'NA' }}
+										{{ singleProductData.selling_price || 'NA' }}
 									</label>
 								</div>
 
@@ -601,7 +572,7 @@
 
 	        return {
 
-	        	query : '',
+	        	// query : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
@@ -628,6 +599,179 @@
 					request : {
 
 					}
+				},
+
+				searchAttributes : {
+
+	        		dates : {},
+	        		search : '',
+		        	dateTo : null,
+		        	dateFrom : null,
+		        	
+		        	/*
+			        	showPendingRequisitions : false,
+			        	showCancelledRequisitions : false,
+			        	showDispatchedRequisitions : false,
+			        	showProduct : null,
+		        	*/
+
+	        	},
+
+				dataToExport: {
+
+					"Product": {
+						field: "name",
+						callback: (name) => {
+							return this.$options.filters.capitalize(name)
+						},
+					},
+					
+					"Manufacturer": {
+						field: "manufacturer",
+						callback: (manufacturer) => {
+							if (manufacturer) {
+								return this.$options.filters.capitalize(manufacturer.name);
+							}
+							else{
+								return 'Own Product'
+							}
+						},
+					},
+
+					SKU: 'sku',
+
+					Price: 'selling_price',
+
+					"Discount": {
+						field: "discount",
+						callback: (discount) => {
+							if (discount) {
+								return discount + ' %';
+							}
+							else{
+								return 0  + ' %';
+							}
+						},
+					},
+
+					"Available Qty": 'available_quantity',
+
+					"Qty Type": {
+						callback: (object) => {
+							if (object) {
+								return object.quantity_type ?? 'Unit'
+							}
+							else{
+								return;
+							}
+						},
+					},
+
+					"Variations": {
+
+						callback: (object) => {
+
+							let infosToReturn = '';
+
+							if (object.has_variations && object.variations.length) {
+
+								object.variations.forEach(
+					
+									(objectVariation, variationIndex) => {
+
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + (objectVariation.available_quantity + ' ' + (object.product ? object.product.quantity_type : 'unit')) + "\n\n");
+
+									}
+									
+								);
+
+
+							}
+							else {
+
+								infosToReturn += 'NA';
+
+							}
+							
+							return infosToReturn;
+
+						},
+					},
+
+					"Serials": {
+
+						callback: (object) => {
+
+							let infosToReturn = '';
+
+							// infosToReturn += (object.available_quantity ?? 0) + ' ';
+
+							if (object.has_serials && ! object.has_variations && object.serials.length) {
+
+								infosToReturn += `Serials:
+								`;
+
+								object.serials.forEach(
+			
+									(serial, serialIndex) => {
+
+										infosToReturn +=  (serialIndex + 1) + ". " + serial  + "\n";					
+
+									}
+									
+								);
+
+							}
+
+							if (object.has_variations && object.variations.length) {
+
+								object.variations.forEach(
+					
+									(objectVariation, variationIndex) => {
+
+										if (object.has_serials && objectVariation.serials.length) {
+
+											infosToReturn += this.$options.filters.capitalize(objectVariation.variation.name) + " Serials:\n";
+
+											objectVariation.serials.forEach(
+						
+												(variationSerial, variationSerialIndex) => {
+
+													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial + "\n";					
+
+												}
+												
+											);
+
+										}
+
+										infosToReturn += "\n";
+
+									}
+									
+								);
+
+							}
+							
+							return infosToReturn;
+
+						},
+					},
+
+					/*
+					"Warning Qty": {
+						callback: (object) => {
+							return (object.warning_quantity + ' ' + object.product ? object.product.quantity_type : ' Unit');
+						},
+					},
+					*/
+
+					'Total Dispatched': 'dispatched_quantity',
+
+					'Pending Requests': 'requested_quantity',
+
+					"Created": 'created_at',
+					
 				},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -665,13 +809,55 @@
 
 		watch : {
 
-			query : function(val){
-				if (val==='') {
+			'searchAttributes.search' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
 					this.fetchAllProducts();
+
 				}
 				else {
-					this.searchData();
+
+					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
+
+					if (! format.test(val)) {
+
+						this.searchData();
+					
+					}
+
 				}
+
+			},
+			
+			'searchAttributes.dateFrom' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllProducts();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
+			},
+
+			'searchAttributes.dateTo' : function(val){
+				
+				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+
+					this.fetchAllProducts();
+
+				}
+				else {
+
+					this.searchData();
+						
+				}
+
 			},
 
 		},
@@ -716,10 +902,11 @@
 		*/
 			fetchAllProducts() {
 				
-				this.query = '';
+				// this.query = '';
 				this.error = '';
 				this.loading = true;
 				this.allFetchedProducts = [];
+				this.searchAttributes.search = '';
 				
 				axios
 					.get('/api/my-products/' + this.perPage + "?page=" + this.pagination.current_page)
@@ -800,7 +987,7 @@
 				this.pagination.current_page = 1;
 				
 				axios
-				.get('/search-my-products/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
+				.post('/search-my-products/' + this.perPage, this.searchAttributes)
 				.then(response => {
 					this.allFetchedProducts = response.data;
 					this.productsToShow = this.allFetchedProducts.all.data;
@@ -815,7 +1002,7 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.query === '') {
+				if (this.searchAttributes.search === '') {
 					this.fetchAllProducts();
 				}
 				else {

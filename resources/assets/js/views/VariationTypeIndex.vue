@@ -36,7 +36,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['current', 'trashed']" 
@@ -46,6 +45,7 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">
 											  		<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
@@ -85,15 +85,6 @@
 																	</td>
 																	
 																	<td v-if="userHasPermissionTo('update-product-asset') || userHasPermissionTo('delete-product-asset')">
-																		<!-- 
-																		<button type="button" 
-																				class="btn btn-grd-info btn-icon"  
-																				@click="$emit('showContentDetails', content)"
-																		>
-																			<i class="fa fa-eye"></i>
-																		</button>
- 																		-->
-
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Edit" 
@@ -199,18 +190,20 @@
 															</pagination>
 														</div>
 													</div>
-										  		</div>
+										  		</div> 
+										  		-->
 
-										  		<!-- 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission = "'product-asset'" 
+										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleAssetData"
 
-										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
@@ -219,9 +212,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-												-->
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -234,10 +225,11 @@
 
 		<asset-create-or-edit-modal 
 			v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')" 
+			:csrf="csrf" 
 			:create-mode="createMode" 
 			:caller-page="'variation type'" 
+			:form-submitted="formSubmitted"
 			:single-asset-data="singleAssetData" 
-			:csrf="csrf"
 
 			@storeAsset="storeAsset($event)" 
 			@updateAsset="updateAsset($event)" 
@@ -246,6 +238,7 @@
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
 			:restoration-message="'But once you think, you can restore this item !'" 
@@ -256,6 +249,7 @@
 		<restore-confirmation-modal 
 			v-if="userHasPermissionTo('delete-product-asset')" 
 			:csrf="csrf" 
+			:form-submitted="formSubmitted"
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleAssetData"
 			:restoration-message="'This will restore all related items !'" 
@@ -299,6 +293,7 @@
 	      		descending : false,
 
 	        	createMode : true,
+	        	formSubmitted : true,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -415,23 +410,29 @@
 			showContentCreateForm() {
 				this.createMode = true;
 				this.singleAssetData = {};
+				this.formSubmitted = false;
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
 				this.createMode = false;
+				this.formSubmitted = false;
 				this.singleAssetData = object;
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
+				this.formSubmitted = false;
 				this.singleAssetData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
-			openContentRestoreForm(object) {	
+			openContentRestoreForm(object) {
+				this.formSubmitted = false;	
 				this.singleAssetData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
 			storeAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.post('/variation-types/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -448,11 +449,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.put('/variation-types/' + this.singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
@@ -469,11 +475,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/variation-types/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
@@ -490,11 +501,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.patch('/variation-types/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
@@ -511,6 +527,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},

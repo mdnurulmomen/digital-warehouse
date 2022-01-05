@@ -48,7 +48,7 @@ Route::name('merchant.')->group(function () {
 
 		// my-properties
 		Route::get('/api/my-products/{perPage?}', 'MerchantController@showMyAllProducts')->name('my-products');
-		Route::get('/search-my-products/{query}/{perPage}', 'MerchantController@searchMyAllProducts')->name('my-products');
+		Route::post('/search-my-products/{perPage}', 'MerchantController@searchMyAllProducts')->name('my-products');
 
 		Route::get('/api/my-requisitions/{perPage?}', 'MerchantController@showMyAllRequisitions')->name('my-requisitions');
 		Route::post('/requisitions/{perPage}', 'MerchantController@makeNewRequisition')->name('my-requisitions');

@@ -1,5 +1,4 @@
 <template>
-	
 	<!-- Modal -->
 	<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -32,7 +31,6 @@
 			</div>
 		</div>
 	</div>
-
 </template>
 
 <script type="text/javascript">

@@ -1,5 +1,4 @@
-<template>
-	
+<template>	
 	<!-- Modal -->
 	<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -27,7 +26,6 @@
 					<input type="hidden" name="_token" :value="csrf">
 
 					<div class="modal-body">
-
 						<div class="form-row">
 							<div class="form-group col-md-12">
 								<label for="inputFirstName">Name</label>
@@ -98,7 +96,6 @@
 			</div>
 		</div>
 	</div>
-
 </template>
 
 <script type="text/javascript">

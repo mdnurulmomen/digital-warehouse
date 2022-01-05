@@ -47,6 +47,8 @@ class MyProductResource extends JsonResource
             // 'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->variationType->loadMissing('variations') : 'NA'),
             
             'variations' => $this->when($this->product->has_variations, MyProductVariationResource::collection($this->variations->loadMissing('productVariation.variation'))),
+
+            'created_at' => $this->created_at
         ];
     }
 }

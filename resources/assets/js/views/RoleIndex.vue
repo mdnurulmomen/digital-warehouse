@@ -23,7 +23,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-role-index') || userHasPermissionTo('create-role')" 
@@ -38,200 +37,186 @@
 											  	></search-and-addition-option>
 											</div>
 											
-											<div class="col-sm-12 col-lg-12">
+											<div class="col-sm-12 col-lg-12">	
 										  		<!-- 
-										  		<tab 
-										  			v-show="query === ''" 
-										  			:tab-names="['current', 'trashed']" 
-										  			:current-tab="currentTab" 
+										  		<div class="table-responsive">
+													<table class="table table-striped table-bordered nowrap text-center">
+														<thead>
+															<tr>
+																<th>
+																	<a 
+																		href="javascript:void(0)" 
+																		@click="changeNamesOrder"
+																	> 
+																		Name
+																		<span v-show="ascending">
+																			<i class="fa fa-sort-up" aria-hidden="true"></i>
+																		</span>
+																		<span v-show="descending">
+																			<i class="fa fa-sort-down" aria-hidden="true"></i>
+																		</span>
+																		<span v-show="!ascending && !descending">
+																			<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																		</span>
+																	</a>
+																</th>
+																<th>
+																	Actions
+																</th>
+															</tr>
+														</thead>
+														<tbody>
 
-										  			@showCurrentContents="showCurrentContents" 
-										  			@showTrashedContents="showTrashedContents" 
-										  		></tab>
-										  		 -->
+															<tr 
+																v-for="content in contentsToShow" 
+																:key="'content-key-' + content.id" 
+																:class="content.id==singleRoleData.id ? 'highlighted' : ''" 
+															>
+																<td>
+																	{{ content.name | capitalize }}
+																</td>
+																
+																<td> 
+																	<button 
+																		type="button" 
+																		class="btn btn-grd-info btn-icon" 
+																		data-toggle="tooltip" data-placement="top" title="View Details"  
+																		@click="showContentDetails(content)" 
+																	>
+																		<i class="fa fa-eye"></i>
+																	</button>
+																		
 
-										  		<div class="tab-content card-block pl-0 pr-0">
-											  		<div class="table-responsive">
-														<table class="table table-striped table-bordered nowrap text-center">
-															<thead>
-																<tr>
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeNamesOrder"
-																		> 
-																			Name
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-																	<th>
-																		Actions
-																	</th>
-																</tr>
-															</thead>
-															<tbody>
+																	<button 
+																		type="button" 
+																		:disabled="formSubmitted"
+																		class="btn btn-grd-primary btn-icon" 
+																		data-toggle="tooltip" data-placement="top" title="Edit" 
+																		v-show="!content.deleted_at" 
+																		@click="openContentEditForm(content)" 
+																		v-if="userHasPermissionTo('update-role')"
+																	>
+																		<i class="fa fa-edit"></i>
+																	</button>
 
-																<tr 
-																	v-for="content in contentsToShow" 
-																	:key="'content-key-' + content.id" 
-																	:class="content.id==singleRoleData.id ? 'highlighted' : ''" 
-																>
-																	<td>
-																		{{ content.name | capitalize }}
-																	</td>
-																	
-																	<td> 
-																		<button 
-																			type="button" 
-																			class="btn btn-grd-info btn-icon" 
-																			data-toggle="tooltip" data-placement="top" title="View Details"  
-																			@click="showContentDetails(content)" 
-																		>
-																			<i class="fa fa-eye"></i>
-																		</button>
- 																		
-
-																		<button 
-																			type="button" 
+																	<button type="button" 
 																			:disabled="formSubmitted"
-																			class="btn btn-grd-primary btn-icon" 
-																			data-toggle="tooltip" data-placement="top" title="Edit" 
+																			class="btn btn-grd-danger btn-icon" 
+																			data-toggle="tooltip" data-placement="top" title="Delete" 
 																			v-show="!content.deleted_at" 
-																			@click="openContentEditForm(content)" 
-																			v-if="userHasPermissionTo('update-role')"
-																		>
-																			<i class="fa fa-edit"></i>
-																		</button>
+																			@click="openContentDeleteForm(content)" 
+																			v-if="userHasPermissionTo('delete-role')"
+																	>
+																		<i class="fa fa-trash"></i>
+																	</button>
+																</td>
+															</tr>
 
-																		<button type="button" 
-																				:disabled="formSubmitted"
-																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete" 
-																				v-show="!content.deleted_at" 
-																				@click="openContentDeleteForm(content)" 
-																				v-if="userHasPermissionTo('delete-role')"
-																		>
-																			<i class="fa fa-trash"></i>
-																		</button>
-																	</td>
-															    
-																</tr>
-																<tr 
-															  		v-show="!contentsToShow.length"
-															  	>
-														    		<td :colspan="2">
-															      		<div class="alert alert-danger" role="alert">
-															      			Sorry, No data found.
-															      		</div>
-															    	</td>
-															  	</tr>
+															<tr 
+														  		v-show="!contentsToShow.length"
+														  	>
+													    		<td :colspan="2">
+														      		<div class="alert alert-danger" role="alert">
+														      			Sorry, No data found.
+														      		</div>
+														    	</td>
+														  	</tr>
+														</tbody>
+														<tfoot>
+															<tr>	
+																<th>
+																	<a 
+																		href="javascript:void(0)" 
+																		@click="changeNamesOrder"
+																	> 
+																		Name
+																		<span v-show="ascending">
+																			<i class="fa fa-sort-up" aria-hidden="true"></i>
+																		</span>
+																		<span v-show="descending">
+																			<i class="fa fa-sort-down" aria-hidden="true"></i>
+																		</span>
+																		<span v-show="!ascending && !descending">
+																			<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
+																		</span>
+																	</a>
+																</th>
+																<th>
+																	Actions
+																</th>
+															</tr>
+														</tfoot>
+													</table>
+												</div>
 
-															</tbody>
-															<tfoot>
-																<tr>	
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeNamesOrder"
-																		> 
-																			Name
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-																	<th>
-																		Actions
-																	</th>
-																</tr>
-															</tfoot>
-														</table>
+												<div class="row d-flex align-items-center">
+													<div class="col-sm-2 col-4">
+														<select 
+															class="form-control" 
+															v-model.number="perPage" 
+															@change="changeNumberContents()"
+														>
+															<option>10</option>
+															<option>20</option>
+															<option>30</option>
+															<option>40</option>
+															<option>50</option>
+														</select>
 													</div>
-
-													<div class="row d-flex align-items-center">
-														<div class="col-sm-2 col-4">
-															<select 
-																class="form-control" 
-																v-model.number="perPage" 
-																@change="changeNumberContents()"
-															>
-																<option>10</option>
-																<option>20</option>
-																<option>30</option>
-																<option>40</option>
-																<option>50</option>
-															</select>
-														</div>
-														<div class="col-sm-2 col-8">
-															<button 
-																type="button" 
-																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
-																@click="query === '' ? fetchAllRoles() : searchData()"
-															>
-																Reload
-																<i class="fa fa-sync"></i>
-															</button>
-														</div>
-														<div class="col-sm-8 col-12 text-right form-group">
-															<pagination
-																v-if="pagination.last_page > 1"
-																:pagination="pagination"
-																:offset="5"
-																@paginate="query === '' ? fetchAllRoles() : searchData()"
-															>
-															</pagination>
-														</div>
+													<div class="col-sm-2 col-8">
+														<button 
+															type="button" 
+															class="btn btn-primary btn-sm" 
+															data-toggle="tooltip" data-placement="top" title="Reload" 
+															@click="query === '' ? fetchAllRoles() : searchData()"
+														>
+															Reload
+															<i class="fa fa-sync"></i>
+														</button>
 													</div>
-										  		</div>
-
-										  		<!-- 
-										  		<table-with-soft-delete-option 
+													<div class="col-sm-8 col-12 text-right form-group">
+														<pagination
+															v-if="pagination.last_page > 1"
+															:pagination="pagination"
+															:offset="5"
+															@paginate="query === '' ? fetchAllRoles() : searchData()"
+														>
+														</pagination>
+													</div>
+												</div> 
+												-->
+										  		 
+										  		<table-with-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission = "'role'" 
+										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleRoleData"
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
 										  			@fetchAllContents="fetchAllRoles" 
 										  			@searchData="searchData" 
 										  		>	
-										  		</table-with-soft-delete-option>
- 												-->
+										  		</table-with-delete-option>
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div> 
-				
+					</div>
 				</div>
 			</div>
 		</div>
 
-	<!-- 	
+		<!-- 	
 		<asset-create-or-edit-modal 
 			:create-mode="createMode" 
 			:caller-page="'role'" 
@@ -241,7 +226,7 @@
 			@storeAsset="storeRole($event)" 
 			@updateAsset="updateRole($event)" 
 		></asset-create-or-edit-modal>
- 	-->
+ 		-->
 
  		<!--Create Or Edit Modal -->
 		<div class="modal fade" id="role-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-role') || userHasPermissionTo('update-role')">
@@ -1354,6 +1339,7 @@
 
 				return false;
 			},
+			/*
 			changeNamesOrder() {
 
 				if (this.ascending) {
@@ -1404,6 +1390,7 @@
 					}
 				);
 			},
+			*/
 			modelName(name) {
 				if (!name) return ''
 

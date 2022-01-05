@@ -48,6 +48,7 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">
 											  		<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
@@ -88,15 +89,6 @@
 																	</td>
 																	
 																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
-																		<!-- 
-																		<button type="button" 
-																				class="btn btn-grd-info btn-icon"  
-																				@click="$emit('showContentDetails', content)"
-																		>
-																			<i class="fa fa-eye"></i>
-																		</button>
- 																		-->
-
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Edit" 
@@ -208,18 +200,20 @@
 															</pagination>
 														</div>
 													</div>
-										  		</div>
-
-										  		<!-- 
+										  		</div> 
+										  		-->
+ 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
 										  			:column-names="['name']" 
 										  			:column-values-to-show="['name']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:pagination = "pagination" 
+										  			:required-permission = "'warehouse-asset'" 
+										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleAssetData"
 
-										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
@@ -228,9 +222,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
- 												-->
 											</div>
-
 										</div>
 									</div>
 								</div>
