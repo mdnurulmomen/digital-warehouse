@@ -13,8 +13,12 @@
 	<meta name="csrf-token" content={{csrf_token()}}>
 
 	<link rel="icon" href="{{ URL::asset('uploads/application/application_favicon.png') }}" type="image/x-icon" sizes="16x16"/>
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Quicksand:500,700" rel="stylesheet">
+	
+	<!-- Fonts -->
+	{{-- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Quicksand:500,700" rel="stylesheet"> --}}
+	<link rel='stylesheet' href='nunito.css'>
+	
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/waves.min.css')}}" type="text/css" media="all">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}">
