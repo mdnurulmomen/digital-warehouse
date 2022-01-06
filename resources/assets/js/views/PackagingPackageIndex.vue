@@ -1,5 +1,5 @@
 
-<template>
+<template v-if="userHasPermissionTo('view-logistic-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
 			:icon="'fa fa-gift'"
@@ -11,18 +11,15 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">											
-
+										<div class="row">
 											<div class="col-sm-12 sub-title">
+											  	<!-- 
 											  	<div class="row d-flex align-items-center text-center">
 											  		<div class="col-sm-3 form-group">	
 															Packaging Packages List
@@ -50,7 +47,20 @@
 											  				New Package
 											  			</button>
 											  		</div>
-											  	</div>
+											  	</div> 
+											  	-->
+
+											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-logistic-asset-index') || userHasPermissionTo('create-logistic-asset')" 
+											  		:query="query" 
+											  		:caller-page="'packaging-package'" 
+											  		:required-permission = "'logistic-asset'" 
+											  		:disable-add-button="formSubmitted" 
+											  		
+											  		@showContentCreateForm="showContentCreateForm" 
+											  		@searchData="searchData($event)" 
+											  		@fetchAllContents="fetchAllContents"
+											  	></search-and-addition-option>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -63,6 +73,9 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
+										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">
 											  		<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
@@ -258,16 +271,20 @@
 															</pagination>
 														</div>
 													</div>
-										  		</div>
-
-										  		<!-- 
+										  		</div> 
+										  		-->
+										  		 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
+										  			:loading="loading"  
 										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
+										  			:pagination = "pagination" 
+										  			:form-submitted="formSubmitted" 
+										  			:column-names="['name', 'price']" 
+										  			:required-permission = "'logistic-asset'" 
+										  			:column-values-to-show="['name', 'price']" 
 										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination"
+										  			:current-content="singleAssetData"
 
 										  			@showContentDetails="showContentDetails($event)" 
 										  			@openContentEditForm="openContentEditForm($event)" 
@@ -278,16 +295,13 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
- 												-->
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -420,7 +434,7 @@
 								<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 									Close
 								</button>
-								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
 									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
@@ -558,6 +572,7 @@
 	        	},
 
 	        	submitForm : true,
+	        	formSubmitted : false,
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -613,8 +628,9 @@
 				this.query = '';
 				this.error = '';
 				this.loading = true;
+				this.formSubmitted = true;
 				this.allFetchedContents = [];
-				
+
 				axios
 					.get('/api/packaging-packages/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
@@ -644,12 +660,21 @@
 					})
 					.finally(response => {
 						this.loading = false;
+						this.formSubmitted = false;
 					});
 
 			},
-			searchData() {
+			searchData(emittedValue = false) {
+
+				if (emittedValue) {
+
+					this.query = emittedValue;
+
+				}
 
 				this.error = '';
+				this.loading = true;
+				this.formSubmitted = true;
 				this.allFetchedContents = [];
 				this.pagination.current_page = 1;
 				
@@ -664,6 +689,10 @@
 				})
 				.catch(e => {
 					this.error = e.toString();
+				})
+				.finally(response => {
+					this.loading = false;
+					this.formSubmitted = false;
 				});
 
 			},
@@ -726,6 +755,8 @@
 
             },
 			storeAsset() {
+
+				this.formSubmitted = true;
 				
 				axios
 					.post('/packaging-packages/' + this.perPage, this.singleAssetData)
@@ -743,10 +774,15 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			updateAsset() {
+
+				this.formSubmitted = true;
 				
 				axios
 					.put('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage, this.singleAssetData)
@@ -764,11 +800,16 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			deleteAsset(singleAssetData) {
 				
+				this.formSubmitted = true;
+
 				axios
 					.delete('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
@@ -785,10 +826,15 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
 			restoreAsset(singleAssetData) {
+
+				this.formSubmitted = true;
 				
 				axios
 					.patch('/packaging-packages/' + this.singleAssetData.id + '/' + this.perPage)
@@ -806,6 +852,9 @@
 								this.$toastr.w(error.response.data.errors[x], "Warning");
 							}
 				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
 					});
 
 			},
@@ -840,6 +889,7 @@
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
 			},
+			/*
 			changeNamesOrder() {
 
 				if (this.ascending) {
@@ -896,31 +946,6 @@
 				}
 				
 			},
-			onImageChange(evnt) {
-				
-				let files = evnt.target.files || evnt.dataTransfer.files;
-
-                // Only process image files.
-		      	if (files.length && files[0].type.match('image.*')) {
-                	
-		      		let reader = new FileReader();
-	                reader.onload = (evnt) => {
-
-	                    this.singleAssetData.preview = evnt.target.result;
-	                    
-	                };
-	                reader.readAsDataURL(files[0]);
-
-                	this.$delete(this.errors.asset, 'preview');
-		      	}
-		      	else{
-		      		this.errors.asset.preview = 'File should be image';
-		      	}
-
-		      	evnt.target.value = '';
-		      	return;
-
-			},
 			ascendingNumeric(columnValue) {
 				this.contentsToShow.sort(
 			 		function(a, b){
@@ -957,6 +982,32 @@
 					}
 				);
 			},
+			*/
+			onImageChange(evnt) {
+				
+				let files = evnt.target.files || evnt.dataTransfer.files;
+
+                // Only process image files.
+		      	if (files.length && files[0].type.match('image.*')) {
+                	
+		      		let reader = new FileReader();
+	                reader.onload = (evnt) => {
+
+	                    this.singleAssetData.preview = evnt.target.result;
+	                    
+	                };
+	                reader.readAsDataURL(files[0]);
+
+                	this.$delete(this.errors.asset, 'preview');
+		      	}
+		      	else{
+		      		this.errors.asset.preview = 'File should be image';
+		      	}
+
+		      	evnt.target.value = '';
+		      	return;
+
+			},
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
@@ -986,8 +1037,7 @@
 							this.$delete(this.errors.asset, 'price');
 						}
 
-						break;
-					
+						break;	
 
 				}
 	 

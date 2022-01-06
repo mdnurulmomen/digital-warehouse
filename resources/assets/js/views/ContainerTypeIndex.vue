@@ -12,11 +12,9 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -47,8 +45,11 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
+										  			:loading="loading" 
 										  			:per-page="perPage" 
 										  			:form-submitted="formSubmitted"
 										  			:column-names="['name', 'Recognizing Code']" 
@@ -74,7 +75,6 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -156,7 +156,7 @@
 	        	loading : false,
 	        	currentTab : 'current',
 
-	        	submitForm : true,
+	        	// submitForm : true,
 	        	createMode : true,
 	        	formSubmitted : false,
 
@@ -275,7 +275,7 @@
 				$('#container-view-modal').modal('show');
 			},
 			showContentCreateForm() {
-				this.submitForm = true;
+				// this.submitForm = true;
 				this.createMode = true;
 				this.formSubmitted = false;
 				
@@ -288,7 +288,7 @@
 				$('#container-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
-				this.submitForm = true;
+				// this.submitForm = true;
 				this.createMode = false;
 				this.formSubmitted = false;
 

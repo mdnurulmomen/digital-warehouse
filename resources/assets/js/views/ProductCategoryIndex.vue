@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-product-asset-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-list-alt'"
 			:title="'product categories'" 
@@ -13,12 +11,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -68,7 +63,9 @@
 										  		</table-with-soft-delete-option>
  												-->
 
-										  		<div class="tab-content card-block pl-0 pr-0">
+ 												<loading v-show="loading"></loading>
+
+										  		<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
 													<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
 															<thead>
@@ -455,13 +452,13 @@
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
 
-	<!-- 
+		<!-- 
 		<asset-view-modal 
 			:caller-page="'variation'" 
 			:asset-to-view="singleAssetData" 
 			:properties-to-show="['name']"
 		></asset-view-modal>
- 	-->
+ 		-->
 
  		<!-- View Modal -->
 		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

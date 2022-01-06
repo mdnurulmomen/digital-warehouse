@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-role-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-tasks'"
 			:title="'roles'" 
@@ -14,11 +12,9 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -38,6 +34,29 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">	
+										  		<loading v-show="loading"></loading>
+										  		 
+										  		<table-with-delete-option 
+										  			:query="query" 
+										  			:loading="loading" 
+										  			:per-page="perPage"  
+										  			:column-names="['name']" 
+										  			:column-values-to-show="['name']" 
+										  			:contents-to-show = "contentsToShow" 
+										  			:pagination = "pagination" 
+										  			:required-permission = "'role'" 
+										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleRoleData"
+
+										  			@showContentDetails="showContentDetails($event)" 
+										  			@openContentEditForm="openContentEditForm($event)" 
+										  			@openContentDeleteForm="openContentDeleteForm($event)" 
+										  			@changeNumberContents="changeNumberContents($event)" 
+										  			@fetchAllContents="fetchAllRoles" 
+										  			@searchData="searchData" 
+										  		>	
+										  		</table-with-delete-option>
+
 										  		<!-- 
 										  		<div class="table-responsive">
 													<table class="table table-striped table-bordered nowrap text-center">
@@ -185,26 +204,6 @@
 													</div>
 												</div> 
 												-->
-										  		 
-										  		<table-with-delete-option 
-										  			:query="query" 
-										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
-										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination" 
-										  			:required-permission = "'role'" 
-										  			:form-submitted="formSubmitted" 
-										  			:current-content="singleRoleData"
-
-										  			@showContentDetails="showContentDetails($event)" 
-										  			@openContentEditForm="openContentEditForm($event)" 
-										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@changeNumberContents="changeNumberContents($event)" 
-										  			@fetchAllContents="fetchAllRoles" 
-										  			@searchData="searchData" 
-										  		>	
-										  		</table-with-delete-option>
 											</div>
 										</div>
 									</div>
@@ -595,7 +594,7 @@
 			@deleteRole="deleteRole($event)" 
 		></delete-confirmation-modal>
 
-	<!-- 
+		<!-- 
 		<restore-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'restoreRole'" 
@@ -610,7 +609,7 @@
 			:asset-to-view="singleRoleData" 
 			:properties-to-show="['name']"
 		></asset-view-modal>
- 	-->
+ 		-->
 
  		<!-- View Modal -->
 		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -918,9 +917,7 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -943,8 +940,8 @@
 	        	loading : false,
 	        	// currentTab : 'current',
 
-	        	ascending : false,
-	      		descending : false,
+	        	// 	ascending : false,
+	      		// descending : false,
 
 	        	createMode : true,
 	        	submitForm : true,

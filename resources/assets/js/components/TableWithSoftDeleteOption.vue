@@ -1,6 +1,9 @@
 <template v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
 	
-	<div class="tab-content card-block pl-0 pr-0">
+	<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
+
+		<!-- <loading v-show="loading"></loading> -->
+
 		<div class="table-responsive">
 			<table class="table table-striped table-bordered nowrap text-center">
 				<thead>
@@ -216,6 +219,10 @@
 				type : Boolean,
 				default: false
 			},
+			loading : {
+				type : Boolean,
+				default: false
+			},
 			currentContent: {
 				type: Object,
 				default: {}
@@ -278,6 +285,15 @@
 				else if (columnValue.match(/email/gi)) {
 					return object.email;
 				}
+				else if (columnValue.match(/name/gi)) {
+					return this.$options.filters.capitalize(object.name);
+				}
+				else if (columnValue.match(/code/gi)) {
+					return this.$options.filters.capitalize(object.code);
+				}
+				else if (columnValue.match(/price/gi)) {
+					return object.price;
+				}
 				else if (columnValue.match(/mobile/gi)) {
 					return object.mobile;
 				}
@@ -293,17 +309,14 @@
 				else if (columnValue.match(/variation_parent_name/gi)) {
 					return object.variation_parent ? this.$options.filters.capitalize(object.variation_parent.name) : '';
 				}
-				else if (columnValue.match(/name/gi)) {
-					return this.$options.filters.capitalize(object.name);
-				}
-				else if (columnValue.match(/code/gi)) {
-					return this.$options.filters.capitalize(object.code);
-				}
 				else if (columnValue.match(/number_deals/gi)) {
-					return object.deals_count;
+					return object.deals_count ?? 0;
 				}
 				else if (columnValue.match(/number_days/gi)) {
-					return object.number_days;
+					return object.number_days ?? 0;
+				}
+				else if (columnValue.match(/commission/gi)) {
+					return object.commission ?? 0;
 				}
 
 			},

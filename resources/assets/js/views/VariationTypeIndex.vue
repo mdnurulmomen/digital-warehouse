@@ -11,12 +11,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -44,6 +41,29 @@
 										  			@showCurrentContents="showCurrentContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
+
+										  		<loading v-show="loading"></loading>
+
+										  		<table-with-soft-delete-option 
+										  			:query="query" 
+										  			:loading="loading"  
+										  			:per-page="perPage"  
+										  			:column-names="['name']" 
+										  			:column-values-to-show="['name']" 
+										  			:contents-to-show = "contentsToShow" 
+										  			:pagination = "pagination" 
+										  			:required-permission = "'product-asset'" 
+										  			:form-submitted="formSubmitted" 
+										  			:current-content="singleAssetData"
+
+										  			@openContentEditForm="openContentEditForm($event)" 
+										  			@openContentDeleteForm="openContentDeleteForm($event)" 
+										  			@openContentRestoreForm="openContentRestoreForm($event)" 
+										  			@changeNumberContents="changeNumberContents($event)" 
+										  			@fetchAllContents="fetchAllContents" 
+										  			@searchData="searchData" 
+										  		>	
+										  		</table-with-soft-delete-option>
 
 										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">
@@ -192,26 +212,6 @@
 													</div>
 										  		</div> 
 										  		-->
-
-										  		<table-with-soft-delete-option 
-										  			:query="query" 
-										  			:per-page="perPage"  
-										  			:column-names="['name']" 
-										  			:column-values-to-show="['name']" 
-										  			:contents-to-show = "contentsToShow" 
-										  			:pagination = "pagination" 
-										  			:required-permission = "'product-asset'" 
-										  			:form-submitted="formSubmitted" 
-										  			:current-content="singleAssetData"
-
-										  			@openContentEditForm="openContentEditForm($event)" 
-										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@openContentRestoreForm="openContentRestoreForm($event)" 
-										  			@changeNumberContents="changeNumberContents($event)" 
-										  			@fetchAllContents="fetchAllContents" 
-										  			@searchData="searchData" 
-										  		>	
-										  		</table-with-soft-delete-option>
 											</div>
 										</div>
 									</div>
@@ -264,9 +264,7 @@
 			:properties-to-show="['name']"
 		></asset-view-modal>
  		-->
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -289,11 +287,11 @@
 	        	loading : false,
 	        	currentTab : 'current',
 
-	        	ascending : false,
-	      		descending : false,
+	        	// ascending : false,
+	      		// descending : false,
 
 	        	createMode : true,
-	        	formSubmitted : true,
+	        	formSubmitted : false,
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -564,6 +562,7 @@
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
 			},
+			/*
 			changeNamesOrder() {
 
 				if (this.ascending) {
@@ -614,6 +613,7 @@
 					}
 				);
 			},
+			*/
             
 		}
   	}

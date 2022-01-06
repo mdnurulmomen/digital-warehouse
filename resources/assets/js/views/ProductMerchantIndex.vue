@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-merchant-product-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-users'"
 			:title="product.name + ' merchants'" 
@@ -14,11 +12,9 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -38,7 +34,9 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
- 												<div class="tab-content card-block pl-0 pr-0">
+												<loading v-show="loading"></loading>
+
+ 												<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">

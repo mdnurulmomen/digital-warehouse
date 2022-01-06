@@ -13,11 +13,9 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -46,27 +44,32 @@
 										  			@showBulkContents="showBulkContents" 
 										  		></tab>
 
-												<!-- 
-													<table-with-soft-delete-option 
-														:query="query" 
-														:per-page="perPage"  
-														:column-names="['name']" 
-														:column-values-to-show="['name']" 
-														:contents-to-show = "productsToShow" 
-														:pagination = "pagination"
+										  		<loading v-show="loading"></loading>
 
-														@showContentDetails="showContentDetails($event)" 
-														@openContentEditForm="openContentEditForm($event)" 
-														@openContentDeleteForm="openContentDeleteForm($event)" 
-														@openContentRestoreForm="openContentRestoreForm($event)" 
-														@changeNumberContents="changeNumberContents($event)" 
-														@fetchAllProducts="fetchAllProducts" 
-														@searchData="searchData" 
-													>	
-													</table-with-soft-delete-option>
+												<!-- 
+												<table-with-soft-delete-option 
+													:query="query" 
+													:per-page="perPage"  
+													:column-names="['name']" 
+													:column-values-to-show="['name']" 
+													:contents-to-show = "productsToShow" 
+													:pagination = "pagination"
+
+													@showContentDetails="showContentDetails($event)" 
+													@openContentEditForm="openContentEditForm($event)" 
+													@openContentDeleteForm="openContentDeleteForm($event)" 
+													@openContentRestoreForm="openContentRestoreForm($event)" 
+													@changeNumberContents="changeNumberContents($event)" 
+													@fetchAllProducts="fetchAllProducts" 
+													@searchData="searchData" 
+												>	
+												</table-with-soft-delete-option>
 												-->
 
- 												<div class="tab-content card-block pl-0 pr-0">
+ 												<div 
+ 													class="tab-content card-block pl-0 pr-0" 
+ 													v-show="!loading"
+ 												>
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -718,7 +721,7 @@
 						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -1030,7 +1033,7 @@
 			</div>
 		</div>
 
-	<!-- 
+		<!-- 
 		<delete-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
@@ -1048,7 +1051,7 @@
 
 			@restoreAsset="restoreAsset($event)" 
 		></restore-confirmation-modal>
- 	-->
+ 		-->
 
  		<!-- Modal -->
 		<div class="modal fade" id="product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -1148,7 +1151,6 @@
 
 											</p>
 
-
 											<!-- <span v-show="singleProductData.variations.length > variationIndex+1">, </span> -->
 										</div>
 									</div>
@@ -1223,6 +1225,7 @@
 
 	        	createMode : true,
 	        	submitForm : true,
+	        	formSubmitted : false,
 
 	        	// allMerchants : [],
 	        	allVariationTypes : [],
@@ -1676,6 +1679,8 @@
 					return;
 				}
 
+				this.formSubmitted = true;
+
 				axios
 					.post('/products/' + this.perPage, this.singleProductData)
 					.then(response => {
@@ -1694,6 +1699,7 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllContainers();
 					});
 
@@ -1704,6 +1710,8 @@
 					this.submitForm = false;
 					return;
 				}
+
+				this.formSubmitted = true;
 
 				axios
 					.put('/products/' + this.singleProductData.id + '/' + this.perPage, this.singleProductData)
@@ -1723,6 +1731,7 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllContainers();
 					});
 

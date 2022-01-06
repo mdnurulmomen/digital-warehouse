@@ -74,7 +74,6 @@
 						  		</div>
 							</div>
 						</div>
-						
 					</div>
 					<div class="modal-footer flex-column">
 						<div class="col-sm-12 text-right" v-show="!submitForm">
@@ -82,7 +81,7 @@
 						  		Please input required fields
 						  	</span>
 						</div>
-						<div class="col-sm-12">
+						<div class="col-sm-12 pl-0 pr-0">
 							<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
 								Close
 							</button>

@@ -322,8 +322,7 @@
 
 						<div class="modal-body">
 
-							<transition-group name="fade">
-							        		
+							<transition-group name="fade">  		
 								<div 
 									class="row" 
 									v-bind:key="'product-modal-step-' + 1" 

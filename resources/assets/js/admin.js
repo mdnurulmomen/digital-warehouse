@@ -435,7 +435,7 @@ const router = new VueRouter({
             component: PackagingPackageIndex,
             meta: {
                 // authRequired: true,
-                // requiredPermission: 'view-product-asset-index' 
+                // requiredPermission: 'view-logistic-asset-index' 
             }
         },
         // view companies is permissible for all

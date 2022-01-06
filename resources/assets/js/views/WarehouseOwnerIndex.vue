@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-warehouse-owner-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-user'"
 			:title="'owners'" 
@@ -14,11 +12,9 @@
 				<div class="page-wrapper">	
 					<div class="page-body">
 
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -48,8 +44,11 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
+										  			:loading="loading" 
 										  			:per-page="perPage" 
 										  			:form-submitted="formSubmitted"
 										  			:required-permission="'warehouse-owner'" 
@@ -75,7 +74,6 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -119,9 +117,7 @@
 			:profile-to-view="singleOwnerDetails" 
 			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'special permissions']"
 		></user-profile-view-modal>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">

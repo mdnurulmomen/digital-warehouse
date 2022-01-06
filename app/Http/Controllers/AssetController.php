@@ -574,7 +574,7 @@ class AssetController extends Controller
     {
         $columnsToSearch = ['name'];
 
-        $query = Variation::with(['variationType.variations', 'variationParent'])->withTrashed();
+        $query = Variation::with(['type.variations', 'parent'])->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

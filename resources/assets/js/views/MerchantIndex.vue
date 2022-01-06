@@ -2,7 +2,6 @@
 <template v-if="userHasPermissionTo('view-merchant-index')">
 
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-users'"
 			:title="'merchants'" 
@@ -13,12 +12,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -48,9 +44,12 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
-										  			:per-page="perPage"  
+										  			:loading="loading" 
+										  			:per-page="perPage" 
 										  			:column-names="['name', 'username', 'email', 'mobile', '# deals']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'number_deals']" 
 										  			:contents-to-show = "contentsToShow" 

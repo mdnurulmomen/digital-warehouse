@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-warehouse-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fas fa-warehouse'"
 			:title="'warehouses'" 
@@ -13,12 +11,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -48,14 +43,18 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
+										  			:loading="loading"  
 										  			:per-page="perPage"  
+										  			:form-submitted="formSubmitted" 
+										  			:required-permission="'warehouse'" 
 										  			:column-names="['name', 'email', 'mobile', 'status']" 
 										  			:column-values-to-show="['name', 'email', 'mobile', 'status']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission="'warehouse'" 
 										  			:current-content="singleWarehouseData"
 
 										  			@showContentDetails="showContentDetails($event)" 
@@ -74,7 +73,6 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
@@ -1920,9 +1918,7 @@
 
 			@restoreWarehouse="restoreWarehouse($event)" 
 		></restore-confirmation-modal>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">

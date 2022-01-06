@@ -1,5 +1,5 @@
 <template>
-	<div class="row justify-content-center">
+	<div class="row justify-content-center card-block">
 		<div class="card p-1">
 			<div class="card-block">
 			  	<div class="overlay dark">

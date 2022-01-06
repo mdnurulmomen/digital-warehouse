@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-merchant-product-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fab fa-product-hunt'"
 			:title="merchantFullName + ' products'" 
@@ -1935,7 +1933,7 @@
 				
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
-					this.fetchAllRequisitions();
+					this.fetchMerchantAllProducts();
 
 				}
 				else {
@@ -1956,7 +1954,7 @@
 				
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
-					this.fetchAllRequisitions();
+					this.fetchMerchantAllProducts();
 
 				}
 				else {
@@ -1971,7 +1969,7 @@
 				
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
-					this.fetchAllRequisitions();
+					this.fetchMerchantAllProducts();
 
 				}
 				else {

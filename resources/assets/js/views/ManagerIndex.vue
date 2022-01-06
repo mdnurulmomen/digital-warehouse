@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-manager-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-user'"
 			:title="'managers'" 
@@ -13,17 +11,13 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-manager-index') || userHasPermissionTo('create-manager')" 
@@ -39,7 +33,6 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
@@ -50,8 +43,11 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
+										  			:loading="loading"  
 										  			:per-page="perPage"  
 										  			:column-names="['name', 'username', 'email', 'mobile']" 
 										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile']" 
@@ -79,7 +75,6 @@
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>

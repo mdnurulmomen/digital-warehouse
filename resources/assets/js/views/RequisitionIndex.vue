@@ -37,9 +37,7 @@
 										  		@fetchAllContents="fetchAllRequisitions"
 											/>
 											
-											<div class="col-sm-12 col-lg-12">
-												<loading v-show="loading"></loading>	
-
+											<div class="col-sm-12 col-lg-12">	
 										  		<tab 
 										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
@@ -49,6 +47,8 @@
 										  			@showDispatchedContents="showDispatchedContents" 
 										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
+
+										  		<loading v-show="loading"></loading>
 
  												<div class="tab-content" v-show="!loading">
 													<div class="card">

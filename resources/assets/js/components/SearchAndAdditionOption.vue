@@ -17,7 +17,10 @@
 	  				New {{ callerPage | capitalize }}
 	  			</button>
   		</div>
-  		<div class="col-sm-6 col-md-6 was-validated form-group" v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
+  		<div 
+	  		class="col-sm-6 col-md-6 was-validated form-group" 
+	  		v-if="$route.name=='delivery-companies' || $route.name=='packaging-packages' || userHasPermissionTo('view-' + requiredPermission + '-index')"
+  		>
   			<input 	type="text" 
 			  		v-model="search" 
 			  		pattern="[^'!#$%^()\x22]+" 

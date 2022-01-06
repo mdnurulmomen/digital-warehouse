@@ -11,12 +11,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -44,6 +41,8 @@
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
+										  		<loading v-show="loading"></loading>
+
 										  		<!-- 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
@@ -65,7 +64,10 @@
 										  		</table-with-soft-delete-option>
 										  		-->
 
-										  		<div class="tab-content card-block pl-0 pr-0">
+										  		<div 
+										  			class="tab-content card-block pl-0 pr-0" 
+										  			v-show="!loading"
+										  		>
 													<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
 															<thead>
@@ -463,9 +465,7 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -512,6 +512,7 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
+	        	
 	        	currentSorting : '',
 	        	currentTab : 'current',
 
