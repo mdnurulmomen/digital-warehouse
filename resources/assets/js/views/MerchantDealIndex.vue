@@ -663,7 +663,7 @@
 																				<button 
 																					class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon"
 																					data-toggle="tooltip" data-placement="top" title="Add Container"  
-																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1)" 
+																					:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || ! warehouseSpace.containers || warehouseSpace.containers.length >= emptyContainers.length" 
 																					@click="addWarehouseContainers(merchantWarehouseIndex, warehouseSpaceIndex)"
 																				>
 																					<i 
@@ -1095,7 +1095,8 @@
 																:initialView="'month'"
 																:minimumView="'day'" 
 																:maximumView="'year'" 
-																:disabled="singleMerchantDealData.payments.length > 1"
+																:disabled="singleMerchantDealData.payments.length > 1" 
+																:input-class="'form-control'" 
 																placeholder="Start Date" 
 																@input="changeRentExpiryDate"
 															>	
@@ -1108,7 +1109,8 @@
 														<div class="date">
 															<datepicker 
 																v-model="singleMerchantDealData.payments[0].date_to" 
-																:disabled="true"
+																:disabled="true" 
+																:input-class="'form-control'" 
 															>	
 															</datepicker>
 														</div>

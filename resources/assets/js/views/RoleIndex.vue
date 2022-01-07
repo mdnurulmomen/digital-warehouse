@@ -272,14 +272,13 @@
 									<label for="inputUsername">Special Permissions</label>
 									<div class="row">
 										<!-- Approvable Models -->
-										<div 
+										<!-- <div 
 											class="col-md-6" 
 											v-for="model in modelCRUDableAndApproveable" 
 											:key="'approve-model-permission-name-' + model"
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-											<!-- create -->
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -290,7 +289,6 @@
 												<label>{{ modelName('create-' + model) }}</label>
 											</div>
 
-											<!-- update -->
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -301,7 +299,6 @@
 												<label>{{ modelName('update/Approve-' + model) }}</label>
 											</div>
 
-											<!-- delete -->
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -312,7 +309,6 @@
 												<label>{{ modelName('delete-' + model) }}</label>
 											</div>
 
-											<!-- view -->
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -323,8 +319,6 @@
 												<label>{{ modelName('view-' + model + '-list') }}</label>
 											</div>
 
-											<!-- approve -->
-											<!-- 
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -334,8 +328,8 @@
 												>
 												<label>{{ modelName('approve-' + model) }}</label>
 											</div>
-												-->
-										</div>
+										</div> 
+										-->
 
 										<!-- CRUD Models -->
 										<div 
@@ -638,6 +632,7 @@
 							<div class="col-md-12">
 								<div class="row">
 									<!-- Approvable Models -->
+									<!-- 
 									<div 
 										class="col-md-6" 
 										v-for="model in modelCRUDableAndApproveable" 
@@ -645,7 +640,6 @@
 									>
 										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-										<!-- create -->
 										<p class="m-0">
 											<span v-show="permissionExists('create-' + model)" class="text-success">
 												<i class="fa fa-check" aria-hidden="true"></i>
@@ -656,7 +650,6 @@
 											{{ modelName('create-' + model) }}
 										</p>
 
-										<!-- update -->
 										<p class="m-0">
 											<span v-show="permissionExists('update-' + model)" class="text-success">
 												<i class="fa fa-check" aria-hidden="true"></i>
@@ -667,7 +660,6 @@
 											{{ modelName('update/Approve-' + model) }}
 										</p>
 
-										<!-- delete -->
 										<p class="m-0">
 											<span v-show="permissionExists('delete-' + model)" class="text-success">
 												<i class="fa fa-check" aria-hidden="true"></i>
@@ -678,7 +670,6 @@
 											{{ modelName('delete-' + model) }}
 										</p>
 
-										<!-- view -->
 										<p class="m-0">
 											<span v-show="permissionExists('view-' + model + '-index')" class="text-success">
 												<i class="fa fa-check" aria-hidden="true"></i>
@@ -688,7 +679,8 @@
 											</span>
 											{{ modelName('view-' + model + '-list') }}
 										</p>
-									</div>
+									</div> 
+									-->
 
 									<!-- CRUD Models -->
 									<div 
@@ -952,9 +944,9 @@
 
 	        	allPermissions : [],
 
-	        	modelCRUDableAndApproveable : [
-	                'Product-Stock',
-	            ],
+	        	// modelCRUDableAndApproveable : [
+	                // 'Product-Stock',
+	            // ],
 
 				modelsCRUDable : [
 	            	'Role',
@@ -964,12 +956,16 @@
 	                'Warehouse',
 	                'Requisition',
 	            	'Product-Asset',
-	                // 'Product-Stock',
+	                'Product-Stock',
 	            	'Warehouse-Owner',
 	                'Warehouse-Asset',
+	            	// 'WarehouseProduct',   // Product-Stock
+	                // 'Product-Category',  // Product-Asset
+	            	// 'Product-Manufacturer',  // Product-Asset
+	            	// 'WarehouseDeliveryCompany'
 	                'Merchant-Deal',
 	                'Merchant-Product',
-	                'Merchant-Payment'
+	                'Merchant-Payment',
 	            ],
 
 	            modelsCreateableUpdatableAndDeletable : [

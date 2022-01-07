@@ -907,7 +907,9 @@ class DealController extends Controller
 
                 $addedContainer->updateContainerStatus(0);
 
-                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedContainer->warehouse_container_id)->where('id', '!=', $merchantContainer->id)
+                // if current rent of same type container at same warehouse is using anywhere else
+                $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedContainer->warehouse_container_id)
+                ->where('id', '!=', $merchantContainer->id)
                 ->whereHas('deal', function ($query) use ($merchantContainer) {
                     $query->where('rent_period_id', $merchantContainer->deal->rent_period_id);
                 })
@@ -915,7 +917,7 @@ class DealController extends Controller
 
                 if (! $sameTypeContainerUsingSameRentPeriod) {
                     
-                   Rent::find($addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->deal->rent_period_id))->first()->update([
+                   $addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->deal->rent_period_id)->first()->update([
                         'active' => 0
                    ]); 
 

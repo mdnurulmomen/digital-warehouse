@@ -316,7 +316,7 @@ class AssetController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:rent_periods,name',
-            'number_days' => 'required|numeric|unique:rent_periods,number_days|max:255',
+            'number_days' => 'required|numeric|unique:rent_periods,number_days|max:65535',
         ]);
 
         $newAsset = new RentPeriod();
@@ -335,7 +335,7 @@ class AssetController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:rent_periods,name,'.$assetToUpdate->id,
-            'number_days' => 'required|numeric|max:255|unique:rent_periods,number_days,'.$assetToUpdate->id,
+            'number_days' => 'required|numeric|max:65535|unique:rent_periods,number_days,'.$assetToUpdate->id,
         ]);
 
         $assetToUpdate->name = strtolower($request->name);

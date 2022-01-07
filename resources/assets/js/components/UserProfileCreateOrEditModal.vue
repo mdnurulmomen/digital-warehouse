@@ -249,6 +249,7 @@
 											<label for="inputUsername">Special Permissions</label>
 											<div class="row">
 												<!-- Approvable Models -->
+												<!-- 
 												<div 
 													class="col-md-6" 
 													v-for="model in modelCRUDableAndApproveable" 
@@ -256,7 +257,6 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-													<!-- create -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -267,7 +267,6 @@
 														<label>{{ modelName('create-' + model) }}</label>
 													</div>
 
-													<!-- update -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -278,7 +277,6 @@
 														<label>{{ modelName('update/Approve-' + model) }}</label>
 													</div>
 
-													<!-- delete -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -289,7 +287,6 @@
 														<label>{{ modelName('delete-' + model) }}</label>
 													</div>
 
-													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -300,8 +297,6 @@
 														<label>{{ modelName('view-' + model + '-list') }}</label>
 													</div>
 
-													<!-- approve -->
-													<!-- 
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -311,8 +306,8 @@
 														>
 														<label>{{ modelName('approve-' + model) }}</label>
 													</div>
- 													-->
-												</div>
+												</div> 
+												-->
 
 												<!-- CRUD Models -->
 												<div 
@@ -611,46 +606,50 @@
 					user : {},
 				},
 
-				modelCRUDableAndApproveable : [
-	                'Product-Stock',
-	            ],
+				// modelCRUDableAndApproveable : [
+	                // 'Product-Stock',
+	            // ],
 
 				modelsCRUDable : [
-	        		'Role',
+	            	'Role',
 	            	'Product',
 	            	'Manager',
 	            	'Merchant',
 	                'Warehouse',
 	                'Requisition',
 	            	'Product-Asset',
-	                // 'Product-Stock',
-	                'Merchant-Deal',
+	                'Product-Stock',
 	            	'Warehouse-Owner',
 	                'Warehouse-Asset',
+	            	// 'WarehouseProduct',   // Product-Stock
+	                // 'Product-Category',  // Product-Asset
+	            	// 'Product-Manufacturer',  // Product-Asset
+	            	// 'WarehouseDeliveryCompany'
+	                'Merchant-Deal',
 	                'Merchant-Product',
 	                'Merchant-Payment',
-	        	],
-
-	        	modelsCreateableUpdatableAndDeletable : [
-                	'Logistic-Asset',
 	            ],
 
-	        	modelsViewableAndUpdatable : [
-	        		'Application-Setting',  // view / update
-	        	],
+	            modelsCreateableUpdatableAndDeletable : [
+	                'Logistic-Asset',
+	            ],            
 
-	        	modelsViewableRecommendableAndApproveable : [
-	        		'Dispatch',  // view / recommend
-	        	],
+	            modelsViewableAndUpdatable : [
+	                'Application-Setting'  // view / update
+	            ],
 
-	        	modelsViewable : [
-	        		'Permission',  // view
-	        	],
+	            modelsViewableRecommendableAndApproveable : [
+	                'Dispatch',  // view / make
+	            ],
 
-	        	modelsViewable2 : [
-	        		'General-Dashboard-One',  // view
-	        		'General-Dashboard-Two',  // view
-	        	],
+	            modelsViewable : [
+	                'Permission',  // view
+	            ],
+
+	            modelsViewable2 : [
+	                'General-Dashboard-One',  // view
+	                'General-Dashboard-Two'  // view
+	            ],
 
 			}
 
