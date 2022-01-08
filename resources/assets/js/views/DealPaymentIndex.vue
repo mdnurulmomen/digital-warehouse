@@ -18,7 +18,7 @@
 
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -1977,6 +1977,7 @@
 			searchData() {
 
 				this.error = '';
+				this.loading = true;
 				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
 				this.pagination.current_page = 1;
@@ -1991,6 +1992,9 @@
 				})
 				.catch(e => {
 					this.error = e.toString();
+				})
+				.finally(response => {
+					this.loading = false;
 				});
 
 			},

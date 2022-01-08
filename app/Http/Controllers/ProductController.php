@@ -602,7 +602,7 @@ class ProductController extends Controller
             
         }
 
-        $numberStock = Stock::where('merchant_id', $request->merchant['id'])->count();
+        $numberStock = Stock::where('merchant_id', $request->merchant_id)->count();
         $userHasUpdatingPermission = $currentUser->hasPermissionTo('update-product-stock');
 
         $newStock = Stock::create([

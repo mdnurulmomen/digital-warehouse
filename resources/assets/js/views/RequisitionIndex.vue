@@ -38,6 +38,8 @@
 											/>
 											
 											<div class="col-sm-12 col-lg-12">	
+												<loading v-show="loading"></loading>
+												
 										  		<tab 
 										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
@@ -47,8 +49,6 @@
 										  			@showDispatchedContents="showDispatchedContents" 
 										  			@showCancelledContents="showCancelledContents" 
 										  		></tab>
-
-										  		<loading v-show="loading"></loading>
 
  												<div class="tab-content" v-show="!loading">
 													<div class="card">
@@ -403,7 +403,7 @@
 						                              			v-model="requiredProduct.product.variations[variationIndex]"
 						                              			class="form-control p-0 is-valid" 
 						                              			placeholder="Variation Name" 
-						                              			label="name" 
+						                              			label="variation_name" 
 						                                  		track-by="id" 
 						                                  		:custom-label="objectNameWithCapitalized" 
 						                                  		:options="requiredProduct.product.variations" 
@@ -3091,12 +3091,14 @@
 			},
 			fetchAllPackagingPackages() {
 
+				/*
 				if (! this.userHasPermissionTo('view-logistic-asset-index')) {
 
 					this.error = 'You do not have permission to view packaging packages';
 					return;
 
 				}
+				*/
 				
 				this.error = '';
 				this.loading = true;
@@ -3732,7 +3734,7 @@
 			    name = name.toString()
 			    return name.charAt(0).toUpperCase() + name.slice(1)
 		    },
-			objectNameWithCapitalized ({ subject, product_name, first_name, last_name, user_name, name, variation, serial_no }) {
+			objectNameWithCapitalized ({ subject, product_name, variation_name, first_name, last_name, user_name, name, variation, serial_no }) {
 		      	if (subject) {
 				    subject = subject.toString()
 				    return subject.charAt(0).toUpperCase() + subject.slice(1)
@@ -3740,6 +3742,10 @@
 		      	else if (product_name) {
 				    product_name = product_name.toString()
 				    return product_name.charAt(0).toUpperCase() + product_name.slice(1)
+		      	}
+		      	else if (variation_name) {
+				    variation_name = variation_name.toString()
+				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
 		      	}
 		      	else if (first_name || last_name || user_name) {
 

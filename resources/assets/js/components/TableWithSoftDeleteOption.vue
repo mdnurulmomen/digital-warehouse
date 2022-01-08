@@ -46,7 +46,7 @@
 									class="btn btn-grd-info btn-icon" 
 									data-toggle="tooltip" data-placement="top" title="View Details"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-show="$route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types'"
+								 	v-show="$route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types'"
 							>
 								<i class="fa fa-eye"></i>
 							</button>

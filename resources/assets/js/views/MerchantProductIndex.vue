@@ -22,6 +22,7 @@
 									<div class="card-block">
 										<div class="row">
 											<div class="col-sm-12 sub-title">
+												<!-- 
 												<div class="row form-group">
 											  		<div class="col-sm-6 d-flex align-items-center form-group">
 											  			<div class="mr-2">
@@ -33,12 +34,6 @@
 											  			</div>
 
 											  			<div class="ml-auto ml-sm-0">
-											  				<!-- 
-											  				<div>
-											  					<i class="fa fa-print fa-lg p-2" aria-hidden="true"></i>
-											  				</div> 
-											  				-->
-
 											  				<div class="dropdown">
 										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
 											  					
@@ -52,19 +47,6 @@
 														  			>
 														  				Excel
 																	</download-excel>
-											  						
-											  						<!-- 
-											  						<download-excel 
-											  							type="csv"
-														  				class="btn btn-default p-1 dropdown-item disabled"
-																		:data="allProducts"
-																		:fields="dataToExport" 
-																		worksheet="Products sheet"
-																		:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-products-' : (currentTab + '-products-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				CSV
-																	</download-excel> 
-																	-->
 											  					</div>
 											  				</div>
 											  			</div>
@@ -113,21 +95,24 @@
 															</ul>
 													  	</div>
 													</div>
-											  	</div>
+											  	</div> 
+											  	-->
 
-											  	<!-- 
-											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-merchant-product-index') || userHasPermissionTo('create-merchant-product')" 
-											  		:query="query" 
+											  	<addition-search-export-option
+													v-if="userHasPermissionTo('view-merchant-product-index') || userHasPermissionTo('create-merchant-product')" 
+											  		:search-attributes="searchAttributes" 
 											  		:caller-page="'products'" 
 											  		:required-permission = "'merchant-product'" 
 											  		:disable-add-button="allProducts.length==0 ? true : false" 
+											  		:data-to-export="dataToExport" 
+											  		:contents-to-download="productsToShow" 
+											  		:pagination="pagination" 
+											  		:current-tab="currentTab"
 											  		
 											  		@showContentCreateForm="showProductMerchantCreateForm" 
 											  		@searchData="searchData($event)" 
 											  		@fetchAllContents="fetchMerchantAllProducts"
-											  	></search-and-addition-option> 
-											  	-->
+												/>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -1927,61 +1912,6 @@
 
 		},
 
-		watch : {
-
-			'searchAttributes.search' : function(val){
-				
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchMerchantAllProducts();
-
-				}
-				else {
-
-					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
-
-					if (! format.test(val)) {
-
-						this.searchData();
-					
-					}
-
-				}
-
-			},
-			
-			'searchAttributes.dateFrom' : function(val){
-				
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchMerchantAllProducts();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
-
-			},
-
-			'searchAttributes.dateTo' : function(val){
-				
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchMerchantAllProducts();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
-
-			},
-
-		},
-
 		filters: {
 
 			capitalize: function (value) {
@@ -2369,10 +2299,10 @@
 					});
 
 			},
-			searchData(emitedValue=false) {
+			searchData(emitedObject=false) {
 
-				if (emitedValue) {
-					this.searchAttributes.search=emitedValue;
+				if (Object.keys(emitedObject).length) {
+					this.searchAttributes=emitedObject;
 				}
 
 				this.error = '';
