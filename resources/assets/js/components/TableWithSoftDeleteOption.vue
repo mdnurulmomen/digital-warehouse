@@ -482,6 +482,25 @@
 					}
 
 				}
+				else if (columnName.match(/#/gi) && columnName.match(/days/gi)) {
+					
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingNumeric('number_days');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('number_days');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingNumeric('number_days');
+					}
+					
+				}
 				
 			},
 			ascendingAlphabets(columnValue) {
