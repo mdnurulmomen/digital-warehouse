@@ -23,6 +23,7 @@ class CreateApplicationSettingsTable extends Migration
             $table->string('default_measure_unit', 100)->default('meter');
             $table->string('official_bank_name', 50)->default('XXXX Bank');
             $table->string('official_bank_account_name', 50)->default('Mr/Mrs XXX');
+            $table->string('official_currency_name', 50)->default('BDT');
             $table->string('official_bank_account_number', 50)->default('XXX-XXXXX-XXXXX');
             $table->string('official_merchant_name', 50)->default('BKash / Rocket / Nogod');
             $table->string('official_merchant_account_number', 50)->default('XXX-XXXXX-XXXXX');

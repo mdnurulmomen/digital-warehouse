@@ -394,16 +394,28 @@
 
 										<div class="form-group col-md-6">
 											<label for="inputFirstName">Selling Price (unit)</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleMerchantProductData.selling_price" 
-												placeholder="Product Selling Price" 
-												:class="!errors.product.product_price  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_price')" 
-												:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.product_category_id ? false : true"
-											>
 
-											<div class="invalid-feedback">
+											<div class="input-group mb-3">
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleMerchantProductData.selling_price" 
+													placeholder="Product Selling Price" 
+													:class="!errors.product.product_price ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('product_price')" 
+													:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.product_category_id ? false : true"
+												>
+												<div class="input-group-append">
+													<span class="input-group-text" id="basic-addon2">
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</span>
+												</div>
+											</div>
+
+											<div 
+												class="invalid-feedback" 
+												style="display: block;" 
+												v-show="errors.product.product_price" 
+											>
 									        	{{ errors.product.product_price }}
 									  		</div>
 										</div>
@@ -606,16 +618,27 @@
 																	<div class="form-group col-md-6">
 																		<label for="inputFirstName">Selling Price (unit)</label>
 
-																		<input type="number" 
-																			class="form-control" 
-																			v-model.number="merchantProductVariation.selling_price" 
-																			placeholder="Variation Selling Price" 
-																			:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-																			@change="validateFormInput('product_variation_price')" 
-																			required="true" 
-																		>
+																		<div class="input-group mb-3">
+																			<input type="number" 
+																				class="form-control" 
+																				v-model.number="merchantProductVariation.selling_price" 
+																				placeholder="Variation Selling Price" 
+																				:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																				@change="validateFormInput('product_variation_price')" 
+																				required="true" 
+																			>
+																			<div class="input-group-append">
+																				<span class="input-group-text" id="basic-addon2">
+																					{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																				</span>
+																			</div>
+																		</div>
 
-																		<div class="invalid-feedback">
+																		<div 
+																			class="invalid-feedback" 
+																			style="display: block;"
+																			v-show="errors.product.variations[index].product_variation_price" 
+																		>
 																        	{{ errors.product.variations[index].product_variation_price }}
 																  		</div>	
 																	</div>
@@ -842,7 +865,8 @@
 														Selling Price (unit) :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.selling_price }}
+														{{ singleMerchantProductData.selling_price }} 
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 													</label>
 												</div>
 
@@ -930,6 +954,7 @@
 																			</label>
 																			<label class="col-8 col-form-label">
 																				{{ merchantProductVariation.selling_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
 
@@ -1302,6 +1327,7 @@
 						</label>
 						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.selling_price }}
+							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 						</label>
 					</div>
 
@@ -1391,6 +1417,7 @@
 												</label>
 												<label class="col-8 col-form-label">
 													{{ merchantProductVariation.selling_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 												</label>
 											</div>
 
@@ -1878,6 +1905,8 @@
 					windowTitle: 'Requisition Details' 
 
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 

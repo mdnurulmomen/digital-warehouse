@@ -886,16 +886,25 @@
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Rent</label>
 
-																							<input 
-																								type="number" 
-																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]['rent']" 
-																								placeholder="Rent price" 
-																								:class="! errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
-																								min="0" 
-																							>
+																							<div class="input-group mb-3">
+																								<input 
+																									type="number" 
+																									class="form-control" 
+																									v-model.number="singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]['rent']" 
+																									placeholder="Rent price" 
+																									:class="! errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																									min="0" 
+																								>
+																								<div class="input-group-append">
+																									<span class="input-group-text" id="basic-addon2">{{ general_settings.official_currency_name || 'BDT' | capitalize }}</span>
+																								</div>
+																							</div>
 
-																							<div class="invalid-feedback">
+																							<div 
+																								class="invalid-feedback" 
+																								style="display: block;" 
+																								v-show="errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name]" 
+																							>
 																					        	{{ errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
@@ -931,18 +940,31 @@
 																					  		</div>
 																		    			</div> 
 																		    			-->
+
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Rent</label>
-																							<input 
-																								type="number" 
-																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]['rent']" 
-																								placeholder="Rent price" 
-																								:class="!errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
-																								min="0" 
-																							>
 
-																							<div class="invalid-feedback">
+																		    				<div class="input-group mb-3">
+																								<input 
+																									type="number" 
+																									class="form-control" 
+																									v-model.number="singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]['rent']" 
+																									placeholder="Rent price" 
+																									:class="!errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																									min="0" 
+																								>
+																								<div class="input-group-append">
+																									<span class="input-group-text" id="basic-addon2">
+																										{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																									</span>
+																								</div>
+																							</div>
+
+																							<div 
+																								class="invalid-feedback" 
+																								style="display: block;" 
+																								v-show="errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name]"
+																							>
 																					        	{{ errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
@@ -981,16 +1003,28 @@
 																		    			<div class="col-sm-12 form-group">	
 																		    				<label for="phone">Rent</label>
 
-																							<input 
-																								type="number" 
-																								class="form-control" 
-																								v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]['rent']" 
-																								placeholder="Rent price" 
-																								:class="!errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
-																								min="0" 
-																							>
+																		    				<div class="input-group mb-3">
+																								<input 
+																									type="number" 
+																									class="form-control" 
+																									v-model.number="singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]['rent']" 
+																									placeholder="Rent price" 
+																									:class="!errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
+																									min="0" 
+																								>
 
-																							<div class="invalid-feedback">
+																								<div class="input-group-append">
+																									<span class="input-group-text" id="basic-addon2">
+																										{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																									</span>
+																								</div>
+																							</div>
+
+																							<div 
+																								class="invalid-feedback" 
+																								style="display: block;" 
+																								v-show="errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name]" 
+																							>
 																					        	{{ errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] }}
 																					  		</div>
 																		    			</div>
@@ -1459,7 +1493,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							Warehouse Details
+							{{ singleWarehouseData.name || 'Warehouse' | capitalize }} Details
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -1763,6 +1797,7 @@
 															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
 																					{{ singleWarehouseData.containers[containerIndex].rents['container_rent_' + rentPeriod.name]['rent'] || 'NA' }}
+																					{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -1792,6 +1827,7 @@
 															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
 																					{{ singleWarehouseData.containers[containerIndex].rents['shelf_rent_' + rentPeriod.name]['rent'] || 'NA' }}
+																					{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -1821,6 +1857,7 @@
 															    				<label for="phone">Rent : </label>
 															    				<label class="col-form-label">
 																					{{ singleWarehouseData.containers[containerIndex].rents['unit_rent_' + rentPeriod.name]['rent'] || 'NA' }}
+																					{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																				</label>
 															    			</div>
 															    		</div>
@@ -2031,6 +2068,8 @@
 
 	            allRoles : [],
 				allPermissions : [],
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 				// modelCRUDableAndApproveable : [
 	                // 'Product-Stock',

@@ -28,6 +28,7 @@ class SettingController extends Controller
             'official_merchant_name' => 'required|string|max:50',
             'official_merchant_account_number' => 'required|string|max:50',
             'vat_percentage' => 'required|numeric|min:0|max:100',
+            'official_currency_name' => 'required|string|max:50',
         ]);
 
         $adminSettings = ApplicationSetting::firstOrCreate([]);
@@ -38,6 +39,7 @@ class SettingController extends Controller
     	$adminSettings->official_bank_account_number = $request->official_bank_account_number;
     	$adminSettings->official_merchant_account_number = $request->official_merchant_account_number;
     	$adminSettings->vat_percentage = $request->vat_percentage;
+        $adminSettings->official_currency_name = $request->official_currency_name;
 
     	$adminSettings->save();
 

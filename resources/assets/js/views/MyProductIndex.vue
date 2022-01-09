@@ -218,6 +218,7 @@
 									</label>
 									<label class="col-sm-6 col-form-label text-left">
 										{{ singleProductData.selling_price || 'NA' }}
+										{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 									</label>
 								</div>
 
@@ -337,7 +338,8 @@
 														<div class="form-row">
 															<label class="col-sm-6 col-form-label font-weight-bold text-right">Price :</label>
 															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.price }}
+																{{ productVariation.selling_price }}
+																{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 															</label>
 														</div>
 
@@ -543,7 +545,7 @@
     	// name : null,
     	// description : null,
     	// sku : null,
-    	// price : null,
+    	// selling_price : null,
     	// initial_quantity : null,
     	// available_quantity : null,
     	// quantity_type : null,
@@ -773,6 +775,8 @@
 					"Created": 'created_at',
 					
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 

@@ -234,6 +234,27 @@
 																                </div>
 														              		</div>
 														              	</div>
+														              	<div class="col-6">
+														              		<div class="row">
+															              		<label class="col-sm-4 col-form-label text-right">
+															              			Currency Name
+															              		</label>
+																                <div class="col-sm-8">
+																                  	<input 
+																                  		type="text" 
+																                  		class="form-control" 
+																                  		v-model="applicationSettings.official_currency_name" 
+																                  		placeholder="BDT / Pound" 
+																                  		required="true" 
+																                  		:class="!errors.applicationSettings.official_currency_name  ? 'is-valid' : 'is-invalid'"
+																						@keyup="validateFormInput('official_currency_name')"
+																                  	>
+																                  	<div class="invalid-feedback">
+																			        	{{ errors.applicationSettings.official_currency_name }}
+																			  		</div>
+																                </div>
+														              		</div>
+														              	</div>
 													              	</div>
 														        	
 													              	<div class="card-footer text-center">
@@ -751,8 +772,9 @@
 				this.validateFormInput('official_bank_account_number');
 				this.validateFormInput('official_merchant_account_number');
 				this.validateFormInput('vat_percentage');
+				this.validateFormInput('official_currency_name');
 
-				if (this.errors.applicationSettings.official_bank_name || this.errors.applicationSettings.official_merchant_name || this.errors.applicationSettings.official_bank_account_name || this.errors.applicationSettings.official_bank_account_number || this.errors.applicationSettings.official_merchant_account_number || this.errors.applicationSettings.vat_percentage) {
+				if (this.errors.applicationSettings.official_bank_name || this.errors.applicationSettings.official_merchant_name || this.errors.applicationSettings.official_bank_account_name || this.errors.applicationSettings.official_bank_account_number || this.errors.applicationSettings.official_merchant_account_number || this.errors.applicationSettings.vat_percentage || this.errors.applicationSettings.official_currency_name) {
 
 					this.submitForm = false;
 					return;
@@ -1002,6 +1024,21 @@
 						else{
 							this.submitForm = true;
 							this.$delete(this.errors.applicationSettings, 'vat_percentage');
+						}
+
+						break;
+
+					case 'official_currency_name' :
+
+						if (!this.applicationSettings.official_currency_name) {
+							this.errors.applicationSettings.official_currency_name = 'Currency name is required';
+						}
+						else if (!this.applicationSettings.official_currency_name.match(/^[_A-z0-9]*((-|_|\s)*[_A-z0-9])*$/g)) {
+							this.errors.applicationSettings.official_currency_name = 'No special character';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.applicationSettings, 'official_currency_name');
 						}
 
 						break;
