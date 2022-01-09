@@ -381,6 +381,62 @@
 											    	{{ errors.merchant }}
 											    </div>
  											</div>
+
+ 											<div class="col-sm-12 form-group" v-show="! singleStockData.has_approval">
+ 												<div class="form-row">
+													<label class="form-group col-md-4">
+														Stock Date :
+													</label>
+
+													<div class="form-group col-md-8">
+														<v-date-picker 
+															v-model="singleStockData.created_at" 
+															color="red" 
+															is-dark
+															is-inline
+															:max-date="new Date()" 
+															:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+															:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+														/>
+													</div>
+												</div>
+ 											</div>
+
+ 											<div 
+ 												class="col-sm-12 form-group"
+ 												v-show="singleStockData.has_approval"
+ 											>
+												<label class="col-form-label font-weight-bold">
+													Stocked Date : 
+												</label>
+												
+												<label class="col-form-label">
+													{{ singleStockData.created_at }}
+												</label>
+ 											</div>
+
+ 											<div 
+	 											class="col-sm-12 form-group" 
+	 											v-show="userHasPermissionTo('update-product-stock')"
+ 											>
+ 												<div class="form-row">
+													<label class="form-group col-md-4">
+														Approval Date :
+													</label>
+
+													<div class="form-group col-md-8">
+														<v-date-picker 
+															v-model="singleStockData.updated_at" 
+															color="red" 
+															is-dark
+															is-inline
+															:max-date="new Date()" 
+															:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+															:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+														/>
+													</div>
+												</div>
+ 											</div>
 										</div>
 								    	 
 								    	<div class="form-row">

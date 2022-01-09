@@ -513,6 +513,56 @@
 													</div>
 												</div>
 
+												<div 
+													class="form-row form-group" 
+													v-show="!singleStockData.has_approval"
+												>
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Stock Date :
+													</label>
+													<div class="col-sm-8">
+														<v-date-picker 
+															v-model="singleStockData.created_at" 
+															color="red" 
+															is-dark
+															is-inline
+															:max-date="new Date()" 
+															:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+															:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+														/>
+													</div>
+												</div>
+
+												<div class="form-row" v-show="singleStockData.has_approval==1">
+													<label class="col-sm-4 col-form-label form-group">
+														Stocked Date
+													</label>
+
+													<label class="col-sm-8 col-form-label form-group">
+														{{ singleStockData.created_at }}
+													</label>
+												</div>
+
+												<div 
+													class="form-row form-group" 
+													v-show="userHasPermissionTo('update-product-stock')"
+												>
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Approval Date :
+													</label>
+													<div class="col-sm-8">
+														<v-date-picker 
+															v-model="singleStockData.updated_at" 
+															color="red" 
+															is-dark
+															is-inline
+															:max-date="new Date()" 
+															:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+															:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+														/>
+													</div>
+												</div>
+
 		 										<div class="form-row form-group">
 													<label class="col-sm-4 col-form-label font-weight-bold text-right">
 														Stock Qty :

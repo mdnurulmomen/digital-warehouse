@@ -10,7 +10,11 @@ class Stock extends Model
 
     protected $casts = [
         'has_approval' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
+
+    public $timestamps = false;
 
     public function stocks()
     {

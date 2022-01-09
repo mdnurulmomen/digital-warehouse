@@ -614,6 +614,8 @@ class ProductController extends Controller
             'approver_id' => $userHasUpdatingPermission ? $currentUser->id : NULL,
             'warehouse_id' => $request['warehouse']['id'],
             'merchant_id' => $request->merchant_id,
+            'created_at' => $request->created_at ? $request->created_at : now(),
+            'updated_at' => ($userHasUpdatingPermission && $request->updated_at) ? $request->updated_at : now(),
         ]);
 
         $productNewStock = $newStock->stocks()->create([
@@ -798,6 +800,7 @@ class ProductController extends Controller
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
                 'warehouse_id' => $request['warehouse']['id'],
+                'updated_at' => $request->updated_at ? $request->updated_at : now(),
             ]);
 
             $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -817,6 +820,7 @@ class ProductController extends Controller
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
                 'warehouse_id' => $request['warehouse']['id'],
+                'updated_at' => $request->updated_at ? $request->updated_at : now(),
             ]);
 
             $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -829,6 +833,7 @@ class ProductController extends Controller
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
                 'warehouse_id' => $request['warehouse']['id'],
+                'updated_at' => $request->updated_at ? $request->updated_at : now(),
             ]);
 
             $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
@@ -841,6 +846,7 @@ class ProductController extends Controller
                 'approver_type' => get_class($currentUser),
                 'approver_id' => $currentUser->id,
                 'warehouse_id' => $request['warehouse']['id'],
+                'updated_at' => $request->updated_at ? $request->updated_at : now(),
             ]);
 
         }
@@ -987,6 +993,8 @@ class ProductController extends Controller
             'approver_id' => $userHasUpdatingPermission ? $currentUser->id : NULL,
             'warehouse_id' => $request->warehouse['id'],
             'merchant_id' => $request->merchant['id'],
+            'created_at' => $request->created_at ? $request->created_at : now(),
+            'updated_at' => ($userHasUpdatingPermission && $request->updated_at) ? $request->updated_at : now(),
         ]);
 
         $request->products = json_decode(json_encode($request->products));
@@ -1117,6 +1125,7 @@ class ProductController extends Controller
                     'approver_type' => get_class($currentUser),
                     'approver_id' => $currentUser->id,
                     'warehouse_id' => $request['warehouse']['id'],
+                    'updated_at' => $request->updated_at ? $request->updated_at : now(),
                 ]);
 
                 $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -1136,6 +1145,7 @@ class ProductController extends Controller
                     'approver_type' => get_class($currentUser),
                     'approver_id' => $currentUser->id,
                     'warehouse_id' => $request['warehouse']['id'],
+                    'updated_at' => $request->updated_at ? $request->updated_at : now(),
                 ]);
 
                 $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -1148,6 +1158,7 @@ class ProductController extends Controller
                     'approver_type' => get_class($currentUser),
                     'approver_id' => $currentUser->id,
                     'warehouse_id' => $request['warehouse']['id'],
+                    'updated_at' => $request->updated_at ? $request->updated_at : now(),
                 ]);
 
                 $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
@@ -1160,6 +1171,7 @@ class ProductController extends Controller
                     'approver_type' => get_class($currentUser),
                     'approver_id' => $currentUser->id,
                     'warehouse_id' => $request['warehouse']['id'],
+                    'updated_at' => $request->updated_at ? $request->updated_at : now(),
                 ]);
 
             }
