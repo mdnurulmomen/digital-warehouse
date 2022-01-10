@@ -49,6 +49,7 @@ class ProductController extends Controller
         $this->middleware("permission:view-product-index")->only(['showAllProducts', 'searchAllProducts', 'showCategoryAllProducts', 'searchCategoryAllProducts']);
         $this->middleware("permission:create-product")->only(['storeNewProduct', 'storeCategoryNewProduct']);
         $this->middleware("permission:update-product")->only(['updateProduct', 'updateCategoryProduct']);
+        $this->middleware("permission:delete-product")->only(['deleteProduct', 'restoreProduct']);
         
         // Product-Stock
         $this->middleware("permission:view-product-stock-index")->only(['showProductAllStocks', 'searchProductAllStocks']);
@@ -245,8 +246,8 @@ class ProductController extends Controller
 
             return response()->json([
 
-                'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)->withCount('merchants')->paginate($perPage)),
-                'bulk' => new ProductCollection(Product::whereNull('product_category_id')->orWhere('product_category_id', 0)->withCount('merchants')->paginate($perPage)),
+                'retail' => new ProductCollection(Product::withTrashed()->where('product_category_id', '!=', 0)->withCount('merchants')->paginate($perPage)),
+                'bulk' => new ProductCollection(Product::withTrashed()->whereNull('product_category_id')->orWhere('product_category_id', 0)->withCount('merchants')->paginate($perPage)),
 
             ], 200);
 
@@ -346,26 +347,24 @@ class ProductController extends Controller
 
         return $this->showAllProducts($perPage);
     }
+    
+    public function deleteProduct($asset, $perPage)
+    {
+        $assetToDelete = Product::findOrFail($asset);
+        // $userToDelete->warehouses()->delete();
+        $assetToDelete->delete();
 
-    /*
-        public function deleteProduct($asset, $perPage)
-        {
-            $assetToDelete = ProductCategory::findOrFail($asset);
-            // $userToDelete->warehouses()->delete();
-            $assetToDelete->delete();
+        return $this->showAllProducts($perPage);
+    }
 
-            return $this->showProductAllCategories($perPage);
-        }
+    public function restoreProduct($asset, $perPage)
+    {
+        $assetToRestore = Product::withTrashed()->findOrFail($asset);
+        // $userToRestore->warehouses()->restore();
+        $assetToRestore->restore();
 
-        public function restoreProduct($asset, $perPage)
-        {
-            $assetToRestore = ProductCategory::withTrashed()->findOrFail($asset);
-            // $userToRestore->warehouses()->restore();
-            $assetToRestore->restore();
-
-            return $this->showProductAllCategories($perPage);
-        }
-    */
+        return $this->showAllProducts($perPage);
+    }
 
     public function searchAllProducts($search, $perPage)
     {

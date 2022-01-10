@@ -145,6 +145,8 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');
+		Route::delete('/products/{product}/{perPage}', 'ProductController@deleteProduct')->name('products');
+		Route::patch('/products/{product}/{perPage}', 'ProductController@restoreProduct')->name('products');
 		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
 
 		// product-stock

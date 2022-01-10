@@ -21,6 +21,7 @@ class CreateProductsTable extends Migration
             $table->boolean('has_variations')->default(false);
             $table->boolean('has_serials')->default(false);
             $table->unsignedSmallInteger('product_category_id')->nullable()->default(0); // stationary / garments
+            $table->softDeletes();
         });
     }
 
