@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Intervention\Image\ImageManagerStatic as Image;
 use Intervention\Image\Exception\NotReadableException;
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
     
     protected $guarded = ['id'];

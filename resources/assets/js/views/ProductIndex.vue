@@ -122,6 +122,29 @@
 																			>
 																				<i class="fa fa-users" aria-hidden="true"></i>
 																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-danger btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Delete" 
+																				v-show="! content.deleted_at"
+																				:disabled="content.product_immutability"  
+																				@click="openContentDeleteForm(content)" 
+																				v-if="userHasPermissionTo('delete-product')"
+																			>
+																				<i class="fa fa-trash"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn btn-grd-warning btn-icon" 
+																				data-toggle="tooltip" data-placement="top" title="Restore" 
+																				v-show="content.deleted_at"  
+																				@click="openContentRestoreForm(content)" 
+																				v-if="userHasPermissionTo('delete-product')"
+																			>
+																				<i class="fa fa-undo"></i>
+																			</button>
 																		</td>
 																	</tr>
 
@@ -1032,8 +1055,7 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- 
+ 
 		<delete-confirmation-modal 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
@@ -1047,11 +1069,10 @@
 			:csrf="csrf" 
 			:submit-method-name="'restoreAsset'" 
 			:content-to-restore="singleProductData"
-			:restoration-message="'This will restore all related items !'" 
+			:restoration-message="'This product will appear at everywhere !'" 
 
 			@restoreAsset="restoreAsset($event)" 
-		></restore-confirmation-modal>
- 		-->
+		></restore-confirmation-modal> 		
 
  		<!-- Modal -->
 		<div class="modal fade" id="product-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -1672,6 +1693,18 @@
 
 				$('#product-createOrEdit-modal').modal('show');
 			},
+			openContentDeleteForm(object) {
+
+				this.singleProductData = JSON.parse(JSON.stringify(object));
+				$('#delete-confirmation-modal').modal('show');
+
+			},
+			openContentRestoreForm(object) {
+
+				this.singleProductData = JSON.parse(JSON.stringify(object));
+				$('#restore-confirmation-modal').modal('show');
+
+			},
 			storeProduct() {
 				
 				if (!this.verifyUserInput()) {
@@ -1721,6 +1754,65 @@
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							$('#product-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
+
+			},
+			deleteAsset() {
+				
+				if (this.singleProductData.product_immutability) {
+					this.submitForm = false;
+					return;
+				}
+
+				this.formSubmitted = true;
+
+				axios
+					.delete('/products/' + this.singleProductData.id + '/' + this.perPage)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Product has been deleted", "Success");
+							this.allFetchedProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							$('#delete-confirmation-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
+
+			},
+			restoreAsset() {
+
+				this.formSubmitted = true;
+
+				axios
+					.patch('/products/' + this.singleProductData.id + '/' + this.perPage)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("Product has been restored", "Success");
+							this.allFetchedProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							$('#restore-confirmation-modal').modal('hide');
 						}
 					})
 					.catch(error => {
