@@ -50,6 +50,7 @@ Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').def
 Vue.component('v-date-picker', require('v-calendar/lib/components/date-picker.umd'));
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('table-with-delete-option', require('./components/TableWithDeleteOption.vue').default);
+Vue.component('mail-create-or-edit-modal', require('./components/MailCreateOrEditModal.vue').default);
 Vue.component('container-type-view-modal', require('./components/ContainerTypeViewModal.vue').default);
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
@@ -95,6 +96,7 @@ import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 import MerchantDealIndex from './views/MerchantDealIndex'
 import DealPaymentIndex from './views/DealPaymentIndex'
+import MailIndex from './views/MailIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
 
 /**
@@ -143,6 +145,15 @@ const router = new VueRouter({
                 // authRequired: true,
                 requiredPermission: 'view-application-setting-index' 
             },
+        },
+        {
+            path: '/mails',
+            name: 'mails',
+            component: MailIndex,
+            meta: {
+                // authRequired: true,
+                // requiredPermission: 'view-product-index' 
+            }
         },
         {
             path: '/storage-types',

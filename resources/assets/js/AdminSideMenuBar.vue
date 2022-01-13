@@ -120,6 +120,17 @@
 								</router-link>
 							</li>
 
+							<li>
+								<router-link :to="{ name: 'mails' }" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<i class="fa fa-envelope"></i>
+									</span>
+									<span class="pcoded-mtext">
+										Mails
+									</span>
+								</router-link>
+							</li>
+
 							<li :class="['merchants', 'merchant-deals', 'deal-payments', 'merchant-products'].includes(currentRouteName) ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-merchant-index')"
 							>

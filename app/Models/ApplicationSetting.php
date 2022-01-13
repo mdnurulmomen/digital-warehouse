@@ -18,6 +18,27 @@ class ApplicationSetting extends Model
      * @param  string  $value
      * @return void
      */
+    
+    public function medias()
+    {
+        return $this->hasMany(Media::class, 'application_setting_id', 'id');
+    }
+
+    public function setApplicationMediaAttribute($medias)
+    {
+        $this->medias()->delete();
+
+        foreach ($medias as $mediaKey => $media) {
+            
+            $newMedia = new Media();
+            $newMedia->name = $media->name;
+            $newMedia->setMediaLogo($media->logo, str_replace(' ', '_', $media->name));
+            $newMedia->link = $media->link;
+            $newMedia->save();
+
+        }
+    }
+
     public function setApplicationLogoAttribute($encodedImageFile)
     {
         if ($encodedImageFile) {
@@ -78,5 +99,6 @@ class ApplicationSetting extends Model
             $this->attributes['application_favicon'] = $imagePath.'application_favicon.png';
 
         }
-    }    
+    } 
+  
 }

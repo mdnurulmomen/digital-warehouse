@@ -17,6 +17,8 @@ class CreateApplicationSettingsTable extends Migration
             $table->tinyIncrements('id');
             // $table->unsignedSmallInteger('default_selling_price')->default(100);
             // $table->unsignedSmallInteger('default_storing_price')->default(100);
+            $table->string('app_name', 50)->default('gudam');
+            $table->string('copyright_message')->default('copyright is restricted');
             $table->unsignedSmallInteger('default_length')->default(10);
             $table->unsignedSmallInteger('default_width')->default(10);
             $table->unsignedSmallInteger('default_height')->default(10);

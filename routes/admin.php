@@ -29,6 +29,8 @@ Route::name('admin.')->group(function () {
 		
 		Route::get('/{any}', 'HomeController@adminHome')->name('home');
 		
+		Route::post('/send-mails/{perPage}', 'MailController@sendDynamicMail')->name('send-mail');
+
 		// profile
 		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
 		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
@@ -40,6 +42,7 @@ Route::name('admin.')->group(function () {
 		Route::put('/contact-settings', 'SettingController@updateContactSetting')->name('contact-settings');	
 		Route::put('/warehouse-settings', 'SettingController@updateWarehouseSetting')->name('warehouse-settings');	
 		Route::put('/system-settings', 'SettingController@updateSystemSetting')->name('system-settings');
+		Route::put('/media-settings', 'SettingController@updateMediaSetting')->name('media-settings');
 
 		// warehouse owner
 		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');

@@ -54,7 +54,13 @@
 
 												<ul class="nav nav-tabs md-tabs" role="tablist">
 													<li class="nav-item">
-														<a class="nav-link active" data-toggle="tab" href="#payment" role="tab">
+														<a class="nav-link active" data-toggle="tab" href="#system" role="tab">
+															<span class="sub-title">System</span>
+														</a>
+														<div class="slide"></div>
+													</li>
+													<li class="nav-item">
+														<a class="nav-link" data-toggle="tab" href="#payment" role="tab">
 															<span class="sub-title">Payment</span>
 														</a>
 														<div class="slide"></div>
@@ -72,16 +78,154 @@
 														<div class="slide"></div>
 													</li>
 													<li class="nav-item">
-														<a class="nav-link" data-toggle="tab" href="#others" role="tab">
-															<span class="sub-title">System</span>
+														<a class="nav-link" data-toggle="tab" href="#media" role="tab">
+															<span class="sub-title">Media</span>
 														</a>
 														<div class="slide"></div>
 													</li>
 												</ul>
 												
 												<div class="tab-content card-block">
+													<div class="tab-pane fade show active" id="system">	
+														<div class="row">
+															<div  
+																v-show="!loading" 
+																class="col-sm-12"
+															>
+																<div class="">
+																	
+															      	<form 
+																      	class="form-horizontal" 
+																      	v-on:submit.prevent="updateSystemSetting"
+															      	>	
+															      		<input 
+																      		type="hidden" 
+																      		name="_token" 
+																      		:value="csrf"
+															      		>
+															            
+													              		<div class="form-group row">
+														              		<label class="col-sm-4 col-form-label text-right">
+														              			App Name
+														              		</label>
 
-													<div class="tab-pane fade show active" id="payment">	
+															              	<div class="col-sm-8">
+															              		<input 
+																                  	type="text" 
+																					class="form-control" 
+																					v-model="applicationSettings.app_name" 
+																					required="true"
+																					placeholder="App Name" 		
+																					:class="!errors.app_name ? 'is-valid' : 'is-invalid'"
+																					@keyup="validateFormInput('app_name')"
+															                  	>
+															                  	<div class="invalid-feedback">
+																		        	{{ errors.app_name }}
+																		  		</div>
+															              	</div>
+														              	</div>
+
+													              		<div class="row d-flex align-items-center text-center mb-4">
+														              		<label class="col-sm-4 col-form-label text-right">
+														              			App Logo
+														              		</label>
+														              		<div class="col-sm-4">
+														                  		<img 
+															                  		class="profile-user-img img-fluid" 
+															                  		:src="applicationSettings.application_logo || 'uploads/application/application_logo.png'" 
+															                  		alt="Application logo"
+														                  		>
+														                	</div>
+															                <div class="col-sm-4">
+															                  	<div class="input-group">
+																                    <div class="custom-file">
+																                        <input 
+																                        	type="file" 
+																                        	class="custom-file-input" 
+																                        	v-on:change="onLogoChange($event, 'logo', false)" 
+																                        	accept="image/*"
+																                        >
+																                        <label class="custom-file-label">
+																                        	Change Logo
+																                        </label>
+																                    </div>
+															                    </div>
+															                </div>
+														            	</div>
+
+													                	<div class="row d-flex align-items-center text-center">
+														              		<label class="col-sm-4 col-form-label text-right">
+														              			Panel Favicon
+														              		</label>
+														              		<div class="col-sm-4">
+														                  		<img 
+															                  		class="profile-user-img img-fluid" 
+															                  		:src="applicationSettings.application_favicon || 'uploads/application/application_favicon.png'" 
+															                  		alt="Application favicon"
+														                  		>
+														                	</div>
+															                <div class="col-sm-4">
+															                  	<div class="input-group">
+																                    <div class="custom-file">
+																                        <input 
+																                        	type="file" 
+																                        	class="custom-file-input" 
+																                        	v-on:change="onLogoChange($event, 'favicon', false)" 
+																                        	accept="image/*"
+																                        >
+																                        <label class="custom-file-label">
+																                        	Change Favicon
+																                        </label>
+																                    </div>
+															                    </div>
+															                </div>
+														            	</div>
+
+														            	<div class="form-group row">
+														              		<label class="col-sm-4 col-form-label text-right">
+														              			Copyright Message
+														              		</label>
+
+															              	<div class="col-sm-8">
+															              		<input 
+																                  	type="text" 
+																					class="form-control" 
+																					v-model="applicationSettings.copyright_message" 
+																					required="true"
+																					placeholder="Copyright Message" 		
+																					:class="!errors.copyright_message ? 'is-valid' : 'is-invalid'"
+																					@keyup="validateFormInput('copyright_message')"
+															                  	>
+															                  	<div class="invalid-feedback">
+																		        	{{ errors.copyright_message }}
+																		  		</div>
+															              	</div>
+														              	</div>
+															            
+															            <div class="card-footer text-center">
+															            	<div class="col-sm-12">
+																				<span 
+																					class="text-danger p-0 m-0 small" 
+																					v-show="!submitForm"
+																				>
+																			  		Please input one file at least
+																			  	</span>
+																			</div>
+															              	<button 
+																              	type="submit" 
+																              	:disabled="loading || !submitForm" 
+																              	class="btn btn-primary"
+															              	>
+															              		Update System Settings
+															              	</button>
+															            </div>
+															      	</form>
+															    </div>
+															</div>
+														</div>
+													</div>
+
+													<div class="tab-pane fade show" id="payment">	
 														<div class="row">
 															<div  
 																v-show="!loading" 
@@ -108,11 +252,11 @@
 																                  		v-model="applicationSettings.official_bank_name" 
 																                  		placeholder="Islami Bank" 
 																                  		required="true" 
-																                  		:class="!errors.applicationSettings.official_bank_name  ? 'is-valid' : 'is-invalid'"
+																                  		:class="!errors.official_bank_name  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('official_bank_name')"
 																                  	>
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_bank_name }}
+																			        	{{ errors.official_bank_name }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -129,11 +273,11 @@
 																                  		v-model="applicationSettings.official_merchant_name" 
 																                  		placeholder="BKash" 
 																                  		required="true" 
-																                  		:class="!errors.applicationSettings.official_merchant_name  ? 'is-valid' : 'is-invalid'"
+																                  		:class="!errors.official_merchant_name  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('official_merchant_name')"
 																                  	>
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_merchant_name }}
+																			        	{{ errors.official_merchant_name }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -153,11 +297,11 @@
 																                  		v-model="applicationSettings.official_bank_account_name" 
 																                  		placeholder="Account Holder Name" 
 																                  		required="true" 
-																                  		:class="!errors.applicationSettings.official_bank_account_name  ? 'is-valid' : 'is-invalid'"
+																                  		:class="!errors.official_bank_account_name  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('official_bank_account_name')"
 																                  	>
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_bank_account_name }}
+																			        	{{ errors.official_bank_account_name }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -174,11 +318,11 @@
 																                  		v-model="applicationSettings.official_bank_account_number" 
 																                  		placeholder="Bank Account Number" 
 																                  		required="true" 
-																                  		:class="!errors.applicationSettings.official_bank_account_number  ? 'is-valid' : 'is-invalid'"
+																                  		:class="!errors.official_bank_account_number  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('official_bank_account_number')"
 																                  	>
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_bank_account_number }}
+																			        	{{ errors.official_bank_account_number }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -198,11 +342,11 @@
 																                  		v-model="applicationSettings.official_merchant_account_number" 
 																                  		placeholder="Merchant Account Number" 
 																                  		required="true" 
-																                  		:class="!errors.applicationSettings.official_merchant_account_number  ? 'is-valid' : 'is-invalid'"
+																                  		:class="!errors.official_merchant_account_number  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('official_merchant_account_number')"
 																                  	>
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_merchant_account_number }}
+																			        	{{ errors.official_merchant_account_number }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -220,16 +364,16 @@
 																						step=".1" 
 																						placeholder="Vat Rate" 
 																						required="true"
-																						:class="!errors.applicationSettings.vat_percentage  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.vat_percentage  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('vat_percentage')">
 																						<span class="input-group-append" id="basic-addon3">
 																							<label class="input-group-text">%</label>
 																						</span>
 																					</div>
 																                	<div class="invalid-feedback" 
-																                		v-show="errors.applicationSettings.vat_percentage"
+																                		v-show="errors.vat_percentage"
 																                	>
-																			        	{{ errors.applicationSettings.vat_percentage }}
+																			        	{{ errors.vat_percentage }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -246,11 +390,11 @@
 																                  		v-model="applicationSettings.official_currency_name" 
 																                  		placeholder="BDT / Pound" 
 																                  		required="true" 
-																                  		:class="!errors.applicationSettings.official_currency_name  ? 'is-valid' : 'is-invalid'"
+																                  		:class="!errors.official_currency_name  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('official_currency_name')"
 																                  	>
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_currency_name }}
+																			        	{{ errors.official_currency_name }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -280,7 +424,7 @@
 														</div>
 													</div>
 
-													<div class="tab-pane fade show fade" id="contact">	
+													<div class="tab-pane fade show" id="contact">	
 														<div class="row">
 															<div  
 																v-show="!loading" 
@@ -310,11 +454,11 @@
 																                  	v-model="applicationSettings.official_customer_care_number" 
 																                  	placeholder="Official Customer Care Number" 
 																                  	required="true"  
-																                  	:class="!errors.applicationSettings.official_customer_care_number  ? 'is-valid' : 'is-invalid'"
+																                  	:class="!errors.official_customer_care_number  ? 'is-valid' : 'is-invalid'"
 																					@keyup="validateFormInput('official_customer_care_number')"
 																                  >
 																                  <div class="invalid-feedback">
-																		        	{{ errors.applicationSettings.official_customer_care_number }}
+																		        	{{ errors.official_customer_care_number }}
 																			  	  </div>
 																                </div>
 														              		</div>
@@ -331,11 +475,11 @@
 																                  	v-model="applicationSettings.official_mail_address" 
 																                  	placeholder="Mail Address" 
 																                  	required="true"  
-																                  	:class="!errors.applicationSettings.official_mail_address  ? 'is-valid' : 'is-invalid'"
+																                  	:class="!errors.official_mail_address  ? 'is-valid' : 'is-invalid'"
 																					@keyup="validateFormInput('official_mail_address')"
 																                  >
 																                  	<div class="invalid-feedback">
-																			        	{{ errors.applicationSettings.official_mail_address }}
+																			        	{{ errors.official_mail_address }}
 																			  		</div>
 																                </div>
 														              		</div>
@@ -348,7 +492,7 @@
 														                <div class="col-sm-10">
 														                  	<ckeditor 
 												                              	class="form-control" 
-												                              	:class="!errors.applicationSettings.official_contact_address  ? 'is-valid' : 'is-invalid'"
+												                              	:class="!errors.official_contact_address  ? 'is-valid' : 'is-invalid'"
 												                              	:editor="editor" 
 												                              	v-model="applicationSettings.official_contact_address" 
 												                              	placeholder="Contact Address" 
@@ -356,7 +500,7 @@
 												                            >
 											                              	</ckeditor>
 											                              	<div class="invalid-feedback">
-																	        	{{ errors.applicationSettings.official_contact_address }}
+																	        	{{ errors.official_contact_address }}
 																	  		</div>
 														                </div>
 													              	</div>
@@ -385,7 +529,7 @@
 														</div>
 													</div>
 
-													<div class="tab-pane fade show fade" id="warehouse">	
+													<div class="tab-pane fade show" id="warehouse">	
 														<div class="row">
 															<div  v-show="!loading" class="col-sm-12">
 																<div class="">
@@ -416,11 +560,11 @@
 																						step="1" 
 																						required="true"
 																						placeholder="Default Price" 		
-																						:class="!errors.applicationSettings.default_selling_price  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.default_selling_price  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('default_selling_price')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_selling_price }}
+																				        	{{ errors.default_selling_price }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -440,11 +584,11 @@
 																						step="1" 
 																						required="true"
 																						placeholder="Default Price" 		
-																						:class="!errors.applicationSettings.default_storing_price  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.default_storing_price  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('default_storing_price')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_storing_price }}
+																				        	{{ errors.default_storing_price }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -467,11 +611,11 @@
 																						step="1" 
 																						required="true"
 																						placeholder="Default Price" 		
-																						:class="!errors.applicationSettings.default_length  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.default_length  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('default_length')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_length }}
+																				        	{{ errors.default_length }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -490,11 +634,11 @@
 																						step="1" 
 																						required="true"
 																						placeholder="Default Price" 		
-																						:class="!errors.applicationSettings.default_width  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.default_width  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('default_width')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_width }}
+																				        	{{ errors.default_width }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -515,11 +659,11 @@
 																						step="1" 
 																						required="true"
 																						placeholder="Default Price" 		
-																						:class="!errors.applicationSettings.default_height  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.default_height  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('default_height')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_height }}
+																				        	{{ errors.default_height }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -536,11 +680,11 @@
 																						v-model="applicationSettings.default_measure_unit" 
 																						required="true"
 																						placeholder="Default Unit" 		
-																						:class="!errors.applicationSettings.default_measure_unit  ? 'is-valid' : 'is-invalid'"
+																						:class="!errors.default_measure_unit  ? 'is-valid' : 'is-invalid'"
 																						@keyup="validateFormInput('default_measure_unit')"
 																	                  >
 																	                  	<div class="invalid-feedback">
-																				        	{{ errors.applicationSettings.default_measure_unit }}
+																				        	{{ errors.default_measure_unit }}
 																				  		</div>
 																	                </div>
 															              		</div>
@@ -571,9 +715,8 @@
 														</div>
 													</div>
 
-													<div class="tab-pane fade show fade" id="others">	
+													<div class="tab-pane fade show" id="media">	
 														<div class="row">
-
 															<div  
 																v-show="!loading" 
 																class="col-sm-12"
@@ -582,7 +725,7 @@
 																	
 															      	<form 
 																      	class="form-horizontal" 
-																      	v-on:submit.prevent="updateSystemSetting"
+																      	v-on:submit.prevent="updateMediaSetting"
 															      	>	
 															      		<input 
 																      		type="hidden" 
@@ -590,61 +733,111 @@
 																      		:value="csrf"
 															      		>
 															            
-													              		<div class="row d-flex align-items-center text-center mb-4">
-														              		<label class="col-sm-4 col-form-label text-right">
-														              			App Logo
-														              		</label>
-														              		<div class="col-sm-4">
-														                  		<img 
-															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.application_logo || 'uploads/application/application_logo.png'" 
-															                  		alt="Application logo"
-														                  		>
-														                	</div>
-															                <div class="col-sm-4">
-															                  	<div class="input-group">
-																                    <div class="custom-file">
-																                        <input 
-																                        	type="file" 
-																                        	class="custom-file-input" 
-																                        	v-on:change="onLogoChange" 
-																                        	accept="image/*"
-																                        >
-																                        <label class="custom-file-label">
-																                        	Change Logo
-																                        </label>
-																                    </div>
-															                    </div>
-															                </div>
-														            	</div>
+															      		<div 
+															      			class="form-row"
+															      			v-if="applicationSettings.medias && applicationSettings.medias.length && applicationSettings.medias.length==errors.medias.length"
+															      		>
+															      			<div 
+															      			class="col-sm-6" 
+															      			v-for="(media, mediaIndex) in applicationSettings.medias" 
+															      			:key="'media-index-' + mediaIndex + '-media-id-' + media.id"
+															      			>
+																	      		<div class="card">
+																	      			<div class="card-header">
+																	      				<p class="lead text-center">
+																	      					Media {{ mediaIndex + 1 }}
+																	      				</p>
+																	      			</div>
 
-													                	<div class="row d-flex align-items-center text-center">
-														              		<label class="col-sm-4 col-form-label text-right">
-														              			Panel Favicon
-														              		</label>
-														              		<div class="col-sm-4">
-														                  		<img 
-															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.application_favicon || 'uploads/application/application_favicon.png'" 
-															                  		alt="Application favicon"
-														                  		>
-														                	</div>
-															                <div class="col-sm-4">
-															                  	<div class="input-group">
-																                    <div class="custom-file">
-																                        <input 
-																                        	type="file" 
-																                        	class="custom-file-input" 
-																                        	v-on:change="onFaviconChange" 
-																                        	accept="image/*"
-																                        >
-																                        <label class="custom-file-label">
-																                        	Change Favicon
-																                        </label>
-																                    </div>
-															                    </div>
-															                </div>
-														            	</div>
+																	      			<div class="card-block">
+																		      			<div class="form-group">
+																		      				<label for="usr">Media Name</label>
+																		      				<input 
+																			                  	type="text" 
+																								class="form-control" 
+																								v-model="media.name" 
+																								required="true"
+																								placeholder="Media Name" 		
+																								:class="!errors.medias[mediaIndex].media_name ? 'is-valid' : 'is-invalid'"
+																								@keyup="validateFormInput('media_name')"
+																		                  	>
+																		                  	<div class="invalid-feedback">
+																					        	{{ errors.medias[mediaIndex].media_name }}
+																					  		</div>
+																		      			</div>
+
+																		      			<div class="form-group">
+																		      				<label for="usr">Media Logo</label>
+																		              		<div class="row d-flex align-items-center text-center">
+																			              		<div class="col-sm-6">
+																				                  	<div class="input-group mb-0">
+																					                    <div class="custom-file">
+																					                        <input 
+																					                        	type="file" 
+																					                        	class="custom-file-input" 
+																					                        	v-on:change="onLogoChange($event, 'media', mediaIndex)" 
+																					                        	accept="image/*"
+																					                        >
+																					                        <label class="custom-file-label">
+																					                        	Change Logo
+																					                        </label>
+																					                    </div>
+																				                    </div>
+																				                </div>
+																			              		<div class="col-sm-6">
+																			                  		<img 
+																				                  		class="profile-user-img img-fluid" 
+																				                  		:src="media.logo || 'uploads/application/media_logo.png'" 
+																				                  		alt="Media logo"
+																			                  		>
+																			                	</div>
+																			            	</div>
+
+																			            	<div 
+																		                  		class="invalid-feedback" 
+																		                  		style="display: block;"
+																		                  		v-show="errors.medias[mediaIndex].media_logo" 
+																		                  	>
+																					        	{{ errors.medias[mediaIndex].media_logo }}
+																					  		</div>
+																		      			</div>
+
+																		      			<div class="form-group">
+																		      				<label for="usr">Media Link</label>
+																		      				
+																		      				<div class="input-group mb-0">
+																		      					<div class="input-group-prepend">
+																		      						<span class="input-group-text" id="basic-addon3">https://</span>
+																		      					</div>
+																		      					<input 
+																				                  	type="text" 
+																									class="form-control" 
+																									v-model="media.link" 
+																									required="true"
+																									placeholder="Redirect URL" 		
+																									:class="! errors.medias[mediaIndex].media_link ? 'is-valid' : 'is-invalid'"
+																									@keyup="validateFormInput('media_link')" 
+																			                  	>
+																		      				</div>
+
+																		                  	<div 
+																		                  		class="invalid-feedback" 
+																		                  		style="display: block;"
+																		                  		v-show="errors.medias[mediaIndex].media_link" 
+																		                  	>
+																					        	{{ errors.medias[mediaIndex].media_link }}
+																					  		</div>
+																		      			</div>	
+																	      			</div>
+																	      		</div>
+															      			</div>
+															      		</div>
+															      		
+															      		<div class="form-row form-group text-center">
+															      			<i class="fa fa-plus-circle text-success fa-2x  col-6" aria-hidden="true" @click="addMedia"></i>
+
+															      			<i class="fa fa-times-circle text-danger fa-2x  col-6" aria-hidden="true" @click="removeMedia"></i>
+															      		</div>
 															            
 															            <div class="card-footer text-center">
 															            	<div class="col-sm-12">
@@ -652,7 +845,7 @@
 																					class="text-danger p-0 m-0 small" 
 																					v-show="!submitForm"
 																				>
-																			  		Please input one file at least
+																			  		Please input required fields
 																			  	</span>
 																			</div>
 															              	<button 
@@ -663,32 +856,23 @@
 															              		Update Media Settings
 															              	</button>
 															            </div>
-															        	
 															      	</form>
 															    </div>
 															</div>
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div> 
-				
 				</div>
 			</div>
 		</div>
-
-		
-
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -708,7 +892,13 @@
 	        	editor: ClassicEditor,
 
 	        	applicationSettings : {
-	        		
+	        		medias : [
+	        			{
+	        				// name : null,
+	        				// logo : null,
+	        				// link : null,
+	        			}
+	        		],
 	        	},
 
 	        	newLogo : null,
@@ -718,7 +908,13 @@
 	        	loading : false,
 
 	        	errors : {
-	        		applicationSettings : {},
+	        		medias : [
+	        			// {
+	        				// name : null,
+	        				// logo : null,
+	        				// link : null,
+	        			// }
+	        		],
 	        	},
 
 	        	submitForm : true,
@@ -762,6 +958,7 @@
 					})
 					.finally(response=>{
 						this.loading = false;
+						this.configureErrorMedias();
 					});
 			},
 			updatePaymentSetting() {
@@ -774,7 +971,7 @@
 				this.validateFormInput('vat_percentage');
 				this.validateFormInput('official_currency_name');
 
-				if (this.errors.applicationSettings.official_bank_name || this.errors.applicationSettings.official_merchant_name || this.errors.applicationSettings.official_bank_account_name || this.errors.applicationSettings.official_bank_account_number || this.errors.applicationSettings.official_merchant_account_number || this.errors.applicationSettings.vat_percentage || this.errors.applicationSettings.official_currency_name) {
+				if (this.errors.official_bank_name || this.errors.official_merchant_name || this.errors.official_bank_account_name || this.errors.official_bank_account_number || this.errors.official_merchant_account_number || this.errors.vat_percentage || this.errors.official_currency_name) {
 
 					this.submitForm = false;
 					return;
@@ -802,7 +999,7 @@
 				this.validateFormInput('official_mail_address');
 				this.validateFormInput('official_contact_address');
 
-				if (this.errors.applicationSettings.official_customer_care_number || this.errors.applicationSettings.official_mail_address || this.errors.applicationSettings.official_contact_address) {
+				if (this.errors.official_customer_care_number || this.errors.official_mail_address || this.errors.official_contact_address) {
 
 					this.submitForm = false;
 					return false;
@@ -836,7 +1033,7 @@
 				this.validateFormInput('default_measure_unit');
 
 
-				if (/* this.errors.applicationSettings.default_selling_price /* || this.errors.applicationSettings.default_storing_price  || */ this.errors.applicationSettings.default_length || this.errors.applicationSettings.default_width || this.errors.applicationSettings.default_height || this.errors.applicationSettings.default_measure_unit) {
+				if (/* this.errors.default_selling_price /* || this.errors.default_storing_price  || */ this.errors.default_length || this.errors.default_width || this.errors.default_height || this.errors.default_measure_unit) {
 
 					this.submitForm = false;
 					return false;
@@ -862,7 +1059,10 @@
 			},
 			updateSystemSetting() {
 
-				if (!this.newLogo && !this.newFavicon) {
+				this.validateFormInput('app_name');
+				this.validateFormInput('copyright_message');
+
+				if (this.errors.app_name || this.errors.copyright_message) {
 					this.submitForm = false;
 					return;
 				}
@@ -891,46 +1091,119 @@
 
 					});
 			},
-			onLogoChange(evnt){
+			updateMediaSetting() {
+
+				this.validateFormInput('media_name');
+				this.validateFormInput('media_logo');
+				this.validateFormInput('media_link');
+
+				if (! this.applicationSettings.medias || ! this.applicationSettings.medias.length || (this.errors.medias && this.errors.medias.some(mediaError => Object.keys(mediaError).length > 0))) {
+					this.submitForm = false;
+					return;
+				}
+
+				axios
+					.put('/media-settings', this.applicationSettings)
+					.then(response => {
+						if (response.status == 200) {
+							
+							this.newLogo = this.newFavicon = null;
+							this.$toastr.s("Media settings have been updated", "Success");
+
+						}
+					})
+					.catch(error => {
+
+						if (error.response.status == 422) {
+
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+
+					});
+
+			},
+			addMedia() {
+				
+				this.submitForm = true;
+
+				if (! this.applicationSettings.medias || ! this.applicationSettings.medias.length) {
+					this.$set(this.applicationSettings, 'medias', [ {} ]);
+					this.$set(this.errors, 'medias', [ {} ]);
+				}
+				else {
+					this.applicationSettings.medias.push({});
+					this.errors.medias.push({});
+				}
+
+			},
+			removeMedia() {
+
+				if (this.applicationSettings.medias && this.applicationSettings.medias.length > 1 && this.errors.medias.length > 1) {
+					this.applicationSettings.medias.pop();
+					this.errors.medias.pop();
+					this.submitForm = true;
+				}
+
+			},
+			onLogoChange(evnt, filename, index){
 				let files = evnt.target.files || evnt.dataTransfer.files;
 
                 // Only process image files.
 		      	if (files.length && files[0].type.match('image.*')) {
 		      		this.submitForm = true;
-                	this.readImage(files[0], 'logo');
+
+		      		if (filename=='logo') {
+                		this.readImage(files[0], 'logo', index);
+		      		}
+		      		else if (filename=='favicon') {
+                		this.readImage(files[0], 'favicon', index);
+		      		}
+		      		else if (filename=='media') {
+                		this.readImage(files[0], 'media', index);
+		      		}
+
 		      	}
 
 		      	evnt.target.value = '';
 
 		      	return;
 			},
-			onFaviconChange(evnt){
-				let files = evnt.target.files || evnt.dataTransfer.files;
-
-                // Only process image files.
-		      	if (files.length && files[0].type.match('image.*')) {
-		      		this.submitForm = true;
-                	this.readImage(files[0], 'favicon');
-		      	}
-
-		      	evnt.target.value = '';
-
-		      	return;
-			},
-			readImage(file, filename) {
+			readImage(file, filename, index = false) {
                 let reader = new FileReader();
 
-                if (filename=='favicon') {
-	                reader.onload = (evnt) => {
-	                    this.newFavicon = this.applicationSettings.application_favicon = evnt.target.result;
-	                };
-                }else{
+                if (filename=='logo') {
                 	reader.onload = (evnt) => {
 	                    this.newLogo = this.applicationSettings.application_logo = evnt.target.result;
 	                };
                 }
+                else if (filename=='favicon') {
+	                reader.onload = (evnt) => {
+	                    this.newFavicon = this.applicationSettings.application_favicon = evnt.target.result;
+	                };
+                }
+                else if (filename=='media' && index >= 0) {
+                	reader.onload = (evnt) => {
+	                    this.applicationSettings.medias[index].logo = evnt.target.result;
+	                };
+                }
 
                 reader.readAsDataURL(file);
+            },
+            configureErrorMedias() {
+
+            	// this.errors.medias = [];
+
+            	if (this.applicationSettings.medias.length) {
+            		this.applicationSettings.medias.forEach(
+            			(applicationMedia, applicationMediaIndex) => {
+            				console.log(applicationMediaIndex);
+            				this.errors.medias.push({});
+            			}
+            		);
+            	}
+
             },
             validateFormInput (formInputName) {
 				
@@ -941,14 +1214,14 @@
 					case 'official_bank_name' :
 
 						if (!this.applicationSettings.official_bank_name) {
-							this.errors.applicationSettings.official_bank_name = 'Bank name is required';
+							this.errors.official_bank_name = 'Bank name is required';
 						}
 						else if (!this.applicationSettings.official_bank_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.applicationSettings.official_bank_name = 'No special character';
+							this.errors.official_bank_name = 'No special character or end space';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_bank_name');
+							this.$delete(this.errors, 'official_bank_name');
 						}
 
 						break;
@@ -956,14 +1229,14 @@
 					case 'official_merchant_name' :
 
 						if (!this.applicationSettings.official_merchant_name) {
-							this.errors.applicationSettings.official_merchant_name = 'Merchant name is required';
+							this.errors.official_merchant_name = 'Merchant name is required';
 						}
 						else if (!this.applicationSettings.official_merchant_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.applicationSettings.official_merchant_name = 'No special character';
+							this.errors.official_merchant_name = 'No special character or end space';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_merchant_name');
+							this.$delete(this.errors, 'official_merchant_name');
 						}
 
 						break;
@@ -971,14 +1244,14 @@
 					case 'official_bank_account_name' :
 
 						if (!this.applicationSettings.official_bank_account_name) {
-							this.errors.applicationSettings.official_bank_account_name = 'Account holder name is required';
+							this.errors.official_bank_account_name = 'Account holder name is required';
 						}
 						else if (!this.applicationSettings.official_bank_account_name.match(/^[_A-z0-9]*((-|_|\s)*[_A-z0-9])*$/g)) {
-							this.errors.applicationSettings.official_bank_account_name = 'No special character';
+							this.errors.official_bank_account_name = 'No special character or end space';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_bank_account_name');
+							this.$delete(this.errors, 'official_bank_account_name');
 						}
 
 						break;
@@ -986,14 +1259,14 @@
 					case 'official_bank_account_number' :
 
 						if (!this.applicationSettings.official_bank_account_number) {
-							this.errors.applicationSettings.official_bank_account_number = 'Account number is required';
+							this.errors.official_bank_account_number = 'Account number is required';
 						}
 						else if (!this.applicationSettings.official_bank_account_number.match(/^[_A-z0-9]*((-|_|\s)*[_A-z0-9])*$/g)) {
-							this.errors.applicationSettings.official_bank_account_number = 'No special character';
+							this.errors.official_bank_account_number = 'No special character or end space';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_bank_account_number');
+							this.$delete(this.errors, 'official_bank_account_number');
 						}
 
 						break;
@@ -1001,14 +1274,14 @@
 					case 'official_merchant_account_number' :
 
 						if (!this.applicationSettings.official_merchant_account_number) {
-							this.errors.applicationSettings.official_merchant_account_number = 'Merchant account is required';
+							this.errors.official_merchant_account_number = 'Merchant account is required';
 						}
 						else if (!this.applicationSettings.official_merchant_account_number.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
-							this.errors.applicationSettings.official_merchant_account_number = 'Invalid account number';
+							this.errors.official_merchant_account_number = 'Invalid account number';
 						}
 						else {
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_merchant_account_number');
+							this.$delete(this.errors, 'official_merchant_account_number');
 						}
 
 						break;
@@ -1016,14 +1289,14 @@
 					case 'vat_percentage' :
 
 						if (!this.applicationSettings.vat_percentage) {
-							this.errors.applicationSettings.vat_percentage = 'Vat rate is required';
+							this.errors.vat_percentage = 'Vat rate is required';
 						}
 						else if (this.applicationSettings.vat_percentage < 0 || this.applicationSettings.vat_percentage > 100 ) {
-							this.errors.applicationSettings.vat_percentage = 'Value should be between 0 and 100';
+							this.errors.vat_percentage = 'Value should be between 0 and 100';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'vat_percentage');
+							this.$delete(this.errors, 'vat_percentage');
 						}
 
 						break;
@@ -1031,14 +1304,14 @@
 					case 'official_currency_name' :
 
 						if (!this.applicationSettings.official_currency_name) {
-							this.errors.applicationSettings.official_currency_name = 'Currency name is required';
+							this.errors.official_currency_name = 'Currency name is required';
 						}
 						else if (!this.applicationSettings.official_currency_name.match(/^[_A-z0-9]*((-|_|\s)*[_A-z0-9])*$/g)) {
-							this.errors.applicationSettings.official_currency_name = 'No special character';
+							this.errors.official_currency_name = 'No special character or end space';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_currency_name');
+							this.$delete(this.errors, 'official_currency_name');
 						}
 
 						break;
@@ -1046,14 +1319,14 @@
 					case 'official_customer_care_number' :
 
 						if (!this.applicationSettings.official_customer_care_number) {
-							this.errors.applicationSettings.official_customer_care_number = 'Customer care number is required';
+							this.errors.official_customer_care_number = 'Customer care number is required';
 						}
 						else if (!this.applicationSettings.official_customer_care_number.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
-							this.errors.applicationSettings.official_customer_care_number = 'Invalid customer care number';
+							this.errors.official_customer_care_number = 'Invalid customer care number';
 						}
 						else {
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_customer_care_number');
+							this.$delete(this.errors, 'official_customer_care_number');
 						}
 
 						break;
@@ -1061,14 +1334,14 @@
 					case 'official_mail_address' :
 
 						if (!this.applicationSettings.official_mail_address) {
-							this.errors.applicationSettings.official_mail_address = 'Official mail is required';
+							this.errors.official_mail_address = 'Official mail is required';
 						}
 						else if (!this.applicationSettings.official_mail_address.match(/[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/g)) {
-							this.errors.applicationSettings.official_mail_address = 'Invalid email';
+							this.errors.official_mail_address = 'Invalid email';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_mail_address');
+							this.$delete(this.errors, 'official_mail_address');
 						}
 
 						break;
@@ -1076,56 +1349,88 @@
 					case 'official_contact_address' :
 
 						if (!this.applicationSettings.official_contact_address) {
-							this.errors.applicationSettings.official_contact_address = 'Official address is required';
+							this.errors.official_contact_address = 'Official address is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'official_contact_address');
+							this.$delete(this.errors, 'official_contact_address');
 						}
 
 						break;
 
-					/*case 'default_selling_price' :
+					/*
+					case 'default_selling_price' :
 
 						if (!this.applicationSettings.default_selling_price) {
-							this.errors.applicationSettings.default_selling_price = 'Selling price is required';
+							this.errors.default_selling_price = 'Selling price is required';
 						}
 						else if (this.applicationSettings.default_selling_price < 0) {
-							this.errors.applicationSettings.default_selling_price = 'Value should be greater than 0';
+							this.errors.default_selling_price = 'Value should be greater than 0';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_selling_price');
+							this.$delete(this.errors, 'default_selling_price');
 						}
 
-						break;*/
+						break;
 
-					/*case 'default_storing_price' :
+					case 'default_storing_price' :
 
 						if (!this.applicationSettings.default_storing_price) {
-							this.errors.applicationSettings.default_storing_price = 'Storing price is required';
+							this.errors.default_storing_price = 'Storing price is required';
 						}
 						else if (this.applicationSettings.default_storing_price < 0) {
-							this.errors.applicationSettings.default_storing_price = 'Value should be greater than 0';
+							this.errors.default_storing_price = 'Value should be greater than 0';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_storing_price');
+							this.$delete(this.errors, 'default_storing_price');
 						}
 
-						break;*/
+						break;
+					*/
+				
+					case 'app_name' :
+
+						if (!this.applicationSettings.app_name) {
+							this.errors.app_name = 'App name is required';
+						}
+						else if (!this.applicationSettings.app_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.app_name = 'No special character or end space';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'app_name');
+						}
+
+						break;
+
+					case 'copyright_message' :
+
+						if (!this.applicationSettings.copyright_message) {
+							this.errors.copyright_message = 'Copyright message is required';
+						}
+						else if (!this.applicationSettings.copyright_message.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							this.errors.copyright_message = 'No special character or end space';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'copyright_message');
+						}
+
+						break;
 
 					case 'default_length' :
 
 						if (!this.applicationSettings.default_length) {
-							this.errors.applicationSettings.default_length = 'Default length is required';
+							this.errors.default_length = 'Default length is required';
 						}
 						else if (this.applicationSettings.default_length < 0) {
-							this.errors.applicationSettings.default_length = 'Value should be greater than 0';
+							this.errors.default_length = 'Value should be greater than 0';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_length');
+							this.$delete(this.errors, 'default_length');
 						}
 
 						break;
@@ -1133,14 +1438,14 @@
 					case 'default_width' :
 
 						if (!this.applicationSettings.default_width) {
-							this.errors.applicationSettings.default_width = 'Default width is required';
+							this.errors.default_width = 'Default width is required';
 						}
 						else if (this.applicationSettings.default_width < 0) {
-							this.errors.applicationSettings.default_width = 'Value should be greater than 0';
+							this.errors.default_width = 'Value should be greater than 0';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_width');
+							this.$delete(this.errors, 'default_width');
 						}
 
 						break;
@@ -1148,14 +1453,14 @@
 					case 'default_height' :
 
 						if (!this.applicationSettings.default_height) {
-							this.errors.applicationSettings.default_height = 'Default height is required';
+							this.errors.default_height = 'Default height is required';
 						}
 						else if (this.applicationSettings.default_height < 0) {
-							this.errors.applicationSettings.default_height = 'Value should be greater than 0';
+							this.errors.default_height = 'Value should be greater than 0';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_height');
+							this.$delete(this.errors, 'default_height');
 						}
 
 						break;
@@ -1163,11 +1468,93 @@
 					case 'default_measure_unit' :
 
 						if (!this.applicationSettings.default_measure_unit) {
-							this.errors.applicationSettings.default_measure_unit = 'Default unit is required';
+							this.errors.default_measure_unit = 'Default unit is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.applicationSettings, 'default_measure_unit');
+							this.$delete(this.errors, 'default_measure_unit');
+						}
+
+						break;
+
+					case 'media_name' :
+
+						if (this.applicationSettings.medias && this.applicationSettings.medias.length) {
+
+							this.applicationSettings.medias.forEach(
+								(media, mediaIndex) => {
+									if (! media.name) {
+										this.errors.medias[mediaIndex].media_name = 'Media name is required';
+									}
+									else if (! media.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+										this.errors.medias[mediaIndex].media_name = 'No special character or end space';
+									}
+									else{
+										this.submitForm = true;
+										this.$delete(this.errors.medias[mediaIndex], 'media_name');
+									}
+								}
+							);
+
+						}
+						else {
+
+							this.errors.medias = [
+								{}
+							];
+						}
+
+						break;
+
+					case 'media_logo' :
+
+						if (this.applicationSettings.medias && this.applicationSettings.medias.length) {
+
+							this.applicationSettings.medias.forEach(
+								(media, mediaIndex) => {
+									if (! media.logo) {
+										this.errors.medias[mediaIndex].media_logo = 'Media logo is required';
+									}
+									else{
+										this.submitForm = true;
+										this.$delete(this.errors.medias[mediaIndex], 'media_logo');
+									}
+								}
+							);
+
+						}
+						else {
+							this.errors.medias = [
+								{}
+							];
+						}
+
+						break;
+
+					case 'media_link' :
+
+						if (this.applicationSettings.medias && this.applicationSettings.medias.length) {
+
+							this.applicationSettings.medias.forEach(
+								(media, mediaIndex) => {
+									if (! media.link) {
+										this.errors.medias[mediaIndex].media_link = 'Media link is required';
+									}
+									else if (! media.link.match(/^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/)) {
+										this.errors.medias[mediaIndex].media_link = 'Invalid URL';
+									}
+									else{
+										this.submitForm = true;
+										this.$delete(this.errors.medias[mediaIndex], 'media_link');
+									}
+								}
+							);
+
+						}
+						else {
+							this.errors.medias = [
+								{}
+							];
 						}
 
 						break;

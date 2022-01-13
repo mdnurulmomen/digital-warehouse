@@ -10,13 +10,13 @@ class SettingController extends Controller
     public function __construct()
     {   
         $this->middleware("permission:view-application-setting-index")->only('showApplicationSetting');
-        $this->middleware("permission:update-application-setting")->only(['updatePaymentSetting', 'updateContactSetting', 'updateWarehouseSetting', 'updateSystemSetting']);
+        $this->middleware("permission:update-application-setting")->only(['updatePaymentSetting', 'updateContactSetting', 'updateWarehouseSetting', 'updateSystemSetting', 'updateMediaSetting']);
     }
 
     // Application Setting
     public function showApplicationSetting()
     {
-    	return response(ApplicationSetting::first(), 200);
+    	return response(ApplicationSetting::with('medias')->first(), 200);
     }
 
     public function updatePaymentSetting(Request $request)
@@ -92,10 +92,36 @@ class SettingController extends Controller
 
     public function updateSystemSetting(Request $request)
     {
+        $request->validate([
+            'app_name' => 'required|string|max:50',
+            'copyright_message' => 'required|string|max:255',
+        ]);
+
         $adminSettings = ApplicationSetting::firstOrCreate([]);
+
+        $adminSettings->app_name = $request->app_name;
+        $adminSettings->copyright_message = $request->copyright_message;
 
         $adminSettings->application_logo = $request->application_logo;
         $adminSettings->application_favicon = $request->application_favicon;
+
+        $adminSettings->save();
+
+        return $this->showApplicationSetting();
+    }
+
+    public function updateMediaSetting(Request $request)
+    {
+        $request->validate([
+            'medias' => 'required|array|min:1',
+            'medias.*.name' => 'required|string',
+            'medias.*.logo' => 'required',
+            'medias.*.link' => 'required|url',
+        ]);
+
+        $adminSettings = ApplicationSetting::firstOrCreate([]);
+
+        $adminSettings->application_media = json_decode(json_encode($request->medias));
 
         $adminSettings->save();
 
