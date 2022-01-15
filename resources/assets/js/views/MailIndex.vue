@@ -3,8 +3,8 @@
 	<div class="pcoded-content">
 		<breadcrumb 
 			:icon="'fa fa-clock-o'"
-			:title="'rent-periods'" 
-			:message="'All our warehouse rent-periods'"
+			:title="'mails'" 
+			:message="'All mails sent from panel'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -446,7 +446,7 @@
 				
 				axios
 				.get(
-					"/api/search-rent-periods/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-send-mails/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -467,7 +467,11 @@
 			showContentCreateForm() {
 				this.createMode = true;
 				this.formSubmitted = false;
-				this.singleAssetData = {};
+				this.singleAssetData = {
+					recipients : [],
+			    	subject : null,
+			    	body : null,
+				};
 				$('#asset-createOrEdit-modal').modal('show');
 			},
 			openContentEditForm(object) {
@@ -517,7 +521,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.put('/rent-periods/' + this.singleAssetData.id + '/' + this.perPage, singleAssetData)
+					.put('/send-mails/' + this.singleAssetData.id + '/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Rent period has been updated", "Success");
@@ -543,7 +547,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.delete('/rent-periods/' + this.singleAssetData.id + '/' + this.perPage)
+					.delete('/send-mails/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Rent period has been deleted", "Success");
@@ -569,7 +573,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.patch('/rent-periods/' + this.singleAssetData.id + '/' + this.perPage)
+					.patch('/send-mails/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Rent period has been restored", "Success");

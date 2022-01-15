@@ -28,19 +28,46 @@
 					<div class="modal-body">
 						<div class="form-row">
 							<div class="form-group col-md-12">
-								<label for="inputFirstName">Recipients</label>
+								<label for="inputFirstName">Input Email</label>
 								<input type="text" 
 									class="form-control" 
-									v-model="singleAssetData.recipients" 
-									placeholder="Email" 
-									:class="!errors.asset.recipients ? 'is-valid' : 'is-invalid'" 
-									@change="validateFormInput('recipients')" 
-									required="true" 
+									v-model="newEmail" 
+									placeholder="New Email Address" 
+									:class="!errors.asset.email ? 'is-valid' : 'is-invalid'" 
+									@change="validateFormInput('email')" 
+									@keyup.enter="addRecipientMail()" 
+									@keydown.enter.prevent='verifyUserInput'
 								>
 
 								<div class="invalid-feedback">
-						        	{{ errors.asset.recipients }}
+						        	{{ errors.asset.email }}
 						  		</div>
+							</div>
+
+							<div class="form-group col-md-12">
+								<label for="inputFirstName">Recipients</label>
+
+								<div class="border border-success p-4 rounded-sm">
+									<ul 
+										id="recipient-email" 
+										v-if="singleAssetData.recipients.length"
+									>
+										<li 
+											v-for="(recipient, recipientIndex) in singleAssetData.recipients"
+											:key="'recipient-email-index-' + recipientIndex + '-recipient-' + recipient"
+										>	
+											{{ recipient }}
+
+											<i 
+												class="fa fa-close text-danger p-2" 
+												data-toggle="tooltip" data-placement="top" title="Remove Mail" 
+												v-show="recipient"
+												@click="removeRecipientMail(recipientIndex)"
+											>	
+											</i>
+										</li>
+									</ul>
+								</div>
 							</div>
 
 							<div class="form-group col-md-12">
@@ -48,10 +75,10 @@
 								<input type="text" 
 									class="form-control" 
 									v-model="singleAssetData.subject" 
-									placeholder="Email" 
+									placeholder="Email Subject" 
 									:class="!errors.asset.subject ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('subject')" 
-									required="true" 
+									@keydown.enter.prevent='verifyUserInput'
 								>
 
 								<div class="invalid-feedback">
@@ -61,14 +88,15 @@
 
 							<div class="form-group col-md-12">
 								<label for="inputFirstName">Body</label>
-								<input type="text" 
-									class="form-control" 
-									v-model="singleAssetData.body" 
-									placeholder="Email" 
-									:class="!errors.asset.body  ? 'is-valid' : 'is-invalid'" 
-									@change="validateFormInput('body')" 
-									required="true" 
-								>
+
+								<ckeditor 
+	                              	class="form-control" 
+	                              	:editor="editor" 
+	                              	v-model="singleAssetData.body"
+	                              	:class="!errors.asset.body ? 'is-valid' : 'is-invalid'"
+	                              	@blur="validateFormInput('body')"
+	                            >
+                              	</ckeditor>
 
 								<div class="invalid-feedback">
 						        	{{ errors.asset.body }}
@@ -99,6 +127,9 @@
 </template>
 
 <script type="text/javascript">
+
+	import CKEditor from '@ckeditor/ckeditor5-vue';
+	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 	
 	export default {
 
@@ -127,27 +158,25 @@
 
 		},
 
+		components: { 
+			ckeditor: CKEditor.component,
+		},
+
 		data() {
 
 			return {
 
+				newEmail : '',
+
 				submitForm : true,
-				
+
 				errors : {
 					asset : {},
 				},
 
+				editor: ClassicEditor,
+				
 			}
-
-		},
-
-		computed: {
-
-		    currentRouteName() {
-
-		        return this.$route.name;
-		    
-		    }
 
 		},
 
@@ -175,14 +204,15 @@
 
             verifyUserInput() {
 
-				// this.validateFormInput('name');
-				// this.validateFormInput('number_days');
+				this.validateFormInput('email');
+				this.validateFormInput('subject');
+				this.validateFormInput('body');
             	
-    //         	if (Object.keys(this.errors.asset).length !== 0 && this.errors.asset.constructor === Object) {
-				// 	this.submitForm = false;
-				// 	return;
-				// }
-				// else {
+            	if (Object.keys(this.errors.asset).length !== 0 && this.errors.asset.constructor === Object) {
+					this.submitForm = false;
+					return;
+				}
+				else {
 
 	            	if (this.createMode) {
 	            		
@@ -194,43 +224,90 @@
 	            		this.$emit('updateAsset', this.singleAssetData)
 	            	}
 
-				// }
+				}
 
             },
+            addRecipientMail() {
+
+				this.validateFormInput('email');
+
+				if (this.newEmail && ! this.errors.asset.hasOwnProperty('email')) {
+
+					let emptyIndex = this.singleAssetData.recipients.findIndex(recipient=> ! recipient || recipient == '');
+
+					if (emptyIndex > -1) {
+
+						this.singleAssetData.recipients[emptyIndex] = this.newEmail;
+						this.newEmail = '';
+
+					}
+					else {
+
+						this.singleAssetData.recipients.push(this.newEmail);
+						this.newEmail = '';
+
+					}
+				
+				}
+
+			},
+			removeRecipientMail(recipientMailIndex) {
+
+				if (this.singleAssetData.recipients.length > recipientMailIndex) {
+
+					this.singleAssetData.recipients.splice(recipientMailIndex, 1);
+					// this.$set(this.singleAssetData.recipients, 'recipientMailIndex', '');
+
+				}
+
+			},
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
 
 				switch(formInputName) {
 
-					case 'name' :
+					case 'email' :
 
-						if (! this.singleAssetData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.asset.name = 'No space or special character';
+						if (! this.newEmail && ! this.singleAssetData.recipients.length) {
+							this.errors.asset.email = 'Recipient is required';
 						}
-						else if (this.currentRouteName=='rent-periods' && ! this.singleAssetData.name.match(/^[a-zA-Z0-9-_]+$/)) {
-							this.errors.asset.name = 'No space or special character';
+						else if (this.newEmail && ! this.newEmail.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/g)) {
+							this.errors.asset.email = 'Invalid email';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'name');
+							this.$delete(this.errors.asset, 'email');
 						}
 
 						break;
-					
-					/*
-					case 'number_days' :
 
-						if (this.currentRouteName=='rent-periods' && (! this.singleAssetData.number_days || this.singleAssetData.number_days < 1)) {
-							this.errors.asset.number_days = 'Day count is required';
+					case 'subject' :
+
+						if (! this.singleAssetData.subject) {
+							this.errors.asset.subject = 'Subject is required';
+						}
+						else if (! this.singleAssetData.subject.match(/^[a-zA-Z ]{2,30}$/g)) {
+							this.errors.asset.subject = 'No special character';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'number_days');
+							this.$delete(this.errors.asset, 'subject');
 						}
 
 						break;
-					*/
+
+					case 'body' :
+
+						if (! this.singleAssetData.body) {
+							this.errors.asset.body = 'Body is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.asset, 'body');
+						}
+
+						break;
 
 				}
 	 

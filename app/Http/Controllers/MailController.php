@@ -9,21 +9,6 @@ use Illuminate\Http\Request;
 class MailController extends Controller
 {
 	public function sendDynamicMail(Request $request, $perPage = false) {
-		/*
-		$request->validate([
-			'to' => 'required|email'
-			'subject' => 'required|string|max:255',
-			'body' => 'required|string|max:255',
-		]);
-
-		Mail::to($request->to)->send(new GeneralMail($request));
-
-		return back()->with("success", "Email is sent successfully.");
-		*/
-
-		// Mail::to('test@gudam.com.bd')->send(new GeneralMail(Admin::find(1)));
-		
-		return new GeneralMail($request);
 
 		$request->validate([
 			'recipients' => 'required|array|min:1',
@@ -33,7 +18,7 @@ class MailController extends Controller
 		]);
 
 		foreach ($request->recipients as $recipient) {
-		    Mail::to($recipient)->send(new GeneralMail($request));
+		    Mail::to($recipient)->send(new GeneralMail($request->subject));
 		}
 
 		return "Email is sent successfully";

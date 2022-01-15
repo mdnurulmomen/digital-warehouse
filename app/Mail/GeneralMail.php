@@ -12,16 +12,17 @@ class GeneralMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $request;
+    public $subject, $from;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($request)
+    public function __construct($subject, $from = false)
     {
-        $this->request = $request;
+        $this->from = $from;
+        $this->subject = $subject;
     }
 
     /**
@@ -30,39 +31,23 @@ class GeneralMail extends Mailable implements ShouldQueue
      * @return $this
      */
     public function build()
-    {
-        // return $this->view('view.name');
-        
-        /*
-        $generalSettings = ApplicationSetting::firstOrCreate([
-            'id' => 1
-        ]);
-        */
-
-        // $officialMailAddress =  $generalSettings->official_mail_address ?? 'admin@gmail.com';     
-        // $officialMailTemplate =  $generalSettings->mail_template;     
-        
-        /*
-        $officialMailAddress =  'nothing@gudam.com.bd';     
-
-
-        return $this->subject('Test Subject Updated')
-            ->view('emails.general');
-        */
-       
+    {  
         $generalSettings = ApplicationSetting::firstOrCreate([
             'id' => 1
         ]);
  
+        // $officialMailHeader =  $generalSettings->official_mail_header;     
         // $officialMailFooter =  $generalSettings->official_mail_footer;     
        
-        return $this->subject($this->request['subject'])
-            ->markdown('emails.general')
+        return $this->subject($this->subject)
+            ->view('emails.general')
             ->with([
                 'appName' => $generalSettings->app_name,
-                'officialMediaItems' => $generalSettings->officialMediaItems,
-                'officialCopyrightMessage' => $generalSettings->officialCopyrightMessage,
-                'officialContactAddress' => $generalSettings->officialContactAddress,
+                'officialMediaItems' => $generalSettings->medias,
+                'officialCopyrightMessage' => $generalSettings->copyright_message,
+                'officialContactAddress' => $generalSettings->official_contact_address,
+                'message' => $this
+                // 'officialMailHeader' => $officialMailHeader,
                 // 'officialMailFooter' => $officialMailFooter,
             ]);
     }
