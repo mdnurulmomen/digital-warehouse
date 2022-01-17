@@ -1,6 +1,6 @@
 <template>	
 	<!-- Modal -->
-	<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="mail-create-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -22,7 +22,6 @@
 					v-on:submit.prevent="verifyUserInput" 
 					autocomplete="off" 
 				>
-
 					<input type="hidden" name="_token" :value="csrf">
 
 					<div class="modal-body">

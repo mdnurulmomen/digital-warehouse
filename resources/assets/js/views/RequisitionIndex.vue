@@ -3798,7 +3798,7 @@
 
 				    	if (index > -1) {
 
-			    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
+			    			this.$set(this.allFetchedRequisitions.dispatched.data, index, e);
 				    	
 				    	}
 				    	else{

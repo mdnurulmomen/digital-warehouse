@@ -50,8 +50,8 @@ Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').def
 Vue.component('v-date-picker', require('v-calendar/lib/components/date-picker.umd'));
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
 Vue.component('table-with-delete-option', require('./components/TableWithDeleteOption.vue').default);
-Vue.component('mail-create-or-edit-modal', require('./components/MailCreateOrEditModal.vue').default);
-Vue.component('container-type-view-modal', require('./components/ContainerTypeViewModal.vue').default);
+// Vue.component('mail-create-modal', require('./components/MailCreateModal.vue').default);
+// Vue.component('container-type-view-modal', require('./components/ContainerTypeViewModal.vue').default);
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/SearchAndAdditionOption.vue').default);
@@ -59,7 +59,7 @@ Vue.component('restore-confirmation-modal', require('./components/RestoreConfirm
 Vue.component('addition-search-export-option', require('./components/AdditionSearchExportOption.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
-Vue.component('container-type-create-or-edit-modal', require('./components/ContainerTypeCreateOrEditModal.vue').default);
+// Vue.component('container-type-create-or-edit-modal', require('./components/ContainerTypeCreateOrEditModal.vue').default);
 
 import AdminSideMenuBar from './AdminSideMenuBar'
 
@@ -152,7 +152,7 @@ const router = new VueRouter({
             component: MailIndex,
             meta: {
                 // authRequired: true,
-                // requiredPermission: 'view-product-index' 
+                requiredPermission: 'view-mail-index' 
             }
         },
         {

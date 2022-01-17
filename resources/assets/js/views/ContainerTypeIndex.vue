@@ -137,6 +137,8 @@
 <script type="text/javascript">
 
 	import axios from 'axios';
+	import ContainerTypeViewModal from '../components/ContainerTypeViewModal.vue';
+	import ContainerTypeCreateOrEditModal from '../components/ContainerTypeCreateOrEditModal.vue';
 
     let singleAssetData = {
     	shelf : {
@@ -145,6 +147,11 @@
     };
 
 	export default {
+
+	    components:{
+	    	ContainerTypeViewModal,
+	    	ContainerTypeCreateOrEditModal
+	    },
 
 	    data() {
 

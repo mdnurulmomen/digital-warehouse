@@ -58,7 +58,7 @@
 									:disabled="formSubmitted"
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentEditForm', content)" 
-									v-if="userHasPermissionTo('update-' + requiredPermission)"
+									v-if="$route.name!='mails' && userHasPermissionTo('update-' + requiredPermission)"
 							>
 								<i class="fa fa-edit"></i>
 							</button>
@@ -285,6 +285,15 @@
 				else if (columnValue.match(/code/gi)) {
 					return this.$options.filters.capitalize(object.code);
 				}
+				else if (columnValue.match(/subject/gi)) {
+					return this.$options.filters.capitalize(object.subject);
+				}
+				else if (columnValue.match(/body/gi)) {
+					return object.body.length > 20 ? object.body.slice(0, 10)+'...' : this.$options.filters.capitalize(object.body);
+				}
+				else if (columnValue.match(/sender/gi)) {
+					return object.sender ? this.getFullName(object.sender) : 'NA';
+				}
 
 			},
 			immuteableWarehouse(warehouse) {
@@ -320,6 +329,63 @@
 						this.ascending = true;
 						this.descending = false;
 						this.ascendingAlphabets('user_name');
+					}
+					
+				}
+				else if (columnName.match(/subject/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('subject');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('subject');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('subject');
+					}
+					
+				}
+				else if (columnName.match(/body/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('body');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('body');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('body');
+					}
+					
+				}
+				else if (columnName.match(/sender/gi)) {
+
+					if (this.ascending) {
+						this.ascending = false;
+						this.descending = true;
+						this.descendingAlphabets('sender.user_name');
+					}
+					else if (this.descending) {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('sender.user_name');
+					}
+					else {
+						this.ascending = true;
+						this.descending = false;
+						this.ascendingAlphabets('sender.user_name');
 					}
 					
 				}

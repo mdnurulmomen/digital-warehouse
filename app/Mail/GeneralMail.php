@@ -12,17 +12,20 @@ class GeneralMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $subject, $from;
+    public $fromAddress, $senderName, $subject, $body, $generalSettings;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($subject, $from = false)
+    public function __construct($subject, $body, $generalSettings, $fromAddress = false, $senderName = false)
     {
-        $this->from = $from;
+        $this->body = $body;
         $this->subject = $subject;
+        $this->generalSettings = $generalSettings;
+        $this->senderName = $senderName ? $senderName : config('mail.from.name');
+        $this->fromAddress = $fromAddress ? $fromAddress : config('mail.from.address'); 
     }
 
     /**
@@ -32,23 +35,8 @@ class GeneralMail extends Mailable implements ShouldQueue
      */
     public function build()
     {  
-        $generalSettings = ApplicationSetting::firstOrCreate([
-            'id' => 1
-        ]);
- 
-        // $officialMailHeader =  $generalSettings->official_mail_header;     
-        // $officialMailFooter =  $generalSettings->official_mail_footer;     
-       
-        return $this->subject($this->subject)
-            ->view('emails.general')
-            ->with([
-                'appName' => $generalSettings->app_name,
-                'officialMediaItems' => $generalSettings->medias,
-                'officialCopyrightMessage' => $generalSettings->copyright_message,
-                'officialContactAddress' => $generalSettings->official_contact_address,
-                'message' => $this
-                // 'officialMailHeader' => $officialMailHeader,
-                // 'officialMailFooter' => $officialMailFooter,
-            ]);
+        return $this->from($this->fromAddress, $this->senderName)
+            ->subject($this->subject)
+            ->view('emails.general');
     }
 }

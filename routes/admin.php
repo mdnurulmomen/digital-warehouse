@@ -29,7 +29,10 @@ Route::name('admin.')->group(function () {
 		
 		Route::get('/{any}', 'HomeController@adminHome')->name('home');
 		
-		Route::post('/send-mails/{perPage}', 'MailController@sendDynamicMail')->name('send-mail');
+		Route::get('/api/mails/{perPage?}', 'MailController@showAllMails')->name('mails');
+		Route::post('/mails/{perPage}', 'MailController@sendDynamicMail')->name('mails');
+		Route::delete('/mails/{mail}/{perPage}', 'MailController@deleteMail')->name('mails');
+		Route::get('api/search-mails/{query}/{perPage}', 'MailController@searchAllMails')->name('search-mails');
 
 		// profile
 		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	

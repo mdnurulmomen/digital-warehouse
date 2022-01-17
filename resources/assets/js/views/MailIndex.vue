@@ -1,8 +1,8 @@
 
-<template v-if="userHasPermissionTo('view-warehouse-asset-index')">
+<template v-if="userHasPermissionTo('view-mail-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-clock-o'"
+			:icon="'fa fa-envelop-o'"
 			:title="'mails'" 
 			:message="'All mails sent from panel'"
 		></breadcrumb>			
@@ -20,11 +20,11 @@
 										<div class="row">
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
+											  		v-if="userHasPermissionTo('view-mail-index') || userHasPermissionTo('create-mail')" 
 											  		:query="query" 
 											  		:caller-page="'mail'" 
 											  		:disable-add-button="formSubmitted" 
-											  		:required-permission="'warehouse-asset'" 
+											  		:required-permission="'mail'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -33,41 +33,37 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-										  		<!-- 
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['current', 'trashed']" 
+										  			:tab-names="['manual', 'automated']" 
 										  			:current-tab="currentTab" 
 
 										  			@showCurrentContents="showCurrentContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab> 
-										  		-->
 
 										  		<loading v-show="loading"></loading>
 										  		 
-										  		<!-- 
-										  		<table-with-soft-delete-option 
+										  		<table-with-delete-option 
 										  			:query="query" 
 										  			:per-page="perPage"  
 										  			:loading="loading"  
-										  			:column-names="['name', '# days']" 
-										  			:column-values-to-show="['name', 'number_days']" 
+										  			:column-names="['subject', 'body', 'sender']" 
+										  			:column-values-to-show="['subject', 'body', 'sender']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
-										  			:required-permission = "'warehouse-asset'" 
+										  			:required-permission = "'mail'" 
 										  			:form-submitted="formSubmitted" 
 										  			:current-content="singleAssetData"
 
-										  			@openContentEditForm="openContentEditForm($event)" 
+										  			@showContentDetails="openContentViewForm($event)" 
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
-										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
 										  		>	
-										  		</table-with-soft-delete-option> 
-										  		-->
+										  		</table-with-delete-option> 
+										  		
 
 										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">
@@ -111,7 +107,7 @@
 																		</a>
 																	</th>
 
-																	<th v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
+																	<th v-if="userHasPermissionTo('update-mail') || userHasPermissionTo('delete-mail')">
 																		Actions
 																	</th>
 																</tr>
@@ -131,14 +127,14 @@
 																		{{ content.number_days }} Days
 																	</td>
 																	
-																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">	
+																	<td v-if="userHasPermissionTo('update-mail') || userHasPermissionTo('delete-mail')">	
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
 																				data-toggle="tooltip" data-placement="top" title="Edit" 
 																				v-show="! content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('update-warehouse-asset')" 
+																				v-if="userHasPermissionTo('update-mail')" 
 																		>
 																			<i class="fa fa-edit"></i>
 																		</button>
@@ -149,7 +145,7 @@
 																				v-show="!content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentDeleteForm(content)" 
-																				v-if="userHasPermissionTo('delete-warehouse-asset')" 
+																				v-if="userHasPermissionTo('delete-mail')" 
 																		>
 																			<i class="fa fa-trash"></i>
 																		</button>
@@ -160,7 +156,7 @@
 																				v-show="content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentRestoreForm(content)" 
-																				v-if="userHasPermissionTo('delete-warehouse-asset')" 
+																				v-if="userHasPermissionTo('delete-mail')" 
 																		>
 																			<i class="fa fa-undo"></i>
 																		</button>
@@ -171,7 +167,7 @@
 																<tr 
 															  		v-show="!contentsToShow.length"
 															  	>
-														    		<td :colspan="(userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')) ? 3 : 2">
+														    		<td :colspan="(userHasPermissionTo('update-mail') || userHasPermissionTo('delete-mail')) ? 3 : 2">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -216,7 +212,7 @@
 																		</a>
 																	</th>
 
-																	<th v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">
+																	<th v-if="userHasPermissionTo('update-mail') || userHasPermissionTo('delete-mail')">
 																		Actions
 																	</th>
 																</tr>
@@ -274,63 +270,57 @@
 			</div>
 		</div>
 
-		<mail-create-or-edit-modal 
-			v-if="userHasPermissionTo('create-warehouse-asset') || userHasPermissionTo('update-warehouse-asset')" 
+		<mail-create-modal 
+			v-if="userHasPermissionTo('create-mail')" 
 			:csrf="csrf" 
 			:create-mode="createMode" 
-			:caller-page="'rent period'" 
+			:caller-page="'mail'" 
 			:form-submitted="formSubmitted"
 			:single-asset-data="singleAssetData" 
 
 			@storeAsset="storeAsset($event)" 
-			@updateAsset="updateAsset($event)" 
-		></mail-create-or-edit-modal>
+		></mail-create-modal>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-warehouse-asset')" 
+			v-if="userHasPermissionTo('delete-mail')" 
 			:csrf="csrf" 
 			:form-submitted="formSubmitted"
 			:submit-method-name="'deleteAsset'" 
 			:content-to-delete="singleAssetData"
-			:restoration-message="'But once you think, you can restore this item !'" 
+			:restoration-message="'Once you delete, you can not restore this item !'" 
 			
 			@deleteAsset="deleteAsset($event)" 
 		></delete-confirmation-modal>
-
-		<!-- 
-		<restore-confirmation-modal 
-			v-if="userHasPermissionTo('delete-warehouse-asset')" 
-			:csrf="csrf" 
-			:form-submitted="formSubmitted"
-			:submit-method-name="'restoreAsset'" 
-			:content-to-restore="singleAssetData"
-			:restoration-message="'This will restore all related items !'" 
-
-			@restoreAsset="restoreAsset($event)" 
-		></restore-confirmation-modal> 
-		-->
-
-		<!-- 
-		<asset-view-modal 
-			:caller-page="'rent period'" 
+		 
+		<mail-view-modal 
+			:caller-page="'mail'" 
 			:asset-to-view="singleAssetData" 
-			:properties-to-show="['name']"
-		></asset-view-modal>
- 		-->
+			:properties-to-show="['subject', 'body', 'sender', 'recipients']"
+		></mail-view-modal>
 	</div>
 </template>
 
 <script type="text/javascript">
 
 	import axios from 'axios';
+	import MailViewModal from '../components/MailViewModal.vue';
+	import MailCreateModal from '../components/MailCreateModal.vue';
 
     let singleAssetData = {
     	recipients : [],
-    	subject : null,
-    	body : null,
+    	subject : '',
+    	body : '',
+    	sender : {},
     };
 
 	export default {
+
+	    components : {
+	    
+	    	MailViewModal,
+	    	MailCreateModal,
+	    
+	    },
 
 	    data() {
 
@@ -340,7 +330,7 @@
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
-	        	// currentTab : 'current',
+	        	currentTab : 'manual',
 
 	        	// ascending : false,
 	      		// descending : false,
@@ -365,7 +355,7 @@
 		
 		created(){
 
-			// this.fetchAllContents();			
+			this.fetchAllContents();			
 
 		},
 
@@ -446,7 +436,7 @@
 				
 				axios
 				.get(
-					"/api/search-send-mails/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-mails/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -458,27 +448,20 @@
 				});
 
 			},
-			/*
-			showContentDetails(object) {	
+			openContentViewForm(object) {	
 				this.singleAssetData = object;
-				$('#asset-view-modal').modal('show');
+				$('#mail-view-modal').modal('show');
 			},
-			*/
 			showContentCreateForm() {
 				this.createMode = true;
 				this.formSubmitted = false;
 				this.singleAssetData = {
 					recipients : [],
-			    	subject : null,
-			    	body : null,
+			    	subject : '',
+    				body : '',
+			    	sender : {},
 				};
-				$('#asset-createOrEdit-modal').modal('show');
-			},
-			openContentEditForm(object) {
-				this.createMode = false;
-				this.formSubmitted = false;
-				this.singleAssetData = object;
-				$('#asset-createOrEdit-modal').modal('show');
+				$('#mail-create-modal').modal('show');
 			},
 			openContentDeleteForm(object) {	
 				this.formSubmitted = false;
@@ -495,39 +478,13 @@
 				this.formSubmitted = true;
 
 				axios
-					.post('/send-mails/' + this.perPage, singleAssetData)
+					.post('/mails/' + this.perPage, singleAssetData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New rent period has been created", "Success");
+							this.$toastr.s("New mail has been created", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#asset-createOrEdit-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					})
-					.finally(response => {
-						this.formSubmitted = false;
-					});
-
-			},
-			updateAsset(singleAssetData) {
-				
-				this.formSubmitted = true;
-
-				axios
-					.put('/send-mails/' + this.singleAssetData.id + '/' + this.perPage, singleAssetData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("Rent period has been updated", "Success");
-							this.allFetchedContents = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#asset-createOrEdit-modal').modal('hide');
+							$('#mail-create-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -547,39 +504,13 @@
 				this.formSubmitted = true;
 
 				axios
-					.delete('/send-mails/' + this.singleAssetData.id + '/' + this.perPage)
+					.delete('/mails/' + this.singleAssetData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Rent period has been deleted", "Success");
+							this.$toastr.s("Mail has been deleted", "Success");
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							$('#delete-confirmation-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					})
-					.finally(response => {
-						this.formSubmitted = false;
-					});
-
-			},
-			restoreAsset(singleAssetData) {
-				
-				this.formSubmitted = true;
-
-				axios
-					.patch('/send-mails/' + this.singleAssetData.id + '/' + this.perPage)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("Rent period has been restored", "Success");
-							this.allFetchedContents = response.data;
-							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
-							$('#restore-confirmation-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -607,22 +538,22 @@
     		},
     		showSelectedTabContents() {
 				
-				if (this.currentTab=='current') {
-					this.contentsToShow = this.allFetchedContents.current.data;
-					this.pagination = this.allFetchedContents.current;
+				if (this.currentTab=='manual') {
+					this.contentsToShow = this.allFetchedContents.manual.data;
+					this.pagination = this.allFetchedContents.manual;
 				}
 				else {
-					this.contentsToShow = this.allFetchedContents.trashed.data;
-					this.pagination = this.allFetchedContents.trashed;
+					this.contentsToShow = this.allFetchedContents.automated.data;
+					this.pagination = this.allFetchedContents.automated;
 				}
 
 			},
 			showCurrentContents() {
-				this.currentTab = 'current';
+				this.currentTab = 'manual';
 				this.showSelectedTabContents();
 			},
 			showTrashedContents() {
-				this.currentTab = 'trashed';
+				this.currentTab = 'automated';
 				this.showSelectedTabContents();
 			},
 			/*

@@ -40,6 +40,7 @@ class PermissionSeeder extends Seeder
                 'Merchant-Payment',
             ];
 
+            // EveryOne can view logistics
             $modelsCreateableUpdatableAndDeletable = [
                 'Logistic-Asset',
                 // 'Delivery-Company',      // Logistic
@@ -61,6 +62,10 @@ class PermissionSeeder extends Seeder
             $modelsViewable2 = [
                 'General-Dashboard-One',  // view
                 'General-Dashboard-Two',  // view
+            ];
+
+            $modelsViewableAndDeletable = [
+                'Mail',  // AppMail // view / delete 
             ];
 
             /*
@@ -145,7 +150,19 @@ class PermissionSeeder extends Seeder
 
                 ]);
 
-            } 
+            }
+
+            foreach ($modelsViewableAndDeletable as $model) {
+                
+                Permission::insert([
+                
+                    [ 'name' => 'view-'.strtolower($model).'-index' ],
+                    [ 'name' => 'delete-'.strtolower($model) ],
+                    [ 'name' => 'create-'.strtolower($model) ],
+
+                ]);
+
+            }
 
         }
 

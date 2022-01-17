@@ -518,6 +518,47 @@
 														<label>{{ modelName('view-' + model) }}</label>
 													</div>
 												</div>
+
+												<!-- Viewable And Deletable -->
+												<div 
+													class="col-md-6" 
+													v-for="model in modelsViewableAndDeletable" 
+													:key="'view-and-deletable-model-permission-name-' + model"
+												>
+													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+													<!-- Create -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('create-' + model)" 
+															@change="insertPermission('create-' + model, $event)" 
+															:ref="'create-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('create-' + model) }}</label>
+													</div>
+
+													<!-- Delete -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('delete-' + model)" 
+															@change="insertPermission('delete-' + model, $event)" 
+															:ref="'delete-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('delete-' + model) }}</label>
+													</div>
+
+													<!-- view -->
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('view-' + model + '-index')" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
+															:ref="'view-' + model.toLowerCase() + '-index'"
+														>
+														<label>{{ modelName('view-' + model + '-list') }}</label>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -649,6 +690,10 @@
 	            modelsViewable2 : [
 	                'General-Dashboard-One',  // view
 	                'General-Dashboard-Two'  // view
+	            ],
+
+	            modelsViewableAndDeletable : [
+	                'Mail',  // AppMail / view / delete
 	            ],
 
 			}
