@@ -132,7 +132,7 @@
 																	<td v-if="userHasPermissionTo('update-warehouse-asset') || userHasPermissionTo('delete-warehouse-asset')">	
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Edit" 
+																				v-tooltip.bottom-end="'Edit'" 
 																				v-show="! content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentEditForm(content)" 
@@ -143,7 +143,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete" 
+																				v-tooltip.bottom-end="'Delete'" 
 																				v-show="!content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentDeleteForm(content)" 
@@ -154,7 +154,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Restore" 
+																				v-tooltip.bottom-end="'Restore'" 
 																				v-show="content.deleted_at" 
 																				:disabled="formSubmitted" 
 																				@click="openContentRestoreForm(content)" 
@@ -241,7 +241,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload

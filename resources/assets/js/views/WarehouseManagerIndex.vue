@@ -103,7 +103,7 @@
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon"  
 																				@click="showContentDetails(warehouse)" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"
+																				v-tooltip.bottom-end="'View Details'"
 																		>
 																			<i class="fa fa-eye"></i>
 																		</button>
@@ -113,14 +113,14 @@
 																				class="btn btn-grd-primary btn-icon" 
 																				@click="openContentEditForm(warehouse)" 
 																				v-if="userHasPermissionTo('update-warehouse-manager')" 
-																				data-toggle="tooltip" data-placement="top" title="Edit"
+																				v-tooltip.bottom-end="'Edit'"
 																		>
 																			<i class="fa fa-edit"></i>
 																		</button>
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete"
+																				v-tooltip.bottom-end="'Delete'"
 																				v-show="warehouse.managers.length" 
 																				@click="openContentDeleteForm(warehouse)" 
 																				v-if="userHasPermissionTo('delete-warehouse-manager')"
@@ -191,7 +191,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload"
+																v-tooltip.bottom-end="'Reload'"
 																@click="query === '' ? fetchAllWarehouseManagers() : searchData()"
 															>
 																Reload

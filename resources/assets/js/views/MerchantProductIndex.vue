@@ -170,7 +170,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"  
+																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showProductMerchantDetails(merchantProduct)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -179,7 +179,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Edit"  
+																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openProductMerchantEditForm(merchantProduct)" 
 																				v-if="userHasPermissionTo('update-merchant-product')"
 																			>
@@ -189,7 +189,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete"  
+																				v-tooltip.bottom-end="'Delete'"  
 																				@click="openProductMerchantDeleteForm(merchantProduct)" 
 																				v-if="userHasPermissionTo('delete-merchant-product')" 
 																				:disabled="merchantProduct.product_immutability"
@@ -200,7 +200,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Requisitions"  
+																				v-tooltip.bottom-end="'Requisitions'"  
 																				@click="goProductRequisitions(merchantProduct)" 
 																				v-if="userHasPermissionTo('view-requisition-index')"
 																			>
@@ -210,7 +210,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-success btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Stocks"  
+																				v-tooltip.bottom-end="'Stocks'"  
 																				@click="goProductStore(merchantProduct)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
@@ -262,7 +262,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="searchAttributes.search === '' ? fetchMerchantAllProducts() : searchData()"
 															>
 																Reload
@@ -690,7 +690,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-															data-toggle="tooltip" data-placement="top" title="Add Variation" 
+															v-tooltip.bottom-end="'Add Variation'" 
 															:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.product.variations && singleMerchantProductData.variations.length >= singleMerchantProductData.product.variations.length" 
 															@click="addMoreVariation()"
 														>
@@ -702,7 +702,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															data-toggle="tooltip" data-placement="top" title="Remove Variation" 
+															v-tooltip.bottom-end="'Remove Variation'" 
 															:disabled="singleMerchantProductData.variations[singleMerchantProductData.variations.length-1].variation_immutability || singleMerchantProductData.variations.length < 2"
 															@click="removeVariation()"
 														>
@@ -1231,7 +1231,7 @@
 						<button 
 							type="button" 
 							class="btn btn-danger" 
-							data-toggle="tooltip" data-placement="top" title="Print"  
+							v-tooltip.bottom-end="'Print'"  
 							@click="print"
 						>
 							Print
@@ -1540,7 +1540,7 @@
 							type="button" 
 							class="btn btn-success" 
 							@click="resetSearchingDates()" 
-							data-toggle="tooltip" data-placement="top" title="Reset"
+							v-tooltip.bottom-end="'Reset'"
 						>
 	                  		Reset
 	                  	</button>

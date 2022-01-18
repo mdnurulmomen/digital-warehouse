@@ -67,7 +67,7 @@
 											  				<button 
 											  					type="button" 
 													  			class="btn btn-success btn-outline-success btn-sm" 
-													  			data-toggle="tooltip" data-placement="top" title="Create New" 
+													  			v-tooltip.bottom-end="'Create New'" 
 											  					v-if="userHasPermissionTo('create-product-stock')"
 													  			@click="showStockCreateForm()" 
 												  			>
@@ -124,7 +124,7 @@
 											  			<button 
 											  				type="button" 
 												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			data-toggle="tooltip" data-placement="top" title="Create New" 
+												  			v-tooltip.bottom-end="'Create New'" 
 										  					v-if="userHasPermissionTo('create-product-stock')"
 												  			@click="showStockCreateForm()" 
 											  			>
@@ -185,7 +185,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"  
+																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showStockDetails(stock)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -195,7 +195,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Approve Stock"  
+																				v-tooltip.bottom-end="'Approve Stock'"  
 																				@click="openStockEditForm(stock)" 
 																				v-if="! stock.has_approval && userHasPermissionTo('update-product-stock')"
 																			>
@@ -205,7 +205,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Edit"  
+																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openStockEditForm(stock)" 
 																				v-if="stock.has_approval==1 && userHasPermissionTo('update-product-stock')"
 																			>
@@ -215,7 +215,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete" 
+																				v-tooltip.bottom-end="'Delete'" 
 																				:disabled="formSubmitted || stock.products.some(stockedProduct=>stockedProduct.stock_quantity > stockedProduct.available_quantity) || (stock.hasOwnProperty('variations') && stock.variations.some(stockVariation => stockVariation.available_quantity < stockVariation.stock_quantity))"  
 																				@click="openStockDeleteForm(stock)" 
 																				v-if="userHasPermissionTo('delete-product-stock')" 
@@ -270,7 +270,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="searchAttributes.search === '' ? fetchAllStocks() : searchData()"
 															>
 																Reload
@@ -444,7 +444,7 @@
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" data-toggle="tooltip" data-placement="top" title="Next">
+									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" v-tooltip.bottom-end="'Next'">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -645,7 +645,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-													data-toggle="tooltip" data-placement="top" title="More Product" 
+													v-tooltip.bottom-end="'More Product'" 
 													@click="addMoreProduct()"
 												>
 													Add Product
@@ -655,7 +655,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-													data-toggle="tooltip" data-placement="top" title="Remove Product" 
+													v-tooltip.bottom-end="'Remove Product'" 
 													:disabled="createMode ? singleStockData.products.length < 2 : singleStockData.products.length < 1" 
 													@click="removeProduct()"
 												>
@@ -676,7 +676,7 @@
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round" 
-													data-toggle="tooltip" data-placement="top" title="Previous" 
+													v-tooltip.bottom-end="'Previous'" 
 													v-on:click="step-=1"
 												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -685,7 +685,7 @@
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round" 
-													data-toggle="tooltip" data-placement="top" title="Next" 
+													v-tooltip.bottom-end="'Next'" 
 													v-on:click="nextPage"
 												>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -775,7 +775,7 @@
 																											<button 
 																												type="button" 
 																												class="btn btn-primary" 
-																												data-toggle="tooltip" data-placement="top" title="Insert Serial" 
+																												v-tooltip.bottom-end="'Insert Serial'" 
 																												@click="addVariationSerial(stockedProductIndex, stockedVariationIndex)"
 																											>
 																												Enlist
@@ -803,7 +803,7 @@
 
 																										<i 
 																											class="fa fa-close text-danger p-2" 
-																											data-toggle="tooltip" data-placement="top" title="Remove" 
+																											v-tooltip.bottom-end="'Remove'" 
 																											v-show="stockedVariationSerial.serial_no && ! stockedVariationSerial.has_requisitions && ! stockedVariationSerial.has_dispatched"
 																											:disabled="stockedVariationSerial.has_requisitions || stockedVariationSerial.has_dispatched" 
 																											@click="removeVariationSerial(stockedProductIndex, stockedVariationIndex, stockedVariationSerialIndex)"
@@ -855,7 +855,7 @@
 																					<button 
 																						type="button" 
 																						class="btn btn-primary" 
-																						data-toggle="tooltip" data-placement="top" title="Insert Serial" 
+																						v-tooltip.bottom-end="'Insert Serial'" 
 																						@click="addProductSerial(stockedProductIndex)"
 																					>
 																						Enlist
@@ -883,7 +883,7 @@
 
 																				<i 
 																					class="fa fa-close text-danger p-2" 
-																					data-toggle="tooltip" data-placement="top" title="Remove" 
+																					v-tooltip.bottom-end="'Remove'" 
 																					v-show="productSerial.serial_no && ! productSerial.has_requisitions && ! productSerial.has_dispatched"
 																					:disabled="productSerial.has_requisitions || productSerial.has_dispatched" 
 																					@click="removeProductSerial(stockedProductIndex, productSerialIndex)"
@@ -919,7 +919,7 @@
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round" 
-													data-toggle="tooltip" data-placement="top" title="Previous" 
+													v-tooltip.bottom-end="'Previous'" 
 													v-on:click="step-=1"
 												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -928,7 +928,7 @@
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round" 
-													data-toggle="tooltip" data-placement="top" title="Next" 
+													v-tooltip.bottom-end="'Next'" 
 													v-on:click="nextPage"
 												>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -1256,7 +1256,7 @@
 																		<button 
 																			type="button" 
 																			class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-																			data-toggle="tooltip" data-placement="top" title="More Space" 
+																			v-tooltip.bottom-end="'More Space'" 
 																			@click="addMoreSpace(stockedProductIndex)"
 																		>
 																			Add Space
@@ -1266,7 +1266,7 @@
 																		<button 
 																			type="button" 
 																			class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-																			data-toggle="tooltip" data-placement="top" title="Remove Space" 
+																			v-tooltip.bottom-end="'Remove Space'" 
 																			:disabled="createMode ? stockedProduct.addresses.length < 2 : stockedProduct.addresses.length < 1" 
 																			@click="removeSpace(stockedProductIndex)"
 																		>
@@ -1952,7 +1952,7 @@
 						<button 
 							type="button" 
 							class="btn btn-danger" 
-							data-toggle="tooltip" data-placement="top" title="Print"  
+							v-tooltip.bottom-end="'Print'"  
 							@click="print()"
 						>
 							Print
@@ -1998,7 +1998,7 @@
 						<button 
 						type="button" 
 						class="btn btn-success" 
-						data-toggle="tooltip" data-placement="top" title="Reset"  
+						v-tooltip.bottom-end="'Reset'"  
 						@click="resetSearchingDates()"
 						>
 	                  		Reset

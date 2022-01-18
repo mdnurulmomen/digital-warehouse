@@ -44,9 +44,7 @@
 	  				<button 
 	  					type="button" 
 			  			class="btn btn-success btn-outline-success btn-sm" 
-			  			data-toggle="tooltip" 
-			  			data-placement="top" 
-			  			title="Create New" 
+			  			v-tooltip.bottom-end="Create New" 
 			  			:disabled="disableAddButton" 
 			  			@click="$emit('showContentCreateForm')" 
 			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
@@ -106,9 +104,7 @@
 	  			<button 
 	  				type="button" 
 		  			class="btn btn-success btn-outline-success btn-sm" 
-		  			data-toggle="tooltip" 
-		  			data-placement="top" 
-		  			title="Create New" 
+		  			v-tooltip.bottom-end="Create New" 
 		  			:disabled="disableAddButton" 
 		  			@click="$emit('showContentCreateForm')" 
 		  			v-if="userHasPermissionTo('create-' + requiredPermission)"
@@ -158,7 +154,7 @@
 								type="button" 
 								class="btn btn-success" 
 								@click="resetSearchingDates()" 
-								data-toggle="tooltip" data-placement="top" title="Reset"
+								v-tooltip.bottom-end="'Reset'"
 							>
 		                  		Reset
 		                  	</button>

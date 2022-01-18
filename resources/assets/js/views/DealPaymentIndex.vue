@@ -80,7 +80,7 @@
 											  				<button 
 											  					v-if="userHasPermissionTo('create-merchant-payment')"
 													  			class="btn btn-success btn-outline-success btn-sm" 
-													  			data-toggle="tooltip" data-placement="top" title="Create New" 
+													  			v-tooltip.bottom-end="'Create New'" 
 													  			@click="showContentCreateForm()"
 												  			>
 												  				<i class="fa fa-plus"></i>
@@ -136,7 +136,7 @@
 														<button 
 										  					v-if="userHasPermissionTo('create-merchant-payment')"
 												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			data-toggle="tooltip" data-placement="top" title="Create New" 
+												  			v-tooltip.bottom-end="'Create New'" 
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -301,7 +301,7 @@
 																	<td>
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"  
+																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																		>
 																			<i class="fa fa-eye"></i>
@@ -310,7 +310,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Edit" 
+																				v-tooltip.bottom-end="'Edit'" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-merchant-payment')" 
 																		>
@@ -319,7 +319,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete" 
+																				v-tooltip.bottom-end="'Delete'" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-merchant-payment')" 
 																		>
@@ -476,7 +476,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="searchAttributes.search === '' ? setDealAllPayments() : searchData()"
 															>
 																Reload
@@ -788,7 +788,7 @@
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
+									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-tooltip.bottom-end="'Next'" v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -968,7 +968,7 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
+												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 
@@ -1338,7 +1338,7 @@
 
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-danger btn-sm ml-auto" data-toggle="tooltip" data-placement="top" title="Print" @click="print">Print</button>
+						<button type="button" class="btn btn-danger btn-sm ml-auto" v-tooltip.bottom-end="'Print'" @click="print">Print</button>
 					</div>
 				</div>
 			</div>
@@ -1540,7 +1540,7 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="Reset"  @click="resetSearchingDates()">
+						<button type="button" class="btn btn-success" v-tooltip.bottom-end="'Reset'"  @click="resetSearchingDates()">
 	                  		Reset
 	                  	</button>
 

@@ -12,8 +12,7 @@
 					</button>
 				</div>
 
-				<div class="modal-body text-center">	
-							
+				<div class="modal-body text-center">			
 					<div class="card">
 						<div class="card-body">
 							<h4 class="card-title">Container</h4>
@@ -112,7 +111,9 @@
 				</div>
 
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">
+						Close
+					</button>
 				</div>
 			</div>
 		</div>

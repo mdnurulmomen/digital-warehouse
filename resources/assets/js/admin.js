@@ -13,6 +13,9 @@ window.toastr = require('vue-toastr');
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+import VTooltip from 'v-tooltip'
+Vue.use(VTooltip)
+
 // import mixin
 import HasPermission from './mixins/HasPermission';
 Vue.mixin(HasPermission);

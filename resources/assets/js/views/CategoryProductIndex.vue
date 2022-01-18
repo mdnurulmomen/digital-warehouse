@@ -65,7 +65,7 @@
 											  				<button 
 											  					type="button" 
 													  			class="btn btn-success btn-outline-success btn-sm" 
-													  			data-toggle="tooltip" data-placement="top" title="Create New" 
+													  			v-tooltip.bottom-end="'Create New'" 
 													  			@click="showContentCreateForm()"
 												  			>
 												  				<i class="fa fa-plus"></i>
@@ -93,7 +93,7 @@
 													<div class="col-md-4 text-right d-none d-md-block">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			data-toggle="tooltip" data-placement="top" title="Create New" 
+												  			v-tooltip.bottom-end="'Create New'" 
 												  			@click="showContentCreateForm()"
 											  			>
 											  				<i class="fa fa-plus"></i>
@@ -152,7 +152,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"  
+																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -161,7 +161,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Edit"  
+																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-product')"
 																			>
@@ -171,7 +171,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-success btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Merchants"  
+																				v-tooltip.bottom-end="'Merchants'"  
 																				@click="goProductMerchants(content)" 
 																				v-if="userHasPermissionTo('view-merchant-product-index')"
 																			>
@@ -220,7 +220,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="query === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload
@@ -701,7 +701,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-															data-toggle="tooltip" data-placement="top" title="Add Variation" 
+															v-tooltip.bottom-end="'Add Variation'" 
 															@click="addMoreVariation()"
 														>
 															Add Variation
@@ -711,7 +711,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															data-toggle="tooltip" data-placement="top" title="Remove Variation" 
+															v-tooltip.bottom-end="'Remove Variation'" 
 															:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
 															@click="removeVariation()"
 														>

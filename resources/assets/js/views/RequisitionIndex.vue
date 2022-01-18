@@ -97,7 +97,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-info btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="View Details"  
+																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
@@ -106,7 +106,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Recommended Dispatch" 
+																				v-tooltip.bottom-end="'Recommended Dispatch'" 
 																				@click="showDispatchRecommendationForm(content)" 
 																				v-show="content.status==0" 
 																				v-if="userHasPermissionTo('recommend-dispatch')"
@@ -117,7 +117,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-warning btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Approve Dispatch"  
+																				v-tooltip.bottom-end="'Approve Dispatch'"  
 																				@click="showDispatchApprovalForm(content)" 
 																				v-show="content.status==1 && content.dispatch.has_approval==0" 
 																				v-if="userHasPermissionTo('approve-dispatch')"
@@ -128,7 +128,7 @@
 																			<button 
 																				type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Cancel Requisition" 
+																				v-tooltip.bottom-end="'Cancel Requisition'" 
 																				@click="openRequisitionCancelForm(content)" 
 																				v-show="content.status==0" 
 																				v-if="userHasPermissionTo('update-requisition')"
@@ -180,7 +180,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
@@ -317,7 +317,7 @@
 									          	<button 
 									          	type="button" 
 									          	class="btn btn-outline-secondary btn-sm btn-round" 
-									          	data-toggle="tooltip" data-placement="top" title="Next" 
+									          	v-tooltip.bottom-end="'Next'" 
 									          	v-on:click="nextPage"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -489,7 +489,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
-													data-toggle="tooltip" data-placement="top" title="Add Product" 
+													v-tooltip.bottom-end="'Add Product'" 
 													:disabled="singleRequisitionData.products.length >= merchantAllProducts.length"
 													@click="addMoreProduct()"
 												>
@@ -500,7 +500,7 @@
 												<button 
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-													data-toggle="tooltip" data-placement="top" title="Remove Product" 
+													v-tooltip.bottom-end="'Remove Product'" 
 													:disabled="singleRequisitionData.products.length < 2"
 													@click="removeProduct()"
 												>
@@ -528,10 +528,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -681,10 +681,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" data-toggle="tooltip" data-placement="top" title="Previous"  v-on:click="step-=1">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next"  v-on:click="nextPage">
+								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -945,7 +945,7 @@
 									          	<button 
 										          	type="button" 
 										          	class="btn btn-outline-secondary btn-sm btn-round" 
-										          	data-toggle="tooltip" data-placement="top" title="Next" 
+										          	v-tooltip.bottom-end="'Next'" 
 										          	v-on:click="nextPage"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -1279,7 +1279,7 @@
 								          		<button 
 									          		type="button" 
 									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
-									          		data-toggle="tooltip" data-placement="top" title="Previous"
+									          		v-tooltip.bottom-end="'Previous'"
 									          		v-on:click="step-=1" 
 								          		>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -1289,7 +1289,7 @@
 									          		type="button" 
 									          		v-on:click="nextPage" 
 									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
-									          		data-toggle="tooltip" data-placement="top" title="Next"
+									          		v-tooltip.bottom-end="'Next'"
 								          		>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -1478,7 +1478,7 @@
 														<button 
 															type="button" 
 															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
-															data-toggle="tooltip" data-placement="top" title="Remove Space" 
+															v-tooltip.bottom-end="'Remove Space'" 
 															:disabled="requiredProduct.addresses.length==1" 
 															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
 															@click="removeSpace(productIndex)"
@@ -1503,7 +1503,7 @@
 								          		<button 
 									          		type="button" 
 									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
-									          		data-toggle="tooltip" data-placement="top" title="Previous"
+									          		v-tooltip.bottom-end="'Previous'"
 									          		v-on:click="step-=1" 
 								          		>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -1511,7 +1511,7 @@
 								          		<button 
 									          		type="button" 
 									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
-									          		data-toggle="tooltip" data-placement="top" title="Next"
+									          		v-tooltip.bottom-end="'Next'"
 									          		v-on:click="nextPage" 
 								          		>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -1695,7 +1695,7 @@
 												<button 
 													type="button" 
 													class="btn btn-outline-secondary btn-sm btn-round" 
-													data-toggle="tooltip" data-placement="top" title="Previous" 
+													v-tooltip.bottom-end="'Previous'" 
 													v-on:click="(userHasPermissionTo('approve-dispatch') && singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0 )) ? step-=1 : step-=2"
 												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -1704,7 +1704,7 @@
 							                  	<button 
 								                  	type="button" 
 								                  	class="btn btn-danger btn-sm btn-round" 
-								                  	data-toggle="tooltip" data-placement="top" title="Cancel Requisition" 
+								                  	v-tooltip.bottom-end="'Cancel Requisition'" 
 								                  	@click="openRequisitionCancelForm(singleDispatchData.requisition)"
 							                  	>
 													{{ singleDispatchData.requisition.status==0 ? 'Cancel Requisition' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Cancel Dispatch' : '' }} 
@@ -2120,7 +2120,7 @@
 						<button 
 							type="button" 
 							class="btn btn-danger" 
-							data-toggle="tooltip" data-placement="top" title="Print"  
+							v-tooltip.bottom-end="'Print'"  
 							@click="print"
 						>
 							Print

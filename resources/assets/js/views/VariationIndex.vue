@@ -127,7 +127,7 @@
 																	<td>
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Edit" 
+																				v-tooltip.bottom-end="'Edit'" 
 																				v-show="! content.deleted_at" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-product-asset')"
@@ -137,7 +137,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-danger btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Delete" 
+																				v-tooltip.bottom-end="'Delete'" 
 																				v-show="! content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-product-asset')"
@@ -147,7 +147,7 @@
 
 																		<button type="button" 
 																				class="btn btn-grd-warning btn-icon" 
-																				data-toggle="tooltip" data-placement="top" title="Restore" 
+																				v-tooltip.bottom-end="'Restore'" 
 																				v-show="content.deleted_at" 
 																				@click="openContentRestoreForm(content)" 
 																				v-if="userHasPermissionTo('delete-product-asset')"
@@ -218,7 +218,7 @@
 															<button 
 																type="button" 
 																class="btn btn-primary btn-sm" 
-																data-toggle="tooltip" data-placement="top" title="Reload" 
+																v-tooltip.bottom-end="'Reload'" 
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload

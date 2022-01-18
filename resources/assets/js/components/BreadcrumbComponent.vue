@@ -19,8 +19,8 @@
 							</router-link>
 						</li>
 						<li class="breadcrumb-item">
-							<router-link :to="{ name: this.$route.name }">
-								{{ this.$route.name | capitalize }}
+							<router-link :to="{ name: $route.name }">
+								{{ $route.name | capitalize }}
 							</router-link>
 						</li>
 					</ul>

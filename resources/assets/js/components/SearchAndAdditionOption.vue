@@ -8,7 +8,7 @@
 
 				<button 
 		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
-		  			data-toggle="tooltip" data-placement="top" title="Create New" 
+		  			v-tooltip.bottom-end="'Create New'" 
 		  			:disabled="disableAddButton" 
 		  			@click="$emit('showContentCreateForm')" 
 		  			v-if="userHasPermissionTo('create-' + requiredPermission)"
@@ -34,7 +34,7 @@
   		<div class="col-sm-6 col-md-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
   			<button 
 	  			class="btn btn-success btn-outline-success btn-sm ml-auto d-none d-sm-none d-md-block d-lg-block" 
-	  			data-toggle="tooltip" data-placement="top" title="Create New" 
+	  			v-tooltip.bottom-end="'Create New'" 
 	  			:disabled="disableAddButton" 
 	  			@click="$emit('showContentCreateForm')"
   			>

@@ -1,8 +1,6 @@
 
 <template>
-
 	<div class="pcoded-content">
-
 		<div class="page-header card">
 			<div class="row align-items-end">
 				<div class="col-lg-8">
@@ -374,7 +372,7 @@
 																		style="right:0;z-index:99;" 
 																		class="close position-absolute text-danger" 
 																		@click="removeWarehousePreview(index)" 
-																		data-toggle="tooltip" data-placement="top" title="Remove Preview"
+																		v-tooltip.bottom-end="'Remove Preview'"
 																	>
 																		<i class="fa fa-times-circle" aria-hidden="true"></i>
 																	</button>
@@ -515,7 +513,7 @@
 																		type="button" 
 																		style="right:0;z-index:9;" 
 																		class="close position-absolute text-danger" 
-																		data-toggle="tooltip" data-placement="top" title="Remove Preview"
+																		v-tooltip.bottom-end="'Remove Preview'"
 																		@click="removeStoragePreview(index, index2)"
 																	>
 																		<i class="fa fa-times-circle" aria-hidden="true"></i>

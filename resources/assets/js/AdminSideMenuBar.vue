@@ -120,7 +120,9 @@
 								</router-link>
 							</li>
 
-							<li>
+							<li :class="currentRouteName=='mails' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-mail-index')"
+							>
 								<router-link :to="{ name: 'mails' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<i class="fa fa-envelope"></i>

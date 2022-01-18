@@ -19,7 +19,7 @@
 					
 				<form 	
 					class="form-horizontal" 
-					v-on:submit.prevent="verifyUserInput" 
+					@submit.prevent="verifyUserInput" 
 					autocomplete="off" 
 				>
 					<input type="hidden" name="_token" :value="csrf">
@@ -35,7 +35,7 @@
 									:class="!errors.asset.email ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('email')" 
 									@keyup.enter="addRecipientMail()" 
-									@keydown.enter.prevent='verifyUserInput'
+									@keydown.enter.prevent="validateFormInput('email')"
 								>
 
 								<div class="invalid-feedback">
@@ -59,7 +59,7 @@
 
 											<i 
 												class="fa fa-close text-danger p-2" 
-												data-toggle="tooltip" data-placement="top" title="Remove Mail" 
+												v-tooltip.bottom-end="'Remove Mail'" 
 												v-show="recipient"
 												@click="removeRecipientMail(recipientIndex)"
 											>	
@@ -77,7 +77,7 @@
 									placeholder="Email Subject" 
 									:class="!errors.asset.subject ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('subject')" 
-									@keydown.enter.prevent='verifyUserInput'
+									@keydown.enter.prevent="validateFormInput('subject')" 
 								>
 
 								<div class="invalid-feedback">
@@ -228,7 +228,7 @@
             },
             addRecipientMail() {
 
-				this.validateFormInput('email');
+				// this.validateFormInput('email');
 
 				if (this.newEmail && ! this.errors.asset.hasOwnProperty('email')) {
 
@@ -273,6 +273,9 @@
 						}
 						else if (this.newEmail && ! this.newEmail.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/g)) {
 							this.errors.asset.email = 'Invalid email';
+						}
+						else if (this.newEmail && this.singleAssetData.recipients.some(recipient=>recipient==this.newEmail)) {
+							this.errors.asset.email = 'Same recipient address';
 						}
 						else{
 							this.submitForm = true;

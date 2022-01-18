@@ -292,7 +292,7 @@
 				                        <div class="form-row">
 											<div class="form-group col-sm-12 text-right">
 												<a data-toggle="collapse" href="#user-password">
-													<i class="fa fa-2x" :class="createMode ? 'fa-angle-up' : 'fa-angle-down'" @click="changeArrow" data-toggle="tooltip" data-placement="top" title="Show Password"></i>
+													<i class="fa fa-2x" :class="createMode ? 'fa-angle-up' : 'fa-angle-down'" @click="changeArrow" v-tooltip.bottom-end="'Show Password'"></i>
 												</a>
 											</div>
 										</div>
@@ -344,7 +344,7 @@
 							          	type="button" 
 							          	v-on:click="nextPage" 
 							          	class="btn btn-outline-secondary btn-sm btn-round" 
-							          	data-toggle="tooltip" data-placement="top" title="Next"
+							          	v-tooltip.bottom-end="'Next'"
 							          	>
 					                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 					                  	</button>
@@ -427,7 +427,7 @@
 							                  		type="button" 
 							                  		v-on:click="step-=1" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Previous"
+							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -443,7 +443,7 @@
 							                  		type="button" 
 							                  		v-on:click="nextPage" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Next"
+							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -474,7 +474,7 @@
 															type="button" 
 															style="right:0;z-index:99;" 
 															class="close position-absolute text-danger" 
-															data-toggle="tooltip" data-placement="top" title="Remove Preview"
+															v-tooltip.bottom-end="'Remove Preview'"
 															@click="removeWarehousePreview(index)"
 														>
 															<i class="fa fa-times-circle" aria-hidden="true"></i>
@@ -540,7 +540,7 @@
 							                  		type="button" 
 							                  		v-on:click="step-=1"
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Previous"
+							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -556,7 +556,7 @@
 							                  		type="button" 
 							                  		v-on:click="nextPage" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Next"
+							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -631,7 +631,7 @@
 																		style="right:0;z-index:9;" 
 																		class="close position-absolute text-danger" 
 																		@click="removeStoragePreview(index, index2)" 
-																		data-toggle="tooltip" data-placement="top" title="Remove Preview"
+																		v-tooltip.bottom-end="'Remove Preview'"
 																	>
 																		<i class="fa fa-times-circle" aria-hidden="true"></i>
 																	</button>
@@ -700,7 +700,7 @@
 															type="button"  
 															@click="addStorage" 
 															class="btn btn-success btn-block btn-sm" 
-															data-toggle="tooltip" data-placement="top" title="More Storage"
+															v-tooltip.bottom-end="'More Storage'"
 														>
 															More Storage
 														</button>	
@@ -712,7 +712,7 @@
 															@click="removeStorage" 
 															class="btn btn-danger btn-block btn-sm" 
 															:disabled="singleWarehouseData.storages.length<=1" 
-															data-toggle="tooltip" data-placement="top" title="Remove Storage"
+															v-tooltip.bottom-end="'Remove Storage'"
 														>
 															Remove Storage
 														</button>	
@@ -728,7 +728,7 @@
 							                  	<button type="button" 
 							                  		v-on:click="step-=1" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Previous"
+							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -743,7 +743,7 @@
 							                  	<button type="button" 
 							                  		v-on:click="nextPage"
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Next"
+							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -1071,7 +1071,7 @@
 															type="button"  
 															@click="addContainer" 
 															class="btn btn-success btn-block btn-sm" 
-															data-toggle="tooltip" data-placement="top" title="Add Container"
+															v-tooltip.bottom-end="'Add Container'"
 														>
 															More Container
 														</button>	
@@ -1080,7 +1080,7 @@
 														<button 
 															type="button" 
 															class="btn btn-danger btn-block btn-sm" 
-															data-toggle="tooltip" data-placement="top" title="Remove Container"
+															v-tooltip.bottom-end="'Remove Container'"
 															@click="removeContainer" 
 															:disabled="singleWarehouseData.containers.length < 2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
 														>
@@ -1099,7 +1099,7 @@
 							                  		type="button" 
 							                  		v-on:click="step-=1" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Previous"
+							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -1115,7 +1115,7 @@
 							                  		type="button" 
 							                  		v-on:click="nextPage"
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
-							                  		data-toggle="tooltip" data-placement="top" title="Next"
+							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -1493,7 +1493,7 @@
 							                  	<button type="button" 
 							                  		class="btn btn-outline-secondary btn-sm btn-round" 
 							                  		v-on:click="step-=1" 
-							                  		data-toggle="tooltip" data-placement="top" title="Previous"
+							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
