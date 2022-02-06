@@ -65,7 +65,7 @@
 																<tbody>
 
 																	<tr 
-																		v-for="content in requisitionsToShow" :key="'content-' + content.id" 
+																		v-for="(content, index) in requisitionsToShow" :key="'content-index-' + index + '-content-' + content.id" 
 																		:class="content.id==singleRequisitionData.id ? 'highlighted' : ''" 
 																	>
 																		<td>

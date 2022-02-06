@@ -69,7 +69,7 @@ class RequisitionController extends Controller
             ],
 
             'products.*.product.variations' => 'required_if:products.*.product.has_variations,true|array',
-            'products.*.product.variations.*.required_serials' => 'required_with:products.*.product.variations.*.required_quantity|array',
+            'products.*.product.variations.*.required_serials' => 'exclude_if:products.*.product.has_serials,false|required_with:products.*.product.variations.*.required_quantity|array',
             'products.*.product.variations.*.required_serials.*' => [
                     Rule::exists('product_variation_serials', 'serial_no')->where(function ($query) {
                         return $query->where('has_requisitions', false)->where('has_dispatched', false);
