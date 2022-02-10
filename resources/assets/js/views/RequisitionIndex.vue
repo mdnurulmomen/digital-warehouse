@@ -65,7 +65,7 @@
 																<tbody>
 
 																	<tr 
-																		v-for="(content, index) in requisitionsToShow" :key="'content-index-' + index + '-content-' + content.id" 
+																		v-for="(content, index) in requisitionsToShow" :key="'tab-' + currentTab + '-content-index-' + index + '-content-' + content.id" 
 																		:class="content.id==singleRequisitionData.id ? 'highlighted' : ''" 
 																	>
 																		<td>
@@ -369,22 +369,32 @@
 												    </div>
 												</div>
 
-												<div 
-													class="form-group col-md-6" 
-													v-if="requiredProduct.product"
-												>
+												<div class="form-group col-md-6" v-if="requiredProduct.product">
 													<label for="inputFirstName">Total Quantity</label>
-													<input type="number" 
-														class="form-control" 
-														v-model.number="requiredProduct.total_quantity" 
-														placeholder="Product Total Quantity" 
-														:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
-														@change="validateFormInput('product_quantity')" 
-														required="true" 
-														min="0" 
-														:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
+
+													<div class="input-group mb-3">
+														<input type="number" 
+															class="form-control"  
+															v-model.number="requiredProduct.total_quantity"  
+															placeholder="Product Total Quantity" 
+															:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('product_quantity')" 
+															required="true" 
+															min="0" 
+															:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
+														>
+														<div class="input-group-append">
+															<span class="input-group-text" id="basic-addon2">
+																{{ requiredProduct.product.product ? requiredProduct.product.product.quantity_type : 'Unit' | capitalize }}
+															</span>
+														</div>
+													</div>
+
+													<div 
+														class="invalid-feedback" 
+														style="display: block;" 
+														v-show="errors.products[productIndex].product_quantity" 
 													>
-													<div class="invalid-feedback">
 											        	{{ errors.products[productIndex].product_quantity }}
 											  		</div>
 												</div>
@@ -413,21 +423,33 @@
 						                              		>
 						                                	</multiselect>
 														</div>
+
 														<div class="form-group col-md-6">
 															<label for="inputFirstName">
 																Variation Quantity
 															</label>
-															<input type="number" 
-																class="form-control" 
-																v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
-																placeholder="Variation Quantity" 
-																:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
-																min="0" 
-																:max="productVariation.available_quantity - productVariation.requested_quantity" 
-																@change="validateFormInput('variations_total_quantity')" 
-															>
+
+															<div class="input-group mb-3">
+																<input type="number" 
+																	class="form-control" 
+																	v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
+																	placeholder="Variation Quantity" 
+																	:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
+																	min="0" 
+																	:max="productVariation.available_quantity - productVariation.requested_quantity" 
+																	@change="validateFormInput('variations_total_quantity')" 
+																>
+																<div class="input-group-append">
+																	<span class="input-group-text" id="basic-addon2">
+																		{{ requiredProduct.product.product ? requiredProduct.product.product.quantity_type : 'Unit' | capitalize }}
+																	</span>
+																</div>
+															</div>
+
 															<div 
 																class="invalid-feedback" 
+																style="display: block;" 
+																v-show="errors.products[productIndex].variation_quantities[variationIndex]" 
 															>
 													        	{{ errors.products[productIndex].variation_quantities[variationIndex] }}
 													  		</div>
@@ -993,26 +1015,42 @@
 													<label for="inputFirstName">
 														Total Required
 													</label>
-													<input 
-														type="number" 
-														class="form-control is-valid" 
-														v-model.number="requiredProduct.quantity" 
-														placeholder="Product Total Quantity" 
-														readonly="true"
-													>
+													
+													<div class="input-group mb-0">
+														<input 
+															type="number" 
+															class="form-control is-valid" 
+															v-model.number="requiredProduct.quantity" 
+															placeholder="Product Total Quantity" 
+															readonly="true"
+														>
+														<div class="input-group-append">
+															<span class="input-group-text">
+																{{ requiredProduct.quantity_type }}
+															</span>
+														</div>
+													</div>
 												</div>
 
 												<div class="form-group col-md-4">
 													<label for="inputFirstName">
 														Total Available
 													</label>
-													<input 
-														type="number" 
-														class="form-control" 
-														:class="requiredProduct.quantity > requiredProduct.available_quantity ? 'is-invalid' : 'is-valid'"
-														v-model.number="requiredProduct.available_quantity" 
-														readonly="true"
-													>
+													
+													<div class="input-group mb-0">
+														<input 
+															type="number" 
+															class="form-control" 
+															:class="requiredProduct.quantity > requiredProduct.available_quantity ? 'is-invalid' : 'is-valid'"
+															v-model.number="requiredProduct.available_quantity" 
+															readonly="true"
+														>
+														<div class="input-group-append">
+															<span class="input-group-text">
+																{{ requiredProduct.quantity_type }}
+															</span>
+														</div>
+													</div>
 												</div>
 											</div>
 
@@ -1080,25 +1118,47 @@
 						                              		>
 						                                	</multiselect>
 														</div>
+
 														<div class="form-group col-md-4">
-															<label for="inputFirstName">Required</label>
-															<input 
-																type="number" 
-																class="form-control" 
-																v-model.number="requiredProduct.variations[variationIndex].quantity" 
-																placeholder="Variation Quantity" 
-																readonly="true" 
-															>
+															<label for="inputFirstName">
+																Required
+															</label>
+															
+															<div class="input-group mb-0">
+																<input 
+																	type="number" 
+																	class="form-control" 
+																	v-model.number="requiredProduct.variations[variationIndex].quantity" 
+																	placeholder="Variation Quantity" 
+																	readonly="true" 
+																>
+																<div class="input-group-append">
+																	<span class="input-group-text">
+																		{{ requiredProduct.quantity_type }}
+																	</span>
+																</div>
+															</div>
 														</div>
+
 														<div class="form-group col-md-4">
-															<label for="inputFirstName">Available</label>
-															<input 
-																type="number" 
-																class="form-control" 
-																v-model.number="productVariation.available_quantity" 
-																placeholder="Dispatch Quantity" 
-																readonly="true" 
-															>
+															<label for="inputFirstName">
+																Available
+															</label>
+															
+															<div class="input-group mb-0">
+																<input 
+																	type="number" 
+																	class="form-control" 
+																	v-model.number="productVariation.available_quantity" 
+																	placeholder="Dispatch Quantity" 
+																	readonly="true" 
+																>
+																<div class="input-group-append">
+																	<span class="input-group-text">
+																		{{ requiredProduct.quantity_type }}
+																	</span>
+																</div>
+															</div>
 														</div>
 
 														<div class="col-sm-12">
@@ -1827,7 +1887,7 @@
 													<div 
 														class="col-md-12 ml-auto" 
 														v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
-														:key="'required-product-' + requiredProduct.id + productIndex"
+														:key="'view-required-product-index-'  + productIndex + '-required-product-' + requiredProduct.id"
 													>
 														<div class="card">
 															<div class="card-body">
@@ -1845,7 +1905,8 @@
 																		Total Quantity :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.quantity }}
+																		{{ requiredProduct.quantity }} 
+																		{{ requiredProduct.quantity_type }}
 																	</label>
 																</div>
 
@@ -1885,6 +1946,8 @@
 																			</label>
 																			<label class="col-sm-6 col-form-label">
 																				{{ productVariation.quantity }}
+
+																				{{ requiredProduct.quantity_type }}
 																			</label>
 																		</div>
 
@@ -2865,12 +2928,14 @@
 
 			fetchAllRequisitions() {
 
+				/*
 				if (! this.userHasPermissionTo('view-requisition-index')) {
 
 					this.error = 'You do not have permission to view requisition-list';
 					return;
 
 				}
+				*/
 
 				this.error = '';
 				this.loading = true;
@@ -2911,12 +2976,14 @@
 			},
 			fetchAvailableRequisitions() {
 
+				/*
 				if (! this.userHasPermissionTo('view-requisition-index')) {
 
 					this.error = 'You do not have permission to view requisition-list';
 					return;
 
 				}
+				*/
 
 				this.error = '';
 				this.loading = true;

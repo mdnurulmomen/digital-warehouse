@@ -599,14 +599,21 @@
 
 																			<div class="form-group col-md-6">
 																				<label for="inputFirstName">Variation Qty</label>
-																				
-																				<input type="number" 
-																					class="form-control" 
-																					v-model.number="stockedVariation.stock_quantity" 
-																					placeholder="Variation Qty" 
-																					:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
-																					required="true" 
-																				>
+
+																				<div class="input-group mb-0">
+																					<input type="number" 
+																						class="form-control" 
+																						v-model.number="stockedVariation.stock_quantity" 
+																						placeholder="Variation Qty" 
+																						:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+																						required="true" 
+																					>
+																					<div class="input-group-append">
+																						<span class="input-group-text">
+																							{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
+																						</span>
+																					</div>
+																				</div>
 
 																				<div class="invalid-feedback">
 																		        	{{ errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity }}

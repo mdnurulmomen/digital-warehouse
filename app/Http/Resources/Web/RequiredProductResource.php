@@ -22,6 +22,7 @@ class RequiredProductResource extends JsonResource
             'merchant_product_id' => $this->merchant_product_id,
             'product_name' => $product->name,
             'quantity' => $this->quantity,
+            'quantity_type' => $product->quantity_type,
             'available_quantity' => $merchantProduct->latestStock->available_quantity,
             'has_variations' => $product->has_variations,
             'has_serials' => $product->has_serials,
