@@ -395,7 +395,7 @@
 										<div class="form-group col-md-6">
 											<label for="inputFirstName">Selling Price (unit)</label>
 
-											<div class="input-group mb-3">
+											<div class="input-group mb-0">
 												<input type="number" 
 													class="form-control" 
 													v-model.number="singleMerchantProductData.selling_price" 
@@ -618,7 +618,7 @@
 																	<div class="form-group col-md-6">
 																		<label for="inputFirstName">Selling Price (unit)</label>
 
-																		<div class="input-group mb-3">
+																		<div class="input-group mb-0">
 																			<input type="number" 
 																				class="form-control" 
 																				v-model.number="merchantProductVariation.selling_price" 
@@ -832,10 +832,10 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Available Quantity :
+														Starting Quantity :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.available_quantity }}
+														{{ singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
@@ -858,7 +858,17 @@
 														{{ singleMerchantProductData.requested_quantity }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
-												</div>	
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Available Quantity :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleMerchantProductData.available_quantity }}
+														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
@@ -979,7 +989,7 @@
 									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials">
 										<div class="form-row">
 											<label class="col-4 col-form-label font-weight-bold">
-												Serials :
+												{{ (searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Stocked' : 'Available' }} Serials :
 											</label>
 											<div class="col-8 col-form-label">
 												<ol 
@@ -1504,6 +1514,7 @@
 		<!-- Printing Section -->
 
 		<!-- Filter Modal -->
+		<!-- 
 		<div class="modal fade" id="product-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
@@ -1551,7 +1562,8 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> 
+		-->
 
 		<!-- 		
 		<delete-confirmation-modal 
@@ -1746,7 +1758,7 @@
 
 					SKU: 'sku',
 
-					Price: 'selling_price',
+					// Price: 'selling_price',
 
 					"Discount": {
 						field: "discount",
@@ -1760,18 +1772,23 @@
 						},
 					},
 
-					"Available Qty": 'available_quantity',
-
-					"Qty Type": {
+					
+					'Starting Qty': {
 						callback: (object) => {
 							if (object) {
-								return object.product ? object.product.quantity_type : 'Unit'
+								return object.available_quantity + object.dispatched_quantity
 							}
 							else{
-								return;
+								return 0;
 							}
 						},
 					},
+
+					'Dispatched': 'dispatched_quantity',
+
+					'Pending Requests': 'requested_quantity',
+
+					"Available Qty": 'available_quantity',
 
 					"Variations": {
 
@@ -1814,8 +1831,8 @@
 
 							if (object.has_serials && ! object.has_variations && object.serials.length) {
 
-								infosToReturn += `Serials:
-								`;
+								infosToReturn += (((this.searchAttributes.dateFrom || this.searchAttributes.dateTo) ? 'Stocked' : 'Available') + ` Serials:
+																`);
 
 								object.serials.forEach(
 			
@@ -1837,7 +1854,7 @@
 
 										if (object.has_serials && objectVariation.serials.length) {
 
-											infosToReturn += this.$options.filters.capitalize(objectVariation.variation.name) + " Serials:\n";
+											infosToReturn += ((this.$options.filters.capitalize(objectVariation.variation.name) + (this.searchAttributes.dateFrom || this.searchAttributes.dateTo) ? 'Stocked' : 'Available') + " Serials:\n");
 
 											objectVariation.serials.forEach(
 						
@@ -1870,6 +1887,17 @@
 						},
 					},
 
+					"Qty Type": {
+						callback: (object) => {
+							if (object) {
+								return object.product ? object.product.quantity_type : 'Unit'
+							}
+							else{
+								return;
+							}
+						},
+					},
+
 					/*
 					"Warning Qty": {
 						callback: (object) => {
@@ -1877,10 +1905,6 @@
 						},
 					},
 					*/
-
-					'Total Dispatched': 'dispatched_quantity',
-
-					'Pending Requests': 'requested_quantity',
 
 					"Created": 'created_at',
 					
@@ -2356,7 +2380,7 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.searchAttributes.search === '') {
+				if (this.searchAttributes.search === '' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 					this.fetchMerchantAllProducts();
 				}
 				else {

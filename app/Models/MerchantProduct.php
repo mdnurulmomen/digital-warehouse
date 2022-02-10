@@ -81,15 +81,20 @@ class MerchantProduct extends Model
 
     public function nonDispatchedRequests()
     {
-        return $this->hasMany(RequiredProduct::class, 'merchant_product_id', 'id')->whereHas('requisition', function ($query) {
+        return $this->hasMany(RequiredProduct::class, 'merchant_product_id', 'id')
+        ->whereHas('requisition', function ($query) {
             $query->where('status', 0);
         });
     }
 
     public function dispatchedRequests()
     {
-        return $this->hasMany(RequiredProduct::class, 'merchant_product_id', 'id')->whereHas('requisition', function ($query) {
+        return $this->hasMany(RequiredProduct::class, 'merchant_product_id', 'id')
+        ->whereHas('requisition', function ($query) {
             $query->where('status', 1);
+        })
+        ->whereHas('dispatch', function ($query1) {
+            $query1->where('has_approval', 1);
         });
     }
 

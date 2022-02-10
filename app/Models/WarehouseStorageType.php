@@ -14,7 +14,7 @@ class WarehouseStorageType extends Model
 
     public function storageType() 
     {
-    	return $this->belongsTo(StorageType::class, 'storage_type_id', 'id');
+    	return $this->belongsTo(StorageType::class, 'storage_type_id', 'id')->withTrashed();
     }
 
     /**

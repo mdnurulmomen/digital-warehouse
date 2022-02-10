@@ -559,7 +559,7 @@
 
 					case 'unit_quantity' :
 
-						if (this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.quantity || this.singleAssetData.shelf.unit.quantity < 1)) {
+						if (this.singleAssetData.has_shelve && this.singleAssetData.shelf.has_units && (!this.singleAssetData.shelf.unit.quantity || this.singleAssetData.shelf.unit.quantity < 1)) {
 							this.errors.container.shelf.unit.quantity = 'Unit quantity is required';
 						}
 						else{

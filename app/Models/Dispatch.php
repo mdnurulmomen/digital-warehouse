@@ -17,7 +17,7 @@ class Dispatch extends Model
      * @var array
      */
     protected $casts = [
-        'released_at' => 'datetime',
+        // 'released_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 

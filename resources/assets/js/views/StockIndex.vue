@@ -314,7 +314,7 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="createMode ? storeStock() : updateStock()" 
+						@submit.prevent="createMode ? storeStock() : updateStock()" 
 						autocomplete="off" 
 						novalidate="true" 
 					>
@@ -772,7 +772,7 @@
 																										:placeholder="stockedVariation.variation.name + ' Serial Number' | capitalize" 
 																										v-model="variationNewSerial[stockedVariationIndex]"
 																										:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_serial ? 'is-valid' : 'is-invalid'" 
-																										@keyup.enter="addVariationSerial(stockedProductIndex, stockedVariationIndex)"  
+																										@keydown.enter.prevent="addVariationSerial(stockedProductIndex, stockedVariationIndex)"  
 																										required="true" 
 																										:disabled="stockedVariation.serials.length>=stockedVariation.stock_quantity && stockedVariation.serials.every(variationSerial=>variationSerial.serial_no)"
 																									>
@@ -853,7 +853,7 @@
 																				v-model="productNewSerial" 
 																				:placeholder="stockedProduct.merchant_product.product.name + 'Serial number' | capitalize" 
 																				:class="! errors.products[stockedProductIndex].product_serial ? 'is-valid' : 'is-invalid'" 
-																				@keyup.enter="addProductSerial(stockedProductIndex)"  
+																				@keydown.enter.prevent="addProductSerial(stockedProductIndex)"  
 																				:disabled="stockedProduct.serials.length >= stockedProduct.stock_quantity && stockedProduct.serials.every(productSerial=>productSerial.serial_no)"
 																			>
 
@@ -1303,7 +1303,7 @@
 													data-placement="top" 
 													data-toggle="tooltip" 
 													class="btn btn-outline-secondary btn-sm btn-round float-left" 
-													v-on:click="step-=1"
+													v-on:click="stockHasSerial() ? step-=1 : step-=2"
 												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -3490,8 +3490,18 @@
 
 						);
 
-						this.step += 1;
 						this.submitForm = true;
+						
+						if (this.stockHasSerial()) {
+							
+							this.step += 1;
+						
+						}
+						else {
+
+							this.step += 2;
+						
+						}
 						
 						// this.resetWarehouseSpaces();
 						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
@@ -3539,6 +3549,11 @@
 					}
 
 				}
+
+			},
+			stockHasSerial() {
+
+				return this.singleStockData.products.some(stockProduct=>stockProduct.has_serials);
 
 			},
 			setProductProperties()

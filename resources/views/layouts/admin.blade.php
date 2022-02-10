@@ -21,7 +21,7 @@
 	
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/waves.min.css')}}" type="text/css" media="all">
-	<link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}">
+	{{-- <link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}"> --}}
 	<link rel="stylesheet" href="{{asset('css/font-awesome-4.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">

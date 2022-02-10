@@ -1693,6 +1693,12 @@
 													</label>
 													<label class="col-sm-6 col-form-label">
 														{{ warehouseStorageType.storage_type.name | capitalize }}
+														<span 
+															class="badge badge-danger"
+															v-show="warehouseStorageType.storage_type.deleted_at"
+														>
+															Trashed
+														</span>
 													</label>
 												</div>
 
@@ -1754,6 +1760,12 @@
 													</label>
 													<label class="col-sm-6 col-form-label">
 														{{ warehouseContainer.container.name | capitalize }}
+														<span 
+															class="badge badge-danger"
+															v-show="warehouseContainer.container.deleted_at"
+														>
+															Trashed
+														</span>
 													</label>
 												</div>
 

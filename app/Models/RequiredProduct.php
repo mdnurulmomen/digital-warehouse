@@ -20,6 +20,11 @@ class RequiredProduct extends Model
     	return $this->belongsTo(Requisition::class, 'requisition_id', 'id');
     }
 
+    public function dispatch()
+    {
+        return $this->belongsTo(Dispatch::class, 'requisition_id', 'requisition_id');
+    }
+
     public function merchantProduct()
     {
     	return $this->belongsTo(MerchantProduct::class, 'merchant_product_id', 'id');

@@ -39,10 +39,10 @@ class MerchantProductVariation extends Model
     public function latestStock()
     {
         return $this->hasOne(ProductVariationStock::class, 'merchant_product_variation_id', 'id')
-            ->whereHas('productStock', function ($query) {
-                $query->whereHas('stock', function ($q) {
-                    $q->where('has_approval', 1);
-                });
+        ->whereHas('productStock', function ($query) {
+            $query->whereHas('stock', function ($q) {
+                $q->where('has_approval', 1);
+            });
         })->orderBy('id', 'desc');
     }
 

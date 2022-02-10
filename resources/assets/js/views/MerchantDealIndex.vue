@@ -1153,56 +1153,96 @@
 												</div>
 
 												<div class="form-row">
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Last Due</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															v-model.number="singleMerchantDealData.payments[0].previous_due" 
-															placeholder="Previous Due" 
-															:disabled="true"
-														>
-													</div>
+													<div class="form-group col-md-6">	
+									    				<label for="phone">Last Due</label>
+														
+									    				<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singleMerchantDealData.payments[0].previous_due" 
+																placeholder="Previous Due" 
+																:disabled="true"
+															>
 
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Net Payable</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															v-model.number="singleMerchantDealData.payments[0].net_payable" 
-															placeholder="Net Payable" 
-															:disabled="true"
-														>
-													</div>
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
+									    			</div>
+
+													<div class="form-group col-md-6">	
+									    				<label for="phone">Net Payable</label>
+														
+									    				<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singleMerchantDealData.payments[0].net_payable" 
+																placeholder="Net Payable" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
+									    			</div>
 												</div>
 
 												<div class="form-row">
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Paid Amount</label>
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singleMerchantDealData.payments[0].paid_amount" 
-															placeholder="Paid Amount" 
-															:class="! errors.payment.paid_amount ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('paid_amount')" 
-															required="true" 
-														>
-														<div class="invalid-feedback">
-													    	{{ errors.payment.paid_amount }}
-													    </div>
-													</div>
+													<div class="form-group col-md-6">	
+									    				<label for="phone">Paid Amount</label>
+														
+									    				<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control" 
+																v-model.number="singleMerchantDealData.payments[0].paid_amount" 
+																placeholder="Paid Amount" 
+																:class="! errors.payment.paid_amount ? 'is-valid' : 'is-invalid'" 
+																@change="validateFormInput('paid_amount')" 
+																required="true" 
+															>
 
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Current Due</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															:value="singleMerchantDealData.payments[0].net_payable - singleMerchantDealData.payments[0].paid_amount" 
-															placeholder="Previous Dues" 
-															:disabled="true"
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
+
+														<div 
+															style="display: block;" 
+															class="invalid-feedback" 
+															v-show="errors.payment.paid_amount"
 														>
-													</div>
+												        	{{ errors.payment.paid_amount }}
+												  		</div>
+									    			</div>
+
+									    			<div class="form-group col-md-6">	
+									    				<label for="phone">Current Due</label>
+														
+									    				<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																:value="singleMerchantDealData.payments[0].net_payable - singleMerchantDealData.payments[0].paid_amount" 
+																placeholder="Previous Dues" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
+									    			</div>
 												</div>
 											</div>
 										</div>
-										
 									</div>
 
 									<div class="col-sm-12 card-footer">
@@ -1683,7 +1723,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.total_rent }}
+														{{ dealPayment.total_rent + ' ' + general_settings.official_currency_name }}
 													</label>
 												</div>
 
@@ -1703,7 +1743,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.previous_due }}
+														{{ dealPayment.previous_due + ' ' + general_settings.official_currency_name }}
 													</label>
 												</div>
 
@@ -1713,7 +1753,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.net_payable }}
+														{{ dealPayment.net_payable + ' ' + general_settings.official_currency_name }}
 													</label>
 												</div>
 
@@ -1723,7 +1763,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.paid_amount }}
+														{{ dealPayment.paid_amount + ' ' + general_settings.official_currency_name }} 
 													</label>
 												</div>
 
@@ -1733,7 +1773,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.current_due }}
+														{{ dealPayment.current_due + ' ' + general_settings.official_currency_name }}
 													</label>
 												</div>
 
@@ -2444,6 +2484,8 @@
 					*/
 					
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -3312,6 +3354,8 @@
 
 						if (this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].hasOwnProperty('containers') && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers.length < this.emptyContainers.length) {
 							
+							this.removeSelectedEmptyContainers(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers);
+
 							this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex].containers.push({});
 							this.$delete(this.errors.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex], 'containers');
 
@@ -3891,6 +3935,12 @@
 				this.resetAvailableSpaces(merchantWarehouseIndex);
 		
 			},
+			resetAvailableSpaces(merchantWarehouseIndex) {
+
+				this.resetWarehouseContainers(merchantWarehouseIndex);
+				this.removeSelectedSpaces(merchantWarehouseIndex);
+
+			},
 			resetWarehouseContainers(merchantWarehouseIndex) {
 				
 				let expectedWarehouseIndex = this.availableWarehouseSpaces.findIndex(
@@ -3914,9 +3964,7 @@
 				}
 
 			},
-			resetAvailableSpaces(merchantWarehouseIndex) {
-
-				this.resetWarehouseContainers(merchantWarehouseIndex);
+			removeSelectedSpaces(merchantWarehouseIndex) {
 
 				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length) {
 
@@ -3927,55 +3975,7 @@
 							if (warehouseSpace.type=='containers' && warehouseSpace.containers && warehouseSpace.containers.length) {
 
 								// for every selected container
-								warehouseSpace.containers.forEach(
-
-									(selectedContainer) => {
-
-										// same division
-										// emptyContainers
-										var selectedContainerIndex = this.emptyContainers.findIndex(
-											(currentContainer) => 
-												currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
-											
-										);
-
-										if (selectedContainerIndex > -1) {
-
-											this.emptyContainers.splice(selectedContainerIndex, 1);
-										
-										}
-
-										// downward
-										// emptyShelfContainers
-										var selectedContainerIndex = this.emptyShelfContainers.findIndex(
-											(currentContainer) => 
-												currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
-											
-										);
-
-										if (selectedContainerIndex > -1) {
-
-											this.emptyShelfContainers.splice(selectedContainerIndex, 1);
-										
-										}
-
-										// downward
-										// emptyUnitContainers
-										var selectedContainerIndex = this.emptyUnitContainers.findIndex(
-											(currentContainer) => 
-												currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
-											
-										);
-
-										if (selectedContainerIndex > -1) {
-
-											this.emptyUnitContainers.splice(selectedContainerIndex, 1);
-
-										}
-
-									}
-
-								);
+								this.removeSelectedEmptyContainers(warehouseSpace.containers);
 
 							}
 							else if (warehouseSpace.type=='shelves' && warehouseSpace.container && warehouseSpace.container.shelves && warehouseSpace.container.shelves.length) {
@@ -4147,8 +4147,60 @@
 							}
 						}
 					);
-
 				}
+
+			},
+			removeSelectedEmptyContainers(selectedContainers) {
+
+				selectedContainers.forEach(
+
+					(selectedContainer) => {
+
+						// same division
+						// emptyContainers
+						var selectedContainerIndex = this.emptyContainers.findIndex(
+							(currentContainer) => 
+								currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+							
+						);
+
+						if (selectedContainerIndex > -1) {
+
+							this.emptyContainers.splice(selectedContainerIndex, 1);
+						
+						}
+
+						// downward
+						// emptyShelfContainers
+						var selectedContainerIndex = this.emptyShelfContainers.findIndex(
+							(currentContainer) => 
+								currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+							
+						);
+
+						if (selectedContainerIndex > -1) {
+
+							this.emptyShelfContainers.splice(selectedContainerIndex, 1);
+						
+						}
+
+						// downward
+						// emptyUnitContainers
+						var selectedContainerIndex = this.emptyUnitContainers.findIndex(
+							(currentContainer) => 
+								currentContainer.id == selectedContainer.id && currentContainer.name == selectedContainer.name && currentContainer.warehouse_container_id == selectedContainer.warehouse_container_id
+							
+						);
+
+						if (selectedContainerIndex > -1) {
+
+							this.emptyUnitContainers.splice(selectedContainerIndex, 1);
+
+						}
+
+					}
+
+				);
 
 			},
 			setTotalRent() {

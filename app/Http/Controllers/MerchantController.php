@@ -277,13 +277,13 @@ class MerchantController extends Controller
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->whereDate('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->whereDate('created_at', '<=', $request->dateTo);
 
         }
 
@@ -453,13 +453,13 @@ class MerchantController extends Controller
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->whereDate('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->whereDate('created_at', '<=', $request->dateTo);
 
         }
 
@@ -523,7 +523,7 @@ class MerchantController extends Controller
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->with(['merchant', 'variations.latestStock', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'variations.latestStock', 'variations.serials',  'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                         ->paginate($perPage)),
                 
                 'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)
@@ -541,7 +541,13 @@ class MerchantController extends Controller
             MerchantProduct::where('merchant_id', $expectedMerchant->id)->whereHas('latestStock', function ($query) {
                 $query->where('available_quantity', '>', 0);
             })
-            ->with(['merchant', 'variations', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+            ->with(['merchant', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+            ->with(['serials' => function ($query) {
+                $query->where('has_requisitions', 0)->where('has_dispatched', 0);
+            }])
+            ->with(['variations.serials' => function ($query) {
+                $query->where('has_requisitions', 0)->where('has_dispatched', 0);
+            }])
             ->latest()
             ->get()
         );
@@ -807,7 +813,7 @@ class MerchantController extends Controller
         $expectedMerchant = Merchant::findOrFail($request->merchant_id);
 
         $query = MerchantProduct::where('merchant_id', $expectedMerchant->id)
-                ->with(['merchant', 'variations', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests']);
+                ->with(['merchant', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.latestStock', 'variations.serials']);
 
         if ($request->search) {
             
@@ -815,6 +821,7 @@ class MerchantController extends Controller
                 $query1->where('sku', 'like', "%$request->search%")
                 ->orWhere('description', 'like', "%$request->search%")
                 ->orWhere('warning_quantity', 'like', "%$request->search%")
+                ->orWhere('discount', 'like', "%$request->search%")
                 ->orWhere('selling_price', 'like', "%$request->search%")
                 ->orWhereHas('manufacturer', function ($query2) use ($request) {
                     $query2->where('name', 'like', "%$request->search%");
@@ -830,15 +837,163 @@ class MerchantController extends Controller
 
         }
 
-        if ($request->dateFrom) {
+        if ($request->dateFrom && $request->dateTo) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->where(function ($query1) use ($request) {
+                $query1->whereDate('created_at', '>=', $request->dateFrom)
+                ->orWhereHas('stocks', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom)
+                        ->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            })
+            ->with(['serials' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom)
+                        ->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }])
+            ->with(['latestStock' => function ($query1) use ($request) {
+                $query1->whereHas('stock', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom)
+                    ->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['nonDispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('requisition', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom)
+                    ->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['dispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('dispatch', function ($query2) use ($request) {
+                    $query2->whereDate('updated_at', '>=', $request->dateFrom)
+                    ->whereDate('updated_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['variations.serials' => function ($query1) use ($request) {
+                $query1->whereHas('variationStock', function ($query2) use ($request) {
+                    $query2->whereHas('productStock', function ($query3) use ($request) {
+                        $query3->whereHas('stock', function ($query4) use ($request) {
+                            $query4->whereDate('created_at', '>=', $request->dateFrom)
+                            ->whereDate('created_at', '<=', $request->dateTo);
+                        });
+                    });
+                });
+            }])
+            ->with(['variations.latestStock' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom)
+                        ->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }]);
 
         }
 
-        if ($request->dateTo) {
+        else if ($request->dateFrom && empty($request->dateTo)) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->where(function ($query1) use ($request) {
+                $query1->whereDate('created_at', '>=', $request->dateFrom)
+                ->orWhereHas('stocks', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom);
+                    });
+                });
+            })
+            ->with(['serials' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom);
+                    });
+                });
+            }])
+            ->with(['latestStock' => function ($query1) use ($request) {
+                $query1->whereHas('stock', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom);
+                });
+            }])
+            ->with(['nonDispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('requisition', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom);
+                });
+            }])
+            ->with(['dispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('dispatch', function ($query2) use ($request) {
+                    $query2->whereDate('updated_at', '>=', $request->dateFrom);
+                });
+            }])
+            ->with(['variations.serials' => function ($query1) use ($request) {
+                $query1->whereHas('variationStock', function ($query2) use ($request) {
+                    $query2->whereHas('productStock', function ($query3) use ($request) {
+                        $query3->whereHas('stock', function ($query4) use ($request) {
+                            $query4->whereDate('created_at', '>=', $request->dateFrom);
+                        });
+                    });
+                });
+            }])
+            ->with(['variations.latestStock' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom);
+                    });
+                });
+            }]);
+
+        }
+
+        else if (empty($request->dateFrom) && $request->dateTo) {
+            
+            $query->where(function ($query1) use ($request) {
+                $query1->whereDate('created_at', '<=', $request->dateTo)
+                ->orWhereHas('stocks', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            })
+            ->with(['serials' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }])
+            ->with(['latestStock' => function ($query1) use ($request) {
+                $query1->whereHas('stock', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['nonDispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('requisition', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['dispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('dispatch', function ($query2) use ($request) {
+                    $query2->whereDate('updated_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['variations.serials' => function ($query1) use ($request) {
+                $query1->whereHas('variationStock', function ($query2) use ($request) {
+                    $query2->whereHas('productStock', function ($query3) use ($request) {
+                        $query3->whereHas('stock', function ($query4) use ($request) {
+                            $query4->whereDate('created_at', '<=', $request->dateTo);
+                        });
+                    });
+                });
+            }])
+            ->with(['variations.latestStock' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }]);
 
         }
 

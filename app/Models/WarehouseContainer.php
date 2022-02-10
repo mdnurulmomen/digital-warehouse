@@ -34,7 +34,7 @@ class WarehouseContainer extends Model
 
     public function container()
     {
-        return $this->belongsTo(Container::class, 'container_id', 'id');
+        return $this->belongsTo(Container::class, 'container_id', 'id')->withTrashed();
     }
 
     public function rents()

@@ -1104,7 +1104,7 @@
 													>	
 														<div class="form-group col-md-4">
 															<label for="inputFirstName">
-																Variation
+																Selected Variation
 															</label>
 															<multiselect 
 						                              			v-model="requiredProduct.variations[variationIndex]"
@@ -3850,7 +3850,14 @@
 			    .listen('NewRequisitionMade', (e) => {
 			        
 			        this.$toastr.i("New requisition arrives", "Info");
-			        this.allFetchedRequisitions.pending?.data.push(e);
+
+			        // this.allFetchedRequisitions.pending?.data.push(e);
+
+			        if (this.allFetchedRequisitions.pending && this.allFetchedRequisitions.pending.data && ! this.allFetchedRequisitions.pending.data.some(pendingRequisition=>pendingRequisition.id==e.id)) {
+
+			        	this.allFetchedRequisitions.pending.data.push(e);
+
+			        }
 
 			    });
 
