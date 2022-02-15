@@ -22,6 +22,7 @@ class StockProductResource extends JsonResource
             'id' => $this->id,
             'stock_quantity' => $this->stock_quantity ?? 0,
             'available_quantity' => $this->available_quantity ?? 0,
+            'unit_buying_price' => $this->unit_buying_price ?? 0.0,
             'merchant_product_id' => $this->merchant_product_id,
             'has_serials' => $product->has_serials,
             'has_variations' => $product->has_variations,

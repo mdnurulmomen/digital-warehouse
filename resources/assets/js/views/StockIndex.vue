@@ -485,7 +485,7 @@
 												<div :id="'stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id" class="collapse show" :aria-labelledby="'heading-stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id" data-parent="#product-accordion">
 													<div class="card-body">
 														<div class="form-row">
-															<div class="col-md-4 form-group text-center align-self-center">
+															<div class="col-md-12 form-group text-center">
 																<img 
 																	:src="stockedProduct.merchant_product ? showPreview(stockedProduct.merchant_product.preview) : ''" 
 																	class="img-fluid" 
@@ -494,58 +494,81 @@
 																>
 															</div>
 
-															<div class="col-md-4 form-group">
-																<label class="col-form-label font-weight-bold">
-																	Select Product :
-																</label>
+															<div class="col-md-12">
+																<div class="row">
+																	<div class="col-md-4 form-group">
+																		<label class="col-form-label font-weight-bold">
+																			Select Product :
+																		</label>
 
-																<multiselect 
-							                              			v-model="stockedProduct.merchant_product"
-							                                  		:options="allProducts" 
-							                                  		:custom-label="objectNameWithCapitalized" 
-							                                  		:required="true" 
-							                                  		:allow-empty="false" 
-							                                  		label="name" 
-							                                  		track-by="id" 
-							                              			placeholder="Select Product" 
-							                              			class="form-control p-0" 
-							                                  		:class="! errors.products[stockedProductIndex].product ? 'is-valid' : 'is-invalid'"  
-							                                  		@input="resetProductProperties(stockedProductIndex)" 
-							                              		>
-							                                	</multiselect>
+																		<multiselect 
+									                              			v-model="stockedProduct.merchant_product"
+									                                  		:options="allProducts" 
+									                                  		:custom-label="objectNameWithCapitalized" 
+									                                  		:required="true" 
+									                                  		:allow-empty="false" 
+									                                  		label="name" 
+									                                  		track-by="id" 
+									                              			placeholder="Select Product" 
+									                              			class="form-control p-0" 
+									                                  		:class="! errors.products[stockedProductIndex].product ? 'is-valid' : 'is-invalid'"  
+									                                  		@input="resetProductProperties(stockedProductIndex)" 
+									                              		>
+									                                	</multiselect>
 
-																<div class="invalid-feedback">
-														        	{{ errors.products[stockedProductIndex].product }}
-														  		</div>
-															</div>
+																		<div class="invalid-feedback">
+																        	{{ errors.products[stockedProductIndex].product }}
+																  		</div>
+																	</div>
 
-															<div class="col-md-4 form-group">
-																<label class="col-form-label font-weight-bold">
-																	Stock Qty :
-																</label>
+																	<div class="col-md-4 form-group">
+																		<label class="col-form-label font-weight-bold">
+																			Stock Qty :
+																		</label>
 
-																<div class="input-group mb-0">
-																	<input type="number" 
-																		class="form-control" 
-																		v-model.number="stockedProduct.stock_quantity" 
-																		placeholder="Product Quantity" 
-																		:class="! errors.products[stockedProductIndex].product_stock_quantity ? 'is-valid' : 'is-invalid'" 
-																		required="true" 
-																	>
-																	<div class="input-group-append">
-																		<span class="input-group-text">
-																			{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
-																		</span>
+																		<div class="input-group mb-0">
+																			<input type="number" 
+																				class="form-control" 
+																				v-model.number="stockedProduct.stock_quantity" 
+																				placeholder="Product Quantity" 
+																				:class="! errors.products[stockedProductIndex].product_stock_quantity ? 'is-valid' : 'is-invalid'" 
+																				required="true" 
+																			>
+																			<div class="input-group-append">
+																				<span class="input-group-text">
+																					{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
+																				</span>
+																			</div>
+																		</div>
+
+																		<div class="invalid-feedback" 
+																			style="display: block;" 
+																			v-show="errors.products[stockedProductIndex].product_stock_quantity"
+																		>
+																        	{{ errors.products[stockedProductIndex].product_stock_quantity }}
+																  		</div>
+																	</div>
+
+																	<div class="col-md-4 form-group">
+																		<label class="col-form-label font-weight-bold">
+																			Buying Price (unit) :
+																		</label>
+
+																		<div class="input-group mb-0">
+																			<input type="number" 
+																				class="form-control is-valid" 
+																				v-model.number="stockedProduct.unit_buying_price" 
+																				placeholder="Product Buying Price"  
+																			>
+																			<div class="input-group-append">
+																				<span class="input-group-text">
+																					{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																				</span>
+																			</div>
+																		</div>
 																	</div>
 																</div>
-
-																<div class="invalid-feedback" 
-																	style="display: block;" 
-																	v-show="errors.products[stockedProductIndex].product_stock_quantity"
-																>
-														        	{{ errors.products[stockedProductIndex].product_stock_quantity }}
-														  		</div>
-															</div>	
+															</div>
 														</div>
 
 														<div class="form-row mt-3">
@@ -582,7 +605,7 @@
 																>	
 																	<div class="col-sm-12">
 																		<div class="form-row">	
-																			<div class="form-group col-md-6">
+																			<div class="form-group col-md-4">
 																				<label for="inputFirstName">Variaiton</label>
 																				<multiselect 
 											                              			v-model="stockedVariation.variation"
@@ -597,7 +620,7 @@
 											                                	</multiselect>
 																			</div>
 
-																			<div class="form-group col-md-6">
+																			<div class="form-group col-md-4">
 																				<label for="inputFirstName">Variation Qty</label>
 
 																				<div class="input-group mb-0">
@@ -618,6 +641,23 @@
 																				<div class="invalid-feedback">
 																		        	{{ errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity }}
 																		  		</div>
+																			</div>
+
+																			<div class="form-group col-md-4">
+																				<label for="inputFirstName">Buying Price (unit)</label>
+
+																				<div class="input-group mb-0">
+																					<input type="number" 
+																						class="form-control is-valid" 
+																						v-model.number="stockedVariation.unit_buying_price" 
+																						placeholder="Variation Buying Price" 
+																					>
+																					<div class="input-group-append">
+																						<span class="input-group-text">
+																							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																						</span>
+																					</div>
+																				</div>
 																			</div>
 																			
 																			<!-- 
@@ -2716,6 +2756,8 @@
 					},
 					
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 

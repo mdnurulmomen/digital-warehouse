@@ -20,6 +20,7 @@ class ProductVariationStockResource extends JsonResource
             'id' => $this->id,
             'stock_quantity' => $this->stock_quantity ?? 0,
             'available_quantity' => $this->available_quantity ?? 0,
+            'unit_buying_price' => $this->unit_buying_price ?? 0.0,
             'merchant_product_variation_id' => $this->merchant_product_variation_id,
             'has_serials' => $product->has_serials,
             'variation' => $this->merchantProductVariation->productVariation->variation,

@@ -17,6 +17,7 @@ class CreateProductStocksTable extends Migration
             $table->increments('id');
             $table->unsignedMediumInteger('stock_quantity');    // quantity including all variations
             $table->unsignedMediumInteger('available_quantity');
+            $table->unsignedDecimal('unit_buying_price', $precision = 8, $scale = 2)->default(0);
             // $table->boolean('has_variations')->default(false);
             // $table->boolean('has_serials')->default(false);
             $table->unsignedInteger('merchant_product_id');

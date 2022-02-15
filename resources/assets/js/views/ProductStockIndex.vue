@@ -13,7 +13,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
@@ -594,7 +593,28 @@
 													</div>
 												</div>
 
-											<!-- 
+												<div class="form-row form-group" v-show="! productMerchant.has_variations">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														Buying Price (unit) :
+													</label>
+													<div class="col-sm-8">
+														<div class="input-group mb-0">
+															<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singleStockData.unit_buying_price" 
+																placeholder="Unit Buying Price" 
+																min="0"
+															>
+															<div class="input-group-append">
+																<span class="input-group-text">
+																	{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																</span>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<!-- 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold text-right">
 														Available Qty:
@@ -604,7 +624,7 @@
 														{{ product.quantity_type }}
 													</label>
 												</div>
-		 									-->
+		 										-->
 
 												<div class="form-row mt-3">
 													<div class="form-group col-md-12 text-center">
@@ -629,7 +649,7 @@
 															v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 															:key="'product-variation-index-' + variationIndex + 'A'"
 														>	
-															<div class="form-group col-md-6">
+															<div class="form-group col-md-4">
 																<label for="inputFirstName">Variaiton</label>
 																<multiselect 
 							                              			v-model="singleStockData.variations[variationIndex].variation"
@@ -645,7 +665,7 @@
 															</div>
 
 															<div 
-																class="form-group col-md-6"
+																class="form-group col-md-4"
 															>
 																<label for="inputFirstName">Variation Qty</label>
 																
@@ -663,6 +683,27 @@
 																<div class="invalid-feedback">
 														        	{{ errors.stock.variations[variationIndex].product_variation_quantity }}
 														  		</div>
+															</div>
+
+															<div 
+																class="form-group col-md-4"
+															>
+																<label for="inputFirstName">Buying Price (unit)</label>
+
+																<div class="input-group mb-0">
+																	<input 
+																		type="number" 
+																		class="form-control is-valid" 
+																		v-model.number="singleStockData.variations[variationIndex].unit_buying_price" 
+																		placeholder="Variation Buying Price" 
+																		min="1"
+																	>
+																	<div class="input-group-append">
+																		<span class="input-group-text">
+																			{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																		</span>
+																	</div>
+																</div>
 															</div>
 															
 															<!-- 
@@ -2389,6 +2430,8 @@
 					},
 					
 				},
+
+	            general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 

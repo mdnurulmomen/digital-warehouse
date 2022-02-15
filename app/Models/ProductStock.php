@@ -69,6 +69,7 @@ class ProductStock extends Model
                         $variationExistingStock->update([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationExistingStock->available_quantity - $difference),
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
                             'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
                         ]);
 
@@ -83,10 +84,18 @@ class ProductStock extends Model
                         $variationExistingStock->update([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => ($variationExistingStock->available_quantity + $difference), 
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
                             'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
                         ]);
 
                         $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
+
+                    }
+                    else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity == $stockVariation->stock_quantity) {
+                        
+                        $variationExistingStock->update([
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
+                        ]);
 
                     }
                     else if(empty($variationExistingStock)) {
@@ -94,6 +103,7 @@ class ProductStock extends Model
                         $productVariationStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => $stockVariation->stock_quantity, 
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
                             'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
                         ]);
 
@@ -118,7 +128,8 @@ class ProductStock extends Model
 
                         $variationNewStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
-                            'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity),
+                            'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity), 
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationLastAvailableValue->selling_price ?? 0,
                             // 'has_serials' => empty($stockVariation->serials) ? false : true,
                             'merchant_product_variation_id' => $stockVariation->id,
                             // 'product_stock_id' => $this->id,

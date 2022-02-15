@@ -38,6 +38,7 @@ class StockRequest extends FormRequest
                 })
             ],
             'products.*.stock_quantity' => 'required|numeric|min:1',
+            'products.*.unit_buying_price' => 'nullable|numeric',
             // 'product_id' => 'required|numeric|exists:products,id',
         ];
 
@@ -51,10 +52,10 @@ class StockRequest extends FormRequest
             }
             if ($product->has_serials && ! $product->has_variations) {
                 if (isset($stockingProduct->id)) {
-                    $rules['products.'.$stockingProductKey.'.serials.*.serial_no'] = 'string|distinct|min:4';
+                    $rules['products.'.$stockingProductKey.'.serials.*.serial_no'] = 'required|string|distinct|min:4|unique:product_serials,serial_no,'.$stockingProduct->id;
                 }
                 else {
-                    $rules['products.'.$stockingProductKey.'.serials.*.serial_no'] = 'string|distinct|min:4|unique:product_serials,serial_no';
+                    $rules['products.'.$stockingProductKey.'.serials.*.serial_no'] = 'required|string|distinct|min:4|unique:product_serials,serial_no';
                 }
             }
             if ($product->has_variations) {
@@ -65,6 +66,7 @@ class StockRequest extends FormRequest
             }
             if ($product->has_variations && array_sum(array_column($stockingProduct->variations, 'stock_quantity')) != $stockingProduct->stock_quantity) {
                 $rules['products.'.$stockingProductKey.'.variations.*.stock_quantity'] = 'required|numeric|min:1';
+                $rules['products.'.$stockingProductKey.'.variations.*.unit_buying_price'] = 'nullable|numeric';
             }
             if ($product->has_variations && $product->has_serials) {
 
@@ -81,7 +83,7 @@ class StockRequest extends FormRequest
             }
             if ($product->has_variations && $product->has_serials) {
                 if (isset($stockingProduct->id)) {
-                    $rules['products.'.$stockingProductKey.'.variations.*.serials.*.serial_no'] = 'required|string|distinct|min:4';
+                    $rules['products.'.$stockingProductKey.'.variations.*.serials.*.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no,'.$stockingProduct->id;
                 }
                 else{
                     $rules['products.'.$stockingProductKey.'.variations.*.serials.*.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no';
@@ -102,6 +104,7 @@ class StockRequest extends FormRequest
     {
         return [
             'products.*.stock_quantity.*' => 'Stock quantity is required !',
+            'products.*.unit_buying_price.*' => 'Buying price should be numeric !',
             'warehouse.id' => [
                 'exists' => 'Warehouse is invalid !',
                 '*' => 'Warehouse is required !',
@@ -124,6 +127,8 @@ class StockRequest extends FormRequest
                 'required' => 'Variation quantity should be equal to product quantity',
                 '*' => 'Variation quantity is required !',
             ],
+
+            'products.*.variations.*.unit_buying_price.*' => 'Buying price should be numeric',
 
             'products.*.variations.*.serials' => [
                 'required' => 'Variation serial is required',
