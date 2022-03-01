@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\MerchantProduct;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\MerchantProductVariation;
 
 class ProductStock extends Model
 {
@@ -41,7 +43,9 @@ class ProductStock extends Model
             
             foreach ($this->variations as $variation) {
 
-                $this->decreaseSuccessorStockVariations($variation, $variation->stock_quantity);
+                MerchantProductVariation::findOrFail($variation->merchant_product_variation_id)->decrement('available_quantity', $variation->stock_quantity);
+
+                // $this->decreaseSuccessorStockVariations($variation, $variation->stock_quantity);
                 $this->deleteStockVariationSerials($variation);
                 $variation->delete();
 
@@ -54,16 +58,21 @@ class ProductStock extends Model
     {
         if (count($variations)) {
             
+            $stockHasApproval = $this->stock->has_approval;
+
             // update / old stock
             if ($this->variations()->count()) {
                 
                 foreach ($variations as $stockVariation) {
                     
+                    $merchantProductExpectedVariation = MerchantProductVariation::findOrFail($stockVariation->merchant_product_variation_id);
+
                     $variationExistingStock = $this->variations()->where('merchant_product_variation_id', $stockVariation->merchant_product_variation_id)->first();
 
+                    /*
+                    // decreasing quantity
                     if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity > $stockVariation->stock_quantity) {
                         
-                        // decrease quantity
                         $difference = $variationExistingStock->stock_quantity - $stockVariation->stock_quantity;
 
                         $variationExistingStock->update([
@@ -75,7 +84,10 @@ class ProductStock extends Model
 
                         $this->decreaseSuccessorStockVariations($variationExistingStock, $difference);
 
+                        $merchantProductExpectedVariation->decrement('available_quantity', $difference);
+
                     }
+                    // increasing quantity
                     else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity < $stockVariation->stock_quantity) {
                         
                         // increase quantity
@@ -90,7 +102,10 @@ class ProductStock extends Model
 
                         $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
 
+                        $merchantProductExpectedVariation->increment('available_quantity', $difference);
+
                     }
+                    // same quantity
                     else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity == $stockVariation->stock_quantity) {
                         
                         $variationExistingStock->update([
@@ -98,6 +113,7 @@ class ProductStock extends Model
                         ]);
 
                     }
+                    // adding existing variation new stock
                     else if(empty($variationExistingStock)) {
 
                         $productVariationStock = $this->variations()->create([
@@ -107,11 +123,90 @@ class ProductStock extends Model
                             'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
                         ]);
 
-                    }
+                        $merchantProductExpectedVariation->increment('available_quantity', $stockVariation->stock_quantity);
 
-                    if (! empty($variationExistingStock) && $variationExistingStock->serials->count()) {
+                    }
+                    */
+                   
+                    // decreasing quantity if available is more than or equal to expected quantity
+                    if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity > $stockVariation->stock_quantity && $variationExistingStock->available_quantity >= $stockVariation->stock_quantity) {
                         
-                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock ?? $productVariationStock);
+                        $difference = $variationExistingStock->available_quantity - $stockVariation->stock_quantity;
+
+                        $variationExistingStock->update([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => ($variationExistingStock->available_quantity - $difference),
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
+                        ]);
+
+                        // $this->decreaseSuccessorStockVariations($variationExistingStock, $difference);
+
+                        if ($stockHasApproval) {
+                            
+                            $merchantProductExpectedVariation->decrement('available_quantity', $difference);
+                        
+                        }
+
+                    }
+                    // increasing quantity
+                    else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity < $stockVariation->stock_quantity) {
+                        
+                        // increase quantity
+                        $difference = $stockVariation->stock_quantity - $variationExistingStock->stock_quantity;
+                        
+                        $variationExistingStock->update([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => ($variationExistingStock->available_quantity + $difference), 
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
+                        ]);
+
+                        // $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
+
+                        if ($stockHasApproval) {
+                            
+                            $merchantProductExpectedVariation->increment('available_quantity', $difference);
+
+                        }
+
+
+                    }
+                    // same quantity
+                    else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity == $stockVariation->stock_quantity) {
+                        
+                        $variationExistingStock->update([
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
+                        ]);
+
+                        if (! $stockHasApproval) {
+                            
+                            $merchantProductExpectedVariation->increment('available_quantity', $difference);
+
+                        }
+
+                    }
+                    // adding existing variation new stock
+                    else if(empty($variationExistingStock)) {
+
+                        $productVariationStock = $this->variations()->create([
+                            'stock_quantity' => $stockVariation->stock_quantity,
+                            'available_quantity' => $stockVariation->stock_quantity, 
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
+                        ]);
+
+                        if ($stockHasApproval) {
+                            
+                            $merchantProductExpectedVariation->increment('available_quantity', $stockVariation->stock_quantity);
+
+                        }
+
+                    }
+    
+                    if ($this->merchantProduct->product->has_serials) {
+                        
+                        $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock ?? $productVariationStock);                   
 
                     }
 
@@ -124,23 +219,32 @@ class ProductStock extends Model
                
                     if (!empty($stockVariation->stock_quantity) && $stockVariation->stock_quantity > 0) {
                         
-                        $variationLastAvailableValue = MerchantProductVariation::findOrFail($stockVariation->id)->latestStock->available_quantity ?? 0;
+                        $merchantProductExpectedVariation = MerchantProductVariation::findOrFail($stockVariation->id);
+                        
+                        // $variationLastAvailableValue = /*MerchantProductVariation::findOrFail($stockVariation->id)->latestStock->available_quantity*/ $merchantProductExpectedVariation->available_quantity ?? 0;
 
                         $variationNewStock = $this->variations()->create([
                             'stock_quantity' => $stockVariation->stock_quantity,
-                            'available_quantity' => ($variationLastAvailableValue + $stockVariation->stock_quantity), 
-                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationLastAvailableValue->selling_price ?? 0,
+                            'available_quantity' => $stockVariation->stock_quantity, 
+                            'unit_buying_price' => $stockVariation->unit_buying_price ?? $merchantProductExpectedVariation->selling_price ?? 0,
                             // 'has_serials' => empty($stockVariation->serials) ? false : true,
                             'merchant_product_variation_id' => $stockVariation->id,
                             // 'product_stock_id' => $this->id,
                             // 'created_at' => now(),
                         ]);
 
-                        if ($this->merchantProduct->product->has_serials) {
-                        
-                            $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
+                        if ($stockHasApproval) {
                             
+                            $merchantProductExpectedVariation->increment('available_quantity', $stockVariation->stock_quantity);
+
                         }
+
+                        if ($this->merchantProduct->product->has_serials) {
+                            
+                            $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
+
+                        }
+
 
                     }
 
@@ -470,7 +574,7 @@ class ProductStock extends Model
 
     protected function setProductVariationSerialNumbers($serials, ProductVariationStock $productVariationStock) 
     {
-        if (count($serials)) {
+        if (count($serials) && $this->merchantProduct->product->has_serials) {
             
             // deleting initially
             $productVariationStock->serials()->delete();

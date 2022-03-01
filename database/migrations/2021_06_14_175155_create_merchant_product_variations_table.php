@@ -18,6 +18,7 @@ class CreateMerchantProductVariationsTable extends Migration
             $table->string('sku'); // scanned or generated on product-code & merchant code
             $table->string('preview')->nullable();
             // $table->string('description')->nullable(); // short description about what has been stored (may be hints for identification / bulk products)
+            $table->unsignedMediumInteger('available_quantity')->default(0);
             $table->unsignedDecimal('selling_price', $precision = 8, $scale = 2);
             $table->unsignedSmallInteger('product_variation_id'); // stationary / garments
             $table->unsignedInteger('merchant_product_id'); // stationary / garments

@@ -25,7 +25,7 @@ class MyRequiredProductVariationResource extends JsonResource
             'quantity' => $this->quantity,
             'has_serials' => $product->has_serials,
             'serials' => $this->when($product->has_serials, $this->serials->loadMissing('serial')->pluck('serial')->pluck('serial_no')),
-            'available_quantity' => $merchantProductVariation->latestStock->available_quantity,
+            'available_quantity' => /*$merchantProductVariation->latestStock->available_quantity*/ $merchantProductVariation->available_quantity,
         ];
     }
 }

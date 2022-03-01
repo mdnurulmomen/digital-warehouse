@@ -229,10 +229,16 @@ class MerchantController extends Controller
         // );
         
        
+        /*
         return MyProductResource::collection(
             MerchantProduct::where('merchant_id', $currentMerchant->id)->whereHas('latestStock', function ($query) {
                 $query->where('available_quantity', '>', 0);
             })->latest()->get()
+        );
+        */
+       
+        return MyProductResource::collection(
+            MerchantProduct::where('merchant_id', $currentMerchant->id)->where('available_quantity', '>', 0)->latest()->get()
         );
 
     }
@@ -312,11 +318,11 @@ class MerchantController extends Controller
 
             return [
 
-                'pending' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'pending' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
 
-                'dispatched' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'dispatched' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
 
-                'cancelled' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
+                'cancelled' => new MyRequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)->where('merchant_id', $currentMerchant->id)->paginate($perPage)),  
             
             ];
 
@@ -427,7 +433,7 @@ class MerchantController extends Controller
 
         $currentMerchant = \Auth::user();
 
-        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
         ->where(function ($query) use ($currentMerchant) {
             $query->where('merchant_id', $currentMerchant->id);
         });
@@ -523,7 +529,7 @@ class MerchantController extends Controller
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->with(['merchant', 'variations.latestStock', 'variations.serials',  'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'variations', 'variations.serials',  'addresses', 'serials', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                         ->paginate($perPage)),
                 
                 'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)
@@ -531,17 +537,16 @@ class MerchantController extends Controller
                                                             $query->whereNull('product_category_id')
                                                                 ->orWhere('product_category_id', 0);
                                                         })
-                                                        ->with(['merchant', 'variations', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'addresses', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                        ->paginate($perPage)),
             ];
 
         }
        
         return MerchantProductResource::collection(
-            MerchantProduct::where('merchant_id', $expectedMerchant->id)->whereHas('latestStock', function ($query) {
-                $query->where('available_quantity', '>', 0);
-            })
-            ->with(['merchant', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests'])
+            MerchantProduct::where('merchant_id', $expectedMerchant->id)
+            ->where('available_quantity', '>', 0)
+            ->with(['merchant', 'variations', 'variations.nonDispatchedRequests', 'nonDispatchedRequests', 'dispatchedRequests'])
             ->with(['serials' => function ($query) {
                 $query->where('has_requisitions', 0)->where('has_dispatched', 0);
             }])
@@ -813,7 +818,7 @@ class MerchantController extends Controller
         $expectedMerchant = Merchant::findOrFail($request->merchant_id);
 
         $query = MerchantProduct::where('merchant_id', $expectedMerchant->id)
-                ->with(['merchant', 'addresses', 'serials', 'latestStock', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.latestStock', 'variations.serials']);
+                ->with(['merchant', 'addresses', 'serials', 'stocks', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.stocks', 'variations.serials']);
 
         if ($request->search) {
             
@@ -841,6 +846,7 @@ class MerchantController extends Controller
             
             $query->where(function ($query1) use ($request) {
                 $query1->whereDate('created_at', '>=', $request->dateFrom)
+                ->whereDate('created_at', '<=', $request->dateTo)
                 ->orWhereHas('stocks', function ($query2) use ($request) {
                     $query2->whereHas('stock', function ($query3) use ($request) {
                         $query3->whereDate('created_at', '>=', $request->dateFrom)
@@ -856,7 +862,7 @@ class MerchantController extends Controller
                     });
                 });
             }])
-            ->with(['latestStock' => function ($query1) use ($request) {
+            ->with(['stocks' => function ($query1) use ($request) {
                 $query1->whereHas('stock', function ($query2) use ($request) {
                     $query2->whereDate('created_at', '>=', $request->dateFrom)
                     ->whereDate('created_at', '<=', $request->dateTo);
@@ -884,7 +890,7 @@ class MerchantController extends Controller
                     });
                 });
             }])
-            ->with(['variations.latestStock' => function ($query1) use ($request) {
+            ->with(['variations.stocks' => function ($query1) use ($request) {
                 $query1->whereHas('productStock', function ($query2) use ($request) {
                     $query2->whereHas('stock', function ($query3) use ($request) {
                         $query3->whereDate('created_at', '>=', $request->dateFrom)
@@ -912,7 +918,7 @@ class MerchantController extends Controller
                     });
                 });
             }])
-            ->with(['latestStock' => function ($query1) use ($request) {
+            ->with(['stocks' => function ($query1) use ($request) {
                 $query1->whereHas('stock', function ($query2) use ($request) {
                     $query2->whereDate('created_at', '>=', $request->dateFrom);
                 });
@@ -936,7 +942,7 @@ class MerchantController extends Controller
                     });
                 });
             }])
-            ->with(['variations.latestStock' => function ($query1) use ($request) {
+            ->with(['variations.stocks' => function ($query1) use ($request) {
                 $query1->whereHas('productStock', function ($query2) use ($request) {
                     $query2->whereHas('stock', function ($query3) use ($request) {
                         $query3->whereDate('created_at', '>=', $request->dateFrom);
@@ -963,7 +969,7 @@ class MerchantController extends Controller
                     });
                 });
             }])
-            ->with(['latestStock' => function ($query1) use ($request) {
+            ->with(['stocks' => function ($query1) use ($request) {
                 $query1->whereHas('stock', function ($query2) use ($request) {
                     $query2->whereDate('created_at', '<=', $request->dateTo);
                 });
@@ -987,7 +993,7 @@ class MerchantController extends Controller
                     });
                 });
             }])
-            ->with(['variations.latestStock' => function ($query1) use ($request) {
+            ->with(['variations.stocks' => function ($query1) use ($request) {
                 $query1->whereHas('productStock', function ($query2) use ($request) {
                     $query2->whereHas('stock', function ($query3) use ($request) {
                         $query3->whereDate('created_at', '<=', $request->dateTo);

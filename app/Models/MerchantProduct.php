@@ -52,7 +52,8 @@ class MerchantProduct extends Model
     {
         return $this->hasMany(ProductSerial::class, 'merchant_product_id', 'id');
     }
-
+    
+    /*
     public function latestStock()
     {
         return $this->hasOne(ProductStock::class, 'merchant_product_id', 'id')
@@ -60,7 +61,18 @@ class MerchantProduct extends Model
             $q->where('has_approval', 1);
         })->orderBy('id', 'desc');
     }
-
+    */
+   
+    public function oldestAvailableStock()
+    {
+        return $this->hasOne(ProductStock::class, 'merchant_product_id', 'id')
+        ->whereHas('stock', function ($q) {
+            $q->where('has_approval', 1);
+        })
+        ->where('available_quantity', '>', 0)
+        ->oldest('id');
+    }
+    
     // immutable product
     public function getProductImmutabilityAttribute()
     {

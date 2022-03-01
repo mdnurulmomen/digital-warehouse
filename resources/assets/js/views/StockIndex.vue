@@ -1810,13 +1810,16 @@
 												v-for="(stockedProduct, stockedProductIndex) in singleStockData.products" 
 												:key="'stocked-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-s'"
 											>
+												<div class="form-row">
+													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+														{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product Name' | capitalize }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }}) Address Detail :
+													</label>
+												</div>
+
 												<div 
 													class="form-row" 
 													v-if="stockedProduct.hasOwnProperty('addresses') && stockedProduct.addresses.length"
 												>
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
-														{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product Name' | capitalize }} ({{ stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }}) Address Detail :
-													</label>
 													<div class="col-sm-12">
 														<div class="form-row">
 															<div 

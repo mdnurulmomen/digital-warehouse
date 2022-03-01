@@ -472,6 +472,7 @@
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ productMerchant.selling_price || 'NA' }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 													</label>
 												</div>
 

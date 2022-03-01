@@ -31,17 +31,17 @@ class RequisitionController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)->latest()->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)->latest()->paginate($perPage)),  
 
-                'dispatched' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)->latest()->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)->latest()->paginate($perPage)),  
                 
-                'cancelled' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)->latest()->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)->latest()->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation'])->where('status', 0)->latest()->get());
+        return RequisitionResource::collection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation'])->where('status', 0)->latest()->get());
 
     }
 
@@ -210,7 +210,7 @@ class RequisitionController extends Controller
             // 'showProduct' => 'nullable|string', 
         ]);        
 
-        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation']);
+        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation']);
 
         /*
         
@@ -299,7 +299,7 @@ class RequisitionController extends Controller
             return [
 
                 'dispatched' => new RequisitionCollection(
-                    Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+                    Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
                     ->whereHas('products', function ($query) use ($merchantProductId) {
                         $query->where('merchant_product_id', $merchantProductId);
                     })
@@ -310,7 +310,7 @@ class RequisitionController extends Controller
                 ),  
 
                 'pending' => new RequisitionCollection(
-                    Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+                    Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
                     ->whereHas('products', function ($query) use ($merchantProductId) {
                         $query->where('merchant_product_id', $merchantProductId);
                     })
@@ -321,7 +321,7 @@ class RequisitionController extends Controller
                 ),  
                 
                 'cancelled' => new RequisitionCollection(
-                    Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+                    Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
                     ->whereHas('products', function ($query) use ($merchantProductId) {
                         $query->where('merchant_product_id', $merchantProductId);
                     })
@@ -352,7 +352,7 @@ class RequisitionController extends Controller
             // 'showProduct' => 'nullable|string', 
         ]);        
 
-        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.latestStock', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation.latestStock', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
         ->whereHas('products', function ($query) use ($request) {
             $query->where('merchant_product_id', $request->merchant_product_id);
         })

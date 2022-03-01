@@ -372,7 +372,7 @@
 												<div class="form-group col-md-6" v-if="requiredProduct.product">
 													<label for="inputFirstName">Total Quantity</label>
 
-													<div class="input-group mb-3">
+													<div class="input-group mb-0">
 														<input type="number" 
 															class="form-control"  
 															v-model.number="requiredProduct.total_quantity"  
@@ -429,7 +429,7 @@
 																Variation Quantity
 															</label>
 
-															<div class="input-group mb-3">
+															<div class="input-group mb-0">
 																<input type="number" 
 																	class="form-control" 
 																	v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 

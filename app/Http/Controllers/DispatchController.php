@@ -149,7 +149,7 @@ class DispatchController extends Controller
             $newDispatch->has_approval = $userHasApprovingPermission ? 1 : 0;
             $newDispatch->updater_type = $userHasApprovingPermission ? get_class($currentUser) : NULL;
             $newDispatch->updater_id = $userHasApprovingPermission ? $currentUser->id : NULL;
-            $newDispatch->updated_at = $userHasApprovingPermission ? $request->requisition['updated_at'] ? $request->requisition['updated_at'] : now() : NULL;
+            $newDispatch->updated_at = $userHasApprovingPermission ? isset($request->requisition['updated_at']) ? $request->requisition['updated_at'] : now() : NULL;
             $newDispatch->requisition_id = $request->requisition['id'];
             $newDispatch->save();
 
@@ -339,7 +339,7 @@ class DispatchController extends Controller
 
             $expectedMerchantProduct = MerchantProduct::find($productToDispatch->merchant_product_id);
 
-            $productAvailableQuantity = $expectedMerchantProduct->latestStock->available_quantity ?? 0;
+            $productAvailableQuantity = /*$expectedMerchantProduct->latestStock->available_quantity*/ $expectedMerchantProduct->available_quantity ?? 0;
 
             if ($productAvailableQuantity < $productToDispatch->quantity) {
                 
@@ -377,7 +377,7 @@ class DispatchController extends Controller
             
                     $merchantProductExpectedVariation = $expectedMerchantProduct->variations()->where('id', $variationToDispatch->merchant_product_variation_id)->first();
 
-                    $variationAvailableQuantity = $merchantProductExpectedVariation->latestStock->available_quantity ?? 0;
+                    $variationAvailableQuantity = /*$merchantProductExpectedVariation->latestStock->available_quantity*/ $merchantProductExpectedVariation->available_quantity ?? 0;
 
                     if ($variationToDispatch->quantity > $variationAvailableQuantity) {
                         

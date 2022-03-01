@@ -36,6 +36,7 @@ class MerchantProductVariation extends Model
         return $this->hasMany(ProductVariationSerial::class, 'merchant_product_variation_id', 'id');
     }
 
+    /*
     public function latestStock()
     {
         return $this->hasOne(ProductVariationStock::class, 'merchant_product_variation_id', 'id')
@@ -45,6 +46,19 @@ class MerchantProductVariation extends Model
             });
         })->orderBy('id', 'desc');
     }
+    */
+   
+    public function oldestAvailableStock()
+    {
+        return $this->hasOne(ProductVariationStock::class, 'merchant_product_variation_id', 'id')
+        ->where('available_quantity', '>', 0)
+        ->whereHas('productStock', function ($query) {
+            $query->whereHas('stock', function ($q) {
+                $q->where('has_approval', 1);
+            });
+        })
+        ->oldest('id');
+    }   
 
     public function nonDispatchedRequests()
     {

@@ -74,7 +74,7 @@ class StockRequest extends FormRequest
                     
                     if (! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
                         
-                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials'] = 'required|array';
+                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials'] = 'required|array|exclude_if:variations.*.stock_quantity,';
 
                     }
 
@@ -82,6 +82,7 @@ class StockRequest extends FormRequest
 
             }
             if ($product->has_variations && $product->has_serials) {
+
                 if (isset($stockingProduct->id)) {
                     $rules['products.'.$stockingProductKey.'.variations.*.serials.*.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no,'.$stockingProduct->id;
                 }
