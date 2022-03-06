@@ -301,7 +301,7 @@
 													is-inline
 													:max-date="new Date()" 
 													:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
-													:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+													:attributes="[ { key: 'today', dot: true } ]" 
 												/>
 											</div>
 										</div>
@@ -939,10 +939,11 @@
 													v-model="singleDispatchData.requisition.updated_at" 
 													color="red" 
 													is-dark
-													is-inline
+													is-inline 
+													:min-date="singleDispatchData.requisition.created_at" 
 													:max-date="new Date()" 
 													:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
-													:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+													:attributes="[ { key: 'today', dot: true } ]" 
 												/>
 											</div>
 										</div>
@@ -2171,9 +2172,7 @@
 											</label>
 										</div> -->
 									</div>
-
 								</div>
-
 							</div>
 						</div>
 					</div>
@@ -2265,14 +2264,12 @@
 					<div class="form-row">
 						<label class="col-6 col-form-label font-weight-bold text-right">Status :</label>
 
-						<label class="col-6 col-form-label">
-															
+						<label class="col-6 col-form-label">									
 							<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
 															
 								{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
 
-							</span>
-							
+							</span>	
 						</label>
 					</div>
 
@@ -2315,7 +2312,6 @@
 						</label>
 						<div class="col-6">
 							<div class="form-row">
-								
 								<div 
 									class="col-md-12 ml-auto" 
 									v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
@@ -3274,6 +3270,8 @@
 	        	this.createRequisition = false;
 	        	
 				this.configureErrorObject(object);
+
+				this.singleRequisitionData = { ...object }; // just for highlightng current row
 
 				this.singleDispatchData = {
 
