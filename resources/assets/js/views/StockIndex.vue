@@ -429,7 +429,8 @@
 															v-model="singleStockData.updated_at" 
 															color="red" 
 															is-dark
-															is-inline
+															is-inline 
+															:min-date="singleStockData.created_at" 
 															:max-date="new Date()" 
 															:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
 															:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
