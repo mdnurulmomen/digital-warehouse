@@ -525,7 +525,8 @@
 															v-model="singleStockData.created_at" 
 															color="red" 
 															is-dark
-															is-inline
+															is-inline 
+															:min-date="productMerchant.created_at" 
 															:max-date="new Date()" 
 															:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
 															:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
