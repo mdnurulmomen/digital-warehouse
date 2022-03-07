@@ -637,7 +637,7 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'available_quantity' => $request->stock_quantity,
-            'unit_buying_price' => $request->unit_buying_price ?? $merchantProduct->selling_price ?? 0,
+            'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
             'merchant_product_id' => $merchantProduct->id
         ]);
 
@@ -835,7 +835,7 @@ class ProductController extends Controller
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity, 
                 'available_quantity' => ($stockToUpdate->available_quantity + $difference),
-                'unit_buying_price' => $request->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
             // $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -851,7 +851,7 @@ class ProductController extends Controller
             $stockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity, 
                 'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
-                'unit_buying_price' => $request->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
             // $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -863,7 +863,7 @@ class ProductController extends Controller
         else if($request->stock_quantity == $stockToUpdate->stock_quantity && ! $stockToUpdate->stock->has_approval) {
 
             $stockToUpdate->update([
-                'unit_buying_price' => $request->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
             // $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
@@ -884,7 +884,7 @@ class ProductController extends Controller
         else {
 
             $stockToUpdate->update([
-                'unit_buying_price' => $request->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
         }
@@ -1044,6 +1044,7 @@ class ProductController extends Controller
         foreach($request->products as $storingProductKey => $storingProduct) {
 
             $merchantProduct = MerchantProduct::findOrFail($storingProduct->merchant_product_id);
+            $product = $merchantProduct->product;
 
             // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
@@ -1051,7 +1052,7 @@ class ProductController extends Controller
                 'stock_quantity' => $storingProduct->stock_quantity,
                 // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $storingProduct->stock_quantity : $lastAvailableQuantity,
                 'available_quantity' => $storingProduct->stock_quantity,
-                'unit_buying_price' => $storingProduct->unit_buying_price ?? $merchantProduct->selling_price ?? 0,
+                'unit_buying_price' => ! $product->has_variations ? ($storingProduct->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,
                 'merchant_product_id' => $merchantProduct->id
             ]);
 
@@ -1061,13 +1062,13 @@ class ProductController extends Controller
 
             }      
 
-            if ($storingProduct->has_variations && ! empty($storingProduct->variations)) {
+            if ($product->has_variations && ! empty($storingProduct->variations)) {
                 
                 $productNewStock->stock_variations = json_decode(json_encode($storingProduct->variations));
 
             }
 
-            if ($storingProduct->has_serials && ! $storingProduct->has_variations && ! empty($storingProduct->serials)) {
+            if ($product->has_serials && ! $storingProduct->has_variations && ! empty($storingProduct->serials)) {
                 
                 $productNewStock->stock_serials = json_decode(json_encode($storingProduct->serials));
 
@@ -1170,7 +1171,7 @@ class ProductController extends Controller
                 $stockToUpdate->update([
                     'stock_quantity' => $stockingProduct->stock_quantity,
                     'available_quantity' => ($stockToUpdate->available_quantity + $difference),
-                    'unit_buying_price' => $stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                 ]);
 
                 // $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -1185,7 +1186,7 @@ class ProductController extends Controller
                 $stockToUpdate->update([
                     'stock_quantity' => $stockingProduct->stock_quantity,
                     'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
-                    'unit_buying_price' => $stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                 ]);
 
                 // $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
@@ -1196,7 +1197,7 @@ class ProductController extends Controller
             else if($stockingProduct->stock_quantity == $stockToUpdate->stock_quantity && ! $stockToUpdate->stock->has_approval) {
 
                 $stockToUpdate->update([
-                    'unit_buying_price' => $stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                 ]);
 
                 $merchantExpectedProduct->increment('available_quantity', $difference);
@@ -1207,14 +1208,14 @@ class ProductController extends Controller
             else if($stockingProduct->stock_quantity == $stockToUpdate->stock_quantity && $stockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
 
                 $stockToUpdate->update([
-                    'unit_buying_price' => $stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                 ]);
 
             }
             else {
 
                 $stockToUpdate->update([
-                    'unit_buying_price' => $stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                 ]);
 
             }

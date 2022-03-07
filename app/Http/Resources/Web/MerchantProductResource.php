@@ -55,6 +55,14 @@ class MerchantProductResource extends JsonResource
             'requested_quantity' => $this->when($this->relationLoaded('nonDispatchedRequests'), $this->nonDispatchedRequests->sum('quantity')),
             'dispatched_quantity' => $this->when($this->relationLoaded('dispatchedRequests'), $this->dispatchedRequests->sum('quantity')),
 
+            'stock_total_cost' => $product->has_variations ? $this->variations->sum(function ($productVariation) {
+                return $productVariation->stocks->sum(function ($productVariationStock) {
+                    return $productVariationStock->stock_quantity * $productVariationStock->unit_buying_price;
+                });
+            }) : $this->stocks->sum(function ($productStock) {
+                return $productStock->available_quantity * $productStock->unit_buying_price;
+            }),
+
             'variations' => $this->when($product->has_variations, MerchantProductVariationResource::customCollection($this->variations, self::$dateFrom)),
 
             'product_immutability' => $this->product_immutability,

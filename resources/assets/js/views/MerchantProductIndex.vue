@@ -882,6 +882,16 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
+														Stock Total Cost :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleMerchantProductData.stock_total_cost }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
 														Selling Price (unit) :
 													</label>
 													<label class="col-8 col-form-label">
@@ -984,6 +994,16 @@
 																			</label>
 																			<label class="col-8 col-form-label">
 																				{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Variation-Stock Total Cost :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.stock_total_cost }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
 																	</div>
@@ -1359,7 +1379,17 @@
 							{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
-					</div>	
+					</div>
+
+					<div class="form-row">
+						<label class="col-4 col-form-label font-weight-bold">
+							Stock Total Cost :
+						</label>
+						<label class="col-8 col-form-label">
+							{{ singleMerchantProductData.stock_total_cost }}
+							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+						</label>
+					</div>
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
@@ -1467,6 +1497,16 @@
 												</label>
 												<label class="col-8 col-form-label">
 													{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-4 col-form-label font-weight-bold">
+													Stock Total Cost :
+												</label>
+												<label class="col-8 col-form-label">
+													{{ merchantProductVariation.stock_total_cost }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 												</label>
 											</div>
 										</div>
@@ -1842,6 +1882,8 @@
 						},
 					},
 
+					'Stock Total Cost' : 'stock_total_cost',
+
 					"Variations": {
 
 						callback: (object) => {
@@ -1854,7 +1896,7 @@
 					
 									(objectVariation, variationIndex) => {
 
-										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + ((objectVariation.available_quantity + objectVariation.previous_quantity) + ' ' + (object.product ? object.product.quantity_type : 'unit')) + "\n\n");
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + ((objectVariation.available_quantity + objectVariation.previous_quantity) + ' ' + (object.product ? object.product.quantity_type : 'unit')) + ", \n" + 'Variation-Stock Total Cost: ' + objectVariation.stock_total_cost + ' ' + general_settings.official_currency_name  + "\n\n");
 
 									}
 									
