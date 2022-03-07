@@ -1004,7 +1004,7 @@ class MerchantController extends Controller
         }
 
         return [
-            'all' => new MerchantProductCollection($query->paginate($perPage)),  
+            'all' => (new MerchantProductCollection($query->paginate($perPage)))->setFromDate($request->dateFrom),  
         ];
     }
 

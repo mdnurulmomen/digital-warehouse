@@ -45,7 +45,11 @@ class MerchantProduct extends Model
 
     public function stocks()
     {
-        return $this->hasMany(ProductStock::class, 'merchant_product_id', 'id')->orderBy('id', 'desc');
+        return $this->hasMany(ProductStock::class, 'merchant_product_id', 'id')
+        ->whereHas('stock', function ($q) {
+            $q->where('has_approval', 1);
+        })
+        ->orderBy('id', 'desc');
     }
 
     public function serials()

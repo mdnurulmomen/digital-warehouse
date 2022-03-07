@@ -6,6 +6,13 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class MerchantProductCollection extends ResourceCollection
 {
+    private static $dateFrom;
+
+    public function setFromDate($value){
+        self::$dateFrom = $value;
+        return $this;
+    }
+
     /**
      * Transform the resource collection into an array.
      *
@@ -16,7 +23,7 @@ class MerchantProductCollection extends ResourceCollection
     {
         return [
             'current_page' => $this->currentPage(),
-            'data'=> MerchantProductResource::collection($this->collection),
+            'data'=> MerchantProductResource::customCollection($this->collection, self::$dateFrom),
             'first_page_url'=> $this->url(1),
             'from'=> $this->firstItem(),
             'last_page'=> $this->lastPage(),

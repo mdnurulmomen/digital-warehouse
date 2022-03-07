@@ -28,7 +28,13 @@ class MerchantProductVariation extends Model
 
     public function stocks()
     {
-        return $this->hasMany(ProductVariationStock::class, 'merchant_product_variation_id', 'id')->orderBy('id', 'desc');
+        return $this->hasMany(ProductVariationStock::class, 'merchant_product_variation_id', 'id')
+        ->whereHas('productStock', function ($query) {
+            $query->whereHas('stock', function ($q) {
+                $q->where('has_approval', 1);
+            });
+        })
+        ->orderBy('id', 'desc');
     }
 
     public function serials()

@@ -139,7 +139,7 @@
 																		<th>Product</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
-																		<th>Stock</th>
+																		<th>Stocked</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -162,7 +162,7 @@
 																		</td>
 
 																		<td>
-																			{{ merchantProduct.available_quantity }}
+																			{{ (merchantProduct.available_quantity + merchantProduct.dispatched_quantity) }}
 																			{{ merchantProduct.hasOwnProperty('product') ? ' ' + merchantProduct.product.quantity_type : ' unit'  }}
 																		</td>
 																		
@@ -835,7 +835,17 @@
 														Starting Quantity :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity }}
+														{{ singleMerchantProductData.previous_quantity }}
+														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Stocked Quantity :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity) }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
@@ -865,7 +875,7 @@
 														Available Quantity :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.available_quantity }}
+														{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
 														{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 													</label>
 												</div>
@@ -973,7 +983,7 @@
 																				Available Qty :
 																			</label>
 																			<label class="col-8 col-form-label">
-																				{{ merchantProductVariation.available_quantity }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+																				{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 																			</label>
 																		</div>
 																	</div>
@@ -1303,10 +1313,20 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Available Quantity :
+							Starting Quantity :
 						</label>
 						<label class="col-8 col-form-label">
-							{{ singleMerchantProductData.available_quantity }}
+							{{ singleMerchantProductData.previous_quantity }}
+							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-4 col-form-label font-weight-bold">
+							Stocked Quantity :
+						</label>
+						<label class="col-8 col-form-label">
+							{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity) }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
 					</div>
@@ -1327,6 +1347,16 @@
 						</label>
 						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.requested_quantity }}
+							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-4 col-form-label font-weight-bold">
+							Available Quantity :
+						</label>
+						<label class="col-8 col-form-label">
+							{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
 							{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 						</label>
 					</div>	
@@ -1436,7 +1466,7 @@
 													Available Qty :
 												</label>
 												<label class="col-8 col-form-label">
-													{{ merchantProductVariation.available_quantity }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
+													{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
 												</label>
 											</div>
 										</div>
@@ -1772,11 +1802,22 @@
 						},
 					},
 
-					
 					'Starting Qty': {
 						callback: (object) => {
 							if (object) {
-								return object.available_quantity + object.dispatched_quantity
+								return object.previous_quantity
+							}
+							else{
+								return 0;
+							}
+						},
+					},
+
+					
+					'Stocked Qty': {
+						callback: (object) => {
+							if (object) {
+								return (object.available_quantity + object.dispatched_quantity)
 							}
 							else{
 								return 0;
@@ -1788,7 +1829,18 @@
 
 					'Pending Requests': 'requested_quantity',
 
-					"Available Qty": 'available_quantity',
+					// "Available Qty": 'available_quantity',
+					
+					'Available Qty': {
+						callback: (object) => {
+							if (object) {
+								return (object.previous_quantity + object.available_quantity)
+							}
+							else{
+								return 0;
+							}
+						},
+					},
 
 					"Variations": {
 
@@ -1802,7 +1854,7 @@
 					
 									(objectVariation, variationIndex) => {
 
-										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + (objectVariation.available_quantity + ' ' + (object.product ? object.product.quantity_type : 'unit')) + "\n\n");
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + ((objectVariation.available_quantity + objectVariation.previous_quantity) + ' ' + (object.product ? object.product.quantity_type : 'unit')) + "\n\n");
 
 									}
 									

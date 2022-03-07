@@ -2,10 +2,19 @@
 
 namespace App\Http\Resources\Web;
 
+use App\Models\ProductStock;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MerchantProductResource extends JsonResource
 {
+    private static $dateFrom;
+
+    public static function customCollection($resource, $value): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        self::$dateFrom = $value;
+        return parent::collection($resource);
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -34,10 +43,20 @@ class MerchantProductResource extends JsonResource
             'product' => new ProductResource($product),
             'has_serials' => $product->has_serials,
             'has_variations' => $product->has_variations,
+
+            'previous_quantity' => isset(self::$dateFrom) ? (int) ProductStock::where('merchant_product_id', $this->id)
+            ->whereHas('stock', function ($query) {
+                $query->where('has_approval', 1)
+                ->whereDate('created_at', '<', self::$dateFrom);
+            })
+            ->sum('available_quantity') : 0,
+
             'available_quantity' => /*$this->when($this->relationLoaded('latestStock'), $this->latestStock->available_quantity ?? 0)*/ $this->relationLoaded('stocks') ? $this->stocks->sum('available_quantity') : $this->available_quantity ?? 0,
             'requested_quantity' => $this->when($this->relationLoaded('nonDispatchedRequests'), $this->nonDispatchedRequests->sum('quantity')),
             'dispatched_quantity' => $this->when($this->relationLoaded('dispatchedRequests'), $this->dispatchedRequests->sum('quantity')),
-            'variations' => $this->when($product->has_variations, MerchantProductVariationResource::collection($this->variations)),
+
+            'variations' => $this->when($product->has_variations, MerchantProductVariationResource::customCollection($this->variations, self::$dateFrom)),
+
             'product_immutability' => $this->product_immutability,
             'serials' => $this->when($product->has_serials && ! $product->has_variations, ProductSerialResource::collection($this->serials)),
             'addresses' => new ProductAddressCollection($this->whenLoaded('addresses')),
