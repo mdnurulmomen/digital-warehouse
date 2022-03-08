@@ -41,6 +41,12 @@ class MerchantProductVariationResource extends JsonResource
             })
             ->sum('available_quantity') : 0,
 
+            'unit_max_price' => $this->when($this->relationLoaded('stocks'), $this->stocks->pluck('unit_buying_price')->max()),
+
+            'unit_min_price' => $this->when($this->relationLoaded('stocks'), $this->stocks->pluck('unit_buying_price')->min()),
+
+            'unit_avg_price' => $this->when($this->relationLoaded('stocks'), $this->stocks->pluck('unit_buying_price')->avg()),
+
             'stock_total_cost' => $this->stocks->sum(function ($productVariationStock) {
                 return $productVariationStock->stock_quantity * $productVariationStock->unit_buying_price;
             }),

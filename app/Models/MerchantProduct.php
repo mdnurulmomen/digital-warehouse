@@ -52,6 +52,26 @@ class MerchantProduct extends Model
         ->orderBy('id', 'desc');
     }
 
+    /*
+    public function variationStocks()
+    {
+        return $this->hasManyThrough(
+            ProductVariationStock::class,
+            MerchantProductVariation::class,
+            'merchant_product_id', // Foreign key on the environments table...
+            'merchant_product_variation_id', // Foreign key on the deployments table...
+            'id', // Local key on the product_variation_stocks table...
+            'id' // Local key on the merchant_product_variations table...
+        )
+        ->whereHas('productStock', function ($query) {
+            $query->whereHas('stock', function ($q) {
+                $q->where('has_approval', 1);
+            });
+        })
+        ->orderBy('id', 'desc');
+    }
+    */
+
     public function serials()
     {
         return $this->hasMany(ProductSerial::class, 'merchant_product_id', 'id');

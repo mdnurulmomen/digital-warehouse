@@ -55,12 +55,18 @@ class MerchantProductResource extends JsonResource
             'requested_quantity' => $this->when($this->relationLoaded('nonDispatchedRequests'), $this->nonDispatchedRequests->sum('quantity')),
             'dispatched_quantity' => $this->when($this->relationLoaded('dispatchedRequests'), $this->dispatchedRequests->sum('quantity')),
 
+            'unit_max_price' => $this->when($this->relationLoaded('stocks'), $product->has_variations ? $this->variations->pluck('stocks')->collapse()->pluck('unit_buying_price')->max() : $this->stocks->pluck('unit_buying_price')->max()),
+
+            'unit_min_price' => $this->when($this->relationLoaded('stocks'), $product->has_variations ? $this->variations->pluck('stocks')->collapse()->pluck('unit_buying_price')->min() : $this->stocks->pluck('unit_buying_price')->min()),
+
+            'unit_avg_price' => $this->when($this->relationLoaded('stocks'), $product->has_variations ? $this->variations->pluck('stocks')->collapse()->pluck('unit_buying_price')->avg() : $this->stocks->pluck('unit_buying_price')->avg()),
+
             'stock_total_cost' => $product->has_variations ? $this->variations->sum(function ($productVariation) {
                 return $productVariation->stocks->sum(function ($productVariationStock) {
                     return $productVariationStock->stock_quantity * $productVariationStock->unit_buying_price;
                 });
             }) : $this->stocks->sum(function ($productStock) {
-                return $productStock->available_quantity * $productStock->unit_buying_price;
+                return $productStock->stock_quantity * $productStock->unit_buying_price;
             }),
 
             'variations' => $this->when($product->has_variations, MerchantProductVariationResource::customCollection($this->variations, self::$dateFrom)),

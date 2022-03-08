@@ -139,7 +139,7 @@
 																		<th>Product</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
-																		<th>Stocked</th>
+																		<th>Available</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -162,7 +162,7 @@
 																		</td>
 
 																		<td>
-																			{{ (merchantProduct.available_quantity + merchantProduct.dispatched_quantity) }}
+																			{{ (merchantProduct.available_quantity + merchantProduct.previous_quantity) }}
 																			{{ merchantProduct.hasOwnProperty('product') ? ' ' + merchantProduct.product.quantity_type : ' unit'  }}
 																		</td>
 																		
@@ -882,6 +882,36 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
+														Unit Max Price :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleMerchantProductData.unit_max_price }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Unit Min Price :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleMerchantProductData.unit_min_price }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Unit Avg Price :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleMerchantProductData.unit_avg_price }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
 														Stock Total Cost :
 													</label>
 													<label class="col-8 col-form-label">
@@ -994,6 +1024,36 @@
 																			</label>
 																			<label class="col-8 col-form-label">
 																				{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Unit Max Price :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.unit_max_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Unit Min Price :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.unit_min_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Unit Avg Price :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.unit_avg_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
 
@@ -1383,6 +1443,36 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
+							Unit Max Price :
+						</label>
+						<label class="col-8 col-form-label">
+							{{ singleMerchantProductData.unit_max_price }}
+							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-4 col-form-label font-weight-bold">
+							Unit Min Price :
+						</label>
+						<label class="col-8 col-form-label">
+							{{ singleMerchantProductData.unit_min_price }}
+							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-4 col-form-label font-weight-bold">
+							Unit Avg Price :
+						</label>
+						<label class="col-8 col-form-label">
+							{{ singleMerchantProductData.unit_avg_price }}
+							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row">
+						<label class="col-4 col-form-label font-weight-bold">
 							Stock Total Cost :
 						</label>
 						<label class="col-8 col-form-label">
@@ -1440,7 +1530,7 @@
 						<div class="col-sm-12">
 							<div class="form-row">
 								<div 
-									class="col-md-6 ml-auto" 
+									class="col-6" 
 									v-for="(merchantProductVariation, merchantProductVariationIndex) in singleMerchantProductData.variations" 
 									:key="'merchant-product-variation-index-' + merchantProductVariationIndex + '-variation-' + merchantProductVariation.id"
 								>
@@ -1497,6 +1587,36 @@
 												</label>
 												<label class="col-8 col-form-label">
 													{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-4 col-form-label font-weight-bold">
+													Unit Max Price :
+												</label>
+												<label class="col-8 col-form-label">
+													{{ merchantProductVariation.unit_max_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-4 col-form-label font-weight-bold">
+													Unit Min Price :
+												</label>
+												<label class="col-8 col-form-label">
+													{{ merchantProductVariation.unit_min_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-4 col-form-label font-weight-bold">
+													Unit Avg Price :
+												</label>
+												<label class="col-8 col-form-label">
+													{{ merchantProductVariation.unit_avg_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 												</label>
 											</div>
 
@@ -1882,6 +2002,12 @@
 						},
 					},
 
+					'Unit Max Price' : 'unit_max_price',
+
+					'Unit Min Price' : 'unit_min_price',
+
+					'Unit Avg Price' : 'unit_avg_price',
+
 					'Stock Total Cost' : 'stock_total_cost',
 
 					"Variations": {
@@ -1896,7 +2022,7 @@
 					
 									(objectVariation, variationIndex) => {
 
-										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + ((objectVariation.available_quantity + objectVariation.previous_quantity) + ' ' + (object.product ? object.product.quantity_type : 'unit')) + ", \n" + 'Variation-Stock Total Cost: ' + objectVariation.stock_total_cost + ' ' + general_settings.official_currency_name  + "\n\n");
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + ((objectVariation.available_quantity + objectVariation.previous_quantity) + ' ' + (object.product ? object.product.quantity_type : 'unit')) + ", \n" + 'Unit Max Price: ' + objectVariation.unit_max_price + ", \n" + 'Unit Min Price: ' + objectVariation.unit_min_price + ", \n" + 'Unit Avg Price: ' + objectVariation.unit_avg_price + ", \n"   + 'Variation-Stock Total Cost: ' + objectVariation.stock_total_cost + ' ' + this.general_settings.official_currency_name  + "\n\n");
 
 									}
 									
