@@ -30,7 +30,8 @@
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllProducts"
+											  		@fetchAllContents="fetchAllProducts" 
+											  		@importExcelFile="importExcelFile($event)" 
 											  	></search-and-addition-option>
 											</div>
 											
@@ -1186,9 +1187,7 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -2446,6 +2445,35 @@
 
 		      	evnt.target.value = '';
 		      	return;
+
+			}, 
+			importExcelFile(fileToExport) {
+
+				// console.log(fileToExport);
+
+				this.formSubmitted = true;
+
+				axios
+					.post('/import-products/' + this.perPage, fileToExport)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New products has been stored", "Success");
+							this.allFetchedProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							// $('#product-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
 
 			},
 			validateFormInput (formInputName) {

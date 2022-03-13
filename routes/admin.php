@@ -257,6 +257,9 @@ Route::name('admin.')->group(function () {
 		// second dashboard
 		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two');
 
+		// imports
+		Route::post('import-products/{perPage}', 'ImportController@importProducts')->name('import-products');
+
 		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 

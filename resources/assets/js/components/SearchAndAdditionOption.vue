@@ -1,49 +1,68 @@
 <template v-if="userHasPermissionTo('view-' + requiredPermission + '-index') || userHasPermissionTo('create-' + requiredPermission)">
 	
-	<div class="row d-flex align-items-center">										  	
-  		<div class="col-sm-6 col-md-3 form-group d-flex align-items-center">	
-				<span>
-					{{ callerPage | capitalize }} List
-				</span>
+	<section>
+		<div class="row d-flex align-items-center">										  	
+	  		<div class="col-sm-6 col-md-3 form-group d-flex align-items-center">	
+					<span>
+						{{ callerPage | capitalize }} List 
 
-				<button 
-		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
+						<i 
+	  						class="fas fa-upload fa-lg pr-3 pl-1" 
+	  						v-show="$route.name=='products'" 
+	  						v-tooltip.bottom-end="'Import ' + callerPage" 
+	  						data-toggle="modal" 
+							:data-target="'#'+ callerPage +'-importing-modal'" 
+	  					>	
+	  					</i>
+					</span>
+
+					<button 
+			  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
+			  			v-tooltip.bottom-end="'Create New'" 
+			  			:disabled="disableAddButton" 
+			  			@click="$emit('showContentCreateForm')" 
+			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+		  			>
+		  				<i class="fa fa-plus"></i>
+		  				New {{ callerPage | capitalize }}
+		  			</button>
+	  		</div>
+	  		<div 
+		  		class="col-sm-6 col-md-6 was-validated form-group" 
+		  		v-if="$route.name=='delivery-companies' || $route.name=='packaging-packages' || userHasPermissionTo('view-' + requiredPermission + '-index')"
+	  		>
+	  			<input 	type="text" 
+				  		v-model="search" 
+				  		pattern="[^'!#$%^()\x22]+" 
+				  		class="form-control" 
+				  		placeholder="Search"
+			  	>
+			  	<div class="invalid-feedback">
+			  		Please search with releavant input
+			  	</div>
+	  		</div>
+	  		<div class="col-sm-6 col-md-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
+	  			<button 
+		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-none d-sm-none d-md-block d-lg-block" 
 		  			v-tooltip.bottom-end="'Create New'" 
 		  			:disabled="disableAddButton" 
-		  			@click="$emit('showContentCreateForm')" 
-		  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+		  			@click="$emit('showContentCreateForm')"
 	  			>
 	  				<i class="fa fa-plus"></i>
 	  				New {{ callerPage | capitalize }}
 	  			</button>
-  		</div>
-  		<div 
-	  		class="col-sm-6 col-md-6 was-validated form-group" 
-	  		v-if="$route.name=='delivery-companies' || $route.name=='packaging-packages' || userHasPermissionTo('view-' + requiredPermission + '-index')"
-  		>
-  			<input 	type="text" 
-			  		v-model="search" 
-			  		pattern="[^'!#$%^()\x22]+" 
-			  		class="form-control" 
-			  		placeholder="Search"
-		  	>
-		  	<div class="invalid-feedback">
-		  		Please search with releavant input
-		  	</div>
-  		</div>
-  		<div class="col-sm-6 col-md-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
-  			<button 
-	  			class="btn btn-success btn-outline-success btn-sm ml-auto d-none d-sm-none d-md-block d-lg-block" 
-	  			v-tooltip.bottom-end="'Create New'" 
-	  			:disabled="disableAddButton" 
-	  			@click="$emit('showContentCreateForm')"
-  			>
-  				<i class="fa fa-plus"></i>
-  				New {{ callerPage | capitalize }}
-  			</button>
-  		</div>
-  	</div>
+	  		</div>
+	  	</div>
 
+	  	<div class="row" v-if="userHasPermissionTo('create-' + requiredPermission)">
+	  		<!-- The Modal -->
+	  		<import-excel 
+	  			:caller-page="callerPage" 
+
+	  			@importExcelFile="importExcelFile($event)" 
+	  		/>
+	  	</div>
+	</section>
 </template>
 
 <script type="text/javascript">
@@ -110,6 +129,20 @@
 				search : this.query
 
 			};
+		},
+
+		methods : {
+
+			importExcelFile(fileToExport) {
+
+				this.$emit('importExcelFile', fileToExport);
+
+				/*
+				this.formSubmitted = true;
+				 */
+
+			},
+
 		}
 
 	}

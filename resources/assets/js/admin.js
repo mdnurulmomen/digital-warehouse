@@ -46,6 +46,7 @@ Vue.component('download-excel', require('vue-json-excel').default);
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('alert', require('./components/AlertComponent.vue').default);
 Vue.component('loading', require('./components/LoadingComponent.vue').default);
+Vue.component('import-excel', require('./components/ImportExcel.vue').default);
 Vue.component('tree-item', require('./components/TreeItemComponent.vue').default);
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
