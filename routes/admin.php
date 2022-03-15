@@ -148,7 +148,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-category-products/{category}/{search}/{perPage?}', 'ProductController@searchCategoryAllProducts')->name('search-category-products');
 
 		// product
-		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products');
+		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products.show');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');
 		Route::delete('/products/{product}/{perPage}', 'ProductController@deleteProduct')->name('products');
@@ -226,7 +226,7 @@ Route::name('admin.')->group(function () {
 
 		// merchant-products
 		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products');
-		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products');
+		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.show');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products');
 		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products');
@@ -258,7 +258,8 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two');
 
 		// imports
-		Route::post('import-products/{perPage}', 'ImportController@importProducts')->name('import-products');
+		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
+		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
 
 		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');

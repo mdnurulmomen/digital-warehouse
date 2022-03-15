@@ -111,7 +111,8 @@
 											  		
 											  		@showContentCreateForm="showProductMerchantCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchMerchantAllProducts"
+											  		@fetchAllContents="fetchMerchantAllProducts" 
+											  		@importExcelFile="importExcelFile($event)" 
 												/>
 											</div>
 											
@@ -2460,7 +2461,7 @@
 
 						if (response.status == 200) {
 
-							this.$toastr.s("New merchant has been stored", "Success");
+							this.$toastr.s("New product has been added", "Success");
 							
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
@@ -2505,7 +2506,7 @@
 
 						if (response.status == 200) {
 
-							this.$toastr.s("Merchant has been updated", "Success");
+							this.$toastr.s("Product has been updated", "Success");
 							
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
@@ -3026,6 +3027,48 @@
 				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 
 				$('#product-view-modal').modal('hide');
+
+			}, 
+			importExcelFile(fileToExport) {
+
+				this.formSubmitted = true;
+
+				fileToExport.set('perPage', this.perPage);
+				fileToExport.set('merchant_id', this.merchant.id);
+
+				axios
+					.post('/import-merchant-products/', fileToExport)
+					.then(response => {
+
+						if (response.status == 200) {
+
+							this.$toastr.s("Products has been added", "Success");
+							
+							this.merchantAllProducts = response.data;
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+							
+							/*
+							if (this.searchAttributes.search) {
+
+								this.searchData();
+
+							}
+							*/
+
+						}
+
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
 
 			},
 			validateFormInput (formInputName) {

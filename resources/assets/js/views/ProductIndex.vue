@@ -2453,8 +2453,10 @@
 
 				this.formSubmitted = true;
 
+				fileToExport.set('perPage', this.perPage);
+
 				axios
-					.post('/import-products/' + this.perPage, fileToExport)
+					.post('/import-products', fileToExport)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New products has been stored", "Success");

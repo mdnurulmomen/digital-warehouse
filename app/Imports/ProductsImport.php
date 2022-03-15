@@ -6,7 +6,7 @@ use App\Models\Product;
 use App\Models\Variation;
 use App\Models\ProductCategory;
 use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToModel;
+// use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;

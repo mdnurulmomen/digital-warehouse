@@ -11,10 +11,10 @@
 	  			</div>
 
 	  			<div class="dropdown">
-						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+					<i class="fas fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown"></i>
   					
   					<div class="dropdown-menu">
-							<download-excel 
+						<download-excel 
 			  				class="btn btn-default p-1 dropdown-item active"
 							:data="contentsToDownload"
 							:fields="dataToExport" 
@@ -37,6 +37,14 @@
 						</download-excel> 
 						-->
   					</div>
+
+  					<i 
+  						class="fas fa-upload fa-lg pr-3 pl-1" 
+  						v-show="$route.name=='merchant-products'"
+  						data-toggle="modal" 
+						:data-target="'#'+ callerPage +'-importing-modal'"
+  					>	
+  					</i>
   				</div>
 
 	  			<div class="ml-auto d-sm-none">
@@ -162,6 +170,15 @@
 					</div>
 				</div>
 			</div>
+	  	</div>
+
+	  	<div class="row">
+	  		<!-- The Modal -->
+	  		<import-excel 
+	  			:caller-page="callerPage" 
+
+	  			@importExcelFile="importExcelFile($event)" 
+	  		/>
 	  	</div>
 	</div>
 </template>
@@ -337,6 +354,15 @@
             	}
 
             },
+            importExcelFile(fileToExport) {
+
+				this.$emit('importExcelFile', fileToExport);
+
+				/*
+				this.formSubmitted = true;
+				 */
+
+			},
 
 		}
 
