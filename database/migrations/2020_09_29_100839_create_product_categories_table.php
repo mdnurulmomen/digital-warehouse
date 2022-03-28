@@ -16,6 +16,7 @@ class CreateProductCategoriesTable extends Migration
         Schema::create('product_categories', function (Blueprint $table) {
             $table->smallIncrements('id');
             $table->string('name', 100);
+            $table->boolean('is_perishable')->default(false);
             $table->unsignedSmallInteger('parent_category_id')->nullable();
             $table->softDeletes();
         });

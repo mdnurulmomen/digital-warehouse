@@ -120,6 +120,8 @@
 																		</a>
 																	</th>
 
+																	<th>Perishable</th>
+
 																	<th>
 																		Actions
 																	</th>
@@ -149,15 +151,23 @@
 																	<td> 
 																		{{ content.products_count }} 
 																	</td>
+
+																	<td> 
+																		<span :class="[content.is_perishable ? 'badge-danger' : 'badge-success', 'badge']">
+																			{{ content.is_perishable ? 'Perishable' : 'Non-Perishable' }}
+																		</span>
+																	</td>
 																	
 																	<td>
+																		<!-- 
 																		<button type="button" 
 																				class="btn btn-grd-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)" 
 																		>
 																			<i class="fa fa-eye"></i>
-																		</button>
+																		</button> 
+																		-->
 
 																		<button type="button" 
 																				class="btn btn-grd-primary btn-icon" 
@@ -203,7 +213,7 @@
 																<tr 
 															  		v-show="! contentsToShow.length"
 															  	>
-														    		<td colspan="4">
+														    		<td colspan="5">
 															      		<div class="alert alert-danger" role="alert">
 															      			Sorry, No data found.
 															      		</div>
@@ -262,6 +272,8 @@
 																			</span>
 																		</a>
 																	</th>
+
+																	<th>Perishable</th>
 
 																	<th>
 																		Actions
@@ -397,6 +409,7 @@
 										:normalizer="treeSelectCustomFunction" 
 										:valueFormat="'object'"
 										@select="validateFormInput('parent_category_id')" 
+										@input="setPerishableValue()"
 										class="form-control p-0 is-valid" 
 										placeholder="Parent Category"
 									/>
@@ -408,6 +421,19 @@
 									>
 							        	{{ errors.asset.parent_category_id }}
 							  		</div>
+								</div>
+							</div>
+
+							<div class="form-row mt-2">
+								<div class="form-group col-md-12 text-center">
+									<toggle-button 
+										v-model="singleAssetData.is_perishable" 
+										:width=200 
+										:sync="true"
+										:color="{checked: 'red', unchecked: 'green'}"
+										:labels="{checked: 'Perishable', unchecked: 'Non Perishable'}" 
+										:disabled="singleAssetData.parent && singleAssetData.parent.is_perishable" 
+									/>
 								</div>
 							</div>
 						</div>
@@ -461,6 +487,7 @@
  		-->
 
  		<!-- View Modal -->
+		<!-- 
 		<div class="modal fade" id="asset-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -496,10 +523,9 @@
 					</div>
 				</div>
 			</div>
-		</div>
-
+		</div> 
+		-->
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -512,6 +538,7 @@
 
     let singleAssetData = {
     	// parent : {},
+    	is_perishable : false
     };
 
 	export default {
@@ -701,10 +728,12 @@
 				});
 
 			},
+			/*
 			showContentDetails(object) {	
 				this.singleAssetData = object;
 				$('#asset-view-modal').modal('show');
 			},
+			*/
 			showContentCreateForm() {
 				this.createMode = true;
 	        	this.submitForm = true;
@@ -717,6 +746,7 @@
 
 				this.singleAssetData = {
 					// parent : {},
+					is_perishable : false
 				};
 
 				$('#asset-createOrEdit-modal').modal('show');
@@ -1019,6 +1049,17 @@
 						return b[columnValue] - a[columnValue];
 					}
 				);
+			},
+			setPerishableValue(){
+
+				if (this.singleAssetData.parent && this.singleAssetData.parent.is_perishable) {
+					// this.singleAssetData.is_perishable = true;
+					this.$set(this.singleAssetData, 'is_perishable', true);
+				}
+				else {
+					this.$set(this.singleAssetData, 'is_perishable', false);
+				}
+
 			},
 			validateFormInput (formInputName) {
 				

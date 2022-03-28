@@ -20,9 +20,12 @@ class StockProductResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'stock_code' => $this->stock_code,
             'stock_quantity' => $this->stock_quantity ?? 0,
-            'available_quantity' => $this->available_quantity ?? 0,
-            'unit_buying_price' => $this->unit_buying_price ?? 0.0,
+            'available_quantity' => $this->when(! $product->has_variations, $this->available_quantity ?? 0),
+            'unit_buying_price' => $this->when(! $product->has_variations, $this->unit_buying_price ?? 0.0),
+            'manufactured_at' => $this->when(! $product->has_variations, $this->manufactured_at),
+            'expired_at' => $this->when(! $product->has_variations, $this->expired_at),
             'merchant_product_id' => $this->merchant_product_id,
             'has_serials' => $product->has_serials,
             'has_variations' => $product->has_variations,
@@ -30,7 +33,7 @@ class StockProductResource extends JsonResource
             'serials' => $this->when($product->has_serials && ! $product->has_variations, ProductSerialResource::collection($this->serials)),
             'variations' => $this->when($product->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('merchantProductVariation.productVariation.variation'))),
             'addresses' => new ProductAddressCollection($this->addresses),
-            'merchant_product' => $this->merchantProduct->loadMissing(['product', 'manufacturer']),
+            'merchant_product' => $this->merchantProduct->loadMissing(['product.category', 'manufacturer']),
         ];
     }
 }

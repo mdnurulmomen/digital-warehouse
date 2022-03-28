@@ -18,9 +18,12 @@ class ProductVariationStockResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'stock_code' => $this->stock_code,
             'stock_quantity' => $this->stock_quantity ?? 0,
             'available_quantity' => $this->available_quantity ?? 0,
             'unit_buying_price' => $this->unit_buying_price ?? 0.0,
+            'manufactured_at' => $this->manufactured_at,
+            'expired_at' => $this->expired_at,
             'merchant_product_variation_id' => $this->merchant_product_variation_id,
             'has_serials' => $product->has_serials,
             'variation' => $this->merchantProductVariation->productVariation->variation,

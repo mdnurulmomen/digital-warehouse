@@ -17,6 +17,7 @@ class ProductCategoryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'is_perishable' => $this->is_perishable,
             'deleted_at' => $this->deleted_at,
             'products_count' => $this->products_count,
             'parent_category_id' => $this->when($this->parent_category_id, $this->parent_category_id),

@@ -12,6 +12,15 @@ class ProductCategory extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_perishable' => 'boolean',
+    ];
+
     // protected $with = ['parent'];
 
     /*

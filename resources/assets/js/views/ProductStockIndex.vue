@@ -22,7 +22,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
-
 											<div class="col-sm-12">
 											  	<!-- 
 											  	<search-and-addition-option 
@@ -365,7 +364,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approval==1 ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' }}
+							{{ createMode ? 'Create ' + product.name + ' Stock' : singleStockData.has_approval==1 ? 'Update ' + product.name + ' Stock' : 'Approve ' + product.name + ' Stock' | capitalize }}
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -381,9 +380,7 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
-							<transition-group name="fade">
-							        		
+							<transition-group name="fade">   		
 								<div 
 									class="row" 
 									v-bind:key="'product-modal-step-' + 1" 
@@ -744,15 +741,202 @@
 							    </div>
 
 							    <div 
+									class="row" 
+									v-bind:key="'product-modal-step-' + 2" 
+									v-show="!loading && step==2"
+								>
+									<h2 class="mx-auto mb-4 lead">Manufacturing & Expiring Date</h2>
+
+									<div class="col-md-12">
+										<div class="row">
+											<!-- Product (No Variation) Mfg. & Exp. Date -->
+											<div class="col-md-12" v-show="! productMerchant.has_variations">
+												<div class="form-row d-flex">
+													<div class="col-md-4 text-center align-self-center">
+														<img 
+															:src="showPreview(productMerchant.preview)" 
+															class="img-fluid" 
+															alt="Product Preview" 
+															width="150px"
+														>
+													</div>
+
+													<div class="col-md-8">
+														<div class="form-row form-group">
+															<label class="col-sm-4 col-form-label font-weight-bold text-right">
+																Manufacturing Date :
+															</label>
+															<div class="col-sm-8">
+																<v-date-picker 
+																	v-model="singleStockData.manufactured_at" 
+																	color="red" 
+																	is-dark
+																	is-inline 
+																	:max-date="new Date()" 
+																	:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+																	:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+																	@input="validateFormInput('manufacturing_date')"
+																/>
+
+																<div class="invalid-feedback" 
+																	style="display: block;" 
+																	v-show="errors.stock.manufacturing_date"
+																>
+														        	{{ errors.stock.manufacturing_date }}
+														  		</div>
+															</div>
+														</div>
+
+														<div class="form-row form-group">
+															<label class="col-sm-4 col-form-label font-weight-bold text-right">
+																Expiring Date :
+															</label>
+															<div class="col-sm-8">
+																<v-date-picker 
+																	v-model="singleStockData.expired_at" 
+																	color="red" 
+																	is-dark
+																	is-inline 
+																	:min-date="singleStockData.manufactured_at" 
+																	:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+																	:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+																	@input="validateFormInput('expiring_date')"
+																/>
+
+																<div class="invalid-feedback" 
+																	style="display: block;" 
+																	v-show="errors.stock.expiring_date"
+																>
+														        	{{ errors.stock.expiring_date }}
+														  		</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<!-- Variations Mfg. & Exp. Date -->
+											<div 
+												class="col-md-12" 
+												v-if="productMerchant.has_variations && singleStockData.hasOwnProperty('variations') && singleStockData.variations.length"
+											>
+												<div 
+													class="card" 
+													v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+													:key="'product-variation-index-' + variationIndex + '-date-picker'"
+												>	
+													<div 
+														class="card-header" 
+														v-show="stockVariation.stock_quantity > 0"
+													>
+														<h5>
+															{{ stockVariation.variation ? stockVariation.variation.name : '' | capitalize }}
+														</h5>
+													</div>
+
+													<div 
+														class="card-body"
+														v-show="stockVariation.stock_quantity > 0"
+													>
+														<div class="form-row">
+															<div class="form-group col-md-12 text-center">
+																<img 
+																	:src="showPreview(stockVariation.preview)" 
+																	class="img-fluid" 
+																	:alt="stockVariation.variation.name + ' Preview'" 
+																	width="150px"
+																>
+																<p class="text-center">{{ stockVariation.variation.name | capitalize }}</p>
+															</div>
+														</div>
+
+														<div class="form-row">
+															<div class="form-group col-md-6">
+																<label class="d-block" for="inputFirstName">Manufacturing Date</label>
+																
+																<v-date-picker 
+																	v-model="stockVariation.manufactured_at" 
+																	color="red" 
+																	is-dark
+																	is-inline 
+																	:max-date="new Date()" 
+																	:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+																	:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+																	@input="validateFormInput('manufacturing_date')"
+																/>
+
+																<div class="invalid-feedback" 
+																	style="display: block;" 
+																	v-show="errors.stock.variations[variationIndex].manufacturing_date"
+																>
+														        	{{ errors.stock.variations[variationIndex].manufacturing_date }}
+														  		</div>
+															</div>
+
+															<div class="form-group col-md-6">
+																<label class="d-block" for="inputFirstName">Expiring Date</label>
+																<v-date-picker 
+																	v-model="stockVariation.expired_at" 
+																	color="red" 
+																	is-dark
+																	is-inline 
+																	:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+																	:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+																	@input="validateFormInput('expiring_date')"
+																/>
+
+																<div class="invalid-feedback" 
+																	style="display: block;" 
+																	v-show="errors.stock.variations[variationIndex].expiring_date"
+																>
+														        	{{ errors.stock.variations[variationIndex].expiring_date }}
+														  		</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12 d-flex justify-content-between">
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round" 
+													v-tooltip.bottom-end="'Previous'" 
+													v-on:click="step-=1"
+												>
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round" 
+													v-tooltip.bottom-end="'Next'" 
+													v-on:click="nextPage"
+												>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+											</div>
+										</div>
+									</div>
+							    </div>
+
+							    <div 
 								    class="row" 
-								    v-bind:key="'product-modal-step-' + 2" 
-								    v-show="!loading && step==2"
+								    v-bind:key="'product-modal-step-' + 3" 
+								    v-show="!loading && step==3"
 							    >
 							    	<h2 class="mx-auto mb-4 lead">{{ product.name | capitalize }} Serials</h2>
 
 							    	<div 
 										class="col-md-12" 
-										v-if="productMerchant.has_serials && productMerchant.has_variations && singleStockData.variations.length && step==2"
+										v-if="productMerchant.has_serials && productMerchant.has_variations && singleStockData.variations.length && step==3"
 									>
 										<div 
 											class="form-row" 
@@ -844,7 +1028,7 @@
 
 									<div 
 										class="col-md-12"
-										v-else-if="productMerchant.has_serials && ! productMerchant.has_variations && singleStockData.stock_quantity > 0 && step==2"
+										v-else-if="productMerchant.has_serials && ! productMerchant.has_variations && singleStockData.stock_quantity > 0 && step==3"
 									>		
 										<div class="form-row">
 											<div class="col-sm-12 form-group">
@@ -949,8 +1133,8 @@
 						     
 							    <div 
 									class="row" 
-									v-bind:key="'product-modal-step-' + 3" 
-									v-show="!loading && step==3" 
+									v-bind:key="'product-modal-step-' + 4" 
+									v-show="!loading && step==4" 
 								>
 									<h2 class="mx-auto mb-4 lead">Store Stock</h2>
 
@@ -1538,7 +1722,43 @@
 											</label>
 
 											<label class="col-sm-6 col-form-label">
-												{{ singleStockData.invoice_no | capitalize }})
+												{{ singleStockData.invoice_no | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="! productMerchant.has_variations">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Product-Stock (Batch) Code :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.stock_code | capitalize }}
+											</label>
+										</div>
+
+										<div 
+											class="form-row" 
+											v-show="singleStockData.manufactured_at"
+										>
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stock Manufacturing Code :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.manufactured_at }}
+											</label>
+										</div>
+
+										<div 
+											class="form-row" 
+											v-show="singleStockData.expired_at"
+										>
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Stock Expiring Code :
+											</label>
+
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.expired_at }}
 											</label>
 										</div>
 
@@ -1557,38 +1777,93 @@
 														v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 															:key="'product-variation-index-' + variationIndex + 'B'"
 													>
-														<div class="form-row">
-															<label class="col-form-label font-weight-bold text-right">
-																-{{ stockVariation.variation.name | capitalize }} :
-															</label>
+														<div class="card">
+															<div class="card-body">
+																<div class="form-row">
+																	<label class="col-form-label font-weight-bold text-right">
+																		{{ stockVariation.variation.name | capitalize }} :
+																	</label>
 
-															<label class="col-form-label">
-																{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
-															</label>
+																	<label class="col-form-label">
+																		{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-form-label font-weight-bold text-right">
+																		Available Quantity :
+																	</label>
+																	<label class="col-form-label">
+																		{{ stockVariation.available_quantity + ' ' + product.quantity_type }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-form-label font-weight-bold text-right">
+																		Buying Price :
+																	</label>
+																	<label class="col-form-label">
+																		{{ stockVariation.unit_buying_price }}
+																		{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																	</label>
+																</div>
+
+																<div class="form-row">
+																	<label class="col-form-label font-weight-bold text-right">
+																		Stock (Batch) Code :
+																	</label>
+																	<label class="col-form-label">
+																		{{ stockVariation.stock_code | capitalize }}
+																	</label>
+																</div>
+
+																<div 
+																	class="form-row" 
+																	v-show="stockVariation.manufactured_at"
+																>
+																	<label class="col-form-label font-weight-bold text-right">
+																		Manufacturing Date :
+																	</label>
+																	<label class="col-form-label">
+																		{{ stockVariation.manufactured_at }}
+																	</label>
+																</div>
+
+																<div 
+																	class="form-row" 
+																	v-show="stockVariation.expired_at"
+																>
+																	<label class="col-form-label font-weight-bold text-right">
+																		Expiring Date :
+																	</label>
+																	<label class="col-form-label">
+																		{{ stockVariation.expired_at }}
+																	</label>
+																</div>
+															</div>
 														</div>
-														
-														<!-- 
-														<div class="form-row">
-															<label class="col-form-label font-weight-bold text-right">
-																Available Quantity :
-															</label>
-															<label class="col-form-label">
-																{{ stockVariation.available_quantity }}
-															</label>
-														</div>
-														-->
 													</div>
 												</div>
 											</div>
 										</div>
 
-										<div class="form-row">
+										<div class="form-row" v-show="! productMerchant.has_variations">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Available Quantity (then) :
+												Available Quantity :
 											</label>
 											
 											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.available_quantity + ' ' + product.quantity_type }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="! productMerchant.has_variations">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Buying Price :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.unit_buying_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 											</label>
 										</div>
 
@@ -1980,7 +2255,7 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ product.name | capitalize }}
+							{{ product.name | capitalize }} ({{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Mr. Manufacturer' | capitalize }})
 						</label>
 					</div>
 
@@ -2000,7 +2275,43 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ singleStockData.invoice_no | capitalize }})
+							{{ singleStockData.invoice_no | capitalize }}
+						</label>
+					</div>
+
+					<div class="form-row" v-show="! productMerchant.has_variations">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Product-Stock (Batch) Code :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.stock_code | capitalize }}
+						</label>
+					</div>
+
+					<div 
+						class="form-row" 
+						v-show="singleStockData.manufactured_at"
+					>
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stock Manufacturing Code :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.manufactured_at }}
+						</label>
+					</div>
+
+					<div 
+						class="form-row" 
+						v-show="singleStockData.expired_at"
+					>
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Stock Expiring Code :
+						</label>
+
+						<label class="col-6 col-form-label">
+							{{ singleStockData.expired_at }}
 						</label>
 					</div>
 
@@ -2019,27 +2330,93 @@
 									v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 										:key="'product-variation-index-' + variationIndex + 'B'"
 								>
-									<div class="form-row">
-										<label class="col-form-label font-weight-bold text-right">
-											-{{ stockVariation.variation.name | capitalize }} :
-										</label>
+									<div class="card">
+										<div class="card-body">
+											<div class="form-row">
+												<label class="col-form-label font-weight-bold text-right">
+													{{ stockVariation.variation.name | capitalize }} :
+												</label>
 
-										<label class="col-form-label">
-											{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
-										</label>
+												<label class="col-form-label">
+													{{ stockVariation.stock_quantity + ' ' + product.quantity_type }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-form-label font-weight-bold text-right">
+													Available Quantity :
+												</label>
+												<label class="col-form-label">
+													{{ stockVariation.available_quantity + ' ' + product.quantity_type }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-form-label font-weight-bold text-right">
+													Buying Price :
+												</label>
+												<label class="col-form-label">
+													{{ stockVariation.unit_buying_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+												</label>
+											</div>
+
+											<div class="form-row">
+												<label class="col-form-label font-weight-bold text-right">
+													Stock (Batch) Code :
+												</label>
+												<label class="col-form-label">
+													{{ stockVariation.stock_code | capitalize }}
+												</label>
+											</div>
+
+											<div 
+												class="form-row" 
+												v-show="stockVariation.manufactured_at"
+											>
+												<label class="col-form-label font-weight-bold text-right">
+													Manufacturing Date :
+												</label>
+												<label class="col-form-label">
+													{{ stockVariation.manufactured_at }}
+												</label>
+											</div>
+
+											<div 
+												class="form-row" 
+												v-show="stockVariation.expired_at"
+											>
+												<label class="col-form-label font-weight-bold text-right">
+													Expiring Date :
+												</label>
+												<label class="col-form-label">
+													{{ stockVariation.expired_at }}
+												</label>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="form-row">
+					<div class="form-row" v-show="! productMerchant.has_variations">
 						<label class="col-6 col-form-label font-weight-bold text-right">
-							Available Quantity (then) :
+							Available Quantity :
 						</label>
 						
 						<label class="col-6 col-form-label">
 							{{ singleStockData.available_quantity + ' ' + product.quantity_type }}
+						</label>
+					</div>
+
+					<div class="form-row" v-show="! productMerchant.has_variations">
+						<label class="col-6 col-form-label font-weight-bold text-right">
+							Buying Price :
+						</label>
+						<label class="col-6 col-form-label">
+							{{ singleStockData.unit_buying_price }}
+							{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 						</label>
 					</div>
 
@@ -2980,6 +3357,27 @@
 
 					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
+						this.step+=1;
+
+						this.submitForm = true;
+						this.resetWarehouseSpaces();
+						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
+					
+					}
+					else {
+					
+						this.submitForm = false;
+					
+					}
+
+				}
+				else if (this.step == 2) {
+
+					this.validateFormInput('manufacturing_date');
+					this.validateFormInput('expiring_date');
+
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
+
 						if (this.productMerchant.has_serials) {
 
 							if (this.productMerchant.has_variations) {
@@ -3002,20 +3400,10 @@
 
 						}
 
-						this.submitForm = true;
-						this.resetWarehouseSpaces();
-						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
-					
-					}
-					else {
-					
-						this.submitForm = false;
-					
 					}
 
 				}
-
-				else if (this.step == 2) {
+				else if (this.step == 3) {
 
 					if (this.productMerchant.has_serials) {
 
@@ -3763,6 +4151,9 @@
 				if (! imagePath || imagePath == '') {
 					return '/' + this.product.preview;
 				}
+				else if (imagePath == 'default') {
+					return '/' + this.productMerchant.preview;
+				}
 				else {
 					return '/' + imagePath || '';
 				}
@@ -4157,6 +4548,94 @@
 						else {
 							this.submitForm = true;
 							this.$delete(this.errors.stock, 'warehouse');
+						}
+
+						break;
+
+					case 'manufacturing_date' : 
+
+						if (! this.productMerchant.has_variations && this.productMerchant.product && this.productMerchant.product.category && this.productMerchant.product.category.is_perishable && ! this.singleStockData.manufactured_at) {
+							
+							this.errors.stock.manufacturing_date = 'Mfg. date is required';
+
+						}
+						else if (this.productMerchant.has_variations && this.productMerchant.product && this.productMerchant.product.category && this.productMerchant.product.category.is_perishable) {
+
+							this.singleStockData.variations.forEach(
+							
+								(stockVariation, stockVariationIndex) => {
+
+									if (stockVariation.stock_quantity > 0 && ! stockVariation.manufactured_at) {
+
+										this.errors.stock.variations[stockVariationIndex].manufacturing_date = 'Mfg. date is required';
+
+									}
+									else {
+
+										this.$delete(this.errors.stock.variations[stockVariationIndex], 'manufacturing_date');
+
+									}
+
+								}
+
+							);
+
+							if (! this.errorInVariationsArray(this.errors.stock.variations)) {
+
+								this.submitForm = true;
+
+							}
+
+						}
+						else {
+							
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'manufacturing_date');
+
+						}
+
+						break;
+
+					case 'expiring_date' : 
+
+						if (! this.productMerchant.has_variations && this.productMerchant.product && this.productMerchant.product.category && this.productMerchant.product.category.is_perishable && ! this.singleStockData.expired_at) {
+
+							this.errors.stock.expiring_date = 'Exp. date is required';
+
+						}
+						else if (this.productMerchant.has_variations && this.productMerchant.product && this.productMerchant.product.category && this.productMerchant.product.category.is_perishable) {
+
+							this.singleStockData.variations.forEach(
+							
+								(stockVariation, stockVariationIndex) => {
+
+									if (stockVariation.stock_quantity > 0 && ! stockVariation.expired_at) {
+
+										this.errors.stock.variations[stockVariationIndex].expiring_date = 'Exp. date is required';
+
+									}
+									else {
+
+										this.$delete(this.errors.stock.variations[stockVariationIndex], 'expiring_date');
+
+									}
+
+								}
+
+							);
+
+							if (! this.errorInVariationsArray(this.errors.stock.variations)) {
+
+								this.submitForm = true;
+
+							}
+
+						}
+						else {
+							
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'expiring_date');
+							
 						}
 
 						break;			
