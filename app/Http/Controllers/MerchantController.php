@@ -529,7 +529,15 @@ class MerchantController extends Controller
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->with(['merchant', 'variations', 'variations.serials',  'addresses', 'serials', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'addresses', 'serials', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.serials'])
+                                                        ->with(['stocks' => function ($query1) {
+                                                            $query1->where('available_quantity', '>', 0);
+                                                         
+                                                        }])
+                                                        ->with(['variations.stocks' => function ($query2) {
+                                                            $query2->where('available_quantity', '>', 0);
+                                                         
+                                                        }])
                                                         ->paginate($perPage)),
                 
                 'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $expectedMerchant->id)
@@ -537,7 +545,7 @@ class MerchantController extends Controller
                                                             $query->whereNull('product_category_id')
                                                                 ->orWhere('product_category_id', 0);
                                                         })
-                                                        ->with(['merchant', 'addresses', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['merchant', 'stocks', 'addresses', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                        ->paginate($perPage)),
             ];
 
@@ -1061,6 +1069,11 @@ class MerchantController extends Controller
             }
 
         }
+    }
+
+    protected function generateProductSKU($merchant, $productCategory, $product, $manufacturer = NULL)
+    {
+        return ('MR'.$merchant.'CT'.$productCategory.'PR'.$product.'MFR'.$manufacturer ? $manufacturer : $merchant);
     }
 
 }

@@ -382,13 +382,17 @@
 											    </div>
  											</div>
 
- 											<div class="col-sm-12 form-group" v-show="! singleStockData.has_approval">
+ 											<div class="col-sm-12 form-group">
  												<div class="form-row">
 													<label class="form-group col-md-4">
 														Stock Date :
 													</label>
 
 													<div class="form-group col-md-8">
+														<p v-show="singleStockData.created_at">
+															{{ singleStockData.created_at }}
+														</p>
+
 														<v-date-picker 
 															v-model="singleStockData.created_at" 
 															color="red" 
@@ -402,6 +406,7 @@
 												</div>
  											</div>
 
+ 											<!-- 
  											<div 
  												class="col-sm-12 form-group"
  												v-show="singleStockData.has_approval"
@@ -413,7 +418,8 @@
 												<label class="col-form-label">
 													{{ singleStockData.created_at }}
 												</label>
- 											</div>
+ 											</div> 
+ 											-->
 
  											<div 
 	 											class="col-sm-12 form-group" 
@@ -425,6 +431,10 @@
 													</label>
 
 													<div class="form-group col-md-8">
+														<p v-show="singleStockData.updated_at">
+															{{ singleStockData.updated_at }}
+														</p>
+
 														<v-date-picker 
 															v-model="singleStockData.updated_at" 
 															color="red" 
@@ -3792,10 +3802,10 @@
 
 				this.error = '';
 				this.allStocks = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
-				.post("/api/search-stocks/" + this.perPage, this.searchAttributes)
+				.post("/api/search-stocks/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.allStocks = response.data.all.data;
 					this.pagination = response.data.all;

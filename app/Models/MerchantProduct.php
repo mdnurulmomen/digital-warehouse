@@ -593,7 +593,8 @@ class MerchantProduct extends Model
 
     protected function generateProductVariationSKU($merchant, $productCategory, $product, $variation)
     {
-        return 'MR'.$merchant.'CT'.$productCategory.'PR'.$product.'VR'.$variation;
+        // return ('MR'.$merchant.'CT'.$productCategory.'PR'.$product.'MFR'.$manufacturer ? $manufacturer->id : $merchant.'VR'.$variation);
+        return $this->sku.'VR'.$variation;
     }
 
 }

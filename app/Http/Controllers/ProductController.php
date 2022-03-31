@@ -20,6 +20,7 @@ use App\Http\Resources\Web\StockCollection;
 // use App\Models\WarehouseContainerStatus;
 // use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Web\ProductResource;
+use App\Http\Requests\Web\ProductStockRequest;
 // use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\ProductCollection;
 // use App\Models\WarehouseContainerShelfUnitStatus;
@@ -268,8 +269,8 @@ class ProductController extends Controller
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
-            'product_category_id' => 'nullable|numeric|exists:product_categories,id',
-            // 'merchant_id' => 'required|numeric|exists:merchants,id',
+            'product_category_id' => 'nullable|integer|exists:product_categories,id',
+            // 'merchant_id' => 'required|integer|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
@@ -314,8 +315,8 @@ class ProductController extends Controller
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
-            'product_category_id' => 'nullable|numeric|exists:product_categories,id',
-            // 'merchant_id' => 'required|numeric|exists:merchants,id',
+            'product_category_id' => 'nullable|integer|exists:product_categories,id',
+            // 'merchant_id' => 'required|integer|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
@@ -408,8 +409,8 @@ class ProductController extends Controller
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
-            'product_category_id' => 'numeric|exists:product_categories,id',
-            // 'merchant_id' => 'required|numeric|exists:merchants,id',
+            'product_category_id' => 'integer|exists:product_categories,id',
+            // 'merchant_id' => 'required|integer|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
@@ -454,8 +455,8 @@ class ProductController extends Controller
             'quantity_type' => 'nullable|string|max:100',
             'has_serials' => 'boolean',
             'has_variations' => 'boolean',
-            'product_category_id' => 'numeric|exists:product_categories,id',
-            // 'merchant_id' => 'required|numeric|exists:merchants,id',
+            'product_category_id' => 'integer|exists:product_categories,id',
+            // 'merchant_id' => 'required|integer|exists:merchants,id',
             'variations' => 'required_if:has_variations,1|array',
             'variations.*.variation' => 'required_if:has_variations,1',
             'variations.*.variation.id' => 'required_if:has_variations,1|exists:variations,id',
@@ -509,25 +510,26 @@ class ProductController extends Controller
         return new ProductStockCollection(ProductStock::with(['addresses', 'variations', 'serials'])->where('merchant_product_id', $productMerchant)->paginate($perPage));
     }
 
-    public function storeProductStock(Request $request, $perPage)
+    public function storeProductStock(ProductStockRequest $request, $perPage)
     {
         $merchantProduct = MerchantProduct::findOrFail($request->merchant_product_id);
         $product = $merchantProduct->product;
 
+        /*
         $request->validate([
             // 'merchant_id' => 'required|exists:merchants,id',
             'warehouse.id' => 'required|exists:warehouses,id',
-            'stock_quantity' => 'required|numeric|min:1', 
+            'stock_quantity' => 'required|integer|min:1', 
             'unit_buying_price' => [ 'nullable', 'numeric', 
-                /*
-                Rule::requiredIf(function () use ($product) {
-                    return $product->product_category_id != NULL;
-                }),
-                */
+                
+                // Rule::requiredIf(function () use ($product) {
+                //     return $product->product_category_id != NULL;
+                // }),
+                
             ],
-            // 'product_id' => 'required|numeric|exists:products,id',
+            // 'product_id' => 'required|integer|exists:products,id',
             'serials' => [
-                'array', 
+                'array', 'min:'.$request->stock_quantity,
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_serials && ! $product->has_variations;
                 })
@@ -547,23 +549,23 @@ class ProductController extends Controller
                 })
             ],
             'variations.*.id' => [
-                'numeric', 'exists:merchant_product_variations,id', 
+                'integer', 'exists:merchant_product_variations,id', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_variations;
                 })
             ],
             'variations.*.stock_quantity' => [
-                'numeric', 'min:1', 
+                'integer', 'min:1', 
                 Rule::requiredIf(function () use ($product, $request) {
                     return $product->has_variations && array_sum($request->input('variations.*.stock_quantity')) != $request->stock_quantity;
                 })
             ],
             'variations.*.unit_buying_price' => [ 'nullable', 'numeric', 
-                /*
-                Rule::requiredIf(function () use ($product) {
-                    return $product->product_category_id != NULL;
-                }),
-                */
+                
+                // Rule::requiredIf(function () use ($product) {
+                //     return $product->product_category_id != NULL;
+                // }),
+                
             ],
             'variations.*.serials' => [
                 'array', 
@@ -598,11 +600,11 @@ class ProductController extends Controller
             // 'serials.*.unique' => ':attribute serial must be unique !',
             
             'variations.*.id.*' => 'Variation id is required !',
-            'variations.*.unit_buying_price.*' => 'Buying price should be numeric !',
             'variations.*.stock_quantity' => [
                 'required' => 'Variation quantity should be equal to product quantity',
                 '*' => 'Variation quantity is required !',
             ],
+            'variations.*.unit_buying_price.*' => 'Buying price should be numeric !',
 
             'variations.*.serials.*' => 'Variation serial is required',
 
@@ -612,6 +614,7 @@ class ProductController extends Controller
                 '*' => 'Variation serial is required',
             ]
         ]);
+        */
 
         // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
@@ -673,25 +676,21 @@ class ProductController extends Controller
         return $this->showProductAllStocks($request->merchant_product_id, $perPage);
     }
 
-    public function updateProductStock(Request $request, $stock, $perPage)
+    public function updateProductStock(ProductStockRequest $request, $stock, $perPage)
     {
         $stockToUpdate = ProductStock::findOrFail($stock);
         $merchantExpectedProduct = $stockToUpdate->merchantProduct;
         $product = $merchantExpectedProduct->product;
 
+        /*
         $request->validate([
             'warehouse.id' => 'required|exists:warehouses,id',
-            'stock_quantity' => 'required|numeric',
+            'stock_quantity' => 'required|integer',
             'unit_buying_price' => [ 'nullable', 'numeric', 
-                /*
-                Rule::requiredIf(function () use ($product) {
-                    return $product->product_category_id != NULL;
-                }),
-                */
             ],
-            // 'product_id' => 'required|numeric|exists:products,id',
+            // 'product_id' => 'required|integer|exists:products,id',
             'serials' => [
-                'array', 
+                'array', 'min:'.$request->stock_quantity,
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_serials && ! $product->has_variations;
                 })
@@ -711,23 +710,18 @@ class ProductController extends Controller
                 })
             ],
             'variations.*.merchant_product_variation_id' => [
-                'numeric', 'exists:merchant_product_variations,id', 
+                'integer', 'exists:merchant_product_variations,id', 
                 Rule::requiredIf(function () use ($product) {
                     return $product->has_variations;
                 })
             ],
             'variations.*.stock_quantity' => [
-                'numeric', 'min:1', 
+                'integer', 'min:1', 
                 Rule::requiredIf(function () use ($product, $request) {
                     return $product->has_variations && array_sum($request->input('variations.*.stock_quantity')) != $request->stock_quantity;
                 })
             ],
             'variations.*.unit_buying_price' => [ 'nullable', 'numeric', 
-                /*
-                Rule::requiredIf(function () use ($product) {
-                    return $product->product_category_id != NULL;
-                }),
-                */
             ],
             'variations.*.serials' => [
                 'array', 
@@ -747,11 +741,11 @@ class ProductController extends Controller
         ],
         [
             'warehouse.id.exists' => 'Warehouse is invalid !',
+            'warehouse.id.*' => 'Warehouse is required !',
             'stock_quantity.*' => 'Stock quantity is missing or invalid !',
             'unit_buying_price.*' => 'Buying price should be numeric !',
-            'warehouse.id.*' => 'Warehouse is required !',
-            'serials.required' => 'Product serial is required !',
             
+            'serials.required' => 'Product serial is required !',
             'serials.*.serial_no' => [
                 'distinct' => 'Duplicate product-serial is invalid',
                 'unique' => 'Product serial exists',
@@ -782,7 +776,7 @@ class ProductController extends Controller
             
             $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
 
-            if ($difference > $stockToUpdate->available_quantity || $difference > /*$stockToUpdate->merchantProduct->latestStock->available_quantity*/ $stockToUpdate->merchantProduct->available_quantity) {
+            if ($difference > $stockToUpdate->available_quantity || $difference > $stockToUpdate->merchantProduct->available_quantity) {
 
                 return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
                 
@@ -827,6 +821,7 @@ class ProductController extends Controller
             }
             
         }
+        */
 
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
 
@@ -1112,7 +1107,8 @@ class ProductController extends Controller
     public function updateStock(StockRequest $request, $stock, $perPage)
     {
         $request['products'] = json_decode(json_encode($request->products));
-
+        
+        /*
         // validation
         foreach ($request->products as $productIndex => $stockingProduct) {
                 
@@ -1174,6 +1170,7 @@ class ProductController extends Controller
             }
 
         }
+        */
 
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
 
@@ -1182,6 +1179,8 @@ class ProductController extends Controller
             return response()->json(['errors'=>["noUser" => "Current user missing, please reload the page"]], 422);
             
         }
+
+        $request['products'] = json_decode(json_encode($request->products));
 
         foreach ($request->products as $productIndex => $stockingProduct) {
             
@@ -1525,17 +1524,17 @@ class ProductController extends Controller
 
         $request->validate([
             // 'product' => 'required',
-            // 'product.id' => 'required|numeric|exists:products,id',
+            // 'product.id' => 'required|integer|exists:products,id',
             // 'merchant' => 'required',
-            // 'merchant.id' => 'required|numeric|exists:merchants,id',
+            // 'merchant.id' => 'required|integer|exists:merchants,id',
             'product_id' => [
-                'required', 'numeric', 'exists:products,id', 
+                'required', 'integer', 'exists:products,id', 
                 Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
                     return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
             ],
             'merchant_id' => [
-                'required', 'numeric', 'exists:merchants,id', 
+                'required', 'integer', 'exists:merchants,id', 
                 Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
                     return $query->where('product_id', $request->product_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
@@ -1546,7 +1545,7 @@ class ProductController extends Controller
                     return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
             ],
-            'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
+            'manufacturer_id' => 'nullable|integer|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
             'selling_price' => [ 'nullable', 'numeric', 
                 Rule::requiredIf(function () use ($product) {
@@ -1555,7 +1554,7 @@ class ProductController extends Controller
             ],
             'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:255',
-            'warning_quantity' => 'nullable|numeric',
+            'warning_quantity' => 'nullable|integer',
             'variations' => [
                 'array', 
                 Rule::requiredIf(function () use ($product) {
@@ -1633,17 +1632,17 @@ class ProductController extends Controller
 
         $request->validate([
             // 'product' => 'required',
-            // 'product.id' => 'required|numeric|exists:products,id',
+            // 'product.id' => 'required|integer|exists:products,id',
             // 'merchant' => 'required',
-            // 'merchant.id' => 'required|numeric|exists:merchants,id',
+            // 'merchant.id' => 'required|integer|exists:merchants,id',
             'product_id' => [
-                'required', 'numeric', 'exists:products,id', 
+                'required', 'integer', 'exists:products,id', 
                 Rule::unique('merchant_products', 'product_id')->where(function ($query) use($request) {
                     return $query->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
             ],
             'merchant_id' => [
-                'required', 'numeric', 'exists:merchants,id', 
+                'required', 'integer', 'exists:merchants,id', 
                 Rule::unique('merchant_products', 'merchant_id')->where(function ($query) use($request) {
                     return $query->where('product_id', $request->product_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
@@ -1654,7 +1653,7 @@ class ProductController extends Controller
                     return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
             ], 
-            'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
+            'manufacturer_id' => 'nullable|integer|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
             'selling_price' => [ 'nullable', 'numeric', 
                 Rule::requiredIf(function () use ($product) {
@@ -1792,6 +1791,7 @@ class ProductController extends Controller
         ], 200);
     }
 
+    /*
     protected function findVariationInvalidQuantity($stockVariaitons = [], ProductStock $productStock)
     {
         if (count($stockVariaitons) && $productStock->variations->count()) {
@@ -1810,7 +1810,7 @@ class ProductController extends Controller
                 // replaced variation-stock but replacing-variation available quantity is less than existing quantity
                 if (empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $merchantProductVariation->available_quantity < $productVariationExistingStock->stock_quantity) {
                     
-                    /*
+                    
                     // MerchantProductVariation which has only stock but already dispatched, cant be replaced
                     if ($merchantProductVariation->stocks->count() < 2 && $merchantProductVariation->dispatchedRequests->count()) {
                         
@@ -1825,7 +1825,7 @@ class ProductController extends Controller
                     }
                     
                     return false;
-                    */
+                    
                    
                     return true;
 
@@ -1840,19 +1840,20 @@ class ProductController extends Controller
 
                     }
                     // has multiple stocks, but deducted quantity is more than ultimate available quantity
-                    else if (($merchantProductVariation->available_quantity < ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) /*|| $merchantProductVariation->stocks()->where('id', '>', $expectedVariationInputedStock->id)->where('available_quantity', '<', $expectedVariationInputedStock->stock_quantity)->exists()*/) {
+                    else if (($merchantProductVariation->available_quantity < ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity))) {
                         
+                        // || $merchantProductVariation->stocks()->where('id', '>', $expectedVariationInputedStock->id)->where('available_quantity', '<', $expectedVariationInputedStock->stock_quantity)->exists()
                         return true;
 
                     }
                     // only stock but deducted quantity is less than dispatched
-                    /*
-                    else if ($merchantProductVariation->stocks->count() < 2 && $merchantProductVariation->dispatchedRequests->sum('quantity') > ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) {
+                    
+                    // else if ($merchantProductVariation->stocks->count() < 2 && $merchantProductVariation->dispatchedRequests->sum('quantity') > ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) {
                         
-                        return true;
+                    //     return true;
 
-                    }
-                    */
+                    // }
+                    
 
                     // return false;
 
@@ -1866,7 +1867,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function increaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
     {
         ProductStock::where('merchant_product_id', $stockToUpdate->merchant_product_id)->where('id', '>', $stockToUpdate->id)->increment('available_quantity', $amount);
@@ -1876,6 +1879,7 @@ class ProductController extends Controller
     {
         ProductStock::where('merchant_product_id', $stockToUpdate->merchant_product_id)->where('id', '>', $stockToUpdate->id)->decrement('available_quantity', $amount);
     }
+    */
 
     protected function generateProductSKU($merchant, $productCategory, $product, $menufacturer)
     {
@@ -1885,6 +1889,7 @@ class ProductController extends Controller
         return 'MR'.$merchant.'BX'.'PR'.$product.'MF'.$menufacturer;
     }
 
+    /*
     protected function checkVariationSerialDuplicacy(Request $request)
     {
         foreach($request->variations as $stockVariationKey => $stockVariation)
@@ -1903,7 +1908,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function checkVariationDuplicateSerial($stockingProduct)
     {
         foreach($stockingProduct->variations as $stockingProductVariationKey => $stockingProductVariation)
@@ -1922,7 +1929,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function checkVariationSerialInvalidity(ProductStock $productStock, $stockVariations)
     {
         if ($productStock->variations()->whereHas('serials', function ($query) {
@@ -1946,9 +1955,10 @@ class ProductController extends Controller
 
                 }
 
-                foreach ($productStockVariation->whereHas('serials', function ($query) {
-                    $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
-                })->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
+                foreach ($productStockVariation->serials()->where(
+                    function($query) {
+                        $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
+                    })->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
                     
                     $productVariationSerialExists = $productVariationSerialCollection->first(function ($object, $key) use ($productStockVariationSerial) {
                         return $object->serial_no == $productStockVariationSerial->serial_no;
@@ -1972,7 +1982,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function checkVariationInvalidSerial(ProductStock $productStock, $stockingProductVariations)
     {
         if ($productStock->variations()->whereHas('serials', function ($query) {
@@ -1985,8 +1997,9 @@ class ProductController extends Controller
                 $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
             })->get() as $productStockVariationKey => $productStockVariation) {
                 
-                foreach ($productStockVariation->whereHas('serials', function ($query1) {
-                    $query1->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
+                foreach ($productStockVariation->serials()->where(
+                    function($query) {
+                        $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
                 })->get() as $productStockVariationSerialKey => $productStockVariationSerial) {
                     
                     foreach ($stockingProductVariations as $stockingProductVariationKey => $stockingProductVariation) {
@@ -2003,16 +2016,16 @@ class ProductController extends Controller
 
                     }
 
-                    /*
-                    $productVariationSerialExists = $stockingProductVariationCollection->first(function ($stockingProductVariation, $stockingProductVariationKey) use ($productStockVariationSerial) {
+                    
+                    // $productVariationSerialExists = $stockingProductVariationCollection->first(function ($stockingProductVariation, $stockingProductVariationKey) use ($productStockVariationSerial) {
 
-                        $stockingProductVariationSerialCollection = collect($stockingProductVariation->serials);
+                    //     $stockingProductVariationSerialCollection = collect($stockingProductVariation->serials);
 
-                        $stockingProductVariationSerialCollection->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
-                            return $variationSerial->serial_no == $productStockVariationSerial->serial_no;
-                        });
-                    });
-                    */
+                    //     $stockingProductVariationSerialCollection->first(function ($variationSerial, $variationSerialKey) use ($productStockVariationSerial) {
+                    //         return $variationSerial->serial_no == $productStockVariationSerial->serial_no;
+                    //     });
+                    // });
+                    
 
                     // if variation serial not found
                     if (empty($productVariationSerialExists)) {
@@ -2030,7 +2043,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function checkProductSerialDuplicacy(Request $request)
     {
         foreach($request->serials as $productSerial)
@@ -2044,7 +2059,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function checkProductDuplicateSerial($stockingProduct)
     {
         foreach($stockingProduct->serials as $productSerial)
@@ -2058,7 +2075,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function checkProductSerialInValidity(ProductStock $productStock, $productSerials)
     {
         if ($productStock->serials()->where(function ($query) {$query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);})->exists()) {
@@ -2085,7 +2104,9 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
+    /*
     protected function getVariationExpectedKey($stockVariations, $stockVariationId)
     {
         foreach ($stockVariations as $stockVariationKey => $stockVariation) {
@@ -2096,6 +2117,7 @@ class ProductController extends Controller
 
         return false;
     }
+    */
 
     protected function updateParentStock(ProductStock $stockToUpdate, $currentUser, Request $request)
     {

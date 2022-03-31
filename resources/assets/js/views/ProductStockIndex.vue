@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-product-stock-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-store'"
 			:title="product.name + ' stocks'" 
@@ -401,7 +399,7 @@
 
 											<div class="col-md-8">
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Product Category :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -410,7 +408,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Name :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -419,7 +417,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Merchant :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -428,7 +426,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Manufacturer :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -437,7 +435,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														SKU Code :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -446,7 +444,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Warning Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -455,7 +453,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Available Quantity :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -464,7 +462,7 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Price :
 													</label>
 													<label class="col-sm-8 col-form-label">
@@ -485,7 +483,7 @@
 		 										-->
 
 		 										<div class="form-row form-group">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Select Warehouse :
 													</label>
 													<div class="col-sm-8">
@@ -514,7 +512,7 @@
 													class="form-row form-group" 
 													v-show="!singleStockData.has_approval"
 												>
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Stock Date :
 													</label>
 													<div class="col-sm-8">
@@ -542,13 +540,13 @@
 												</div>
 
 												<div 
-													class="form-row form-group" 
+													class="form-row" 
 													v-show="userHasPermissionTo('update-product-stock')"
 												>
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold form-group text-md-right">
 														Approval Date :
 													</label>
-													<div class="col-sm-8">
+													<div class="col-sm-8 form-group">
 														<v-date-picker 
 															v-model="singleStockData.updated_at" 
 															color="red" 
@@ -563,7 +561,7 @@
 												</div>
 
 		 										<div class="form-row form-group">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Stock Qty :
 													</label>
 													<div class="col-sm-8">
@@ -594,7 +592,7 @@
 												</div>
 
 												<div class="form-row form-group" v-show="! productMerchant.has_variations">
-													<label class="col-sm-4 col-form-label font-weight-bold text-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Buying Price (unit) :
 													</label>
 													<div class="col-sm-8">
@@ -763,7 +761,7 @@
 
 													<div class="col-md-8">
 														<div class="form-row form-group">
-															<label class="col-sm-4 col-form-label font-weight-bold text-right">
+															<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 																Manufacturing Date :
 															</label>
 															<div class="col-sm-8">
@@ -788,7 +786,7 @@
 														</div>
 
 														<div class="form-row form-group">
-															<label class="col-sm-4 col-form-label font-weight-bold text-right">
+															<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 																Expiring Date :
 															</label>
 															<div class="col-sm-8">
@@ -965,7 +963,7 @@
 																	placeholder="Variation Serial number" 
 																	v-model="variationNewSerial[stockedVariationIndex]"
 																	:class="! errors.stock.variations[stockedVariationIndex].product_variation_serial ? 'is-valid' : 'is-invalid'" 
-																	@keyup.enter="addVariationSerial(stockedVariationIndex)" 
+																	@keydown.enter.prevent="addVariationSerial(stockedVariationIndex)" 
 																	@change="validateFormInput('product_variation_serial')" 
 																	required="true" 
 																	:disabled="stockedVariation.serials.length>=stockedVariation.stock_quantity && stockedVariation.serials.every(variationSerial=>variationSerial.serial_no)"
@@ -1021,6 +1019,18 @@
 															</ul>
 														</div>
 													</div>
+
+													<div class="form-row">
+														<div class="col-sm-12">
+															<div 
+																class="invalid-feedback text-center" 
+																style="display: block;" 
+																v-show="errors.stock.variations[stockedVariationIndex].product_total_serials"
+															>
+													        	{{ errors.stock.variations[stockedVariationIndex].product_total_serials }}
+													  		</div>
+														</div>
+													</div>
 												</div>
 											</div>
 										</div>
@@ -1044,7 +1054,7 @@
 														v-model="productNewSerial" 
 														placeholder="Product Serial number" 
 														:class="! errors.stock.product_serial ? 'is-valid' : 'is-invalid'" 
-														@keyup.enter="addProductSerial()" 
+														@keydown.enter.prevent="addProductSerial()" 
 														@change="validateFormInput('product_serial')" 
 														:disabled="singleStockData.serials.length >= singleStockData.stock_quantity && singleStockData.serials.every(productSerial=>productSerial.serial_no)"
 													>
@@ -1097,6 +1107,18 @@
 														</span>
 													</li>
 												</ul>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="col-sm-12">
+												<div 
+													class="invalid-feedback text-center" 
+													style="display: block;" 
+													v-show="errors.stock.product_total_serials"
+												>
+										        	{{ errors.stock.product_total_serials }}
+										  		</div>
 											</div>
 										</div>
 									</div>
@@ -1697,7 +1719,7 @@
 
  									<div class="tab-pane active" id="product-stock" role="tabpanel">
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Product Name :
 											</label>
 
@@ -1707,7 +1729,7 @@
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Merchant Name :
 											</label>
 
@@ -1717,7 +1739,7 @@
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stock Invoice :
 											</label>
 
@@ -1727,7 +1749,7 @@
 										</div>
 
 										<div class="form-row" v-show="! productMerchant.has_variations">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Product-Stock (Batch) Code :
 											</label>
 
@@ -1740,7 +1762,7 @@
 											class="form-row" 
 											v-show="singleStockData.manufactured_at"
 										>
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stock Manufacturing Code :
 											</label>
 
@@ -1753,7 +1775,7 @@
 											class="form-row" 
 											v-show="singleStockData.expired_at"
 										>
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stock Expiring Code :
 											</label>
 
@@ -1763,7 +1785,7 @@
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stock Quantity :
 											</label>
 
@@ -1848,7 +1870,7 @@
 										</div>
 
 										<div class="form-row" v-show="! productMerchant.has_variations">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Available Quantity :
 											</label>
 											
@@ -1858,7 +1880,7 @@
 										</div>
 
 										<div class="form-row" v-show="! productMerchant.has_variations">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Buying Price :
 											</label>
 											<label class="col-sm-6 col-form-label">
@@ -1868,7 +1890,7 @@
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stocked on :
 											</label>
 
@@ -1878,7 +1900,7 @@
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stocked at :
 											</label>
 
@@ -1888,7 +1910,7 @@
 										</div>
 
 										<div class="form-row" v-if="singleStockData.hasOwnProperty('keeper')">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Stored By :
 											</label>
 
@@ -1898,7 +1920,7 @@
 										</div>
 
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Approval :
 											</label>
 
@@ -1910,7 +1932,7 @@
 										</div>
 
 										<div class="form-row" v-if="singleStockData.has_approval">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
 											</label>
 
@@ -1920,7 +1942,7 @@
 										</div>
 
 										<div class="form-row" v-if="singleStockData.has_approval">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
 											</label>
 
@@ -1932,7 +1954,7 @@
 
 									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleStockData.has_serials">
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 												Serials :
 											</label>
 											<div class="col-sm-6 col-form-label">
@@ -2000,7 +2022,7 @@
 											class="form-row" 
 											v-if="singleStockData.hasOwnProperty('addresses') && singleStockData.addresses.length"
 										>
-											<label class="col-sm-4 col-form-label font-weight-bold text-right">
+											<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 												Address Detail :
 											</label>
 											<div class="col-sm-12">
@@ -2022,7 +2044,7 @@
 																<h6>Container Address</h6>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Warehouse :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2031,7 +2053,7 @@
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2040,7 +2062,7 @@
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Container # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2060,7 +2082,7 @@
 																<h6>Shelves Address</h6>
 																
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2069,7 +2091,7 @@
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Container # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2080,7 +2102,7 @@
 																<div 
 																	class="form-row"
 																>
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Shelf # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2111,7 +2133,7 @@
 																<h6>Units Address</h6>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Container Type :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2120,7 +2142,7 @@
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Container # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2129,7 +2151,7 @@
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Shelf # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -2138,7 +2160,7 @@
 																</div>
 
 																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Unit # :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
@@ -3407,6 +3429,8 @@
 
 					if (this.productMerchant.has_serials) {
 
+						this.validateFormInput('product_total_serials');
+
 						if (this.productMerchant.has_variations) {
 							
 							this.validateFormInput('product_variation_serial');
@@ -4245,7 +4269,54 @@
 						}
 
 						break;
-					
+
+					case 'product_total_serials' :
+
+						if (this.productMerchant.has_variations) {
+
+							this.singleStockData.variations.forEach(
+								(stockVariation, stockVariationIndex) => {
+
+									if (stockVariation.stock_quantity > 0 && stockVariation.stock_quantity != stockVariation.serials.length) {
+
+										this.errors.stock.variations[stockVariationIndex].product_total_serials = 'Serials are more or less than quantity';
+
+									}
+									else {
+
+										this.$delete(this.errors.stock.variations[stockVariationIndex], 'product_total_serials');
+
+									}
+
+								}
+								
+							);
+
+							if (!this.errorInVariationsArray(this.errors.stock.variations)) {
+								this.submitForm = true;
+							}
+							
+						}
+						else {
+							
+							// this.submitForm = true;
+							// this.errors.stock.variations = [];
+
+							if (! this.productMerchant.has_variations && this.singleStockData.stock_quantity > 0 && this.singleStockData.stock_quantity != this.singleStockData.serials.length) {
+
+								this.errors.stock.product_total_serials = 'Serials are more or less than quantity';
+
+							}
+							else {
+
+								this.submitForm = true;
+								this.$delete(this.errors.stock, 'product_total_serials');
+
+							}
+
+						}
+
+						break;
 				
 					case 'product_address' : 
 
@@ -4452,7 +4523,6 @@
 						break;
 					
 					case 'product_variation_serial' :
-
 
 						if (this.productMerchant.has_serials && this.productMerchant.has_variations && this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
 							
