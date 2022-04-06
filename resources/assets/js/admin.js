@@ -30,6 +30,12 @@ import { routeNeedsPermission, userHasPermissionTo } from './public.js'
 import VueHtmlToPaper from 'vue-html-to-paper';
 Vue.use(VueHtmlToPaper);
 
+import Barcode from 'vue-barcode'
+Vue.component('barcode', Barcode)
+
+import VueQRCodeComponent from 'vue-qrcode-component'
+Vue.component('qr-code', VueQRCodeComponent)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -42,6 +48,7 @@ Vue.use(VueHtmlToPaper);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Registering component globally
+// Vue.component('barcode', require('vue-barcode'));
 Vue.component('download-excel', require('vue-json-excel').default);
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('alert', require('./components/AlertComponent.vue').default);
