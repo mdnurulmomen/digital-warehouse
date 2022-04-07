@@ -29,8 +29,8 @@
 											  		:disable-add-button="allProductCategories.length==0 ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllProducts" 
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllProducts()" 
 											  		@importExcelFile="importExcelFile($event)" 
 											  	></search-and-addition-option>
 											</div>
@@ -190,7 +190,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllProducts() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -1572,7 +1572,6 @@
 
 				this.error = '';
 				this.allFetchedProducts = [];
-				this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -1663,7 +1662,7 @@
 
 					this.productMode = 'retail product';
 
-					if (object.has_variations) {
+					if (object.has_variations && object.variations.length) {
 						
 						object.variations.forEach(
 							(productVariation, index) => {
@@ -1718,8 +1717,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New product has been stored", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
 							$('#product-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1750,8 +1752,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Product has been updated", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
 							$('#product-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1782,8 +1787,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Product has been deleted", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -1809,8 +1817,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Product has been restored", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})
@@ -2460,8 +2471,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New products has been stored", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+							
 							// $('#product-createOrEdit-modal').modal('hide');
 						}
 					})

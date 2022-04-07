@@ -30,8 +30,8 @@
 										  		:pagination="pagination" 
 										  		:current-tab="currentTab"
 										  		
-										  		@searchData="searchData($event)" 
-										  		@fetchAllContents="fetchAllProducts"
+										  		@searchData="pagination.current_page = 1; searchData($event)" 
+										  		@fetchAllContents="pagination.current_page = 1; fetchAllProducts()"
 											/>
 											
 											<div class="col-sm-12 col-lg-12">
@@ -124,7 +124,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchAllProducts() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -815,6 +815,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllProducts();
@@ -836,6 +838,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllProducts();
@@ -851,6 +855,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllProducts();
@@ -988,10 +994,10 @@
 
 				this.error = '';
 				this.allFetchedProducts = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
-				.post('/search-my-products/' + this.perPage, this.searchAttributes)
+				.post('/search-my-products/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.allFetchedProducts = response.data;
 					this.productsToShow = this.allFetchedProducts.all.data;

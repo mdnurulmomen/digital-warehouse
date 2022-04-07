@@ -58,8 +58,8 @@
 											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -589,12 +589,16 @@
 		watch : {
 
 			query : function(val){
+
+				this.pagination.current_page = 1; 
+
 				if (val==='') {
 					this.fetchAllContents();
 				}
 				else {
 					this.searchData();
 				}
+
 			},
 
 		},
@@ -676,7 +680,7 @@
 				this.loading = true;
 				this.formSubmitted = true;
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -763,8 +767,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New package has been created", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -789,8 +796,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Package has been updated", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -815,8 +825,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Package has been deleted", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -841,8 +854,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Package has been restored", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})

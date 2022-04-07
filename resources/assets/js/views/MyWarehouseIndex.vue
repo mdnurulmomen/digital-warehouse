@@ -193,7 +193,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllWarehouses() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllWarehouses() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -773,6 +773,8 @@
 
 			query : function(val){
 
+				this.pagination.current_page = 1; 
+
 				if (val==='') {
 
 					this.fetchAllWarehouses();
@@ -914,7 +916,7 @@
 
 				this.error = '';
 				this.allFetchedWarehouses = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get('/search-my-warehouses/' + this.query + "/" +  this.perPage + "?page=" + this.pagination.current_page)

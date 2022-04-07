@@ -177,7 +177,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchShelfAllUnits() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchShelfAllUnits() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -299,6 +299,8 @@
 
 			query : function(val){
 				
+				this.pagination.current_page = 1; 
+				
 				if (val==='') {
 					this.fetchShelfAllUnits();
 				}
@@ -377,7 +379,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(

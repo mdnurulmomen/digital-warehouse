@@ -1,6 +1,5 @@
 
 <template v-if="userHasPermissionTo('view-product-index')">
-
 	<div class="pcoded-content">
 		<breadcrumb 
 			:icon="'fab fa-product-hunt'"
@@ -221,7 +220,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllProducts() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllProducts() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -250,7 +249,7 @@
 			</div>
 		</div>
 
-	<!-- 
+		<!-- 
 		<asset-create-or-edit-modal 
 			:create-mode="createMode" 
 			:caller-page="'variation'" 
@@ -260,7 +259,7 @@
 			@storeProduct="storeProduct($event)" 
 			@updateAsset="updateAsset($event)" 
 		></asset-create-or-edit-modal>
- 	-->
+ 		-->
 
  		<!--Create Or Edit Modal -->
 		<div class="modal fade" id="product-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product') || userHasPermissionTo('update-product')">
@@ -1378,12 +1377,16 @@
 		watch : {
 
 			query : function(val){
+
+				this.pagination.current_page = 1;
+
 				if (val==='') {
 					this.fetchAllProducts();
 				}
 				else {
 					this.searchData();
 				}
+
 			},
 
 		},
@@ -1615,7 +1618,7 @@
 
 				this.error = '';
 				// this.allFetchedProducts = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get("/api/search-category-products/" + this.category.id + '/' + this.query + '/' + this.perPage + "?page=" + this.pagination.current_page)
@@ -1639,6 +1642,7 @@
 				else {
 					this.searchData();
 				}
+				
     		},
     		showContentDetails(object) {		
 				// this.singleProductData = { ...object };
@@ -1751,7 +1755,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("New product has been stored", "Success");
 							// this.allFetchedProducts = response.data;
+							
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.allProducts = response.data.data;
+							
 							$('#product-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1785,7 +1792,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Product has been updated", "Success");
 							// this.allFetchedProducts = response.data;
+							
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.allProducts = response.data.data;
+							
 							$('#product-createOrEdit-modal').modal('hide');
 						}
 					})

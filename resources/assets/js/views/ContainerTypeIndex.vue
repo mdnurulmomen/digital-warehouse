@@ -19,7 +19,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
@@ -29,13 +28,12 @@
 											  		:required-permission="'warehouse-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 										  		<tab 
 										  			v-show="query === ''" 
 										  			:tab-names="['current', 'trashed']" 
@@ -64,8 +62,8 @@
 										  			@openContentDeleteForm="openContentDeleteForm" 
 										  			@openContentRestoreForm="openContentRestoreForm" 
 										  			@changeNumberContents="changeNumberContents" 
-										  			@fetchAllContents="fetchAllContents" 
-										  			@searchData="searchData" 
+										  			@fetchAllContents="fetchAllContents()" 
+										  			@searchData="searchData()" 
 										  		>	
 										  		</table-with-soft-delete-option>
 											</div>
@@ -261,7 +259,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -323,7 +321,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("New container has been created", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#container-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -349,7 +350,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Container has been updated", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#container-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -375,7 +379,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Container has been deleted", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -401,7 +408,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Container has been restored", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})

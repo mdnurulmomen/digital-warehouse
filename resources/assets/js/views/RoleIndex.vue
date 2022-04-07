@@ -28,8 +28,8 @@
 											  		:disable-add-button="(allPermissions.length==0 || formSubmitted) ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllRoles"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllRoles()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -1212,7 +1212,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -1278,8 +1278,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New role has been created", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#role-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1309,8 +1312,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Role has been updated", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#role-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -1335,8 +1341,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Role has been deleted", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})

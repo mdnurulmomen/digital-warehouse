@@ -23,7 +23,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<my-requisition-addition-search-export-option 
 												:search-attributes="searchAttributes" 
 										  		:caller-page="'my-requisition'" 
@@ -201,7 +200,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -1685,6 +1684,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New requisition has been stored", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
@@ -1713,6 +1713,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Dispatched products has been received", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
@@ -1738,10 +1739,10 @@
 
 				this.error = '';
 				this.allFetchedRequisitions = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
-				.post("/api/search-my-requisitions/" + this.perPage, this.searchAttributes)
+				.post("/api/search-my-requisitions/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.allFetchedRequisitions = response.data;
 					this.requisitionsToShow = this.allFetchedRequisitions.all.data;

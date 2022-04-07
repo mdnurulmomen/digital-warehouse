@@ -477,7 +477,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? setDealAllPayments() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? setDealAllPayments() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -1776,6 +1776,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllPayments();
@@ -1797,6 +1799,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllPayments();
@@ -1812,6 +1816,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllPayments();
@@ -1980,11 +1986,11 @@
 				this.loading = true;
 				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				this.searchAttributes.merchant_deal_id = this.deal.id;
 				
 				axios
-				.post("/api/search-deal-payments/" + this.perPage, this.searchAttributes)
+				.post("/api/search-deal-payments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
 					this.dealAllPayments = response.data.all.data;
@@ -2076,7 +2082,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("New payment has been added", "Success");
 							// this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
+							
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2109,7 +2118,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Payment has been updated", "Success");
 							// this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
+
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2133,7 +2145,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Storage type has been deleted", "Success");
 							// this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})

@@ -160,7 +160,7 @@
 					type="button" 
 					class="btn btn-primary btn-sm" 
 					v-tooltip.bottom-end="'Reload'" 
-					@click="query === '' ? $emit('fetchAllContents') : $emit('searchData')"
+					@click="pagination.current_page = 1; query === '' ? $emit('fetchAllContents') : $emit('searchData')"
 				>
 					Reload
 					<i class="fa fa-sync"></i>

@@ -110,8 +110,8 @@
 											  		:current-tab="currentTab"
 											  		
 											  		@showContentCreateForm="showProductMerchantCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchMerchantAllProducts" 
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchMerchantAllProducts()" 
 											  		@importExcelFile="importExcelFile($event)" 
 												/>
 											</div>
@@ -264,7 +264,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchMerchantAllProducts() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchMerchantAllProducts() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -2463,14 +2463,17 @@
 
 							this.$toastr.s("New product has been added", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
-							/*if (this.searchAttributes.search) {
+							/*
+							if (this.searchAttributes.search) {
 
 								this.searchData();
 
-							}*/
+							}
+							*/
 
 							$('#product-createOrEdit-modal').modal('hide');
 						}
@@ -2508,14 +2511,17 @@
 
 							this.$toastr.s("Product has been updated", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
-							/*if (this.query) {
+							/*
+							if (this.query) {
 
 								this.searchData();
 
-							}*/
+							}
+							*/
 
 							$('#product-createOrEdit-modal').modal('hide');
 							
@@ -2547,14 +2553,17 @@
 
 							this.$toastr.s("Merchant has been deleted", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
-							/*if (this.query) {
+							/*
+							if (this.query) {
 
 								this.searchData();
 
-							}*/
+							}
+							*/
 
 							$('#delete-confirmation-modal').modal('hide');
 							
@@ -2581,12 +2590,12 @@
 
 				this.error = '';
 				this.merchantAllProducts = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 
 				this.searchAttributes.merchant_id = this.merchant.id;
 				
 				axios
-				.post('/search-merchant-products/' + this.perPage, this.searchAttributes)
+				.post('/search-merchant-products/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.merchantAllProducts = response.data;
 					this.productsToShow = this.merchantAllProducts.all.data;
@@ -3044,6 +3053,7 @@
 
 							this.$toastr.s("Products has been added", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.merchantAllProducts = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							

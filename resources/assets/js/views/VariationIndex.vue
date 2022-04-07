@@ -26,8 +26,8 @@
 											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -219,7 +219,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllContents() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -683,7 +683,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -753,8 +753,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New variation has been created", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -782,8 +785,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation has been updated", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -806,8 +812,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation has been deleted", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -830,8 +839,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Variation has been restored", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allFetchedContents = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})

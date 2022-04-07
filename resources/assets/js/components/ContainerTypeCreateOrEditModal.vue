@@ -498,7 +498,10 @@
 				
 					case 'code' :
 
-						if (this.singleAssetData.code && ! this.singleAssetData.code.match(/^[a-zA-Z0-9-_]+$/)) {
+						if (! this.singleAssetData.code) {
+							this.errors.container.code = 'Code is required';
+						}
+						else if (! this.singleAssetData.code.match(/^[a-zA-Z0-9-_]+$/)) {
 							this.errors.container.code = 'No space or special character';
 						}
 						else{

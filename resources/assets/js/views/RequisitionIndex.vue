@@ -181,7 +181,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -3381,6 +3381,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New requisition has been stored", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
@@ -3418,6 +3419,7 @@
 
 							this.userHasPermissionTo('approve-dispatch') ? this.$toastr.s("Requisition has been dispatched", "Success") : this.$toastr.i("Requisition has been recommended", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
@@ -3457,6 +3459,7 @@
 
 							this.$toastr.s("Requisition has been cancelled", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
@@ -3485,7 +3488,7 @@
 
 				this.error = '';
 				this.allFetchedRequisitions = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.post('/search-requisitions/' + this.perPage, this.searchAttributes)

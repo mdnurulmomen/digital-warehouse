@@ -27,8 +27,8 @@
 											  		:disable-add-button="(allContainers.length==0 || allRentPeriods.length==0 || allStorageTypes.length==0 || allWarehouseOwners.length==0 || formSubmitted) ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllWarehouses"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllWarehouses()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -2598,7 +2598,7 @@
 
 				this.error = '';
 				this.allFetchedWarehouses = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -2750,6 +2750,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New warehouse has been created", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
@@ -2780,6 +2781,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse has been updated", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
@@ -2815,6 +2817,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse has been deleted", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
@@ -2843,6 +2846,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse has been restored", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 							

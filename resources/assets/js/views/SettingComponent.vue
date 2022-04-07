@@ -126,17 +126,17 @@
 														              	</div>
 
 													              		<div class="row d-flex align-items-center text-center mb-4">
-														              		<label class="col-sm-4 col-form-label text-right">
+														              		<label class="col-sm-4 col-form-label text-right form-group">
 														              			App Logo
 														              		</label>
-														              		<div class="col-sm-4">
+														              		<div class="col-sm-4 form-group">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
 															                  		:src="applicationSettings.application_logo || 'uploads/application/application_logo.png'" 
 															                  		alt="Application logo"
 														                  		>
 														                	</div>
-															                <div class="col-sm-4">
+															                <div class="col-sm-4 form-group">
 															                  	<div class="input-group">
 																                    <div class="custom-file">
 																                        <input 
@@ -153,18 +153,18 @@
 															                </div>
 														            	</div>
 
-													                	<div class="row d-flex align-items-center text-center">
-														              		<label class="col-sm-4 col-form-label text-right">
+													                	<div class="row d-flex align-items-center text-center mb-4">
+														              		<label class="col-sm-4 col-form-label text-right form-group">
 														              			Panel Favicon
 														              		</label>
-														              		<div class="col-sm-4">
+														              		<div class="col-sm-4 form-group">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
 															                  		:src="applicationSettings.application_favicon || 'uploads/application/application_favicon.png'" 
 															                  		alt="Application favicon"
 														                  		>
 														                	</div>
-															                <div class="col-sm-4">
+															                <div class="col-sm-4 form-group">
 															                  	<div class="input-group">
 																                    <div class="custom-file">
 																                        <input 
@@ -182,11 +182,11 @@
 														            	</div>
 
 														            	<div class="form-group row">
-														              		<label class="col-sm-4 col-form-label text-right">
+														              		<label class="col-sm-4 col-form-label text-right form-group">
 														              			Copyright Message
 														              		</label>
 
-															              	<div class="col-sm-8">
+															              	<div class="col-sm-8 form-group">
 															              		<input 
 																                  	type="text" 
 																					class="form-control" 

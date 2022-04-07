@@ -59,8 +59,8 @@
 											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -532,6 +532,8 @@
 
 			query : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (val==='') {
 					
 					this.fetchAllContents();
@@ -624,7 +626,7 @@
 				this.loading = true;
 				this.formSubmitted = true;
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -712,7 +714,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("New package has been created", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1; 
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -738,7 +743,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Company has been updated", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1; 
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#asset-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -764,7 +772,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Company has been deleted", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1; 
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -790,7 +801,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Company has been restored", "Success");
 							this.allFetchedContents = response.data;
+
+							this.pagination.current_page = 1; 
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})

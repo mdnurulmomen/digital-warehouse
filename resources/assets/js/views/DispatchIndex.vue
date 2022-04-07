@@ -152,7 +152,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllDispatches() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllDispatches() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -1202,12 +1202,16 @@
 		watch : {
 
 			query : function(val){
+
+				this.pagination.current_page = 1;
+
 				if (val==='') {
 					this.fetchAllDispatches();
 				}
 				else {
 					this.searchData();
 				}
+
 			},
 
 		},
@@ -1326,7 +1330,7 @@
 
 				this.error = '';
 				this.allDispatchedRequisition = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -1397,6 +1401,8 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Requisition has been dispatched", "Success");
+
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.allDispatchedRequisition = response.data.data;
 							
 							// this.allDispatchedRequisition = response.data;

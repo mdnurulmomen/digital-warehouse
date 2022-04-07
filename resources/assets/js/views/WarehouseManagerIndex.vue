@@ -192,7 +192,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'"
-																@click="query === '' ? fetchAllWarehouseManagers() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllWarehouseManagers() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -441,12 +441,16 @@
 		watch : {
 
 			query : function(val){
+				
+				this.pagination.current_page = 1; 
+
 				if (val==='') {
 					this.fetchAllWarehouseManagers();
 				}
 				else {
 					this.searchData();
 				}
+
 			},
 
 		},
@@ -555,7 +559,7 @@
 
 				this.error = '';
 				this.allWarehouseManagers = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -595,8 +599,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Warehouse manager has been updated", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.allWarehouseManagers = response.data.data;
 							this.query !== '' ? this.searchData() : '';
+
 							$('#warehouse-manager-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -621,8 +628,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Manager has been deleted", "Success");
+
+							this.pagination.current_page = 1; 
 							this.allWarehouseManagers = response.data.data;
 							this.query !== '' ? this.searchData() : '';
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})

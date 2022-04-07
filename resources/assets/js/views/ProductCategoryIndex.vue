@@ -26,8 +26,8 @@
 											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="searchData($event, 1)" 
+											  		@fetchAllContents="pagination.current_page=1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -302,7 +302,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllContents() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllContents() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -313,7 +313,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchAllContents() : searchData()"
+																@paginate="query === '' ? fetchAllContents() : searchData(query, pagination.current_page)"
 															>
 															</pagination>
 														</div>
@@ -704,7 +704,7 @@
 					});
 
 			},
-			searchData(emitedValue=false) {
+			searchData(emitedValue=false, currentPage = 1) {
 
 				if (emitedValue) {
 					this.query=emitedValue;
@@ -712,7 +712,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				this.pagination.current_page = currentPage;
 				
 				axios
 				.get(

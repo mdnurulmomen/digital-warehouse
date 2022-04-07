@@ -28,8 +28,8 @@
 											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -216,7 +216,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -284,8 +284,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New merchant has been created", "Success");
+							
 							this.allFetchedContents = response.data;
+							this.pagination.current_page = 1; 
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#user-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -310,8 +313,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("merchant has been updated", "Success");
+
 							this.allFetchedContents = response.data;
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#user-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -336,8 +342,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("merchant has been deleted", "Success");
+
 							this.allFetchedContents = response.data;
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -362,8 +371,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("merchant has been restored", "Success");
+
 							this.allFetchedContents = response.data;
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})

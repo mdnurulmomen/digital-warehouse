@@ -185,7 +185,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'"
-																@click="query === '' ? fetchAllContainers() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllContainers() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -361,6 +361,8 @@
 
 			query : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (val==='') {
 					this.fetchAllContainers();
 				}
@@ -439,7 +441,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(

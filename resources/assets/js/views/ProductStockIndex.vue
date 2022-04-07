@@ -316,7 +316,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchProductAllStocks() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchProductAllStocks() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -1754,12 +1754,11 @@
 											</label>
 
 											<div class="col-sm-6">
-												<!-- 
 												<label class="col-form-label">
 													{{ singleStockData.stock_code | capitalize }}
-												</label> 
-												-->
+												</label>
 												
+												<!-- 
 												<barcode 
 													:value="singleStockData.stock_code" 
 													format= "CODE128"
@@ -1772,7 +1771,8 @@
 													style="overflow: auto;"
 												>
 											    	Barcode Not Working.
-											  	</barcode>
+											  	</barcode> 
+											  	-->
 												
 												<!-- <svg id="view-stock-code" class="d-block"/> -->
 
@@ -2915,6 +2915,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchProductAllStocks();
@@ -2936,6 +2938,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchProductAllStocks();
@@ -2951,6 +2955,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchProductAllStocks();
@@ -3296,7 +3302,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been stored", "Success");
+
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+							
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3328,7 +3337,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been updated", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3355,7 +3367,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been deleted", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -3377,10 +3392,9 @@
 
 				this.error = '';
 				this.allStocks = [];
-				this.pagination.current_page = 1;
 				
 				axios
-				.post("/api/search-product-stocks/" + this.productMerchant.id + "/" + this.perPage, this.searchAttributes)
+				.post("/api/search-product-stocks/" + this.productMerchant.id + "/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.allStocks = response.data.all.data;
 					this.pagination = response.data.all;
@@ -4151,6 +4165,7 @@
 				else {
 					this.searchData();
 				}
+
     		},
     		objectNameWithCapitalized ({ name, variation }) {
 		      	

@@ -277,7 +277,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -2124,6 +2124,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllRequisitions();
@@ -2145,6 +2147,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllRequisitions();
@@ -2160,6 +2164,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllRequisitions();
@@ -2533,6 +2539,7 @@
 						if (response.status == 200) {
 							this.$toastr.s("New requisition has been stored", "Success");
 							
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 
@@ -2724,7 +2731,7 @@
 
 				this.error = '';
 				this.allFetchedRequisitions = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				this.searchAttributes.merchant_product_id = this.merchantProduct.id;
 				
 				axios

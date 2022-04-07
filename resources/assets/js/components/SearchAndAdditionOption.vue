@@ -93,12 +93,14 @@
 		watch : {
 
 			search : function(val){
+
 				if (val==='') {
 					this.$emit('fetchAllContents');
 				}
 				else {
 					this.$emit('searchData', this.search);
 				}
+
 			},
 
 		},

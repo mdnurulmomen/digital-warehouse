@@ -238,6 +238,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.$emit('fetchAllContents');
@@ -259,6 +261,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.$emit('fetchAllContents');
@@ -274,6 +278,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.$emit('fetchAllContents');

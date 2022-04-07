@@ -27,8 +27,8 @@
 											  		:disable-add-button="formSubmitted" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchAllContents"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -66,9 +66,7 @@
 										  			@searchData="searchData" 
 										  		>	
 										  		</table-with-soft-delete-option>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
@@ -219,7 +217,7 @@
 
 				this.error = '';
 				this.allFetchedContents = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
@@ -276,7 +274,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("New manager has been created", "Success");
 							this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1; 
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#user-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -302,7 +303,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Manager has been updated", "Success");
 							this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#user-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -328,7 +332,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Manager has been deleted", "Success");
 							this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -354,7 +361,10 @@
 						if (response.status == 200) {
 							this.$toastr.s("Manager has been restored", "Success");
 							this.allFetchedContents = response.data;
+							
+							this.pagination.current_page = 1;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
 							$('#restore-confirmation-modal').modal('hide');
 						}
 					})

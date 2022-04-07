@@ -988,19 +988,19 @@ class ProductController extends Controller
                 $q->where('stock_code', 'like', "%$request->search%")
                 ->orWhere('stock_quantity', 'like', "%$request->search%")
                 ->orWhere('available_quantity', 'like', "%$request->search%")
-                ->orWhere('unit_buying_price', 'like', "%$request->search%");
-            })
-            ->orWhereHas('serials', function ($query2) use ($request) {
-                $query2->where('serial_no', 'like', "%$request->search%");
-            })
-            ->orWhereHas('variations', function ($query3) use ($request) {
-                $query3->where('stock_code', 'like', "%$request->search%")
-                    ->orWhere('stock_quantity', 'like', "%$request->search%")
-                    ->orWhere('available_quantity', 'like', "%$request->search%")
-                    ->orWhere('unit_buying_price', 'like', "%$request->search%")
-                    ->orWhereHas('serials', function ($query4) use ($request) {
-                        $query4->where('serial_no', 'like', "%$request->search%");
-                    });
+                ->orWhere('unit_buying_price', 'like', "%$request->search%")
+                ->orWhereHas('serials', function ($query2) use ($request) {
+                    $query2->where('serial_no', 'like', "%$request->search%");
+                })
+                ->orWhereHas('variations', function ($query3) use ($request) {
+                    $query3->where('stock_code', 'like', "%$request->search%")
+                        ->orWhere('stock_quantity', 'like', "%$request->search%")
+                        ->orWhere('available_quantity', 'like', "%$request->search%")
+                        ->orWhere('unit_buying_price', 'like', "%$request->search%")
+                        ->orWhereHas('serials', function ($query4) use ($request) {
+                            $query4->where('serial_no', 'like', "%$request->search%");
+                        });
+                });
             });
 
         }

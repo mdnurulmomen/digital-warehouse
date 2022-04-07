@@ -297,7 +297,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchAllMerchantDeals() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchAllMerchantDeals() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -2535,6 +2535,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllMerchantDeals();
@@ -2556,6 +2558,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllMerchantDeals();
@@ -2571,6 +2575,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1;
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllMerchantDeals();
@@ -3136,8 +3142,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New deal has been stored", "Success");
+							
+							this.pagination.current_page = 1;
 							// this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
 							this.searchAttributes.search !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							
 							$('#merchantDeal-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3168,8 +3177,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Deal has been updated", "Success");
+							
+							this.pagination.current_page = 1;
 							// this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
 							this.searchAttributes.search !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+							
 							$('#merchantDeal-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3200,8 +3212,11 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Deal has been deleted", "Success");
+							
+							this.pagination.current_page = 1;
 							// this.query !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
 							this.searchAttributes.search !== '' ? this.searchData() : this.setMerchantDealsPagination(response);
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -3220,14 +3235,13 @@
 			},
 			searchData() {
 
-
 				this.error = '';
 				this.merchantAllDeals = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				this.searchAttributes.merchant_id = this.merchant.id;
 				
 				axios
-				.post('/search-merchant-deals/' + this.perPage, this.searchAttributes)
+				.post('/search-merchant-deals/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.merchantAllDeals = response.data.all.data;
 					this.pagination = response.data.all;

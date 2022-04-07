@@ -271,7 +271,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="searchAttributes.search === '' ? fetchAllStocks() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllStocks() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -3188,6 +3188,8 @@
 
 			'searchAttributes.search' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllStocks();
@@ -3209,6 +3211,8 @@
 			
 			'searchAttributes.dateFrom' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllStocks();
@@ -3224,6 +3228,8 @@
 
 			'searchAttributes.dateTo' : function(val){
 				
+				this.pagination.current_page = 1; 
+
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
 					this.fetchAllStocks();
@@ -3721,7 +3727,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been stored", "Success");
+
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3753,7 +3762,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been updated", "Success");
+
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3780,7 +3792,10 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Stock has been deleted", "Success");
+
+							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+
 							$('#delete-confirmation-modal').modal('hide');
 						}
 					})
@@ -4879,6 +4894,7 @@
 				else {
 					this.searchData();
 				}
+				
     		},
     		objectNameWithCapitalized ({ name, variation, user_name, product }) {
 		      	

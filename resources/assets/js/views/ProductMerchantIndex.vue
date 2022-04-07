@@ -28,8 +28,8 @@
 											  		:disable-add-button="allMerchants.length==0 ? true : false" 
 											  		
 											  		@showContentCreateForm="showProductMerchantCreateForm" 
-											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="fetchProductAllMerchants"
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchProductAllMerchants()"
 											  	></search-and-addition-option>
 											</div>
 											
@@ -165,7 +165,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="query === '' ? fetchProductAllMerchants() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchProductAllMerchants() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -1841,6 +1841,8 @@
 						if (response.status == 200) {
 
 							this.$toastr.s("New merchant has been stored", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.productAllMerchants = response.data.data;
 							
 							if (this.query) {
@@ -1884,6 +1886,8 @@
 						if (response.status == 200) {
 
 							this.$toastr.s("Merchant has been updated", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.productAllMerchants = response.data.data;
 
 							if (this.query) {
@@ -1921,6 +1925,8 @@
 						if (response.status == 200) {
 
 							this.$toastr.s("Merchant has been deleted", "Success");
+							
+							this.pagination.current_page = 1; 
 							this.productAllMerchants = response.data.data;
 
 							if (this.query) {
@@ -1954,7 +1960,7 @@
 
 				this.error = '';
 				this.productAllMerchants = [];
-				this.pagination.current_page = 1;
+				// this.pagination.current_page = 1;
 				
 				axios
 				.get(
