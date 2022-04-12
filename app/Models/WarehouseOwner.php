@@ -103,6 +103,7 @@ class WarehouseOwner extends Authenticatable
         }
     }
 
+    /*
     public function setUserPermissionsAttribute($permissions = [])
     {
         // if (count($permissions)) {
@@ -122,5 +123,6 @@ class WarehouseOwner extends Authenticatable
 
         // }
     }
+    */
 
 }

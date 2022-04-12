@@ -121,7 +121,6 @@
 					return this.profileToView.active ? 'Approved' : 'Pending';
 				}
 				
-				/*
 				else if (property.match(/roles/gi)) {
 					let roles = [];
 					
@@ -159,7 +158,6 @@
 
 					return permissions.toString();
 				}
-				*/
 				
 				else if (property.match(/registered/gi)) {
 					return this.profileToView.created_at ? this.getReadableDate(this.profileToView.created_at) : 'No Date';

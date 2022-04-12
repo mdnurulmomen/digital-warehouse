@@ -404,6 +404,7 @@ class Warehouse extends Authenticatable
 
     }
 
+    /*
     public function setUserPermissionsAttribute($permissions = [])
     {
         // if (count($permissions)) {
@@ -423,6 +424,7 @@ class Warehouse extends Authenticatable
 
         // }
     }
+    */
 
 /*
     // new

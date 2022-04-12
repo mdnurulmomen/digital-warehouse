@@ -70,6 +70,8 @@ Vue.component('restore-confirmation-modal', require('./components/RestoreConfirm
 Vue.component('addition-search-export-option', require('./components/AdditionSearchExportOption.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
+Vue.component('permissive-user-profile-view-modal', require('./components/PermissiveUserProfileViewModal.vue').default);
+Vue.component('permissive-user-profile-create-or-edit-modal', require('./components/PermissiveUserProfileCreateOrEditModal.vue').default);
 // Vue.component('container-type-create-or-edit-modal', require('./components/ContainerTypeCreateOrEditModal.vue').default);
 
 import AdminSideMenuBar from './AdminSideMenuBar'

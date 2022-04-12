@@ -44,9 +44,11 @@ class WarehouseController extends Controller
             
             return response()->json([
 
-        		'approved' => WarehouseOwner::with(['roles', 'permissions'])->withCount('warehouses')->where('active', 1)->paginate($perPage),
-                'pending' => WarehouseOwner::with(['roles', 'permissions'])->withCount('warehouses')->where('active', 0)->paginate($perPage),
-        		'trashed' => WarehouseOwner::with(['roles', 'permissions'])->withCount('warehouses')->onlyTrashed()->paginate($perPage),
+        		'approved' => WarehouseOwner::withCount('warehouses')->where('active', 1)->paginate($perPage),
+
+                'pending' => WarehouseOwner::withCount('warehouses')->where('active', 0)->paginate($perPage),
+
+        		'trashed' => WarehouseOwner::withCount('warehouses')->onlyTrashed()->paginate($perPage),
 
         	], 200);
 
@@ -84,8 +86,8 @@ class WarehouseController extends Controller
             $newUser->save();
         }
 
-        $newUser->user_permissions = json_decode(json_encode($request->permissions));
-        $newUser->user_roles = json_decode(json_encode($request->roles));
+        // $newUser->user_permissions = json_decode(json_encode($request->permissions));
+        // $newUser->user_roles = json_decode(json_encode($request->roles));
 
         return $this->showAllOwners($perPage);
     }
@@ -116,8 +118,8 @@ class WarehouseController extends Controller
             $userToUpdate->password = Hash::make($request->password);
         }
 
-        $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
-        $userToUpdate->user_roles = json_decode(json_encode($request->roles));
+        // $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
+        // $userToUpdate->user_roles = json_decode(json_encode($request->roles));
 
         $userToUpdate->save();
 
@@ -146,7 +148,9 @@ class WarehouseController extends Controller
     {
         $columnsToSearch = ['first_name', 'last_name', 'user_name', 'mobile', 'email'];
 
-        $query = WarehouseOwner::with(['roles', 'permissions'])->withCount('warehouses')->withTrashed();
+        // $query = WarehouseOwner::with(['roles', 'permissions'])->withCount('warehouses')->withTrashed();
+        
+        $query = WarehouseOwner::withCount('warehouses')->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");
@@ -171,9 +175,11 @@ class WarehouseController extends Controller
             
             return [
 
-                'approved' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 1)->paginate($perPage)),
-                'pending' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->where('active', 0)->paginate($perPage)),
-                'trashed' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->onlyTrashed()->paginate($perPage)),
+                'approved' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers'])->where('active', 1)->paginate($perPage)),
+
+                'pending' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers'])->where('active', 0)->paginate($perPage)),
+
+                'trashed' => new WarehouseCollection(Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers'])->onlyTrashed()->paginate($perPage)),
 
             ];
 
@@ -266,8 +272,8 @@ class WarehouseController extends Controller
             
         $newWarehouse->warehouse_containers = json_decode(json_encode($request->containers));
 
-        $newWarehouse->user_permissions = json_decode(json_encode($request->permissions));
-        $newWarehouse->user_roles = json_decode(json_encode($request->roles));
+        // $newWarehouse->user_permissions = json_decode(json_encode($request->permissions));
+        // $newWarehouse->user_roles = json_decode(json_encode($request->roles));
 
         return $this->showAllWarehouses($perPage);
     }
@@ -370,8 +376,8 @@ class WarehouseController extends Controller
         
         $warehouseToUpdate->warehouse_containers = json_decode(json_encode($request->containers));
 
-        $warehouseToUpdate->user_permissions = json_decode(json_encode($request->permissions));
-        $warehouseToUpdate->user_roles = json_decode(json_encode($request->roles));
+        // $warehouseToUpdate->user_permissions = json_decode(json_encode($request->permissions));
+        // $warehouseToUpdate->user_roles = json_decode(json_encode($request->roles));
 
         return $this->showAllWarehouses($perPage);
     }
@@ -396,7 +402,7 @@ class WarehouseController extends Controller
     {
         $columnsToSearch = ['name', 'user_name', 'email', 'mobile', 'warehouse_deal'];
 
-        $query = Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers', 'roles', 'permissions'])->withTrashed();
+        $query = Warehouse::with(['previews', 'owner', 'feature', 'storages', 'containers'])->withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

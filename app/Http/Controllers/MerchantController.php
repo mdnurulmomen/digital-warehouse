@@ -51,9 +51,11 @@ class MerchantController extends Controller
             
             return response()->json([
 
-        		'approved' => Merchant::with(['roles', 'permissions'])->withCount('deals')->where('active', 1)->latest()->paginate($perPage),
-                'pending' => Merchant::with(['roles', 'permissions'])->withCount('deals')->where('active', 0)->latest()->paginate($perPage),
-        		'trashed' => Merchant::with(['roles', 'permissions'])->withCount('deals')->onlyTrashed()->latest()->paginate($perPage),
+        		'approved' => Merchant::withCount('deals')->where('active', 1)->latest()->paginate($perPage),
+
+                'pending' => Merchant::withCount('deals')->where('active', 0)->latest()->paginate($perPage),
+
+        		'trashed' => Merchant::withCount('deals')->onlyTrashed()->latest()->paginate($perPage),
 
         	], 200);
 
@@ -91,8 +93,8 @@ class MerchantController extends Controller
             $newUser->save();
         }
 
-        $newUser->user_permissions = json_decode(json_encode($request->permissions));
-        $newUser->user_roles = json_decode(json_encode($request->roles));
+        // $newUser->user_permissions = json_decode(json_encode($request->permissions));
+        // $newUser->user_roles = json_decode(json_encode($request->roles));
 
         return $this->showAllMerchants($perPage);
     }
@@ -123,8 +125,8 @@ class MerchantController extends Controller
             $userToUpdate->password = Hash::make($request->password);
         }
 
-        $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
-        $userToUpdate->user_roles = json_decode(json_encode($request->roles));
+        // $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
+        // $userToUpdate->user_roles = json_decode(json_encode($request->roles));
 
         $userToUpdate->save();
 
@@ -134,8 +136,8 @@ class MerchantController extends Controller
     public function deleteMerchant($owner, $perPage)
     {
     	$userToDelete = Merchant::findOrFail($owner);
-        $userToDelete->permissions()->detach();
-        $userToDelete->roles()->detach();
+        // $userToDelete->permissions()->detach();
+        // $userToDelete->roles()->detach();
         $userToDelete->delete();
 
         return $this->showAllMerchants($perPage);
@@ -153,7 +155,7 @@ class MerchantController extends Controller
     {
         $columnsToSearch = ['first_name', 'last_name', 'user_name', 'mobile', 'email'];
 
-        $query = Merchant::with(['roles', 'permissions'])->withTrashed();
+        $query = Merchant::withTrashed();
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");

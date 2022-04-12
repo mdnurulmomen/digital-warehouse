@@ -77,7 +77,7 @@
 			</div>
 		</div>
 
-		<user-profile-create-or-edit-modal 
+		<permissive-user-profile-create-or-edit-modal 
 			v-if="userHasPermissionTo('create-manager') || userHasPermissionTo('update-manager')" 
 			:csrf="csrf" 
 			:create-mode="createMode" 
@@ -87,7 +87,7 @@
 
 			@storeUser="storeUser($event)" 
 			@updateUser="updateUser($event)" 
-		></user-profile-create-or-edit-modal>
+		></permissive-user-profile-create-or-edit-modal>
 
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-manager')" 
@@ -111,14 +111,12 @@
 			@restoreUser="restoreUser($event)" 
 		></restore-confirmation-modal>
 
-		<user-profile-view-modal 
+		<permissive-user-profile-view-modal 
 			:user="'manager'" 
 			:profile-to-view="singleUserDetails" 
 			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'special permissions']"
-		></user-profile-view-modal>
-
+		></permissive-user-profile-view-modal>
 	</div>
-
 </template>
 
 <script type="text/javascript">

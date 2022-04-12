@@ -199,7 +199,6 @@
 									</div>
 								</div>
 
-								<!-- 
 								<div class="col-sm-12 form-group mb-0 text-right card-footer">
 					          		<div class="text-danger small mb-1" v-show="!submitForm">
 								  		Please input required fields
@@ -208,29 +207,9 @@
 						          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
 				                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 				                  	</button>
-					          	</div> 
-					          	-->
-
-					          	<div class="col-sm-12 form-group mb-0 card-footer">
-									<div class="flex-column">
-										<div class="col-sm-12 text-right" v-show="!submitForm">
-											<span class="text-danger small">
-										  		Please input required fields
-										  	</span>
-										</div>
-										<div class="col-sm-12">
-											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Previous" v-on:click="step--">
-						                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
-						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
-												{{ createMode ? 'Save' : 'Update' }}
-											</button>
-										</div>
-									</div>
 					          	</div>
 							</div>
 
-							<!-- 
 							<div 
 								class="row" 
 								v-bind:key="'user-modal-step-' + 2" 
@@ -269,6 +248,68 @@
 										<div class="form-group col-md-12">
 											<label for="inputUsername">Special Permissions</label>
 											<div class="row">
+												<!-- Approvable Models -->
+												<!-- 
+												<div 
+													class="col-md-6" 
+													v-for="model in modelCRUDableAndApproveable" 
+													:key="'approve-model-permission-name-' + model"
+												>
+													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
+
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('create-' + model)" 
+															@change="insertPermission('create-' + model, $event)" 
+															:ref="'create-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('create-' + model) }}</label>
+													</div>
+
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('update-' + model)" 
+															@change="insertPermission('update-' + model, $event)" 
+															:ref="'update-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('update/Approve-' + model) }}</label>
+													</div>
+
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('delete-' + model)" 
+															@change="insertPermission('delete-' + model, $event)" 
+															:ref="'delete-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('delete-' + model) }}</label>
+													</div>
+
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('view-' + model + '-index')" 
+															@change="insertPermission('view-' + model + '-index', $event)" 
+															:ref="'view-' + model.toLowerCase() + '-index'"
+														>
+														<label>{{ modelName('view-' + model + '-list') }}</label>
+													</div>
+
+													<div class="form-check">
+														<input 
+															type="checkbox" 
+															:checked="permissionExists('approve-' + model)" 
+															@change="insertPermission('approve-' + model, $event)" 
+															:ref="'approve-' + model.toLowerCase()"
+														>
+														<label>{{ modelName('approve-' + model) }}</label>
+													</div>
+												</div> 
+												-->
+
+												<!-- CRUD Models -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsCRUDable" 
@@ -276,6 +317,7 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
+													<!-- create -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -286,6 +328,7 @@
 														<label>{{ modelName('create-' + model) }}</label>
 													</div>
 
+													<!-- update -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -296,6 +339,7 @@
 														<label>{{ modelName('update-' + model) }}</label>
 													</div>
 
+													<!-- delete -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -306,6 +350,7 @@
 														<label>{{ modelName('delete-' + model) }}</label>
 													</div>
 
+													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -316,7 +361,8 @@
 														<label>{{ modelName('view-' + model + '-list') }}</label>
 													</div>
 												</div>
-	
+
+												<!-- CUD Models -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsCreateableUpdatableAndDeletable" 
@@ -324,6 +370,7 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
+													<!-- create -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -334,6 +381,7 @@
 														<label>{{ modelName('create-' + model) }}</label>
 													</div>
 
+													<!-- update -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -344,6 +392,7 @@
 														<label>{{ modelName('update-' + model) }}</label>
 													</div>
 
+													<!-- delete -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -353,8 +402,11 @@
 														>
 														<label>{{ modelName('delete-' + model) }}</label>
 													</div>
+
+													<!-- view is public-->
 												</div>
 
+												<!-- Viewable and Updatable CRUD -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewableAndUpdatable" 
@@ -362,6 +414,7 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
+													<!-- update -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -372,6 +425,7 @@
 														<label>{{ modelName('update-' + model) }}</label>
 													</div>
 
+													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -383,6 +437,7 @@
 													</div>
 												</div>
 
+												<!-- Viewable and Makeable -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewableRecommendableAndApproveable" 
@@ -390,6 +445,7 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
+													<!-- recommend -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -400,6 +456,7 @@
 														<label>{{ modelName('recommend-' + model) }}</label>
 													</div>
 
+													<!-- update -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -410,6 +467,7 @@
 														<label>{{ modelName('update/Approve-' + model) }}</label>
 													</div>
 													
+													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -421,6 +479,7 @@
 													</div>
 												</div>
 
+												<!-- Viewable -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewable" 
@@ -428,6 +487,7 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
+													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -439,6 +499,7 @@
 													</div>
 												</div>
 
+												<!-- Viewable 2 -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewable2" 
@@ -446,6 +507,7 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
+													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -457,13 +519,14 @@
 													</div>
 												</div>
 
+												<!-- Viewable And Deletable -->
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewableAndDeletable" 
 													:key="'view-and-deletable-model-permission-name-' + model"
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
-
+													<!-- Create -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -474,6 +537,7 @@
 														<label>{{ modelName('create-' + model) }}</label>
 													</div>
 
+													<!-- Delete -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -484,6 +548,7 @@
 														<label>{{ modelName('delete-' + model) }}</label>
 													</div>
 
+													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -522,8 +587,7 @@
 										</div>
 									</div>
 					          	</div>
-							</div> 
-							-->
+							</div>
 						</transition-group>
 					</div>
 				</form>
@@ -574,6 +638,9 @@
 
 				step : 1,
 
+				allRoles : [],
+				allPermissions : [],
+
 				loading : false,
 
 				submitForm : true,
@@ -586,10 +653,6 @@
 	                // 'Product-Stock',
 	            // ],
 
-				/*
-				allRoles : [],
-				allPermissions : [],
-				
 				modelsCRUDable : [
 	            	'Role',
 	            	'Product',
@@ -634,13 +697,11 @@
 	            modelsViewableAndDeletable : [
 	                'Mail',  // AppMail / view / delete
 	            ],
-	            */
 
 			}
 
 		},
 
-		/*
 		created(){
 
 			if (this.userHasPermissionTo('view-role-index')) {
@@ -656,7 +717,7 @@
 			}
 		
 		},
-		
+
 		watch: {
 
 			singleUserDetails: function(newUserDetail, oldUserDetail) { // watch it
@@ -667,9 +728,8 @@
 				this.disableExistingRolePermissions();
 
 			}
-
+			
 		},
-		*/
 
 		filters: {
 
@@ -696,7 +756,6 @@
 
 		methods : {
 
-			/*
 			fetchAllRoles() {
 				
 				this.query = '';
@@ -773,10 +832,9 @@
 					});
 
 			},
-			*/
 			nextPage() {
 				
-				if (this.step==1) {
+				if (this.step==1 && this.step < 2) {
 					
 					this.validateFormInput('user_name');
 					this.validateFormInput('mobile');
@@ -798,7 +856,6 @@
 				}
 
 			},
-			/*
 			modelName(name) {
 
 				if (!name) return ''
@@ -939,6 +996,17 @@
 						this.singleUserDetails.permissions.splice(uncheckedPermissionIndex, 1);
 					}
 
+					/*
+						let modelName = permissionName.replace(/create|update|delete|recommend/, "");
+
+						if (! modelName.includes('view') && ! this.permissionExists('create' + modelName) && ! this.permissionExists('update' + modelName) && ! this.permissionExists('delete' + modelName) && ! this.permissionExists('recommend' + modelName)) {
+
+							let viewPermission = permissionName.replace(/create|update|delete|recommend/, "view").toLowerCase();
+							this.$refs[viewPermission + '-index'][0].disabled = false;
+						
+						}
+					*/
+
 				}
 
 			},
@@ -992,7 +1060,7 @@
 
 				}
 
-			},*/
+			},
 			onImageChange(evnt) {
 				
 				let files = evnt.target.files || evnt.dataTransfer.files;

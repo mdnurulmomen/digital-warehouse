@@ -114,10 +114,9 @@
 		<user-profile-view-modal 
 			:user="'merchant'" 
 			:profile-to-view="singleUserDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', 'roles', 'special permissions']"
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
 		></user-profile-view-modal>
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -127,8 +126,8 @@
     let singleUserDetails = {
     	active : false,
     	profile_preview : {},
-    	roles : [],
-		permissions : [],
+  		// roles : [],
+		// permissions : [],
     };
 
 	export default {
@@ -254,8 +253,8 @@
 				this.singleUserDetails = {
 					active : false,
 					profile_preview : {},
-					roles : [],
-					permissions : [],
+					// roles : [],
+					// permissions : [],
 				};
 				$('#user-createOrEdit-modal').modal('show');
 			},

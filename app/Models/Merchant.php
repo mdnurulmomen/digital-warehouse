@@ -109,6 +109,7 @@ class Merchant extends Authenticatable
         }
     }
 
+    /*
     public function setUserPermissionsAttribute($permissions = [])
     {
         // if (count($permissions)) {
@@ -128,5 +129,6 @@ class Merchant extends Authenticatable
 
         // }
     }
+    */
     
 }
