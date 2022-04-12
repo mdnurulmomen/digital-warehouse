@@ -27,14 +27,17 @@ Route::name('manager.')->group(function () {
 
 	Route::middleware(['auth:manager'])->group(function () {
 	    
-		Route::get('/{any}', 'HomeController@managerHome')->name('home');
+		Route::get('/{any}', 'HomeController@adminHome')->name('home');
+		
+		Route::get('/api/mails/{perPage?}', 'MailController@showAllMails')->name('mails');
+		Route::post('/mails/{perPage}', 'MailController@sendDynamicMail')->name('mails');
+		Route::delete('/mails/{mail}/{perPage}', 'MailController@deleteMail')->name('mails');
+		Route::get('api/search-mails/{query}/{perPage}', 'MailController@searchAllMails')->name('search-mails');
 
 		// profile
-		Route::get('/api/profile', 'ProfileController@showManagerProfile')->name('profile');	
-		Route::put('/profile', 'ProfileController@updateManagerProfile')->name('profile');	
-		Route::post('/password', 'ProfileController@updateManagerPassword')->name('password');
-
-		/* special routes */
+		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile');	
+		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile');	
+		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password');
 
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings');
@@ -42,6 +45,7 @@ Route::name('manager.')->group(function () {
 		Route::put('/contact-settings', 'SettingController@updateContactSetting')->name('contact-settings');	
 		Route::put('/warehouse-settings', 'SettingController@updateWarehouseSetting')->name('warehouse-settings');	
 		Route::put('/system-settings', 'SettingController@updateSystemSetting')->name('system-settings');
+		Route::put('/media-settings', 'SettingController@updateMediaSetting')->name('media-settings');
 
 		// warehouse owner
 		Route::get('/api/owners/{perPage?}', 'WarehouseController@showAllOwners')->name('warehouse-owners');
@@ -62,8 +66,20 @@ Route::name('manager.')->group(function () {
 		// merchant-warehouses
 		Route::get('/api/dealt-warehouses/{merchant}/{warehouse?}/{perPage?}', 'WarehouseController@showMerchantWarehouses')->name('merchant-warehouses');
 
-		// warehouse container
-		Route::get('/api/warehouse-containers/{warehouse?}', 'WarehouseController@showAllWarehouseEmptySpaces')->name('warehouse-containers');
+		// warehouse empty containers
+		Route::get('/api/warehouse-empty-containers/{warehouse?}', 'WarehouseController@showAllWarehouseEmptySpaces')->name('warehouse-empty-containers');
+
+		// warehouse-containers
+		Route::get('/api/warehouses/{warehouse}/containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('warehouse-containers');
+		Route::get('/api/warehouses/{warehouse}/search-containers/{search}/{perPage?}', 'WarehouseController@searchWarehouseAllContainers')->name('search-warehouse-containers');
+
+		// warehouse-container-shelves
+		Route::get('/api/warehouse-containers/{container}/shelves/{perPage?}', 'WarehouseController@showContainerAllShelves')->name('warehouse-container-shelves');
+		Route::get('/api/warehouse-containers/{container}/search-shelves/{search}/{perPage?}', 'WarehouseController@searchContainerAllShelves')->name('search-warehouse-container-shelves');
+
+		// warehouse-container-shelf-units
+		Route::get('/api/warehouse-container-shelves/{shelf}/units/{perPage?}', 'WarehouseController@showShelfAllUnits')->name('warehouse-container-shelf-units');
+		Route::get('/api/warehouse-container-shelves/{shelf}/search-units/{search}/{perPage?}', 'WarehouseController@searchShelfAllUnits')->name('search-warehouse-container-shelf-units');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
@@ -144,9 +160,11 @@ Route::name('manager.')->group(function () {
 		Route::get('/api/search-category-products/{category}/{search}/{perPage?}', 'ProductController@searchCategoryAllProducts')->name('search-category-products');
 
 		// product
-		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products');
+		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products.show');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products');	
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products');
+		Route::delete('/products/{product}/{perPage}', 'ProductController@deleteProduct')->name('products');
+		Route::patch('/products/{product}/{perPage}', 'ProductController@restoreProduct')->name('products');
 		Route::get('/api/search-products/{search}/{perPage}', 'ProductController@searchAllProducts')->name('search-products');
 
 		// product-stock
@@ -154,13 +172,25 @@ Route::name('manager.')->group(function () {
 		Route::post('/product-stocks/{perPage}', 'ProductController@storeProductStock')->name('product-stocks');
 		Route::put('/product-stocks/{stock}/{perPage}', 'ProductController@updateProductStock')->name('product-stocks');
 		Route::delete('/product-stocks/{stock}/{perPage}', 'ProductController@deleteProductStock')->name('product-stocks');
-		Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
+		// Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
 		Route::post('/api/search-product-stocks/{productMerchant}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
+
+		// stock
+		Route::get('/api/stocks/{perPage?}', 'ProductController@showAllStocks')->name('stocks');
+		Route::post('/stocks/{perPage}', 'ProductController@storeStock')->name('stocks');
+		Route::put('/stocks/{stock}/{perPage}', 'ProductController@updateStock')->name('stocks');
+		Route::delete('/stocks/{stock}/{perPage}', 'ProductController@deleteStock')->name('stocks');
+		Route::post('/api/search-stocks/{perPage}', 'ProductController@searchAllStocks')->name('search-stocks');
 
 		// requisition
 		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions');
+		Route::post('/requisitions/{perPage}', 'RequisitionController@makeNewRequisition')->name('requisitions');
 		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions');
 		Route::post('/search-requisitions/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
+
+		// Merchant-Requisitions
+		Route::get('/api/merchant-product-requisitions/{merchantProduct}/{perPage?}', 'RequisitionController@showMerchantProductAllRequisitions')->name('merchant-product-requisitions');
+		Route::post('/search-merchant-product-requisitions/{perPage?}', 'RequisitionController@searchMerchantProductAllRequisitions')->name('search-merchant-product-requisitions');
 
 		// dispatch
 		Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
@@ -207,25 +237,29 @@ Route::name('manager.')->group(function () {
 		Route::get('/api/search-product-merchants/{product}/{search}/{perPage}', 'ProductController@searchProductAllMerchants')->name('search-product-merchants');
 
 		// merchant-products
-		Route::get('/api/merchant-products/{merchant}/{perPage}', 'MerchantController@showMerchantAllProducts')->name('merchant-products');
+		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products');
+		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.show');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products');
 		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products');
-		Route::get('/api/search-merchant-products/{merchant}/{search}/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('search-merchant-products');
+		Route::post('/search-merchant-products/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('search-merchant-products');
 
 		// merchant-deals
 		Route::get('/api/merchant-deals/{merchant}/{perPage?}','DealController@showMerchantAllDeals')->name('merchant-deals');
 		Route::post('/merchant-deals/{perPage}','DealController@storeMerchantDeal')->name('merchant-deals');	
 		Route::put('/merchant-deals/{deal}/{perPage}','DealController@updateMerchantDeal')->name('merchant-deals');	
 		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals');
-		Route::get('/api/search-merchant-deals/{merchant}/{search}/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
+		Route::post('/search-merchant-deals/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
 
 		// deal-payments
 		Route::get('/api/deal-payments/{deal}/{perPage?}', 'DealController@showDealAllPayments')->name('deal-payments');
 		Route::post('/deal-payments/{perPage}', 'DealController@storeDealNewPayment')->name('deal-payments');	
 		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments');	
 		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments');
-		Route::get('/api/search-deal-payments/{deal}/{search}/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+		Route::post('/api/search-deal-payments/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+
+		// merchant-agents
+		Route::get('/api/merchant-agents/{merchant}/{perPage?}', 'MerchantController@showMerchantAllAgents')->name('merchant-agents');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions');
@@ -234,17 +268,20 @@ Route::name('manager.')->group(function () {
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one');
 		// second dashboard
 		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two');
-		
+
+		// imports
+		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
+		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
+
+		// manager logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 		Route::fallback(function () {
-
 			$access_token = Illuminate\Support\Str::random(60);
-        	$roles = \Auth::guard('manager')->user()->roles;
-        	$permissions = Auth::guard('manager')->user()->permissions;
+        	$roles = \Auth::guard('admin')->user()->roles;
+        	$permissions = Auth::guard('admin')->user()->permissions;
         	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
-			return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
-		    
+			return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		});
 
 		/*
