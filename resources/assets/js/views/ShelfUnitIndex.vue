@@ -1,8 +1,6 @@
 
-<template>
-
+<template v-if="userHasPermissionTo('view-warehouse-index')">
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'containers'" 
 			:message="'All our containers'"
@@ -12,7 +10,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<loading v-show="loading"></loading>
 
 						<alert v-show="error" :error="error"></alert>
@@ -22,13 +19,12 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
-
 												<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
-															{{ $route.params.name }} Shelves List
+															{{ shelfName | capitalize }} Units List
 											  		</div>
+
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 
 														  		v-model="query" 
@@ -40,7 +36,8 @@
 													  		Please search with releavant input
 													  	</div>
 											  		</div>
-										  		<!-- 
+										  			
+										  			<!-- 
 											  		<div class="col-sm-3 text-right">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
@@ -50,13 +47,11 @@
 											  				New Container
 											  			</button>
 											  		</div>
- 												-->
+ 													-->
 											  	</div>
-
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query === ''">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
@@ -64,7 +59,7 @@
 															aria-selected="true" 
 															@click="showEngagedContents"
 														>
-															Engaged (Full)
+															Occupied (Full)
 														</a>
 														<div class="slide"></div>
 													</li>
@@ -74,7 +69,7 @@
 															aria-selected="true" 
 															@click="showPartialContents"
 														>
-															Engaged (Partial)
+															Occupied (Partial)
 														</a>
 														<div class="slide"></div>
 													</li>
@@ -111,9 +106,9 @@
 																		<td>{{ content.name }}</td>
 																		
 																		<td>
-																			<span :class="[content.engaged==1 ? 'badge-danger' : content.engaged==0.5 ? 'badge-info' : 'badge-success', 'badge']">
+																			<span :class="[content.occupied==1 ? 'badge-danger' : content.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																				
-																				{{ content.engaged==1 ? 'Engaged' : content.engaged==0.5 ? 'Partially Engaged' : 'Empty' }}
+																				{{ content.occupied==1 ? 'Occupied' : content.occupied==0.5 ? 'Partially Occupied' : 'Empty' }}
 
 																			</span>
 																		</td>
@@ -122,19 +117,20 @@
 																    		<button type="button" 
 																					class="btn btn-grd-info btn-icon" 
 																					v-tooltip.bottom-end="'View Details'" 
-																					v-show="content.product" 
 																					@click="showUnitDetails(content)"
 																			>
-																				<i class="fa fa-info"></i>
+																				<i class="fa fa-eye"></i>
 																			</button>
 
+																			<!-- 
 																			<span 
 																			v-show="! content.product" 
-																			:class="[content.engaged==1 ? 'badge-danger' : content.engaged==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
+																			:class="[content.occupied==1 ? 'badge-danger' : content.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																				
-																				{{ content.engaged==1 ? 'Engaged' : content.engaged==0.5 ? 'Partially Engaged' : 'Empty' }}
+																				{{ content.occupied==1 ? 'Packed' : content.occupied==0.5 ? 'Partially Occupied' : 'Empty' }}
 
-																			</span>
+																			</span> 
+																			-->
 																    	</td>
 																	</tr>
 																	<tr 
@@ -146,7 +142,6 @@
 																      		</div>
 																    	</td>
 																  	</tr>
-
 																</tbody>
 																<tfoot>
 																	<tr>
@@ -231,17 +226,22 @@
 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Shelf Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ $route.params.name | capitalize }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ shelfName | capitalize }}</label>
 								</div>
 
 								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Container Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ containerName | capitalize }}</label>
+								</div>
+
+								<div class="form-row" v-if="singleUnitData.product" >
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleUnitData.product ? singleUnitData.product.product.name : 'No Product' | capitalize }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleUnitData.product && singleUnitData.product.merchant_product && singleUnitData.product.merchant_product.product ? singleUnitData.product.merchant_product.product.name : 'No Product' | capitalize }}</label>
 								</div>
 
 								<div class="form-row" v-if="singleUnitData.product">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product SKU :</label>
-									<label class="col-sm-6 form-control-plaintext">{{  singleUnitData.product.product.sku }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{  singleUnitData.product.merchant_product.sku }}</label>
 								</div>
 							</div>
 						</div>
@@ -263,6 +263,20 @@
 
 	export default {
 
+	    props: {
+
+			containerName:{
+				type: String,
+				required: true,
+			},
+
+			shelfName:{
+				type: String,
+				required: true,
+			},
+
+		},
+
 	    data() {
 
 	        return {
@@ -272,7 +286,7 @@
     			perPage : 10,
 	        	loading : false,
 
-	        	currentTab : 'engaged',
+	        	currentTab : 'occupied',
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -344,7 +358,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/my-shelf-units/' + this.$route.params.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/warehouse-container-shelves/' + this.$route.params.id + '/units/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -383,7 +397,7 @@
 				
 				axios
 				.get(
-					"/api/search-my-shelf-units/" + this.$route.params.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					'/api/warehouse-container-shelves/' + this.$route.params.id + '/search-units/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -418,7 +432,7 @@
 				this.showSelectedTabContents();
 			},
 			showEngagedContents() {
-				this.currentTab = 'engaged';
+				this.currentTab = 'occupied';
 				this.showSelectedTabContents();
 			},
 			showSelectedTabContents() {
@@ -431,8 +445,8 @@
 					this.pagination = this.allFetchedContents.partial;
 				}
 				else {
-					this.contentsToShow = this.allFetchedContents.engaged.data;
-					this.pagination = this.allFetchedContents.engaged;
+					this.contentsToShow = this.allFetchedContents.occupied.data;
+					this.pagination = this.allFetchedContents.occupied;
 				}
 
 			},

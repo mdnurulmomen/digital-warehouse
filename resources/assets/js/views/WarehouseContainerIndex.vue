@@ -1,8 +1,6 @@
 
-<template>
-
+<template v-if="userHasPermissionTo('view-warehouse-index')">
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'containers'" 
 			:message="'All our containers'"
@@ -12,7 +10,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<loading v-show="loading"></loading>
 
 						<alert v-show="error" :error="error"></alert>
@@ -21,13 +18,11 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">											
-
+										<div class="row">
 											<div class="col-sm-12 sub-title">
-
 												<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
-															Warehouse Containers List
+															{{ warehouseName | capitalize }} Containers List
 											  		</div>
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 
@@ -52,11 +47,9 @@
 											  		</div>
  												-->
 											  	</div>
-
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query==''">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
@@ -64,7 +57,7 @@
 															aria-selected="true" 
 															@click="showEngagedContents"
 														>
-															Engaged (Full)
+															Occupied (Full)
 														</a>
 														<div class="slide"></div>
 													</li>
@@ -74,7 +67,7 @@
 															aria-selected="true" 
 															@click="showPartialContents"
 														>
-															Engaged (Partial)
+															Occupied (Partial)
 														</a>
 														<div class="slide"></div>
 													</li>
@@ -102,7 +95,6 @@
 																	</tr>
 																</thead>
 																<tbody>
-
 																	<tr 
 																		v-for="content in contentsToShow" 
 																		:key="content.id" 
@@ -111,9 +103,9 @@
 																		<td>{{ content.name }}</td>
 																		
 																		<td>
-																			<span :class="[content.engaged==1 ? 'badge-danger' : content.engaged==0.5 ? 'badge-info' : 'badge-success', 'badge']">
+																			<span :class="[content.occupied==1 ? 'badge-danger' : content.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																				
-																				{{ content.engaged==1 ? 'Engaged' : content.engaged==0.5 ? 'Partially Engaged' : 'Empty' }}
+																				{{ content.occupied==1 ? 'Packed' : content.occupied==0.5 ? 'Partially Occupied' : 'Empty' }}
 
 																			</span>
 																		</td>
@@ -121,27 +113,28 @@
 																		<td>
 																			<button type="button" 
 																					class="btn btn-grd-info btn-icon" 
-																					v-tooltip.bottom-end="'View Details'"
-																					v-show="content.product" 
+																					v-tooltip.bottom-end="'View Details'" 
 																					@click="showContainerDetails(content)"
-																			>
-																				<i class="fa fa-info"></i>
-																			</button>
-
-																			<button type="button" 
-																					class="btn btn-grd-info btn-icon"  
-																					v-tooltip.bottom-end="'View Details'"
-																					v-show="content.container_shelf_statuses.length" 
-																					@click="showContainerShelfDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
 																			</button>
 
+																			<button type="button" 
+																					class="btn btn-grd-primary btn-icon"  
+																					v-tooltip.bottom-end="'Move Inside'"
+																					v-show="content.container_shelf_statuses && content.container_shelf_statuses.length" 
+																					@click="showContainerShelfDetails(content)"
+																			>
+																				<i class="fas fa-arrow-alt-circle-up"></i>
+																			</button>
+
+																			<!-- 
 																			<span class="text-danger" 
 																				v-show="!content.container_shelf_statuses.length" 
 																			>
 																				<span class="badge badge-danger">No Shelf</span>
-																			</span>
+																			</span> 
+																			-->
 																		</td>
 																    
 																	</tr>
@@ -154,7 +147,6 @@
 																      		</div>
 																    	</td>
 																  	</tr>
-
 																</tbody>
 																<tfoot>
 																	<tr>
@@ -239,14 +231,14 @@
 									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.name | capitalize }}</label>
 								</div>
 
-								<div class="form-row">
+								<div class="form-row" v-if="singleContainerData.product" >
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.product ? singleContainerData.product.product.name : 'No Product' | capitalize }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleContainerData.product && singleContainerData.product.merchant_product && singleContainerData.product.merchant_product.product ? singleContainerData.product && singleContainerData.product.merchant_product && singleContainerData.product.merchant_product.product.name : 'No Product' | capitalize }}</label>
 								</div>
 
 								<div class="form-row" v-if="singleContainerData.product">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product SKU :</label>
-									<label class="col-sm-6 form-control-plaintext">{{  singleContainerData.product.product.sku }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{  singleContainerData.product.merchant_product.sku }}</label>
 								</div>
 
 								<!-- 
@@ -269,7 +261,35 @@
 								<div class="form-row" v-if="singleContainerData.hasOwnProperty('container_shelf_statuses')">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Shelf :</label>
 									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[singleContainerData.container_shelf_statuses.length ? 'badge-success' : 'badge-danger', 'badge']">{{ singleContainerData.container_shelf_statuses.length ? 'Available' : 'No Shelf' }}</span>
+										<span :class="[singleContainerData.container_shelf_statuses && singleContainerData.container_shelf_statuses.length ? 'badge-success' : 'badge-secondary', 'badge']">{{ singleContainerData.container_shelf_statuses.length ? 'Available' : 'No Shelf' }}</span>
+									</label>
+								</div>
+
+								<div class="form-row" v-if="singleContainerData.hasOwnProperty('container_shelf_statuses') && singleContainerData.container_shelf_statuses.length">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Number Shelves :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										{{ singleContainerData.container_shelf_statuses.length }}
+									</label>
+								</div>
+
+								<div class="form-row" v-if="singleContainerData.hasOwnProperty('container_shelf_statuses') && singleContainerData.container_shelf_statuses.length">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Packed Shelves :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										{{ singleContainerData.container_shelf_statuses.filter(containerShelf=>containerShelf.occupied==1).length }}
+									</label>
+								</div>
+
+								<div class="form-row" v-if="singleContainerData.hasOwnProperty('container_shelf_statuses') && singleContainerData.container_shelf_statuses.length">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Occupied Shelves :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										{{ singleContainerData.container_shelf_statuses.filter(containerShelf=>containerShelf.occupied==0.5).length }}
+									</label>
+								</div>
+
+								<div class="form-row" v-if="singleContainerData.hasOwnProperty('container_shelf_statuses') && singleContainerData.container_shelf_statuses.length">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Empty Shelves :</label>
+									<label class="col-sm-6 form-control-plaintext">
+										{{ singleContainerData.container_shelf_statuses.filter(containerShelf=>containerShelf.occupied==0.0).length }}
 									</label>
 								</div>
 							</div>
@@ -325,6 +345,15 @@
 
 	export default {
 
+	    props: {
+
+			warehouseName:{
+				type: String,
+				required: true,
+			},
+
+		},
+
 	    data() {
 
 	        return {
@@ -334,7 +363,7 @@
     			perPage : 10,
 	        	loading : false,
 
-	        	currentTab : 'engaged',
+	        	currentTab : 'occupied',
 
 	        	allFetchedContents : [],
 	        	contentsToShow : [],
@@ -364,10 +393,14 @@
 				this.pagination.current_page = 1; 
 
 				if (val==='') {
+
 					this.fetchAllContainers();
+
 				}
 				else {
+
 					this.searchData();
+					
 				}
 				
 			},
@@ -377,6 +410,7 @@
 		filters: {
 
 			capitalize: function (value) {
+				
 				if (!value) return ''
 				
 				const words = value.split(" ");
@@ -392,6 +426,7 @@
 				}
 
 				return words.join(" ");
+
 			}
 
 		},
@@ -406,7 +441,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/my-containers/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/warehouses/' + this.$route.params.id + '/containers/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -445,7 +480,7 @@
 				
 				axios
 				.get(
-					"/api/search-my-containers/" + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/warehouses/" + this.$route.params.id + '/search-containers/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -464,8 +499,8 @@
 			showContainerShelfDetails(object) {
 				const containerId = object.id;
 				const containerName = object.name;
-				// this.$router.push({ name: 'container-shelves', params: { containerId,  containerName} })
-				this.$router.push({ path: `/my-container-shelves/` + containerId + '/' + containerName });
+				
+				this.$router.push({ name: 'warehouse-container-shelves', params: { id: containerId, containerName: containerName }});
 			},
             changeNumberContents() {
 				this.pagination.current_page = 1;
@@ -486,7 +521,7 @@
 				this.showSelectedTabContents();
 			},
 			showEngagedContents() {
-				this.currentTab = 'engaged';
+				this.currentTab = 'occupied';
 				this.showSelectedTabContents();
 			},
 			showSelectedTabContents() {
@@ -499,8 +534,8 @@
 					this.pagination = this.allFetchedContents.partial;
 				}
 				else {
-					this.contentsToShow = this.allFetchedContents.engaged.data;
-					this.pagination = this.allFetchedContents.engaged;
+					this.contentsToShow = this.allFetchedContents.occupied.data;
+					this.pagination = this.allFetchedContents.occupied;
 				}
 
 			},

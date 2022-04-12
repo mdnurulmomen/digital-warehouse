@@ -101,6 +101,15 @@
 							>
 								<i aria-hidden="true" class="fab fa-product-hunt"></i>
 							</button>
+
+							<button type="button" 
+									class="btn btn-grd-warning btn-icon"  
+									v-tooltip.bottom-end="'Move Inside'"
+									v-if="$route.name=='warehouses'" 
+									@click="$emit('showContainerShelfDetails', content)"
+							>
+								<i class="fas fa-arrow-alt-circle-up"></i>
+							</button>
 						</td>
 					</tr>
 					<tr 

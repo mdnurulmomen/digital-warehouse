@@ -88,6 +88,9 @@ import MerchantIndex from './views/MerchantIndex'
 import StorageTypeIndex from './views/StorageTypeIndex'
 import ContainerIndex from './views/ContainerTypeIndex'
 import WarehouseIndex from './views/WarehouseIndex'
+import WarehouseContainerIndex from './views/WarehouseContainerIndex'
+import ContainerShelfIndex from './views/ContainerShelfIndex'
+import ShelfUnitIndex from './views/ShelfUnitIndex'
 import RentPeriodIndex from './views/RentPeriodIndex'
 import VariationTypeIndex from './views/VariationTypeIndex'
 import VariationIndex from './views/VariationIndex'
@@ -245,6 +248,62 @@ const router = new VueRouter({
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-warehouse-index' 
+            }
+        },
+        {
+            path: '/warehouse/:id/containers',
+            name: 'warehouse-containers',
+            component: WarehouseContainerIndex, 
+            props : true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.id && to.params.warehouseName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/warehouses');
+                }
+            }
+        },
+        {
+            path: '/warehouse-container/:id/shelves',
+            name: 'warehouse-container-shelves',
+            component: ContainerShelfIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.id && to.params.containerName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    // next(false);
+                    next('/warehouses');
+                }
+            }
+        },
+        {
+            path: '/warehouse-container-shelf/:id/units',
+            name: 'warehouse-container-shelf-units',
+            component: ShelfUnitIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.id && to.params.containerName && to.params.shelfName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    // next(false);
+                    next('/warehouses');
+                }
             }
         },
         /*

@@ -24,6 +24,9 @@ Vue.component('ToggleButton', ToggleButton)
 // importing custom components
 import { routeNeedsPermission, userHasPermissionTo } from './public.js'
 
+import VTooltip from 'v-tooltip'
+Vue.use(VTooltip)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -58,9 +61,10 @@ import WarehouseSideMenuBar from './WarehouseSideMenuBar'
 
 import WarehouseHome from './views/Home'
 import Profile from './views/WarehouseProfileComponent'
-import MyContainerIndex from './views/WarehouseContainerIndex'
-import ContainerShelfIndex from './views/ContainerShelfIndex'
-import ShelfUnitIndex from './views/ShelfUnitIndex'
+import MyContainerIndex from './views/MyContainerIndex'
+import MyContainerShelfIndex from './views/MyContainerShelfIndex'
+import MyShelfUnitIndex from './views/MyShelfUnitIndex'
+
 import UnAuthorized from './views/403'
 import NotFound from './views/404'
 
@@ -115,14 +119,34 @@ const router = new VueRouter({
             component: MyContainerIndex,
         },
         {
-            path: '/my-container-shelves/:id/:name',
+            path: '/my-container/:id/shelves',
             name: 'my-container-shelves',
-            component: ContainerShelfIndex,
+            component: MyContainerShelfIndex,
+            props: true,
+            beforeEnter: (to, from, next) => {
+                if (to.params.id && to.params.containerName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    // next(false);
+                    next('/my-containers');
+                }
+            }
         },
         {
-            path: '/my-shelf-units/:id/:name',
+            path: '/my-shelf/:id/units',
             name: 'my-shelf-units',
-            component: ShelfUnitIndex,
+            component: MyShelfUnitIndex,
+            props: true,
+            beforeEnter: (to, from, next) => {
+                if (to.params.id && to.params.containerName && to.params.shelfName) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    // next(false);
+                    next('/my-containers');
+                }
+            }
         },
         
         // special routes

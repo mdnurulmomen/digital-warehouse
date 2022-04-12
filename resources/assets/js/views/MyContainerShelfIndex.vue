@@ -1,6 +1,8 @@
 
-<template v-if="userHasPermissionTo('view-warehouse-index')">
+<template>
+
 	<div class="pcoded-content">
+
 		<breadcrumb 
 			:title="'containers'" 
 			:message="'All our containers'"
@@ -282,27 +284,6 @@
 										{{ singleShelfData.container_shelf_unit_statuses.length }}
 									</label>
 								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Packed Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.filter(shelfUnit=>shelfUnit.occupied==1).length }}
-									</label>
-								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Occupied Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.filter(shelfUnit=>shelfUnit.occupied==0.5).length }}
-									</label>
-								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Empty Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.filter(shelfUnit=>shelfUnit.occupied==0.0).length }}
-									</label>
-								</div>
 							</div>
 						</div>
 
@@ -446,7 +427,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/warehouse-containers/' + this.$route.params.id + '/shelves/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-container-shelves/' + this.$route.params.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -485,7 +466,7 @@
 				
 				axios
 				.get(
-					"/api/warehouse-containers/" + this.$route.params.id + '/search-shelves/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-my-container-shelves/" + this.$route.params.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -504,7 +485,9 @@
 			showShelfUnitDetails(object) {	
 				const shelfId = object.id;
 				const shelfName = object.name;
-				this.$router.push({ name: 'warehouse-container-shelf-units', params: { id: shelfId, shelfName: shelfName, containerName: this.containerName }});
+				// this.$router.push({ name: 'container-shelves', params: { shelfId,  shelfName} })
+				// this.$router.push({ path: `/my-shelf-units/` + shelfId + '/' + shelfName });
+				this.$router.push({ name: 'my-shelf-units', params: { id: shelfId, shelfName: shelfName, containerName: this.containerName }});
 			},
             changeNumberContents() {
 				this.pagination.current_page = 1;

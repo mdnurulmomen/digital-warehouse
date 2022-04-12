@@ -1,5 +1,5 @@
 
-<template v-if="userHasPermissionTo('view-warehouse-index')">
+<template>
 	<div class="pcoded-content">
 		<breadcrumb 
 			:title="'containers'" 
@@ -10,7 +10,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<loading v-show="loading"></loading>
 
 						<alert v-show="error" :error="error"></alert>
@@ -20,13 +19,12 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
-
 												<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
-															{{ containerName | capitalize }} Shelves List
+															{{ shelfName | capitalize }} Units List
 											  		</div>
+
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 
 														  		v-model="query" 
@@ -38,7 +36,8 @@
 													  		Please search with releavant input
 													  	</div>
 											  		</div>
-										  		<!-- 
+										  			
+										  			<!-- 
 											  		<div class="col-sm-3 text-right">
 											  			<button 
 												  			class="btn btn-success btn-outline-success btn-sm" 
@@ -48,13 +47,11 @@
 											  				New Container
 											  			</button>
 											  		</div>
- 												-->
+ 													-->
 											  	</div>
-
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query === ''">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
@@ -96,53 +93,45 @@
 																	<tr>
 																		<th>Name</th>
 																		<th>Status</th>
-																		<th>Actions</th>
+																		<th>Details</th>
 																	</tr>
 																</thead>
 																<tbody>
 
 																	<tr 
-																		v-for="content in contentsToShow" 
-																		:key="content.id" 
-																		:class="content.id==singleShelfData.id ? 'highlighted' : ''"
+																	v-for="content in contentsToShow" 
+																	:key="content.id" 
+																	:class="content.id==singleUnitData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ content.name }}</td>
 																		
 																		<td>
 																			<span :class="[content.occupied==1 ? 'badge-danger' : content.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
 																				
-																				{{ content.occupied==1 ? 'Packed' : content.occupied==0.5 ? 'Partially Occupied' : 'Empty' }}
+																				{{ content.occupied==1 ? 'Occupied' : content.occupied==0.5 ? 'Partially Occupied' : 'Empty' }}
 
 																			</span>
 																		</td>
-																		
-																		<td>
-																			<button type="button" 
+																    	
+																    	<td>
+																    		<button type="button" 
 																					class="btn btn-grd-info btn-icon" 
-																					v-tooltip.bottom-end="'View Details'"  
-																					@click="showShelfDetails(content)"
+																					v-tooltip.bottom-end="'View Details'" 
+																					@click="showUnitDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
 																			</button>
 
-																			<button type="button" 
-																					class="btn btn-grd-primary btn-icon" 
-																					v-tooltip.bottom-end="'Move Inside'"  
-																					v-show="content.container_shelf_unit_statuses.length" 
-																					@click="showShelfUnitDetails(content)"
-																			>
-																				<i class="fas fa-arrow-alt-circle-up"></i>
-																			</button>
-
 																			<!-- 
-																			<span class="text-danger" 
-																				v-show="!content.container_shelf_unit_statuses.length" 
-																			>
-																				<span class="badge badge-danger">No Unit</span>
+																			<span 
+																			v-show="! content.product" 
+																			:class="[content.occupied==1 ? 'badge-danger' : content.occupied==0.5 ? 'badge-warning' : 'badge-success', 'badge']">
+																				
+																				{{ content.occupied==1 ? 'Packed' : content.occupied==0.5 ? 'Partially Occupied' : 'Empty' }}
+
 																			</span> 
 																			-->
-																		</td>
-																    
+																    	</td>
 																	</tr>
 																	<tr 
 																  		v-show="!contentsToShow.length"
@@ -153,13 +142,12 @@
 																      		</div>
 																    	</td>
 																  	</tr>
-
 																</tbody>
 																<tfoot>
 																	<tr>
 																		<th>Name</th>
 																		<th>Status</th>
-																		<th>Actions</th>
+																		<th>Details</th>
 																	</tr>
 																</tfoot>
 															</table>
@@ -184,7 +172,7 @@
 																type="button" 
 																class="btn btn-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="pagination.current_page = 1; query === '' ? fetchContainerAllShelves() : searchData()"
+																@click="pagination.current_page = 1; query === '' ? fetchShelfAllUnits() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -195,32 +183,30 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="query === '' ? fetchContainerAllShelves() : searchData()"
+																@paginate="query === '' ? fetchShelfAllUnits() : searchData()"
 															>
 															</pagination>
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					</div> 
 				</div>
 			</div>
 		</div>
 
 		<!-- View Modal -->
-		<div class="modal fade" id="shelf-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="unit-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							Shelf Details
+							Unit Details
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -232,9 +218,15 @@
 						<div class="card">
 							<div class="card-body">
 								<!-- <h4 class="card-title">Container</h4> -->
+
+								<div class="form-row">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">Unit Name :</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleUnitData.name | capitalize }}</label>
+								</div>
+
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Shelf Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.name | capitalize }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ shelfName | capitalize }}</label>
 								</div>
 
 								<div class="form-row">
@@ -242,102 +234,17 @@
 									<label class="col-sm-6 form-control-plaintext">{{ containerName | capitalize }}</label>
 								</div>
 
-								<div class="form-row" v-if="singleShelfData.product" >
+								<div class="form-row" v-if="singleUnitData.product" >
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product Name :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.product && singleShelfData.product.merchant_product && singleShelfData.product.merchant_product.product ? singleShelfData.product.merchant_product.product.name : 'No Product' | capitalize }}</label>
+									<label class="col-sm-6 form-control-plaintext">{{ singleUnitData.product && singleUnitData.product.merchant_product && singleUnitData.product.merchant_product.product ? singleUnitData.product.merchant_product.product.name : 'No Product' | capitalize }}</label>
 								</div>
 
-								<div class="form-row" v-if="singleShelfData.product">
+								<div class="form-row" v-if="singleUnitData.product">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">Product SKU :</label>
-									<label class="col-sm-6 form-control-plaintext">{{  singleShelfData.product.merchant_product.sku }}</label>
-								</div>
-
-								<!-- 
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.length }}</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Width :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.width }}</label>
-								</div>
-								
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.height }}</label>
-								</div>
-								-->
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses')">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Unit :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[singleShelfData.container_shelf_unit_statuses.length ? 'badge-success' : 'badge-secondary', 'badge']">{{ singleShelfData.container_shelf_unit_statuses.length ? 'Available' : 'No Unit' }}</span>
-									</label>
-								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Number Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.length }}
-									</label>
-								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Packed Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.filter(shelfUnit=>shelfUnit.occupied==1).length }}
-									</label>
-								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Occupied Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.filter(shelfUnit=>shelfUnit.occupied==0.5).length }}
-									</label>
-								</div>
-
-								<div class="form-row" v-if="singleShelfData.hasOwnProperty('container_shelf_unit_statuses') && singleShelfData.container_shelf_unit_statuses.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Empty Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										{{ singleShelfData.container_shelf_unit_statuses.filter(shelfUnit=>shelfUnit.occupied==0.0).length }}
-									</label>
+									<label class="col-sm-6 form-control-plaintext">{{  singleUnitData.product.merchant_product.sku }}</label>
 								</div>
 							</div>
 						</div>
-
-						<!-- shelf -->
-						<!-- 
-						<div class="card" v-if="singleShelfData.has_shelve">
-							<div class="card-body">
-								<h4 class="card-title">Container Shelf</h4>
-								
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Shelves :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.shelf.quantity }}</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Units :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[singleShelfData.shelf.has_units ? 'badge-success' : 'badge-danger', 'badge']">{{ singleShelfData.shelf.has_units ? 'Available' : 'NA' }}</span>
-									</label>
-								</div>
-							</div>
-						</div>
- 						-->
-						<!-- unit -->
-						<!-- 
-						<div class="card" v-if="singleShelfData.has_shelve && singleShelfData.shelf.has_units">
-							<div class="card-body">
-								<h4 class="card-title">Shelf Unit</h4>
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right"># Units :</label>
-									<label class="col-sm-6 form-control-plaintext">{{ singleShelfData.shelf.unit.quantity }}</label>
-								</div>
-							</div>
-						</div>
- 						-->
 					</div>
 
 					<div class="modal-footer">
@@ -363,6 +270,11 @@
 				required: true,
 			},
 
+			shelfName:{
+				type: String,
+				required: true,
+			},
+
 		},
 
 	    data() {
@@ -383,7 +295,7 @@
 		        	current_page: 1
 		      	},
 
-		      	singleShelfData : {},
+		      	singleUnitData : {},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -393,7 +305,7 @@
 		
 		created(){
 
-			this.fetchContainerAllShelves();
+			this.fetchShelfAllUnits();
 
 		},
 
@@ -401,10 +313,10 @@
 
 			query : function(val){
 				
-				this.pagination.current_page = 1;
+				this.pagination.current_page = 1; 
 				
 				if (val==='') {
-					this.fetchContainerAllShelves();
+					this.fetchShelfAllUnits();
 				}
 				else {
 					this.searchData();
@@ -438,7 +350,7 @@
 		
 		methods : {
 
-			fetchContainerAllShelves() {
+			fetchShelfAllUnits() {
 				
 				this.query = '';
 				this.error = '';
@@ -446,7 +358,7 @@
 				this.allFetchedContents = [];
 				
 				axios
-					.get('/api/warehouse-containers/' + this.$route.params.id + '/shelves/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-shelf-units/' + this.$route.params.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
@@ -485,7 +397,7 @@
 				
 				axios
 				.get(
-					"/api/warehouse-containers/" + this.$route.params.id + '/search-shelves/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
+					"/api/search-my-shelf-units/" + this.$route.params.id + '/' + this.query + "/" + this.perPage + "?page=" + this.pagination.current_page
 				)
 				.then(response => {
 					this.allFetchedContents = response.data;
@@ -497,20 +409,15 @@
 				});
 
 			},
-			showShelfDetails(object) {
-				this.singleShelfData = object;
-				$('#shelf-view-modal').modal('show');
-			},
-			showShelfUnitDetails(object) {	
-				const shelfId = object.id;
-				const shelfName = object.name;
-				this.$router.push({ name: 'warehouse-container-shelf-units', params: { id: shelfId, shelfName: shelfName, containerName: this.containerName }});
+			showUnitDetails(object) {
+				this.singleUnitData = object;
+				$('#unit-view-modal').modal('show');
 			},
             changeNumberContents() {
 				this.pagination.current_page = 1;
 
 				if (this.query === '') {
-					this.fetchContainerAllShelves();
+					this.fetchShelfAllUnits();
 				}
 				else {
 					this.searchData();

@@ -25,7 +25,7 @@ class WarehouseController extends Controller
         $this->middleware("permission:delete-warehouse-owner")->only(['deleteOwner', 'restoreOwner']);
 
         // Warehouse
-        $this->middleware("permission:view-warehouse-index")->only(['showAllWarehouses', 'searchAllWarehouses']);
+        $this->middleware("permission:view-warehouse-index")->only(['showAllWarehouses', 'searchAllWarehouses', 'showWarehouseAllContainers', 'searchWarehouseAllContainers', 'showContainerAllShelves', 'searchContainerAllShelves', 'showShelfAllUnits', 'searchShelfAllUnits']);
         $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
         $this->middleware("permission:update-warehouse")->only('updateWarehouse');
         $this->middleware("permission:delete-warehouse")->only(['deleteWarehouse', 'restoreWarehouse']);
@@ -417,8 +417,7 @@ class WarehouseController extends Controller
 
     // merchant-warehouses
     public function showMerchantWarehouses($merchant, $warehouse = false, $perPage = false)
-    {
-        
+    { 
         if ($perPage) {
             return;
         }
@@ -477,7 +476,7 @@ class WarehouseController extends Controller
     
     }
 
-    // warehouse-contaners
+    // warehouse-empty-contaners
     public function showAllWarehouseEmptySpaces($warehouse = false) {
             
         if($warehouse){
@@ -543,29 +542,254 @@ class WarehouseController extends Controller
                                 
     }
 
-    // my containers
+    // warehouse-containers (admin)
+    public function showWarehouseAllContainers($warehouse, $perPage = false) {
+        
+        // $currentWarehouse = \Auth::guard('warehouse')->user();
+
+        $emptyContainers = WarehouseContainerStatus::with(['containerShelfStatuses'])
+        ->where('occupied', 0.0)
+        ->whereHas('warehouseContainer', function ($query) use ($warehouse) {
+            $query->where('warehouse_id', $warehouse);
+        });
+
+        $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+        ->where('occupied', 0.5)
+        ->whereHas('warehouseContainer', function ($query) use ($warehouse) {
+            $query->where('warehouse_id', $warehouse);
+        });
+
+        $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+        ->where('occupied', 1)
+        ->whereHas('warehouseContainer', function ($query) use ($warehouse) {
+            $query->where('warehouse_id', $warehouse);
+        });
+
+
+        if ($perPage) {
+            
+            $emptyContainers = $emptyContainers->paginate($perPage);
+
+            $partialContainers = $partialContainers->paginate($perPage);
+
+            $engagedContainers = $engagedContainers->paginate($perPage);
+
+        }
+
+        return [
+            'empty' => $emptyContainers, 
+            'partial' => $partialContainers, 
+            'occupied' => $engagedContainers, 
+        ];
+                                
+    }
+
+    public function searchWarehouseAllContainers($warehouse, $search, $perPage = false)
+    {
+        // $currentWarehouse = \Auth::guard('warehouse')->user();
+
+        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+                ->where(function ($query1) use ($search) {
+                    $query1->where('name', 'like', "%$search%")
+                      ->orWhereHas('warehouseContainer.container', function ($query2) use ($search) {
+                            $query2->where('name', 'like', "%$search%");
+                       })
+                      ->orWhereHas('containerShelfStatuses', function ($query3) use ($search) {
+                            $query3->where('name', 'like', "%$search%")
+                            ->orWhereHas('containerShelfUnitStatuses', function ($query4) use ($search) {
+                                $query4->where('name', 'like', "%$search%");
+                            });
+                       });
+                })
+                ->whereHas('warehouseContainer', function ($q) use ($warehouse) {
+                    $q->where('warehouse_id', $warehouse);
+                });
+
+        if ($perPage) {
+            
+            return response()->json([
+                'all' => $query->paginate($perPage),    
+            ], 200);
+
+        }
+        else {
+
+
+
+        }
+
+    }
+
+    // shelves of specific container (admin)
+    public function showContainerAllShelves($containerId, $perPage = false) {
+        
+        if ($perPage) {
+            
+            // $currentWarehouse = \Auth::guard('warehouse')->user();
+
+            $expectedContainer = WarehouseContainerStatus::findOrFail($containerId);
+
+            // if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
+                
+            $emptyShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
+                                            ->where('occupied', 0.0)
+                                            ->where('warehouse_container_status_id', $expectedContainer->id)
+                                            ->paginate($perPage);
+
+            $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                                            ->where('occupied', 0.5)
+                                            ->where('warehouse_container_status_id', $expectedContainer->id)
+                                            ->paginate($perPage);
+
+            $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                                            ->where('occupied', 1)
+                                            ->where('warehouse_container_status_id', $expectedContainer->id)
+                                            ->paginate($perPage);
+
+            return [
+                'empty' => $emptyShelves, 
+                'partial' => $partialShelves, 
+                'occupied' => $engagedShelves, 
+            ];
+
+            // }
+
+            return [
+                'empty' => [], 
+                'partial' => [], 
+                'occupied' => [], 
+            ];
+
+        }
+                                
+    }
+
+    public function searchContainerAllShelves($container, $search, $perPage)
+    {
+        if ($perPage) {
+
+            // $currentWarehouse = \Auth::guard('warehouse')->user();
+
+            $expectedContainer = WarehouseContainerStatus::findOrFail($container);
+
+            // if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
+
+            $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                                    ->where(function ($query) use ($search) {
+                                        $query->where('name', 'like', "%$search%")
+                                              ->orWhereHas('containerShelfUnitStatuses', function ($query2) use ($search) {
+                                                    $query2->where('name', 'like', "%$search%");
+                                                        
+                                               });
+                                    })
+                                    ->where('warehouse_container_status_id', $expectedContainer->id);
+
+            return response()->json([
+                'all' => $query->paginate($perPage),    
+            ], 200);
+
+            // }
+
+            return response()->json([
+                'all' => [],    
+            ], 200);
+
+        }
+
+    }
+
+    // units of specific shelf
+    public function showShelfAllUnits($shelf, $perPage = false) {
+        
+        if ($perPage) {
+            
+            // $currentWarehouse = \Auth::guard('warehouse')->user();
+
+            $expectedShelf = WarehouseContainerShelfStatus::findOrFail($shelf);
+
+            // if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
+                
+                $emptyUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.0)
+                                                ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
+                                                ->paginate($perPage);
+
+                $partialUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.5)
+                                                ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
+                                                ->paginate($perPage);
+
+                $engagedUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 1)
+                                                ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
+                                                ->paginate($perPage);
+
+                return [
+                    'empty' => $emptyUnits, 
+                    'partial' => $partialUnits, 
+                    'occupied' => $engagedUnits, 
+                ];
+
+            // }
+
+            return [
+                'empty' => [], 
+                'partial' => [], 
+                'occupied' => [], 
+            ];
+
+        }
+                                
+    }
+
+    public function searchShelfAllUnits($shelf, $search, $perPage)
+    {
+        if ($perPage) {
+
+            // $currentWarehouse = \Auth::guard('warehouse')->user();
+
+            $expectedShelf = WarehouseContainerShelfStatus::findOrFail($shelf);
+
+            // if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
+
+                $query = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')
+                                            ->where('name', 'like', "%$search%")
+                                            ->where('warehouse_container_shelf_status_id', $expectedShelf->id);
+
+                return response()->json([
+                    'all' => $query->paginate($perPage),    
+                ], 200);
+
+            // }
+
+            return response()->json([
+                'all' => [],    
+            ], 200);
+
+        }
+
+    }
+
+    // my-containers (warehouse)
     public function showMyContainers($perPage = false) {
         
         if ($perPage) {
             
             $currentWarehouse = \Auth::guard('warehouse')->user();
 
-            $emptyContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.product'])
-                                                ->where('engaged', 0.0)
+            $emptyContainers = WarehouseContainerStatus::with(['containerShelfStatuses'])
+                                                ->where('occupied', 0.0)
                                                 ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
                                                     $query->where('warehouse_id', $currentWarehouse->id);
                                                 })
                                                 ->paginate($perPage);
 
-            $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.product'])
-                                                ->where('engaged', 0.5)
+            $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+                                                ->where('occupied', 0.5)
                                                 ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
                                                     $query->where('warehouse_id', $currentWarehouse->id);
                                                 })
                                                 ->paginate($perPage);
 
-            $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.product'])
-                                                ->where('engaged', 1)
+            $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+                                                ->where('occupied', 1)
                                                 ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
                                                     $query->where('warehouse_id', $currentWarehouse->id);
                                                 })
@@ -574,42 +798,41 @@ class WarehouseController extends Controller
             return [
                 'empty' => $emptyContainers, 
                 'partial' => $partialContainers, 
-                'engaged' => $engagedContainers, 
+                'occupied' => $engagedContainers, 
             ];
 
         }
                                 
     }
 
-    // search containers of specific warehouse
-    public function searchWarehouseAllContainers($search, $perPage)
+    public function searchMyAllContainers($search, $perPage)
     {
         $currentWarehouse = \Auth::guard('warehouse')->user();
 
-        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.product'])
-                            ->where(function ($query1) use ($search) {
-                                $query1->where('name', 'like', "%$search%")
-                                      ->orWhereHas('warehouseContainer.container', function ($query2) use ($search) {
-                                            $query2->where('name', 'like', "%$search%");
-                                       })
-                                      ->orWhereHas('containerShelfStatuses', function ($query3) use ($search) {
-                                            $query3->where('name', 'like', "%$search%")
-                                                ->orWhereHas('containerShelfUnitStatuses', function ($query4) use ($search) {
-                                                    $query4->where('name', 'like', "%$search%");
-                                                });
-                                       });
-                            })
-                            ->whereHas('warehouseContainer', function ($q) use ($currentWarehouse) {
-                                $q->where('warehouse_id', $currentWarehouse->id);
+        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+                ->where(function ($query1) use ($search) {
+                    $query1->where('name', 'like', "%$search%")
+                      ->orWhereHas('warehouseContainer.container', function ($query2) use ($search) {
+                            $query2->where('name', 'like', "%$search%");
+                       })
+                      ->orWhereHas('containerShelfStatuses', function ($query3) use ($search) {
+                            $query3->where('name', 'like', "%$search%")
+                            ->orWhereHas('containerShelfUnitStatuses', function ($query4) use ($search) {
+                                $query4->where('name', 'like', "%$search%");
                             });
+                       });
+                })
+                ->whereHas('warehouseContainer', function ($q) use ($currentWarehouse) {
+                    $q->where('warehouse_id', $currentWarehouse->id);
+                });
 
         return response()->json([
             'all' => $query->paginate($perPage),    
         ], 200);
     }
 
-    // shelves of specific container
-    public function showContainerAllShelves($containerId, $perPage = false) {
+    // shelves of my-container (warehouse)
+    public function showMyContainerAllShelves($containerId, $perPage = false) {
         
         if ($perPage) {
             
@@ -619,25 +842,25 @@ class WarehouseController extends Controller
 
             if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
                 
-                $emptyShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.product'])
-                                                ->where('engaged', 0.0)
+                $emptyShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses'])
+                                                ->where('occupied', 0.0)
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
-                $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.product'])
-                                                ->where('engaged', 0.5)
+                $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                                                ->where('occupied', 0.5)
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
-                $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.product'])
-                                                ->where('engaged', 1)
+                $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                                                ->where('occupied', 1)
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
                 return [
                     'empty' => $emptyShelves, 
                     'partial' => $partialShelves, 
-                    'engaged' => $engagedShelves, 
+                    'occupied' => $engagedShelves, 
                 ];
 
             }
@@ -645,15 +868,14 @@ class WarehouseController extends Controller
             return [
                 'empty' => [], 
                 'partial' => [], 
-                'engaged' => [], 
+                'occupied' => [], 
             ];
 
         }
                                 
     }
 
-    // search shelves of specific container
-    public function searchContainerAllShelves($container, $search, $perPage)
+    public function searchMyContainerAllShelves($container, $search, $perPage)
     {
         if ($perPage) {
 
@@ -663,7 +885,7 @@ class WarehouseController extends Controller
 
             if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
 
-                $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.product'])
+                $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
                                         ->where(function ($query) use ($search) {
                                             $query->where('name', 'like', "%$search%")
                                                   ->orWhereHas('containerShelfUnitStatuses', function ($query2) use ($search) {
@@ -687,8 +909,8 @@ class WarehouseController extends Controller
 
     }
 
-    // units of specific shelf
-    public function showShelfAllUnits($shelf, $perPage = false) {
+    // units of my-shelf
+    public function showMyShelfAllUnits($shelf, $perPage = false) {
         
         if ($perPage) {
             
@@ -698,22 +920,22 @@ class WarehouseController extends Controller
 
             if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
                 
-                $emptyUnits = WarehouseContainerShelfUnitStatus::with('product.product')->where('engaged', 0.0)
+                $emptyUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.0)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
-                $partialUnits = WarehouseContainerShelfUnitStatus::with('product.product')->where('engaged', 0.5)
+                $partialUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.5)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
-                $engagedUnits = WarehouseContainerShelfUnitStatus::with('product.product')->where('engaged', 1)
+                $engagedUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 1)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
                 return [
                     'empty' => $emptyUnits, 
                     'partial' => $partialUnits, 
-                    'engaged' => $engagedUnits, 
+                    'occupied' => $engagedUnits, 
                 ];
 
             }
@@ -721,14 +943,14 @@ class WarehouseController extends Controller
             return [
                 'empty' => [], 
                 'partial' => [], 
-                'engaged' => [], 
+                'occupied' => [], 
             ];
 
         }
                                 
     }
 
-    public function searchShelfAllUnits($shelf, $search, $perPage)
+    public function searchMyShelfAllUnits($shelf, $search, $perPage)
     {
         if ($perPage) {
 
@@ -738,7 +960,7 @@ class WarehouseController extends Controller
 
             if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
 
-                $query = WarehouseContainerShelfUnitStatus::with('product.product')
+                $query = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')
                                             ->where('name', 'like', "%$search%")
                                             ->where('warehouse_container_shelf_status_id', $expectedShelf->id);
 

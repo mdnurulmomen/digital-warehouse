@@ -62,6 +62,7 @@
 										  			@openContentDeleteForm="openContentDeleteForm($event)" 
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
+										  			@showContainerShelfDetails="showContainerShelfDetails($event)" 
 										  			@fetchAllContents="fetchAllWarehouses" 
 										  			@searchData="searchData" 
 										  		>	
@@ -2613,6 +2614,9 @@
 					this.error = e.toString();
 				});
 
+			},
+			showContainerShelfDetails(object) {
+				this.$router.push({ name: 'warehouse-containers', params: { id: object.id, warehouseName : object.name }});
 			},
 			showContentDetails(object) {
 				this.singleWarehouseData = object;

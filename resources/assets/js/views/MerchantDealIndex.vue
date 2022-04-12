@@ -2660,7 +2660,7 @@
 				this.allWarehouseSpaces = [];
 
 				axios
-					.get('/api/warehouse-containers/')
+					.get('/api/warehouse-empty-containers/')
 					.then(response => {
 						if (response.status == 200) {
 							
@@ -2743,7 +2743,7 @@
 					this.emptyUnitContainers = [];
 
 					axios
-						.get('/api/warehouse-containers/' + warehouse)
+						.get('/api/warehouse-empty-containers/' + warehouse)
 						.then(response => {
 							if (response.status == 200) {
 								

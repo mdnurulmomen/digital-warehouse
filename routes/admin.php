@@ -66,8 +66,20 @@ Route::name('admin.')->group(function () {
 		// merchant-warehouses
 		Route::get('/api/dealt-warehouses/{merchant}/{warehouse?}/{perPage?}', 'WarehouseController@showMerchantWarehouses')->name('merchant-warehouses');
 
-		// warehouse container
-		Route::get('/api/warehouse-containers/{warehouse?}', 'WarehouseController@showAllWarehouseEmptySpaces')->name('warehouse-containers');
+		// warehouse empty containers
+		Route::get('/api/warehouse-empty-containers/{warehouse?}', 'WarehouseController@showAllWarehouseEmptySpaces')->name('warehouse-empty-containers');
+
+		// warehouse-containers
+		Route::get('/api/warehouses/{warehouse}/containers/{perPage?}', 'WarehouseController@showWarehouseAllContainers')->name('warehouse-containers');
+		Route::get('/api/warehouses/{warehouse}/search-containers/{search}/{perPage?}', 'WarehouseController@searchWarehouseAllContainers')->name('search-warehouse-containers');
+
+		// warehouse-container-shelves
+		Route::get('/api/warehouse-containers/{container}/shelves/{perPage?}', 'WarehouseController@showContainerAllShelves')->name('warehouse-container-shelves');
+		Route::get('/api/warehouse-containers/{container}/search-shelves/{search}/{perPage?}', 'WarehouseController@searchContainerAllShelves')->name('search-warehouse-container-shelves');
+
+		// warehouse-container-shelf-units
+		Route::get('/api/warehouse-container-shelves/{shelf}/units/{perPage?}', 'WarehouseController@showShelfAllUnits')->name('warehouse-container-shelf-units');
+		Route::get('/api/warehouse-container-shelves/{shelf}/search-units/{search}/{perPage?}', 'WarehouseController@searchShelfAllUnits')->name('search-warehouse-container-shelf-units');
 
 		// manager
 		Route::get('/api/managers/{perPage?}', 'ManagerController@showAllManagers')->name('managers');
