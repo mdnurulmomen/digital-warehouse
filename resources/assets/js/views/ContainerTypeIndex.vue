@@ -50,8 +50,8 @@
 										  			:loading="loading" 
 										  			:per-page="perPage" 
 										  			:form-submitted="formSubmitted"
-										  			:column-names="['name', 'Recognizing Code']" 
-										  			:column-values-to-show="['name', 'code']" 
+										  			:column-names="['name', 'Recognizing Code', 'Storage Type']" 
+										  			:column-values-to-show="['name', 'code', 'storageType']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission="'warehouse-asset'" 
@@ -95,6 +95,7 @@
 			:create-mode="createMode" 
 			:caller-page="'container type'" 
 			:form-submitted="formSubmitted"
+			:all-storage-types="allStorageTypes"
 			:single-asset-data="singleAssetData" 
 			:general_settings="general_settings"
 
@@ -165,8 +166,10 @@
 	        	createMode : true,
 	        	formSubmitted : false,
 
-	        	allFetchedContents : [],
 	        	contentsToShow : [],
+	        	allFetchedContents : [],
+
+	        	allStorageTypes : [],
 
 	        	pagination: {
 		        	current_page: 1
@@ -185,6 +188,7 @@
 		created(){
 
 			this.fetchAllContents();
+			this.fetchAllStorageTypes();
 
 		},
 
@@ -225,6 +229,44 @@
 						if (response.status == 200) {
 							this.allFetchedContents = response.data;
 							this.showSelectedTabContents();
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllStorageTypes() {
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allStorageTypes = [];
+				
+				axios
+					.get('/api/storage-types/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allStorageTypes = response.data ?? [];
 						}
 					})
 					.catch(error => {
@@ -465,6 +507,8 @@
 </script>
 
 <style scoped>
+	@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
 	.branches-enter-active {
   		transition: all 1s ease;
 	}

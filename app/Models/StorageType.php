@@ -19,4 +19,9 @@ class StorageType extends Model
     	return $this->belongsToMany(Warehouse::class, 'warehouse_storage_types', 'storage_type_id', 'warehouse_id');
     }
 
+    public function containers()
+    {
+        return $this->hasMany(Container::class, 'storage_type_id', 'id');
+    }
+
 }

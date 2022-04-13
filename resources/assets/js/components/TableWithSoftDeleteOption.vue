@@ -327,6 +327,9 @@
 				else if (columnValue.match(/commission/gi)) {
 					return object.commission ?? 0;
 				}
+				else if (columnValue.match(/storageType/gi)) {
+					return Object.keys(object.storage_type).length ? this.$options.filters.capitalize(object.storage_type.name) : 'NA';
+				}
 
 			},
 			immuteableWarehouse(warehouse) {

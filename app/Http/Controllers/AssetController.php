@@ -132,8 +132,9 @@ class AssetController extends Controller
         if ($perPage) {
             return response()->json([
 
-                'current' => Container::with(['shelf.unit'])->withCount('warehouses')->latest('id')->paginate($perPage),
-                'trashed' => Container::with(['shelf.unit'])->onlyTrashed()->withCount('warehouses')->latest('id')->paginate($perPage),
+                'current' => Container::with(['shelf.unit', 'storageType'])->withCount('warehouses')->latest('id')->paginate($perPage),
+
+                'trashed' => Container::with(['shelf.unit', 'storageType'])->onlyTrashed()->withCount('warehouses')->latest('id')->paginate($perPage),
 
             ], 200);
         }
@@ -146,6 +147,7 @@ class AssetController extends Controller
         $request->validate([
             'name' => 'required|string|max:100|unique:containers,name',
             'code' => 'required|string|max:100|unique:containers,code',
+            'storage_type_id' => 'required|integer|exists:storage_types,id',
             'length' => 'required|numeric',
             'width' => 'required|numeric',
             'height' => 'required|numeric',
@@ -163,6 +165,7 @@ class AssetController extends Controller
 
         $newContainer = new Container();
 
+        $newContainer->storage_type_id = $request->storage_type_id;
         $newContainer->name = strtolower($request->name);
         $newContainer->code = strtolower($request->code);
         $newContainer->length = $request->length;
@@ -205,6 +208,7 @@ class AssetController extends Controller
         $containerToUpdate = Container::findOrFail($owner);
 
         $request->validate([
+            'storage_type_id' => 'required|integer|exists:storage_types,id',
             'name' => 'required|string|max:100|unique:containers,name,'.$containerToUpdate->id,
             'code' => 'required|string|max:100|unique:containers,code,'.$containerToUpdate->id,
             'length' => 'required|numeric',
@@ -213,16 +217,17 @@ class AssetController extends Controller
             // 'storing_price' => 'required|numeric',
             // 'selling_price' => 'required|numeric',
             // 'has_shelve' => 'required|boolean',
-            'shelf.quantity' => 'required_if:has_shelve,1|numeric',
+            'shelf.quantity' => 'required_if:has_shelve,1|integer',
             // 'shelf.storing_price' => 'required_if:has_shelve,1|numeric',
             // 'shelf.selling_price' => 'required_if:has_shelve,1|numeric',
             // 'shelf.has_units' => 'required_if:has_shelve,1|boolean',
-            'shelf.unit.quantity' => 'required_if:shelf.has_units,1|numeric',
+            'shelf.unit.quantity' => 'required_if:shelf.has_units,1|integer',
             // 'shelf.unit.storing_price' => 'required_if:shelf.has_units,1|numeric',
             // 'shelf.unit.selling_price' => 'required_if:shelf.has_units,1|numeric',
         ]);
 
         $containerToUpdate->update([
+            'storage_type_id' => $request->storage_type_id,
             'name' => strtolower($request->name),
             'code' => strtolower($request->code),
             'length' => $request->length,
@@ -316,7 +321,7 @@ class AssetController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:rent_periods,name',
-            'number_days' => 'required|numeric|unique:rent_periods,number_days|max:65535',
+            'number_days' => 'required|integer|unique:rent_periods,number_days|max:65535',
         ]);
 
         $newAsset = new RentPeriod();
@@ -335,7 +340,7 @@ class AssetController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100|unique:rent_periods,name,'.$assetToUpdate->id,
-            'number_days' => 'required|numeric|max:65535|unique:rent_periods,number_days,'.$assetToUpdate->id,
+            'number_days' => 'required|integer|max:65535|unique:rent_periods,number_days,'.$assetToUpdate->id,
         ]);
 
         $assetToUpdate->name = strtolower($request->name);
@@ -501,8 +506,8 @@ class AssetController extends Controller
                         ->where('variation_parent_id', $request->variation_parent_id);
                 }),
             ],
-            'variation_type_id' => 'required|numeric|exists:variation_types,id',
-            'variation_parent_id' => 'nullable|numeric|exists:variations,id',
+            'variation_type_id' => 'required|integer|exists:variation_types,id',
+            'variation_parent_id' => 'nullable|integer|exists:variations,id',
         ]);
 
         $newAsset = new Variation();
@@ -531,10 +536,10 @@ class AssetController extends Controller
                         ->whereNotIn('id', [ $assetToUpdate->id ]);
                 }),
             ],
-            'variation_type_id' => 'required|numeric|exists:variation_types,id',
-            // 'variation_parent_id' => 'nullable|numeric|exists:variations,id',
+            'variation_type_id' => 'required|integer|exists:variation_types,id',
+            // 'variation_parent_id' => 'nullable|integer|exists:variations,id',
             'variation_parent_id' => [
-                'nullable', 'numeric', 'exists:variations,id', 
+                'nullable', 'integer', 'exists:variations,id', 
                 Rule::notIn([ $asset ]),
             ],
         ]);

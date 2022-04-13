@@ -37,4 +37,10 @@ class Container extends Model
     {
         return $this->hasMany(WarehouseContainer::class, 'container_id', 'id');
     }
+
+    public function storageType()
+    {
+        return $this->belongsTo(StorageType::class, 'storage_type_id', 'id')->withTrashed();
+    }
+    
 }

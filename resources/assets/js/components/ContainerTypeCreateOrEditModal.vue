@@ -27,6 +27,34 @@
 				    			<div class="mr-1 p-2 border w-100">
 						    		<div class="form-row">
 										<div class="form-group col-md-12">
+											<label for="inputFirstName">Storage Type</label>
+											
+											<multiselect 
+		                              			v-model="singleAssetData.storage_type" 
+		                              			class="form-control p-0" 
+		                              			:class="errors.container.storage_type ? 'is-invalid' : 'is-valid'"
+		                              			placeholder="Container Storage Type" 
+		                                  		:custom-label="nameWithCapitalized" 
+		                                  		:options="allStorageTypes" 
+		                                  		:required="true" 
+		                                  		:allow-empty="false" 
+		                                  		@input="setContainerStorageType()" 
+		                                  		@close="validateFormInput('storage_type')" 
+		                              		>
+		                                	</multiselect>
+
+											<div 
+												class="invalid-feedback" 
+												style="display: block;" 
+												v-show="errors.container.storage_type"
+											>
+									        	{{ errors.container.storage_type }}
+									  		</div>
+										</div>
+									</div>
+
+						    		<div class="form-row">
+										<div class="form-group col-md-12">
 											<label for="inputFirstName">Name</label>
 											<input type="text" 
 												class="form-control" 
@@ -364,8 +392,14 @@
 </template>
 
 <script type="text/javascript">
+
+	import Multiselect from 'vue-multiselect';
 	
 	export default {
+
+		components:{
+	    	multiselect : Multiselect
+	    },
 
 		props : {
 
@@ -392,6 +426,10 @@
 			general_settings : {
 				type : Object,
 				required : true
+			},
+			allStorageTypes : {
+				type : Array,
+				required : true
 			}
 
 		},
@@ -399,6 +437,8 @@
 		data() {
 
 			return {
+
+				// allStorageTypes : [],
 
 				submitForm : true,
 				
@@ -446,10 +486,33 @@
 
 		methods : {
 
+            setContainerStorageType(){
+
+            	if (Object.keys(this.singleAssetData.storage_type).length > 0) {
+
+            		this.singleAssetData.storage_type_id = this.singleAssetData.storage_type.id;
+
+            	}
+
+            },
+            nameWithCapitalized ({ name }) {
+				
+				if (!name) return ''
+
+				const words = name.split(" ");
+
+				for (let i = 0; i < words.length; i++) {
+				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+				}
+
+				return words.join(" ");
+
+		    },
             verifyUserInput() {
 
 				this.validateFormInput('name');
 				this.validateFormInput('code');
+				this.validateFormInput('storage_type');
 				this.validateFormInput('container_length');
 				this.validateFormInput('container_width');
 				this.validateFormInput('container_height');
@@ -480,6 +543,21 @@
 				this.submitForm = false;
 
 				switch(formInputName) {
+
+					case 'storage_type' :
+
+						if (! this.singleAssetData.storage_type) {
+							this.errors.container.storage_type = 'Storage name is required';
+						}
+						else if (! Object.keys(this.singleAssetData.storage_type).length > 0 || ! this.singleAssetData.storage_type_id) {
+							this.errors.container.storage_type = 'Storage name is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.container, 'storage_type');
+						}
+
+						break;
 
 					case 'name' :
 
