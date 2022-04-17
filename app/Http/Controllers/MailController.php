@@ -29,8 +29,28 @@ class MailController extends Controller
             
             return response()->json([
 
-        		'manual' => new MailCollection(AppMail::whereNotNull('sender_type')->latest('id')->paginate($perPage)),
-        		'automated' => new MailCollection(AppMail::whereNull('sender_type')->latest('id')->paginate($perPage)),
+        		'manual' => new MailCollection(
+        			AppMail::whereNotNull('sender_type')
+        			->whereHas('recipients', function ($query) {
+					    $query->where('status', 1);
+					})
+        			->latest('id')->paginate($perPage)
+				),
+        		
+        		'automated' => new MailCollection(
+        			AppMail::whereNull('sender_type')
+        			->whereHas('recipients', function ($query) {
+					    $query->where('status', 1);
+					})
+        			->latest('id')->paginate($perPage)
+        		),
+
+        		'failed' => new MailCollection(
+        			AppMail::whereHas('recipients', function ($query) {
+					    $query->where('status', 0);
+					})
+        			->latest('id')->paginate($perPage)
+        		),
 
         	], 200);
 
@@ -45,7 +65,7 @@ class MailController extends Controller
 			'recipients' => 'required|array|min:1',
 			'recipients.*' => 'required|email',
 			'subject' => 'required|string|max:255',
-			'body' => 'required|string|max:255',
+			'body' => 'required|string|max:65000',
 		]);
 
 		$generalSettings = ApplicationSetting::firstOrCreate([

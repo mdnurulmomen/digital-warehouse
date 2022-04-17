@@ -1,7 +1,7 @@
 <template>	
 	<!-- Modal -->
 	<div class="modal fade" id="mail-create-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
+		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">
@@ -27,19 +27,18 @@
 					<div class="modal-body">
 						<div class="form-row">
 							<div class="form-group col-md-12">
-								<label for="inputFirstName">Input Email</label>
+								<label for="inputFirstName">Email Address</label>
 								<input type="text" 
 									class="form-control" 
 									v-model="newEmail" 
 									placeholder="New Email Address" 
-									:class="!errors.asset.email ? 'is-valid' : 'is-invalid'" 
+									:class="!errors.email ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('email')" 
-									@keyup.enter="addRecipientMail()" 
-									@keydown.enter.prevent="validateFormInput('email')"
+									@keydown.enter.prevent="validateFormInput('email');addRecipientMail()"
 								>
 
 								<div class="invalid-feedback">
-						        	{{ errors.asset.email }}
+						        	{{ errors.email }}
 						  		</div>
 							</div>
 
@@ -75,13 +74,13 @@
 									class="form-control" 
 									v-model="singleAssetData.subject" 
 									placeholder="Email Subject" 
-									:class="!errors.asset.subject ? 'is-valid' : 'is-invalid'" 
+									:class="!errors.subject ? 'is-valid' : 'is-invalid'" 
 									@change="validateFormInput('subject')" 
 									@keydown.enter.prevent="validateFormInput('subject')" 
 								>
 
 								<div class="invalid-feedback">
-						        	{{ errors.asset.subject }}
+						        	{{ errors.subject }}
 						  		</div>
 							</div>
 
@@ -92,13 +91,13 @@
 	                              	class="form-control" 
 	                              	:editor="editor" 
 	                              	v-model="singleAssetData.body"
-	                              	:class="!errors.asset.body ? 'is-valid' : 'is-invalid'"
+	                              	:class="!errors.body ? 'is-valid' : 'is-invalid'"
 	                              	@blur="validateFormInput('body')"
 	                            >
                               	</ckeditor>
 
 								<div class="invalid-feedback">
-						        	{{ errors.asset.body }}
+						        	{{ errors.body }}
 						  		</div>
 							</div>
 						</div>
@@ -170,7 +169,7 @@
 				submitForm : true,
 
 				errors : {
-					asset : {},
+
 				},
 
 				editor: ClassicEditor,
@@ -207,7 +206,7 @@
 				this.validateFormInput('subject');
 				this.validateFormInput('body');
             	
-            	if (Object.keys(this.errors.asset).length !== 0 && this.errors.asset.constructor === Object) {
+            	if (Object.keys(this.errors).length !== 0 && this.errors.constructor === Object) {
 					this.submitForm = false;
 					return;
 				}
@@ -230,7 +229,7 @@
 
 				// this.validateFormInput('email');
 
-				if (this.newEmail && ! this.errors.asset.hasOwnProperty('email')) {
+				if (this.newEmail && ! this.errors.hasOwnProperty('email')) {
 
 					let emptyIndex = this.singleAssetData.recipients.findIndex(recipient=> ! recipient || recipient == '');
 
@@ -269,17 +268,17 @@
 					case 'email' :
 
 						if (! this.newEmail && ! this.singleAssetData.recipients.length) {
-							this.errors.asset.email = 'Recipient is required';
+							this.errors.email = 'Recipient is required';
 						}
 						else if (this.newEmail && ! this.newEmail.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/g)) {
-							this.errors.asset.email = 'Invalid email';
+							this.errors.email = 'Invalid email';
 						}
 						else if (this.newEmail && this.singleAssetData.recipients.some(recipient=>recipient==this.newEmail)) {
-							this.errors.asset.email = 'Same recipient address';
+							this.errors.email = 'Same recipient address';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'email');
+							this.$delete(this.errors, 'email');
 						}
 
 						break;
@@ -287,14 +286,14 @@
 					case 'subject' :
 
 						if (! this.singleAssetData.subject) {
-							this.errors.asset.subject = 'Subject is required';
+							this.errors.subject = 'Subject is required';
 						}
 						else if (! this.singleAssetData.subject.match(/^[a-zA-Z ]{2,30}$/g)) {
-							this.errors.asset.subject = 'No special character';
+							this.errors.subject = 'No special character';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'subject');
+							this.$delete(this.errors, 'subject');
 						}
 
 						break;
@@ -302,11 +301,11 @@
 					case 'body' :
 
 						if (! this.singleAssetData.body) {
-							this.errors.asset.body = 'Body is required';
+							this.errors.body = 'Body is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.asset, 'body');
+							this.$delete(this.errors, 'body');
 						}
 
 						break;

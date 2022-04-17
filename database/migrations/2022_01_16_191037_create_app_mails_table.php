@@ -16,7 +16,7 @@ class CreateAppMailsTable extends Migration
         Schema::create('app_mails', function (Blueprint $table) {
             $table->increments('id');
             $table->string('subject');
-            $table->string('body');
+            $table->text('body');
             $table->string('sender_type')->nullable();
             $table->string('sender_id')->nullable();
             $table->timestamp('created_at')->useCurrent();

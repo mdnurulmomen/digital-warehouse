@@ -35,11 +35,12 @@
 											<div class="col-sm-12 col-lg-12">
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['manual', 'automated']" 
+										  			:tab-names="['manual', 'automated', 'failed']" 
 										  			:current-tab="currentTab" 
 
-										  			@showCurrentContents="showCurrentContents" 
-										  			@showTrashedContents="showTrashedContents" 
+										  			@showManualContents="showManualContents" 
+										  			@showAutomatedContents="showAutomatedContents" 
+										  			@showFailedContents="showFailedContents" 
 										  		></tab> 
 
 										  		<loading v-show="loading"></loading>
@@ -548,18 +549,26 @@
 					this.contentsToShow = this.allFetchedContents.manual.data;
 					this.pagination = this.allFetchedContents.manual;
 				}
-				else {
+				else if (this.currentTab=='automated') {
 					this.contentsToShow = this.allFetchedContents.automated.data;
 					this.pagination = this.allFetchedContents.automated;
 				}
+				else {
+					this.contentsToShow = this.allFetchedContents.failed.data;
+					this.pagination = this.allFetchedContents.failed;
+				}
 
 			},
-			showCurrentContents() {
+			showManualContents() {
 				this.currentTab = 'manual';
 				this.showSelectedTabContents();
 			},
-			showTrashedContents() {
+			showAutomatedContents() {
 				this.currentTab = 'automated';
+				this.showSelectedTabContents();
+			},
+			showFailedContents() {
+				this.currentTab = 'failed';
 				this.showSelectedTabContents();
 			},
 			/*
