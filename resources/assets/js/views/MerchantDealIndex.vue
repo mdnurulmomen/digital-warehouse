@@ -109,8 +109,8 @@
 																		href="javascript:void(0)"
 																		class="nav-link p-0" 
 																		data-toggle="modal" 
-																		data-target="#payment-custom-search"
-																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
+																		data-target="#deal-custom-search"
+																		:class="{ 'active': searchAttributes.dates && Object.keys(searchAttributes.dates).length > 0 }"
 																	>
 																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
 																	</a>
@@ -1847,9 +1847,7 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -3743,7 +3741,7 @@
             },
             setSearchingDates(){
 
-            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
+            	if (this.searchAttributes.dates && Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
 
 					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
 					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;

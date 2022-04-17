@@ -2397,7 +2397,7 @@
             },
             setSearchingDates(){
 
-            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
+            	if (this.searchAttributes.dates && Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
 
 					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
 					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
