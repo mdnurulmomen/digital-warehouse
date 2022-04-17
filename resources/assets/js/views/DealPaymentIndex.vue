@@ -817,7 +817,7 @@
 																aria-label="Amount Per Installment" 
 															>
 															<div class="input-group-append">
-																<span class="input-group-text">taka</span>
+																<span class="input-group-text">{{ general_settings.official_currency_name }}</span>
 															</div>
 														</div>
 													</div>
@@ -877,12 +877,21 @@
 												<div class="form-row">
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Total Rent</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															v-model.number="singlePaymentData.total_rent" 
-															placeholder="Total Rent" 
-															:disabled="true"
-														>
+
+														<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singlePaymentData.total_rent" 
+																placeholder="Total Rent" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
 													</div>
 
 													<div class="form-group col-md-6">
@@ -910,49 +919,86 @@
 												<div class="form-row">
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Last Due</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															v-model.number="singlePaymentData.previous_due" 
-															placeholder="Previous Due" 
-															:disabled="true"
-														>
+
+														<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singlePaymentData.previous_due" 
+																placeholder="Previous Due" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
 													</div>
 
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Net Payable</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															v-model.number="singlePaymentData.net_payable" 
-															placeholder="Net Payable" 
-															:disabled="true"
-														>
+
+														<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singlePaymentData.net_payable" 
+																placeholder="Net Payable" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
 													</div>
 												</div>
 
 												<div class="form-row">
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Paid Amount</label>
-														<input type="number" 
-															class="form-control" 
-															v-model.number="singlePaymentData.paid_amount" 
-															placeholder="Paid Amount" 
-															:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
-															@change="validateFormInput('paid_amount')" 
-															required="true" 
-														>
-														<div class="invalid-feedback">
+
+														<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singlePaymentData.paid_amount" 
+																placeholder="Paid Amount" 
+																:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
+																@change="validateFormInput('paid_amount')" 
+																required="true" 
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
+
+									    				<div class="invalid-feedback">
 													    	{{ errors.paid_amount }}
 													    </div>
 													</div>
 
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Current Due</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															:value="singlePaymentData.net_payable - singlePaymentData.paid_amount" 
-															placeholder="Previous Dues" 
-															:disabled="true"
-														>
+
+														<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																:value="singlePaymentData.net_payable - singlePaymentData.paid_amount" 
+																placeholder="Previous Dues" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
 													</div>
 												</div>
 											</div>
@@ -1048,7 +1094,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.total_rent }}
+								{{ singlePaymentData.total_rent }} {{ general_settings.official_currency_name }}
 							</label>
 						</div>
 
@@ -1068,7 +1114,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.previous_due }}
+								{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
 							</label>
 						</div>
 
@@ -1078,7 +1124,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.net_payable }}
+								{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
 							</label>
 						</div>
 
@@ -1088,7 +1134,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.paid_amount }}
+								{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
 							</label>
 						</div>
 
@@ -1098,7 +1144,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.current_due }}
+								{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
 							</label>
 						</div>
 
@@ -1148,7 +1194,7 @@
 										</label>
 
 										<label class="col-6 col-form-label">
-											{{ paymentRent.rent }}
+											{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
 										</label>	
 									</div>
 								</div>
@@ -1416,7 +1462,7 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ singlePaymentData.previous_due }}
+							{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
 						</label>
 					</div>
 
@@ -1426,7 +1472,7 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ singlePaymentData.net_payable }}
+							{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
 						</label>
 					</div>
 
@@ -1436,7 +1482,7 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ singlePaymentData.paid_amount }}
+							{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
 						</label>
 					</div>
 
@@ -1446,7 +1492,7 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ singlePaymentData.current_due }}
+							{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
 						</label>
 					</div>
 
@@ -1456,7 +1502,7 @@
 						</label>
 
 						<label class="col-6 col-form-label">
-							{{ singlePaymentData.paid_at }}
+							{{ singlePaymentData.paid_at }} 
 						</label>
 					</div>
 
@@ -1496,7 +1542,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ paymentRent.rent }}
+										{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
 									</label>	
 								</div>
 							</div>
@@ -1738,6 +1784,8 @@
 					windowTitle: 'Payment Details' 
 
 				},
+
+	            general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 

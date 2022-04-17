@@ -1122,12 +1122,21 @@
 												<div class="form-row">
 													<div class="form-group col-md-6">
 														<label for="inputFirstName">Total Rent</label>
-														<input type="number" 
-															class="form-control is-valid" 
-															v-model.number="singleMerchantDealData.payments[0].total_rent" 
-															placeholder="Total Rent" 
-															:disabled="true"
-														>
+
+														<div class="input-group mb-0">
+									    					<input type="number" 
+																class="form-control is-valid" 
+																v-model.number="singleMerchantDealData.payments[0].total_rent" 
+																placeholder="Total Rent" 
+																:disabled="true"
+															>
+
+									    					<div class="input-group-append">
+									    						<span class="input-group-text">
+									    							{{ general_settings.official_currency_name }}
+									    						</span>
+									    					</div>
+									    				</div>
 													</div>
 
 													<div class="form-group col-md-6">
@@ -1709,7 +1718,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Expired At :
+														Expiring At :
 													</label>
 
 													<label class="col-sm-6 col-form-label">
