@@ -146,7 +146,7 @@ class AssetController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:containers,name',
-            'code' => 'required|string|max:100|unique:containers,code',
+            'code' => 'required|string|alpha_dash|max:100|unique:containers,code',
             'storage_type_id' => 'required|integer|exists:storage_types,id',
             'length' => 'required|numeric',
             'width' => 'required|numeric',
@@ -210,7 +210,7 @@ class AssetController extends Controller
         $request->validate([
             'storage_type_id' => 'required|integer|exists:storage_types,id',
             'name' => 'required|string|max:100|unique:containers,name,'.$containerToUpdate->id,
-            'code' => 'required|string|max:100|unique:containers,code,'.$containerToUpdate->id,
+            'code' => 'required|string|alpha_dash|max:100|unique:containers,code,'.$containerToUpdate->id,
             'length' => 'required|numeric',
             'width' => 'required|numeric',
             'height' => 'required|numeric',

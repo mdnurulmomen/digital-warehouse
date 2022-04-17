@@ -150,7 +150,7 @@
 									    	<div class="card-body">
 									    		<div class="form-row d-flex align-items-center">
 													<div class="form-group col-md-6">
-														<img class="img-fluid" 
+														<img class="img-fluid position-relative w-100 h-100" 
 															:src="singleWarehouseData.site_map_preview || ''"
 															alt="site_map_preview" 
 														>
@@ -1748,6 +1748,7 @@
 													</label>
 													<label class="col-sm-6 col-form-label">
 														{{ warehouseContainer.quantity }}
+														<i class="fa fa-print fa-lg ml-1 text-danger" aria-hidden="true" @click="printWarehouseContainers([ warehouseContainer ])"  v-tooltip.bottom-end="'Print'"></i>
 													</label>
 												</div>
 
@@ -1957,6 +1958,73 @@
 			</div>
 		</div>
 
+		<!-- Printing Section -->
+		<div id="sectionToPrint" class="d-none">
+			<div class="card">
+				<div class="card-body" v-if="containersToPrint.length">
+					<div 
+						v-for="(warehouseContainerToPrint, warehouseContainerIndexToPrint) in containersToPrint" 
+						:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id"
+					>
+						<div 
+							class="mb-3" 
+							v-for="containerIndexToPrint in warehouseContainerToPrint.quantity" 
+							:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint"
+						>
+							<div class="form-row">
+								<div class="col-12 col-form-label text-center">
+									<label class="font-weight-bold">
+										{{ warehouseContainerToPrint.container ? warehouseContainerToPrint.container.name : '' | capitalize }} {{ containerIndexToPrint }} :
+									</label>
+
+									<label class="pl-1">
+										{{ warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA' }}
+									</label>
+								</div>
+							</div>
+
+							<div class="form-row" v-if="warehouseContainerToPrint.container && warehouseContainerToPrint.container.shelf && warehouseContainerToPrint.container.shelf.quantity > 0">
+								<div 
+									class="col-12"
+									v-for="containerShelfIndex in warehouseContainerToPrint.container.shelf.quantity" 
+									:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint + '-container-shelf-index-' + containerShelfIndex"
+								>
+									<div class="form-row">
+										<div class="col-12 col-form-label form-group text-center">
+											<label class="font-weight-bold">
+												Shelf {{ containerShelfIndex }} :
+											</label>
+
+											<label class="pl-1">
+												{{ (warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex }}
+											</label>
+										</div>
+									</div>
+									
+									<div class="form-row" v-if="warehouseContainerToPrint.container && warehouseContainerToPrint.container.shelf && warehouseContainerToPrint.container.shelf.unit && warehouseContainerToPrint.container.shelf.unit.quantity > 0">
+										<div 
+											class="col-12 col-form-label form-group text-center"
+											v-for="shelfUnitIndex in warehouseContainerToPrint.container.shelf.unit.quantity" 
+											:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint + '-container-shelf-index-' + containerShelfIndex + '-shelf-unit-index-' + shelfUnitIndex"
+										>
+											<label class="font-weight-bold">
+												Unit {{ shelfUnitIndex }} :
+											</label>
+
+											<label class="pl-1">
+												{{ (warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex + '-unt-' + shelfUnitIndex }}
+												
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<delete-confirmation-modal 
 			v-if="userHasPermissionTo('delete-warehouse')"
 			:csrf="csrf" 
@@ -2068,6 +2136,25 @@
 	        	allWarehouseOwners : [],
 	        	allFetchedWarehouses : [],
 
+	        	containersToPrint : [
+	        		{	
+	        			/* warehouse_containers */	
+						quantity : 0,
+						// container_id : null,
+						container : {	 // containers	
+							// name : '',
+							// has_shelve : true,
+							shelf : { 	// warehouse_container_shelfs
+								// has_units : true,
+								quantity : 0,  // total number warehouse_container_shelfs
+								unit :  {    // warehouse_container_shelf_units
+									quantity : 0,  // length of warehouse_container_shelf_units	
+								},	
+							}, 
+						},
+					}
+	        	],
+
 	        	pagination: {
 		        	current_page: 1
 		      	},
@@ -2098,6 +2185,27 @@
 				// allPermissions : [],
 
 				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
+
+				printingStyles : {
+				    
+				    name: '_blank',
+				    
+				    specs: [
+				        'fullscreen=yes',
+				        'titlebar=yes',
+				        'scrollbars=yes'
+				    ],
+
+				    styles: [
+				    	"/css/bootstrap.min.css",
+				    ],
+
+				    timeout: 1000, // default timeout before the print window appears
+					autoClose: true, // if false, the window will not close after printing
+					windowTitle: 'Warehouse Container Details' 
+
+				},
+
 
 				// modelCRUDableAndApproveable : [
 	                // 'Product-Stock',
@@ -2602,6 +2710,7 @@
 			},
 			showContentDetails(object) {
 				this.singleWarehouseData = object;
+				// this.containersToPrint = JSON.parse(JSON.stringify(object.containers));
 				$('#warehouse-view-modal').modal('show');
 			},
 			showContentCreateForm() {
@@ -2740,6 +2849,8 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
+							this.printWarehouseContainers(this.singleWarehouseData.containers);
+
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2770,6 +2881,8 @@
 							this.pagination.current_page = 1; 
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+
+							this.printWarehouseContainers(this.singleWarehouseData.containers);
 
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
@@ -2891,6 +3004,17 @@
 			showTrashedContents() {
 				this.currentTab = 'trashed';
 				this.showSelectedTabContents();
+			},
+			printWarehouseContainers(containers) {
+	        
+	        	this.containersToPrint = JSON.parse(JSON.stringify(containers));
+
+				this.$nextTick(function () {
+					// DOM is now updated
+					// `this` is bound to the current instance
+					this.print();
+				})
+
 			},
 			setWarehouseOwner() {
 				if (this.ownerObject && Object.keys(this.ownerObject).length > 0) {
@@ -3969,6 +4093,17 @@
 					this.singleWarehouseData.containers.pop();
 					this.errors.warehouse.containers.pop();
 				}
+			},
+			print() {
+
+				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
+				
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singleWarehouseData.name } - Containers`);
+
+				this.$htmlToPaper('sectionToPrint', this.printingStyles);
+
+				$('#warehouse-view-modal').modal('hide');
+
 			},
 			changeContainerRents(index) {
 				this.singleWarehouseData.containers[index].rents = {};
