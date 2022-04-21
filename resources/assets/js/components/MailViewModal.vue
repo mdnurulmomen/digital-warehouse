@@ -19,7 +19,8 @@
 							<label class="font-weight-bold">{{ property | capitalize }}: </label>
 						</div>
 						<div class="form-group col-6">
-							{{ getPropertyValue(property) }}
+							<!-- {{ getPropertyValue(property) }} -->
+							<span v-html="getPropertyValue(property)"></span>
 						</div>
 					</div>
 				</div>

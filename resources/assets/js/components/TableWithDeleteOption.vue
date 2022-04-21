@@ -39,7 +39,8 @@
 						:class="content.id==currentContent.id ? 'highlighted' : ''"
 					>
 						<td v-for="columnValue in columnValuesToShow" :key="columnValue">
-							{{ getColumnValue(content, columnValue) }}
+							<!-- {{ getColumnValue(content, columnValue) }} -->
+							<span v-html="getColumnValue(content, columnValue)"></span>
 						</td>
 						
 						<td>
