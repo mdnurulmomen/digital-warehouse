@@ -10,7 +10,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<loading v-show="loading"></loading>
 
 						<alert v-show="error" :error="error"></alert>
@@ -20,9 +19,7 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">											
-
 											<div class="col-sm-12 sub-title">
-
 												<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
 															{{ containerName | capitalize }} Shelves List

@@ -22,7 +22,7 @@
 											<div class="col-sm-12 sub-title">
 												<div class="row d-flex align-items-center">
 											  		<div class="col-sm-3 text-left">	
-															Warehouse Containers List
+														Warehouse Containers List
 											  		</div>
 											  		<div class="col-sm-9 was-validated text-center">
 											  			<input 	type="text" 

@@ -12,7 +12,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row">
@@ -1610,27 +1609,45 @@
 	        	this.submitForm = true;
 	        	
 				this.singleProductData = {
-					
-					preview : null,
-					
-					variations : [],
+				
+					// name : null,
+			    	// description : null,
+			    	// sku : null,
+			    	// price : null,
+			    	// initial_quantity : null,
+			    	// available_quantity : null,
+			    	// quantity_type : null,
+			    	// has_variations : null,
+			    	
+			    	preview : null,
+
+			    	variations : [],
 					
 					/*
-						addresses : [
-							{},
-						],
+					addresses : [
+						{},
+					],
 					*/
+				
+			    	// product_category_id : null,
+			    	// merchant_id : null,
+			    	// category : {},
+			    	// merchant : {},
+				
 				};
 
 				this.errors = {
+					
 					product : {
 						variations : [],
+						
 						/*
 						addresses : [
 							{},
 						],
 						*/
 					},
+
 				};
 
 				$('#product-createOrEdit-modal').modal('show');

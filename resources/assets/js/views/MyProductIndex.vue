@@ -21,7 +21,6 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">	
-
 											<my-product-search-export-option
 										  		:search-attributes="searchAttributes" 
 										  		:caller-page="'my-products'" 

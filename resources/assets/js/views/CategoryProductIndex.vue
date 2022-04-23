@@ -11,7 +11,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row">
@@ -45,7 +44,7 @@
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Products'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 

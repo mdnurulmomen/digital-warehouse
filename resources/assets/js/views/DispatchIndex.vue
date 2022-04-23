@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-dispatch-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'dispatches'" 
 			:message="'All our dispatches'"
@@ -12,7 +10,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<loading v-show="loading"></loading>
 
 						<alert v-show="error" :error="error"></alert>

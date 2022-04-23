@@ -13,7 +13,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
@@ -35,7 +34,7 @@
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Stocks'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 

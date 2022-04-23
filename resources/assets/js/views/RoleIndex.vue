@@ -11,7 +11,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row">
@@ -948,35 +947,65 @@
 										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 										<!-- Create -->
 										<div class="form-check">
+											<!-- 
 											<input 
 												type="checkbox" 
 												:checked="permissionExists('create-' + model)" 
 												@change="insertPermission('create-' + model, $event)" 
 												:ref="'create-' + model.toLowerCase()"
 											>
-											<label>{{ modelName('create-' + model) }}</label>
+											<label>{{ modelName('create-' + model) }}</label> 
+											-->
+
+											<span v-show="permissionExists('create-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('create-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('create-' + model) }}
 										</div>
 
 										<!-- Delete -->
 										<div class="form-check">
+											<!-- 
 											<input 
 												type="checkbox" 
 												:checked="permissionExists('delete-' + model)" 
 												@change="insertPermission('delete-' + model, $event)" 
 												:ref="'delete-' + model.toLowerCase()"
 											>
-											<label>{{ modelName('delete-' + model) }}</label>
+											<label>{{ modelName('delete-' + model) }}</label> 
+											-->
+
+											<span v-show="permissionExists('delete-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('delete-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('delete-' + model) }}
 										</div>
 
 										<!-- view -->
 										<div class="form-check">
+											<!-- 
 											<input 
 												type="checkbox" 
 												:checked="permissionExists('view-' + model + '-index')" 
 												@change="insertPermission('view-' + model + '-index', $event)" 
 												:ref="'view-' + model.toLowerCase() + '-index'"
 											>
-											<label>{{ modelName('view-' + model + '-list') }}</label>
+											<label>{{ modelName('view-' + model + '-list') }}</label> 
+											-->
+
+											<span v-show="permissionExists('view-' + model)" class="text-success">
+												<i class="fa fa-check" aria-hidden="true"></i>
+											</span>
+											<span v-show="!permissionExists('view-' + model)" class="text-danger">
+												<i class="fa fa-times" aria-hidden="true"></i>
+											</span>
+											{{ modelName('view-' + model) }}
 										</div>
 									</div>
 								</div>

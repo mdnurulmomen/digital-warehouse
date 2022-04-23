@@ -3,29 +3,29 @@
 	<section>
 		<div class="row d-flex align-items-center">										  	
 	  		<div class="col-sm-6 col-md-3 form-group d-flex align-items-center">	
-					<span>
-						{{ callerPage | capitalize }} List 
+				<span>
+					{{ callerPage | capitalize }} List 
 
-						<i 
-	  						class="fas fa-upload fa-lg pr-3 pl-1" 
-	  						v-show="$route.name=='products'" 
-	  						v-tooltip.bottom-end="'Import ' + callerPage" 
-	  						data-toggle="modal" 
-							:data-target="'#'+ callerPage +'-importing-modal'" 
-	  					>	
-	  					</i>
-					</span>
+					<i 
+  						class="fas fa-upload fa-lg pr-3 pl-1" 
+  						v-show="$route.name=='products'" 
+  						v-tooltip.bottom-end="'Upload ' + callerPage" 
+  						data-toggle="modal" 
+						:data-target="'#'+ callerPage +'-importing-modal'" 
+  					>	
+  					</i>
+				</span>
 
-					<button 
-			  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
-			  			v-tooltip.bottom-end="'Create New'" 
-			  			:disabled="disableAddButton" 
-			  			@click="$emit('showContentCreateForm')" 
-			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
-		  			>
-		  				<i class="fa fa-plus"></i>
-		  				New {{ callerPage | capitalize }}
-		  			</button>
+				<button 
+		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
+		  			v-tooltip.bottom-end="'Create New'" 
+		  			:disabled="disableAddButton" 
+		  			@click="$emit('showContentCreateForm')" 
+		  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+	  			>
+	  				<i class="fa fa-plus"></i>
+	  				New {{ callerPage | capitalize }}
+	  			</button>
 	  		</div>
 	  		<div 
 		  		class="col-sm-6 col-md-6 was-validated form-group" 

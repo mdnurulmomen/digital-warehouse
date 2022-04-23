@@ -2,7 +2,6 @@
 <template>
 
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:title="'containers'" 
 			:message="'All our containers'"
@@ -12,7 +11,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<loading v-show="loading"></loading>
 
 						<alert v-show="error" :error="error"></alert>
@@ -52,11 +50,9 @@
 											  		</div>
  												-->
 											  	</div>
-
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-
 												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query === ''">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 

@@ -11,7 +11,7 @@
 	  			</div>
 
 	  			<div class="dropdown">
-					<i class="fas fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown"></i>
+					<i class="fas fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown" v-tooltip.bottom-end="'Download ' + callerPage + 's'"></i>
   					
   					<div class="dropdown-menu">
 						<download-excel 
@@ -42,6 +42,7 @@
   						class="fas fa-upload fa-lg pr-3 pl-1" 
   						v-show="$route.name=='merchant-products'"
   						data-toggle="modal" 
+  						v-tooltip.bottom-end="'Upload ' + callerPage + 's'" 
 						:data-target="'#'+ callerPage +'-importing-modal'"
   					>	
   					</i>
