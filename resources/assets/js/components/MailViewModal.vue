@@ -96,7 +96,7 @@
 					return this.$options.filters.capitalize(this.assetToView.body);
 				}
 				else if (property.match(/sender/gi)) {
-					return this.assetToView.sender ? this.getFullName(this.assetToView.sender) : 'NA';
+					return this.assetToView.sender ? this.$options.filters.capitalize(this.getFullName(this.assetToView.sender)) : 'NA';
 				}
 				else if (property.match(/recipients/gi)) {
 					

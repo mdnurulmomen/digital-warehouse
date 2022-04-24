@@ -296,16 +296,24 @@
 
 										<div class="form-group col-md-6">
 											<label for="inputFirstName">Selling Price (unit)</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleMerchantProductData.selling_price" 
-												placeholder="Product Selling Price" 
-												:class="!errors.product.product_price  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_price')" 
-												:disabled="product.category ? false : true"
-											>
 
-											<div class="invalid-feedback">
+									  		<div class="input-group mb-0">
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleMerchantProductData.selling_price" 
+													placeholder="Product Selling Price" 
+													:class="!errors.product.product_price  ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('product_price')" 
+													:disabled="product.category ? false : true"
+												>
+												<div class="input-group-append">
+													<span class="input-group-text" id="basic-addon2">
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</span>
+												</div>
+											</div>
+
+											<div class="invalid-feedback" style="display: block;" v-show="errors.product.product_price">
 									        	{{ errors.product.product_price }}
 									  		</div>
 										</div>
@@ -340,12 +348,20 @@
 										</div>
 
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Warning Quantity</label>
-											<input type="number" 
-												class="form-control is-valid" 
-												v-model.number="singleMerchantProductData.warning_quantity" 
-												placeholder="Product Warning Quantity" 
-											>
+											<label for="inputFirstName">Warning Qty</label>
+											
+											<div class="input-group mb-0">
+												<input type="number" 
+													class="form-control is-valid" 
+													v-model.number="singleMerchantProductData.warning_quantity" 
+													placeholder="Product Warning Qty" 
+												>
+												<div class="input-group-append">
+													<span class="input-group-text" id="basic-addon2">
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</span>
+												</div>
+											</div>
 										</div>
 									</div>
 
@@ -507,18 +523,25 @@
 																	<div class="form-group col-md-6">
 																		<label for="inputFirstName">Selling Price (unit)</label>
 
-																		<input type="number" 
-																			class="form-control" 
-																			v-model.number="merchantProductVariation.selling_price" 
-																			placeholder="Variation Selling Price" 
-																			:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-																			@change="validateFormInput('product_variation_price')" 
-																			required="true" 
-																		>
+																  		<div class="input-group mb-0">
+																			<input type="number" 
+																				class="form-control" 
+																				v-model.number="merchantProductVariation.selling_price" 
+																				placeholder="Variation Selling Price" 
+																				:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																				@change="validateFormInput('product_variation_price')" 
+																				required="true" 
+																			>
+																			<div class="input-group-append">
+																				<span class="input-group-text" id="basic-addon2">
+																					{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																				</span>
+																			</div>
+																		</div>
 
-																		<div class="invalid-feedback">
+																		<div class="invalid-feedback" style="display: block;" v-show="errors.product.variations[index].product_variation_price">
 																        	{{ errors.product.variations[index].product_variation_price }}
-																  		</div>	
+																  		</div>
 																	</div>
 
 																	<div class="form-group col-md-6">
@@ -1007,7 +1030,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Warning Quantity :
+														Warning Qty :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.warning_quantity + ' ' + product.quantity_type }}
@@ -1016,7 +1039,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Available Quantity :
+														Available Qty :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.available_quantity + ' ' + product.quantity_type }}
@@ -1025,7 +1048,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Dispatched Quantity :
+														Dispatched Qty :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.dispatched_quantity + ' ' + product.quantity_type }}
@@ -1034,7 +1057,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Pending Requested Quantity :
+														Pending Requested Qty :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.requested_quantity + ' ' + product.quantity_type }}
@@ -1046,7 +1069,8 @@
 														Selling Price (unit) :
 													</label>
 													<label class="col-sm-8 col-form-label">
-														{{ singleMerchantProductData.selling_price }}
+														{{ singleMerchantProductData.selling_price }} 
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 													</label>
 												</div>
 
@@ -1134,6 +1158,7 @@
 																			</label>
 																			<label class="col-sm-8 col-form-label">
 																				{{ merchantProductVariation.selling_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
 																	</div>
@@ -1199,7 +1224,7 @@
 														<!-- 
 														<div class="form-row">
 															<label class="col-form-label font-weight-bold text-right">
-																Available Quantity :
+																Available Qty :
 															</label>
 															<label class="col-form-label text-left">
 																{{ merchantProductVariation.available_quantity }}
@@ -1553,6 +1578,8 @@
 						*/
 					},
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -2762,7 +2789,7 @@
 					case 'product_available_quantity' :
 
 						if (!this.singleMerchantProductData.available_quantity || this.singleMerchantProductData.available_quantity < 0 || this.singleMerchantProductData.available_quantity > this.singleMerchantProductData.initial_quantity) {
-							this.errors.product.product_available_quantity = 'Quantity is required';
+							this.errors.product.product_available_quantity = 'Qty is required';
 						}
 						else{
 							this.submitForm = true;
@@ -2870,7 +2897,7 @@
 										this.errors.product.variations[index].product_variation_quantity = 'Variation quantity is required';
 									}
 									else if (productVariation.initial_quantity < productVariation.requested_quantity) {
-										this.errors.product.variations[index].product_variation_quantity = 'Quantity cant be less than required quantity';
+										this.errors.product.variations[index].product_variation_quantity = 'Qty cant be less than required quantity';
 									}
 									else {
 										this.$delete(this.errors.product.variations[index], 'product_variation_quantity');

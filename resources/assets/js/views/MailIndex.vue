@@ -63,8 +63,7 @@
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
 										  		>	
-										  		</table-with-delete-option> 
-										  		
+										  		</table-with-delete-option>
 
 										  		<!-- 
 										  		<div class="tab-content card-block pl-0 pr-0">

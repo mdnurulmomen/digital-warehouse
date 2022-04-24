@@ -450,11 +450,11 @@
 										</div>
 
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Warning Quantity</label>
+											<label for="inputFirstName">Warning Qty</label>
 											<input type="number" 
 												class="form-control is-valid" 
 												v-model.number="singleMerchantProductData.warning_quantity" 
-												placeholder="Product Warning Quantity" 
+												placeholder="Product Warning Qty" 
 											>
 										</div>
 									</div>
@@ -822,7 +822,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Warning Quantity :
+														Warning Qty :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.warning_quantity }}
@@ -832,7 +832,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Starting Quantity :
+														Starting Qty :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.previous_quantity }}
@@ -842,7 +842,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Stocked Quantity :
+														Stocked Qty :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity) }}
@@ -852,7 +852,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Dispatched Quantity :
+														Dispatched Qty :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.dispatched_quantity }}
@@ -862,7 +862,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Pending Requested Quantity :
+														Pending Requested Qty :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.requested_quantity }}
@@ -872,7 +872,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Available Quantity :
+														Available Qty :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
@@ -1128,7 +1128,7 @@
 														<!-- 
 														<div class="form-row">
 															<label class="col-form-label font-weight-bold text-right">
-																Available Quantity :
+																Available Qty :
 															</label>
 															<label class="col-form-label text-left">
 																{{ merchantProductVariation.available_quantity }}
@@ -1383,7 +1383,7 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Warning Quantity :
+							Warning Qty :
 						</label>
 						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.warning_quantity }}
@@ -1393,7 +1393,7 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Starting Quantity :
+							Starting Qty :
 						</label>
 						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.previous_quantity }}
@@ -1403,7 +1403,7 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Stocked Quantity :
+							Stocked Qty :
 						</label>
 						<label class="col-8 col-form-label">
 							{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity) }}
@@ -1413,7 +1413,7 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Dispatched Quantity :
+							Dispatched Qty :
 						</label>
 						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.dispatched_quantity }}
@@ -1423,7 +1423,7 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Pending Requested Quantity :
+							Pending Requested Qty :
 						</label>
 						<label class="col-8 col-form-label">
 							{{ singleMerchantProductData.requested_quantity }}
@@ -1433,7 +1433,7 @@
 
 					<div class="form-row">
 						<label class="col-4 col-form-label font-weight-bold">
-							Available Quantity :
+							Available Qty :
 						</label>
 						<label class="col-8 col-form-label">
 							{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
@@ -1687,7 +1687,7 @@
 									<!-- 
 									<div class="form-row">
 										<label class="col-form-label font-weight-bold text-right">
-											Available Quantity :
+											Available Qty :
 										</label>
 										<label class="col-form-label text-left">
 											{{ merchantProductVariation.available_quantity }}
@@ -3167,7 +3167,7 @@
 					case 'product_available_quantity' :
 
 						if (!this.singleMerchantProductData.available_quantity || this.singleMerchantProductData.available_quantity < 0 || this.singleMerchantProductData.available_quantity > this.singleMerchantProductData.initial_quantity) {
-							this.errors.product.product_available_quantity = 'Quantity is required';
+							this.errors.product.product_available_quantity = 'Qty is required';
 						}
 						else{
 							this.submitForm = true;
@@ -3267,7 +3267,7 @@
 										this.errors.product.variations[index].product_variation_quantity = 'Variation quantity is required';
 									}
 									else if (productVariation.initial_quantity < productVariation.requested_quantity) {
-										this.errors.product.variations[index].product_variation_quantity = 'Quantity cant be less than required quantity';
+										this.errors.product.variations[index].product_variation_quantity = 'Qty cant be less than required quantity';
 									}
 									else {
 										this.$delete(this.errors.product.variations[index], 'product_variation_quantity');
