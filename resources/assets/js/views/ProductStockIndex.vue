@@ -2000,6 +2000,8 @@
 															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
 														</span>
 
+														<i class="fa fa-print fa-lg text-danger" aria-hidden="true" @click="printStockCode({ has_serials : singleStockData.has_serials, has_variations : singleStockData.has_variations, stock_code : singleStockData.stock_code, serials : [ { serial_no : productSerial.serial_no } ] })" v-tooltip.bottom-end="'Print'"></i>
+
 														<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
 													</li>	
 												</ol>
@@ -2026,6 +2028,8 @@
 																		<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
 																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
 																		</span>
+
+																		<i class="fa fa-print fa-lg text-danger" aria-hidden="true" @click="printStockCode({ has_serials : singleStockData.has_serials, has_variations : singleStockData.has_variations, variations : [ { stock_code : stockVariation.stock_code, variation : stockVariation.variation, serials : [ { serial_no : variationSerial.serial_no } ] } ] })" v-tooltip.bottom-end="'Print'"></i>
 
 																		<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
 																	</li>	
@@ -2241,7 +2245,7 @@
 							type="button" 
 							class="btn btn-danger" 
 							v-tooltip.bottom-end="'Print'"  
-							@click="print()"
+							@click="printInvoice()"
 						>
 							Print
 						</button>
@@ -2300,24 +2304,156 @@
 			</div>
 		</div>
 
+		<div id="productCodeToPrint" class="d-none">
+			<div class="card">
+				<!-- 
+				<div class="card-header">
+					<div class="form-row text-center" v-show="! singleStockData.has_variations">
+						<label class="col-12 col-form-label font-weight-bold">
+							Stock (Batch) Code :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="singleStockData.stock_code"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div> 
+				</div>
+				-->
+
+				<div 
+					class="card-body form-group" 
+					v-for="(productSerial, productSerialIndex) in productToPrint.serials"
+					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
+				>
+					<div class="form-row text-center">
+						<label class="col-12 col-form-label font-weight-bold">
+							Stock (Batch) Code :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="productToPrint.stock_code"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div>
+
+					<div class="form-row text-center">
+						<label class="col-12 col-form-label font-weight-bold">
+							Serial :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="productSerial.serial_no"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div>
+				</div>
+
+				<div 
+					class="card-body" 
+					v-for="(productVariation, productVariationIndex) in productToPrint.variations"
+					:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id"
+				>
+					<!-- 
+					<div class="form-row text-center" v-show="singleStockData.has_variations">
+						<label class="col-12 col-form-label font-weight-bold">
+							Stock (Batch) Code :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="productVariation.stock_code"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div> 
+					-->
+
+					<div 
+						class="form-group"
+						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials"
+						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id"
+					>
+						<div class="form-row text-center">
+							<label class="col-12 col-form-label font-weight-bold">
+								Stock (Batch) Code :
+							</label>
+
+							<label class="col-12 col-form-label">
+								<svg 
+							  		class="barcode" 
+							        :jsbarcode-format="'CODE128'" 
+							        :jsbarcode-value="productVariation.stock_code"
+							        jsbarcode-width=1 
+							        jsbarcode-height=25 
+							        last-char= ">"
+							    >    
+						        </svg> 
+							</label>
+						</div>
+
+						<div class="form-row text-center">
+							<label class="col-12 col-form-label font-weight-bold">
+								Serial :
+							</label>
+
+							<label class="col-12 col-form-label">
+								<svg 
+							  		class="barcode" 
+							        :jsbarcode-format="'CODE128'" 
+							        :jsbarcode-value="productVariationSerial.serial_no"
+							        jsbarcode-width=1 
+							        jsbarcode-height=25 
+							        last-char= ">"
+							    >    
+						        </svg> 
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
 				<div class="card-header">
 					<div class="form-row">
-						<div class="col-sm-12 text-center">
+						<div class="col-6">
 							<img 
 								class="img-fluid" 
 								:src="'/' + general_settings.application_logo" 
 								:alt="general_settings.app_name + ' Logo'"
 							>
 							
-							<h5 class="text-center">Gudam</h5>
-						</div>
-					</div>
-					
-					<div class="form-row d-flex">
-						<div class="col-6 align-self-center">
-							<h5>{{ general_settings.app_name | capitalize }} Invoice</h5>
+							<h5>
+								{{ general_settings.app_name | capitalize }} Stock Invoice
+							</h5>
 						</div>
 
 						<div class="col-6">
@@ -2326,7 +2462,6 @@
 							:size="50" 
 							class="float-right"
 							></qr-code>
-							<!-- <h5>{{ singleStockData.invoice_no | capitalize }}</h5> -->
 						</div>
 					</div>
 				</div>
@@ -2335,7 +2470,7 @@
 					<div class="form-row form-group">
 						<div class="col-6">
 							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-right">
+								<label class="col-6 col-form-label font-weight-bold">
 									Stocked at :
 								</label>
 
@@ -2345,7 +2480,7 @@
 							</div>
 
 							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-right">
+								<label class="col-6 col-form-label font-weight-bold">
 									Stocked on :
 								</label>
 
@@ -2355,7 +2490,7 @@
 							</div>
 
 							<div class="form-row" v-if="singleStockData.hasOwnProperty('keeper')">
-								<label class="col-6 col-form-label font-weight-bold text-right">
+								<label class="col-6 col-form-label font-weight-bold">
 									Stored By :
 								</label>
 
@@ -2365,7 +2500,7 @@
 							</div>
 
 							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-right">
+								<label class="col-6 col-form-label font-weight-bold">
 									Approval :
 								</label>
 
@@ -2377,7 +2512,7 @@
 							</div>
 
 							<div class="form-row" v-if="singleStockData.has_approval">
-								<label class="col-6 col-form-label font-weight-bold text-right">
+								<label class="col-6 col-form-label font-weight-bold">
 									{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
 								</label>
 
@@ -2387,7 +2522,7 @@
 							</div>
 
 							<div class="form-row" v-if="singleStockData.has_approval">
-								<label class="col-6 col-form-label font-weight-bold text-right">
+								<label class="col-6 col-form-label font-weight-bold">
 									{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
 								</label>
 
@@ -2408,6 +2543,7 @@
 								</label>
 							</div>
 
+							<!-- 
 							<div class="form-row" v-show="productMerchant.has_variations">
 								<label class="col-6 col-form-label font-weight-bold text-right">
 									Product Name :
@@ -2416,7 +2552,8 @@
 								<label class="col-6 col-form-label">
 									{{ product.name | capitalize }} ({{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Mr. Manufacturer' | capitalize }})
 								</label>
-							</div>
+							</div> 
+							-->
 
 							<div 
 								class="form-row" 
@@ -2458,13 +2595,15 @@
 					</div> 
 					-->
 
+					<!-- 
 					<div class="form-row">
 						<div class="col-12">
 							<label class="col-form-label font-weight-bold">
 								Description :
 							</label>
 						</div>
-					</div>
+					</div> 
+					-->
 
 					<div class="form-row">
 						<div class="col-12">
@@ -2472,9 +2611,10 @@
 								<thead>
 									<tr>
 										<th>Name</th>
+										<th>Variation</th>
 										<th>Stock Qty ({{ product.quantity_type }})</th>
-										<th>Stock (Batch) Code</th>
 										<!-- 
+										<th>Stock (Batch) Code</th>
 										<th>Buying Price ({{ general_settings.official_currency_name || 'BDT' | capitalize }})</th>
 										-->
 										<th>Serials</th>
@@ -2484,129 +2624,163 @@
 
 								<tbody>
 									<div v-if="! productMerchant.has_variations">
-										<td>
-											{{ product.name | capitalize }} ({{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Mr. Manufacturer' | capitalize }})
-										</td>
+										<tr>
+											<td>
+												{{ product.name | capitalize }} ({{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Mr. Manufacturer' | capitalize }})
+											</td>
 
-										<td>{{ singleStockData.stock_quantity  }}</td>
+											<td>--</td>
 
-										<td>
+											<td>{{ singleStockData.stock_quantity  }}</td>
+
 											<!-- 
-											<label class="col-form-label">
-												{{ singleStockData.stock_code | capitalize }}
-											</label> 
+											<td>
+												 
+												<label class="col-form-label">
+													{{ singleStockData.stock_code | capitalize }}
+												</label> 
+												
+
+												<svg id="print-stock-code"></svg>
+
+											  	<svg 
+											  		class="barcode" 
+											        :jsbarcode-format="(singleStockData.stock_code && singleStockData.stock_code.length > 12) ? 'CODE128' : 'EAN13'" 
+											        :jsbarcode-value="singleStockData.stock_code"
+											        jsbarcode-width=1 
+											        jsbarcode-height=25 
+											        last-char= ">"
+											    >    
+										        </svg> 
+										    	
+												 
+												<barcode 
+													:value="singleStockData.stock_code" 
+													format="EAN" 
+													background="#ccffff"
+													lineColor= "#000000"
+													width=1
+													height=25
+													class="d-block" 
+												>
+											    	Barcode Not Working.
+											  	</barcode> 
+											  	
+											</td> 
 											-->
 
-											<!-- <svg id="print-stock-code"></svg> -->
+											<!-- <td>{{ singleStockData.unit_buying_price }}</td> -->
 
-											<barcode 
-												:value="singleStockData.stock_code" 
-												format= "CODE128"
-												background="#ccffff"
-												lineColor= "#000000"
-												width=1
-												height=25
-												class="d-block" 
-											>
-										    	Barcode Not Working.
-										  	</barcode>
-										</td>
+											<td>
+												<ol 
+													v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
+												>
+													<li v-for="(productSerial, productIndex) in singleStockData.serials">
+														{{ productSerial.serial_no }}
 
-										<!-- <td>{{ singleStockData.unit_buying_price }}</td> -->
+														<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
 
-										<td>
-											<ol 
-												v-if="singleStockData.has_serials && singleStockData.hasOwnProperty('serials') && singleStockData.serials.length"
-											>
-												<li v-for="(productSerial, productIndex) in singleStockData.serials">
-													{{ productSerial.serial_no }}
+														<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
+													</li>	
+												</ol>
 
-													<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
-														{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
-													</span>
-
-													<span v-show="(productIndex + 1) < singleStockData.serials.length">, </span> 
-												</li>	
-											</ol>
-
-											<span v-else>
-												NA
-											</span>
-										</td>
+												<span v-else>
+													--
+												</span>
+											</td>
+										</tr>
 
 										<!-- <td></td> -->
 									</div>
 
 									<div v-else-if="productMerchant.has_variations && singleStockData.hasOwnProperty('variations') && singleStockData.variations.length">
-
 										<tr 
 											v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 											:key="'product-variation-index-' + variationIndex + 'B'"
-										>
-											<div class="card">
-												<div class="card-body">
-													<td>
-														{{ stockVariation.variation.name | capitalize }}
-														 
-														<p v-show="stockVariation.manufactured_at">
-															Mfg Date : {{ stockVariation.manufactured_at }}
-														</p>
+										>	
+											<td>
+												{{ product.name | capitalize }} ({{ productMerchant.manufacturer ? productMerchant.manufacturer.name : 'Mr. Manufacturer' | capitalize }})
+											</td>
 
-														<p v-show="stockVariation.expired_at">
-															Exp Date : {{ stockVariation.expired_at }}
-														</p>
-													</td>
-													
-													<td>{{ stockVariation.stock_quantity }}</td>
-													
-													<td>
-														<!-- 
-														<label class="col-form-label">
-															{{ singleStockData.stock_code | capitalize }}
-														</label> 
-														-->
+											<td>
+												{{ stockVariation.variation.name | capitalize }}
+												 
+												<p v-show="stockVariation.manufactured_at">
+													Mfg Date : {{ stockVariation.manufactured_at }}
+												</p>
 
-														<!-- <svg id="print-stock-code"></svg> -->
+												<p v-show="stockVariation.expired_at">
+													Exp Date : {{ stockVariation.expired_at }}
+												</p>
+											</td>
+											
+											<td>{{ stockVariation.stock_quantity }}</td>
+											
+											<!-- 
+											<td>
+												 
+												<label class="col-form-label">
+													{{ singleStockData.stock_code | capitalize }}
+												</label> 
+												
 
-														<barcode 
-															:value="stockVariation.stock_code" 
-															format= "CODE128"
-															background="#ccffff"
-															lineColor= "#000000"
-															width=1
-															height=25
-															class="d-block" 
-														>
-													    	Barcode Not Working.
-													  	</barcode>
-													</td>
+												<svg id="print-stock-code"></svg>
 
-													<!-- <td>{{ stockVariation.unit_buying_price }}</td> -->
+												<svg 
+											  		class="barcode" 
+											        :jsbarcode-format="(stockVariation.stock_code && stockVariation.stock_code.length > 12) ? 'CODE128' : 'EAN13'" 
+											        :jsbarcode-value="stockVariation.stock_code"
+											        jsbarcode-width=1 
+											        jsbarcode-height=25 
+											        last-char= ">"
+											    >    
+										        </svg> 
 
-													<td>
+												 
+												<barcode 
+													:value="stockVariation.stock_code" 
+													format="EAN"
+													background="#ccffff"
+													lineColor= "#000000"
+													width=1
+													height=25
+													class="d-block" 
+												>
+											    	Barcode Not Working.
+											  	</barcode> 
+											  	
+											</td> 
+											-->
 
-														<ol 
-															v-if="singleStockData.has_serials && stockVariation.hasOwnProperty('serials') && stockVariation.serials.length"
-														>
-															<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
-																{{ variationSerial.serial_no }}
+											<!-- 
+											<td>
+												{{ stockVariation.unit_buying_price }}
+											</td> 
+											-->
 
-																<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
-																	{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
-																</span>
+											<td>
+												<ol 
+													v-if="singleStockData.has_serials && stockVariation.hasOwnProperty('serials') && stockVariation.serials.length"
+												>
+													<li v-for="(variationSerial, variationIndex) in stockVariation.serials">
+														{{ variationSerial.serial_no }}
 
-																<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
-															</li>	
-														</ol>
-
-														<span v-else>
-															NA
+														<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
 														</span>
-													</td>
 
-													<!-- <td></td> -->
-												</div>
-											</div>
+														<span v-show="(variationIndex + 1) < stockVariation.serials.length">, </span> 
+													</li>	
+												</ol>
+
+												<span v-else>
+													--
+												</span>
+											</td>
+
+											<!-- <td></td> -->
 										</tr>
 									</div>
 								</tbody>
@@ -2695,6 +2869,8 @@
 					],
 
 	        	},
+
+	        	productToPrint : {},
 
 	        	errors : {
 					stock : {
@@ -3306,6 +3482,8 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 							
+							this.printStockCode(this.singleStockData);
+
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3340,6 +3518,8 @@
 							
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+
+							this.printStockCode(this.singleStockData);
 
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
@@ -4208,10 +4388,12 @@
 				return words.join(" ");
 
 		    },
-		    print() {
+		    printInvoice() {
 
 				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
 				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
+
+				JsBarcode(".barcode").init();
 
 				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 
@@ -4225,6 +4407,35 @@
 				*/
 
 				$('#stock-view-modal').modal('hide');
+
+			},
+			printStockCode(productToPrint = {}) {
+
+				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
+
+				// this.$set(this, 'productToPrint', productToPrint);
+				this.productToPrint = productToPrint;
+
+				this.$nextTick(function () {
+
+					JsBarcode(".barcode").init();
+					
+					this.$htmlToPaper('productCodeToPrint', this.printingStyles);
+
+				})
+
+
+				/*
+				JsBarcode("#print-stock-code", this.singleStockData.stock_code, 
+					{
+						width:1, 
+						height:25
+					}
+				);
+				*/
+
+				// $('#stock-view-modal').modal('hide');
 
 			},
 		    resetSearchingDates(){

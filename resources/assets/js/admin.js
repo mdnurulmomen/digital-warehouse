@@ -30,8 +30,8 @@ import { routeNeedsPermission, userHasPermissionTo } from './public.js'
 import VueHtmlToPaper from 'vue-html-to-paper';
 Vue.use(VueHtmlToPaper);
 
-import Barcode from 'vue-barcode'
-Vue.component('barcode', Barcode)
+import JsBarcode from 'jsbarcode'
+Vue.component('JsBarcode', JsBarcode)
 
 import VueQRCodeComponent from 'vue-qrcode-component'
 Vue.component('qr-code', VueQRCodeComponent)

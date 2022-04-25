@@ -154,8 +154,8 @@
 																</thead>
 																<tbody>
 																	<tr 
-																		v-for="stock in allStocks" 
-																		:key="'merchant-product-stock-' + stock.id" 
+																		v-for="(stock, stockIndex) in allStocks" 
+																		:key="'stock-index-' + stockIndex + '-stock-' + stock.id" 
 																		:class="stock.id==singleStockData.id ? 'highlighted' : ''"
 																	>
 																		<td>
@@ -1892,6 +1892,8 @@
 
 													<label class="col-sm-6 col-form-label">
 														{{ stockedProduct.stock_code | capitalize }}
+
+														<i class="fa fa-print fa-lg text-danger" aria-hidden="true" @click="printStockCode([ stockedProduct ])" v-tooltip.bottom-end="'Print'"></i>
 													</label>
 												</div>
 
@@ -2041,6 +2043,8 @@
 																	{{ stockedProductSerial.has_dispatched ? 'Dispatched' : stockedProductSerial.has_requisitions ? 'Requested' : '' }}
 																</span>
 
+																<i class="fa fa-print fa-lg text-danger" aria-hidden="true" @click="printStockCode([ { has_serials : stockedProduct.has_serials, has_variations : stockedProduct.has_variations, stock_code : stockedProduct.stock_code, merchant_product : stockedProduct.merchant_product, serials : [ { serial_no : stockedProductSerial.serial_no } ] } ])" v-tooltip.bottom-end="'Print'"></i>
+
 																<span v-show="(stockedProductIndex + 1) < stockedProduct.serials.length">
 																	, 
 																</span> 
@@ -2072,6 +2076,8 @@
 																				<span :class="[stockedProductVariationSerial.has_dispatched ? 'badge badge-danger' : stockedProductVariationSerial.has_requisitions ? 'badge badge-warning' : '']">
 																					{{ stockedProductVariationSerial.has_dispatched ? 'Dispatched' : stockedProductVariationSerial.has_requisitions ? 'Requested' : '' }}
 																				</span>
+
+																				<i class="fa fa-print fa-lg text-danger" aria-hidden="true" @click="printStockCode([ { has_serials : stockedProduct.has_serials, has_variations : stockedProduct.has_variations, merchant_product : stockedProduct.merchant_product, variations : [ { stock_code : stockedProductVariation.stock_code, variation : stockedProductVariation.variation, serials : [ { serial_no : stockedProductVariationSerial.serial_no } ] } ] } ])" v-tooltip.bottom-end="'Print'"></i>
 
 																				<span v-show="(stockedProductVariationIndex + 1) < stockedProductVariation.serials.length">
 																					, 
@@ -2109,7 +2115,7 @@
 											<div 
 												class="col-md-12" 
 												v-for="(stockedProduct, stockedProductIndex) in singleStockData.products" 
-												:key="'stocked-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-s'"
+												:key="'stocked-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-B'"
 											>
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold text-right">
@@ -2165,7 +2171,6 @@
 																				{{ containerAddress.name.substring(containerAddress.name.lastIndexOf("-")+1) }}
 																			</label>
 																		</div>
-
 																	</div>
 																</div>
 
@@ -2202,7 +2207,6 @@
 																				Shelf # :
 																			</label>
 																			<label class="col-6 col-form-label">
-
 																				<ul id="shelf-addresses">
 																					<li 
 																						v-for="shelfAddress in stockAddress.container.shelves" 
@@ -2213,10 +2217,8 @@
 																						
 																					</li>
 																				</ul>
-
 																			</label>
 																		</div>
-
 																	</div>
 																</div>
 
@@ -2225,7 +2227,6 @@
 																	v-if="stockAddress.hasOwnProperty('type') && stockAddress.type.includes('units') && stockAddress.hasOwnProperty('container') && stockAddress.container.hasOwnProperty('warehouse_container')"
 																>
 																	<div class="card-body">
-																		
 																		<h6>Units Address</h6>
 
 																		<div class="form-row">
@@ -2304,7 +2305,7 @@
 							type="button" 
 							class="btn btn-danger" 
 							v-tooltip.bottom-end="'Print'"  
-							@click="print()"
+							@click="printInvoice()"
 						>
 							Print
 						</button>
@@ -2362,335 +2363,253 @@
 				</div>
 			</div>
 		</div>
-
-		 
+ 
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
-				<div class="card-body">
+				<div class="card-header">
 					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Merchant :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ getFullName(singleStockData.merchant) | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Invoice :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singleStockData.invoice_no }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Stocked on :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singleStockData.created_at }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Stocked at :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singleStockData.hasOwnProperty('warehouse') ? singleStockData.warehouse.name : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleStockData.hasOwnProperty('keeper')">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Stored By :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singleStockData.keeper.user_name | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Approval :
-						</label>
-
-						<label class="col-6 col-form-label">
-							<span :class="[singleStockData.has_approval==1 ? 'badge-success' : singleStockData.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
-								{{ singleStockData.has_approval==1 ? 'Approved' : singleStockData.has_approval==-1 ? 'Cancelled' : 'Pending' }}
-							</span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleStockData.has_approval">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singleStockData.approver.user_name | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleStockData.has_approval">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singleStockData.updated_at }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleStockData.has_approval">
-						<label class="col-6 col-form-label font-weight-bold text-md-right">
-							Stock Products :
-						</label>
-					</div>
-
-					<div 
-						class="card"
-						v-for="(stockedProduct, stockedProductIndex) in singleStockData.products" 
-						:key="'stock-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-B'"
-					>
-						<div class="card-header">
-							{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }}
-							({{ (stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer) ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }})
+						<div class="col-6">
+							<img 
+								class="img-fluid" 
+								:src="'/' + general_settings.application_logo" 
+								:alt="general_settings.app_name + ' Logo'"
+							>
+							
+							<h5>
+								{{ general_settings.app_name | capitalize }} Stock Invoice
+							</h5>
 						</div>
 
-						<div class="card-body">
-							<div class="form-row" v-show="! stockedProduct.has_variations">
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Product-Stock (Batch) Code :
+						<div class="col-6">
+							<qr-code 
+							:text="singleStockData.invoice_no || ''"
+							:size="50" 
+							class="float-right"
+							></qr-code>
+						</div>
+					</div>
+				</div>
+
+				<div class="card-body">
+					<div class="form-row form-group">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Stocked at :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ stockedProduct.stock_code | capitalize }}
-								</label>
-							</div>
-
-							<div 
-								class="form-row" 
-								v-show="stockedProduct.manufactured_at"
-							>
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Stock Manufacturing Code :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ stockedProduct.manufactured_at }}
-								</label>
-							</div>
-
-							<div 
-								class="form-row" 
-								v-show="stockedProduct.expired_at"
-							>
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Stock Expiring Code :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ stockedProduct.expired_at }}
+									{{ singleStockData.hasOwnProperty('warehouse') ? singleStockData.warehouse.name : '' }}
 								</label>
 							</div>
 
 							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Stock Quantity :
+								<label class="col-6 col-form-label font-weight-bold">
+									Stocked on :
 								</label>
 
-								<div class="col-6 col-form-label">
-									
-									{{ stockedProduct.stock_quantity }} {{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
-									
-									<div class="form-row" v-if="stockedProduct.has_variations && stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length">
-										<div 
-											class="col-md-12" 
-											v-for="(stockedProductVariation, stockedProductVariationIndex) in stockedProduct.variations" 
-											:key="'stock-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + 'product-variation-index-' + stockedProductVariationIndex + '-B'"
-										>
-											<div class="card">
-												<div class="card-body">
-													<div class="form-row">
-														<label class="col-form-label font-weight-bold text-right">
-															{{ stockedProductVariation.variation.name | capitalize }} :
-														</label>
-
-														<label class="col-form-label">
-															{{ stockedProductVariation.stock_quantity }} {{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
-														</label>
-													</div>
-
-													<div class="form-row">
-														<label class="col-form-label font-weight-bold text-right">
-															Available Quantity :
-														</label>
-														<label class="col-form-label">
-															{{ stockedProductVariation.available_quantity }} {{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
-														</label>
-													</div>
-
-													<div class="form-row">
-														<label class="col-form-label font-weight-bold text-right">
-															Buying Price :
-														</label>
-														<label class="col-form-label">
-															{{ stockedProductVariation.unit_buying_price }}
-															{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-														</label>
-													</div>
-
-													<div class="form-row">
-														<label class="col-form-label font-weight-bold text-right">
-															Stock (Batch) Code :
-														</label>
-														<label class="col-form-label">
-															{{ stockedProductVariation.stock_code | capitalize }}
-														</label>
-													</div>
-
-													<div 
-														class="form-row" 
-														v-show="stockedProductVariation.manufactured_at"
-													>
-														<label class="col-form-label font-weight-bold text-right">
-															Manufacturing Date :
-														</label>
-														<label class="col-form-label">
-															{{ stockedProductVariation.manufactured_at }}
-														</label>
-													</div>
-
-													<div 
-														class="form-row" 
-														v-show="stockedProductVariation.expired_at"
-													>
-														<label class="col-form-label font-weight-bold text-right">
-															Expiring Date :
-														</label>
-														<label class="col-form-label">
-															{{ stockedProductVariation.expired_at }}
-														</label>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="form-row" v-show="! stockedProduct.has_variations">
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Available Quantity :
-								</label>
-								
 								<label class="col-6 col-form-label">
-									{{ stockedProduct.available_quantity }} {{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
+									{{ singleStockData.created_at }}
 								</label>
 							</div>
 
-							<div class="form-row" v-show="! stockedProduct.has_variations">
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Buying Price :
+							<div class="form-row" v-if="singleStockData.hasOwnProperty('keeper')">
+								<label class="col-6 col-form-label font-weight-bold">
+									Stored By :
 								</label>
+
 								<label class="col-6 col-form-label">
-									{{ stockedProduct.unit_buying_price }}
-									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+									{{ singleStockData.keeper.user_name | capitalize }}
 								</label>
 							</div>
 
-							<!-- 
 							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Available Quantity (then) :
+								<label class="col-6 col-form-label font-weight-bold">
+									Approval :
 								</label>
-								
-								<label class="col-6 col-form-label">
-									{{ stockedProduct.available_quantity }} {{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
-								</label>
-							</div> 
-							-->
 
-							<div class="form-row" v-show="stockedProduct.has_serials">
-								<label class="col-6 col-form-label font-weight-bold text-md-right">
-									Serials :
+								<label class="col-6 col-form-label">
+									<span :class="[singleStockData.has_approval==1 ? 'badge-success' : singleStockData.has_approval==-1 ? 'badge-danger' : 'badge-secondary', 'badge']">
+										{{ singleStockData.has_approval==1 ? 'Approved' : singleStockData.has_approval==-1 ? 'Cancelled' : 'NA' }}
+									</span>
 								</label>
-								<div class="col-6 col-form-label">
-									<ol 
-										v-if="stockedProduct.has_serials && stockedProduct.hasOwnProperty('serials') && stockedProduct.serials.length"
+							</div>
+
+							<div class="form-row" v-if="singleStockData.has_approval">
+								<label class="col-6 col-form-label font-weight-bold">
+									{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} By :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singleStockData.approver.user_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleStockData.has_approval">
+								<label class="col-6 col-form-label font-weight-bold">
+									{{ singleStockData.has_approval==1 ? 'Approved' : 'Cancelled' }} on :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singleStockData.updated_at }}
+								</label>
+							</div>
+						</div>
+						
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Merchant Name :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ getFullName(singleStockData.merchant) | capitalize }}
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-row" v-if="singleStockData.has_approval">
+						<label class="col-6 col-form-label font-weight-bold">
+							Stocked Products :
+						</label>
+
+						<div class="col-12">
+							<table class="table table-striped table-bordered nowrap text-center">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Variation</th>
+										<th>Stock Qty</th>
+										<!-- 
+										<th>Buying Price ({{ general_settings.official_currency_name || 'BDT' | capitalize }})</th>
+										-->
+										<th>Serials</th>
+										<!-- <th>Total</th> -->
+									</tr>
+								</thead>
+
+								<tbody>
+									<div 
+										v-for="(stockedProduct, stockedProductIndex) in singleStockData.products" 
+										:key="'printing-stock-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-B'"
 									>
-										<li v-for="(stockedProductSerial, stockedProductIndex) in stockedProduct.serials">
-											{{ stockedProductSerial.serial_no }}
+										<div v-if="! stockedProduct.has_variations">
+											<tr>
+												<td>
+													{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }}
+													({{ (stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer) ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }})
 
-											<span :class="[stockedProductSerial.has_dispatched ? 'badge badge-danger' : stockedProductSerial.has_requisitions ? 'badge badge-warning' : '']">
-												{{ stockedProductSerial.has_dispatched ? 'Dispatched' : stockedProductSerial.has_requisitions ? 'Requested' : '' }}
-											</span>
+													<p class="mt-2 mb-1" v-show="stockedProduct.manufactured_at">
+														Mfg Date : {{ stockedProduct.manufactured_at }}
+													</p>
 
-											<span v-show="(stockedProductIndex + 1) < stockedProduct.serials.length">
-												, 
-											</span> 
-										</li>	
-									</ol>
-									
-									<div class="form-row" v-if="stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length">
-										<div 
-											class="col-md-12" 
-											v-for="(stockedProductVariation, stockedProductVariationIndex) in stockedProduct.variations" 
-											:key="'stock-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + 'product-variation-index-' + stockedProductVariationIndex + '-B'"
-										>
-											<div class="form-row">
-												<label class="col-form-label font-weight-bold text-right">
-													{{ stockedProductVariation.variation.name | capitalize }} |
-												</label>
+													<p v-show="stockedProduct.expired_at">
+														Exp Date : {{ stockedProduct.expired_at }}
+													</p>
+												</td>
 
-												<label class="col-form-label">
-													<!-- 
-													{{ stockedProductVariation.stock_quantity }}
-													{{ stockedProduct.merchant_product ? stockedProduct.merchant_product.product.quantity_type : 'Unit'}} 
-													-->
+												<td>--</td>
+
+												<td>
+													{{ stockedProduct.stock_quantity  }}
+													{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
+												</td>
+
+												<!-- 
+												<td>
+													{{ stockedProduct.unit_buying_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+												</td> 
+												-->
+
+												<td>
 													<ol 
-														v-if="stockedProduct.has_serials && stockedProductVariation.serials.length"
+														v-if="stockedProduct.has_serials && stockedProduct.hasOwnProperty('serials') && stockedProduct.serials.length"
 													>
-														<li v-for="(stockedProductVariationSerial, stockedProductVariationIndex) in stockedProductVariation.serials">
-															{{ stockedProductVariationSerial.serial_no }}
+														<li v-for="(productSerial, productSerialIndex) in stockedProduct.serials">
+															
+															{{ productSerial.serial_no }}
 
-															<span :class="[stockedProductVariationSerial.has_dispatched ? 'badge badge-danger' : stockedProductVariationSerial.has_requisitions ? 'badge badge-warning' : '']">
-																{{ stockedProductVariationSerial.has_dispatched ? 'Dispatched' : stockedProductVariationSerial.has_requisitions ? 'Requested' : '' }}
+															<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+																{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
 															</span>
 
-															<span v-show="(stockedProductVariationIndex + 1) < stockedProductVariation.serials.length">
-																, 
-															</span> 
+															<span v-show="(productSerialIndex + 1) < stockedProduct.serials.length">, </span> 
 														</li>	
 													</ol>
-												</label>
-											</div>
-											
-											<!-- 
-											<div class="form-row">
-												<label class="col-form-label font-weight-bold text-right">
-													Available Quantity :
-												</label>
-												<label class="col-form-label">
-													{{ stockVariation.available_quantity }}
-												</label>
-											</div>
-											-->
+
+													<span v-else>
+														--
+													</span>
+												</td>
+											</tr>
+										</div>
+										
+										<div v-else-if="stockedProduct.has_variations && stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length">
+											<tr 
+												v-for="(stockedProductVariation, stockedProductVariationIndex) in stockedProduct.variations" 
+												:key="'printing-stock-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + 'product-variation-index-' + stockedProductVariationIndex + '-B'"
+											>	
+												<td>
+													{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }}
+													({{ (stockedProduct.merchant_product && stockedProduct.merchant_product.manufacturer) ? stockedProduct.merchant_product.manufacturer.name : 'Own Product' | capitalize }})
+												</td>
+
+												<td>
+													{{ stockedProductVariation.variation.name | capitalize }}
+													 
+													<p class="mb-1 mt-2" v-show="stockedProductVariation.manufactured_at">
+														Mfg Date : {{ stockedProductVariation.manufactured_at }}
+													</p>
+
+													<p v-show="stockedProductVariation.expired_at">
+														Exp Date : {{ stockedProductVariation.expired_at }}
+													</p>
+												</td>
+												
+												<td>
+
+													{{ stockedProductVariation.stock_quantity }} 
+													{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
+												</td>
+
+												<!-- 
+												<td>
+													{{ stockedProductVariation.unit_buying_price }}
+													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+												</td>
+												 -->
+
+												<td>
+													<ol 
+														v-if="stockedProduct.has_serials && stockedProductVariation.hasOwnProperty('serials') && stockedProductVariation.serials.length"
+													>
+														<li v-for="(variationSerial, variationIndex) in stockedProductVariation.serials">
+															
+															{{ variationSerial.serial_no }}
+
+															<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+															</span>
+
+															<span v-show="(variationIndex + 1) < stockedProductVariation.serials.length">, </span> 
+														</li>	
+													</ol>
+
+													<span v-else>
+														--
+													</span>
+												</td>
+											</tr>
 										</div>
 									</div>
-								</div>
-							</div>
+								</tbody>
+							</table>							
 						</div>
 					</div>
 
+					<!-- 
 					<div 
 						class="form-row mt-2" 
 						v-if="singleStockData.hasOwnProperty('products') && singleStockData.products.length"
@@ -2879,13 +2798,152 @@
 								</div>
 							</div>
 						</div>
+					</div> 
+					-->
+				</div>
+			</div>
+		</div>
+
+		<div id="stockCodeToPrint" class="d-none">
+			<div 
+				class="card" 
+				v-for="(stockedProduct, stockedProductIndex) in stockProductsToPrint"
+				:key="'printing-product-serial-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-c'"
+			>
+				<!-- 
+				<div class="card-header">
+					<div class="form-row text-center" v-show="! stockedProduct.has_variations">
+						<label class="col-12 col-form-label font-weight-bold">
+							{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }} Stock (Batch) Code :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="stockedProduct.stock_code"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div> 
+				</div>
+				-->
+
+				<div 
+					class="card-body form-group" 
+					v-for="(productSerial, productSerialIndex) in stockedProduct.serials"
+					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id + '-c'"
+				>
+					<div class="form-row text-center">
+						<label class="col-12 col-form-label font-weight-bold">
+							{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }} Stock (Batch) Code :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="stockedProduct.stock_code"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div>
+
+					<div class="form-row text-center">
+						<label class="col-12 col-form-label font-weight-bold">
+							Serial :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="productSerial.serial_no"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div>
+				</div>
+
+				<div 
+					class="card-body" 
+					v-for="(productVariation, productVariationIndex) in stockedProduct.variations"
+					:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-c'"
+				>
+					<!-- 
+					<div class="form-row text-center" v-show="stockedProduct.has_variations">
+						<label class="col-12 col-form-label font-weight-bold">
+							{{ productVariation.variation ? productVariation.variation.name : 'Variation' | capitalize }} Stock (Batch) Code :
+						</label>
+
+						<label class="col-12 col-form-label">
+							<svg 
+						  		class="barcode" 
+						        :jsbarcode-format="'CODE128'" 
+						        :jsbarcode-value="productVariation.stock_code"
+						        jsbarcode-width=1 
+						        jsbarcode-height=25 
+						        last-char= ">"
+						    >    
+					        </svg> 
+						</label>
+					</div> 
+					-->
+
+					<div 
+						class="form-group"
+						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials"
+						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id + '-c'"
+					>
+						<div class="form-row text-center">
+							<label class="col-12 col-form-label font-weight-bold">
+								{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }} ({{ productVariation.variation ? productVariation.variation.name : 'Variation' | capitalize }}) Stock (Batch) Code :
+							</label>
+
+							<label class="col-12 col-form-label">
+								<svg 
+							  		class="barcode" 
+							        :jsbarcode-format="'CODE128'" 
+							        :jsbarcode-value="productVariation.stock_code"
+							        jsbarcode-width=1 
+							        jsbarcode-height=25 
+							        last-char= ">"
+							    >    
+						        </svg> 
+							</label>
+						</div>
+
+						<div class="form-row text-center">
+							<label class="col-12 col-form-label font-weight-bold">
+								Serial :
+							</label>
+
+							<label class="col-12 col-form-label">
+								<svg 
+							  		class="barcode" 
+							        :jsbarcode-format="'CODE128'" 
+							        :jsbarcode-value="productVariationSerial.serial_no"
+							        jsbarcode-width=1 
+							        jsbarcode-height=25 
+							        last-char= ">"
+							    >    
+						        </svg> 
+							</label>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div> 
-		
+		</div>
 	</div>
-
 </template>
 
 <script type="text/javascript">
@@ -2968,6 +3026,8 @@
 	        			}
 	        		],
 	        	},
+
+	        	stockProductsToPrint : [],
 
 	        	errors : {
 					// mercahnt : null,
@@ -3730,6 +3790,8 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
+							this.printStockCode(this.singleStockData.products);
+
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -3764,6 +3826,8 @@
 
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
+
+							this.printStockCode(this.singleStockData.products);
 
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
@@ -4957,14 +5021,46 @@
 				return words.join(" ");
 
 		    },
-		    print() {
+		    printInvoice() {
 
 				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
 				this.printingStyles.windowTitle = this.singleStockData.invoice_no +  ' Stock Details';
 
 				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 
-				$('#requisition-view-modal').modal('hide');
+				$('#stock-view-modal').modal('hide');
+
+			},
+			printStockCode(productsToPrint = []) {
+
+				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
+				
+				// this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
+				
+				this.printingStyles.windowTitle = this.singleStockData.invoice_no +  ' Stock Details';
+
+				// this.stockProductsToPrint = productsToPrint;
+			
+				this.$set(this, 'stockProductsToPrint', productsToPrint);
+		        	
+				this.$nextTick(function () {
+
+					JsBarcode(".barcode").init();
+					this.$htmlToPaper('stockCodeToPrint', this.printingStyles);
+
+		      	})
+
+
+				/*
+				JsBarcode("#print-stock-code", this.singleStockData.stock_code, 
+					{
+						width:1, 
+						height:25
+					}
+				);
+				*/
+
+				// $('#stock-view-modal').modal('hide');
 
 			},
 		    resetSearchingDates(){
