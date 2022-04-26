@@ -1393,159 +1393,177 @@
 		<!-- Printing Modal -->
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
-				<div class="card-title">Payment ({{ singlePaymentData.invoice_no }}) Details</div>
-				
-				<div class="card-body">
+				<div class="card-header">
 					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Invoice No :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.invoice_no | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							# Installment :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.number_installment }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Date From :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.date_from }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Date To :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.date_to }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Total Rent :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.total_rent }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Discount :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.discount }} %
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Last Due :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Net Payeble :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Paid Amount :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Due :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Paid at :
-						</label>
-
-						<label class="col-6 col-form-label">
-							{{ singlePaymentData.paid_at }} 
-						</label>
-					</div>
-
-					<div 
-						class="form-row" 
-						v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length"
-					>
-						<div 
-							class="col-sm-6" 
-							v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
-							:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
-						>
-							<div class="card card-body">
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Space Type :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA' }}
-									</label>	
-								</div>
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Space Name :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
-									</label>	
-								</div>
+						<div class="col-6">
+							<img 
+								class="img-fluid" 
+								:src="'/' + general_settings.application_logo" 
+								:alt="general_settings.app_name + ' Logo'"
+							>
 							
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Rent :
-									</label>
+							<h5>
+								{{ general_settings.app_name | capitalize }} Payment Invoice
+							</h5>
+						</div>
 
-									<label class="col-6 col-form-label">
-										{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
-									</label>	
-								</div>
+						<div class="col-6">
+							<qr-code 
+							:text="singlePaymentData.invoice_no || ''"
+							:size="50" 
+							class="float-right"
+							></qr-code>
+						</div>
+					</div>
+				</div>
+
+				<div class="card-body">
+					<div class="form-row form-group">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Total Rent :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.total_rent }} {{ general_settings.official_currency_name }}
+								</label>
 							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Discount :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.discount }} %
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Last Due :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Net Payeble :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Paid Amount :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Due :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
+								</label>
+							</div>
+						</div>
+						
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Merchant Name :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ merchantName | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									# Installment :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.number_installment }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Rent from :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.date_from }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Rent To :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.date_to }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Paid at :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.paid_at }} 
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-row">
+						<div class="col-12">
+							<table class="table table-striped table-bordered nowrap text-center">
+								<thead>
+									<tr>
+										<th>Space Type</th>
+										<th>Space Name</th>
+										<th>Rent</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									<tr 
+										v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
+										:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
+									>	
+										<td>
+											{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA' }}
+										</td>
+
+										<td>
+											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
+										</td>
+										
+										<td>
+											{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
+										</td>
+									</tr>
+								</tbody>
+							</table>							
 						</div>
 					</div>
 				</div>
@@ -2133,6 +2151,8 @@
 							
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
+
+							this.print();
 							
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
@@ -2169,6 +2189,8 @@
 							
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
+
+							this.print();
 
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
@@ -2431,6 +2453,11 @@
 
 				// this.printingStyles.name = `${ this.singlePaymentData.invoice_no } Details`;
 				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singlePaymentData.invoice_no } Details`);
+
+				// this.$set(this, 'paymentToPrint', paymentToPrint);
+				// this.paymentToPrint = paymentToPrint;
+
+				JsBarcode(".barcode").init();
 
 				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 
