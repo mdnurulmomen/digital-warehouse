@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-requisition-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-truck'"
 			:title="'requisitions'" 
@@ -2251,202 +2249,342 @@
 		<!-- Printing Section -->
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
+				<div class="card-header">
+					<div class="form-row">
+						<div class="col-6">
+							<img 
+								class="img-fluid" 
+								:src="'/' + general_settings.application_logo" 
+								:alt="general_settings.app_name + ' Logo'"
+							>
+							
+							<h5>
+								{{ general_settings.app_name | capitalize }} Requisition Invoice
+							</h5>
+						</div>
+
+						<div class="col-6">
+							<qr-code 
+							:text="singleRequisitionData.subject || ''"
+							:size="50" 
+							class="float-right"
+							></qr-code>
+						</div>
+					</div>
+				</div>
+
 				<div class="card-body">
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Subject :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.subject | capitalize }}
-						</label>
-					</div>
+					<div class="form-row form-group">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Subject :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.subject | capitalize }}
+								</label>
+							</div>
 
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">Status :</label>
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">Status :</label>
 
-						<label class="col-6 col-form-label">									
-							<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
-															
-								{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
+								<label class="col-6 col-form-label">									
+									<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+																	
+										{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
 
-							</span>	
-						</label>
-					</div>
+									</span>	
+								</label>
+							</div>
 
-					<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('cancellation_reason')">
-						<label class="col-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
+							<div 
+								class="form-row" 
+								v-if="singleRequisitionData.creator"
+							>
+								<label class="col-6 col-form-label font-weight-bold">
+									Created By :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.creator.user_name | capitalize }}
+								</label>
+							</div>
 
-						<label class="col-6 col-form-label">
-							<span v-html="singleRequisitionData.cancellation_reason"></span>
-						</label>
-					</div>
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Requested on :
+								</label>
 
-					<div 
-						class="form-row" 
-						v-if="singleRequisitionData.creator"
-					>
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Created By :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.creator.user_name | capitalize }}
-						</label>
-					</div>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.created_at }}
+								</label>
+							</div>
 
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Requested on :
-						</label>
+							<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} on :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.updated_at }}
+								</label>
+							</div>
 
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.created_at }}
-						</label>
+							<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} By :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.updater.user_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  On :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.dispatch.updated_at }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval==1">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Received :
+								</label>
+								<label class="col-6 col-form-label">
+									<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
+										{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
+									</span>
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('agent')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Collection Point :
+								</label>
+								<label class="col-6 col-form-label">
+									<span v-html="singleRequisitionData.dispatch.agent.collection_point"></span>
+								</label>
+							</div>
+						</div>
+
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Service :
+								</label>
+								<label class="col-6 col-form-label">
+									<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+								</label>
+							</div>
+							
+							<div class="form-row" v-show="singleRequisitionData.agent">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Agent Name :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
+								</label>
+							</div>
+
+							<div class="form-row" v-show="singleRequisitionData.agent">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Agent Mobile :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
+								</label>
+							</div>
+
+							<div class="form-row" v-show="singleRequisitionData.agent">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Agent Code :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('cancellation_reason')">
+								<label class="col-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
+
+								<label class="col-6 col-form-label">
+									<span v-html="singleRequisitionData.cancellation_reason"></span>
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.delivery">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Delivery Address :
+								</label>
+								<label class="col-6 col-form-label">
+									<span v-html="singleRequisitionData.delivery.address"></span>
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('delivery')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Delivery Receipt :
+								</label>
+								<label class="col-6 col-form-label">
+									<img 
+										class="img-fluid" 
+										:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
+										alt="delivery receipt" 
+									>
+								</label>
+							</div>
+						</div>
 					</div>
 
 					<div 
 						class="form-row" 
 						v-if="singleRequisitionData.products && singleRequisitionData.products.length"
 					>
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Product Detail :
-						</label>
-						<div class="col-6">
-							<div class="form-row">
-								<div 
-									class="col-md-12 ml-auto" 
-									v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
-									:key="'required-product-' + requiredProduct.id + productIndex"
-								>
-									<div class="card">
-										<div class="card-body">
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Product Name :
-												</label>
-												<label class="col-6 col-form-label">
+						<label class="col-12 col-form-label font-weight-bold">Products :</label>
+						
+						<div class="col-12">
+							<table class="table table-striped table-bordered nowrap text-center">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Qty</th>
+										<th>Serials</th>
+										<th>Variations</th>
+										<th>Packaging</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									<div 
+										v-for="(requiredProduct, requiredProductIndex) in singleRequisitionData.products" 
+										:key="'printing-required-product-index-' + requiredProductIndex + '-required-product-' + requiredProduct.id"
+									>
+										<div >
+											<tr>
+												<td>
 													{{ requiredProduct.product_name | capitalize }}
-												</label>
-											</div>
+												</td>
 
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Total Quantity :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.quantity }}
-												</label>
-											</div>
+												<td>{{ requiredProduct.quantity || '--' }}</td>
 
-											<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Product Serials :
-												</label>
-												<label class="col-6 col-form-label">
-													<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials" :key="'required-product-' + productIndex + '-product-serial-index-' + productSerialIndex + '-product-serial-' + productSerial.serial.serial_no">
+												<td>
+													<div v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length"
+													>
+														<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials" :key="'required-product-' + requiredProductIndex + '-product-serial-index-' + productSerialIndex + '-product-serial-' + productSerial.serial.serial_no">
 
-														{{ productSerial.serial.serial_no }}
+															{{ productSerial.serial.serial_no }}
 
-														<span v-show="(productSerialIndex+1) < requiredProduct.serials.length">, </span>
-													</span>
-												</label>
-											</div>
+															<span v-show="(productSerialIndex+1) < requiredProduct.serials.length">, </span>
+														</span>
+													</div>
 
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Variations :
-												</label>
-												<label class="col-6 col-form-label">
+													<div class="form-row" v-if="requiredProduct.has_serials && requiredProduct.has_variations && requiredProduct.variations">
+														<div 
+															class="col-sm-12" 
+															v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+															:key="'printing-required-product-variation-' + productVariation.id + variationIndex"
+														>
+															<div class="form-row" v-if="productVariation.has_serials && productVariation.serials.length">
+																<label class="col-6 col-form-label font-weight-bold text-right">
+																	{{ productVariation.variation_name | capitalize }} Serials :
+																</label>
+																<label class="col-6 col-form-label">
+																	<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials" :key="'required-product-' + productIndex + '-variation-index-' + variationIndex + '-product-variation-serial-index-' + variationSerialIndex + '-product-variation-serial-' + variationSerial.serial.serial_no">
+
+																		{{ variationSerial.serial.serial_no }}
+
+																		<span v-show="(variationSerialIndex+1) < productVariation.serials.length">, </span>
+																	</span>
+																</label>
+															</div>
+														</div>
+													</div>
+												</td>
+
+												<td>
 													<span :class="[requiredProduct.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ requiredProduct.has_variations ? 'Yes' : 'No' }}
 													</span>
-												</label>
-											</div>
 
-											<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
-												<div 
-													class="col-sm-12" 
-													v-for="(productVariation, variationIndex) in requiredProduct.variations" 
-													:key="'required-product-variation-' + productVariation.id + variationIndex"
-												>
-													<div class="form-row">
-														<label class="col-6 col-form-label font-weight-bold text-right">
-															 {{ productVariation.variation_name | capitalize }} :
-														</label>
-														<label class="col-6 col-form-label">
-															{{ productVariation.quantity }}
-														</label>
+													<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
+														<div 
+															class="col-sm-12" 
+															v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+															:key="'required-product-variation-' + productVariation.id + variationIndex"
+														>
+															<div class="form-row">
+																<label class="col-6 col-form-label font-weight-bold text-right">
+																	 {{ productVariation.variation_name | capitalize }} :
+																</label>
+																<label class="col-6 col-form-label">
+																	{{ productVariation.quantity }}
+																</label>
+															</div>
+														</div>
 													</div>
+												</td>
 
-													<div class="form-row" v-if="productVariation.has_serials && productVariation.serials.length">
-														<label class="col-6 col-form-label font-weight-bold text-right">
-															{{ productVariation.variation_name | capitalize }} Serials :
-														</label>
-														<label class="col-6 col-form-label">
-															<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials" :key="'required-product-' + productIndex + '-variation-index-' + variationIndex + '-product-variation-serial-index-' + variationSerialIndex + '-product-variation-serial-' + variationSerial.serial.serial_no">
-
-																{{ variationSerial.serial.serial_no }}
-
-																<span v-show="(variationSerialIndex+1) < productVariation.serials.length">, </span>
-															</span>
-														</label>
-													</div>
-												</div>
-											</div>
-
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Packaging Service :
-												</label>
-												<label class="col-6 col-form-label">
+												<td>
 													<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
 														{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
 													</span>
-												</label>
-											</div>
 
-											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package') && requiredProduct.preferred_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Preferred Package :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.preferred_package.name | capitalize }}
-												</label>
-											</div>
+													<div class="form-row" v-show="requiredProduct.packaging_service">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Packaging Service :
+														</label>
+														<label class="col-6 col-form-label">
+															<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
+																{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
+															</span>
+														</label>
+													</div>
 
-											<div class="form-row" v-else-if="requiredProduct.hasOwnProperty('preferred_package') && !requiredProduct.preferred_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Preferred Package :
-												</label>
-												<label class="col-6 col-form-label">
-													<span class="badge badge-info">
-														NA
-													</span>
-												</label>
-											</div>
+													<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package')">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Preferred Package :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ requiredProduct.preferred_package ? requiredProduct.preferred_package.name : '--' | capitalize }}
+														</label>
+													</div>
 
-											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Dispatched Package :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.dispatched_package.name | capitalize }}
-												</label>
-											</div>
+													<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Dispatched Package :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ requiredProduct.dispatched_package.name | capitalize }}
+														</label>
+													</div>
 
-											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Package Quantity :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.dispatched_package.quantity }}
-												</label>
-											</div>
+													<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Package Quantity :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ requiredProduct.dispatched_package.quantity }}
+														</label>
+													</div>
+												</td>
+											</tr>
 										</div>
+										<!-- <td></td> -->
 									</div>
-								</div>
-							</div>
-						</div>
+								</tbody>
+							</table>							
+						</div>	
 					</div>
 
+					<!-- 
 					<div class="form-row" v-if="singleRequisitionData.description">
 						<label class="col-6 col-form-label font-weight-bold text-right">
 							Product Note :
@@ -2454,121 +2592,8 @@
 						<label class="col-6 col-form-label">
 							<span v-html="singleRequisitionData.description"></span>
 						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Service :
-						</label>
-						<label class="col-6 col-form-label">
-							<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.delivery">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Delivery Address :
-						</label>
-						<label class="col-6 col-form-label">
-							<span v-html="singleRequisitionData.delivery.address"></span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('delivery')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Delivery Receipt :
-						</label>
-						<label class="col-6 col-form-label">
-							<img 
-								class="img-fluid" 
-								:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
-								alt="delivery receipt" 
-							>
-						</label>
-					</div>
-
-					<div class="form-row" v-show="singleRequisitionData.agent">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Agent Name :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-show="singleRequisitionData.agent">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Agent Mobile :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-show="singleRequisitionData.agent">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Agent Code :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} on :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.updated_at }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} By :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.updater.user_name | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  On :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.dispatch.updated_at }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval==1">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Received :
-						</label>
-						<label class="col-6 col-form-label">
-							<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
-								{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
-							</span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('agent')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Collection Point :
-						</label>
-						<label class="col-6 col-form-label">
-							<span v-html="singleRequisitionData.dispatch.agent.collection_point"></span>
-						</label>
-					</div>
+					</div> 
+					-->
 				</div>
 			</div>
 		</div>
@@ -2849,6 +2874,8 @@
 					windowTitle: 'Requisition Details' 
 
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
@@ -3827,7 +3854,7 @@
 		      			user_name = user_name.toString();
 		      		}
 
-		      		return first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '' + ' ' + last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '' + ' ' + user_name ? (user_name.charAt(0).toUpperCase() + user_name.slice(1)) : '';
+		      		return ((first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '') + ' ' + (last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '') + ' ' + (user_name ? (user_name.charAt(0).toUpperCase() + user_name.slice(1)) : ''));
 
 		      	}
 		      	else if (name) {
