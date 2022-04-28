@@ -230,9 +230,7 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
 							<transition-group name="fade">
-
 								<div 
 									class="row" 
 									v-bind:key="'requisition-modal-step-' + 1" 
@@ -887,7 +885,7 @@
 							<transition-group name="fade">
 								<div 
 									class="row" 
-									v-bind:key="'requisition-modal-step-' + 1" 
+									v-bind:key="'dispatch-modal-step-' + 1" 
 									v-show="!loading && step==1"
 								>								  	
 									<h2 class="mx-auto mb-4 lead">Requisition Profile</h2>
@@ -978,7 +976,7 @@
 
 						        <div 
 									class="row" 
-									v-bind:key="'requisition-modal-step-' + 2" 
+									v-bind:key="'dispatch-modal-step-' + 2" 
 									v-show="!loading && step==2"
 								>								  	
 									<h2 class="mx-auto mb-4 lead">Required Products</h2>
@@ -1053,43 +1051,78 @@
 												</div>
 											</div>
 
-											<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+											<div class="form-row">
 												<div class="form-group col-md-4">
 													<label for="inputFirstName">
-														Product Serials
+														Select Stock (batch) Code
 													</label>
+
+													<multiselect 
+				                              			v-model="requiredProduct.selected_stock"
+				                              			placeholder="Product Name" 
+				                              			label="stock_code" 
+				                                  		track-by="id" 
+				                                  		class="form-control p-0" 
+				                                  		:class="! errors.products[productIndex].product_stock_code ? 'is-valid' : 'is-invalid'"  
+				                                  		:custom-label="objectNameWithCapitalized" 
+				                                  		:options="requiredProduct.available_stocks" 
+				                                  		@close="validateFormInput('product_stock_code')"
+				                              		>
+				                                	</multiselect>
+
+				                                	<div class="invalid-feedback">
+												    	{{ errors.products[productIndex].product_stock_code }}
+												    </div>
 												</div>
 
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Mfg. Date
+													</label>
+
+													<p class="form-control">
+														{{ requiredProduct.selected_stock ? requiredProduct.selected_stock.manufactured_at : '--' }}
+													</p>
+												</div>
+
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Exp. Date
+													</label>
+
+													<p class="form-control">
+														{{ requiredProduct.selected_stock ? requiredProduct.selected_stock.expired_at : '--' }}
+													</p>
+												</div>
+											</div>
+
+											<div class="card card-body" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
 												<div 
-													class="form-group col-md-8" 
+													class="form-row" 
 													v-for="(requiredProductSerial, productSerialIndex) in requiredProduct.serials" 
 														:key="'required-product-name-' + requiredProduct.product_name + '-serial-' + productSerialIndex"
 												>
-													<div class="form-row">
-														<div class="col-md-6">
-															<label for="inputFirstName">
-																Serial # {{ productSerialIndex + 1 }}
-															</label>
-															
-															<input 
-																type="text" 
-																class="form-control" 
-																v-model="requiredProductSerial.serial.serial_no" 
-																readonly="true"
-															>
-														</div>
+													<div class="col-md-6 form-group">
+														<label for="inputFirstName">
+															Serial # {{ productSerialIndex + 1 }}
+														</label>
+														
+														<input 
+															type="text" 
+															class="form-control" 
+															v-model="requiredProductSerial.serial.serial_no" 
+															readonly="true"
+														>
+													</div>
 
-														<div class="col-md-6">
-															<label for="inputFirstName">
-																Status
-															</label>
+													<div class="col-md-6 form-group">
+														<label for="inputFirstName">
+															Status
+														</label>
 
-															<div class="form-control border-0">
-																<span :class="[requiredProductSerial.serial.has_dispatched ? 'badge-danger' : 'badge-success', 'badge']">
-																	{{ requiredProductSerial.serial.has_dispatched ? 'NA' : 'Available' }}
-																</span>
-															</div>
-														</div>
+														<span :class="[requiredProductSerial.serial.has_dispatched ? 'badge-danger' : 'badge-success', 'badge form-control d-block']">
+															{{ requiredProductSerial.serial.has_dispatched ? 'NA' : 'Available' }}
+														</span>
 													</div>
 												</div>
 											</div>
@@ -1101,61 +1134,112 @@
 														v-for="(productVariation, variationIndex) in requiredProduct.variations" 
 														:key="'required-product-' + productIndex + 'variation-' + variationIndex"
 													>	
-														<div class="form-group col-md-4">
-															<label for="inputFirstName">
-																Selected Variation
-															</label>
-															<multiselect 
-						                              			v-model="requiredProduct.variations[variationIndex]"
-						                              			placeholder="Variation Name" 
-						                              			label="variation_name" 
-						                                  		track-by="product_variation_id" 
-						                                  		class="form-control p-0 is-valid" 
-						                                  		:custom-label="objectNameWithCapitalized" 
-						                                  		:options="singleDispatchData.requisition.products"
-						                                  		:disabled="true"
-						                              		>
-						                                	</multiselect>
-														</div>
+														<div class="col-sm-12">
+															<div class="form-row">
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Selected Variation
+																	</label>
+																	<multiselect 
+								                              			v-model="requiredProduct.variations[variationIndex]"
+								                              			placeholder="Variation Name" 
+								                              			label="variation_name" 
+								                                  		track-by="product_variation_id" 
+								                                  		class="form-control p-0 is-valid" 
+								                                  		:custom-label="objectNameWithCapitalized" 
+								                                  		:options="singleDispatchData.requisition.products"
+								                                  		:disabled="true"
+								                              		>
+								                                	</multiselect>
+																</div>
 
-														<div class="form-group col-md-4">
-															<label for="inputFirstName">
-																Required
-															</label>
-															
-															<div class="input-group mb-0">
-																<input 
-																	type="number" 
-																	class="form-control" 
-																	v-model.number="requiredProduct.variations[variationIndex].quantity" 
-																	placeholder="Variation Quantity" 
-																	readonly="true" 
-																>
-																<div class="input-group-append">
-																	<span class="input-group-text">
-																		{{ requiredProduct.quantity_type }}
-																	</span>
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Required
+																	</label>
+																	
+																	<div class="input-group mb-0">
+																		<input 
+																			type="number" 
+																			class="form-control" 
+																			v-model.number="requiredProduct.variations[variationIndex].quantity" 
+																			placeholder="Variation Quantity" 
+																			readonly="true" 
+																		>
+																		<div class="input-group-append">
+																			<span class="input-group-text">
+																				{{ requiredProduct.quantity_type }}
+																			</span>
+																		</div>
+																	</div>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Available
+																	</label>
+																	
+																	<div class="input-group mb-0">
+																		<input 
+																			type="number" 
+																			class="form-control" 
+																			v-model.number="productVariation.available_quantity" 
+																			placeholder="Dispatch Quantity" 
+																			readonly="true" 
+																		>
+																		<div class="input-group-append">
+																			<span class="input-group-text">
+																				{{ requiredProduct.quantity_type }}
+																			</span>
+																		</div>
+																	</div>
 																</div>
 															</div>
 														</div>
 
-														<div class="form-group col-md-4">
-															<label for="inputFirstName">
-																Available
-															</label>
-															
-															<div class="input-group mb-0">
-																<input 
-																	type="number" 
-																	class="form-control" 
-																	v-model.number="productVariation.available_quantity" 
-																	placeholder="Dispatch Quantity" 
-																	readonly="true" 
-																>
-																<div class="input-group-append">
-																	<span class="input-group-text">
-																		{{ requiredProduct.quantity_type }}
-																	</span>
+														<div class="col-sm-12">
+															<div class="form-row">
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Select Stock (batch) Code
+																	</label>
+
+																	<multiselect 
+								                              			v-model="productVariation.selected_stock"
+								                              			placeholder="Stock Code" 
+								                              			label="stock_code" 
+								                                  		track-by="id" 
+								                                  		class="form-control p-0" 
+								                                  		:class="! errors.products[productIndex].variation_stock_codes[variationIndex] ? 'is-valid' : 'is-invalid'"  
+								                                  		:custom-label="objectNameWithCapitalized" 
+								                                  		:options="productVariation.available_stocks" 
+								                                  		@close="validateFormInput('variation_stock_codes')"
+								                              		>
+								                                	</multiselect>
+
+								                                	<div class="invalid-feedback">
+																    	{{ errors.products[productIndex].variation_stock_codes[variationIndex] }}
+																    </div>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Mfg. Date
+																	</label>
+
+																	<p class="form-control">
+																		{{ productVariation.selected_stock ? productVariation.selected_stock.manufactured_at : '--' }}
+																	</p>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Exp. Date
+																	</label>
+
+																	<p class="form-control">
+																		{{ productVariation.selected_stock ? productVariation.selected_stock.expired_at : '--' }}
+																	</p>
 																</div>
 															</div>
 														</div>
@@ -1237,9 +1321,9 @@
 											</div>
 									 		-->
 
-									 		<div class="card">
+									 		<div class="card" v-if="requiredProduct.packaging_service">
 									 			<div class="card-body">
-											 		<div class="form-row" v-if="requiredProduct.packaging_service">
+											 		<div class="form-row">
 														<div class="form-group col-md-12 text-center">
 															<toggle-button 
 																v-model="requiredProduct.packaging_service" 
@@ -1359,7 +1443,7 @@
 
 								<div 
 									class="row" 
-									v-bind:key="3" 
+									v-bind:key="'dispatch-modal-step-' + 3" 
 									v-show="!loading && step==3"
 								>
 									<h2 class="mx-auto mb-4 lead">Released Addresses</h2>
@@ -1547,7 +1631,6 @@
 													</div>
 												</div>
 											</div>
-
 										</div>
 									</div>
 
@@ -1582,7 +1665,7 @@
 
 								<div 
 									class="row" 
-									v-bind:key="'requisition-modal-step-' + 4" 
+									v-bind:key="'dispatch-modal-step-' + 4" 
 									v-show="!loading && step==4"
 								>	
 									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
@@ -2709,9 +2792,10 @@
 						{
 							// product_id : '',
 							// product_quantity : '',
-							// variations_total_quantity : ''
+							// variations_total_quantity : '',
 							variation_serials : [],
 							variation_quantities : [],
+							variation_stock_codes : [],
 						}
 
 					],
@@ -3261,7 +3345,8 @@
 							// product_quantity : '',
 							// variations_total_quantity : ''
 							variation_serials : [],
-							variation_quantities : []
+							variation_quantities : [],
+							variation_stock_codes : [],
 						}
 						
 					],
@@ -3581,7 +3666,8 @@
 							this.errors.products.push(
 								{
 									variation_serials : [],
-									variation_quantities : []
+									variation_quantities : [],
+									variation_stock_codes : [],
 								}
 							);
 						// }
@@ -3652,7 +3738,7 @@
 				if (array.length) {
 
 					return array.some(
-						product => Object.keys(product).length > 2 || product.variation_quantities.some(productVariation => productVariation != null) || (product.variation_serials.some(productVariation => productVariation != null))
+						product => Object.keys(product).length > 3 || product.variation_quantities.some(productVariation => productVariation != null) || (product.variation_serials.some(productVariation => productVariation != null)) || product.variation_stock_codes.some(variationStockCode => variationStockCode != null)
 					);
 
 				}
@@ -3712,10 +3798,12 @@
 						
 						if (this.step==2) {
 
+							this.validateFormInput('product_stock_code');
+							this.validateFormInput('variation_stock_codes');
 							this.validateFormInput('dispatched_package');
 							this.validateFormInput('dispatched_package_quantity');
 
-							if (this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 2)) {
+							if (this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 3)) {
 
 								this.submitForm = false;
 								return;
@@ -3829,7 +3917,7 @@
 			    name = name.toString()
 			    return name.charAt(0).toUpperCase() + name.slice(1)
 		    },
-			objectNameWithCapitalized ({ subject, product_name, variation_name, first_name, last_name, user_name, name, variation, serial_no }) {
+			objectNameWithCapitalized ({ subject, product_name, variation_name, first_name, last_name, user_name, name, variation, serial_no, stock_code, available_quantity }) {
 		      	if (subject) {
 				    subject = subject.toString()
 				    return subject.charAt(0).toUpperCase() + subject.slice(1)
@@ -3868,6 +3956,10 @@
 		      	else if (serial_no) {
 		      		serial_no = serial_no.toString()
 				    return serial_no.charAt(0).toUpperCase() + serial_no.slice(1)
+		      	}
+		      	else if (stock_code && available_quantity) {
+		      		stock_code = stock_code.toString()
+				    return stock_code.charAt(0).toUpperCase() + stock_code.slice(1) + '(' + available_quantity + ')'
 		      	}
 		      	else 
 		      		return ''
@@ -4015,16 +4107,19 @@
 
 			},
 			addMoreProduct() {
+				
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
 					this.singleRequisitionData.products.push({ product : {}, total_quantity : 0 });
 					
 					this.errors.products.push({
 						variation_serials : [],
-						variation_quantities : []
+						variation_quantities : [],
+						variation_stock_codes : [],
 					});
 
 				}
+
 			},
 			removeProduct() {
 					
@@ -4578,6 +4673,91 @@
 						else {
 							this.submitForm = true;
 							this.errors.delivery = {};
+						}
+
+						break;
+
+					case 'product_stock_code' : 
+
+						if (this.singleDispatchData.requisition && this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+							
+								(requiredProduct, requiredProductIndex) => {
+
+									if (! requiredProduct.selected_stock || ! Object.keys(requiredProduct.selected_stock).length > 0) {
+
+										// this.errors.products[requiredProductIndex].product_stock_code = 'Stock code is required';
+										
+										this.$set(this.errors.products[requiredProductIndex], 'product_stock_code', 'Stock code is required');
+
+									}
+									else {
+
+										this.$delete(this.errors.products[requiredProductIndex], 'product_stock_code');
+
+									}				
+
+								}
+								
+							);
+
+						}
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'variation_stock_codes' : 
+
+						if (this.singleDispatchData.requisition && this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+							
+								(requiredProduct, requiredProductIndex) => {
+
+									if (requiredProduct.has_variations && requiredProduct.variations.length) {
+										
+										this.$set(this.errors.products[requiredProductIndex], 'variation_stock_codes', []);
+
+										requiredProduct.variations.forEach(
+								
+											(requiredProductVariation, requiredProductVariationIndex) => {
+
+												if (! requiredProductVariation.selected_stock || ! Object.keys(requiredProductVariation.selected_stock).length > 0) {
+													
+													this.$set(this.errors.products[requiredProductIndex].variation_stock_codes, requiredProductVariationIndex, 'Stock code is required');
+
+												}
+												else {
+
+													this.$set(this.errors.products[requiredProductIndex].variation_stock_codes, requiredProductVariationIndex, null);
+
+												}
+
+											}
+										);
+
+									}
+									else {
+
+										// this.$delete(this.errors.products[requiredProductIndex], 'variation_stock_codes');
+										// this.errors.products[requiredProductIndex].variation_stock_codes = [];
+										this.$set(this.errors.products[requiredProductIndex], 'variation_stock_codes', []);
+
+									}
+				
+
+								}
+								
+							);
+
+						}
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
 						}
 
 						break;

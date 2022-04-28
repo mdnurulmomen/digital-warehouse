@@ -22,8 +22,8 @@ class CreateProductStocksTable extends Migration
             // $table->boolean('has_variations')->default(false);
             // $table->boolean('has_serials')->default(false);
             $table->unsignedInteger('merchant_product_id');
-            $table->timestamp('manufactured_at')->nullable();
-            $table->timestamp('expired_at')->nullable();
+            $table->date('manufactured_at')->nullable();
+            $table->date('expired_at')->nullable();
             $table->unsignedInteger('stock_id');
         });
     }

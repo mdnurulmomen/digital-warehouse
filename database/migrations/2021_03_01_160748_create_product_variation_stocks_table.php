@@ -21,8 +21,8 @@ class CreateProductVariationStocksTable extends Migration
             $table->unsignedDecimal('unit_buying_price', $precision = 8, $scale = 2)->default(0);
             // $table->boolean('has_serials')->default(false);
             $table->unsignedMediumInteger('merchant_product_variation_id'); // stationary / garments
-            $table->timestamp('manufactured_at')->nullable();
-            $table->timestamp('expired_at')->nullable();
+            $table->date('manufactured_at')->nullable();
+            $table->date('expired_at')->nullable();
             $table->unsignedInteger('product_stock_id');
         });
     }

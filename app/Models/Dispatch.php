@@ -65,9 +65,9 @@ class Dispatch extends Model
 
                 // $productAvailableQuantity = $merchantExpectedProduct->latestStock->available_quantity ?? 0;
                 
-                $productAvailableQuantity = $merchantExpectedProduct->available_quantity ?? 0;
+                // $productAvailableQuantity = $merchantExpectedProduct->available_quantity ?? 0;
 
-                if ($productAvailableQuantity >= $dispatchingProduct->quantity) {
+                // if ($merchantExpectedProduct->available_quantity >= $dispatchingProduct->quantity) {
                     
                     /*
                     $dispatchedProduct = $merchantExpectedProduct->dispatches()->create([
@@ -93,7 +93,9 @@ class Dispatch extends Model
                    
                     if (! $merchantExpectedProduct->product->has_variations) {
                         
-                        $this->deductProductStockQuantity($merchantExpectedProduct, $dispatchingProduct->quantity);
+                        // $this->deductProductStockQuantity($merchantExpectedProduct, $dispatchingProduct->quantity);
+                        
+                        $this->deductProductStockQuantity($dispatchingProduct, $dispatchingProduct->quantity);
 
                     }
 
@@ -106,9 +108,9 @@ class Dispatch extends Model
 
                             // $variationAvailableQuantity = $merchantProductExpectedVariation->latestStock->available_quantity ?? 0;
                             
-                            $variationAvailableQuantity = $merchantProductExpectedVariation->available_quantity ?? 0;
+                            // $variationAvailableQuantity = $merchantProductExpectedVariation->available_quantity ?? 0;
 
-                            if ($variationToDispatch->quantity <= $variationAvailableQuantity) {
+                            // if ($variationToDispatch->quantity <= $merchantProductExpectedVariation->available_quantity) {
 
                                 /*
                                     $dispatchedProductVariation = $dispatchedProduct->variations()->create([
@@ -131,7 +133,9 @@ class Dispatch extends Model
                                
                                 $merchantProductExpectedVariation->decrement('available_quantity', $variationToDispatch->quantity);
                                
-                                $this->deductVariationStockQuantity($merchantProductExpectedVariation, $variationToDispatch->quantity);
+                                // $this->deductVariationStockQuantity($merchantProductExpectedVariation, $variationToDispatch->quantity);
+
+                                $this->deductVariationStockQuantity($variationToDispatch, $variationToDispatch->quantity);
 
                                 // dispatching variation-serials
                                 if ($variationToDispatch->has_serials && count($variationToDispatch->serials)==$variationToDispatch->quantity) {
@@ -154,7 +158,7 @@ class Dispatch extends Model
 
                                 } 
                                 
-                            }
+                            // }
 
                         }
 
@@ -183,19 +187,20 @@ class Dispatch extends Model
                     }
 
                     // Updating Product Addresses
-                    if ($productAvailableQuantity==0 || $merchantExpectedProduct->available_quantity==0) {  // No more products available
+                    if ($merchantExpectedProduct->available_quantity==0 || $merchantExpectedProduct->available_quantity==0) {  // No more products available
                         
                         $merchantExpectedProduct->deleteOldAddresses();
                         // $merchantExpectedProduct->variations()->delete();
 
                     }
-                    else if ($productAvailableQuantity > 0 && $merchantExpectedProduct->available_quantity > 0) {
+
+                    else if ($merchantExpectedProduct->available_quantity > 0 && $merchantExpectedProduct->available_quantity > 0) {
                         
                         $merchantExpectedProduct->product_address = json_decode(json_encode($dispatchingProduct->addresses));
 
                     }
 
-                }
+                // }
 
                 $expectedRequiredProduct = RequiredProduct::find($dispatchingProduct->id);
 
@@ -321,9 +326,9 @@ class Dispatch extends Model
     }
     */
    
-    protected function deductProductStockQuantity(MerchantProduct $merchantExpectedProduct, $quantityToDeduct)
+    protected function deductProductStockQuantity($dispatchingProduct, $quantityToDeduct)
     {
-        while ($quantityToDeduct > 0) {
+        // while ($quantityToDeduct > 0) {
             
             // $productStockToDeduct = $merchantExpectedProduct->oldestAvailableStock;
             
@@ -337,6 +342,8 @@ class Dispatch extends Model
             ->first();
             */
            
+            /*
+            // Deducting from oldest stock
             $productStockToDeduct = ProductStock::where('merchant_product_id', $merchantExpectedProduct->id)
             ->where('available_quantity', '>', 0)
             ->whereHas('stock', function ($q) {
@@ -344,6 +351,9 @@ class Dispatch extends Model
             })
             ->oldest('id')
             ->first();
+            */
+           
+            $productStockToDeduct = ProductStock::where('stock_code', $dispatchingProduct->selected_stock->stock_code)->firstOrFail();
                      
 
             // \Log::info('Merchant-Product id: '.$merchantExpectedProduct->id.'. Oldest product-stock id: '.$productStockToDeduct->id.'. Quantity to deduct is: '.$quantityToDeduct.'. But oldest product-stock available qty is :'.$productStockToDeduct->available_quantity);
@@ -351,10 +361,17 @@ class Dispatch extends Model
             if ($productStockToDeduct->available_quantity >= $quantityToDeduct) { 
 
                 $productStockToDeduct->decrement('available_quantity', $quantityToDeduct);
+                
                 // $merchantExpectedProduct->decrement('available_quantity', $quantityToDeduct);
-                $quantityToDeduct = 0;
+                // $quantityToDeduct = 0;
+
+                RequiredProduct::findOrFail($dispatchingProduct->id)->update([
+                    'selected_stock_code' => $dispatchingProduct->selected_stock->stock_code
+                ]);
 
             }
+
+            /*
             else if ($productStockToDeduct->available_quantity < $quantityToDeduct) {
                 
                 $currentQuantity = $productStockToDeduct->available_quantity;
@@ -368,13 +385,14 @@ class Dispatch extends Model
                 $quantityToDeduct = 0;
 
             }
+            */
 
-        }
+        // }
     }
 
-    protected function deductVariationStockQuantity(MerchantProductVariation $merchantProductExpectedVariation, $quantityToDeduct)
+    protected function deductVariationStockQuantity($variationToDispatch, $quantityToDeduct)
     {
-        while ($quantityToDeduct > 0) {
+        // while ($quantityToDeduct > 0) {
             
             // $variationStockToDeduct = $merchantProductExpectedVariation->oldestAvailableStock;
 
@@ -392,6 +410,7 @@ class Dispatch extends Model
             ->first();
             */
            
+            /*
             $variationStockToDeduct = ProductVariationStock::where('merchant_product_variation_id', $merchantProductExpectedVariation->id)
             ->where('available_quantity', '>', 0)
             ->whereHas('productStock', function ($query) {
@@ -401,11 +420,18 @@ class Dispatch extends Model
             })
             ->oldest('id')
             ->first();
+            */
 
-            if ($variationStockToDeduct->available_quantity >= $quantityToDeduct) {                
+            $variationStockToDeduct = ProductVariationStock::where('stock_code', $variationToDispatch->selected_stock->stock_code)->firstOrFail();
+
+            // if ($variationStockToDeduct->available_quantity >= $quantityToDeduct) {                
 
                 $variationStockToDeduct->decrement('available_quantity', $quantityToDeduct);
                 $variationStockToDeduct->productStock()->decrement('available_quantity', $quantityToDeduct);
+
+                RequiredProductVariation::findOrFail($variationToDispatch->id)->update([
+                    'selected_stock_code' => $variationToDispatch->selected_stock->stock_code
+                ]);
 
                 // \Log::info('Product Stock id : '.$variationStockToDeduct->productStock->id.'. Quantity deducted is : '.$quantityToDeduct.'. Now Product Stock Available Quantity : '.$variationStockToDeduct->productStock->available_quantity);
                 
@@ -415,9 +441,11 @@ class Dispatch extends Model
                 ]);
                 */
                 
-                $quantityToDeduct = 0;
+                // $quantityToDeduct = 0;
 
-            }
+            // }
+            
+            /*
             else if ($variationStockToDeduct->available_quantity < $quantityToDeduct) {
                 
                 $currentQuantity = $variationStockToDeduct->available_quantity;
@@ -428,11 +456,11 @@ class Dispatch extends Model
 
                 // \Log::info('Product Stock id : '.$variationStockToDeduct->productStock->id.'. Quantity deducted is : '.$currentQuantity.'. Now Product Stock Available Quantity : '.$variationStockToDeduct->productStock->available_quantity);
 
-                /*
-                $variationStockToDeduct->productStock()->update([
-                    'available_quantity' => $variationStockToDeduct->productStock->available_quantity - $variationStockToDeduct->available_quantity,
-                ]);
-                */
+                
+                // $variationStockToDeduct->productStock()->update([
+                //     'available_quantity' => $variationStockToDeduct->productStock->available_quantity - $variationStockToDeduct->available_quantity,
+                // ]);
+                
 
             }
             // stop loop
@@ -441,11 +469,12 @@ class Dispatch extends Model
                 $quantityToDeduct = 0;
 
             }
+            */
 
             // \Log::info("End Of while loop");
             // \Log::info("");
 
-        }
+        // }
     }
 
 }

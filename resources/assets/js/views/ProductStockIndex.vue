@@ -4414,8 +4414,8 @@
 				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
 				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
 
-				// this.$set(this, 'productToPrint', productToPrint);
-				this.productToPrint = productToPrint;
+				this.$set(this, 'productToPrint', productToPrint);
+				// this.productToPrint = productToPrint;
 
 				this.$nextTick(function () {
 

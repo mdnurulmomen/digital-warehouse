@@ -20,7 +20,8 @@ class CreateRequiredProductsTable extends Migration
             // $table->boolean('has_variations')->default(false);
             // $table->boolean('has_serials')->default(false);
             $table->boolean('packaging_service')->default(false);
-            $table->boolean('confirm_availability')->default(false); // confirm availablity / cancelled
+            $table->string('selected_stock_code')->nullable();
+            // $table->boolean('confirm_availability')->default(false); // confirm availablity / cancelled
             $table->unsignedInteger('warehouse_id')->nullable(); // which warehouse cancelled / confirmed the required-product-availablity
             $table->unsignedInteger('requisition_id');
         });

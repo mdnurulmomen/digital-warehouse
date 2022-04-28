@@ -18,6 +18,7 @@ class CreateRequiredProductVariationsTable extends Migration
             $table->unsignedMediumInteger('merchant_product_variation_id');
             $table->unsignedMediumInteger('quantity');
             // $table->boolean('has_serials')->default(false);
+            $table->string('selected_stock_code')->nullable();
             $table->unsignedInteger('required_product_id');
         });
     }

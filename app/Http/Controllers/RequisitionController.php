@@ -31,17 +31,46 @@ class RequisitionController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)->latest()->paginate($perPage)),  
+                'pending' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 0)
+                    ->with(['products.merchantProduct.stocks' => function ($query) {
+                        $query->where('available_quantity', '>', 0);
+                    }])
+                    ->with(['products.merchantProduct.variations.stocks' => function ($query) {
+                        $query->where('available_quantity', '>', 0);
+                    }])
+                    ->latest()->paginate($perPage)),  
 
-                'dispatched' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)->latest()->paginate($perPage)),  
+                'dispatched' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', 1)
+                    ->with(['products.merchantProduct.stocks' => function ($query) {
+                        $query->where('available_quantity', '>', 0);
+                    }])
+                    ->with(['products.merchantProduct.variations.stocks' => function ($query) {
+                        $query->where('available_quantity', '>', 0);
+                    }])
+                    ->latest()->paginate($perPage)),  
                 
-                'cancelled' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)->latest()->paginate($perPage)),  
+                'cancelled' => new RequisitionCollection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])->where('status', -1)
+                    ->with(['products.merchantProduct.stocks' => function ($query) {
+                        $query->where('available_quantity', '>', 0);
+                    }])
+                    ->with(['products.merchantProduct.variations.stocks' => function ($query) {
+                        $query->where('available_quantity', '>', 0);
+                    }])
+                    ->latest()->paginate($perPage)),  
             
             ];
 
         }
 
-        return RequisitionResource::collection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation'])->where('status', 0)->latest()->get());
+        return RequisitionResource::collection(Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation'])
+            ->with(['products.merchantProduct.stocks' => function ($query) {
+                $query->where('available_quantity', '>', 0);
+            }])
+            ->with(['products.merchantProduct.variations.stocks' => function ($query) {
+                $query->where('available_quantity', '>', 0);
+            }])
+            ->where('status', 0)
+            ->latest()->get());
 
     }
 
@@ -210,7 +239,13 @@ class RequisitionController extends Controller
             // 'showProduct' => 'nullable|string', 
         ]);        
 
-        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation']);
+        $query = Requisition::with(['creator', 'updater', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return', 'products.merchantProduct.product', 'products.merchantProduct.addresses', 'products.variations.merchantProductVariation', 'products.variations.merchantProductVariation.productVariation.variation', 'cancellation'])
+            ->with(['products.merchantProduct.stocks' => function ($query) {
+                $query->where('available_quantity', '>', 0);
+            }])
+            ->with(['products.merchantProduct.variations.stocks' => function ($query) {
+                $query->where('available_quantity', '>', 0);
+            }]);
 
         /*
         

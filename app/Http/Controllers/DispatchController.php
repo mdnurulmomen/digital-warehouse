@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Dispatch;
 use App\Models\Requisition;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
 use App\Models\RequiredProductSerial;
+use App\Models\ProductVariationStock;
+use App\Models\RequiredProductVariation;
 use App\Jobs\BroadcastRequisitionDispatch;
 use App\Models\RequiredProductVariationSerial;
 use App\Http\Resources\Web\RequisitionCollection;
@@ -72,6 +75,12 @@ class DispatchController extends Controller
             'requisition.products' => 'required|array|min:'.$expectedRequisition->products->count(),
             'requisition.products.*.merchant_product_id' => 'required|exists:merchant_products,id',
 
+            'requisition.products.*.id' => [
+                Rule::exists('required_products', 'id')->where(function ($query) use ($request) {
+                    return $query->where('requisition_id', $request->requisition['id']);
+                })
+            ],
+
             'requisition.products.*.quantity' => 'required|numeric|min:1',
             'requisition.products.*.has_variations' => 'required|boolean',
             'requisition.products.*.has_serials' => 'required|boolean',
@@ -86,10 +95,31 @@ class DispatchController extends Controller
             'requisition.products.*.serials' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|array|min:1',
             'requisition.products.*.serials.*.id' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|numeric|exists:required_product_serials,id',
 
+            'requisition.products.*.selected_stock' => 'exclude_if:requisition.products.*.has_variations,1|required',
+            'requisition.products.*.selected_stock.stock_code' => [
+                    'exclude_if:requisition.products.*.has_variations,1',
+                    Rule::exists('product_stocks', 'stock_code')->where(function ($query) {
+                        return $query->where('available_quantity', '>', 0);
+                    }),
+            ],
+
             // 'agent' => 'required_if:delivery,0,',
             // 'agent.agent_receipt' => 'required_if:delivery,0,',
             
             'requisition.products.*.variations' => 'required_if:requisition.products.*.has_variations,1|array|min:1',
+
+            'requisition.products.*.variations.*.id' => [
+                
+                'exclude_if:requisition.products.*.has_variations,0',
+
+                function ($attribute, $value, $fail) use ($request) {
+                    $requiredProductVariation = RequiredProductVariation::findOrFail($value);
+
+                    if ($requiredProductVariation->requiredProduct->requisition_id != $request->requisition['id']) {
+                        $fail('The '.$attribute.' is invalid.');
+                    }
+                },
+            ],
 
             'requisition.products.*.variations.*.merchant_product_variation_id' => 'required_with:requisition.products.*.variations|numeric|exists:merchant_product_variations,id',
             'requisition.products.*.variations.*.quantity' => 'required_with:requisition.products.*.variations|numeric|min:1',
@@ -100,6 +130,16 @@ class DispatchController extends Controller
 
             'requisition.products.*.variations.*.serials' => 'required_if:requisition.products.*.variations.*.has_serials,1|array|min:1',
             'requisition.products.*.variations.*.serials.*.id' => 'required_if:requisition.products.*.variations.*.has_serials,1|numeric|exists:required_product_variation_serials,id',
+
+
+            'requisition.products.*.variations.*.selected_stock' => 'required_if:requisition.products.*.has_variations,1',
+            'requisition.products.*.variations.*.selected_stock.stock_code' => [
+                    'required_if:requisition.products.*.has_variations,1',
+                    Rule::exists('product_variation_stocks', 'stock_code')->where(function ($query) {
+                        return $query->where('available_quantity', '>', 0);
+                    }),
+            ],
+
 
             'delivery' => 'required_if:requisition.agent,0,',
             // 'delivery.address' => 'required_if:agent,0,',
@@ -339,11 +379,17 @@ class DispatchController extends Controller
 
             $expectedMerchantProduct = MerchantProduct::find($productToDispatch->merchant_product_id);
 
-            $productAvailableQuantity = /*$expectedMerchantProduct->latestStock->available_quantity*/ $expectedMerchantProduct->available_quantity ?? 0;
+            // $productAvailableQuantity = /*$expectedMerchantProduct->latestStock->available_quantity*/ $expectedMerchantProduct->available_quantity ?? 0;
 
-            if ($productAvailableQuantity < $productToDispatch->quantity) {
+            if ($expectedMerchantProduct->available_quantity < $productToDispatch->quantity) {
                 
                 return response()->json(['errors'=>["productSerialError" => ucfirst($expectedMerchantProduct->product->name)." quantity is more than available"]], 422);
+
+            }
+
+            else if (! $expectedMerchantProduct->product->has_variations && (ProductStock::where('stock_code', $productToDispatch->selected_stock->stock_code)->firstOrFail()->merchant_product_id != $expectedMerchantProduct->id || ProductStock::where('stock_code', $productToDispatch->selected_stock->stock_code)->firstOrFail()->available_quantity < $productToDispatch->quantity)) {
+                
+                return response()->json(['errors'=>["productStockCodeError" => ucfirst($expectedMerchantProduct->product->name)." stock code is invalid"]], 422);
 
             }
 
@@ -377,11 +423,17 @@ class DispatchController extends Controller
             
                     $merchantProductExpectedVariation = $expectedMerchantProduct->variations()->where('id', $variationToDispatch->merchant_product_variation_id)->first();
 
-                    $variationAvailableQuantity = /*$merchantProductExpectedVariation->latestStock->available_quantity*/ $merchantProductExpectedVariation->available_quantity ?? 0;
+                    // $variationAvailableQuantity = /*$merchantProductExpectedVariation->latestStock->available_quantity*/ $merchantProductExpectedVariation->available_quantity ?? 0;
 
-                    if ($variationToDispatch->quantity > $variationAvailableQuantity) {
+                    if ($variationToDispatch->quantity > $merchantProductExpectedVariation->available_quantity) {
                         
                         return response()->json(['errors'=>["variationSerialError" => ucfirst($variationToDispatch->variation_name)." quantity is more than available"]], 422);
+
+                    }
+
+                    else if (ProductVariationStock::where('stock_code', $variationToDispatch->selected_stock->stock_code)->firstOrFail()->merchant_product_variation_id != $merchantProductExpectedVariation->id || ProductVariationStock::where('stock_code', $variationToDispatch->selected_stock->stock_code)->firstOrFail()->available_quantity < $variationToDispatch->quantity) {
+                
+                        return response()->json(['errors'=>["productStockCodeError" => ucfirst($merchantProductExpectedVariation->productVariation->variation->name)." stock code is invalid"]], 422);
 
                     }
 
