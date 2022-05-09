@@ -117,7 +117,7 @@ class Requisition extends Model
             foreach ($requiredProducts as $requiredProduct) {
     			
     			$requisitionedProduct = $this->products()->create([
-    				'merchant_product_id' => $requiredProduct->id,
+    				'merchant_product_id' => $requiredProduct->product->id,
                     'quantity' => $requiredProduct->total_quantity,
     				// 'has_variations' => $requiredProduct->product->has_variations ?? false,
                     // 'has_serials' => $requiredProduct->product->has_serials ?? false,

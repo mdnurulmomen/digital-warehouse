@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-requisition-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-truck'"
 			:title="merchantProduct.product.name + ' requisitions'" 
@@ -21,119 +19,25 @@
 							  	<div class="card">
 									<div class="card-block">
 										<div class="row">
-											<div class="col-sm-12">
-											  	<div class="row form-group">
-											  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">
-											  			<div class="mr-2">
-											  				<span>
-											  					{{ merchantProduct.product.name | capitalize }}
-													  			{{ 
-													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Requisitions List' : 'Requisitions List'
-													  			}}
-											  				</span>
-											  			</div>
-
-											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Requisitions'"></i>
-										  					
-										  					<div class="dropdown-menu">
-									  							<download-excel 
-													  				class="btn btn-default p-1 dropdown-item active"
-																	:data="requisitionsToShow"
-																	:fields="dataToExport" 
-																	:worksheet="merchantProduct.product.name + ' Requisitions Sheet'"
-																	:name="merchantProduct.product.name + '-' + ((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
-													  			>
-													  				Excel
-																</download-excel>
-										  						
-										  						<!-- 
-										  						<download-excel 
-										  							type="csv"
-													  				class="btn btn-default p-1 dropdown-item disabled"
-																	:data="requisitionsToShow"
-																	:fields="dataToExport" 
-																	worksheet="Requisitions sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-requisitions-' : (currentTab + '-requisitions-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
-													  			>
-													  				CSV
-																</download-excel> 
-																-->
-										  					</div>
-										  				</div>
-
-											  			<div class="ml-auto d-sm-none">
-											  				<button 
-											  					type="button" 
-													  			class="btn btn-success btn-outline-success btn-sm" 
-													  			v-tooltip.bottom-end="'Create New'" 
-													  			@click="showContentCreateForm()"
-												  			>
-												  				<i class="fa fa-plus"></i>
-												  				New Requisition
-												  			</button>
-											  			</div>
-											  		</div>
-
-											  		<div class="col-md-4 col-sm-6 was-validated text-center d-flex align-items-center form-group">
-											  			<div class="mx-sm-auto w-75">
-										  					<input 	
-																type="text" 
-														  		class="form-control" 
-														  		pattern="[^'!#$%^()\x22]+" 
-														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Requisitions"
-													  		>
-
-													  		<div class="invalid-feedback">
-														  		Please search with releavant input
-														  	</div>
-											  			</div>
-
-														<div class="ml-auto ml-sm-0">
-															<ul class="nav nav-pills">
-																<li class="nav-item">
-																	<a 
-																		href="javascript:void(0)"
-																		class="nav-link p-1"
-																		@click="setTodayDate()" 
-																		:class="{ 'active': searchAttributes.dateFrom == currentDate && ! searchAttributes.dateTo }"
-																	>
-																		Today
-																	</a>
-																</li>
-
-																<li class="nav-item">
-																	<a 
-																		href="javascript:void(0)"
-																		class="nav-link p-0" 
-																		data-toggle="modal" 
-																		data-target="#requisition-custom-search"
-																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
-																	>
-																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
-																	</a>
-																</li>
-															</ul>
-													  	</div>
-													</div>
-
-													<div class="col-md-4 text-right d-none d-md-block">
-											  			<button 
-												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			v-tooltip.bottom-end="'Create New'" 
-												  			@click="showContentCreateForm()"
-											  			>
-											  				<i class="fa fa-plus"></i>
-											  				New Requisition
-											  			</button>
-													</div>
-											  	</div>
-											</div>
+											<addition-search-export-option
+												v-if="userHasPermissionTo('view-requisition-index') || userHasPermissionTo('create-requisition')" 
+										  		:search-attributes="searchAttributes" 
+										  		:caller-page="'requisition'" 
+										  		:required-permission = "'requisition'" 
+										  		:disable-add-button="formSubmitted ? true : false" 
+										  		:data-to-export="dataToExport" 
+										  		:contents-to-download="requisitionsToShow" 
+										  		:pagination="pagination" 
+										  		:current-tab="currentTab"
+										  		
+										  		@showContentCreateForm="showContentCreateForm" 
+										  		@searchData="searchData($event)" 
+										  		@fetchAllContents="fetchAllRequisitions"
+											/>
 											
-											<div class="col-sm-12 col-lg-12">
-												<loading v-show="loading"></loading>	
-
+											<div class="col-sm-12 col-lg-12">	
+												<loading v-show="loading"></loading>
+												
 										  		<tab 
 										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
@@ -156,10 +60,10 @@
 																		<th>Actions</th>
 																	</tr>
 																</thead>
+																
 																<tbody>
-
 																	<tr 
-																		v-for="content in requisitionsToShow" :key="'content-' + content.id" 
+																		v-for="(content, index) in requisitionsToShow" :key="'tab-' + currentTab + '-content-index-' + index + '-content-' + content.id" 
 																		:class="content.id==singleRequisitionData.id ? 'highlighted' : ''" 
 																	>
 																		<td>
@@ -218,7 +122,7 @@
 																				v-if="userHasPermissionTo('approve-dispatch')"
 																			>
 																				<i class="fa fa-check-circle"></i>
-																			</button> 
+																			</button>
 
 																			<button 
 																				type="button" 
@@ -229,7 +133,7 @@
 																				v-if="userHasPermissionTo('update-requisition')"
 																			>
 																				<i class="fa fa-trash"></i>
-																			</button>
+																			</button> 
 																			-->
 																		</td>
 																	</tr>
@@ -328,9 +232,7 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
 							<transition-group name="fade">
-
 								<div 
 									class="row" 
 									v-bind:key="'requisition-modal-step-' + 1" 
@@ -339,6 +241,7 @@
 									<h2 class="mx-auto mb-4 lead">Requisition Profile</h2>
 
 							        <div class="col-md-12">
+							        	<!-- 
 							        	<div class="form-row">
 							        		<div class="form-group col-md-12">
 							        			<label for="inputFirstName">Select Merchant</label>
@@ -362,6 +265,27 @@
 			                                	<div class="invalid-feedback">
 											    	{{ errors.merchant_id }}
 											    </div>
+							        		</div>
+							        	</div> 
+							        	-->
+
+							        	<div class="form-row">
+							        		<div class="form-group col-md-12">
+							        			<label for="inputFirstName">Select Merchant</label>
+													
+												<multiselect 
+			                              			v-model="singleRequisitionData.merchant"
+			                              			placeholder="Merchant Name" 
+			                              			label="name" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="[]" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false" 
+			                                  		class="form-control p-0 is-valid" 
+			                                  		:disabled="true"
+			                              		>
+			                                	</multiselect>
 							        		</div>
 							        	</div>
 
@@ -440,6 +364,7 @@
 											:key="'required-product-' + productIndex"
 										>
 											<div class="form-row">
+												<!-- 
 												<div class="form-group col-md-6">
 													<label for="inputFirstName">Select Product</label>
 													
@@ -463,24 +388,53 @@
 				                                	<div class="invalid-feedback">
 												    	{{ errors.products[productIndex].product_id }}
 												    </div>
+												</div> 
+												-->
+
+												<div class="form-group col-md-6">
+													<label for="inputFirstName">Select Product</label>
+													
+													<multiselect 
+				                              			v-model="requiredProduct.product"
+				                              			placeholder="Product Name" 
+				                              			label="name" 
+				                                  		track-by="id" 
+				                                  		:custom-label="objectNameWithCapitalized" 
+				                                  		:options="[]" 
+				                                  		:required="true" 
+				                                  		:allow-empty="false" 
+				                                  		class="form-control p-0 is-valid" 
+				                                  		:disabled="true"
+				                              		>
+				                                	</multiselect>
 												</div>
 
-												<div 
-													class="form-group col-md-6" 
-													v-if="requiredProduct.product"
-												>
+												<div class="form-group col-md-6" v-if="requiredProduct.product">
 													<label for="inputFirstName">Total Quantity</label>
-													<input type="number" 
-														class="form-control" 
-														v-model.number="requiredProduct.total_quantity" 
-														placeholder="Product Total Quantity" 
-														:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
-														@change="validateFormInput('product_quantity')" 
-														required="true" 
-														min="0" 
-														:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
+
+													<div class="input-group mb-0">
+														<input type="number" 
+															class="form-control"  
+															v-model.number="requiredProduct.total_quantity"  
+															placeholder="Product Total Quantity" 
+															:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('product_quantity')" 
+															required="true" 
+															min="0" 
+															:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
+														>
+														<div class="input-group-append">
+															<span class="input-group-text" id="basic-addon2">
+																{{ requiredProduct.product.product ? requiredProduct.product.product.quantity_type : 'Unit' | capitalize }}
+															</span>
+														</div>
+													</div>
+
+													<div 
+														class="invalid-feedback" 
+														style="display: block;" 
+														v-show="errors.products[productIndex].product_quantity" 
 													>
-													<div class="invalid-feedback">
 											        	{{ errors.products[productIndex].product_quantity }}
 											  		</div>
 												</div>
@@ -499,7 +453,7 @@
 						                              			v-model="requiredProduct.product.variations[variationIndex]"
 						                              			class="form-control p-0 is-valid" 
 						                              			placeholder="Variation Name" 
-						                              			label="name" 
+						                              			label="variation_name" 
 						                                  		track-by="id" 
 						                                  		:custom-label="objectNameWithCapitalized" 
 						                                  		:options="requiredProduct.product.variations" 
@@ -509,21 +463,33 @@
 						                              		>
 						                                	</multiselect>
 														</div>
+
 														<div class="form-group col-md-6">
 															<label for="inputFirstName">
 																Variation Quantity
 															</label>
-															<input type="number" 
-																class="form-control" 
-																v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
-																placeholder="Variation Quantity" 
-																:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
-																min="0" 
-																:max="productVariation.available_quantity - productVariation.requested_quantity" 
-																@change="validateFormInput('variations_total_quantity')" 
-															>
+
+															<div class="input-group mb-0">
+																<input type="number" 
+																	class="form-control" 
+																	v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
+																	placeholder="Variation Quantity" 
+																	:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
+																	min="0" 
+																	:max="productVariation.available_quantity - productVariation.requested_quantity" 
+																	@change="validateFormInput('variations_total_quantity')" 
+																>
+																<div class="input-group-append">
+																	<span class="input-group-text" id="basic-addon2">
+																		{{ requiredProduct.product.product ? requiredProduct.product.product.quantity_type : 'Unit' | capitalize }}
+																	</span>
+																</div>
+															</div>
+
 															<div 
 																class="invalid-feedback" 
+																style="display: block;" 
+																v-show="errors.products[productIndex].variation_quantities[variationIndex]" 
 															>
 													        	{{ errors.products[productIndex].variation_quantities[variationIndex] }}
 													  		</div>
@@ -580,6 +546,7 @@
 											</div>
 										</div>
 
+										<!-- 
 										<div class="form-row">
 											<div class="form-group col-md-6">
 												<button 
@@ -603,7 +570,8 @@
 													Remove Product
 												</button>
 											</div>
-										</div>
+										</div> 
+										-->
 									</div>
 
 									<div class="form-group col-md-12">
@@ -691,7 +659,6 @@
 				                                  		@close="validateFormInput('product_serials')"
 				                              		>
 				                                	</multiselect>
-
 				                                	 
 				                                	<div 
 														class="invalid-feedback" 
@@ -921,16 +888,1043 @@
 												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
 													Request
 												</button>
 											</div>
 								    	</div>
 							        </div>
 							    </div>
-
 							</transition-group>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 
+ 		<!--Dispatch Modal -->
+		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-requisition') || userHasPermissionTo('update-requisition')">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							{{ (singleDispatchData.requisition.status==0 && ! userHasPermissionTo('approve-dispatch')) ? 'Recommend' : 'Approve' }} {{ singleDispatchData.requisition.subject | capitalize }}
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+						
+					<form 	
+						class="form-horizontal" 
+						v-on:submit.prevent="makeDispatch()" 
+						autocomplete="off" 
+						novalidate="true" 
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-body">
+							<transition-group name="fade">
+								<div 
+									class="row" 
+									v-bind:key="'dispatch-modal-step-' + 1" 
+									v-show="!loading && step==1"
+								>								  	
+									<h2 class="mx-auto mb-4 lead">Requisition Profile</h2>
+
+							        <div class="col-md-12">	
+										<div class="form-row">
+											<!-- 
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">
+													Selected Requisition
+												</label>
+												<multiselect 
+			                              			v-model="singleDispatchData.requisition"
+			                              			placeholder="Requisition Subject" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="availableRequisitions" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false" 
+			                                  		class="form-control p-0" 
+			                                  		:class="!errors.requisition_id ? 'is-valid' : 'is-invalid'" 
+			                                  		@close="validateFormInput('requisition_id')" 
+			                              		>
+			                                	</multiselect>
+			                                	<div class="invalid-feedback">
+											    	{{ errors.requisition_id }}
+											    </div>
+											</div>
+											 -->
+											 
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">
+													Selected Requisition
+												</label>
+												<multiselect 
+			                              			v-model="singleDispatchData.requisition"
+			                              			placeholder="Requisition Subject" 
+			                                  		track-by="id" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:options="[]" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false" 
+			                                  		class="form-control p-0 is-valid" 
+			                              		>
+			                                	</multiselect>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-4 col-form-label form-group">
+												Requested On
+											</label>
+
+											<label class="col-sm-8 col-form-label form-group">
+												{{ singleDispatchData.requisition.created_at }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleDispatchData.requisition.status==0">
+											<label class="form-group col-md-3">
+												{{ userHasPermissionTo('approve-dispatch') ? 'Dispatch' : 'Recommendation' }} Date
+											</label>
+
+											<div class="form-group col-md-9">
+												<v-date-picker 
+													v-model="singleDispatchData.requisition.updated_at" 
+													color="red" 
+													is-dark
+													is-inline 
+													:min-date="singleDispatchData.requisition.created_at" 
+													:max-date="new Date()" 
+													:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+													:attributes="[ { key: 'today', dot: true } ]" 
+												/>
+											</div>
+										</div>
+
+										<div class="form-row" v-show="singleDispatchData.requisition.status==1">
+											<label class="col-sm-4 col-form-label form-group">
+												Recommended On
+											</label>
+
+											<label class="col-sm-8 col-form-label form-group">
+												{{ singleDispatchData.requisition.updated_at }}
+											</label>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+								    	<div class="form-row">
+									    	<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+									          	<button 
+										          	type="button" 
+										          	class="btn btn-outline-secondary btn-sm btn-round" 
+										          	v-tooltip.bottom-end="'Next'" 
+										          	v-on:click="nextPage"
+									          	>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+								    	</div>
+							        </div>
+							    </div>
+
+						        <div 
+									class="row" 
+									v-bind:key="'dispatch-modal-step-' + 2" 
+									v-show="!loading && step==2"
+								>								  	
+									<h2 class="mx-auto mb-4 lead">Required Products</h2>
+
+									<div 
+										class="col-md-12" 
+										v-if="Object.keys(singleDispatchData.requisition).length > 0 && singleDispatchData.requisition.products && singleDispatchData.requisition.products.length"
+									>
+										<div 
+											class="card card-body" 
+											v-for="(requiredProduct, productIndex) in singleDispatchData.requisition.products" 
+											:key="'required-product-' + productIndex"
+										>
+											<div class="form-row">
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Product
+													</label>
+													<multiselect 
+				                              			v-model="singleDispatchData.requisition.products[productIndex]"
+				                              			placeholder="Product Name" 
+				                              			label="product_name" 
+				                                  		track-by="merchant_product_id" 
+				                                  		class="form-control p-0 is-valid" 
+				                                  		:custom-label="objectNameWithCapitalized" 
+				                                  		:options="singleDispatchData.requisition.products"
+				                                  		:disabled="true"
+				                              		>
+				                                	</multiselect>
+												</div>
+
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Total Required
+													</label>
+													
+													<div class="input-group mb-0">
+														<input 
+															type="number" 
+															class="form-control is-valid" 
+															v-model.number="requiredProduct.quantity" 
+															placeholder="Product Total Quantity" 
+															readonly="true"
+														>
+														<div class="input-group-append">
+															<span class="input-group-text">
+																{{ requiredProduct.quantity_type }}
+															</span>
+														</div>
+													</div>
+												</div>
+
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Total Available
+													</label>
+													
+													<div class="input-group mb-0">
+														<input 
+															type="number" 
+															class="form-control" 
+															:class="requiredProduct.quantity > requiredProduct.available_quantity ? 'is-invalid' : 'is-valid'"
+															v-model.number="requiredProduct.available_quantity" 
+															readonly="true"
+														>
+														<div class="input-group-append">
+															<span class="input-group-text">
+																{{ requiredProduct.quantity_type }}
+															</span>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="form-row" v-if="! requiredProduct.has_variations && requiredProduct.available_stocks && requiredProduct.available_stocks.length">
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Select Stock (batch) Code
+													</label>
+
+													<multiselect 
+				                              			v-model="requiredProduct.selected_stock"
+				                              			placeholder="Stock Code" 
+				                              			label="stock_code" 
+				                                  		track-by="id" 
+				                                  		class="form-control p-0" 
+				                                  		:class="! errors.products[productIndex].product_stock_code ? 'is-valid' : 'is-invalid'"  
+				                                  		:custom-label="objectNameWithCapitalized" 
+				                                  		:options="requiredProduct.available_stocks" 
+				                                  		@close="validateFormInput('product_stock_code')"
+				                              		>
+				                                	</multiselect>
+
+				                                	<div class="invalid-feedback">
+												    	{{ errors.products[productIndex].product_stock_code }}
+												    </div>
+												</div>
+
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Mfg. Date
+													</label>
+
+													<p class="form-control">
+														{{ requiredProduct.selected_stock ? requiredProduct.selected_stock.manufactured_at : '--' }}
+													</p>
+												</div>
+
+												<div class="form-group col-md-4">
+													<label for="inputFirstName">
+														Exp. Date
+													</label>
+
+													<p class="form-control">
+														{{ requiredProduct.selected_stock ? requiredProduct.selected_stock.expired_at : '--' }}
+													</p>
+												</div>
+											</div>
+
+											<div class="card card-body" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
+												<div 
+													class="form-row" 
+													v-for="(requiredProductSerial, productSerialIndex) in requiredProduct.serials" 
+														:key="'required-product-name-' + requiredProduct.product_name + '-serial-' + productSerialIndex"
+												>
+													<div class="col-md-6 form-group">
+														<label for="inputFirstName">
+															Serial # {{ productSerialIndex + 1 }}
+														</label>
+														
+														<input 
+															type="text" 
+															class="form-control" 
+															v-model="requiredProductSerial.serial.serial_no" 
+															readonly="true"
+														>
+													</div>
+
+													<div class="col-md-6 form-group">
+														<label for="inputFirstName">
+															Status
+														</label>
+
+														<span :class="[requiredProductSerial.serial.has_dispatched ? 'badge-danger' : 'badge-success', 'badge form-control d-block']">
+															{{ requiredProductSerial.serial.has_dispatched ? 'NA' : 'Available' }}
+														</span>
+													</div>
+												</div>
+											</div>
+
+											<div class="card" v-if="requiredProduct.has_variations && requiredProduct.hasOwnProperty('variations') && requiredProduct.variations.length">
+												<div class="card-body">
+													<div 
+														class="form-row" 
+														v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+														:key="'required-product-' + productIndex + 'variation-' + variationIndex"
+													>	
+														<div class="col-sm-12">
+															<div class="form-row">
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Selected Variation
+																	</label>
+																	<multiselect 
+								                              			v-model="requiredProduct.variations[variationIndex]"
+								                              			placeholder="Variation Name" 
+								                              			label="variation_name" 
+								                                  		track-by="product_variation_id" 
+								                                  		class="form-control p-0 is-valid" 
+								                                  		:custom-label="objectNameWithCapitalized" 
+								                                  		:options="singleDispatchData.requisition.products"
+								                                  		:disabled="true"
+								                              		>
+								                                	</multiselect>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Required
+																	</label>
+																	
+																	<div class="input-group mb-0">
+																		<input 
+																			type="number" 
+																			class="form-control" 
+																			v-model.number="requiredProduct.variations[variationIndex].quantity" 
+																			placeholder="Variation Quantity" 
+																			readonly="true" 
+																		>
+																		<div class="input-group-append">
+																			<span class="input-group-text">
+																				{{ requiredProduct.quantity_type }}
+																			</span>
+																		</div>
+																	</div>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Available
+																	</label>
+																	
+																	<div class="input-group mb-0">
+																		<input 
+																			type="number" 
+																			class="form-control" 
+																			v-model.number="productVariation.available_quantity" 
+																			placeholder="Dispatch Quantity" 
+																			readonly="true" 
+																		>
+																		<div class="input-group-append">
+																			<span class="input-group-text">
+																				{{ requiredProduct.quantity_type }}
+																			</span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+
+														<div class="col-sm-12" v-if="productVariation.available_stocks && productVariation.available_stocks.length">
+															<div class="form-row">
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Select Stock (batch) Code
+																	</label>
+
+																	<multiselect 
+								                              			v-model="productVariation.selected_stock"
+								                              			placeholder="Stock Code" 
+								                              			label="stock_code" 
+								                                  		track-by="id" 
+								                                  		class="form-control p-0" 
+								                                  		:class="! errors.products[productIndex].variation_stock_codes[variationIndex] ? 'is-valid' : 'is-invalid'"  
+								                                  		:custom-label="objectNameWithCapitalized" 
+								                                  		:options="productVariation.available_stocks" 
+								                                  		@close="validateFormInput('variation_stock_codes')"
+								                              		>
+								                                	</multiselect>
+
+								                                	<div class="invalid-feedback">
+																    	{{ errors.products[productIndex].variation_stock_codes[variationIndex] }}
+																    </div>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Mfg. Date
+																	</label>
+
+																	<p class="form-control">
+																		{{ productVariation.selected_stock ? productVariation.selected_stock.manufactured_at : '--' }}
+																	</p>
+																</div>
+
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		Exp. Date
+																	</label>
+
+																	<p class="form-control">
+																		{{ productVariation.selected_stock ? productVariation.selected_stock.expired_at : '--' }}
+																	</p>
+																</div>
+															</div>
+														</div>
+
+														<div class="col-sm-12">
+															<div class="form-row" v-if="productVariation.has_serials">
+																<div class="form-group col-md-4">
+																	<label for="inputFirstName">
+																		{{ productVariation.variation_name | capitalize }} Serials
+																	</label>
+																</div>
+
+																<div 
+																	class="form-group col-md-8" 
+																	v-for="(requiredProductVariationSerial, productVariationSerialIndex) in productVariation.serials" 
+																		:key="'required-product-name-' + requiredProduct.product_name + 'variation-name-' + productVariation.variation_name + '-serial-' + productVariationSerialIndex"
+																>
+																	<div class="form-row">
+																		<div class="col-md-6">
+																			<label for="inputFirstName">
+																				Serial # {{ productVariationSerialIndex + 1 }}
+																			</label>
+																			
+																			<input 
+																				type="text" 
+																				class="form-control" 
+																				v-model="requiredProductVariationSerial.serial.serial_no" 
+																				readonly="true"
+																			>
+																		</div>
+
+																		<div class="col-md-6">
+																			<label for="inputFirstName">
+																				Status
+																			</label>
+
+																			<div class="form-control border-0">
+																				<span :class="[requiredProductVariationSerial.serial.has_dispatched ? 'badge-danger' : 'badge-success', 'badge']">
+																					{{ requiredProductVariationSerial.serial.has_dispatched ? 'NA' : 'Available' }}
+																				</span>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+
+													
+													<!-- 
+													<div 
+														class="form-row text-center" 
+														v-show="errors.products[productIndex].variation_total_dispatched_quantity" 
+													>
+														<div class="invalid-feedback" 
+															style="display:block;"
+														>
+													    	{{ 
+													    		errors.products[productIndex].variation_total_dispatched_quantity
+													    	}}
+													    </div>
+
+													</div>
+												 	-->
+												</div>
+											</div>
+										
+											<!-- 
+											<div class="form-row">
+												<div class="form-group col-md-12 text-center">
+													<div 
+														class="invalid-feedback" 
+														style="display: block;" 
+														v-show="errors.products[productIndex].variation_total_dispatched_quantity"
+													>
+											        	{{ errors.products[productIndex].variation_total_dispatched_quantity }}
+											  		</div>
+												</div>
+											</div>
+									 		-->
+
+									 		<div class="card" v-if="requiredProduct.packaging_service">
+									 			<div class="card-body">
+											 		<div class="form-row">
+														<div class="form-group col-md-12 text-center">
+															<toggle-button 
+																v-model="requiredProduct.packaging_service" 
+																:value="false" 
+																:width=200 
+																:color="{checked: 'green', unchecked: 'red'}"
+																:labels="{checked: 'Want Packaging', unchecked: 'No Packaging'}" 
+																:disabled="true"
+															/>
+														</div>
+
+														<div class="col-md-12">
+															<div class="form-row">
+																<div class="col-md-4">
+																	<label for="inputFirstName">
+																		Preferred Package
+																	</label>
+																	<multiselect 
+								                              			v-model="requiredProduct.preferred_package" 
+								                              			class="form-control p-0 is-valid" 
+								                              			:placeholder="requiredProduct.preferred_package ? 'Preferred Package' : 'No Preferred Package'" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:options="[]" 
+								                                  		:disabled="true"
+								                              		>
+								                                	</multiselect>
+																</div>
+
+																<div class="col-md-4">
+																	<label for="inputFirstName">
+																		Choose Package
+																	</label>
+																	<multiselect 
+								                              			v-model="requiredProduct.dispatched_package" 
+								                              			class="form-control p-0" 
+								                              			:class="!errors.products[productIndex].dispatched_package ? 'is-valid' : 'is-invalid'" 
+								                              			placeholder="Choose Package" 
+								                              			label="name" 
+								                                  		track-by="id" 
+								                                  		:options="allPackagingPackages" 
+								                                  		@input="validateFormInput('dispatched_package')"
+								                              		>
+								                                	</multiselect>
+								                                	<div class="invalid-feedback">
+																    	{{ errors.products[productIndex].dispatched_package }}
+																    </div>
+																</div>
+
+																<div class="col-md-4">
+																	<label for="inputFirstName">
+																		Package Quantity
+																	</label>
+																	<input 
+																		type="number" 
+																		v-model.number="requiredProduct.dispatched_package_quantity" 
+																		class="form-control" 
+																		:class="!errors.products[productIndex].dispatched_package_quantity ? 'is-valid' : 'is-invalid'" 
+																		placeholder="Package Total Quantity" 
+																		@change="validateFormInput('dispatched_package_quantity')"
+																	>
+																	<div class="invalid-feedback">
+																    	{{ errors.products[productIndex].dispatched_package_quantity }}
+																    </div>
+																</div>
+															</div>
+														</div>
+													</div>
+									 			</div>
+									 		</div>
+										</div>
+									</div>
+
+									<div 
+										class="form-group col-md-12" 
+										v-if="Object.keys(singleDispatchData.requisition).length > 0"
+									>
+										<label for="inputFirstName">Short Note</label>
+										<ckeditor 
+			                              	class="form-control" 
+			                              	:editor="editor" 
+			                              	v-model="singleDispatchData.requisition.description" 
+			                              	:disabled="true"
+			                            >
+		                              	</ckeditor>
+									</div>
+										
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+								          	</div>
+								          	<div class="col-md-12">
+								          		<button 
+									          		type="button" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
+									          		v-tooltip.bottom-end="'Previous'"
+									          		v-on:click="step-=1" 
+								          		>
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+
+								          		<button 
+									          		type="button" 
+									          		v-on:click="nextPage" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          		v-tooltip.bottom-end="'Next'"
+								          		>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+										</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'dispatch-modal-step-' + 3" 
+									v-show="!loading && step==3"
+								>
+									<h2 class="mx-auto mb-4 lead">Released Addresses</h2>
+
+									<div 
+										class="col-md-12" 
+										v-if="Object.keys(singleDispatchData.requisition).length > 0 && singleDispatchData.requisition.products && singleDispatchData.requisition.products.length"
+									>
+										<div 
+											class="card"
+											v-for="(requiredProduct, productIndex) in singleDispatchData.requisition.products" 
+											:key="'required-product-index-' + productIndex"
+										>
+											<div class="card-header">
+												{{ requiredProduct.product_name | capitalize }}
+											</div>
+
+											<div 
+											class="card-body" 
+											v-for="(requiredProductAddress, productAddressIndex) in requiredProduct.addresses" 
+											:key="'required-product-index-' + productIndex + '-address-index' + productAddressIndex" 
+											>
+												<div class="form-row ml-5 mr-5">
+													<div class="form-group col-md-12 text-center">
+														<label for="inputFirstName">
+															Released Space Type {{ productAddressIndex + 1 }}
+														</label>
+														<multiselect 
+					                              			v-model="requiredProductAddress.type" 
+					                              			class="form-control p-0 is-valid" 
+					                                  		:options="['containers', 'shelves', 'units']" 
+					                                  		:custom-label="nameWithCapitalized" 
+					                                  		:required="true" 
+					                                  		:allow-empty="false"
+					                              			placeholder="Containers / Shelves / Units" 
+					                                  		:disabled="true" 
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-if="requiredProductAddress.type=='containers'"
+												>
+													<div class="form-group col-md-12">
+														<label for="inputFirstName">
+															Released Containers
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.addresses[productAddressIndex].released_containers"
+					                              			placeholder="Select Contaners" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		class="form-control p-0 is-valid" 
+					                                  		:options="requiredProduct.addresses[productAddressIndex].containers" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].containers.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-if="requiredProductAddress.type=='shelves'"
+												>
+													<div class="form-group col-md-6">
+														<label for="inputFirstName">
+															Selected Container
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container" 
+					                              			placeholder="Parent Contaner" 
+					                              			class="form-control p-0 is-valid" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-6" 
+														v-if="requiredProduct.addresses[productAddressIndex].container"
+													>
+														<label for="inputFirstName">
+															Released Shelves
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container.released_shelves"
+					                              			placeholder="Select Shelves" 
+					                              			class="form-control p-0 is-valid" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="requiredProduct.addresses[productAddressIndex].container.shelves" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelves.length < 2 && requiredProduct.addresses.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+
+												<div class="form-row" v-if="requiredProductAddress.type=='units'">
+													<div class="form-group col-md-4">
+														<label for="inputFirstName">
+															Selected Container
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container"
+					                              			placeholder="Parent Contaner" 
+					                              			class="form-control p-0 is-valid" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-if="requiredProduct.addresses[productAddressIndex].container"
+													>
+														<label for="inputFirstName">
+															Selected Shelf
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container.shelf"
+					                              			placeholder="Parent Shelf" 
+					                              			class="form-control p-0 is-valid" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="[]" 
+					                                  		:disabled="true"
+					                              		>
+					                                	</multiselect>
+													</div>
+
+													<div 
+														class="form-group col-md-4" 
+														v-if="requiredProduct.addresses[productAddressIndex].container && requiredProduct.addresses[productAddressIndex].container.shelf"
+													>
+														<label for="inputFirstName">
+															Released Units
+														</label>
+														<multiselect 
+					                              			v-model="requiredProduct.addresses[productAddressIndex].container.shelf.released_units"
+					                              			placeholder="Select Units" 
+					                              			class="form-control p-0 is-valid" 
+					                              			label="name" 
+					                                  		track-by="id" 
+					                                  		:options="requiredProduct.addresses[productAddressIndex].container.shelf.units" 
+					                                  		:multiple="true" 
+					                                  		:close-on-select="false" 
+					                                  		:clear-on-select="false" 
+					                                  		:preserve-search="true" 
+					                                  		:disabled="(requiredProduct.available_quantity > requiredProduct.quantity && requiredProduct.addresses[productAddressIndex].container.shelf.units.length < 2) || requiredProduct.available_quantity == requiredProduct.quantity"
+					                              		>
+					                                	</multiselect>
+													</div>
+												</div>
+											</div>
+
+											<div class="card-footer">
+												<div class="form-row">
+													<div class="form-group col-md-12">
+														<button 
+															type="button" 
+															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															v-tooltip.bottom-end="'Remove Space'" 
+															:disabled="requiredProduct.addresses.length==1" 
+															v-show="requiredProduct.available_quantity > requiredProduct.quantity"
+															@click="removeSpace(productIndex)"
+														>
+															Remove Space
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right">
+								          		<div class="text-danger small mb-1" v-show="!submitForm">
+											  		Please input required fields
+									          	</div>
+								          	</div>
+								          	<div class="col-md-12">
+								          		<button 
+									          		type="button" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
+									          		v-tooltip.bottom-end="'Previous'"
+									          		v-on:click="step-=1" 
+								          		>
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+								          		<button 
+									          		type="button" 
+									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          		v-tooltip.bottom-end="'Next'"
+									          		v-on:click="nextPage" 
+								          		>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+								          	</div>
+										</div>
+									</div>
+								</div>
+
+								<div 
+									class="row" 
+									v-bind:key="'dispatch-modal-step-' + 4" 
+									v-show="!loading && step==4"
+								>	
+									<h2 class="mx-auto mb-4 lead">Deployment Details</h2>	
+									
+									<div class="form-group col-md-12 text-center">
+										<span :class="[singleDispatchData.requisition.delivery ? 'badge-primary' : 'badge-info', 'badge']">{{ singleDispatchData.requisition.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+									</div>
+
+									<div 
+										class="col-sm-12" 
+										v-if="!singleDispatchData.requisition.delivery && singleDispatchData.requisition.agent"
+									>
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Name</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleDispatchData.requisition.agent.name" 
+													placeholder="Agent Name" 
+													readonly="true" 
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Mobile</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleDispatchData.requisition.agent.mobile" 
+													placeholder="Agent Mobile" 
+													readonly="true" 
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Agent Code</label>
+												<input type="text" 
+													class="form-control" 
+													v-model="singleDispatchData.requisition.agent.code" 
+													placeholder="Agent Code" 
+													readonly="true" 
+												>
+											</div>
+
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Collection Point</label>
+												<ckeditor 
+					                              	class="form-control" 
+					                              	:editor="editor" 
+					                              	v-model="singleDispatchData.agent.collection_point" 
+			                                  		:class="!errors.agent.collection_point ? 'is-valid' : 'is-invalid'" 
+			                                  		@blur="validateFormInput('collection_point')" 
+					                            >
+				                              	</ckeditor>
+				                              	<div class="invalid-feedback">
+											    	{{ errors.agent.collection_point }}
+											    </div>
+											</div>
+
+											<!-- 
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">Presence</label>
+													
+												<span :class="[singleDispatchData.requisition.agent.presence_confirmation ? 'badge-success' : 'badge-danger', 'badge']">
+													{{ singleDispatchData.requisition.agent.presence_confirmation ? 'Present' : 'Not Yet' }}
+												</span>
+											</div>											
+ 											-->
+										</div>
+
+										<!-- 
+										<div class="form-row d-flex">
+											<div class="form-group col-md-6">
+												<img class="img-fluid" 
+													:src="singleDispatchData.agent.agent_receipt || ''"
+													alt="agent_receipt" 
+												>
+											</div>
+
+											<div class="form-group col-md-6  align-self-center">
+												<div class="custom-file">
+												    <input 
+												    	type="file" 
+												    	class="form-control custom-file-input" 
+														:class="!errors.agent.agent_receipt  ? 'is-valid' : 'is-invalid'" 
+											    	 	@change="onAgentReceiptChange" 
+											    	 	accept="image/*"
+												    >
+												    <label class="custom-file-label">
+												    	Agent Receipt...
+												    </label>
+												    <div class="invalid-feedback">
+												    	{{ errors.agent.agent_receipt }}
+												    </div>
+											  	</div>
+											</div>
+										</div>
+										-->
+									</div>
+
+									<div 
+										class="col-sm-12" 
+										v-if="singleDispatchData.requisition.delivery && ! singleDispatchData.requisition.agent"
+									>
+										<div class="form-row">
+											<div class="form-group col-md-12">
+												<label for="inputFirstName">Address</label>
+												<ckeditor 
+					                              	class="form-control" 
+					                              	:editor="editor" 
+					                              	v-model="singleDispatchData.requisition.delivery.address" 
+					                              	:disabled="true" 
+					                            >
+				                              	</ckeditor>
+											</div>
+										</div>
+
+										<div class="form-row d-flex">
+											<div class="form-group col-md-6 text-center">
+												<img class="img-fluid" 
+													:src="singleDispatchData.delivery.delivery_receipt || ''"
+													alt="delivery_receipt" 
+												>
+											</div>
+
+											<div class="form-group col-md-6 align-self-center">
+												<div class="custom-file">
+												    <input type="file" 
+												    	class="form-control custom-file-input" 
+														:class="!errors.delivery.delivery_receipt  ? 'is-valid' : 'is-invalid'" 
+											    	 	@change="onDeliveryReceiptChange" 
+											    	 	accept="image/*"
+												    >
+												    <label class="custom-file-label">Delivery Receipt...</label>
+												    <div class="invalid-feedback">
+												    	{{ errors.delivery.delivery_receipt }}
+												    </div>
+											  	</div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<label for="inputFirstName">
+													Delivery Price
+												</label>
+												<input 
+													type="number" 
+													class="form-control" 
+													v-model.number="singleDispatchData.delivery.delivery_price" 
+													placeholder="Delivery Price" 
+													:class="!errors.delivery.delivery_price ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('delivery_price')" 
+												>
+												<div class="invalid-feedback">
+											    	{{ errors.delivery.delivery_price }}
+											    </div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-12 card-footer">
+							        	<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12 d-flex justify-content-between">
+												<button 
+													type="button" 
+													class="btn btn-outline-secondary btn-sm btn-round" 
+													v-tooltip.bottom-end="'Previous'" 
+													v-on:click="(userHasPermissionTo('approve-dispatch') && singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0 )) ? step-=1 : step-=2"
+												>
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+							                  	
+							                  	<button 
+								                  	type="button" 
+								                  	class="btn btn-danger btn-sm btn-round" 
+								                  	v-tooltip.bottom-end="'Cancel Requisition'" 
+								                  	@click="openRequisitionCancelForm(singleDispatchData.requisition)"
+							                  	>
+													{{ singleDispatchData.requisition.status==0 ? 'Cancel Requisition' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Cancel Dispatch' : '' }} 
+												</button>
+
+												<button 
+													type="submit" 
+													class="btn btn-primary btn-sm btn-round" 
+													:disabled="!submitForm || nondispatchable || formSubmitted"
+												>
+													{{ singleDispatchData.requisition.status==0 ? 'Recommend Dispatch' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve Dispatch' : '' }}
+												</button>
+											</div>
+								    	</div>
+							        </div>
+						        </div>
+							</transition-group>
 						</div>
 
 					</form>
@@ -1036,7 +2030,7 @@
 													<div 
 														class="col-md-12 ml-auto" 
 														v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
-														:key="'required-product-' + requiredProduct.id + productIndex"
+														:key="'view-required-product-index-'  + productIndex + '-required-product-' + requiredProduct.id"
 													>
 														<div class="card">
 															<div class="card-body">
@@ -1054,7 +2048,17 @@
 																		Total Quantity :
 																	</label>
 																	<label class="col-sm-6 col-form-label">
-																		{{ requiredProduct.quantity }}
+																		{{ requiredProduct.quantity }} 
+																		{{ requiredProduct.quantity_type }}
+																	</label>
+																</div>
+
+																<div class="form-row" v-show="! requiredProduct.has_variations && requiredProduct.selected_stock_code">
+																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																		Selected Stock Code :
+																	</label>
+																	<label class="col-sm-6 col-form-label">
+																		{{ requiredProduct.selected_stock_code }} 
 																	</label>
 																</div>
 
@@ -1094,6 +2098,17 @@
 																			</label>
 																			<label class="col-sm-6 col-form-label">
 																				{{ productVariation.quantity }}
+
+																				{{ requiredProduct.quantity_type }}
+																			</label>
+																		</div>
+
+																		<div class="form-row" v-show="productVariation.selected_stock_code">
+																			<label class="col-sm-6 col-form-label font-weight-bold text-right">
+																				Selected Stock Code :
+																			</label>
+																			<label class="col-sm-6 col-form-label">
+																				{{ productVariation.selected_stock_code }} 
 																			</label>
 																		</div>
 
@@ -1317,9 +2332,7 @@
 											</label>
 										</div> -->
 									</div>
-
 								</div>
-
 							</div>
 						</div>
 					</div>
@@ -1334,56 +2347,6 @@
 						>
 							Print
 						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Filter Modal -->
-		<div class="modal fade" id="requisition-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="form-row">
-							<div class="col-12 text-center">
-								<p>
-									Timelaps
-								</p>
-								 
-								<v-date-picker 
-									v-model="searchAttributes.dates" 
-									color="red" 
-									is-dark
-									is-range 
-									is-inline
-									:max-date="new Date()" 
-									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
-									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
-									@input="setSearchingDates()"
-								/> 
-							</div>					
-						</div>
-					</div>
-					
-					<div class="modal-footer">
-						<button 
-							type="button" 
-							class="btn btn-success" 
-							@click="resetSearchingDates()" 
-							v-tooltip.bottom-end="'Reset'"
-						>
-	                  		Reset
-	                  	</button>
-
-						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
-	                  		See Results
-	                  	</button>
 					</div>
 				</div>
 			</div>
@@ -1448,205 +2411,342 @@
 		<!-- Printing Section -->
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
-				<div class="card-body">
+				<div class="card-header">
 					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Subject :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.subject | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">Status :</label>
-
-						<label class="col-6 col-form-label">
-															
-							<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
-															
-								{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
-
-							</span>
+						<div class="col-6">
+							<img 
+								class="img-fluid" 
+								:src="'/' + general_settings.application_logo" 
+								:alt="general_settings.app_name + ' Logo'"
+							>
 							
-						</label>
+							<h5>
+								{{ general_settings.app_name | capitalize }} Requisition Invoice
+							</h5>
+						</div>
+
+						<div class="col-6">
+							<qr-code 
+							:text="singleRequisitionData.subject || ''"
+							:size="50" 
+							class="float-right"
+							></qr-code>
+						</div>
 					</div>
+				</div>
 
-					<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('cancellation_reason')">
-						<label class="col-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
+				<div class="card-body">
+					<div class="form-row form-group">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Subject :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.subject | capitalize }}
+								</label>
+							</div>
 
-						<label class="col-6 col-form-label">
-							<span v-html="singleRequisitionData.cancellation_reason"></span>
-						</label>
-					</div>
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">Status :</label>
 
-					<div 
-						class="form-row" 
-						v-if="singleRequisitionData.creator"
-					>
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Created By :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.creator.user_name | capitalize }}
-						</label>
-					</div>
+								<label class="col-6 col-form-label">									
+									<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
+																	
+										{{ singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'Dispatched' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'Recommended' : singleRequisitionData.status==0 ? 'Pending' : 'Cancelled' }}
 
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Requested on :
-						</label>
+									</span>	
+								</label>
+							</div>
 
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.created_at }}
-						</label>
+							<div 
+								class="form-row" 
+								v-if="singleRequisitionData.creator"
+							>
+								<label class="col-6 col-form-label font-weight-bold">
+									Created By :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.creator.user_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Requested on :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.created_at }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold">
+									{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} on :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.updated_at }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold">
+									{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} By :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.updater.user_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold">
+									{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  On :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.dispatch.updated_at }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
+								<label class="col-6 col-form-label font-weight-bold">
+									{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval==1">
+								<label class="col-6 col-form-label font-weight-bold">
+									Received :
+								</label>
+								<label class="col-6 col-form-label">
+									<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
+										{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
+									</span>
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('agent')">
+								<label class="col-6 col-form-label font-weight-bold">
+									Collection Point :
+								</label>
+								<label class="col-6 col-form-label">
+									<span v-html="singleRequisitionData.dispatch.agent.collection_point"></span>
+								</label>
+							</div>
+						</div>
+
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Service :
+								</label>
+								<label class="col-6 col-form-label">
+									<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
+								</label>
+							</div>
+							
+							<div class="form-row" v-show="singleRequisitionData.agent">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Agent Name :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
+								</label>
+							</div>
+
+							<div class="form-row" v-show="singleRequisitionData.agent">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Agent Mobile :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
+								</label>
+							</div>
+
+							<div class="form-row" v-show="singleRequisitionData.agent">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Agent Code :
+								</label>
+								<label class="col-6 col-form-label">
+									{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.hasOwnProperty('cancellation_reason')">
+								<label class="col-6 col-form-label font-weight-bold text-right">Cancellation Reason :</label>
+
+								<label class="col-6 col-form-label">
+									<span v-html="singleRequisitionData.cancellation_reason"></span>
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.delivery">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Delivery Address :
+								</label>
+								<label class="col-6 col-form-label">
+									<span v-html="singleRequisitionData.delivery.address"></span>
+								</label>
+							</div>
+
+							<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('delivery')">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Delivery Receipt :
+								</label>
+								<label class="col-6 col-form-label">
+									<img 
+										class="img-fluid" 
+										:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
+										alt="delivery receipt" 
+									>
+								</label>
+							</div>
+						</div>
 					</div>
 
 					<div 
 						class="form-row" 
 						v-if="singleRequisitionData.products && singleRequisitionData.products.length"
 					>
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Product Detail :
-						</label>
-						<div class="col-6">
-							<div class="form-row">
-								
-								<div 
-									class="col-md-12 ml-auto" 
-									v-for="(requiredProduct, productIndex) in singleRequisitionData.products" 
-									:key="'required-product-' + requiredProduct.id + productIndex"
-								>
-									<div class="card">
-										<div class="card-body">
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Product Name :
-												</label>
-												<label class="col-6 col-form-label">
+						<label class="col-12 col-form-label font-weight-bold">Products :</label>
+						
+						<div class="col-12">
+							<table class="table table-striped table-bordered nowrap text-center">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Qty</th>
+										<th>Serials</th>
+										<th>Variations</th>
+										<th>Packaging</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									<div 
+										v-for="(requiredProduct, requiredProductIndex) in singleRequisitionData.products" 
+										:key="'printing-required-product-index-' + requiredProductIndex + '-required-product-' + requiredProduct.id"
+									>
+										<div >
+											<tr>
+												<td>
 													{{ requiredProduct.product_name | capitalize }}
-												</label>
-											</div>
+												</td>
 
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Total Quantity :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.quantity }}
-												</label>
-											</div>
+												<td>{{ requiredProduct.quantity || '--' }}</td>
 
-											<div class="form-row" v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Product Serials :
-												</label>
-												<label class="col-6 col-form-label">
-													<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials" :key="'required-product-' + productIndex + '-product-serial-index-' + productSerialIndex + '-product-serial-' + productSerial.serial.serial_no">
+												<td>
+													<div v-if="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length"
+													>
+														<span v-for="(productSerial, productSerialIndex) in requiredProduct.serials" :key="'required-product-' + requiredProductIndex + '-product-serial-index-' + productSerialIndex + '-product-serial-' + productSerial.serial.serial_no">
 
-														{{ productSerial.serial.serial_no }}
+															{{ productSerial.serial.serial_no }}
 
-														<span v-show="(productSerialIndex+1) < requiredProduct.serials.length">, </span>
-													</span>
-												</label>
-											</div>
+															<span v-show="(productSerialIndex+1) < requiredProduct.serials.length">, </span>
+														</span>
+													</div>
 
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Variations :
-												</label>
-												<label class="col-6 col-form-label">
+													<div class="form-row" v-if="requiredProduct.has_serials && requiredProduct.has_variations && requiredProduct.variations">
+														<div 
+															class="col-sm-12" 
+															v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+															:key="'printing-required-product-variation-' + productVariation.id + variationIndex"
+														>
+															<div class="form-row" v-if="productVariation.has_serials && productVariation.serials.length">
+																<label class="col-6 col-form-label font-weight-bold text-right">
+																	{{ productVariation.variation_name | capitalize }} Serials :
+																</label>
+																<label class="col-6 col-form-label">
+																	<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials" :key="'required-product-' + requiredProductIndex + '-variation-index-' + variationIndex + '-product-variation-serial-index-' + variationSerialIndex + '-product-variation-serial-' + variationSerial.serial.serial_no">
+
+																		{{ variationSerial.serial.serial_no }}
+
+																		<span v-show="(variationSerialIndex+1) < productVariation.serials.length">, </span>
+																	</span>
+																</label>
+															</div>
+														</div>
+													</div>
+												</td>
+
+												<td>
 													<span :class="[requiredProduct.has_variations ? 'badge-success' : 'badge-danger', 'badge']">{{ requiredProduct.has_variations ? 'Yes' : 'No' }}
 													</span>
-												</label>
-											</div>
 
-											<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
-												<div 
-													class="col-sm-12" 
-													v-for="(productVariation, variationIndex) in requiredProduct.variations" 
-													:key="'required-product-variation-' + productVariation.id + variationIndex"
-												>
-													<div class="form-row">
-														<label class="col-6 col-form-label font-weight-bold text-right">
-															 {{ productVariation.variation_name | capitalize }} :
-														</label>
-														<label class="col-6 col-form-label">
-															{{ productVariation.quantity }}
-														</label>
+													<div class="form-row" v-if="requiredProduct.has_variations && requiredProduct.variations">
+														<div 
+															class="col-sm-12" 
+															v-for="(productVariation, variationIndex) in requiredProduct.variations" 
+															:key="'required-product-variation-' + productVariation.id + variationIndex"
+														>
+															<div class="form-row">
+																<label class="col-6 col-form-label font-weight-bold text-right">
+																	 {{ productVariation.variation_name | capitalize }} :
+																</label>
+																<label class="col-6 col-form-label">
+																	{{ productVariation.quantity }}
+																</label>
+															</div>
+														</div>
 													</div>
+												</td>
 
-													<div class="form-row" v-if="productVariation.has_serials && productVariation.serials.length">
-														<label class="col-6 col-form-label font-weight-bold text-right">
-															{{ productVariation.variation_name | capitalize }} Serials :
-														</label>
-														<label class="col-6 col-form-label">
-															<span v-for="(variationSerial, variationSerialIndex) in productVariation.serials" :key="'required-product-' + productIndex + '-variation-index-' + variationIndex + '-product-variation-serial-index-' + variationSerialIndex + '-product-variation-serial-' + variationSerial.serial.serial_no">
-
-																{{ variationSerial.serial.serial_no }}
-
-																<span v-show="(variationSerialIndex+1) < productVariation.serials.length">, </span>
-															</span>
-														</label>
-													</div>
-												</div>
-											</div>
-
-											<div class="form-row">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Packaging Service :
-												</label>
-												<label class="col-6 col-form-label">
+												<td>
 													<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
 														{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
 													</span>
-												</label>
-											</div>
 
-											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package') && requiredProduct.preferred_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Preferred Package :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.preferred_package.name | capitalize }}
-												</label>
-											</div>
+													<div class="form-row" v-show="requiredProduct.packaging_service">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Packaging Service :
+														</label>
+														<label class="col-6 col-form-label">
+															<span :class="[requiredProduct.packaging_service ? 'badge-success' : 'badge-danger', 'badge']">
+																{{ requiredProduct.packaging_service ? 'Yes' : 'NA' }}
+															</span>
+														</label>
+													</div>
 
-											<div class="form-row" v-else-if="requiredProduct.hasOwnProperty('preferred_package') && !requiredProduct.preferred_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Preferred Package :
-												</label>
-												<label class="col-6 col-form-label">
-													<span class="badge badge-info">
-														NA
-													</span>
-												</label>
-											</div>
+													<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('preferred_package')">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Preferred Package :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ requiredProduct.preferred_package ? requiredProduct.preferred_package.name : '--' | capitalize }}
+														</label>
+													</div>
 
-											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Dispatched Package :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.dispatched_package.name | capitalize }}
-												</label>
-											</div>
+													<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Dispatched Package :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ requiredProduct.dispatched_package.name | capitalize }}
+														</label>
+													</div>
 
-											<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
-												<label class="col-6 col-form-label font-weight-bold text-right">
-													Package Quantity :
-												</label>
-												<label class="col-6 col-form-label">
-													{{ requiredProduct.dispatched_package.quantity }}
-												</label>
-											</div>
+													<div class="form-row" v-if="requiredProduct.packaging_service && requiredProduct.hasOwnProperty('dispatched_package') && requiredProduct.dispatched_package">
+														<label class="col-6 col-form-label font-weight-bold text-right">
+															Package Quantity :
+														</label>
+														<label class="col-6 col-form-label">
+															{{ requiredProduct.dispatched_package.quantity }}
+														</label>
+													</div>
+												</td>
+											</tr>
 										</div>
+										<!-- <td></td> -->
 									</div>
-								</div>
-							</div>
-						</div>
+								</tbody>
+							</table>							
+						</div>	
 					</div>
 
+					<!-- 
 					<div class="form-row" v-if="singleRequisitionData.description">
 						<label class="col-6 col-form-label font-weight-bold text-right">
 							Product Note :
@@ -1654,121 +2754,8 @@
 						<label class="col-6 col-form-label">
 							<span v-html="singleRequisitionData.description"></span>
 						</label>
-					</div>
-
-					<div class="form-row">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Service :
-						</label>
-						<label class="col-6 col-form-label">
-							<span :class="[singleRequisitionData.delivery ? 'badge-success' : 'badge-info', 'badge']">{{ singleRequisitionData.delivery ? 'Delivery Service' : 'Agent Service' }}</span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.delivery">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Delivery Address :
-						</label>
-						<label class="col-6 col-form-label">
-							<span v-html="singleRequisitionData.delivery.address"></span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('delivery')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Delivery Receipt :
-						</label>
-						<label class="col-6 col-form-label">
-							<img 
-								class="img-fluid" 
-								:src="singleRequisitionData.dispatch.delivery.receipt_preview || ''"
-								alt="delivery receipt" 
-							>
-						</label>
-					</div>
-
-					<div class="form-row" v-show="singleRequisitionData.agent">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Agent Name :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.agent ? singleRequisitionData.agent.name : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-show="singleRequisitionData.agent">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Agent Mobile :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.agent ? singleRequisitionData.agent.mobile : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-show="singleRequisitionData.agent">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Agent Code :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.agent ? singleRequisitionData.agent.code : 'NA' }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} on :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.updated_at }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status!=0 && singleRequisitionData.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.status==1 ? 'Recommended' : singleRequisitionData.status==-1 ? 'Cancelled' : '' }} By :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.updater.user_name | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  On :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.dispatch.updated_at }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval != 0 && singleRequisitionData.dispatch.hasOwnProperty('updater')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							{{ singleRequisitionData.dispatch.has_approval==1 ? 'Approved' : 'Cancelled' }}  By :
-						</label>
-						<label class="col-6 col-form-label">
-							{{ singleRequisitionData.dispatch.updater.user_name | capitalize }}
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.has_approval==1">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Received :
-						</label>
-						<label class="col-6 col-form-label">
-							<span :class="[!unconfirmed(singleRequisitionData) ? 'badge-success' : 'badge-danger', 'badge']">
-								{{ !unconfirmed(singleRequisitionData) ? 'Confirmed' : 'Not Confirmed' }}
-							</span>
-						</label>
-					</div>
-
-					<div class="form-row" v-if="singleRequisitionData.status==1 && singleRequisitionData.hasOwnProperty('dispatch') && singleRequisitionData.dispatch.hasOwnProperty('agent')">
-						<label class="col-6 col-form-label font-weight-bold text-right">
-							Collection Point :
-						</label>
-						<label class="col-6 col-form-label">
-							<span v-html="singleRequisitionData.dispatch.agent.collection_point"></span>
-						</label>
-					</div>
+					</div> 
+					-->
 				</div>
 			</div>
 		</div>
@@ -1798,6 +2785,16 @@
 		agent : {},
 
 		delivery : {},
+				
+    };
+
+    let singleDispatchData = {
+
+		requisition : {},
+
+		// delivery : {},
+
+		// agent : {}
 				
     };
 
@@ -1857,12 +2854,13 @@
 	        	editor: ClassicEditor,
 
 	        	submitForm : true,
+	        	formSubmitted : false,
 	        	createRequisition : true,
 
 	        	requisitionsToShow : [],
 	        	allFetchedRequisitions : [],
 
-	        	availableRequisitions : [],
+	        	// availableRequisitions : [],
 	        	
 	        	allPackagingPackages : [],
 
@@ -1872,11 +2870,11 @@
 		        	current_page: 1
 		      	},
 
-		      	allMerchants : [],
-		      	merchantAllProducts : [],
+		      	// allMerchants : [],
+		      	// merchantAllProducts : [],
 	        	merchantAllAgents : [],
 
-	        	// singleDispatchData : singleDispatchData,
+	        	singleDispatchData : singleDispatchData,
 	        	singleRequisitionData : singleRequisitionData,
 
 		   		errors : {
@@ -1890,9 +2888,10 @@
 						{
 							// product_id : '',
 							// product_quantity : '',
-							// variations_total_quantity : ''
+							// variations_total_quantity : '',
 							variation_serials : [],
 							variation_quantities : [],
+							variation_stock_codes : [],
 						}
 
 					],
@@ -1919,23 +2918,7 @@
 
 					"Requested On": 'created_at',
 
-					"Required Qty": {
-						field: "products",
-						callback: (products) => {
-							if (products) {
-								let objectSummation = products.reduce(
-									(a, b) => ({ quantity: a.quantity + b.quantity })
-								);
-
-								return objectSummation.quantity;
-							}
-							else{
-								return 0;
-							}
-						},
-					},
-
-					"Requirement Details": {
+					"Products": {
 						field: "products",
 						callback: (products) => {
 
@@ -2072,6 +3055,8 @@
 
 				},
 
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -2080,18 +3065,19 @@
 		
 		created(){
 			
-			// this.subscribeToChannels();
+			this.subscribeToChannels();
 			this.fetchAllRequisitions();
 			this.fetchAllPackagingPackages();
-			this.fetchAvailableRequisitions();
-			this.fetchAllMerchants();
+			// this.fetchAvailableRequisitions();
+			// this.fetchAllMerchants();
+			this.fetchMerchantAllAgents();
+			this.removeEngagedSerials();
 
 		},
 
 		computed: {
 			
 			// a computed getter
-			/*
 			nondispatchable: function () {
 				
 				if (this.singleDispatchData.requisition.hasOwnProperty('products') && this.singleDispatchData.requisition.products.length) {
@@ -2109,73 +3095,11 @@
 				return false;
 
 			},
-			*/
 
 			currentDate: function() {
 
 				let date = new Date();
 				return date.getFullYear() + '-' +  (date.getMonth() + 1) + '-' + date.getDate();
-
-			},
-
-		},
-
-		watch : {
-
-			'searchAttributes.search' : function(val){
-				
-				this.pagination.current_page = 1; 
-
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllRequisitions();
-
-				}
-				else {
-
-					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
-
-					if (! format.test(val)) {
-
-						this.searchData();
-					
-					}
-
-				}
-
-			},
-			
-			'searchAttributes.dateFrom' : function(val){
-				
-				this.pagination.current_page = 1; 
-
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllRequisitions();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
-
-			},
-
-			'searchAttributes.dateTo' : function(val){
-				
-				this.pagination.current_page = 1; 
-
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllRequisitions();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
 
 			},
 
@@ -2209,12 +3133,14 @@
 
 			fetchAllRequisitions() {
 
+				/*
 				if (! this.userHasPermissionTo('view-requisition-index')) {
 
 					this.error = 'You do not have permission to view requisition-list';
 					return;
 
 				}
+				*/
 
 				this.error = '';
 				this.loading = true;
@@ -2222,7 +3148,7 @@
 				this.allFetchedRequisitions = [];
 				
 				axios
-					.get('/api/merchant-product-requisitions/' + this.merchantProduct.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/requisitions/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedRequisitions = response.data;
@@ -2253,14 +3179,8 @@
 					});
 
 			},
+			/*
 			fetchAvailableRequisitions() {
-
-				if (! this.userHasPermissionTo('view-requisition-index')) {
-
-					this.error = 'You do not have permission to view requisition-list';
-					return;
-
-				}
 
 				this.error = '';
 				this.loading = true;
@@ -2298,6 +3218,8 @@
 					});
 
 			},
+			*/
+			/*
 			fetchAllMerchants() {
 
 				if (! this.userHasPermissionTo('view-merchant-index')) {
@@ -2343,6 +3265,8 @@
 					});
 
 			},
+			*/
+			/*
 			fetchMerchantAllProducts() {
 				
 				if (! this.userHasPermissionTo('view-merchant-product-index')) {
@@ -2358,7 +3282,7 @@
 				this.merchantAllProducts = [];
 				
 				axios
-					.get('/api/merchant-products/' + this.singleRequisitionData.merchant_id)
+					.get('/api/merchant-products/' + this.merchantId)
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllProducts = response.data.data;
@@ -2388,6 +3312,7 @@
 					});
 
 			},
+			*/
 			fetchMerchantAllAgents() {
 				
 				if (! this.userHasPermissionTo('view-merchant-index')) {
@@ -2403,7 +3328,7 @@
 				this.merchantAllAgents = [];
 				
 				axios
-					.get('/api/merchant-agents/' + this.singleRequisitionData.merchant_id)
+					.get('/api/merchant-agents/' + this.merchantId)
 					.then(response => {
 						if (response.status == 200) {
 							this.merchantAllAgents = Object.values(response.data);
@@ -2435,12 +3360,14 @@
 			},
 			fetchAllPackagingPackages() {
 
+				/*
 				if (! this.userHasPermissionTo('view-logistic-asset-index')) {
 
 					this.error = 'You do not have permission to view packaging packages';
 					return;
 
 				}
+				*/
 				
 				this.error = '';
 				this.loading = true;
@@ -2482,14 +3409,17 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	this.createRequisition = true;
 	        	
 				this.singleRequisitionData = {
 
+					merchant : this.merchantProduct.merchant,
+					merchant_id : this.merchantId,
 					
 					products : [
 						{
-							product : {},
+							product : this.merchantProduct,
 							total_quantity : 0
 						}
 					],
@@ -2512,7 +3442,8 @@
 							// product_quantity : '',
 							// variations_total_quantity : ''
 							variation_serials : [],
-							variation_quantities : []
+							variation_quantities : [],
+							variation_stock_codes : [],
 						}
 						
 					],
@@ -2526,40 +3457,10 @@
 				$('#requisition-createOrEdit-modal').modal('show');
 				
 			},
-			storeRequisition() {
-				
-				if (!this.verifyRequisitionInput()) {
-					this.submitForm = false;
-					return;
-				}
-
-				axios
-					.post('/requisitions/' + this.perPage, this.singleRequisitionData)
-					.then(response => {
-						if (response.status == 200) {
-							this.$toastr.s("New requisition has been stored", "Success");
-							
-							this.pagination.current_page = 1; 
-							this.allFetchedRequisitions = response.data;
-							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
-
-							$('#requisition-createOrEdit-modal').modal('hide');
-						}
-					})
-					.catch(error => {
-						if (error.response.status == 422) {
-							for (var x in error.response.data.errors) {
-								this.$toastr.w(error.response.data.errors[x], "Warning");
-							}
-				      	}
-					})
-					.finally(response => {
-						this.fetchMerchantAllProducts();
-					});
-
-			},
-			/*
 			openRequisitionCancelForm(object) {
+
+				this.submitForm = true;
+				this.formSubmitted = false;
 
 				this.singleRequisitionData = { ...object };
 
@@ -2574,9 +3475,12 @@
 
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	this.createRequisition = false;
 	        	
 				this.configureErrorObject(object);
+
+				this.singleRequisitionData = { ...object }; // just for highlightng current row
 
 				this.singleDispatchData = {
 
@@ -2615,7 +3519,26 @@
 				
 				this.step = 1;
 	        	this.submitForm = true;
+	        	this.formSubmitted = false;
 	        	this.createRequisition = false;
+	        	
+			/*
+				this.singleDispatchData = {
+
+					requisition : { ...object },
+
+					delivery : {},
+
+					// agent : {}
+							
+			    };
+
+				this.errors = {
+					// products : [],
+					delivery : {},
+					// agent : {},
+				};
+			*/
 
 				this.configureErrorObject(object);
 
@@ -2652,6 +3575,96 @@
 				$('#dispatch-createOrEdit-modal').modal('show');
 
 			},
+			storeRequisition() {
+				
+				if (!this.verifyRequisitionInput()) {
+					this.submitForm = false;
+					return;
+				}
+
+				this.formSubmitted = true;
+
+				axios
+					.post('/requisitions/' + this.perPage, this.singleRequisitionData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New requisition has been stored", "Success");
+							
+							this.pagination.current_page = 1; 
+							this.allFetchedRequisitions = response.data;
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+
+							$('#requisition-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchMerchantAllProducts();
+						this.removeEngagedSerials();
+					});
+
+			},
+			removeEngagedSerials() {
+
+				if (! this.merchantProduct.has_variations && this.merchantProduct.has_serials) {
+
+					if (this.singleRequisitionData.products.length && this.singleRequisitionData.products[0].serials) {
+
+						this.merchantProduct.serials = this.merchantProduct.serials.filter(
+							productSerial => ! this.singleRequisitionData.products[0].serials.find(serialToRemove => serialToRemove.serial_no == productSerial.serial_no)
+						);
+
+					}
+					else {
+
+						this.merchantProduct.serials = this.merchantProduct.serials.filter(
+							productSerial => ! productSerial.has_requisitions && ! productSerial.has_dispatched
+						);
+
+					}
+
+				}
+				else if (this.merchantProduct.has_variations && this.merchantProduct.has_serials) {
+
+					this.merchantProduct.variations.forEach(
+
+						(productVariation, productVariationIndex) => {
+
+							if (this.singleRequisitionData.products.length && this.singleRequisitionData.products[0].variations) {
+
+								variationToSearch = this.singleRequisitionData.products[0].variations.find(variationToSearch => variationToSearch.required_quantity && variationToSearch.id == productVariation.id);
+
+								if (variationToSearch) {
+
+									productVariation.serials = productVariation.serials.filter(
+										variationSerialToStore => ! variationToSearch.serials.find(serialToRemove => serialToRemove.serial_no == variationSerialToStore.serial_no)
+									);						
+
+								}
+
+							}
+							else {
+
+								productVariation.serials = productVariation.serials.filter(
+									variationSerialToStore => ! variationSerialToStore.has_requisitions && ! variationSerialToStore.has_dispatched
+								);
+
+							}
+
+						}
+
+					);
+
+				}
+
+			},
 			makeDispatch() {
 				
 				if (!this.verifyDispatchInput()) {
@@ -2661,6 +3674,8 @@
 
 				}
 
+				this.formSubmitted = true;
+
 				axios
 					.post('/dispatches/' + this.perPage, this.singleDispatchData)
 					.then(response => {
@@ -2668,6 +3683,7 @@
 
 							this.userHasPermissionTo('approve-dispatch') ? this.$toastr.s("Requisition has been dispatched", "Success") : this.$toastr.i("Requisition has been recommended", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
@@ -2682,13 +3698,12 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllRequisitions();
 					});
 
 			},
 			cancelRequisition() {
-
-				this.submitForm = true;
 
 				if (! this.singleRequisitionData.hasOwnProperty('cancellation_reason') || ! this.singleRequisitionData.cancellation_reason) {
 
@@ -2698,6 +3713,7 @@
 
 				}
 
+				this.formSubmitted = true;
 				this.$delete(this.errors, 'cancellation');
 
 				axios
@@ -2707,6 +3723,7 @@
 
 							this.$toastr.s("Requisition has been cancelled", "Success");
 
+							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
 							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
@@ -2722,20 +3739,23 @@
 				      	}
 					})
 					.finally(response => {
+						this.formSubmitted = false;
 						// this.fetchAllRequisitions();
 					});
 
 			},
-			*/
-			searchData() {
+			searchData(emitedObject=false) {
+
+				if (emitedObject) {
+					this.searchAttributes=emitedObject;
+				}
 
 				this.error = '';
 				this.allFetchedRequisitions = [];
 				// this.pagination.current_page = 1;
-				this.searchAttributes.merchant_product_id = this.merchantProduct.id;
 				
 				axios
-				.post('/search-merchant-product-requisitions/' + this.perPage, this.searchAttributes)
+				.post('/search-requisitions/' + this.perPage, this.searchAttributes)
 				.then(response => {
 					this.allFetchedRequisitions = response.data;
 					this.requisitionsToShow = this.allFetchedRequisitions.all.data;
@@ -2746,7 +3766,6 @@
 				});
 
 			},
-			/*
 			verifyDispatchInput() {
 
 				// this.validateFormInput('delivery_address');
@@ -2764,7 +3783,6 @@
 
 				return false;
 			},
-			*/
 			verifyRequisitionInput() {
 
 				this.validateFormInput('agent_name');
@@ -2780,7 +3798,6 @@
 
 				return false;
 			},
-			/*
 			configureErrorObject(object) {
 
 				this.errors = {
@@ -2801,7 +3818,8 @@
 							this.errors.products.push(
 								{
 									variation_serials : [],
-									variation_quantities : []
+									variation_quantities : [],
+									variation_stock_codes : [],
 								}
 							);
 						// }
@@ -2811,7 +3829,6 @@
 				);
 
 			},
-			*/
 			changeNumberContents() {
 				
 				this.pagination.current_page = 1;
@@ -2873,7 +3890,7 @@
 				if (array.length) {
 
 					return array.some(
-						product => Object.keys(product).length > 2 || product.variation_quantities.some(productVariation => productVariation != null) || (product.variation_serials.some(productVariation => productVariation != null))
+						product => Object.keys(product).length > 3 || product.variation_quantities.some(productVariation => productVariation != null) || (product.variation_serials.some(productVariation => productVariation != null)) || product.variation_stock_codes.some(variationStockCode => variationStockCode != null)
 					);
 
 				}
@@ -2882,15 +3899,15 @@
 			},
 			nextPage() {
 				
-				// if (this.createRequisition) {
+				if (this.createRequisition) {
 
 					if (this.step==1) {
 						this.validateFormInput('subject');
-						this.validateFormInput('merchant_id');
+						// this.validateFormInput('merchant_id');
 						this.validateFormInput('description');
 					}
 					else if (this.step == 2) {
-						this.validateFormInput('product_id');
+						// this.validateFormInput('product_id');
 						this.validateFormInput('product_quantity');
 						this.validateFormInput('variations_total_quantity');
 					}
@@ -2901,8 +3918,8 @@
 
 					if (! this.errors.subject && !this.errorInArray(this.errors.products) && this.step < 4) {
 						
-						this.fetchMerchantAllAgents();
-						this.fetchMerchantAllProducts();
+						// this.fetchMerchantAllAgents();
+						// this.fetchMerchantAllProducts();
 
 						if (this.step != 2 || this.requisitionHasSerialProduct()) {
 
@@ -2922,22 +3939,25 @@
 						this.submitForm = false;
 					}
 
-				// }
-				/*
+				}
 				else {
 
+					/*
 					if (this.step==1) {
 						this.validateFormInput('requisition_id');
 					}
+					*/
 
-					if (!this.errors.requisition_id && this.step < 4) {
+					if (/*! this.errors.requisition_id && */this.step < 4) {
 						
 						if (this.step==2) {
 
+							this.validateFormInput('product_stock_code');
+							this.validateFormInput('variation_stock_codes');
 							this.validateFormInput('dispatched_package');
 							this.validateFormInput('dispatched_package_quantity');
 
-							if (this.errors.products.some(requiredProductError => Object.keys(requiredProductError).length > 2)) {
+							if (this.errorInArray(this.errors.products)) {
 
 								this.submitForm = false;
 								return;
@@ -2948,7 +3968,7 @@
 							}
 							else {
 								const productRemains = this.singleDispatchData.requisition.products.some(
-									requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0
+									requiredProduct => (requiredProduct.available_quantity - requiredProduct.quantity) > 0
 								);
 
 								if (productRemains) {
@@ -2973,7 +3993,6 @@
 					}
 
 				}
-				*/
 
 			},
 			showPendingContents() {
@@ -2988,7 +4007,6 @@
 				this.currentTab = 'cancelled';
 				this.showSelectedTabProducts();
 			},
-			/*
 			removeSpace(productIndex) {	
 				
 				if (this.singleDispatchData.requisition.products.length > productIndex && this.singleDispatchData.requisition.products[productIndex].addresses.length > 1) {
@@ -3038,7 +4056,6 @@
 				);
 
 			},
-			*/
 			print() {
 
 				// this.printingStyles.name = `${ this.singleRequisitionData.subject } Details`;
@@ -3054,7 +4071,7 @@
 			    name = name.toString()
 			    return name.charAt(0).toUpperCase() + name.slice(1)
 		    },
-			objectNameWithCapitalized ({ subject, product_name, first_name, last_name, user_name, name, variation, serial_no }) {
+			objectNameWithCapitalized ({ subject, product_name, variation_name, first_name, last_name, user_name, name, variation, serial_no, stock_code, available_quantity }) {
 		      	if (subject) {
 				    subject = subject.toString()
 				    return subject.charAt(0).toUpperCase() + subject.slice(1)
@@ -3062,6 +4079,10 @@
 		      	else if (product_name) {
 				    product_name = product_name.toString()
 				    return product_name.charAt(0).toUpperCase() + product_name.slice(1)
+		      	}
+		      	else if (variation_name) {
+				    variation_name = variation_name.toString()
+				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
 		      	}
 		      	else if (first_name || last_name || user_name) {
 
@@ -3075,7 +4096,7 @@
 		      			user_name = user_name.toString();
 		      		}
 
-		      		return first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '' + ' ' + last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '' + ' ' + user_name ? (user_name.charAt(0).toUpperCase() + user_name.slice(1)) : '';
+		      		return ((first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '') + ' ' + (last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '') + ' ' + (user_name ? (user_name.charAt(0).toUpperCase() + user_name.slice(1)) : ''));
 
 		      	}
 		      	else if (name) {
@@ -3090,17 +4111,27 @@
 		      		serial_no = serial_no.toString()
 				    return serial_no.charAt(0).toUpperCase() + serial_no.slice(1)
 		      	}
+		      	else if (stock_code && available_quantity) {
+		      		stock_code = stock_code.toString()
+				    return stock_code.charAt(0).toUpperCase() + stock_code.slice(1) + '(' + available_quantity + ')'
+		      	}
 		      	else 
 		      		return ''
 		    },
-		    /*
 		    subscribeToChannels() {
 
 		    	Echo.private(`new-requisition`)
 			    .listen('NewRequisitionMade', (e) => {
 			        
 			        this.$toastr.i("New requisition arrives", "Info");
-			        this.allFetchedRequisitions.pending?.data.push(e);
+
+			        // this.allFetchedRequisitions.pending?.data.push(e);
+
+			        if (this.allFetchedRequisitions.pending && this.allFetchedRequisitions.pending.data && ! this.allFetchedRequisitions.pending.data.some(pendingRequisition=>pendingRequisition.id==e.id)) {
+
+			        	this.allFetchedRequisitions.pending.data.push(e);
+
+			        }
 
 			    });
 
@@ -3115,7 +4146,7 @@
 
 				    	if (index > -1) {
 
-			    			Vue.set(this.allFetchedRequisitions.dispatched.data, index, e);
+			    			this.$set(this.allFetchedRequisitions.dispatched.data, index, e);
 				    	
 				    	}
 				    	else{
@@ -3136,6 +4167,7 @@
 				}
 
 		    },
+		    /*
 		    onAgentReceiptChange(evnt) {
 
 				let files = evnt.target.files || evnt.dataTransfer.files;
@@ -3175,7 +4207,6 @@
 		      	return;
 
 			},
-			/*
 			createImage(file) {
                 let reader = new FileReader();
                 
@@ -3195,46 +4226,7 @@
 
                 reader.readAsDataURL(file);
             },
-            */
-            resetSearchingDates(){
-
-            	this.searchAttributes.dates = {};
-				this.searchAttributes.dateTo = null;
-				this.searchAttributes.dateFrom = null;				
-
-            },
-            setSearchingDates(){
-
-            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
-
-					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
-					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
-						
-				}
-				else {
-
-					this.resetSearchingDates();
-
-				}
-
-            },
-            setTodayDate() {
-            	
-            	if (this.searchAttributes.dateFrom != this.currentDate || this.searchAttributes.dateTo) {
-	            	
-	            	// this.searchAttributes.dateTo = null; 
-	            	this.searchAttributes.dates = {};
-	            	this.searchAttributes.dateTo = null;
-	            	this.searchAttributes.dateFrom = this.currentDate;
-
-            	}
-            	else {
-
-	            	this.searchAttributes.dateFrom = null
-
-            	}
-
-            },
+            /*
             setRequisitionMerchant() {
 
             	if (Object.keys(this.singleRequisitionData.merchant).length > 0) {
@@ -3244,11 +4236,14 @@
             	}
 
             },
+            */
+            /*
             setRequiredProduct(index) {
 				if (this.singleRequisitionData.products[index].product && Object.keys(this.singleRequisitionData.products[index].product).length > 0) {
 					this.singleRequisitionData.products[index].id = this.singleRequisitionData.products[index].product.id;
 				}
 			},
+			*/
             setRequisitionAgent() {
 				if (! this.singleRequisitionData.delivery_service) {
 					this.singleRequisitionData.agent = {};
@@ -3269,17 +4264,21 @@
 				}
 
 			},
+			/*
 			addMoreProduct() {
+				
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
 					this.singleRequisitionData.products.push({ product : {}, total_quantity : 0 });
 					
 					this.errors.products.push({
 						variation_serials : [],
-						variation_quantities : []
+						variation_quantities : [],
+						variation_stock_codes : [],
 					});
 
 				}
+
 			},
 			removeProduct() {
 					
@@ -3291,6 +4290,7 @@
 				}
 				
 			},
+			*/
 			customPackagingPackageName ({ name, price, description, preview }) {
 		      	if (name && price) {
 		      		return name.charAt(0).toUpperCase() + name.slice(1) + ' - Each Price (BDT) ' + price 
@@ -3354,6 +4354,7 @@
 						}
 
 						break;
+					*/
 
 					case 'delivery_price' :
 
@@ -3507,6 +4508,7 @@
 
 						break;
 
+					/*
 					case 'agent_receipt' :
 
 						if (this.singleDispatchData.requisition.hasOwnProperty('agent')) {
@@ -3532,6 +4534,7 @@
 						break;
 					*/
 				
+					/*
 					case 'merchant_id' :
 
 						if (! this.singleRequisitionData.merchant || Object.keys(this.singleRequisitionData.merchant).length==0) {
@@ -3543,6 +4546,7 @@
 						}
 
 						break;
+					*/
 				
 					case 'subject' :
 
@@ -3558,7 +4562,7 @@
 						}
 
 						break;
-				/*
+					/*
 					case 'description' :
 
 						if (this.singleRequisitionData.description && !this.singleRequisitionData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
@@ -3570,8 +4574,9 @@
 						}
 
 						break;
-				*/
+					*/
 
+					/*
 					case 'product_id' :
 
 						this.singleRequisitionData.products.forEach(
@@ -3591,14 +4596,15 @@
 									this.$delete(this.errors.products[productIndex], 'product_id');
 								}
 
-								if (!this.errorInArray(this.errors.products)) {
-									this.submitForm = true;
-								}
-
 							}
 						);
 
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
 						break;
+					*/
 
 					case 'product_quantity' :
 
@@ -3833,6 +4839,92 @@
 						else {
 							this.submitForm = true;
 							this.errors.delivery = {};
+						}
+
+						break;
+
+					case 'product_stock_code' : 
+
+						if (this.singleDispatchData.requisition && this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+							
+								(requiredProduct, requiredProductIndex) => {
+
+									if (! requiredProduct.selected_stock || ! Object.keys(requiredProduct.selected_stock).length > 0) {
+
+										// this.errors.products[requiredProductIndex].product_stock_code = 'Stock code is required';
+										
+										this.$set(this.errors.products[requiredProductIndex], 'product_stock_code', 'Stock code is required');
+
+									}
+									else {
+
+										this.$delete(this.errors.products[requiredProductIndex], 'product_stock_code');
+
+									}				
+
+								}
+								
+							);
+
+						}
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'variation_stock_codes' : 
+
+						if (this.singleDispatchData.requisition && this.singleDispatchData.requisition.products && this.singleDispatchData.requisition.products.length) {
+
+							this.singleDispatchData.requisition.products.forEach(
+							
+								(requiredProduct, requiredProductIndex) => {
+
+									if (requiredProduct.has_variations && requiredProduct.variations.length) {
+										
+										this.$delete(this.errors.products[requiredProductIndex], 'product_stock_code');
+										this.$set(this.errors.products[requiredProductIndex], 'variation_stock_codes', []);
+
+										requiredProduct.variations.forEach(
+								
+											(requiredProductVariation, requiredProductVariationIndex) => {
+
+												if (! requiredProductVariation.selected_stock || ! Object.keys(requiredProductVariation.selected_stock).length > 0) {
+													
+													this.$set(this.errors.products[requiredProductIndex].variation_stock_codes, requiredProductVariationIndex, 'Stock code is required');
+
+												}
+												else {
+
+													this.$set(this.errors.products[requiredProductIndex].variation_stock_codes, requiredProductVariationIndex, null);
+
+												}
+
+											}
+										);
+
+									}
+									else {
+
+										// this.$delete(this.errors.products[requiredProductIndex], 'variation_stock_codes');
+										// this.errors.products[requiredProductIndex].variation_stock_codes = [];
+										this.$set(this.errors.products[requiredProductIndex], 'variation_stock_codes', []);
+
+									}
+				
+
+								}
+								
+							);
+
+						}
+
+						if (!this.errorInArray(this.errors.products)) {
+							this.submitForm = true;
 						}
 
 						break;

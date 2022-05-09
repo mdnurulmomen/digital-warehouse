@@ -3482,7 +3482,7 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 							
-							this.printStockCode(this.singleStockData);
+							// this.printStockCode(this.singleStockData);		// as there is no stock code then
 
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
