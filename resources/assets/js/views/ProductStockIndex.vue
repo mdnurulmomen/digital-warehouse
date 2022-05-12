@@ -571,6 +571,7 @@
 																v-model.number="singleStockData.stock_quantity" 
 																placeholder="Product initial qty" 
 																:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
+																@keydown.enter.prevent="nextPage" 
 																@change="validateFormInput('product_stock_quantity')" 
 																required="true" 
 																:readonly="! createMode && allStocks.length && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
@@ -601,7 +602,8 @@
 																class="form-control is-valid" 
 																v-model.number="singleStockData.unit_buying_price" 
 																placeholder="Unit Buying Price" 
-																min="0"
+																min="0" 
+																@keydown.enter.prevent="nextPage" 
 															>
 															<div class="input-group-append">
 																<span class="input-group-text">
@@ -673,6 +675,7 @@
 																	placeholder="Variation Qty" 
 																	:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 																	@change="validateFormInput('product_variation_quantity')" 
+																	@keydown.enter.prevent="nextPage" 
 																	required="true" 
 																	:readonly="! createMode && allStocks.length && allStocks[allStocks.length-1].variations.length > variationIndex && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
 																	:min="createMode ? 1 : allStocks[allStocks.length-1].variations.length > variationIndex ? (stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity) : 1"
@@ -694,7 +697,8 @@
 																		class="form-control is-valid" 
 																		v-model.number="singleStockData.variations[variationIndex].unit_buying_price" 
 																		placeholder="Variation Buying Price" 
-																		min="1"
+																		min="1" 
+																		@keydown.enter.prevent="nextPage" 
 																	>
 																	<div class="input-group-append">
 																		<span class="input-group-text">
@@ -1782,7 +1786,7 @@
 											  		id="view-stock-code" 
 											        :jsbarcode-format="'CODE128'" 
 											        :jsbarcode-width=1 
-											        :jsbarcode-height=25 
+											        :jsbarcode-height=252
 											        :jsbarcode-value="singleStockData.stock_code"
 											    >    
 										        </svg> 
@@ -2305,75 +2309,142 @@
 		</div>
 
 		<div id="productCodeToPrint" class="d-none">
-			<div class="card">
-				<!-- 
-				<div class="card-header">
-					<div class="form-row text-center" v-show="! singleStockData.has_variations">
-						<label class="col-12 col-form-label font-weight-bold">
-							Stock (Batch) Code :
-						</label>
+			<!-- 
+			<div class="card-header">
+				<div class="form-row text-center" v-show="! singleStockData.has_variations">
+					<label class="col-12 col-form-label font-weight-bold">
+						Stock (Batch) Code :
+					</label>
 
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="singleStockData.stock_code"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div> 
-				</div>
-				-->
+					<label class="col-12 col-form-label">
+						<svg 
+					  		class="barcode" 
+					        :jsbarcode-format="'CODE128'" 
+					        :jsbarcode-value="singleStockData.stock_code"
+					        jsbarcode-width=1 
+					        jsbarcode-height=252
+					        last-char= ">"
+					    >    
+				        </svg> 
+					</label>
+				</div> 
+			</div>
+			-->
 
+			<div v-show="! productToPrint.has_serials && ! productToPrint.has_variations">
 				<div 
-					class="card-body form-group" 
-					v-for="(productSerial, productSerialIndex) in productToPrint.serials"
-					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
+					style="border:1px dotted; text-align:center;" 
+					v-for="productQuantity in productToPrint.stock_quantity"
+					:class="productQuantity % 3 == 1 ? 'page-break' : ''" 
+					:key="'printing-product-quantity-index-' + productQuantity + '-product-' + productToPrint.id"
 				>
-					<div class="form-row text-center">
-						<label class="col-12 col-form-label font-weight-bold">
-							Stock (Batch) Code :
-						</label>
+					<h6 style="margin-bottom:0px; margin-top:0px;">
+						Stock-Code :
+					</h6>
 
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="productToPrint.stock_code"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div>
-
-					<div class="form-row text-center">
-						<label class="col-12 col-form-label font-weight-bold">
-							Serial :
-						</label>
-
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="productSerial.serial_no"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div>
+					<svg  
+				  		class="barcode" 
+				        :jsbarcode-value="productToPrint.stock_code" 
+				        jsbarcode-width="1" 
+				        jsbarcode-height="12" 
+				        jsbarcode-margintop="0" 
+				        jsbarcode-marginbottom="0" 
+				        jsbarcode-textmargin="0" 
+				        jsbarcode-textalign="center" 
+				        jsbarcode-fontsize="10" 
+				        style='display: block;width: 100%;'
+				    >
+				    </svg>
 				</div>
+			</div>
 
+			<div v-show="! productToPrint.has_serials && productToPrint.has_variations">
 				<div 
-					class="card-body" 
 					v-for="(productVariation, productVariationIndex) in productToPrint.variations"
 					:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id"
+				>
+					<div 
+						style="border:1px dotted; text-align:center;" 
+						v-for="productVariationQuantityIndex in productVariation.stock_quantity"
+						:class="productVariationQuantityIndex % 3 == 1 ? 'page-break' : ''" 
+						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
+					>
+						<h6 style="margin-bottom:0px; margin-top:0px;">
+							{{ productVariationQuantityIndex }}
+
+							{{ (productVariationQuantityIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+						</h6>
+
+						<svg  
+					  		class="barcode" 
+					        :jsbarcode-value="productVariation.stock_code" 
+					        jsbarcode-width="1" 
+					        jsbarcode-height="12" 
+					        jsbarcode-margintop="0" 
+					        jsbarcode-marginbottom="0" 
+					        jsbarcode-textmargin="0" 
+					        jsbarcode-textalign="center" 
+					        jsbarcode-fontsize="10" 
+					        style='display: block;width: 100%;'
+					    >
+					    </svg>
+					</div>
+				</div>
+			</div>
+
+			<div v-show="productToPrint.has_serials && ! productToPrint.has_variations">
+				<div 
+					style="border:1px dotted;" 
+					v-for="(productSerial, productSerialIndex) in productToPrint.serials"
+					:class="productSerialIndex % 2 == 1 ? 'page-break' : ''" 
+					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
+				>
+					<div style="text-align:center;">
+						<h6 style="margin-bottom:0px; margin-top:0px;">
+							Stock-Code :
+						</h6>
+
+						<svg  
+					  		class="barcode" 
+					        :jsbarcode-value="productToPrint.stock_code" 
+					        jsbarcode-width="1" 
+					        jsbarcode-height="12" 
+					        jsbarcode-margintop="0" 
+					        jsbarcode-marginbottom="0" 
+					        jsbarcode-textmargin="0" 
+					        jsbarcode-textalign="center" 
+					        jsbarcode-fontsize="10" 
+					        style='display: block;width: 100%;'
+					    >
+					    </svg>
+					</div>
+
+					<div style="text-align:center;">
+						<h6 style="margin-bottom:0px; margin-top:0px;">
+							Serial :
+						</h6>
+
+						<svg  
+					  		class="barcode" 
+					        :jsbarcode-value="productSerial.serial_no" 
+					        jsbarcode-width="1" 
+					        jsbarcode-height="12" 
+					        jsbarcode-margintop="0" 
+					        jsbarcode-marginbottom="0" 
+					        jsbarcode-textmargin="0" 
+					        jsbarcode-textalign="center" 
+					        jsbarcode-fontsize="10" 
+					        style='display: block;width: 100%;'
+					    >
+					    </svg>
+					</div>
+				</div>
+			</div>
+
+			<div v-show="productToPrint.has_serials && productToPrint.has_variations">
+				<div 
+					v-for="(productVariation, productVariationIndex) in productToPrint.variations"
+					:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id" 
 				>
 					<!-- 
 					<div class="form-row text-center" v-show="singleStockData.has_variations">
@@ -2387,7 +2458,7 @@
 						        :jsbarcode-format="'CODE128'" 
 						        :jsbarcode-value="productVariation.stock_code"
 						        jsbarcode-width=1 
-						        jsbarcode-height=25 
+						        jsbarcode-height=252
 						        last-char= ">"
 						    >    
 					        </svg> 
@@ -2396,44 +2467,51 @@
 					-->
 
 					<div 
-						class="form-group"
+						style="border:1px dotted;" 
 						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials"
-						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id"
+						:class="productVariationSerialIndex % 4 == 1 ? 'page-break' : ''" 
+						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
 					>
-						<div class="form-row text-center">
-							<label class="col-12 col-form-label font-weight-bold">
-								Stock (Batch) Code :
-							</label>
+						<div style="text-align:center;">
+							<h6 style="margin-bottom:0px; margin-top:0px;">
+								{{ productVariationSerialIndex }}
 
-							<label class="col-12 col-form-label">
-								<svg 
-							  		class="barcode" 
-							        :jsbarcode-format="'CODE128'" 
-							        :jsbarcode-value="productVariation.stock_code"
-							        jsbarcode-width=1 
-							        jsbarcode-height=25 
-							        last-char= ">"
-							    >    
-						        </svg> 
-							</label>
+								{{ (productVariationSerialIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+							</h6>
+
+							<svg  
+						  		class="barcode" 
+						        :jsbarcode-value="productVariation.stock_code" 
+						        jsbarcode-width="1" 
+						        jsbarcode-height="12" 
+						        jsbarcode-margintop="0" 
+						        jsbarcode-marginbottom="0" 
+						        jsbarcode-textmargin="0" 
+						        jsbarcode-textalign="center" 
+						        jsbarcode-fontsize="10" 
+						        style='display: block;width: 100%;'
+						    >
+						    </svg>
 						</div>
 
-						<div class="form-row text-center">
-							<label class="col-12 col-form-label font-weight-bold">
+						<div style="text-align:center;">
+							<h6 style="margin-bottom:0px; margin-top:0px;">
 								Serial :
-							</label>
+							</h6>
 
-							<label class="col-12 col-form-label">
-								<svg 
-							  		class="barcode" 
-							        :jsbarcode-format="'CODE128'" 
-							        :jsbarcode-value="productVariationSerial.serial_no"
-							        jsbarcode-width=1 
-							        jsbarcode-height=25 
-							        last-char= ">"
-							    >    
-						        </svg> 
-							</label>
+							<svg  
+						  		class="barcode" 
+						        :jsbarcode-value="productVariationSerial.serial_no" 
+						        jsbarcode-width="1" 
+						        jsbarcode-height="12" 
+						        jsbarcode-margintop="0" 
+						        jsbarcode-marginbottom="0" 
+						        jsbarcode-textmargin="0" 
+						        jsbarcode-textalign="center" 
+						        jsbarcode-fontsize="10" 
+						        style='display: block;width: 100%;'
+						    >
+						    </svg>
 						</div>
 					</div>
 				</div>
@@ -2648,7 +2726,7 @@
 											        :jsbarcode-format="(singleStockData.stock_code && singleStockData.stock_code.length > 12) ? 'CODE128' : 'EAN13'" 
 											        :jsbarcode-value="singleStockData.stock_code"
 											        jsbarcode-width=1 
-											        jsbarcode-height=25 
+											        jsbarcode-height=252
 											        last-char= ">"
 											    >    
 										        </svg> 
@@ -2733,7 +2811,7 @@
 											        :jsbarcode-format="(stockVariation.stock_code && stockVariation.stock_code.length > 12) ? 'CODE128' : 'EAN13'" 
 											        :jsbarcode-value="stockVariation.stock_code"
 											        jsbarcode-width=1 
-											        jsbarcode-height=25 
+											        jsbarcode-height=252
 											        last-char= ">"
 											    >    
 										        </svg> 
@@ -2892,11 +2970,11 @@
 
 	        	printingStyles : {
 				    
-				    // name: 'Test Name',
+				    name: "_blank",
 				    
 				    specs: [
 				        'fullscreen=yes',
-				        // 'titlebar=yes',
+				        'titlebar=yes',
 				        'scrollbars=yes'
 				    ],
 
@@ -2906,7 +2984,7 @@
 
 				    timeout: 1000, // default timeout before the print window appears
 					autoClose: true, // if false, the window will not close after printing
-					windowTitle: 'Stock Details' 
+					windowTitle: 'Product Stock Details' 
 
 				},
 
@@ -3519,7 +3597,7 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
-							this.printStockCode(this.singleStockData);
+							// this.printStockCode(this.singleStockData);		// as there is no stock code then
 
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
@@ -3534,6 +3612,7 @@
 					.finally(response => {
 						this.formSubmitted = false;
 						this.fetchMerchantAllWarehouses();
+						this.printStockCode(this.singleStockData);
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -4390,12 +4469,10 @@
 		    },
 		    printInvoice() {
 
-				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
+				this.printingStyles.name = `${ this.singleStockData.subject } Details`;
 				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
 
-				JsBarcode(".barcode").init();
-
-				this.$htmlToPaper('sectionToPrint', this.printingStyles);
+				// JsBarcode(".barcode").init();
 
 				/*
 				JsBarcode("#print-stock-code", this.singleStockData.stock_code, 
@@ -4405,26 +4482,16 @@
 					}
 				);
 				*/
+
+				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 
 				$('#stock-view-modal').modal('hide');
 
 			},
 			printStockCode(productToPrint = {}) {
 
-				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
-				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
-
-				this.$set(this, 'productToPrint', productToPrint);
 				// this.productToPrint = productToPrint;
-
-				this.$nextTick(function () {
-
-					JsBarcode(".barcode").init();
-					
-					this.$htmlToPaper('productCodeToPrint', this.printingStyles);
-
-				})
-
+				this.$set(this, 'productToPrint', productToPrint);
 
 				/*
 				JsBarcode("#print-stock-code", this.singleStockData.stock_code, 
@@ -4434,6 +4501,14 @@
 					}
 				);
 				*/
+			
+				this.$nextTick(function () {
+
+					JsBarcode(".barcode").init();
+					
+					this.$htmlToPaper('productCodeToPrint');
+
+				});
 
 				// $('#stock-view-modal').modal('hide');
 
@@ -4553,7 +4628,7 @@
 
 						if (this.productMerchant.has_variations) {
 
-							if (!this.errorInVariationsArray(this.errors.stock.variations)) {
+							if (! this.errorInVariationsArray(this.errors.stock.variations)) {
 
 								let variationTotalQuantity = this.singleStockData.variations.reduce(
 									(value, currentObject) => {
@@ -5038,5 +5113,11 @@
 	.fade-enter, .fade-leave-to {
   		transform: translateX(10px);
   		opacity: 0;
+	}
+	.page-break {
+		display: block;
+		/*break-after: page;*/
+    	page-break-before: always;
+    	position: relative;
 	}
 </style>

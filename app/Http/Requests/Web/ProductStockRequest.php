@@ -50,8 +50,6 @@ class ProductStockRequest extends FormRequest
 
         if ($product->has_serials && ! $product->has_variations) {
             $rules['serials'] = 'required|array|min:'.$this->input('stock_quantity');
-        }
-        if ($product->has_serials && ! $product->has_variations) {
             
             foreach (json_decode(json_encode($this->input('serials'))) as $productSerialkey => $productSerial) {
                 
@@ -79,12 +77,10 @@ class ProductStockRequest extends FormRequest
                 }
 
             }
-
         }
         if ($product->has_variations) {
             $rules['variations'] = 'required|array';
-        }
-        if ($product->has_variations) {
+            
             // $rules['variations.*.id'] = 'required_without:variations.*.merchant_product_variation_id|integer|exists:merchant_product_variations,id';
 
             // $rules['variations.*.merchant_product_variation_id'] = 'required_without:variations.*.id|integer|exists:merchant_product_variations,id';
@@ -103,9 +99,9 @@ class ProductStockRequest extends FormRequest
                 }
 
             }
-
         }
         if ($product->has_variations && array_sum(array_column($this->input('variations'), 'stock_quantity')) != $this->input('stock_quantity')) {
+            $rules['total_stock_quantity'] = 'required|integer|min:'.array_sum(array_column($this->input('variations'), 'stock_quantity'));
             $rules['variations.*.stock_quantity'] = 'required|integer|min:1';
             $rules['variations.*.unit_buying_price'] = 'nullable|numeric';
         }
@@ -174,6 +170,7 @@ class ProductStockRequest extends FormRequest
             'merchant_product_id.required' => 'Merchant-Product id is required !',
             'merchant_product_id.*' => 'Merchant-Product id is invalid !',
             'stock_quantity.*' => 'Stock quantity is required !',
+            'total_stock_quantity.*' => 'Variation total Stock qty is more or less than product qty !',
             'unit_buying_price.*' => 'Buying price should be numeric !',
             'serials.required' => 'Product serial is required !',
             

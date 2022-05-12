@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>Gudam | Admin Template</title>
+	<title>{{ ucfirst($general_settings->app_name) }} | Admin Template</title>
 
 	<meta charset="utf-8">
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />

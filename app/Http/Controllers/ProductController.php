@@ -643,7 +643,7 @@ class ProductController extends Controller
         ]);
 
         $productNewStock = $newStock->stocks()->create([
-            'stock_code' => ('MPS'.$merchantProduct->sku.$merchantProduct->stocks->count()),
+            'stock_code' => ('S'.$merchantProduct->sku.$merchantProduct->stocks->count()),
             'stock_quantity' => $request->stock_quantity,
             // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'available_quantity' => $request->stock_quantity,
@@ -1069,7 +1069,7 @@ class ProductController extends Controller
             // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
             $productNewStock = $newStock->stocks()->create([
-                'stock_code' => ('MPS'.$merchantProduct->sku.$merchantProduct->stocks->count()),
+                'stock_code' => ('S'.$merchantProduct->sku.$merchantProduct->stocks->count()),
                 'stock_quantity' => $storingProduct->stock_quantity,
                 // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $storingProduct->stock_quantity : $lastAvailableQuantity,
                 'available_quantity' => $storingProduct->stock_quantity,
@@ -1202,7 +1202,7 @@ class ProductController extends Controller
                 $stockToUpdate->delete();
 
                 $stockToUpdate = ProductStock::create([
-                    'stock_code' => ('MPS'.$merchantExpectedProduct->sku.$merchantExpectedProduct->stocks->count()),
+                    'stock_code' => ('S'.$merchantExpectedProduct->sku.$merchantExpectedProduct->stocks->count()),
                     'stock_quantity' => $stockingProduct->stock_quantity,
                     // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $stockingProduct->stock_quantity : $lastAvailableQuantity,
                     'available_quantity' => $stockingProduct->stock_quantity,
@@ -1601,7 +1601,7 @@ class ProductController extends Controller
 
         $productNewMerchant = MerchantProduct::create([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, $request->manufacturer_id), 
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'manufacturer_id' => $request->manufacturer_id, 
@@ -1711,7 +1711,7 @@ class ProductController extends Controller
 
         $productMerchantToUpdate->update([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($request->merchant_id, $product->product_category_id, $product->id, $request->manufacturer_id), 
+            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
             'manufacturer_id' => $request->manufacturer_id, 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
@@ -1881,12 +1881,12 @@ class ProductController extends Controller
     }
     */
 
-    protected function generateProductSKU($merchant, $productCategory, $product, $menufacturer)
+    protected function generateProductSKU($productCategory, $product, $merchant, $manufacturer)
     {
         if ($productCategory) {
-            return 'MR'.$merchant.'CT'.$productCategory.'PR'.$product.'MF'.$menufacturer;
+            return 'C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer;
         }
-        return 'MR'.$merchant.'BX'.'PR'.$product.'MF'.$menufacturer;
+        return 'B'.'P'.$product.'M'.$merchant.'M'.$manufacturer;
     }
 
     /*
