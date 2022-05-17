@@ -643,7 +643,7 @@ class ProductController extends Controller
         ]);
 
         $productNewStock = $newStock->stocks()->create([
-            'stock_code' => ('S'.$merchantProduct->sku.$merchantProduct->stocks->count()),
+            'stock_code' => ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
             'stock_quantity' => $request->stock_quantity,
             // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'available_quantity' => $request->stock_quantity,
@@ -1069,7 +1069,7 @@ class ProductController extends Controller
             // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
             $productNewStock = $newStock->stocks()->create([
-                'stock_code' => ('S'.$merchantProduct->sku.$merchantProduct->stocks->count()),
+                'stock_code' => ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
                 'stock_quantity' => $storingProduct->stock_quantity,
                 // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $storingProduct->stock_quantity : $lastAvailableQuantity,
                 'available_quantity' => $storingProduct->stock_quantity,
@@ -1202,7 +1202,7 @@ class ProductController extends Controller
                 $stockToUpdate->delete();
 
                 $stockToUpdate = ProductStock::create([
-                    'stock_code' => ('S'.$merchantExpectedProduct->sku.$merchantExpectedProduct->stocks->count()),
+                    'stock_code' => ($merchantExpectedProduct->sku.'S'.($merchantExpectedProduct->stocks->count()+1)),
                     'stock_quantity' => $stockingProduct->stock_quantity,
                     // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $stockingProduct->stock_quantity : $lastAvailableQuantity,
                     'available_quantity' => $stockingProduct->stock_quantity,
@@ -1540,10 +1540,12 @@ class ProductController extends Controller
                 }),
             ],
             'sku' => [
-                'required', 'string', 
+                'sometimes', 'nullable', 'string', 'unique:merchant_products,sku',
+                /*
                 Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
                     return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 }),
+                */
             ],
             'manufacturer_id' => 'nullable|integer|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
@@ -1567,7 +1569,7 @@ class ProductController extends Controller
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
             'variations.*.selling_price' => 'required_with:variations|numeric',
-            'variations.*.sku' => 'string',
+            'variations.*.sku' => 'sometimes|nullable|string|unique:merchant_product_variations,sku',
         ],
         [
             'product_id.required' => 'Product is required',
@@ -1578,7 +1580,7 @@ class ProductController extends Controller
             'merchant_id.unique' => 'Merchant already exists',
             'merchant_id.*' => 'Merchant is invalid', 
 
-            'sku.required' => 'SKU is required',
+            // 'sku.required' => 'SKU is required',
             'sku.unique' => 'SKU already exists',
             'sku.*' => 'SKU is invalid', 
 
@@ -1601,7 +1603,7 @@ class ProductController extends Controller
 
         $productNewMerchant = MerchantProduct::create([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
+            'sku' => ! empty($request->sku) ? strtoupper($request->sku) : $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'manufacturer_id' => $request->manufacturer_id, 
@@ -1648,10 +1650,13 @@ class ProductController extends Controller
                 })->ignore($productMerchant),
             ],
             'sku' => [
-                'required', 'string', 
+                'sometimes', 'nullable', 'string', 
+                /*
                 Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
                     return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
                 })->ignore($productMerchant),
+                */
+                Rule::unique('merchant_products', 'sku')->ignore($productMerchant),
             ], 
             'manufacturer_id' => 'nullable|integer|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
@@ -1675,7 +1680,7 @@ class ProductController extends Controller
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
             'variations.*.selling_price' => 'required_with:variations|numeric',
-            'variations.*.sku' => 'string',
+            'variations.*.sku' => 'sometimes|nullable|string',
         ],
         [
             'product_id.required' => 'Product is required',
@@ -1686,7 +1691,7 @@ class ProductController extends Controller
             'merchant_id.unique' => 'Merchant already exists',
             'merchant_id.*' => 'Merchant is invalid', 
 
-            'sku.required' => 'SKU is required',
+            // 'sku.required' => 'SKU is required',
             'sku.unique' => 'SKU already exists',
             'sku.*' => 'SKU is invalid', 
 
@@ -1711,7 +1716,7 @@ class ProductController extends Controller
 
         $productMerchantToUpdate->update([
 
-            'sku' => strtoupper($request->sku) ?? $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
+            'sku' => ! empty($request->sku) ? strtoupper($request->sku) : $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
             'manufacturer_id' => $request->manufacturer_id, 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
@@ -1881,12 +1886,16 @@ class ProductController extends Controller
     }
     */
 
-    protected function generateProductSKU($productCategory, $product, $merchant, $manufacturer)
+    protected function generateProductSKU($productCategory, $product, $merchant, $manufacturer = NULL)
     {
         if ($productCategory) {
-            return 'C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer;
+
+            // return 'C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer;
+            return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+
         }
-        return 'B'.'P'.$product.'M'.$merchant.'M'.$manufacturer;
+        
+        return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
     }
 
     /*

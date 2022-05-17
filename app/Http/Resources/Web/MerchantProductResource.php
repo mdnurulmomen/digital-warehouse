@@ -28,7 +28,7 @@ class MerchantProductResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $product->name,
-            'sku' => $this->sku,
+            'sku' => $this->when($this->sku, $this->sku),
             'preview' => $this->preview,
             'manufacturer_id' => $this->when($this->manufacturer_id, $this->manufacturer_id),
             'manufacturer' => $this->when($this->manufacturer_id, $this->manufacturer),

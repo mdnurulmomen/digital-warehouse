@@ -272,7 +272,7 @@ class MerchantProduct extends Model
             // updation
             if ($this->variations()->count()) {
                 
-                // deducting variations
+                // deleting variation images & files
                 if ($this->variations()->count() > count($merchantProductNewVariations)) {
                     
                     for ($i=$this->variations()->count(); $i>count($merchantProductNewVariations); $i--) { 
@@ -594,7 +594,7 @@ class MerchantProduct extends Model
     protected function generateProductVariationSKU($merchant, $productCategory, $product, $variation)
     {
         // return ('MR'.$merchant.'CT'.$productCategory.'PR'.$product.'MFR'.$manufacturer ? $manufacturer->id : $merchant.'VR'.$variation);
-        return $this->sku.'VR'.$variation;
+        return ($this->sku.'V'.$variation);
     }
 
 }

@@ -279,7 +279,7 @@
 
 									<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Product Code/SKU</label>
+											<label for="inputFirstName">Product SKU</label>
 											<input type="text" 
 												class="form-control" 
 												v-model="singleMerchantProductData.sku" 
@@ -1010,9 +1010,9 @@
 													</label>
 												</div>
 
-												<div class="form-row">
+												<div class="form-row" v-show="singleMerchantProductData.sku">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Product Code/SKU :
+														Product SKU :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.sku }}
@@ -2721,11 +2721,8 @@
 						break;
 
 					case 'product_sku' :
-
-						if (! this.singleMerchantProductData.sku) {
-							this.errors.product.product_sku = 'Product SKU is required';
-						}
-						else if (! this.singleMerchantProductData.sku.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+ 
+						if (this.singleMerchantProductData.sku && ! this.singleMerchantProductData.sku.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
 							this.errors.product.product_sku = 'No special character';
 						}
 						else{
