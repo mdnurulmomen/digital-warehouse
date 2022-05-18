@@ -1169,7 +1169,7 @@
 											</div>
 										</div>
 
-										<div class="row">
+										<div class="row card-footer">
 											<div class="col-sm-12 text-right" v-show="!submitForm">
 												<span class="text-danger small mb-1">
 											  		Please input required fields
@@ -2806,138 +2806,167 @@
 
 		<div id="stockCodeToPrint" class="d-none">
 			<div 
-				class="card" 
 				v-for="(stockedProduct, stockedProductIndex) in stockProductsToPrint"
-				:key="'printing-product-serial-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-c'"
-			>
-				<!-- 
-				<div class="card-header">
-					<div class="form-row text-center" v-show="! stockedProduct.has_variations">
-						<label class="col-12 col-form-label font-weight-bold">
-							{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }} Stock (Batch) Code :
-						</label>
-
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="stockedProduct.stock_code"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div> 
-				</div>
-				-->
-
-				<div 
-					class="card-body form-group" 
-					v-for="(productSerial, productSerialIndex) in stockedProduct.serials"
-					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id + '-c'"
-				>
-					<div class="form-row text-center">
-						<label class="col-12 col-form-label font-weight-bold">
-							{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }} Stock (Batch) Code :
-						</label>
-
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="stockedProduct.stock_code"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div>
-
-					<div class="form-row text-center">
-						<label class="col-12 col-form-label font-weight-bold">
-							Serial :
-						</label>
-
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="productSerial.serial_no"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div>
-				</div>
-
-				<div 
-					class="card-body" 
-					v-for="(productVariation, productVariationIndex) in stockedProduct.variations"
-					:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-c'"
-				>
-					<!-- 
-					<div class="form-row text-center" v-show="stockedProduct.has_variations">
-						<label class="col-12 col-form-label font-weight-bold">
-							{{ productVariation.variation ? productVariation.variation.name : 'Variation' | capitalize }} Stock (Batch) Code :
-						</label>
-
-						<label class="col-12 col-form-label">
-							<svg 
-						  		class="barcode" 
-						        :jsbarcode-format="'CODE128'" 
-						        :jsbarcode-value="productVariation.stock_code"
-						        jsbarcode-width=1 
-						        jsbarcode-height=25 
-						        last-char= ">"
-						    >    
-					        </svg> 
-						</label>
-					</div> 
-					-->
-
+				:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-serial-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-c'"
+			> 
+				<div v-show="! stockedProduct.has_serials && ! stockedProduct.has_variations">
 					<div 
-						class="form-group"
-						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials"
-						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id + '-c'"
+						style="border:1px dotted; text-align:center;" 
+						v-for="productQuantity in stockedProduct.stock_quantity" 
+						:style="productQuantity % 3 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-quantity-index-' + productQuantity + '-product-' + stockedProduct.id"
 					>
-						<div class="form-row text-center">
-							<label class="col-12 col-form-label font-weight-bold">
-								{{ stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : 'Product' | capitalize }} ({{ productVariation.variation ? productVariation.variation.name : 'Variation' | capitalize }}) Stock (Batch) Code :
-							</label>
+						<h6 style="margin-bottom:0px; margin-top:0px;">
+							{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : '') | capitalize }} Stock-Code :
+						</h6>
 
-							<label class="col-12 col-form-label">
-								<svg 
-							  		class="barcode" 
-							        :jsbarcode-format="'CODE128'" 
-							        :jsbarcode-value="productVariation.stock_code"
-							        jsbarcode-width=1 
-							        jsbarcode-height=25 
-							        last-char= ">"
-							    >    
-						        </svg> 
-							</label>
+						<svg  
+					  		class="barcode" 
+					        :jsbarcode-value="stockedProduct.stock_code" 
+					        jsbarcode-width="1" 
+					        jsbarcode-height="12" 
+					        jsbarcode-margintop="0" 
+					        jsbarcode-marginbottom="0" 
+					        jsbarcode-textmargin="0" 
+					        jsbarcode-textalign="center" 
+					        jsbarcode-fontsize="10" 
+					        style='display: block;width: 100%;'
+					    >
+					    </svg>
+					</div>
+				</div>
+
+				<div v-show="! stockedProduct.has_serials && stockedProduct.has_variations">
+					<div 
+						v-for="(productVariation, productVariationIndex) in stockedProduct.variations"
+						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id"
+					>
+						<div 
+							style="border:1px dotted; text-align:center;" 
+							v-for="productVariationQuantityIndex in productVariation.stock_quantity" 
+							:style="productVariationQuantityIndex % 3 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+							:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
+						>
+							<h6 style="margin-bottom:0px; margin-top:0px;">
+								{{ (productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+							</h6>
+
+							<svg  
+						  		class="barcode" 
+						        :jsbarcode-value="productVariation.stock_code" 
+						        jsbarcode-width="1" 
+						        jsbarcode-height="12" 
+						        jsbarcode-margintop="0" 
+						        jsbarcode-marginbottom="0" 
+						        jsbarcode-textmargin="0" 
+						        jsbarcode-textalign="center" 
+						        jsbarcode-fontsize="10" 
+						        style='display: block;width: 100%;'
+						    >
+						    </svg>
+						</div>
+					</div>
+				</div>
+
+				<div v-show="stockedProduct.has_serials && ! stockedProduct.has_variations">
+					<div 
+						style="border:1px dotted;" 
+						v-for="(productSerial, productSerialIndex) in stockedProduct.serials" 
+						:style="(productSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
+					>
+						<div style="text-align:center;">
+							<h6 style="margin-bottom:0px; margin-top:0px;">
+								{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : '') | capitalize }} Stock-Code :
+							</h6>
+
+							<svg  
+						  		class="barcode" 
+						        :jsbarcode-value="stockedProduct.stock_code" 
+						        jsbarcode-width="1" 
+						        jsbarcode-height="12" 
+						        jsbarcode-margintop="0" 
+						        jsbarcode-marginbottom="0" 
+						        jsbarcode-textmargin="0" 
+						        jsbarcode-textalign="center" 
+						        jsbarcode-fontsize="10" 
+						        style='display: block;width: 100%;'
+						    >
+						    </svg>
 						</div>
 
-						<div class="form-row text-center">
-							<label class="col-12 col-form-label font-weight-bold">
-								Serial :
-							</label>
+						<div style="text-align:center;">
+							<h6 style="margin-bottom:0px; margin-top:0px;">
+								{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : '') | capitalize }} Serial :
+							</h6>
 
-							<label class="col-12 col-form-label">
-								<svg 
+							<svg  
+						  		class="barcode" 
+						        :jsbarcode-value="productSerial.serial_no" 
+						        jsbarcode-width="1" 
+						        jsbarcode-height="12" 
+						        jsbarcode-margintop="0" 
+						        jsbarcode-marginbottom="0" 
+						        jsbarcode-textmargin="0" 
+						        jsbarcode-textalign="center" 
+						        jsbarcode-fontsize="10" 
+						        style='display: block;width: 100%;'
+						    >
+						    </svg>
+						</div>
+					</div>
+				</div>
+
+				<div v-show="stockedProduct.has_serials && stockedProduct.has_variations">
+					<div 
+						v-for="(productVariation, productVariationIndex) in stockedProduct.variations"
+						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id" 
+					>
+						<div 
+							style="border:1px dotted;" 
+							v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials" 
+							:style="(productVariationSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+							:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
+						>
+							<div style="text-align:center;">
+								<h6 style="margin-bottom:0px; margin-top:0px;">
+									{{ (productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+								</h6>
+
+								<svg  
 							  		class="barcode" 
-							        :jsbarcode-format="'CODE128'" 
-							        :jsbarcode-value="productVariationSerial.serial_no"
-							        jsbarcode-width=1 
-							        jsbarcode-height=25 
-							        last-char= ">"
-							    >    
-						        </svg> 
-							</label>
+							        :jsbarcode-value="productVariation.stock_code" 
+							        jsbarcode-width="1" 
+							        jsbarcode-height="12" 
+							        jsbarcode-margintop="0" 
+							        jsbarcode-marginbottom="0" 
+							        jsbarcode-textmargin="0" 
+							        jsbarcode-textalign="center" 
+							        jsbarcode-fontsize="10" 
+							        style='display: block;width: 100%;'
+							    >
+							    </svg>
+							</div>
+
+							<div style="text-align:center;">
+								<h6 style="margin-bottom:0px; margin-top:0px;">
+									{{ (productVariation.variation ? productVariation.variation.name : '') | capitalize }} Serial :
+								</h6>
+
+								<svg  
+							  		class="barcode" 
+							        :jsbarcode-value="productVariationSerial.serial_no" 
+							        jsbarcode-width="1" 
+							        jsbarcode-height="12" 
+							        jsbarcode-margintop="0" 
+							        jsbarcode-marginbottom="0" 
+							        jsbarcode-textmargin="0" 
+							        jsbarcode-textalign="center" 
+							        jsbarcode-fontsize="10" 
+							        style='display: block;width: 100%;'
+							    >
+							    </svg>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -5032,12 +5061,6 @@
 
 			},
 			printStockCode(productsToPrint = []) {
-
-				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
-				
-				// this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.productMerchant.product.name } - ${ this.productMerchant.merchant.user_name } Stock Details`);
-				
-				this.printingStyles.windowTitle = this.singleStockData.invoice_no +  ' Stock Details';
 
 				// this.stockProductsToPrint = productsToPrint;
 			

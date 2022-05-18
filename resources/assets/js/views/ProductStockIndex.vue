@@ -726,20 +726,18 @@
 														</div>
 													</div>
 												</div>
-										    	 
-										    	<div class="form-row">
-											    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
-										          		<div class="text-danger small mb-1" v-show="!submitForm">
-													  		Please input required fields
-											          	</div>
-											          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" v-tooltip.bottom-end="'Next'">
-									                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-									                  	</button>
-										          	</div>
-										    	</div>
 											</div>	
 										</div>
 									</div>
+
+							    	<div class="col-sm-12 card-footer text-right">
+						          		<div class="text-danger small mb-1" v-show="!submitForm">
+									  		Please input required fields
+							          	</div>
+							          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" v-tooltip.bottom-end="'Next'">
+					                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+					                  	</button>
+						          	</div>
 							    </div>
 
 							    <div 
@@ -900,7 +898,7 @@
 											</div>
 										</div>
 
-										<div class="row">
+										<div class="row card-footer">
 											<div class="col-sm-12 text-right" v-show="!submitForm">
 												<span class="text-danger small mb-1">
 											  		Please input required fields
@@ -2334,8 +2332,8 @@
 			<div v-show="! productToPrint.has_serials && ! productToPrint.has_variations">
 				<div 
 					style="border:1px dotted; text-align:center;" 
-					v-for="productQuantity in productToPrint.stock_quantity"
-					:class="productQuantity % 3 == 1 ? 'page-break' : ''" 
+					v-for="productQuantity in productToPrint.stock_quantity" 
+					:style="productQuantity % 3 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 					:key="'printing-product-quantity-index-' + productQuantity + '-product-' + productToPrint.id"
 				>
 					<h6 style="margin-bottom:0px; margin-top:0px;">
@@ -2365,12 +2363,12 @@
 				>
 					<div 
 						style="border:1px dotted; text-align:center;" 
-						v-for="productVariationQuantityIndex in productVariation.stock_quantity"
-						:class="productVariationQuantityIndex % 3 == 1 ? 'page-break' : ''" 
+						v-for="productVariationQuantityIndex in productVariation.stock_quantity" 
+						:style="productVariationQuantityIndex % 3 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
 					>
 						<h6 style="margin-bottom:0px; margin-top:0px;">
-							{{ productVariationQuantityIndex }}
+							<!-- {{ productVariationQuantityIndex }} -->
 
 							{{ (productVariationQuantityIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 						</h6>
@@ -2395,8 +2393,8 @@
 			<div v-show="productToPrint.has_serials && ! productToPrint.has_variations">
 				<div 
 					style="border:1px dotted;" 
-					v-for="(productSerial, productSerialIndex) in productToPrint.serials"
-					:class="productSerialIndex % 2 == 1 ? 'page-break' : ''" 
+					v-for="(productSerial, productSerialIndex) in productToPrint.serials" 
+					:style="(productSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
 				>
 					<div style="text-align:center;">
@@ -2468,13 +2466,13 @@
 
 					<div 
 						style="border:1px dotted;" 
-						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials"
-						:class="productVariationSerialIndex % 4 == 1 ? 'page-break' : ''" 
+						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials" 
+						:style="(productVariationSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
 					>
 						<div style="text-align:center;">
 							<h6 style="margin-bottom:0px; margin-top:0px;">
-								{{ productVariationSerialIndex }}
+								<!-- {{ productVariationSerialIndex }} -->
 
 								{{ (productVariationSerialIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 							</h6>
@@ -5113,11 +5111,5 @@
 	.fade-enter, .fade-leave-to {
   		transform: translateX(10px);
   		opacity: 0;
-	}
-	.page-break {
-		display: block;
-		/*break-after: page;*/
-    	page-break-before: always;
-    	position: relative;
 	}
 </style>
