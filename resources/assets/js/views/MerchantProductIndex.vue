@@ -377,7 +377,7 @@
 
 									<div class="form-row">
 										<div class="form-group col-md-6">
-											<label for="inputFirstName">Product SKU</label>
+											<label for="inputFirstName">Product SKU (max:15)</label>
 											<input type="text" 
 												class="form-control" 
 												v-model="singleMerchantProductData.sku" 
@@ -385,6 +385,7 @@
 												:class="!errors.product.product_sku ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_sku')" 
 												required="true" 
+												maxlength="15" 
 											>
 
 											<div class="invalid-feedback">
@@ -644,12 +645,13 @@
 																	</div>
 
 																	<div class="form-group col-md-6">
-																		<label for="inputFirstName">Variation SKU</label>
+																		<label for="inputFirstName">SKU (max:15)</label>
 																
 																		<input type="text" 
 																			class="form-control is-valid" 
 																			v-model="merchantProductVariation.sku" 
 																			placeholder="Variation Unique SKU" 
+																			maxlength="15" 
 																		>
 																	</div>
 																</div>
@@ -1570,7 +1572,7 @@
 					<h5 class="card-title">Stocks</h5>
 					
 					<h6 class="card-subtitle mb-2 text-muted">
-						From {{ searchAttributes.dateFrom ? searchAttributes.dateFrom : singleMerchantProductData.created_at }} to {{ searchAttributes.dateTo ? searchAttributes.dateTo : currentTime }}
+						{{ searchAttributes.dateFrom ? searchAttributes.dateFrom : singleMerchantProductData.created_at }} -- {{ searchAttributes.dateTo ? searchAttributes.dateTo : currentTime }}
 					</h6>
 
 					<div class="card-text">
@@ -1686,7 +1688,7 @@
 				</div>
 			</div>
 
-			<div class="card">
+			<div class="card" v-show="singleMerchantProductData.has_serials">
 				<div class="card-body">
 					<h5 class="card-title">Available Serials</h5>
 
@@ -2248,7 +2250,8 @@
 			currentTime: function() {
 
 				let date = new Date();
-				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+				// return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate();
 
 			},
 

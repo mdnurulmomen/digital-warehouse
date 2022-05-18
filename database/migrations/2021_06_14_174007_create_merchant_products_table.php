@@ -25,7 +25,7 @@ class CreateMerchantProductsTable extends Migration
             $table->unsignedDecimal('selling_price', $precision = 8, $scale = 2)->nullable();
             $table->unsignedInteger('product_id'); // which product is this
             $table->unsignedInteger('merchant_id'); // who's product is this
-            $table->timestamp('created_at')->useCurrent();
+            $table->date('created_at');
         });
     }
 

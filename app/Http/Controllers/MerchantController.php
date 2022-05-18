@@ -590,7 +590,7 @@ class MerchantController extends Controller
                 }),
             ],
             'sku' => [
-                'sometimes', 'nullable', 'string', 'unique:merchant_products,sku',
+                'sometimes', 'nullable', 'string', 'max:15', 'unique:merchant_products,sku',
                 /*
                 Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
                     return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
@@ -619,7 +619,7 @@ class MerchantController extends Controller
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
             'variations.*.selling_price' => 'required_with:variations|numeric',
-            'variations.*.sku' => 'sometimes|nullable|string|unique:merchant_product_variations,sku',
+            'variations.*.sku' => 'sometimes|nullable|string|max:15|unique:merchant_product_variations,sku',
         ],
         [
             'product_id.required' => 'Product is required',
@@ -662,7 +662,7 @@ class MerchantController extends Controller
             'discount' => $product->product_category_id ? $request->discount : NULL,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
-            'created_at' => now()
+            'created_at' => now()->format('Y-m-d')
 
         ]);
 
@@ -700,7 +700,7 @@ class MerchantController extends Controller
                 })->ignore($productMerchant),
             ],
             'sku' => [
-                'sometimes', 'nullable', 'string', 
+                'sometimes', 'nullable', 'string', 'max:15',
                 /*
                 Rule::unique('merchant_products', 'sku')->where(function ($query) use($request) {
                     return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
@@ -730,7 +730,7 @@ class MerchantController extends Controller
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
             'variations.*.selling_price' => 'required_with:variations|numeric',
-            'variations.*.sku' => 'sometimes|nullable|string',
+            'variations.*.sku' => 'sometimes|nullable|string|max:15',
         ],
         [
             'product_id.required' => 'Product is required',
@@ -775,7 +775,7 @@ class MerchantController extends Controller
             'discount' => $product->product_category_id ? $request->discount : NULL,
             'product_id' => $request->product_id,
             'merchant_id' => $request->merchant_id,
-            'created_at' => now()
+            // 'created_at' => now()->format('Y-m-d')
 
         ]);
 
@@ -1083,11 +1083,13 @@ class MerchantController extends Controller
         if ($productCategory) {
             
             // return ('C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer ? $manufacturer : $merchant);
-            return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+            // return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+            return ('P'.$product.$merchant.($manufacturer ? $manufacturer : $merchant));
 
         }
 
-        return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+        // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+        return ('BP'.$product.$merchant.($manufacturer ? $manufacturer : $merchant));
     }
 
 }
