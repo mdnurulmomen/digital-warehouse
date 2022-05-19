@@ -1892,12 +1892,12 @@ class ProductController extends Controller
 
             // return 'C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer;
             // return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
-            return ('P'.$product.$merchant.($manufacturer ? $manufacturer : $merchant));
+            return ('P'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
 
         }
         
         // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
-        return ('BP'.$product.$merchant.($manufacturer ? $manufacturer : $merchant));
+        return ('BP'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
     }
 
     /*

@@ -1748,7 +1748,10 @@
 													</label>
 													<label class="col-sm-6 col-form-label">
 														{{ warehouseContainer.quantity }}
-														<i class="fa fa-print fa-lg ml-1 text-danger" aria-hidden="true" @click="printWarehouseContainers([ warehouseContainer ])"  v-tooltip.bottom-end="'Print'"></i>
+														
+														<a href="javascript:void(0)">
+															<i class="fa fa-print fa-lg ml-1 text-danger" aria-hidden="true" @click="printWarehouseContainers([ warehouseContainer ])"  v-tooltip.bottom-end="'Print'"></i>
+														</a>
 													</label>
 												</div>
 
@@ -1960,62 +1963,104 @@
 
 		<!-- Printing Section -->
 		<div id="sectionToPrint" class="d-none">
-			<div class="card">
-				<div class="card-body" v-if="containersToPrint.length">
+			<div v-if="containersToPrint.length">
+				<div 
+					v-for="(warehouseContainerToPrint, warehouseContainerIndexToPrint) in containersToPrint" 
+					:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id"
+				>
 					<div 
-						v-for="(warehouseContainerToPrint, warehouseContainerIndexToPrint) in containersToPrint" 
-						:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id"
+						v-for="containerIndexToPrint in warehouseContainerToPrint.quantity" 
+						:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint"
 					>
-						<div 
-							class="mb-3" 
-							v-for="containerIndexToPrint in warehouseContainerToPrint.quantity" 
-							:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint"
-						>
-							<div class="form-row">
-								<div class="col-12 col-form-label text-center">
-									<label class="font-weight-bold">
-										{{ warehouseContainerToPrint.container ? warehouseContainerToPrint.container.name : '' | capitalize }} {{ containerIndexToPrint }} :
-									</label>
+						<div class="form-row">
+							<div class="col-12 border text-center">
+								<h6 class="mt-0 mb-0 small">
+									{{ warehouseContainerToPrint.container ? warehouseContainerToPrint.container.name : '' | capitalize }} {{ containerIndexToPrint }}
+								</h6>
 
-									<label class="pl-1">
-										{{ warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA' }}
-									</label>
-								</div>
+								<!-- 
+								<label class="pl-1">
+									{{ warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA' }}
+								</label> 
+								-->
+
+								<svg  
+							  		class="barcode" 
+							        :jsbarcode-value="warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA'" 
+							        jsbarcode-width="1" 
+							        jsbarcode-height="15" 
+							        jsbarcode-margin="2" 
+							        jsbarcode-textmargin="0" 
+							        jsbarcode-textalign="center" 
+							        jsbarcode-fontsize="10" 
+							        style='display: block;width: 100%;'
+							    >
+							    </svg>
 							</div>
+						</div>
 
-							<div class="form-row" v-if="warehouseContainerToPrint.container && warehouseContainerToPrint.container.shelf && warehouseContainerToPrint.container.shelf.quantity > 0">
-								<div 
-									class="col-12"
-									v-for="containerShelfIndex in warehouseContainerToPrint.container.shelf.quantity" 
-									:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint + '-container-shelf-index-' + containerShelfIndex"
-								>
-									<div class="form-row">
-										<div class="col-12 col-form-label form-group text-center">
-											<label class="font-weight-bold">
-												Shelf {{ containerShelfIndex }} :
-											</label>
+						<div class="form-row" v-if="warehouseContainerToPrint.container && warehouseContainerToPrint.container.shelf && warehouseContainerToPrint.container.shelf.quantity > 0">
+							<div 
+								class="col-12"
+								v-for="containerShelfIndex in warehouseContainerToPrint.container.shelf.quantity" 
+								:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint + '-container-shelf-index-' + containerShelfIndex"
+							>
+								<div class="form-row">
+									<div class="col-12 border text-center">
+										<h6 class="mt-0 mb-0 small">
+											Shelf {{ containerShelfIndex }}
+										</h6>
 
-											<label class="pl-1">
-												{{ (warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex }}
-											</label>
-										</div>
+										<!-- 
+										<label class="pl-1">
+											{{ (warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex }}
+										</label> 
+										-->
+
+										<svg  
+									  		class="barcode" 
+									        :jsbarcode-value="(warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex" 
+									        jsbarcode-width="1" 
+									        jsbarcode-height="15" 
+									        jsbarcode-margin="2" 
+									        jsbarcode-textmargin="0" 
+									        jsbarcode-textalign="center" 
+									        jsbarcode-fontsize="10" 
+									        style='display: block;width: 100%;'
+									    >
+									    </svg>
 									</div>
-									
-									<div class="form-row" v-if="warehouseContainerToPrint.container && warehouseContainerToPrint.container.shelf && warehouseContainerToPrint.container.shelf.unit && warehouseContainerToPrint.container.shelf.unit.quantity > 0">
-										<div 
-											class="col-12 col-form-label form-group text-center"
-											v-for="shelfUnitIndex in warehouseContainerToPrint.container.shelf.unit.quantity" 
-											:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint + '-container-shelf-index-' + containerShelfIndex + '-shelf-unit-index-' + shelfUnitIndex"
-										>
-											<label class="font-weight-bold">
-												Unit {{ shelfUnitIndex }} :
-											</label>
+								</div>
+								
+								<div class="form-row" v-if="warehouseContainerToPrint.container && warehouseContainerToPrint.container.shelf && warehouseContainerToPrint.container.shelf.unit && warehouseContainerToPrint.container.shelf.unit.quantity > 0">
+									<div 
+										class="col-12 border text-center"
+										v-for="shelfUnitIndex in warehouseContainerToPrint.container.shelf.unit.quantity" 
+										:key="'printing-warehouse-container-index-' + warehouseContainerIndexToPrint + '-printing-warehouse-container-' + warehouseContainerToPrint.container_id + '-container-index-' + containerIndexToPrint + '-container-shelf-index-' + containerShelfIndex + '-shelf-unit-index-' + shelfUnitIndex"
+									>
+										<h6 class="mt-0 mb-0 small">
+											Unit {{ shelfUnitIndex }}
+										</h6>
 
-											<label class="pl-1">
-												{{ (warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex + '-unt-' + shelfUnitIndex }}
-												
-											</label>
-										</div>
+										<!-- 
+										<label class="pl-1">
+											{{ (warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex + '-unt-' + shelfUnitIndex }}
+											
+										</label> 
+										-->
+
+										<svg  
+									  		class="barcode" 
+									        :jsbarcode-value="(warehouseContainerToPrint.container ? (warehouseContainerToPrint.container.code + '-' + containerIndexToPrint) : 'NA') + '-shl-' + containerShelfIndex + '-unt-' + shelfUnitIndex" 
+									        jsbarcode-width="1" 
+									        jsbarcode-height="15" 
+									        jsbarcode-margin="2" 
+									        jsbarcode-textmargin="0" 
+									        jsbarcode-textalign="center" 
+									        jsbarcode-fontsize="10" 
+									        style='display: block;width: 100%;'
+									    >
+									    </svg>
 									</div>
 								</div>
 							</div>
@@ -3012,6 +3057,7 @@
 				this.$nextTick(function () {
 					// DOM is now updated
 					// `this` is bound to the current instance
+					JsBarcode(".barcode").init();
 					this.print();
 				})
 
@@ -4098,7 +4144,7 @@
 
 				// this.printingStyles.name = `${ this.singleStockData.subject } Details`;
 				
-				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singleWarehouseData.name } - Containers`);
+				// this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singleWarehouseData.name } - Containers`);
 
 				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 

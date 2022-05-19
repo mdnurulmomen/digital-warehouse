@@ -1195,7 +1195,7 @@
 
             	// this.errors.medias = [];
 
-            	if (this.applicationSettings.medias.length) {
+            	if (this.applicationSettings.medias && this.applicationSettings.medias.length) {
             		this.applicationSettings.medias.forEach(
             			(applicationMedia, applicationMediaIndex) => {
             				console.log(applicationMediaIndex);

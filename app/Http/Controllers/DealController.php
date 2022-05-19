@@ -185,7 +185,7 @@ class DealController extends Controller
         $request['payments'] = json_decode(json_encode($request->payments)); 
 
         $dealNewPayment = $newDeal->payments()->create([
-            'invoice_no' => $newDeal->name.'-PY-1',
+            'invoice_no' => $newDeal->name.'P1',
             'number_installment' => $request->payments[0]->number_installment,
             'date_from' => $request->payments[0]->date_from,
             'date_to' => $request->payments[0]->date_to,
@@ -591,7 +591,7 @@ class DealController extends Controller
         $dealRecentPayment = $paymentDeal->payments()->has('rents')->latest('id')->first();
 
         $dealNewPayment = $paymentDeal->payments()->create([
-            'invoice_no' => $paymentDeal->name.'-PY-'.($paymentDeal->payments->count() + 1),
+            'invoice_no' => $paymentDeal->name.'P'.($paymentDeal->payments->count() + 1),
             'number_installment' => $request->number_installment,
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,

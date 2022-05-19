@@ -29,7 +29,7 @@ class MerchantDeal extends Model
     protected static function booted()
     {
         static::created(function ($deal) {
-            $deal->name = 'MR-'.$deal->merchant_id.'-DL-'.$deal->id;
+            $deal->name = 'M'.$deal->merchant_id.'D'.$deal->id;
             $deal->save();
         });
     }

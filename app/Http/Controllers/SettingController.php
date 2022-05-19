@@ -112,11 +112,14 @@ class SettingController extends Controller
 
     public function updateMediaSetting(Request $request)
     {
+        $linkregex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
+
         $request->validate([
             'medias' => 'required|array|min:1',
             'medias.*.name' => 'required|string',
             'medias.*.logo' => 'required',
-            'medias.*.link' => 'required|url',
+            // 'medias.*.link' => 'required|url',
+            'medias.*.link' => 'required|regex:'.$linkregex,
         ]);
 
         $adminSettings = ApplicationSetting::firstOrCreate([]);

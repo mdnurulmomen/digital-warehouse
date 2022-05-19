@@ -2333,7 +2333,7 @@
 				<div 
 					style="border:1px dotted; text-align:center;" 
 					v-for="productQuantity in productToPrint.stock_quantity" 
-					:style="productQuantity % 3 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+					:style="productQuantity / 4 >= 1 && productQuantity % 4 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 					:key="'printing-product-quantity-index-' + productQuantity + '-product-' + productToPrint.id"
 				>
 					<h6 style="margin-bottom:0px; margin-top:0px;">
@@ -2344,9 +2344,8 @@
 				  		class="barcode" 
 				        :jsbarcode-value="productToPrint.stock_code" 
 				        jsbarcode-width="1" 
-				        jsbarcode-height="12" 
-				        jsbarcode-margintop="0" 
-				        jsbarcode-marginbottom="0" 
+				        jsbarcode-height="15" 
+				        jsbarcode-margin="2" 
 				        jsbarcode-textmargin="0" 
 				        jsbarcode-textalign="center" 
 				        jsbarcode-fontsize="10" 
@@ -2364,7 +2363,7 @@
 					<div 
 						style="border:1px dotted; text-align:center;" 
 						v-for="productVariationQuantityIndex in productVariation.stock_quantity" 
-						:style="productVariationQuantityIndex % 3 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+						:style="productVariationQuantityIndex / 4 >= 1 && productVariationQuantityIndex % 4 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
 					>
 						<h6 style="margin-bottom:0px; margin-top:0px;">
@@ -2377,9 +2376,8 @@
 					  		class="barcode" 
 					        :jsbarcode-value="productVariation.stock_code" 
 					        jsbarcode-width="1" 
-					        jsbarcode-height="12" 
-					        jsbarcode-margintop="0" 
-					        jsbarcode-marginbottom="0" 
+					        jsbarcode-height="15" 
+					        jsbarcode-margin="2" 
 					        jsbarcode-textmargin="0" 
 					        jsbarcode-textalign="center" 
 					        jsbarcode-fontsize="10" 
@@ -2394,7 +2392,7 @@
 				<div 
 					style="border:1px dotted;" 
 					v-for="(productSerial, productSerialIndex) in productToPrint.serials" 
-					:style="(productSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+					:style="(productSerialIndex + 1) / 2 >= 1 && (productSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
 				>
 					<div style="text-align:center;">
@@ -2406,9 +2404,8 @@
 					  		class="barcode" 
 					        :jsbarcode-value="productToPrint.stock_code" 
 					        jsbarcode-width="1" 
-					        jsbarcode-height="12" 
-					        jsbarcode-margintop="0" 
-					        jsbarcode-marginbottom="0" 
+					        jsbarcode-height="15" 
+					        jsbarcode-margin="3" 
 					        jsbarcode-textmargin="0" 
 					        jsbarcode-textalign="center" 
 					        jsbarcode-fontsize="10" 
@@ -2426,9 +2423,8 @@
 					  		class="barcode" 
 					        :jsbarcode-value="productSerial.serial_no" 
 					        jsbarcode-width="1" 
-					        jsbarcode-height="12" 
-					        jsbarcode-margintop="0" 
-					        jsbarcode-marginbottom="0" 
+					        jsbarcode-height="15" 
+					        jsbarcode-margin="3" 
 					        jsbarcode-textmargin="0" 
 					        jsbarcode-textalign="center" 
 					        jsbarcode-fontsize="10" 
@@ -2467,7 +2463,7 @@
 					<div 
 						style="border:1px dotted;" 
 						v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials" 
-						:style="(productVariationSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
+						:style="(productVariationSerialIndex + 1) / 2 >= 1 && (productVariationSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
 					>
 						<div style="text-align:center;">
@@ -2481,9 +2477,8 @@
 						  		class="barcode" 
 						        :jsbarcode-value="productVariation.stock_code" 
 						        jsbarcode-width="1" 
-						        jsbarcode-height="12" 
-						        jsbarcode-margintop="0" 
-						        jsbarcode-marginbottom="0" 
+						        jsbarcode-height="15" 
+						        jsbarcode-margin="3" 
 						        jsbarcode-textmargin="0" 
 						        jsbarcode-textalign="center" 
 						        jsbarcode-fontsize="10" 
@@ -2501,9 +2496,8 @@
 						  		class="barcode" 
 						        :jsbarcode-value="productVariationSerial.serial_no" 
 						        jsbarcode-width="1" 
-						        jsbarcode-height="12" 
-						        jsbarcode-margintop="0" 
-						        jsbarcode-marginbottom="0" 
+						        jsbarcode-height="15" 
+						        jsbarcode-margin="3" 
 						        jsbarcode-textmargin="0" 
 						        jsbarcode-textalign="center" 
 						        jsbarcode-fontsize="10" 
