@@ -161,7 +161,7 @@ class Warehouse extends Authenticatable
                 return;
             }
 
-            $img->save($imagePath.'w-'.$this->id.'-site-map.jpg');
+            $img->save($imagePath.'w-'.$this->id.'-site-map.jpg', 100);
 
             $this->attributes['site_map_preview'] = $imagePath.'w-'.$this->id.'-site-map.jpg';
 
@@ -197,7 +197,7 @@ class Warehouse extends Authenticatable
                     continue;
                 }
 
-                $img->save($imagePath.'w-'.$this->id.'-preview-'.($i+1).'.jpg');
+                $img->save($imagePath.'w-'.$this->id.'-preview-'.($i+1).'.jpg', 100);
 
             }
 
@@ -270,7 +270,7 @@ class Warehouse extends Authenticatable
                         continue;
                     }
 
-                    $img->save($imagePath.'w-'.$this->id.'-st-'.$newStorage->storage_type->id.'-preview-'.($newStoragePreviewIndex+1).'.jpg');
+                    $img->save($imagePath.'w-'.$this->id.'-st-'.$newStorage->storage_type->id.'-preview-'.($newStoragePreviewIndex+1).'.jpg', 100);
 
                     $warehouseStorageNewPreview = $warehouseNewStorageType->previews()->firstOrCreate([
                         'preview' => $imagePath.'w-'.$this->id.'-st-'.$newStorage->storage_type->id.'-preview-'.($newStoragePreviewIndex+1).'.jpg'

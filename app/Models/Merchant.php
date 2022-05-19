@@ -98,8 +98,8 @@ class Merchant extends Authenticatable
                 return;
             }
 
-            // $img = $img->resize(100, 100);
-            $img->save($imagePath.$this->id.'.jpg');
+            $img = $img->resize(300, 300);  // when facebook uses 180*180
+            $img->save($imagePath.$this->id.'.jpg', 100);
 
             $this->profilePreview()->updateOrCreate(
                 ['user_id' => $this->id, 'user_type' => get_class($this)],
