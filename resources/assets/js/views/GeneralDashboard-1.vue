@@ -481,7 +481,8 @@
 
 		created(){
 		
-			this.getDashboardOneData();			
+			// console.log('created');
+            this.getDashboardOneData();			
 
 		},
 

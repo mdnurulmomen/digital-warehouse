@@ -64,7 +64,7 @@
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['rent-periods', 'storage-types', 'containers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-warehouse-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -148,7 +148,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['products', 'product-merchants', 'product-stocks', 'stocks', 'product-categories', 'category-products', 'variation-types', 'variations', 'product-manufacturers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations', 'products', 'product-merchants', 'product-stocks', 'stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('view-product-asset-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -161,7 +161,7 @@
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['product-categories', 'category-products', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-product-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -223,12 +223,15 @@
 									<span class="pcoded-micon">
 										<i class="fa fa-truck"></i>
 									</span>
+
 									<span class="pcoded-mtext">
 										Requisitions
 									</span>
+
 									<span class="pcoded-badge label label-warning" v-show="currentRouteName!='requisitions' && newRequisition.length">
 										{{ newRequisition.length }}
 									</span>
+									
 									<span class="pcoded-badge label label-success" v-show="currentRouteName!='requisitions' && newAcceptance.length">
 										{{ newAcceptance.length }}
 									</span>
@@ -262,7 +265,6 @@
 							</li>
 						</ul>
 					</div>
-
 				</div>
 			</nav>
 
