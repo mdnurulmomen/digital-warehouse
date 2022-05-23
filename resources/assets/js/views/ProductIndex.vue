@@ -37,11 +37,12 @@
 											<div class="col-sm-12 col-lg-12">
 										  		<tab 
 										  			v-show="query === ''" 
-										  			:tab-names="['retail', 'bulk']" 
+										  			:tab-names="['retail', 'bulk', 'trashed']" 
 										  			:current-tab="'retail'" 
 
 										  			@showRetailContents="showRetailContents" 
 										  			@showBulkContents="showBulkContents" 
+										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
 
 										  		<loading v-show="loading"></loading>
@@ -108,7 +109,8 @@
 																				class="btn btn-grd-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openContentEditForm(content)" 
-																				v-if="userHasPermissionTo('update-product')"
+																				v-if="userHasPermissionTo('update-product')" 
+																				v-show="! content.deleted_at"
 																			>
 																				<i class="fa fa-edit"></i>
 																			</button>
@@ -118,6 +120,7 @@
 																				class="btn btn-grd-success btn-icon" 
 																				v-tooltip.bottom-end="'Merchants'"  
 																				@click="goProductMerchants(content)" 
+																				v-show="! content.deleted_at"
 																				v-if="userHasPermissionTo('view-merchant-product-index')"
 																			>
 																				<i class="fa fa-users" aria-hidden="true"></i>
@@ -1876,6 +1879,10 @@
 					this.productsToShow = this.allFetchedProducts.retail.data;
 					this.pagination = this.allFetchedProducts.retail;
 				}
+				else if (this.currentTab=='trashed') {
+					this.productsToShow = this.allFetchedProducts.trashed.data;
+					this.pagination = this.allFetchedProducts.trashed;
+				}
 				else {
 					this.productsToShow = this.allFetchedProducts.bulk.data;
 					this.pagination = this.allFetchedProducts.bulk;
@@ -1981,6 +1988,10 @@
 			},
 			showBulkContents() {
 				this.currentTab = 'bulk';
+				this.showSelectedTabProducts();
+			},
+			showTrashedContents() {
+				this.currentTab = 'trashed';
 				this.showSelectedTabProducts();
 			},
 			addMoreVariation() {

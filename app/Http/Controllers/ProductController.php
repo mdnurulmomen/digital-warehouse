@@ -267,8 +267,11 @@ class ProductController extends Controller
 
             return response()->json([
 
-                'retail' => new ProductCollection(Product::withTrashed()->where('product_category_id', '!=', 0)->withCount('merchants')->paginate($perPage)),
-                'bulk' => new ProductCollection(Product::withTrashed()->whereNull('product_category_id')->orWhere('product_category_id', 0)->withCount('merchants')->paginate($perPage)),
+                'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)->withCount('merchants')->paginate($perPage)),
+
+                'bulk' => new ProductCollection(Product::whereNull('product_category_id')->orWhere('product_category_id', 0)->withCount('merchants')->paginate($perPage)),
+
+                'trashed' => new ProductCollection(Product::onlyTrashed()->withCount('merchants')->paginate($perPage)),
 
             ], 200);
 
