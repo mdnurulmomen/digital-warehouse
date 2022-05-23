@@ -37,7 +37,10 @@ class DealController extends Controller
     // Merchant-Deal
     public function showMerchantAllDeals($merchant, $perPage)
     {
-        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces', 'payments'])->latest()->paginate($perPage));
+        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces', 'payments'])->with(['rentPeriod' => function($query) {
+                    $query->withTrashed();
+        }])
+        ->latest()->paginate($perPage));
     }
 
     public function storeMerchantDeal(Request $request, $perPage)
@@ -53,8 +56,8 @@ class DealController extends Controller
             
             'payments' => 'required|array|min:1',
             'payments.*.number_installment' => 'required|numeric',
-            'payments.*.date_from' => 'required|date',
-            'payments.*.date_to' => 'required|date',
+            'payments.*.date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'payments.*.date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'payments.*.total_rent' => 'required|numeric',
             'payments.*.discount' => 'required|numeric|between:0,100',
             'payments.*.previous_due' => 'numeric|min:0',
@@ -243,8 +246,8 @@ class DealController extends Controller
             
             'payments' => 'required|array|min:1',
             'payments.*.number_installment' => 'required|numeric',
-            'payments.*.date_from' => 'required|date',
-            'payments.*.date_to' => 'required|date',
+            'payments.*.date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'payments.*.date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'payments.*.total_rent' => 'required|numeric',
             'payments.*.discount' => 'required|numeric|between:0,100',
             'payments.*.previous_due' => 'required|numeric',
@@ -441,15 +444,7 @@ class DealController extends Controller
            return response()->json(['errors'=>["undeletableDeal" => "Deal has multiple payments"]], 422);
             
         }
-        else if ($dealToDelete->whereHas('spaces', function ($query) {
-            $query->whereHasMorph(
-                'space',
-                [ WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class ],
-                function ($query1) {
-                    $query1->where('occupied', '!=', 0.0);
-                }
-            );
-        })->exists()) {
+        else if ($dealToDelete->spaces->count() && $dealToDelete->spaces()->whereHasMorph('space',[ WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class ],function ($query1) {$query1->where('occupied', '!=', 0.0);})->exists()) {
 
            return response()->json(['errors'=>["undeletableDeal" => "Dealt space is occupied"]], 422);
             
@@ -563,8 +558,8 @@ class DealController extends Controller
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
             'number_installment' => 'required|numeric|min:1',
-            'date_from' => 'required|date',
-            'date_to' => 'required|date',
+            'date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'total_rent' => 'required|numeric',
             'discount' => 'required|numeric|between:0,100',
             'previous_due' => 'numeric',
@@ -645,8 +640,8 @@ class DealController extends Controller
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
             'number_installment' => 'required|numeric|min:1',
-            'date_from' => 'required|date',
-            'date_to' => 'required|date',
+            'date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'total_rent' => 'required|numeric',
             'discount' => 'required|numeric|between:0,100',
             'previous_due' => 'numeric',
@@ -721,8 +716,8 @@ class DealController extends Controller
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
             'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
-            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
-            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             // 'showPendingRequisitions' => 'nullable|boolean',
             // 'showCancelledRequisitions' => 'nullable|boolean',
             // 'showDispatchedRequisitions' => 'nullable|boolean',

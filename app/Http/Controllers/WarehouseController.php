@@ -129,6 +129,17 @@ class WarehouseController extends Controller
     public function deleteOwner($owner, $perPage)
     {
     	$userToDelete = WarehouseOwner::findOrFail($owner);
+
+        if ($userToDelete->warehouses->count()) {
+            
+            return response()->json([
+                'errors'=>[
+                    'userInUser' => "User is in use at ".$userToDelete->warehouses->count().' warehouses',
+                ],
+            ], 422); 
+
+        }
+        
         // $userToDelete->warehouses()->delete();
         $userToDelete->delete();
 
@@ -385,6 +396,18 @@ class WarehouseController extends Controller
     public function deleteWarehouse($owner, $perPage)
     {
         $warehouseToDelete = Warehouse::findOrFail($owner);
+
+        // in use
+        if ($warehouseToDelete->whereHas('containers',function($query){$query->has('deals');})->exists()) {
+            
+            return response()->json([
+                'errors'=>[
+                    'userdPropertiesError' => ucfirst($warehouseToDelete->name)." is in used at ".Warehouse::find(1)->whereHas('containers',function($query){$query->has('deals');})->count().' deals',
+                ],
+            ], 422);
+
+        }
+
         $warehouseToDelete->delete();
 
         return $this->showAllWarehouses($perPage);

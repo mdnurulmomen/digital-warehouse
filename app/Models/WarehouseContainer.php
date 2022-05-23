@@ -37,6 +37,7 @@ class WarehouseContainer extends Model
         return $this->belongsTo(Container::class, 'container_id', 'id')->withTrashed();
     }
 
+    // to update warehouse-containers easily
     public function rents()
     {
         return $this->morphMany(Rent::class, 'warehouse_storer')->withTrashed();

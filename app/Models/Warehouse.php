@@ -66,7 +66,7 @@ class Warehouse extends Authenticatable
 
     public function owner()
     {
-        return $this->belongsTo(WarehouseOwner::class, 'warehouse_owner_id');
+        return $this->belongsTo(WarehouseOwner::class, 'warehouse_owner_id')->withTrashed();
     }
 
     public function feature()
@@ -100,6 +100,7 @@ class Warehouse extends Authenticatable
     }
 */
 
+    // to update warehouse-containers easily
     public function containers()
     {
         return $this->hasMany(WarehouseContainer::class, 'warehouse_id')->withTrashed();

@@ -122,6 +122,12 @@ class ProductController extends Controller
     {
         $assetToDelete = ProductManufacturer::findOrFail($asset);
 
+        if ($assetToDelete->merchantProducts->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->merchantProducts->count()." products"]], 422);
+
+        }
+
         $assetToDelete->delete();
 
         return $this->showAllManufacturers($perPage);
@@ -212,6 +218,18 @@ class ProductController extends Controller
     public function deleteProductCategory($asset, $perPage)
     {
         $assetToDelete = ProductCategory::findOrFail($asset);
+        
+        if ($assetToDelete->childs->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->childs->count()." childs"]], 422);
+
+        }
+        else if ($assetToDelete->products->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->products->count()." products"]], 422);
+
+        }
+
         // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
@@ -231,14 +249,14 @@ class ProductController extends Controller
     {
         $columnsToSearch = ['name'];
 
-        $query = ProductCategory::withTrashed();
+        $query = ProductCategory::withTrashed()->withCount('products')->with('parent')->latest('id');
 
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");
         }
 
         return response()->json([
-            'all' => $query->paginate($perPage),    
+            'all' => new ProductCategoryCollection($query->paginate($perPage)),    
         ], 200);
     }
 
@@ -354,6 +372,13 @@ class ProductController extends Controller
     public function deleteProduct($asset, $perPage)
     {
         $assetToDelete = Product::findOrFail($asset);
+        
+        if ($assetToDelete->merchants->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->merchants->count()." merchants"]], 422);
+
+        }
+
         // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 

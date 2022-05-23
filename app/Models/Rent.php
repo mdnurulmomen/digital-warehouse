@@ -23,7 +23,7 @@ class Rent extends Model
 
     public function rentPeriod()
     {
-        return $this->belongsTo(RentPeriod::class, 'rent_period_id', 'id');
+        return $this->belongsTo(RentPeriod::class, 'rent_period_id', 'id')->withTrashed();
     }
 
     /*

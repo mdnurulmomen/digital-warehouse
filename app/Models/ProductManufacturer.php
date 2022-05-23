@@ -11,4 +11,9 @@ class ProductManufacturer extends Model
 
     public $timestamps = false;
     protected $guarded = ['id'];
+
+    public function merchantProducts()
+    {
+        return $this->hasMany(MerchantProduct::class, 'manufacturer_id', 'id');
+    }
 }

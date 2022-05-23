@@ -96,6 +96,18 @@ class AssetController extends Controller
     public function deleteStorageType($asset, $perPage)
     {
     	$assetToDelete = StorageType::findOrFail($asset);
+        
+        if ($assetToDelete->containers->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->containers->count()." containers"]], 422);
+
+        }
+        else if ($assetToDelete->warehouses->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->warehouses->count().' warehouses']], 422);
+
+        }
+        
         // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
@@ -269,6 +281,13 @@ class AssetController extends Controller
     public function deleteContainer($asset, $perPage)
     {
         $containerToDelete = Container::findOrFail($asset);
+        
+        if ($containerToDelete->warehouses->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($containerToDelete->name)." is in use at ".$containerToDelete->warehouses->count()." warehouses"]], 422);
+
+        }
+
         // $userToDelete->warehouses()->delete();
         $containerToDelete->delete();
 
@@ -354,7 +373,15 @@ class AssetController extends Controller
     public function deleteRentPeriod($asset, $perPage)
     {
         $assetToDelete = RentPeriod::findOrFail($asset);
+        
+        if ($assetToDelete->spaces->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->spaces->count()." spaces"]], 422);
+
+        }
+
         // $userToDelete->warehouses()->delete();
+        
         $assetToDelete->delete();
 
         return $this->showAllRentPeriods($perPage);
@@ -445,6 +472,13 @@ class AssetController extends Controller
     public function deleteVariationType($asset, $perPage)
     {
         $assetToDelete = VariationType::findOrFail($asset);
+        
+        if ($assetToDelete->variations->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->variations->count()." variations"]], 422);
+
+        }
+
         // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
@@ -560,6 +594,13 @@ class AssetController extends Controller
     public function deleteVariation($asset, $perPage)
     {
         $assetToDelete = Variation::findOrFail($asset);
+        
+        if ($assetToDelete->childs->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->childs->count()." childs"]], 422);
+
+        }
+
         // $userToDelete->warehouses()->delete();
         $assetToDelete->delete();
 
