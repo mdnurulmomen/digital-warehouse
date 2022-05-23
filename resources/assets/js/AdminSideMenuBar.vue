@@ -52,7 +52,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['owners', 'warehouses', 'storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['owners', 'warehouses', 'storage-types', 'containers', 'rent-periods', 'warehouse-containers', 'warehouse-container-shelves', 'warehouse-container-shelf-units'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('view-warehouse-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -99,7 +99,7 @@
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='warehouses' ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-index')">
+									<li :class="['warehouses', 'warehouse-containers', 'warehouse-container-shelves', 'warehouse-container-shelf-units'].includes(currentRouteName) ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-index')">
 										<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Warehouses</span>
 										</router-link>

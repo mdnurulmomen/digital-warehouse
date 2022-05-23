@@ -109,7 +109,7 @@
 																	<td>{{ content.name | capitalize }}</td>
 
 																	<td>
-																		{{ content.type ? content.type.name : 'NA' | capitalize }}
+																		{{ content.type ? content.type.name : 'NA' | capitalizeEachWord }}
 																	</td>
 																		
 																	<td>
@@ -436,7 +436,7 @@
 								<label class="font-weight-bold">Name: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.name | capitalize }}
+								{{ singleAssetData.name | capitalizeEachWord }}
 							</div>
 						</div>
 
@@ -445,7 +445,7 @@
 								<label class="font-weight-bold">Parent Variation: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.parent ? $options.filters.capitalize(singleAssetData.parent.name) : 'NA' }}
+								{{ singleAssetData.parent ? $options.filters.capitalizeEachWord(singleAssetData.parent.name) : 'NA' }}
 							</div>
 						</div>
 
@@ -454,7 +454,7 @@
 								<label class="font-weight-bold">Variation Type: </label>
 							</div>
 							<div class="form-group col-md-6 text-left">
-								{{ singleAssetData.type ? $options.filters.capitalize(singleAssetData.type.name) : 'NA' }}
+								{{ singleAssetData.type ? $options.filters.capitalizeEachWord(singleAssetData.type.name) : 'NA' }}
 							</div>
 						</div>
 
@@ -553,6 +553,12 @@
 		filters: {
 
 			capitalize: function (value) {
+				if (!value) return ''
+					value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			},
+
+			capitalizeEachWord: function (value) {
 				if (!value) return ''
 
 				const words = value.split(" ");
