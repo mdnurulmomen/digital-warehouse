@@ -1793,6 +1793,7 @@
 			deleteAsset() {
 				
 				if (this.singleProductData.product_immutability) {
+					this.$toastr.w("Product is in use", "Warning");
 					this.submitForm = false;
 					return;
 				}
@@ -2055,7 +2056,7 @@
 					this.singleProductData.product_category_id = this.singleProductData.category.id;
 				}
 
-				this.validateFormInput('product_category');
+				// this.validateFormInput('product_category');
 			},
 			setProductMerchant() {
 				// console.log('merchant has been triggered');
@@ -2096,7 +2097,7 @@
 					// 	{}, {}
 					// ];
 					
-					this.availableVariations = this.singleProductData.variation_type.variations;
+					this.availableVariations = this.singleProductData.variation_type.variations ?? [];
 
 				}
 				else {

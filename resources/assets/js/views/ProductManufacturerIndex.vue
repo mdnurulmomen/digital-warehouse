@@ -79,7 +79,7 @@
 			v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')" 
 			:csrf="csrf" 
 			:create-mode="createMode" 
-			:caller-page="'menufacturer'" 
+			:caller-page="'manufacturer'" 
 			:form-submitted="formSubmitted"
 			:single-asset-data="singleAssetData" 
 

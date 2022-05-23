@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-merchant-deal-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'fa fa-handshake-o'"
 			:title="fullName + ' deals'" 
@@ -193,7 +191,7 @@
 																			{{ (merchantDeal.rent_period && merchantDeal.rent_period.name) ? merchantDeal.rent_period.name : 'No Package' | capitalize }}
 																		</td>
 
-																		<td>
+																		<td v-if="merchantDeal.payments[merchantDeal.payments.length-1] && merchantDeal.payments[merchantDeal.payments.length-1].date_to">
 																			{{ merchantDeal.payments[merchantDeal.payments.length-1].date_to }}
 																			<span 
 																			v-show="checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to)"
@@ -201,6 +199,10 @@
 																			>
 																				{{ checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to) ? 'Expired' : '' }}
 																			</span>
+																		</td>
+
+																		<td v-else>
+																			--
 																		</td>
 																		
 																		<td>
@@ -585,77 +587,119 @@
 																	class="form-row ml-3 mr-3" 
 																	v-show="warehouseSpace.type=='containers'"
 																>
+																	<!-- 
 																	<div 
 																		class="col-md-12" 
 																		v-if="warehouseSpace.containers && Array.isArray(warehouseSpace.containers) && warehouseSpace.containers.length"
-																	>
-																		<div 
-																			class="form-row mb-1" 
-																			v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers"
-																			:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-container-id-' + warehouseContainer.id"
+																	> 
+																	<div 
+																		class="form-row" 
+																	> 
+																	-->
+																	<div class="form-group col-md-12">
+																		<label for="inputFirstName">Selected Containers</label>
+
+																		<multiselect 
+																			v-model="warehouseSpace.containers"
+																			placeholder="Select Container" 
+																			label="name" 
+																			track-by="id" 
+																			:options="emptyContainers" 
+																			:multiple="true" 
+																			:close-on-select="false" 
+																			:clear-on-select="false" 
+																			:preserve-search="true" 
+																			:required="true" 
+																			:allow-empty="false" 
+																			class="form-control p-0" 
+																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.payments.length > 1" 
+																			@input="setContainerRentPeriod(warehouseSpace.containers[warehouseSpace.containers.length-1])" 
+																			@close="validateFormInput('containers')" 
 																		>
-																			<div class="form-group col-md-12">
-																				<label for="inputFirstName">Container {{ warehouseContainerIndex + 1 }}</label>
+																		</multiselect>
 
-																				<multiselect 
-																					v-model="warehouseSpace.containers[warehouseContainerIndex]"
-																					placeholder="Select Container" 
-																					label="name" 
-																					track-by="id" 
-																					:options="emptyContainers" 
-																					:clear-on-select="false" 
-																					:preserve-search="true" 
-																					:required="true" 
-																					:allow-empty="false" 
-																					class="form-control p-0" 
-																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)" 
-																					@input="setContainerRentPeriod(warehouseSpace.containers[warehouseContainerIndex])" 
-																					@close="validateFormInput('containers')" 
-																				>
-																				</multiselect>
-
-																				<div class="invalid-feedback">
-																					{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers }}
-																				</div>
-																			</div>
-
-																			<!-- 
-																			<div class="form-group col-md-6" v-if="warehouseContainer && Array.isArray(warehouseContainer.rents)">
-																				<label for="inputFirstName">Rent Package</label>
-
-																				<multiselect 
-																					v-model="warehouseSpace.containers[warehouseContainerIndex].selected_rent"
-																					placeholder="Select Rent Periods" 
-																					label="name" 
-																					track-by="id" 
-																					:options="warehouseContainer.rents" 
-																					:custom-label="objectNameWithCapitalized" 
-																					:clear-on-select="false" 
-																					:preserve-search="true" 
-																					:required="true" 
-																					:allow-empty="false" 
-																					class="form-control p-0" 
-																					:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period ? 'is-valid' : 'is-invalid'" 
-																					:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
-																					@close="validateFormInput('space_rent_period')" 
-																				>
-																				</multiselect>
-																				
-																				<div class="invalid-feedback">
-																					{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period }}
-																				</div>
-																			</div> 
-																			-->
+																		<div class="invalid-feedback">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers }}
 																		</div>
 																	</div>
+																	<!-- 
+																	</div> 
+																	<div 
+																		class="form-row mb-1" 
+																		v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers"
+																		:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-container-id-' + warehouseContainer.id"
+																	>
+																		<div class="form-group col-md-12">
+																			<label for="inputFirstName">Container {{ warehouseContainerIndex + 1 }}</label>
 
+																			<multiselect 
+																				v-model="warehouseSpace.containers[warehouseContainerIndex]"
+																				placeholder="Select Container" 
+																				label="name" 
+																				track-by="id" 
+																				:options="emptyContainers" 
+																				:clear-on-select="false" 
+																				:preserve-search="true" 
+																				:required="true" 
+																				:allow-empty="false" 
+																				class="form-control p-0" 
+																				:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
+																				:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)" 
+																				@input="setContainerRentPeriod(warehouseSpace.containers[warehouseContainerIndex])" 
+																				@close="validateFormInput('containers')" 
+																			>
+																			</multiselect>
+
+																			<div class="invalid-feedback">
+																				{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers }}
+																			</div>
+																		</div>
+
+																		<div class="form-group col-md-6" v-if="warehouseContainer && Array.isArray(warehouseContainer.rents)">
+																			<label for="inputFirstName">Rent Package</label>
+
+																			<multiselect 
+																				v-model="warehouseSpace.containers[warehouseContainerIndex].selected_rent"
+																				placeholder="Select Rent Periods" 
+																				label="name" 
+																				track-by="id" 
+																				:options="warehouseContainer.rents" 
+																				:custom-label="objectNameWithCapitalized" 
+																				:clear-on-select="false" 
+																				:preserve-search="true" 
+																				:required="true" 
+																				:allow-empty="false" 
+																				class="form-control p-0" 
+																				:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period ? 'is-valid' : 'is-invalid'" 
+																				:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.payments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
+																				@close="validateFormInput('space_rent_period')" 
+																			>
+																			</multiselect>
+																			
+																			<div class="invalid-feedback">
+																				{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period }}
+																			</div>
+																		</div> 
+																	</div> 
+																	</div> 
+																	-->
+
+																	<!-- 
 																	<div class="col-md-12 text-center" v-else>
+																		<p class="text-danger">
+																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers }}
+																		</p>
+																	</div> 
+																	-->
+
+																	<div class="col-md-12 text-center" v-show="errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers">
 																		<p class="text-danger">
 																			{{ errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers }}
 																		</p>
 																	</div>
 
+																	<!-- 
 																	<div class="col-md-12 card-footer mt-2">
 																		<div class="form-row text-center">
 																			<div class="col-md-6">
@@ -688,7 +732,8 @@
 																				</button>
 																			</div>
 																		</div>
-																	</div>
+																	</div> 
+																	-->
 																</div>
 															</div>
 
@@ -3931,7 +3976,9 @@
 
 					if (this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].type=='containers') {
 						
-						this.$set(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers', [ {} ]);
+						// this.$set(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers', [ {} ]);
+						
+						this.$set(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'containers', []);
 
 						this.$delete(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex], 'container');
 

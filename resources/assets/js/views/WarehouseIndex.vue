@@ -369,7 +369,7 @@
 				                              	
 			                              		<!-- <div class="d-flex flex-row align-content-center"> -->
 		                              				<multiselect 
-			                                  			v-model="ownerObject"
+			                                  			v-model="singleWarehouseData.owner"
 			                                  			placeholder="Warehouse Owner" 
 				                                  		label="user_name" 
 				                                  		track-by="id" 
@@ -2204,7 +2204,7 @@
 		        	current_page: 1
 		      	},
 
-		      	ownerObject : {},
+		      	// ownerObject : {},
 
 	        	singleWarehouseData : singleWarehouseData,
 
@@ -2765,7 +2765,7 @@
 				this.submitForm = true;
 				this.formSubmitted = false;
 
-				this.ownerObject = {};
+				// this.ownerObject = {};
 
 				this.errors = {
 	        		warehouse : {
@@ -2781,7 +2781,7 @@
 	        	};
 	        	
 				this.singleWarehouseData = {
-					// owner : {},
+					owner : {},
 					previews : [],
 			    	
 			    	feature : {
@@ -2845,7 +2845,7 @@
 				this.createMode = false;
 				this.formSubmitted = false;
 
-				this.ownerObject = 	this.allWarehouseOwners.find(objectExists);
+				// this.ownerObject = 	this.allWarehouseOwners.find(objectExists);
 				
 				this.errors = {
 	        		warehouse : {
@@ -3063,8 +3063,14 @@
 
 			},
 			setWarehouseOwner() {
+				/*
 				if (this.ownerObject && Object.keys(this.ownerObject).length > 0) {
 					this.singleWarehouseData.warehouse_owner_id = this.ownerObject.id;
+				}
+				*/
+			
+				if (this.singleWarehouseData.owner && Object.keys(this.singleWarehouseData.owner).length > 0) {
+					this.singleWarehouseData.warehouse_owner_id = this.singleWarehouseData.owner.id;
 				}
 			},
 			objectNameWithCapitalized ({ name, user_name }) {
@@ -3648,7 +3654,7 @@
 
 					case 'owner' :
 
-						if (! this.ownerObject || Object.keys(this.ownerObject).length === 0 || ! this.singleWarehouseData.warehouse_owner_id) {
+						if (! this.singleWarehouseData.owner || Object.keys(this.singleWarehouseData.owner).length === 0 || ! this.singleWarehouseData.warehouse_owner_id) {
 							this.errors.warehouse.owner = 'Owner is required';
 						}
 						else{

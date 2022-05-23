@@ -408,8 +408,8 @@
 										:show-count="true" 
 										:normalizer="treeSelectCustomFunction" 
 										:valueFormat="'object'"
+										@input="setProductParent();setPerishableValue()"
 										@select="validateFormInput('parent_category_id')" 
-										@input="setPerishableValue()"
 										class="form-control p-0 is-valid" 
 										placeholder="Parent Category"
 									/>
@@ -1049,6 +1049,17 @@
 						return b[columnValue] - a[columnValue];
 					}
 				);
+			},
+			setProductParent() {
+
+				if (this.singleAssetData.parent && Object.keys(this.singleAssetData.parent).length) {
+					this.singleAssetData.parent_category_id = this.singleAssetData.parent.id;
+				}
+				else {
+					// this.singleAssetData.parent_category_id = null;
+					this.$delete(this.singleAssetData, 'parent_category_id');
+				}
+
 			},
 			setPerishableValue(){
 
