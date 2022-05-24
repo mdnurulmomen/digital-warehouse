@@ -86,21 +86,21 @@ class RequisitionController extends Controller
             'products.*.total_quantity' => 'required|numeric|min:1',
             'products.*.packaging_service' => 'boolean',
             // 'products.*.package' => 'required_if:products.*.packaging_service,true',
-            'products.*.product' => 'required',
-            'products.*.product.id' => 'required|numeric|exists:merchant_products,id',
-            'products.*.product.has_serials' => 'required|boolean',
-            'products.*.product.has_variations' => 'required|boolean',
+            'products.*.merchant_product' => 'required',
+            'products.*.merchant_product.id' => 'required|numeric|exists:merchant_products,id',
+            'products.*.merchant_product.has_serials' => 'required|boolean',
+            'products.*.merchant_product.has_variations' => 'required|boolean',
 
-            'products.*.serials' => 'exclude_if:products.*.product.has_variations,true|required_if:products.*.product.has_serials,true|array',
+            'products.*.serials' => 'exclude_if:products.*.merchant_product.has_variations,true|required_if:products.*.merchant_product.has_serials,true|array',
             'products.*.serials.*' => [
                     Rule::exists('product_serials', 'serial_no')->where(function ($query) {
                         return $query->where('has_requisitions', false)->where('has_dispatched', false);
                     }),
             ],
 
-            'products.*.product.variations' => 'required_if:products.*.product.has_variations,true|array',
-            'products.*.product.variations.*.required_serials' => 'exclude_if:products.*.product.has_serials,false|required_with:products.*.product.variations.*.required_quantity|array',
-            'products.*.product.variations.*.required_serials.*' => [
+            'products.*.merchant_product.variations' => 'required_if:products.*.merchant_product.has_variations,true|array',
+            'products.*.merchant_product.variations.*.required_serials' => 'exclude_if:products.*.merchant_product.has_serials,false|required_with:products.*.merchant_product.variations.*.required_quantity|array',
+            'products.*.merchant_product.variations.*.required_serials.*' => [
                     Rule::exists('product_variation_serials', 'serial_no')->where(function ($query) {
                         return $query->where('has_requisitions', false)->where('has_dispatched', false);
                     }),
@@ -477,13 +477,13 @@ class RequisitionController extends Controller
     {
         foreach ($products as $requiredProduct) {
             
-            if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && (empty($requiredProduct->serials) || $requiredProduct->total_quantity != count($requiredProduct->serials))) {
+            if ($requiredProduct->merchant_product->has_serials && ! $requiredProduct->merchant_product->has_variations && (empty($requiredProduct->serials) || $requiredProduct->total_quantity != count($requiredProduct->serials))) {
                 
                 return response()->json(['errors'=>["productSerial" => "Product serial is required"]], 422);
 
             }
 
-            else if ($requiredProduct->product->has_serials && ! $requiredProduct->product->has_variations && count($requiredProduct->serials)) {
+            else if ($requiredProduct->merchant_product->has_serials && ! $requiredProduct->merchant_product->has_variations && count($requiredProduct->serials)) {
                         
                 foreach ($requiredProduct->serials as $requiredProductSerialIndex => $requiredProductSerial) {
                     
@@ -497,9 +497,9 @@ class RequisitionController extends Controller
 
             }
 
-            else if ($requiredProduct->product->has_serials && $requiredProduct->product->has_variations) {
+            else if ($requiredProduct->merchant_product->has_serials && $requiredProduct->merchant_product->has_variations) {
                 
-                foreach ($requiredProduct->product->variations as $requiredProductVariation) {
+                foreach ($requiredProduct->merchant_product->variations as $requiredProductVariation) {
                     
                     if (! empty($requiredProductVariation->required_quantity) && $requiredProductVariation->required_quantity > 0 && (empty($requiredProductVariation->required_serials) || $requiredProductVariation->required_quantity != count($requiredProductVariation->required_serials))) {
                 

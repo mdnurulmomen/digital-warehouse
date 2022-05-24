@@ -344,7 +344,7 @@
 													
 													<!-- 
 													<multiselect 
-				                              			v-model="requiredProduct.product"
+				                              			v-model="requiredProduct.merchant_product"
 				                              			placeholder="Product Name" 
 				                              			label="name" 
 				                                  		track-by="id" 
@@ -362,7 +362,7 @@
 				                                	-->
 
 				                                	<multiselect 
-				                              			v-model="requiredProduct.product"
+				                              			v-model="requiredProduct.merchant_product"
 				                              			placeholder="Product Name" 
 				                              			label="name" 
 				                                  		track-by="id" 
@@ -382,7 +382,7 @@
 												    </div>
 												</div>
 
-												<div class="form-group col-md-6" v-if="requiredProduct.product">
+												<div class="form-group col-md-6" v-if="requiredProduct.merchant_product">
 													<label for="inputFirstName">Total Quantity</label>
 
 													<div class="input-group mb-0">
@@ -394,11 +394,11 @@
 															@change="validateFormInput('product_quantity')" 
 															required="true" 
 															min="0" 
-															:max="requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity"
+															:max="requiredProduct.merchant_product.available_quantity - requiredProduct.merchant_product.requested_quantity"
 														>
 														<div class="input-group-append">
 															<span class="input-group-text" id="basic-addon2">
-																{{ requiredProduct.product.product ? requiredProduct.product.product.quantity_type : 'Unit' | capitalize }}
+																{{ (requiredProduct.merchant_product && requiredProduct.merchant_product.product) ? requiredProduct.merchant_product.product.quantity_type : 'Unit' | capitalize }}
 															</span>
 														</div>
 													</div>
@@ -413,23 +413,23 @@
 												</div>
 											</div>
 
-											<div class="card" v-if="requiredProduct.product && requiredProduct.product.has_variations && requiredProduct.product.variations.length">
+											<div class="card" v-if="requiredProduct.merchant_product && requiredProduct.merchant_product.has_variations && requiredProduct.merchant_product.variations.length">
 												<div class="card-body">
 													<div 
 														class="form-row" 
-														v-for="(productVariation, variationIndex) in requiredProduct.product.variations" 
+														v-for="(productVariation, variationIndex) in requiredProduct.merchant_product.variations" 
 														:key="'required-product-variation-' + productIndex + variationIndex"
 													>	
 														<div class="form-group col-md-6">
 															<label for="inputFirstName">Select Variation</label>
 															<multiselect 
-						                              			v-model="requiredProduct.product.variations[variationIndex]"
+						                              			v-model="requiredProduct.merchant_product.variations[variationIndex]"
 						                              			class="form-control p-0 is-valid" 
 						                              			placeholder="Variation Name" 
 						                              			label="variation_name" 
 						                                  		track-by="id" 
 						                                  		:custom-label="objectNameWithCapitalized" 
-						                                  		:options="requiredProduct.product.variations" 
+						                                  		:options="requiredProduct.merchant_product.variations" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false" 
 						                                  		:disabled="true"
@@ -445,7 +445,7 @@
 															<div class="input-group mb-0">
 																<input type="number" 
 																	class="form-control" 
-																	v-model.number="requiredProduct.product.variations[variationIndex].required_quantity" 
+																	v-model.number="requiredProduct.merchant_product.variations[variationIndex].required_quantity" 
 																	placeholder="Variation Quantity" 
 																	:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
 																	min="0" 
@@ -454,7 +454,7 @@
 																>
 																<div class="input-group-append">
 																	<span class="input-group-text" id="basic-addon2">
-																		{{ requiredProduct.product.product ? requiredProduct.product.product.quantity_type : 'Unit' | capitalize }}
+																		{{ (requiredProduct.merchant_product && requiredProduct.merchant_product.product) ? requiredProduct.merchant_product.product.quantity_type : 'Unit' | capitalize }}
 																	</span>
 																</div>
 															</div>
@@ -473,7 +473,7 @@
 
 											<div 
 												class="form-row" 
-												v-if="requiredProduct.product && requiredProduct.total_quantity"
+												v-if="requiredProduct.merchant_product && requiredProduct.total_quantity"
 											>
 												<div class="form-group col-md-12 text-center">
 													<toggle-button 
@@ -592,13 +592,13 @@
 										>
 											<div 
 												class="form-row"
-												v-if="requiredProduct.product && requiredProduct.product.has_serials && ! requiredProduct.product.has_variations && requiredProduct.total_quantity > 0"
+												v-if="requiredProduct.merchant_product && requiredProduct.merchant_product.has_serials && ! requiredProduct.merchant_product.has_variations && requiredProduct.total_quantity > 0"
 											>
 												<div class="form-group col-md-4">
 													<label for="inputFirstName">Selected Product</label>
 													
 													<multiselect 
-				                              			v-model="requiredProduct.product" 
+				                              			v-model="requiredProduct.merchant_product" 
 				                              			class="form-control p-0 is-valid" 
 				                              			placeholder="Product Name" 
 				                              			label="name" 
@@ -626,7 +626,7 @@
 				                              			label="name" 
 				                                  		track-by="id" 
 				                                  		:custom-label="objectNameWithCapitalized" 
-				                                  		:options="requiredProduct.product.serials" 
+				                                  		:options="requiredProduct.merchant_product.serials" 
 				                                  		@close="validateFormInput('product_serials')"
 				                              		>
 				                                	</multiselect>
@@ -642,18 +642,18 @@
 
 											<div 
 												class="form-row"
-												v-else-if="requiredProduct.product && requiredProduct.product.has_serials && requiredProduct.product.has_variations && requiredProduct.total_quantity > 0"
+												v-else-if="requiredProduct.merchant_product && requiredProduct.merchant_product.has_serials && requiredProduct.merchant_product.has_variations && requiredProduct.total_quantity > 0"
 											>
 												<div class="form-group col-md-12">
 													<div class="card">
 														<div class="card-header">
-															{{ requiredProduct.product.name | capitalize }} Serials
+															{{ requiredProduct.merchant_product.name | capitalize }} Serials
 														</div>
 
 														<div class="card-body">
 															<div 
 																class="form-row" 
-																v-for="(productVariation, variationIndex) in requiredProduct.product.variations" 
+																v-for="(productVariation, variationIndex) in requiredProduct.merchant_product.variations" 
 																:key="'required-product-' + productIndex + '-variation-' + variationIndex + '-serials'" 
 																v-show="productVariation.required_quantity > 0"
 															>	
@@ -678,7 +678,7 @@
 																	</label>
 
 																	<multiselect 
-								                              			v-model="requiredProduct.product.variations[variationIndex].required_serials" 
+								                              			v-model="requiredProduct.merchant_product.variations[variationIndex].required_serials" 
 								                              			class="form-control p-0 is-valid" 
 								                              			:class="errors.products[productIndex].variation_serials[variationIndex] ? 'is-invalid' : 'is-valid'"
 								                              			placeholder="Variation Serials" 
@@ -688,7 +688,7 @@
 								                              			label="name" 
 								                                  		track-by="id" 
 								                                  		:custom-label="objectNameWithCapitalized" 
-								                                  		:options="requiredProduct.product.variations[variationIndex].serials" 
+								                                  		:options="requiredProduct.merchant_product.variations[variationIndex].serials" 
 								                                  		@close="validateFormInput('product_serials')"
 								                              		>
 								                                	</multiselect>
@@ -2785,7 +2785,7 @@
 
 		products : [
 			{
-				// product : {},
+				// merchant_product : {},
 				// total_quantity : 0
 			}
 		],
@@ -3409,7 +3409,7 @@
 					
 					products : [
 						{
-							product : {},
+							merchant_product : {},
 							total_quantity : 0
 						}
 					],
@@ -4199,7 +4199,7 @@
 				
 				if (this.singleRequisitionData.products.length < this.merchantAllProducts.length) {
 
-					this.singleRequisitionData.products.push({ product : {}, total_quantity : 0 });
+					this.singleRequisitionData.products.push({ merchant_product : {}, total_quantity : 0 });
 					
 					this.errors.products.push({
 						variation_serials : [],
@@ -4256,7 +4256,7 @@
 			requisitionHasSerialProduct() {
 
 				return this.singleRequisitionData.products.some(
-					currentProduct => currentProduct.product.has_serials
+					currentProduct => currentProduct.merchant_product.has_serials
 				);
 
 			},
@@ -4507,10 +4507,12 @@
 							
 							(requiredProduct, productIndex) => {
 
-								if (/*! requiredProduct.id || */! requiredProduct.product || Object.keys(requiredProduct.product).length==0) {
+								if (/*! requiredProduct.id || */ ! requiredProduct.merchant_product || Object.keys(requiredProduct.merchant_product).length==0) {
+
 									this.errors.products[productIndex].product_id = 'Product is required';
+
 								}
-								else if (this.singleRequisitionData.products.filter(current => current.id == requiredProduct.id).length > 1) {
+								else if (requiredProduct.merchant_product && this.singleRequisitionData.products.filter(currentRequiredProduct => currentRequiredProduct.merchant_product.id == requiredProduct.merchant_product.id).length > 1) {
 
 									this.errors.products[productIndex].product_id = 'Same product is selected';
 
@@ -4538,8 +4540,8 @@
 								if (!requiredProduct.total_quantity || requiredProduct.total_quantity < 1) {
 									this.errors.products[productIndex].product_quantity = 'Quantity is required';
 								}
-								else if (requiredProduct.total_quantity > (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity)) {
-									this.errors.products[productIndex].product_quantity = 'Quantity is more than available (max : ' + (requiredProduct.product.available_quantity - requiredProduct.product.requested_quantity) + ').';
+								else if (requiredProduct.total_quantity > (requiredProduct.merchant_product.available_quantity - requiredProduct.merchant_product.requested_quantity)) {
+									this.errors.products[productIndex].product_quantity = 'Quantity is more than available (max : ' + (requiredProduct.merchant_product.available_quantity - requiredProduct.merchant_product.requested_quantity) + ').';
 								}
 								else{
 									// this.errors.products[productIndex].product_quantity = null;
@@ -4564,11 +4566,11 @@
 
 							(requiredProduct, productIndex) => {
 
-								if (requiredProduct.product && requiredProduct.product.has_variations) {
+								if (requiredProduct.merchant_product && requiredProduct.merchant_product.has_variations) {
 
 									let variationTotalQuantity = 0;
 
-									requiredProduct.product.variations.forEach(current => variationTotalQuantity += current.required_quantity ?? 0);
+									requiredProduct.merchant_product.variations.forEach(current => variationTotalQuantity += current.required_quantity ?? 0);
 
 									// console.log(variationTotalQuantity);
 
@@ -4577,7 +4579,7 @@
 									}
 									else{
 
-										requiredProduct.product.variations.forEach(
+										requiredProduct.merchant_product.variations.forEach(
 
 											(productVariation, variationIndex) => {
 
@@ -4633,17 +4635,17 @@
 							
 							(requiredProduct, productIndex) => {
 
-								if (requiredProduct.product.has_serials && ! requiredProduct.product.has_variations && requiredProduct.total_quantity > 0 && (! requiredProduct.hasOwnProperty('serials') || requiredProduct.serials.length != requiredProduct.total_quantity)) {
+								if (requiredProduct.merchant_product.has_serials && ! requiredProduct.merchant_product.has_variations && requiredProduct.total_quantity > 0 && (! requiredProduct.hasOwnProperty('serials') || requiredProduct.serials.length != requiredProduct.total_quantity)) {
 
 									this.errors.products[productIndex].product_serials = 'Product serial is required';
 								}
-								else if (requiredProduct.product.has_serials &&  requiredProduct.product.has_variations && requiredProduct.total_quantity > 0) {
+								else if (requiredProduct.merchant_product.has_serials &&  requiredProduct.merchant_product.has_variations && requiredProduct.total_quantity > 0) {
 									
 									this.$delete(this.errors.products[productIndex], 'product_serials');
 
 									this.$delete(this.singleRequisitionData.products[productIndex], 'serials');
 
-									requiredProduct.product.variations.forEach(
+									requiredProduct.merchant_product.variations.forEach(
 										(requiredProductVariation, variationIndex) => {
 
 											if (requiredProductVariation.required_quantity > 0 && (! requiredProductVariation.hasOwnProperty('required_serials') || requiredProductVariation.required_serials.length != requiredProductVariation.required_quantity)) {
