@@ -498,7 +498,7 @@
 																	:src="stockedProduct.merchant_product ? showPreview(stockedProduct.merchant_product.preview) : ''" 
 																	class="img-fluid" 
 																	alt="Product Preview" 
-																	width="150px"
+																	width="100px"
 																>
 															</div>
 
@@ -540,6 +540,7 @@
 																				v-model.number="stockedProduct.stock_quantity" 
 																				placeholder="Product Quantity" 
 																				:class="! errors.products[stockedProductIndex].product_stock_quantity ? 'is-valid' : 'is-invalid'" 
+																				@keydown.enter.prevent="nextPage" 
 																				required="true" 
 																			>
 																			<div class="input-group-append">
@@ -566,6 +567,7 @@
 																			<input type="number" 
 																				class="form-control is-valid" 
 																				v-model.number="stockedProduct.unit_buying_price" 
+																				@keydown.enter.prevent="nextPage" 
 																				:disabled="stockedProduct.has_variations"
 																				placeholder="Product Buying Price"  
 																			>
@@ -638,6 +640,7 @@
 																						v-model.number="stockedVariation.stock_quantity" 
 																						placeholder="Variation Qty" 
 																						:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+																						@keydown.enter.prevent="nextPage" 
 																						required="true" 
 																					>
 																					<div class="input-group-append">
@@ -660,6 +663,7 @@
 																						class="form-control is-valid" 
 																						v-model.number="stockedVariation.unit_buying_price" 
 																						placeholder="Variation Buying Price" 
+																						@keydown.enter.prevent="nextPage" 
 																					>
 																					<div class="input-group-append">
 																						<span class="input-group-text">
@@ -1107,7 +1111,7 @@
 																					:src="showPreview(stockVariation.preview)" 
 																					class="img-fluid" 
 																					:alt="$options.filters.capitalize(stockVariation.variation.name) + ' Preview'" 
-																					width="150px"
+																					width="100px"
 																				>
 																				<p class="text-center">{{ stockVariation.variation.name | capitalize }}</p>
 																			</div>
@@ -2370,7 +2374,8 @@
 							<img 
 								class="img-fluid" 
 								:src="'/' + general_settings.application_logo" 
-								:alt="general_settings.app_name + ' Logo'"
+								:alt="general_settings.app_name + ' Logo'" 
+								width="100px"
 							>
 							
 							<h5>
@@ -2812,10 +2817,10 @@
 						style="border:1px dotted; text-align:center;" 
 						v-for="productQuantity in stockedProduct.stock_quantity" 
 						:style="productQuantity / 4 >= 1 && productQuantity % 4 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
-						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-quantity-index-' + productQuantity + '-product-' + stockedProduct.id"
+						:key="'printing-product-quantity-index-' + productQuantity + '-product-' + stockedProduct.id"
 					>
-						<h6 style="margin-bottom:0px; margin-top:0px;">
-							{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : '') | capitalize }} Stock-Code :
+						<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
+							{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : '' | capitalize }} Stock-Code :
 						</h6>
 
 						<svg  
@@ -2836,16 +2841,18 @@
 				<div v-show="! stockedProduct.has_serials && stockedProduct.has_variations">
 					<div 
 						v-for="(productVariation, productVariationIndex) in stockedProduct.variations"
-						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id"
+						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id"
 					>
 						<div 
 							style="border:1px dotted; text-align:center;" 
 							v-for="productVariationQuantityIndex in productVariation.stock_quantity" 
 							:style="productVariationQuantityIndex / 4 >= 1 && productVariationQuantityIndex % 4 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
-							:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
+							:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
 						>
-							<h6 style="margin-bottom:0px; margin-top:0px;">
-								{{ (productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
+								<!-- {{ productVariationQuantityIndex }} -->
+
+								{{ (productVariationQuantityIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 							</h6>
 
 							<svg  
@@ -2869,11 +2876,11 @@
 						style="border:1px dotted;" 
 						v-for="(productSerial, productSerialIndex) in stockedProduct.serials" 
 						:style="(productSerialIndex + 1) / 2 >= 1 && (productSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
-						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
+						:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
 					>
 						<div style="text-align:center;">
-							<h6 style="margin-bottom:0px; margin-top:0px;">
-								{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : '') | capitalize }} Stock-Code :
+							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
+								{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : '' | capitalize }} Stock-Code :
 							</h6>
 
 							<svg  
@@ -2891,8 +2898,8 @@
 						</div>
 
 						<div style="text-align:center;">
-							<h6 style="margin-bottom:0px; margin-top:0px;">
-								{{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product ? stockedProduct.merchant_product.product.name : '') | capitalize }} Serial :
+							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
+								Serial :
 							</h6>
 
 							<svg  
@@ -2914,17 +2921,39 @@
 				<div v-show="stockedProduct.has_serials && stockedProduct.has_variations">
 					<div 
 						v-for="(productVariation, productVariationIndex) in stockedProduct.variations"
-						:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id" 
+						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id" 
 					>
+						<!-- 
+						<div class="form-row text-center" v-show="singleStockData.has_variations">
+							<label class="col-12 col-form-label font-weight-bold">
+								Stock (Batch) Code :
+							</label>
+
+							<label class="col-12 col-form-label">
+								<svg 
+							  		class="barcode" 
+							        :jsbarcode-format="'CODE128'" 
+							        :jsbarcode-value="productVariation.stock_code"
+							        jsbarcode-width=1 
+							        jsbarcode-height=252
+							        last-char= ">"
+							    >    
+						        </svg> 
+							</label>
+						</div> 
+						-->
+
 						<div 
 							style="border:1px dotted;" 
 							v-for="(productVariationSerial, productVariationSerialIndex) in productVariation.serials" 
 							:style="(productVariationSerialIndex + 1) / 2 >= 1 && (productVariationSerialIndex + 1) % 2 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
-							:key="'printing-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
+							:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
 						>
 							<div style="text-align:center;">
-								<h6 style="margin-bottom:0px; margin-top:0px;">
-									{{ (productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+								<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
+									<!-- {{ productVariationSerialIndex }} -->
+
+									{{ (productVariationSerialIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 								</h6>
 
 								<svg  
@@ -2942,8 +2971,8 @@
 							</div>
 
 							<div style="text-align:center;">
-								<h6 style="margin-bottom:0px; margin-top:0px;">
-									{{ (productVariation.variation ? productVariation.variation.name : '') | capitalize }} Serial :
+								<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
+									Serial :
 								</h6>
 
 								<svg  
@@ -3811,7 +3840,7 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
-							this.printStockCode(this.singleStockData.products);
+							// this.printStockCode(this.singleStockData.products);
 
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
@@ -3848,7 +3877,7 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
-							this.printStockCode(this.singleStockData.products);
+							// this.printStockCode(this.singleStockData.products);
 
 							$('#stock-createOrEdit-modal').modal('hide');
 						}
@@ -3862,6 +3891,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
+						this.printStockCode(this.singleStockData.products);
 						// this.fetchMerchantWarehouseAllSpaces();
 						// this.fetchWarehouseAllContainers();
 					});

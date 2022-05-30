@@ -463,7 +463,9 @@
 										    	<div class="card-body">
 										    		<div class="form-row d-flex align-items-center text-center">
 														<div class="form-group col-md-6">
-															<img class="img-fluid" 
+															<img 
+																width="100px" 
+																class="img-fluid" 
 																:src="singleProductData.preview || ''"
 																alt="Product Picture" 
 															>
@@ -629,7 +631,9 @@
 															<div class="form-group col-md-12">
 													    		<div class="d-flex form-row text-center">
 																	<div class="col-md-8">
-																		<img class="img-fluid" 
+																		<img 
+																			width="100px" 
+																			class="img-fluid" 
 																			:src="productVariation.preview || ''"
 																			alt="Variation Picture" 
 																		>
@@ -1091,7 +1095,7 @@
 					<div class="modal-body">
 						<div class="form-row d-flex">
 							<div class="col-md-4 align-self-center text-center">
-								<img :src="singleProductData.preview" class="img-fluid" alt="Product Preview" width="150px">
+								<img :src="singleProductData.preview" class="img-fluid" alt="Product Preview" width="100px">
 							</div>
 
 							<div class="col-md-8">

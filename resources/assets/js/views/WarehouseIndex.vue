@@ -2894,8 +2894,6 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							this.printWarehouseContainers(this.singleWarehouseData.containers);
-
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2908,6 +2906,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
+						this.printWarehouseContainers(this.singleWarehouseData.containers);
 					});
 
 			},
@@ -2927,8 +2926,6 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							this.printWarehouseContainers(this.singleWarehouseData.containers);
-
 							$('#warehouse-createOrEdit-modal').modal('hide');
 						}
 					})
@@ -2941,6 +2938,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
+						this.printWarehouseContainers(this.singleWarehouseData.containers);
 					});
 
 			},

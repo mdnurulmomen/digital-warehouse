@@ -391,9 +391,9 @@
 											<div class="col-md-4 text-center align-self-center">
 												<img 
 													:src="showPreview(productMerchant.preview)" 
-													class="img-fluid" 
+													class="img-fluid w-50" 
 													alt="Product Preview" 
-													width="150px"
+													width="100px"
 												>
 											</div>
 
@@ -603,6 +603,7 @@
 																v-model.number="singleStockData.unit_buying_price" 
 																placeholder="Unit Buying Price" 
 																min="0" 
+																:disabled="singleStockData.has_variations"
 																@keydown.enter.prevent="nextPage" 
 															>
 															<div class="input-group-append">
@@ -678,7 +679,7 @@
 																	@keydown.enter.prevent="nextPage" 
 																	required="true" 
 																	:readonly="! createMode && allStocks.length && allStocks[allStocks.length-1].variations.length > variationIndex && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
-																	:min="createMode ? 1 : allStocks[allStocks.length-1].variations.length > variationIndex ? (stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity) : 1"
+																	:min="createMode ? 1 : allStocks.length && allStocks[allStocks.length-1].variations.length > variationIndex ? (stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity) : 1"
 																>
 
 																<div class="invalid-feedback">
@@ -757,7 +758,7 @@
 															:src="showPreview(productMerchant.preview)" 
 															class="img-fluid" 
 															alt="Product Preview" 
-															width="150px"
+															width="100px"
 														>
 													</div>
 
@@ -844,7 +845,7 @@
 																	:src="showPreview(stockVariation.preview)" 
 																	class="img-fluid" 
 																	:alt="stockVariation.variation.name + ' Preview'" 
-																	width="150px"
+																	width="100px"
 																>
 																<p class="text-center">{{ stockVariation.variation.name | capitalize }}</p>
 															</div>
@@ -2336,7 +2337,7 @@
 					:style="productQuantity / 4 >= 1 && productQuantity % 4 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 					:key="'printing-product-quantity-index-' + productQuantity + '-product-' + productToPrint.id"
 				>
-					<h6 style="margin-bottom:0px; margin-top:0px;">
+					<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 						Stock-Code :
 					</h6>
 
@@ -2366,7 +2367,7 @@
 						:style="productVariationQuantityIndex / 4 >= 1 && productVariationQuantityIndex % 4 == 1 ? 'display: block; page-break-before: always; position: relative;' : ''" 
 						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-quantity-' + productVariationQuantityIndex"
 					>
-						<h6 style="margin-bottom:0px; margin-top:0px;">
+						<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 							<!-- {{ productVariationQuantityIndex }} -->
 
 							{{ (productVariationQuantityIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
@@ -2396,7 +2397,7 @@
 					:key="'printing-product-serial-index-' + productSerialIndex + '-product-' + productSerial.id"
 				>
 					<div style="text-align:center;">
-						<h6 style="margin-bottom:0px; margin-top:0px;">
+						<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 							Stock-Code :
 						</h6>
 
@@ -2415,7 +2416,7 @@
 					</div>
 
 					<div style="text-align:center;">
-						<h6 style="margin-bottom:0px; margin-top:0px;">
+						<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 							Serial :
 						</h6>
 
@@ -2467,7 +2468,7 @@
 						:key="'printing-product-variation-index-' + productVariationIndex + '-variation-' + productVariation.id + '-serial-index-' + productVariationSerialIndex + '-serial-' + productVariationSerial.id" 
 					>
 						<div style="text-align:center;">
-							<h6 style="margin-bottom:0px; margin-top:0px;">
+							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 								<!-- {{ productVariationSerialIndex }} -->
 
 								{{ (productVariationSerialIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
@@ -2488,7 +2489,7 @@
 						</div>
 
 						<div style="text-align:center;">
-							<h6 style="margin-bottom:0px; margin-top:0px;">
+							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 								Serial :
 							</h6>
 
@@ -2517,8 +2518,9 @@
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
+								width="100px" 
 								:src="'/' + general_settings.application_logo" 
-								:alt="general_settings.app_name + ' Logo'"
+								:alt="general_settings.app_name + ' Logo'" 
 							>
 							
 							<h5>
@@ -3554,7 +3556,7 @@
 							
 							// this.printStockCode(this.singleStockData);		// as there is no stock code then
 
-							$('#stock-createOrEdit-modal').modal('hide');
+							// $('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -4591,7 +4593,7 @@
 									if (productVariation.stock_quantity < 0) {
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is invalid';
 									}
-									else if(! this.createMode && this.allStocks[this.allStocks.length-1].variations.length > index && ((productVariation.primary_quantity - productVariation.stock_quantity) > this.allStocks[this.allStocks.length-1].variations[index].available_quantity)){
+									else if(! this.createMode && this.allStocks.length && this.allStocks[this.allStocks.length-1].variations.length > index && ((productVariation.primary_quantity - productVariation.stock_quantity) > this.allStocks[this.allStocks.length-1].variations[index].available_quantity)){
 
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is less than minimum ' + (productVariation.primary_quantity-this.allStocks[this.allStocks.length-1].variations[index].available_quantity);
 									}

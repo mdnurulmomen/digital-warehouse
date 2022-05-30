@@ -373,7 +373,8 @@
 										    		<div class="form-row d-flex align-items-center text-center">
 														<div class="form-group col-md-6">
 															<img 
-																class="img-fluid"  
+																width="100px"   
+																class="img-fluid" 
 																:src="showPreview(singleMerchantProductData.preview)"
 																alt="Product Preview" 
 															>
@@ -562,6 +563,7 @@
 																<div class="form-row text-center d-flex">
 																	<div class="col-md-6 form-group">
 																		<img 
+																			width="100px" 
 																			class="img-fluid" 
 																			:src="showPreview(merchantProductVariation.preview)"
 																			alt="Variation Preview" 
@@ -986,10 +988,10 @@
 										<div class="form-row d-flex">
 											<div class="col-md-4 align-self-center text-center">
 												<img 
+													width="100px"
 													:src="showPreview(singleMerchantProductData.preview)" 
 													class="img-fluid" 
 													alt="Product Preview" 
-													width="150px"
 												>
 											</div>
 
