@@ -63,10 +63,10 @@ class StockRequest extends FormRequest
                             'required', 'string', 'distinct', 'min:4', 
 
                             Rule::unique('product_serials', 'serial_no')
-                            ->ignore(1, 'has_dispatched')
                             ->where(function ($query) use ($productSerial) {
                                 return $query->where('id', '!=', $productSerial->id);
                             })
+                            ->ignore(1, 'has_dispatched')
                         ];
                     }
                     else {
@@ -87,10 +87,12 @@ class StockRequest extends FormRequest
             }
             if ($product->has_variations) {
                 $rules['products.'.$stockingProductKey.'.variations.*.merchant_product_variation_id'] = 'required|integer|exists:merchant_product_variations,id';
+
+                $rules['products.'.$stockingProductKey.'.variations.*.stock_quantity'] = 'sometimes|integer|min:0';
+                $rules['products.'.$stockingProductKey.'.variations.*.unit_buying_price'] = 'sometimes|numeric|min:0';
             }
             if ($product->has_variations && array_sum(array_column($stockingProduct->variations, 'stock_quantity')) != $stockingProduct->stock_quantity) {
-                $rules['products.'.$stockingProductKey.'.variations.*.stock_quantity'] = 'required|integer|min:1';
-                $rules['products.'.$stockingProductKey.'.variations.*.unit_buying_price'] = 'nullable|numeric';
+                $rules['products.'.$stockingProductKey.'.variations.*.total_stock_quantity'] = 'required|integer|min:'.array_sum(array_column($stockingProduct->variations, 'stock_quantity'));
             }
             if ($product->has_variations && $product->has_serials) {
 
@@ -98,7 +100,9 @@ class StockRequest extends FormRequest
                     
                     if (! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
                         
-                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials'] = 'required|array|exclude_if:variations.*.stock_quantity,';
+                        // $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials'] = 'required|array';
+                        
+                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials'] = ['required', 'array'];
 
                     }
 
@@ -118,10 +122,10 @@ class StockRequest extends FormRequest
                                 'required','string','distinct','min:4',
                                 
                                 Rule::unique('product_variation_serials', 'serial_no')
-                                ->ignore(1, 'has_dispatched')
                                 ->where(function ($query) use ($variationSerial) {
                                     return $query->where('id', '!=', $variationSerial->id);
                                 })
+                                ->ignore(1, 'has_dispatched')
                             ];
                         }
                         else {
@@ -180,6 +184,7 @@ class StockRequest extends FormRequest
             ],
 
             'products.*.variations.*.unit_buying_price.*' => 'Buying price should be numeric',
+            'products.*.variations.*.total_stock_quantity.*' => 'Stock qty does not match',
 
             'products.*.variations.*.serials' => [
                 'required' => 'Variation serial is required',
@@ -205,75 +210,80 @@ class StockRequest extends FormRequest
     {
         $validator->after(function ($validator) {
 
-            // validation
-            foreach (json_decode(json_encode($this->input('products'))) as $productIndex => $stockingProduct) {
+            // when updating
+            if ($this->route('stock')) {
                 
-                $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
-                $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
-                $product = $merchantProduct->product;
-                
-                // If Replaced Merchant-Product and available-quantity is gonna be negative
-                if ($stockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id && ! $product->has_variations && $stockToUpdate->stock_quantity > $merchantProduct->available_quantity) {
+                // validation
+                foreach (json_decode(json_encode($this->input('products'))) as $productIndex => $stockingProduct) {
                     
-                    $missingProduct = ucfirst($product->name);
-                    // return response()->json(['errors'=>["$product->name" => "$missingProduct is not found"]], 422);
-                    $validator->errors()->add("$product->name", "$missingProduct is not found");
-
-                }
-
-                // already stocked product && reducing stock quantity
-                // decreasing qty is more than stock or product available
-                else if ($stockToUpdate->merchant_product_id == $stockingProduct->merchant_product_id && ! $product->has_variations && $stockToUpdate->stock_quantity > $stockingProduct->stock_quantity && ((($stockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $stockToUpdate->available_quantity) || (($stockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $stockToUpdate->merchantProduct->available_quantity))) {
-
-                    // return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
-                    $validator->errors()->add("invalidValue", "Stock quantity is less than minimum");
-
-                }
-                else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $stockToUpdate)) {
-
-                    // return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
-                    $validator->errors()->add("invalidVariationData", "Trying to update immutable variation or less than minimum");
-
-                }
-                else if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials))) /* || $this->checkProductDuplicateSerial($stockingProduct)*/ )) {
-
-                    // if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
+                    $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
+                    $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
+                    $product = $merchantProduct->product;
+                    
+                    // If Replaced Merchant-Product and available-quantity is gonna be negative
+                    if ($stockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id && ! $product->has_variations && $stockToUpdate->stock_quantity > $merchantProduct->available_quantity) {
                         
-                        $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)));
-                        // return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
-                        $validator->errors()->add("$serialNotFound", "$serialNotFound serial not found");
-
-                    // }
-                    /*
-                    else {
-
-                        $duplicateValue = $this->checkProductDuplicateSerial($stockingProduct);
-                        // return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
-                        $validator->errors()->add("$duplicateValue", "$duplicateValue serial is taken");
+                        $missingProduct = ucfirst($product->name);
+                        // return response()->json(['errors'=>["$product->name" => "$missingProduct is not found"]], 422);
+                        $validator->errors()->add("$product->name", "$missingProduct is not found");
 
                     }
-                    */
 
-                }
-                else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations))) /* || $this->checkVariationDuplicateSerial($stockingProduct)*/ )) {
+                    // already stocked product && reducing stock quantity
+                    // decreasing qty is more than stock or product available
+                    else if ($stockToUpdate->merchant_product_id == $stockingProduct->merchant_product_id && ! $product->has_variations && $stockToUpdate->stock_quantity > $stockingProduct->stock_quantity && ((($stockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $stockToUpdate->available_quantity) || (($stockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $stockToUpdate->merchantProduct->available_quantity))) {
 
-                    // if ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
-                        
-                        $serialNotFound = $this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)));
-                        // return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
-                        $validator->errors()->add("$serialNotFound", "$serialNotFound serial not found");
-
-                    // }
-                    /*
-                    else {
-
-                        $duplicateValue = $this->checkVariationDuplicateSerial($stockingProduct);
-                        // return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
-                        $validator->errors()->add("$duplicateValue", "$duplicateValue serial is taken");
+                        // return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
+                        $validator->errors()->add("invalidValue", "Stock quantity is less than minimum");
 
                     }
-                    */
-                    
+                    else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $stockToUpdate)) {
+
+                        // return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
+                        $validator->errors()->add("invalidVariationData", "Trying to update immutable variation or less than minimum");
+
+                    }
+                    else if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials))) /* || $this->checkProductDuplicateSerial($stockingProduct)*/ )) {
+
+                        // if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
+                            
+                            $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)));
+                            // return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
+                            $validator->errors()->add("$serialNotFound", "$serialNotFound serial not found");
+
+                        // }
+                        /*
+                        else {
+
+                            $duplicateValue = $this->checkProductDuplicateSerial($stockingProduct);
+                            // return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+                            $validator->errors()->add("$duplicateValue", "$duplicateValue serial is taken");
+
+                        }
+                        */
+
+                    }
+                    else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations))) /* || $this->checkVariationDuplicateSerial($stockingProduct)*/ )) {
+
+                        // if ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
+                            
+                            $serialNotFound = $this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)));
+                            // return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
+                            $validator->errors()->add("$serialNotFound", "$serialNotFound serial not found");
+
+                        // }
+                        /*
+                        else {
+
+                            $duplicateValue = $this->checkVariationDuplicateSerial($stockingProduct);
+                            // return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
+                            $validator->errors()->add("$duplicateValue", "$duplicateValue serial is taken");
+
+                        }
+                        */
+                        
+                    }
+
                 }
 
             }
