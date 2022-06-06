@@ -16,6 +16,7 @@ mix.js('resources/assets/js/admin.js', 'public/js')
     .js('resources/assets/js/owner.js', 'public/js')
     .js('resources/assets/js/warehouse.js', 'public/js')
     .js('resources/assets/js/manager.js', 'public/js')
+    .js('resources/assets/js/website.js', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css');
 
 if (mix.inProduction()) {

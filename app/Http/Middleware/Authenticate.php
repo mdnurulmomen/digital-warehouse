@@ -33,7 +33,8 @@ class Authenticate extends Middleware
                 return route('manager.login');
             }
             else
-                return route('login');
+                return route('website.home');
+                // return route('login');
             
         }
     }

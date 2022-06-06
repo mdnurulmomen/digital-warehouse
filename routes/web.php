@@ -13,31 +13,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('website');
-
-Route::get('/clear-cache', function() {
-    
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('route:clear');
-    Artisan::call('view:clear');
-    // Artisan::call('event:clear');
-    // Artisan::call('optimize:clear');
-
-    return 'All cache has been flushed';
-
-});
-
 Auth::routes();
 
 Route::name('merchant.')->group(function () {
 
-	Route::middleware(['auth:merchant'])->group(function () {
+	Route::middleware(['auth'])->group(function () {
 
 		Route::get('/{any}', 'HomeController@index')->name('home');
 
+		// API's
 		// profile
 		Route::get('/api/profile', 'ProfileController@showMerchantProfile')->name('profile');	
 		Route::put('/profile', 'ProfileController@updateMerchantProfile')->name('profile');	
@@ -58,7 +42,9 @@ Route::name('merchant.')->group(function () {
 		Route::post('/receive-dispatched-products/{perPage}', 'MerchantController@receiveDispatchedProducts')->name('receive-dispatched-products');
 
 		/* special routes */
-		/**/
+
+		// packaging-packages
+		Route::get('/api/packaging-packages/{perPage?}','AssetController@showAllPackagingPackages')->name('packaging-packages');
 		
 		Route::fallback(function () {
 
@@ -72,5 +58,23 @@ Route::name('merchant.')->group(function () {
 		});
 
 	});
+
+});
+
+Route::name('website.')->group(function () {
+
+	Route::get('/{any?}', 'WebsiteController@index')->name('home');
+
+});
+
+Route::get('/clear-cache', function() {
+    
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    // Artisan::call('event:clear');
+    // Artisan::call('optimize:clear');
+    return 'All cache has been flushed';
 
 });
