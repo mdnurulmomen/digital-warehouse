@@ -30,12 +30,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $access_token = Str::random(60);
-        $roles = Auth::user()->roles;
-        $permissions = Auth::user()->permissions;
+        // $access_token = Str::random(60);
+        // $roles = Auth::user()->roles;
+        // $permissions = Auth::user()->permissions;
         $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.merchant', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
+        return view('layouts.merchant', [/*'permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token,*/ 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -45,12 +45,12 @@ class HomeController extends Controller
      */
     public function adminHome()
     {
-        $accessToken = Str::random(60);
+        // $accessToken = Str::random(60);
         $roles = Auth::guard('admin')->user()->roles;
         $permissions = Auth::guard('admin')->user()->permissions;
         $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
+        return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, /*'access_token' => $accessToken,*/ 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -60,12 +60,12 @@ class HomeController extends Controller
      */
     public function managerHome()
     {
-        $accessToken = Str::random(60);
+        // $accessToken = Str::random(60);
         $roles = Auth::guard('manager')->user()->roles;
         $permissions = Auth::guard('manager')->user()->permissions;
         $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
+        return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, /*'access_token' => $accessToken,*/ 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -75,12 +75,12 @@ class HomeController extends Controller
      */
     public function ownerHome()
     {
-        $accessToken = Str::random(60);
-        $roles = Auth::guard('owner')->user()->roles;
-        $permissions = Auth::guard('owner')->user()->permissions;
+        // $accessToken = Str::random(60);
+        // $roles = Auth::guard('owner')->user()->roles;
+        // $permissions = Auth::guard('owner')->user()->permissions;
         $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.owner', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
+        return view('layouts.owner', [/*'permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken,*/ 'general_settings' => $generalSettings]);
     }
 
     /**
@@ -90,11 +90,11 @@ class HomeController extends Controller
      */
     public function warehouseHome()
     {
-        $accessToken = Str::random(60);
-        $roles = Auth::guard('warehouse')->user()->roles;
-        $permissions = Auth::guard('warehouse')->user()->permissions;
+        // $accessToken = Str::random(60);
+        // $roles = Auth::guard('warehouse')->user()->roles;
+        // $permissions = Auth::guard('warehouse')->user()->permissions;
         $generalSettings = ApplicationSetting::firstOrCreate([]);
 
-        return view('layouts.warehouse', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken, 'general_settings' => $generalSettings]);
+        return view('layouts.warehouse', [/*'permissions' => $permissions, 'roles' => $roles, 'access_token' => $accessToken,*/ 'general_settings' => $generalSettings]);
     }
 }

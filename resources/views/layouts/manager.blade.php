@@ -151,7 +151,7 @@
 										<li>
 
 											<a href="{{ route('manager.logout') }}"
-		                                       onclick="event.preventDefault();
+		                                       onclick="event.preventDefault();logout();
 		                                                     document.getElementById('manager-logout-form').submit();">
 		                                        <i class="feather icon-log-out"></i>
 		                                        {{ __('Logout') }}
@@ -304,9 +304,9 @@
 	<!-- Scripts -->
 	<script type="text/javascript">
 		/*alert('Executed');*/
-		window.localStorage.setItem("roles", JSON.stringify(@json($roles)));
-		window.localStorage.setItem("permissions", JSON.stringify(@json($permissions)));
-		window.localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));
+		localStorage.setItem("roles", JSON.stringify(@json($roles)));
+		localStorage.setItem("permissions", JSON.stringify(@json($permissions)));
+		localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));
 		/* window.localStorage.setItem("access_token", JSON.stringify(@json($access_token))); */
 	</script>
     <script src="{{ mix('js/manager.js') }}"></script>

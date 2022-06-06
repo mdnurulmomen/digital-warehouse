@@ -589,8 +589,8 @@ window.showProfile = () => {
 }
 
 window.logout = () => {
-    window.localStorage.removeItem('roles');
-    window.localStorage.removeItem('permissions');
+    localStorage.removeItem('roles');
+    localStorage.removeItem('permissions');
+    // localStorage.removeItem('access_token');
+    localStorage.removeItem('general_settings');
 }
-
-

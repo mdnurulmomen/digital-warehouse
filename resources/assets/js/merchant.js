@@ -13,6 +13,9 @@ window.toastr = require('vue-toastr');
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+import VTooltip from 'v-tooltip'
+Vue.use(VTooltip)
+
 // import mixin
 import HasPermission from './mixins/HasPermission';
 Vue.mixin(HasPermission);
@@ -23,6 +26,9 @@ Vue.component('ToggleButton', ToggleButton)
 
 // importing custom components
 import { routeNeedsPermission, userHasPermissionTo } from './public.js'
+
+import VueHtmlToPaper from 'vue-html-to-paper';
+Vue.use(VueHtmlToPaper);
 
 /**
  * The following block of code may be used to automatically register your
@@ -466,6 +472,11 @@ window.showProfile = () => {
 }
 
 window.logout = () => {
-    window.localStorage.removeItem('roles');
-    window.localStorage.removeItem('permissions');
+    /*
+    localStorage.removeItem('roles');
+    localStorage.removeItem('permissions');
+    */
+    
+    // localStorage.removeItem('access_token');
+    localStorage.removeItem('general_settings');
 }

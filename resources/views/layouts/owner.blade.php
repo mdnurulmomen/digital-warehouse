@@ -151,7 +151,7 @@
 										<li>
 
 											<a href="{{ route('owner.logout') }}"
-		                                       onclick="event.preventDefault();
+		                                       onclick="event.preventDefault();logout();
 		                                                     document.getElementById('owner-logout-form').submit();">
 		                                        <i class="feather icon-log-out"></i>
 		                                        {{ __('Logout') }}
@@ -303,11 +303,7 @@
 
 	<!-- Scripts -->
 	<script type="text/javascript">
-		/*alert('Executed');*/
-		window.localStorage.setItem("roles", JSON.stringify(@json($roles)));
-		window.localStorage.setItem("permissions", JSON.stringify(@json($permissions)));
 		window.localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));
-		/* window.localStorage.setItem("access_token", JSON.stringify(@json($access_token))); */
 	</script>
     <script src="{{ mix('js/owner.js') }}"></script>
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/jquery-ui.min.js')}}"></script>
