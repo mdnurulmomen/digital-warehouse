@@ -64,6 +64,7 @@ Route::name('merchant.')->group(function () {
 Route::name('website.')->group(function () {
 
 	Route::get('/{any?}', 'WebsiteController@index')->name('home');
+	Route::post('/contact-queries', 'WebsiteController@storeNewMessage')->name('contact-queries');
 
 });
 
