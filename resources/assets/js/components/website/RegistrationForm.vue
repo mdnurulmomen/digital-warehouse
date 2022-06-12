@@ -4,7 +4,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<form action="" class="reg-form">
+					<div class="reg-form">
 						<ul
 						class="nav nav-pills justify-content-evenly gap-3 mb-5"
 						id="pills-tab"
@@ -12,27 +12,25 @@
 						>
 						<li class="nav-item w-100" role="presentation">
 							<a
-							class="tab-btn active"
-							id="pills-home-tab"
-							data-bs-toggle="pill"
-							data-bs-target="#pills-home"
 							type="button"
-							role="tab"
-							aria-controls="pills-home"
-							aria-selected="true"
+							class="tab-btn active"
+							id="pills-owner-tab"
+							data-bs-toggle="pill"
+							data-bs-target="#pills-owner"
+							role="tab" 
+							@click="resetMerchantErrors()" 
 							>Owner</a
 							>
 						</li>
 						<li class="nav-item w-100" role="presentation">
 							<a
-							class="tab-btn"
-							id="pills-profile-tab"
-							data-bs-toggle="pill"
-							data-bs-target="#pills-profile"
 							type="button"
-							role="tab"
-							aria-controls="pills-profile"
-							aria-selected="false"
+							class="tab-btn"
+							id="pills-merchant-tab"
+							data-bs-toggle="pill"
+							data-bs-target="#pills-merchant"
+							role="tab" 
+							@click="resetOwnerErrors()" 
 							>Merchant</a
 							>
 						</li>
@@ -40,114 +38,228 @@
 					<div class="tab-content" id="pills-tabContent">
 						<div
 						class="tab-pane fade show active"
-						id="pills-home"
+						id="pills-owner"
 						role="tabpanel"
-						aria-labelledby="pills-home-tab"
+						aria-labelledby="pills-owner-tab"
 						>
 						<div class="row">
 							<div class="col-md-6">
 								<img
 								class="img-fluid reg-img"
-								:src="'/images/reg.jpg'"
+								:src="'/images/owner-reg.jpg'"
 								alt=""
 								/>
 							</div>
 							<div class="col-md-6">
-								<form class="row g-3 form-bg">
-									<div class="col-12 mb-4">
-										<input
-										type="text"
-										class="form-control custom-input"
-										placeholder="First Name*"
-										required
-										/>
+								<form
+								class="row g-3 form-bg form-horizontal" 
+								@submit.prevent="submitOwnerRegistrationForm()" 
+								autocomplete="off" 
+								>
+								<input type="hidden" name="_token" :value="csrf">
+
+								<div class="col-md-6 col-sm-12 form-group">
+									<label class="form-label">First Name</label>
+									<input 
+									type="text" 
+									class="form-control" 
+									v-model="singleOwnerRegistrationData.first_name" 
+									placeholder="Place Your First Name" 
+									:class="!errors.owner.first_name ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_first_name')" 
+									/>
+									<div class="invalid-feedback">
+										{{ errors.owner.first_name }}
 									</div>
-									<div class="col-12 mb-4">
-										<input
-										type="text"
-										class="form-control custom-input"
-										placeholder="Last Name*"
-										required
-										/>
+								</div>
+
+								<div class="col-md-6 col-sm-12 form-group">
+									<label class="form-label">Last Name</label>
+									<input 
+									type="text" 
+									class="form-control" 
+									v-model="singleOwnerRegistrationData.last_name" 
+									placeholder="Place Your Last Name" 
+									:class="!errors.owner.last_name ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_last_name')" 
+									/>
+
+									<div class="invalid-feedback">
+										{{ errors.owner.last_name }}
 									</div>
-									<div class="col-12 mb-4">
-										<input
-										type="email"
-										class="form-control custom-input"
-										placeholder="Email*"
-										required
-										/>
+								</div>
+
+								<div class="col-md-6 col-sm-12 form-group">
+									<label class="form-label">Email*</label>
+									<input
+									type="email"
+									class="form-control"
+									v-model="singleOwnerRegistrationData.email" 
+									placeholder="Place Your Email" 
+									:class="!errors.owner.email ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_email')" 
+									/>
+
+									<div class="invalid-feedback">
+										{{ errors.owner.email }}
 									</div>
-									<div class="col-12 mb-4">
-										<input
-										type="text"
-										class="form-control custom-input"
-										placeholder="Company*"
-										required
-										/>
+								</div>
+
+								<div class="col-md-6 col-sm-12 form-group">
+									<label class="form-label">Mobile*</label>
+									<input
+									type="tel"
+									class="form-control"
+									v-model="singleOwnerRegistrationData.mobile" 
+									placeholder="Place Your Contact No" 
+									:class="!errors.owner.mobile ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_mobile')" 
+									/>
+
+									<div class="invalid-feedback">
+										{{ errors.owner.mobile }}
 									</div>
-									<div class="col-12 mb-5">
-										<input
-										type="tel"
-										class="form-control custom-input"
-										placeholder="Mobile Number*"
-										required
-										/>
+								</div>
+
+								<div class="col-md-12 col-sm-12 form-group">
+									<label class="form-label">Username</label>
+									<input 
+									type="text" 
+									class="form-control" 
+									autocomplete="new-password" 
+									v-model="singleOwnerRegistrationData.user_name" 
+									placeholder="Username should be unique" 
+									:class="!errors.owner.user_name ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_user_name')" 
+									/>
+									<div class="invalid-feedback">
+										{{ errors.owner.user_name }}
 									</div>
-									<div class="col-12 mb-4">
-										<h5>What's your situation?</h5>
-										<div class="form-check">
-											<input
-											class="form-check-input"
-											type="radio"
-											name="flexRadioDefault"
-											id="flexRadioDefault1"
-											/>
-											<label
-											class="form-check-label"
-											for="flexRadioDefault1"
-											>
-											I'm looking for space
-										</label>
+								</div>
+
+								<div class="col-md-12 col-sm-12 form-group">
+									<label class="form-label">Password*</label>
+									<input
+									type="password"
+									class="form-control" 
+									autocomplete="new-password" 
+									v-model="singleOwnerRegistrationData.password" 
+									placeholder="Minimum length 8" 
+									:class="!errors.owner.password ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_password')" 
+									/>
+
+									<div class="invalid-feedback">
+										{{ errors.owner.password }}
 									</div>
-									<div class="form-check">
-										<input
-										class="form-check-input"
-										type="radio"
-										name="flexRadioDefault"
-										id="flexRadioDefault2"
-										checked
-										/>
-										<label
-										class="form-check-label"
-										for="flexRadioDefault2"
-										>
-										I've got extra space
+								</div>
+
+								<div class="col-md-12 col-sm-12 form-group">
+									<label class="form-label">Confirm Password*</label>
+									<input
+									type="password"
+									class="form-control" 
+									autocomplete="nope" 
+									v-model="singleOwnerRegistrationData.password_confirmation" 
+									placeholder="Confirm Your Password" 
+									:class="!errors.owner.password_confirmation ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('owner_password_confirmation')" 
+									/>
+
+									<div class="invalid-feedback">
+										{{ errors.owner.password_confirmation }}
+									</div>
+								</div>
+
+								<div class="col-md-12 col-sm-12 form-group">
+									<label class="form-label">
+										Number of Warehouses You Want to Rent
 									</label>
+										<!-- 
+										<select 
+											class="form-control" 
+											:class="!errors.owner.number_rentable_warehouses ? 'is-valid' : 'is-invalid'"
+											v-model="singleOwnerRegistrationData.number_rentable_warehouses"
+											:readonly="formSubmitted" 
+											>
+											<option value="" selected="selected"></option>
+											<option value="warehouses-1">1 warehouse</option>
+											<option value="warehouses-2">2 - 4 warehouses</option>
+											<option value="warehouses-3">5 - 10 warehouses</option>
+											<option value="warehouses-4">10+ warehouses</option>
+										</select> 
+									-->
+
+									<input 
+									type="number" 
+									class="form-control" 
+									v-model="singleOwnerRegistrationData.number_rentable_warehouses" 
+									placeholder="Number Rentable Warehouses" 
+									:class="!errors.owner.number_rentable_warehouses ? 'is-valid' : 'is-invalid'" 
+									:readonly="formSubmitted" 
+									@change="validateFormInput('number_rentable_warehouses')" 
+									/>
+
+									<div class="invalid-feedback">
+										{{ errors.owner.number_rentable_warehouses }}
+									</div>
+								</div>
+
+								<div class="col-md-12 col-sm-12 form-group mb-3">
+									<label class="form-label">
+										Warehouse Average Size *
+									</label>
+									<select 
+									class="form-control" 
+									:class="!errors.owner.available_size ? 'is-valid' : 'is-invalid'"
+									v-model="singleOwnerRegistrationData.available_size"
+									:readonly="formSubmitted" 
+									>
+									<option value="" selected="selected"></option>
+									<option value="facility-size-1">< 10,000 sq ft</option>
+									<option value="facility-size-2">10,000 - 50,000 sq ft</option>
+									<option value="facility-size-3">50,000+ sq ft</option>
+								</select>
+
+								<div class="invalid-feedback">
+									{{ errors.owner.available_size }}
 								</div>
 							</div>
-							<div class="col-12 mb-3">
-								<div class="form-check">
-									<input
-									class="form-check-input"
-									type="checkbox"
-									value=""
-									id="flexCheckChecked"
-									checked
-									/>
-									<label
-									class="form-check-label"
-									for="flexCheckChecked"
+
+							<div class="col-md-12 col-sm-12 text-center" v-show="Object.keys(registrationFormFailureMessage).length > 0">
+								<ul>
+									<li 
+									class="text-danger text-start" 
+									v-for="x in registrationFormFailureMessage"
 									>
-									I have read and agree to PlaceHolder's Terms of
-									Service and Privacy Policy
-								</label>
-							</div>
+									{{ x[0] }}
+								</li>
+							</ul>
 						</div>
-						<div class="col-12 text-end">
-							<a href="" class="more-btn w-100" type="submit"
-							>SUBMIT</a
-							>
+
+						<div class="col-md-12 col-sm-12 text-center" v-show="registrationFormSuccessMessage && Object.keys(registrationFormFailureMessage).length == 0 && Object.keys(errors.owner).length == 0 && Object.keys(errors.merchant).length == 0">
+							<span style="color: #23b8bf">
+								{{ registrationFormSuccessMessage }}
+							</span>
+						</div>
+
+						<div class="col-md-12 col-sm-12 text-center" v-show="! submitForm">
+							<span class="text-danger small">
+								**Please input required fields
+							</span>
+						</div>
+
+						<div class="col-md-12 col-sm-12 text-end">
+							<button type="submit" class="more-btn w-100 btn btn-default" :disabled="formSubmitted">
+								Rent My Warehouse
+							</button>
 						</div>
 					</form>
 				</div>
@@ -155,107 +267,204 @@
 		</div>
 		<div
 		class="tab-pane fade"
-		id="pills-profile"
+		id="pills-merchant"
 		role="tabpanel"
-		aria-labelledby="pills-profile-tab"
+		aria-labelledby="pills-merchant-tab"
 		>
 		<div class="row">
 			<div class="col-md-6">
-				<form class="row g-3 form-bg">
-					<div class="col-12 mb-4">
-						<input
-						type="text"
-						class="form-control custom-input"
-						placeholder="First Name*"
-						required
-						/>
+				<form
+				class="row g-3 form-bg form-horizontal" 
+				@submit.prevent="submitMerchantRegistrationForm()" 
+				autocomplete="off" 
+				>
+				<input type="hidden" name="_token" :value="csrf">
+
+				<div class="col-md-6 col-sm-12 form-group">
+					<label class="form-label">First Name</label>
+					<input 
+					type="text" 
+					class="form-control" 
+					v-model="singleMerchantRegistrationData.first_name" 
+					placeholder="Place Your First Name" 
+					:class="!errors.merchant.first_name ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_first_name')" 
+					/>
+					<div class="invalid-feedback">
+						{{ errors.merchant.first_name }}
 					</div>
-					<div class="col-12 mb-4">
-						<input
-						type="text"
-						class="form-control custom-input"
-						placeholder="Last Name*"
-						required
-						/>
+				</div>
+
+				<div class="col-md-6 col-sm-12 form-group">
+					<label class="form-label">Last Name</label>
+					<input 
+					type="text" 
+					class="form-control" 
+					v-model="singleMerchantRegistrationData.last_name" 
+					placeholder="Place Your Last Name" 
+					:class="!errors.merchant.last_name ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_last_name')" 
+					/>
+
+					<div class="invalid-feedback">
+						{{ errors.merchant.last_name }}
 					</div>
-					<div class="col-12 mb-4">
-						<input
-						type="email"
-						class="form-control custom-input"
-						placeholder="Email*"
-						required
-						/>
+				</div>
+
+				<div class="col-md-6 col-sm-12 form-group">
+					<label class="form-label">Email*</label>
+					<input
+					type="email"
+					class="form-control"
+					v-model="singleMerchantRegistrationData.email" 
+					placeholder="Place Your Email" 
+					:class="!errors.merchant.email ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_email')" 
+					/>
+
+					<div class="invalid-feedback">
+						{{ errors.merchant.email }}
 					</div>
-					<div class="col-12 mb-4">
-						<input
-						type="text"
-						class="form-control custom-input"
-						placeholder="Company*"
-						required
-						/>
+				</div>
+
+				<div class="col-md-6 col-sm-12 form-group">
+					<label class="form-label">Mobile*</label>
+					<input
+					type="tel"
+					class="form-control"
+					v-model="singleMerchantRegistrationData.mobile" 
+					placeholder="Place Your Contact No" 
+					:class="!errors.merchant.mobile ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_mobile')" 
+					/>
+
+					<div class="invalid-feedback">
+						{{ errors.merchant.mobile }}
 					</div>
-					<div class="col-12 mb-5">
-						<input
-						type="tel"
-						class="form-control custom-input"
-						placeholder="Mobile Number*"
-						required
-						/>
+				</div>
+
+				<div class="col-md-12 col-sm-12 form-group">
+					<label class="form-label">Username*</label>
+					<input 
+					type="text" 
+					class="form-control" 
+					v-model="singleMerchantRegistrationData.user_name" 
+					placeholder="Username should be unique" 
+					:class="!errors.merchant.user_name ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_user_name')" 
+					/>
+					<div class="invalid-feedback">
+						{{ errors.merchant.user_name }}
 					</div>
-					<div class="col-12 mb-4">
-						<h5>What's your situation?</h5>
-						<div class="form-check">
-							<input
-							class="form-check-input"
-							type="radio"
-							name="flexRadioDefault"
-							id="flexRadioDefault1"
-							/>
-							<label
-							class="form-check-label"
-							for="flexRadioDefault1"
-							>
-							I'm looking for space
-						</label>
+				</div>
+
+				<div class="col-md-12 col-sm-12 form-group">
+					<label class="form-label">Password*</label>
+					<input
+					type="password"
+					class="form-control" 
+					autocomplete="new-password" 
+					v-model="singleMerchantRegistrationData.password" 
+					placeholder="Minimum length 8" 
+					:class="!errors.merchant.password ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_password')" 
+					/>
+
+					<div class="invalid-feedback">
+						{{ errors.merchant.password }}
 					</div>
-					<div class="form-check">
-						<input
-						class="form-check-input"
-						type="radio"
-						name="flexRadioDefault"
-						id="flexRadioDefault2"
-						checked
-						/>
-						<label
-						class="form-check-label"
-						for="flexRadioDefault2"
-						>
-						I've got extra space
+				</div>
+
+				<div class="col-md-12 col-sm-12 form-group">
+					<label class="form-label">Confirm Password*</label>
+					<input
+					type="password"
+					class="form-control" 
+					autocomplete="new-password" 
+					v-model="singleMerchantRegistrationData.password_confirmation" 
+					placeholder="Confirm Your Password" 
+					:class="!errors.merchant.password_confirmation ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('merchant_password_confirmation')" 
+					/>
+
+					<div class="invalid-feedback">
+						{{ errors.merchant.password_confirmation }}
+					</div>
+				</div>
+
+				<div class="col-12 form-group">
+					<label class="form-label">Company*</label>
+					<input 
+					type="text"
+					class="form-control"
+					v-model="singleOwnerRegistrationData.company" 
+					placeholder="Place Your Company Name" 
+					:class="!errors.merchant.company ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('company')" 
+					/>
+
+					<div class="invalid-feedback">
+						{{ errors.merchant.company }}
+					</div>
+				</div>
+				
+				<div class="col-md-12 col-sm-12 form-group mb-3">
+					<label class="form-label">
+						Required Size *
 					</label>
+					<select 
+					class="form-control" 
+					:class="!errors.merchant.required_size ? 'is-valid' : 'is-invalid'"
+					v-model="singleMerchantRegistrationData.required_size"
+					:readonly="formSubmitted" 
+					@change="validateFormInput('required_size')" 
+					>
+					<option value="" selected="selected"></option>
+					<option value="facility-size-1">< 10,000 sq ft</option>
+					<option value="facility-size-2">10,000 - 50,000 sq ft</option>
+					<option value="facility-size-3">50,000+ sq ft</option>
+				</select>
+
+				<div class="invalid-feedback">
+					{{ errors.merchant.required_size }}
 				</div>
 			</div>
-			<div class="col-12 mb-3">
-				<div class="form-check">
-					<input
-					class="form-check-input"
-					type="checkbox"
-					value=""
-					id="flexCheckChecked"
-					checked
-					/>
-					<label
-					class="form-check-label"
-					for="flexCheckChecked"
+
+			<div class="col-md-12 col-sm-12 text-center" v-show="Object.keys(registrationFormFailureMessage).length > 0">
+				<ul>
+					<li 
+					class="text-danger text-start" 
+					v-for="x in registrationFormFailureMessage"
 					>
-					I have read and agree to PlaceHolder's Terms of
-					Service and Privacy Policy
-				</label>
-			</div>
+					{{ x[0] }}
+				</li>
+			</ul>
 		</div>
-		<div class="col-12 text-end">
-			<a href="" class="more-btn w-100" type="submit"
-			>SUBMIT</a
-			>
+
+		<div class="col-md-12 col-sm-12 text-center" v-show="registrationFormSuccessMessage && Object.keys(registrationFormFailureMessage).length == 0 && Object.keys(errors.owner).length == 0 && Object.keys(errors.merchant).length == 0">
+			<span style="color: #23b8bf">
+				{{ registrationFormSuccessMessage }}
+			</span>
+		</div>
+
+		<div class="col-md-12 col-sm-12 text-center" v-show="! submitForm">
+			<span class="text-danger small">
+				**Please input required fields
+			</span>
+		</div>
+
+		<div class="col-md-12 col-sm-12 text-center">
+			<button type="submit" class="more-btn w-100 btn btn-default" :disabled="formSubmitted">
+				Send Requirements
+			</button>
 		</div>
 	</form>
 </div>
@@ -269,7 +478,7 @@
 </div>
 </div>
 </div>
-</form>
+</div>
 </div>
 </div>
 </div>
@@ -278,13 +487,405 @@
 </template>
 
 <script>
-export default {
-  data () {
-    return {
+	export default {
+		props : {
 
-    }
-  }
-}
+			csrf : {
+				type : String,
+				required : true
+			},
+			formSubmitted : {
+				type : Boolean,
+				default: false
+			},
+			singleOwnerRegistrationData : {
+				type : Object,
+				required : true
+			},
+			singleMerchantRegistrationData : {
+				type : Object,
+				required : true
+			},
+			registrationFormSuccessMessage : {
+				type : String,
+				default: null
+			},
+			registrationFormFailureMessage : {
+				type : Object,
+				default: {}
+			},
+
+		},
+		data () {
+			return {
+				errors : {
+					owner : {},
+					merchant : {},
+				}, 
+
+				submitForm : true,
+			}
+		},
+
+		methods: {
+
+			submitOwnerRegistrationForm() {
+
+				this.validateFormInput('owner_first_name');
+				this.validateFormInput('owner_last_name');
+				this.validateFormInput('owner_email');
+				this.validateFormInput('owner_mobile');
+				this.validateFormInput('owner_user_name');
+				this.validateFormInput('owner_password');
+				this.validateFormInput('owner_password_confirmation');
+				this.validateFormInput('number_rentable_warehouses');
+				this.validateFormInput('available_size');
+
+				if (Object.keys(this.errors.owner).length > 0) {
+					this.submitForm = false;
+					return;
+				}
+				else {
+					this.$emit('submitOwnerRegistrationForm', this.singleOwnerRegistrationData);
+				}
+
+			},
+
+			submitMerchantRegistrationForm() {
+
+				this.validateFormInput('merchant_first_name');
+				this.validateFormInput('merchant_last_name');
+				this.validateFormInput('merchant_email');
+				this.validateFormInput('merchant_mobile');
+				this.validateFormInput('merchant_user_name');
+				this.validateFormInput('merchant_password');
+				this.validateFormInput('merchant_password_confirmation');
+				this.validateFormInput('company');
+				this.validateFormInput('required_size');
+
+				if (Object.keys(this.errors.merchant).length > 0) {
+					this.submitForm = false;
+					return;
+				}
+				else {
+					this.$emit('submitMerchantRegistrationForm', this.singleMerchantRegistrationData);
+				}
+
+			},
+
+			resetOwnerErrors() {
+				this.submitForm = true;
+				this.errors.owner = {};
+				this.$emit('resetParentProps');
+			},
+
+			resetMerchantErrors() {
+				this.submitForm = true;
+				this.errors.merchant = {};
+				this.$emit('resetParentProps');
+			},
+
+			validateFormInput (formInputName) {
+
+				this.submitForm = false;
+
+				switch(formInputName) {
+					
+					case 'owner_first_name' : 
+					
+					if (! this.singleOwnerRegistrationData.first_name && ! this.singleOwnerRegistrationData.last_name) {
+						
+						this.errors.owner.first_name = 'First or last name is required'
+
+					}
+					else if (this.singleOwnerRegistrationData.first_name && ! this.singleOwnerRegistrationData.first_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+
+						this.errors.owner.first_name = 'No special characters';
+
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'first_name');
+						this.$delete(this.errors.owner, 'last_name');
+					}
+
+					break;
+
+					case 'owner_last_name' : 
+					
+					if (! this.singleOwnerRegistrationData.first_name && ! this.singleOwnerRegistrationData.last_name) {
+						
+						this.errors.owner.last_name = 'First or last name is required'
+
+					}
+					else if (this.singleOwnerRegistrationData.last_name && ! this.singleOwnerRegistrationData.last_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+
+						this.errors.owner.last_name = 'No special characters';
+
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'first_name');
+						this.$delete(this.errors.owner, 'last_name');
+					}
+
+					break;
+
+					case 'owner_email' : 
+					
+					if (! this.singleOwnerRegistrationData.email) {
+						this.errors.owner.email = 'Email is required';
+					}
+					else if (! this.singleOwnerRegistrationData.email.match(/[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/g)) {
+						this.errors.owner.email = 'Invalid email address';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'email');
+					}
+
+					break;
+
+					case 'owner_mobile' :
+
+					if (! this.singleOwnerRegistrationData.mobile) {
+						this.errors.owner.mobile = 'Mobile is required';
+					}
+					else if (! this.singleOwnerRegistrationData.mobile.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
+						this.errors.owner.mobile = 'Invalid mobile number';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'mobile');
+					}
+
+					break;
+
+					case 'owner_user_name' :
+
+					if (! this.singleOwnerRegistrationData.user_name) {
+						this.errors.owner.user_name = 'Username is required';
+					}
+					else if (! this.singleOwnerRegistrationData.user_name.match(/^[-\w\.\$@\*\!]{3,30}$/g)) {
+						this.errors.owner.user_name = 'No special character';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'user_name');
+					}
+
+					break;
+
+					case 'owner_password' :
+
+					if (!this.singleOwnerRegistrationData.password) {
+						this.errors.owner.password = 'Password is required';
+					}
+					else if (this.singleOwnerRegistrationData.password.length < 8) {
+						this.errors.owner.password = 'Minimum length should be 8';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'password');
+					}
+
+					break;
+
+					case 'owner_password_confirmation' :
+
+					if (this.singleOwnerRegistrationData.password && ! this.singleOwnerRegistrationData.password_confirmation) {
+						this.errors.owner.password_confirmation = 'Password is required';
+					}
+					else if (this.singleOwnerRegistrationData.password && this.singleOwnerRegistrationData.password !== this.singleOwnerRegistrationData.password_confirmation) {
+						this.errors.owner.password_confirmation = "Password doesn't match";
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'password_confirmation');
+					}
+
+					break;
+
+					case 'number_rentable_warehouses' :
+
+					if (! this.singleOwnerRegistrationData.number_rentable_warehouses) {
+						this.errors.owner.number_rentable_warehouses = 'Warehouse number is required';
+					}
+					else if (this.singleOwnerRegistrationData.number_rentable_warehouses < 0) {
+						this.errors.owner.number_rentable_warehouses = 'Invalid warehouse number';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'number_rentable_warehouses');
+					}
+
+					break;
+
+					case 'available_size' :
+
+					if (! this.singleOwnerRegistrationData.available_size) {
+						this.errors.owner.available_size = 'Warehouse number is required';
+					}
+					/*
+					else if (! this.singleOwnerRegistrationData.available_size < 0) {
+						this.errors.owner.available_size = 'Invalid warehouse number';
+					}
+					*/
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.owner, 'available_size');
+					}
+
+					break;
+
+					case 'merchant_first_name' : 
+					
+					if (! this.singleMerchantRegistrationData.first_name && ! this.singleMerchantRegistrationData.last_name) {
+						
+						this.errors.merchant.first_name = 'First or last name is required'
+
+					}
+					else if (this.singleMerchantRegistrationData.first_name && ! this.singleMerchantRegistrationData.first_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+
+						this.errors.merchant.first_name = 'No special characters';
+
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'first_name');
+						this.$delete(this.errors.merchant, 'last_name');
+					}
+
+					break;
+
+					case 'merchant_last_name' : 
+					
+					if (! this.singleMerchantRegistrationData.first_name && ! this.singleMerchantRegistrationData.last_name) {
+						
+						this.errors.merchant.last_name = 'First or last name is required'
+
+					}
+					else if (this.singleMerchantRegistrationData.last_name && ! this.singleMerchantRegistrationData.last_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+
+						this.errors.merchant.last_name = 'No special characters';
+
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'first_name');
+						this.$delete(this.errors.merchant, 'last_name');
+					}
+
+					break;
+
+					case 'merchant_email' : 
+					
+					if (! this.singleMerchantRegistrationData.email) {
+						this.errors.merchant.email = 'Email is required';
+					}
+					else if (! this.singleMerchantRegistrationData.email.match(/[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/g)) {
+						this.errors.merchant.email = 'Invalid email address';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'email');
+					}
+
+					break;
+
+					case 'merchant_mobile' :
+
+					if (! this.singleMerchantRegistrationData.mobile) {
+						this.errors.merchant.mobile = 'Mobile is required';
+					}
+					else if (! this.singleMerchantRegistrationData.mobile.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
+						this.errors.merchant.mobile = 'Invalid mobile number';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'mobile');
+					}
+
+					break;
+
+					case 'merchant_user_name' :
+
+					if (! this.singleMerchantRegistrationData.user_name) {
+						this.errors.merchant.user_name = 'Username is required';
+					}
+					else if (! this.singleMerchantRegistrationData.user_name.match(/^[-\w\.\$@\*\!]{3,30}$/g)) {
+						this.errors.merchant.user_name = 'No special character';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'user_name');
+					}
+
+					break;
+
+					case 'merchant_password' :
+
+					if (!this.singleMerchantRegistrationData.password) {
+						this.errors.merchant.password = 'Password is required';
+					}
+					else if (this.singleMerchantRegistrationData.password.length < 8) {
+						this.errors.merchant.password = 'Minimum length should be 8';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'password');
+					}
+
+					break;
+
+					case 'merchant_password_confirmation' :
+
+					if (this.singleMerchantRegistrationData.password && ! this.singleMerchantRegistrationData.password_confirmation) {
+						this.errors.merchant.password_confirmation = 'Password is required';
+					}
+					else if (this.singleMerchantRegistrationData.password && this.singleMerchantRegistrationData.password !== this.singleMerchantRegistrationData.password_confirmation) {
+						this.errors.merchant.password_confirmation = "Password doesn't match";
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'password_confirmation');
+					}
+
+					break;
+
+					case 'company' : 
+					
+					if (this.singleMerchantRegistrationData.company && ! this.singleMerchantRegistrationData.company.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+
+						this.errors.merchant.company = 'No special characters';
+
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'company');
+					}
+
+					break;
+
+					case 'required_size' : 
+					
+					if (! this.singleMerchantRegistrationData.required_size) {
+
+						this.errors.merchant.required_size = 'Size is required';
+
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'required_size');
+					}
+
+					break;
+					
+				}
+			}
+
+		}
+	}
 </script>
 
 <style lang="css" scoped>

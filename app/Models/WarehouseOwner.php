@@ -66,6 +66,11 @@ class WarehouseOwner extends Authenticatable
         return $this->hasMany(Warehouse::class, 'warehouse_owner_id', 'id');
     }
 
+    public function rentableWarehouse()
+    {
+        return $this->hasOne(OwnerRentableWarehouse::class, 'warehouse_owner_id', 'id');
+    }
+
     /**
      * Set the user's first name.
      *

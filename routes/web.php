@@ -65,6 +65,8 @@ Route::name('website.')->group(function () {
 
 	Route::get('/{any?}', 'WebsiteController@index')->name('home');
 	Route::post('/contact-queries', 'WebsiteController@storeNewMessage')->name('contact-queries');
+	Route::post('/owners', 'WebsiteController@storeOwnerRegistrationRequest')->name('owners');
+	Route::post('/merchants', 'WebsiteController@storeMerchantRegistrationRequest')->name('merchants');
 
 });
 

@@ -71,10 +71,10 @@ class WarehouseController extends Controller
 
         $newUser = new WarehouseOwner();
 
-        $newUser->first_name = $request->first_name;
-        $newUser->last_name = $request->last_name;
-        $newUser->user_name = $request->user_name;
-        $newUser->email = $request->email;
+        $newUser->first_name = strtolower($request->first_name);
+        $newUser->last_name = strtolower($request->last_name);
+        $newUser->user_name = strtolower($request->user_name);
+        $newUser->email = strtolower($request->email);
         $newUser->mobile = $request->mobile;
         $newUser->password = Hash::make($request->password);
         $newUser->active = $request->active;
