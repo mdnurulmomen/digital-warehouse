@@ -24,6 +24,7 @@ class CreateContainersTable extends Migration
             // $table->unsignedSmallInteger('selling_price')->default(100);
             $table->boolean('has_shelve')->default(false);
             $table->unsignedSmallInteger('storage_type_id');
+            $table->unsignedSmallInteger('container_type_id');
             $table->softDeletes();
         });
     }

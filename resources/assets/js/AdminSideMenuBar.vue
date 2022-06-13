@@ -49,7 +49,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['owners', 'warehouses', 'storage-types', 'containers', 'rent-periods', 'warehouse-containers', 'warehouse-container-shelves', 'warehouse-container-shelf-units'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['owners', 'warehouses', 'storage-types', 'container-types', 'containers', 'rent-periods', 'warehouse-containers', 'warehouse-container-shelves', 'warehouse-container-shelf-units'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('view-warehouse-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -61,7 +61,7 @@
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['rent-periods', 'storage-types', 'containers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['rent-periods', 'storage-types', 'container-types', 'containers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-warehouse-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -82,9 +82,15 @@
 												</router-link>
 											</li>
 
+											<li :class="currentRouteName=='container-types' ? 'active' : ''">
+												<router-link :to="{ name: 'container-types' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Container Types</span>
+												</router-link>
+											</li>
+
 											<li :class="currentRouteName=='containers' ? 'active' : ''">
 												<router-link :to="{ name: 'containers' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Container Types</span>
+													<span class="pcoded-mtext">Containers</span>
 												</router-link>
 											</li>
 										</ul>

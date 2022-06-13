@@ -7,6 +7,7 @@ use App\Models\Container;
 use App\Models\RentPeriod;
 use App\Models\StorageType;
 use Illuminate\Http\Request;
+use App\Models\ContainerType;
 use App\Models\VariationType;
 use Illuminate\Validation\Rule;
 use App\Models\DeliveryCompany;
@@ -19,23 +20,23 @@ class AssetController extends Controller
 {
     public function __construct()
     {
-        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods']);
+        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainerTypes', 'searchAllContainerTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods']);
 
         $this->middleware("permission:view-product-asset-index")->only(['showAllVariationTypes', 'searchVariationTypes', 'showAllVariations', 'searchAllVariations']);
 
-        $this->middleware("permission:create-warehouse-asset")->only(['storeNewStorageType', 'storeNewContainer', 'storeNewRentPeriod']);
+        $this->middleware("permission:create-warehouse-asset")->only(['storeNewStorageType', 'storeNewContainerType', 'storeNewContainer', 'storeNewRentPeriod']);
 
         $this->middleware("permission:create-product-asset")->only(['storeVariationType', 'storeNewVariation']);
 
         $this->middleware("permission:create-logistic-asset")->only(['storeNewPackagingPackage', 'storeDeliveryNewCompany']);
 
-        $this->middleware("permission:update-warehouse-asset")->only(['updateStorageType', 'updateContainer', 'updateRentPeriod']);
+        $this->middleware("permission:update-warehouse-asset")->only(['updateStorageType', 'updateContainerType', 'updateContainer', 'updateRentPeriod']);
 
         $this->middleware("permission:update-product-asset")->only(['updateVariationType', 'updateVariation']);
 
         $this->middleware("permission:update-logistic-asset")->only(['updatePackagingPackage', 'updateDeliveryCompany']);
         
-        $this->middleware("permission:delete-warehouse-asset")->only(['deleteStorageType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
+        $this->middleware("permission:delete-warehouse-asset")->only(['deleteStorageType', 'deleteContainerType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
 
         $this->middleware("permission:delete-product-asset")->only(['deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation']);
 
@@ -138,15 +139,106 @@ class AssetController extends Controller
         ], 200);
     }
 
+    // container types
+    public function showAllContainerTypes($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => ContainerType::latest('id')->paginate($perPage),
+                'trashed' => ContainerType::latest('id')->onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return ContainerType::latest('id')->get();
+    }
+
+    public function storeNewContainerType(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:container_types,name',
+            // 'code' => 'required|string|max:100|unique:storage_types,code',
+        ]);
+
+        $newAsset = new ContainerType();
+
+        $newAsset->name = strtolower($request->name);
+        // $newAsset->code = strtolower($request->code);
+
+        $newAsset->save();
+
+        return $this->showAllContainerTypes($perPage);
+    }
+
+    public function updateContainerType(Request $request, $owner, $perPage)
+    {
+        $assetToUpdate = ContainerType::findOrFail($owner);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:container_types,name,'.$assetToUpdate->id,
+            // 'code' => 'required|string|max:100|unique:storage_types,code,'.$assetToUpdate->id,
+        ]);
+
+        $assetToUpdate->name = strtolower($request->name);
+        // $assetToUpdate->code = strtolower($request->code);
+
+        $assetToUpdate->save();
+
+        return $this->showAllContainerTypes($perPage);
+    }
+
+    public function deleteContainerType($asset, $perPage)
+    {
+        $assetToDelete = ContainerType::findOrFail($asset);
+        
+        if ($assetToDelete->containers->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->containers->count()." containers"]], 422);
+
+        }
+        
+        // $userToDelete->warehouses()->delete();
+        $assetToDelete->delete();
+
+        return $this->showAllContainerTypes($perPage);
+    }
+
+    public function restoreContainerType($asset, $perPage)
+    {
+        $userToRestore = ContainerType::withTrashed()->findOrFail($asset);
+        // $userToRestore->warehouses()->restore();
+        $userToRestore->restore();
+
+        return $this->showAllContainerTypes($perPage);
+    }
+
+    public function searchAllContainerTypes($search, $perPage)
+    {
+        $columnsToSearch = ['name'];
+
+        $query = ContainerType::withTrashed();
+
+        foreach($columnsToSearch as $column){
+            $query->orWhere($column, 'like', "%$search%");
+        }
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
     // Containers
     public function showAllContainers($perPage=false)
     {
         if ($perPage) {
             return response()->json([
 
-                'current' => Container::with(['shelf.unit', 'storageType'])->withCount('warehouses')->latest('id')->paginate($perPage),
+                'current' => Container::with(['shelf.unit', 'storageType', 'containerType'])->withCount('warehouses')->latest('id')->paginate($perPage),
 
-                'trashed' => Container::with(['shelf.unit', 'storageType'])->onlyTrashed()->withCount('warehouses')->latest('id')->paginate($perPage),
+                'trashed' => Container::with(['shelf.unit', 'storageType', 'containerType'])->onlyTrashed()->withCount('warehouses')->latest('id')->paginate($perPage),
 
             ], 200);
         }
@@ -159,7 +251,8 @@ class AssetController extends Controller
         $request->validate([
             'name' => 'required|string|max:100|unique:containers,name',
             'code' => 'required|string|alpha_dash|max:100|unique:containers,code',
-            'storage_type_id' => 'required|integer|exists:storage_types,id',
+            'storage_type_id' => 'required|integer|exists:storage_types,id', 
+            'container_type_id' => 'required|integer|exists:container_types,id', 
             'length' => 'required|numeric',
             'width' => 'required|numeric',
             'height' => 'required|numeric',
@@ -178,6 +271,7 @@ class AssetController extends Controller
         $newContainer = new Container();
 
         $newContainer->storage_type_id = $request->storage_type_id;
+        $newContainer->container_type_id = $request->container_type_id;
         $newContainer->name = strtolower($request->name);
         $newContainer->code = strtolower($request->code);
         $newContainer->length = $request->length;
@@ -220,7 +314,8 @@ class AssetController extends Controller
         $containerToUpdate = Container::findOrFail($owner);
 
         $request->validate([
-            'storage_type_id' => 'required|integer|exists:storage_types,id',
+            'storage_type_id' => 'required|integer|exists:storage_types,id', 
+            'container_type_id' => 'required|integer|exists:container_types,id', 
             'name' => 'required|string|max:100|unique:containers,name,'.$containerToUpdate->id,
             'code' => 'required|string|alpha_dash|max:100|unique:containers,code,'.$containerToUpdate->id,
             'length' => 'required|numeric',
@@ -240,6 +335,7 @@ class AssetController extends Controller
 
         $containerToUpdate->update([
             'storage_type_id' => $request->storage_type_id,
+            'container_type_id' => $request->container_type_id,
             'name' => strtolower($request->name),
             'code' => strtolower($request->code),
             'length' => $request->length,

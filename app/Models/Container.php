@@ -40,7 +40,12 @@ class Container extends Model
 
     public function storageType()
     {
-        return $this->belongsTo(StorageType::class, 'storage_type_id', 'id')->withTrashed();
+        return $this->belongsTo(StorageType::class, 'storage_type_id', 'id');
+    }
+
+    public function containerType()
+    {
+        return $this->belongsTo(ContainerType::class, 'container_type_id', 'id');
     }
     
 }

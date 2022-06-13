@@ -105,6 +105,14 @@ Route::name('admin.')->group(function () {
 		Route::patch('/storage-types/{type}/{perPage}','AssetController@restoreStorageType')->name('storage-types');
 		Route::get('/api/search-storage-types/{search}/{perPage}','AssetController@searchAllStorageTypes')->name('search-storage-types');
 
+		// container type
+		Route::get('/api/container-types/{perPage?}','AssetController@showAllContainerTypes')->name('container-types');
+		Route::post('/container-types/{perPage}','AssetController@storeNewContainerType')->name('container-types');	
+		Route::put('/container-types/{type}/{perPage}','AssetController@updateContainerType')->name('container-types');	
+		Route::delete('/container-types/{type}/{perPage}','AssetController@deleteContainerType')->name('container-types');	
+		Route::patch('/container-types/{type}/{perPage}','AssetController@restoreContainerType')->name('container-types');
+		Route::get('/api/search-container-types/{search}/{perPage}','AssetController@searchAllContainerTypes')->name('search-container-types');
+
 		// container
 		Route::get('/api/containers/{perPage?}', 'AssetController@showAllContainers')->name('containers');
 		Route::post('/containers/{perPage}', 'AssetController@storeNewContainer')->name('containers');	

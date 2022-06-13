@@ -88,7 +88,8 @@ import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
 import ManagerIndex from './views/ManagerIndex'
 import MerchantIndex from './views/MerchantIndex'
 import StorageTypeIndex from './views/StorageTypeIndex'
-import ContainerIndex from './views/ContainerTypeIndex'
+import ContainerIndex from './views/ContainerIndex'
+import ContainerTypeIndex from './views/ContainerTypeIndex'
 import WarehouseIndex from './views/WarehouseIndex'
 import WarehouseContainerIndex from './views/WarehouseContainerIndex'
 import ContainerShelfIndex from './views/ContainerShelfIndex'
@@ -175,6 +176,15 @@ const router = new VueRouter({
             path: '/storage-types',
             name: 'storage-types',
             component: StorageTypeIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-warehouse-asset-index' 
+            }
+        },
+        {
+            path: '/container-types',
+            name: 'container-types',
+            component: ContainerTypeIndex,
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-warehouse-asset-index' 

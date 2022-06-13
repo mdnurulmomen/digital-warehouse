@@ -32,6 +32,11 @@
 							</div>
 
 							<div class="form-row">
+								<label class="col-sm-6 col-form-label font-weight-bold text-right">Container Type :</label>
+								<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.container_type ? singleAssetData.container_type.name : 'NA' | capitalize }}</label>
+							</div>
+
+							<div class="form-row">
 								<label class="col-sm-6 col-form-label font-weight-bold text-right">Length :</label>
 								<label class="col-sm-6 form-control-plaintext">{{ singleAssetData.length + ' ' + general_settings.default_measure_unit }}</label>
 							</div>
