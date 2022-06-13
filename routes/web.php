@@ -15,6 +15,18 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::get('/clear-cache', function() {
+    
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    // Artisan::call('event:clear');
+    // Artisan::call('optimize:clear');
+    return 'All cache has been flushed';
+
+});
+
 Route::name('merchant.')->group(function () {
 
 	Route::middleware(['auth'])->group(function () {
@@ -67,17 +79,5 @@ Route::name('website.')->group(function () {
 	Route::post('/contact-queries', 'WebsiteController@storeNewMessage')->name('contact-queries');
 	Route::post('/owners', 'WebsiteController@storeOwnerRegistrationRequest')->name('owners');
 	Route::post('/merchants', 'WebsiteController@storeMerchantRegistrationRequest')->name('merchants');
-
-});
-
-Route::get('/clear-cache', function() {
-    
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('route:clear');
-    Artisan::call('view:clear');
-    // Artisan::call('event:clear');
-    // Artisan::call('optimize:clear');
-    return 'All cache has been flushed';
 
 });

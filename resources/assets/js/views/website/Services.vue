@@ -1,6 +1,8 @@
 <template>
   <div>
-    <service-banners/>
+    <div class="hero-area">
+      <service-banners/>
+    </div>
 
     <main>
       <service-list/>

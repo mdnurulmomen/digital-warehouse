@@ -7,6 +7,7 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+// window.toastr = require('vue-toastr');
 
 // importing plugin
 import VueRouter from 'vue-router'

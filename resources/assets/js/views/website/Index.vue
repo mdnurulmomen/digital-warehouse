@@ -1,6 +1,8 @@
 <template>
 	<div>
-    <index-banners/>
+    <div class="hero-area">
+      <index-banners/>
+    </div>
 
     <main>
       <workflow-map/>

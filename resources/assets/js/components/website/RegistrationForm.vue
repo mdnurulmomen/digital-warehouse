@@ -404,7 +404,7 @@
 					<input 
 					type="text"
 					class="form-control"
-					v-model="singleOwnerRegistrationData.company" 
+					v-model="singleMerchantRegistrationData.company" 
 					placeholder="Place Your Company Name" 
 					:class="!errors.merchant.company ? 'is-valid' : 'is-invalid'" 
 					:readonly="formSubmitted" 

@@ -126,7 +126,7 @@
 					  	</span>
 					</div>
 
-					<div class="col-sm-12 text-right" v-show="!submitForm">
+					<div class="col-sm-12 text-center" v-show="!submitForm">
 						<span class="text-danger small">
 					  		**Please input required fields
 					  	</span>

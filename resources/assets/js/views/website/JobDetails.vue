@@ -1,6 +1,8 @@
 <template>
     <div>
-    	<job-detail-banner-list/>
+        <div class="hero-area">
+    	   <job-detail-banner-list/> 
+        </div>
 
     	<main>
     		<!-- Hero Area Started  -->

@@ -1,11 +1,8 @@
 <template>
-
 	<div class="pcoded-main-container">
 		<div class="pcoded-wrapper">
-
 			<nav class="pcoded-navbar">
 				<div class="nav-list">
-						
 					<div class="pcoded-inner-navbar main-menu">
 						<div class="pcoded-navigation-label">Navigation</div>
 

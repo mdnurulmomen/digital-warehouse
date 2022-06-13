@@ -8,7 +8,7 @@
 						<div class="col-md-8 tab-content" data-aos="zoom-in" data-aos-duration="1000">
 							<img
 							class="img-fluid responsive-margin"
-							:src="'/images/about-us-banner.jpg'"
+							:src="warehousePreviews[0]"
 							alt="img"
 							/>
 						</div>
@@ -16,16 +16,18 @@
 							<img
 							class="img-fluid small-img"
 							data-aos="zoom-in" data-aos-duration="1000"
-							:src="'/images/store-img-1.png'"
+							:src="warehousePreviews[1]" 
+							@click="changePreviewOrder(1)" 
 							alt="img"
 							/>
 							<img
 							class="img-fluid small-img"
 							data-aos="zoom-in" data-aos-duration="1000"
-							:src="'/images/store-img-2.png'"
+							:src="warehousePreviews[2]" 
+							@click="changePreviewOrder(2)" 
 							alt="img"
 							/>
-							<a href="" class="btn-book btn-width mx-auto" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Get A Quote</a>
+							<a href="javascript:void(0);" class="btn-book btn-width mx-auto" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Get A Quote</a>
 						</div>
 						<div class="col-12" data-aos="fade-up" data-aos-duration="1000">
 							<h3>GHB Building</h3>
@@ -673,8 +675,25 @@ Roughly how many basket do you need to store? *
 		},
 		data () {
 			return {
+				warehousePreviews : [
+					'/images/about-us-banner.jpg', '/images/store-img-1.png', '/images/store-img-2.png'
+				]
+			}
+		},
+		methods : {
+
+			changePreviewOrder(index) {
+
+				let tempImage = this.warehousePreviews[0];
+				
+				// this.warehousePreviews[0] = this.warehousePreviews[index];
+				// this.warehousePreviews[index] = tempImage;
+				
+				this.$set(this.warehousePreviews, 0, this.warehousePreviews[index]);
+				this.$set(this.warehousePreviews, index, tempImage);
 
 			}
+
 		}
 	}
 </script>

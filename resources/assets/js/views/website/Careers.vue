@@ -1,6 +1,8 @@
 <template>
   <div>
-    <career-banner-list/>
+    <div class="hero-area">
+      <career-banner-list/>
+    </div>
     
   	<main>
       <job-list/>
