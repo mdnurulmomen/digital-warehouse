@@ -87,7 +87,7 @@
               // this.$toastr.s("Your message has been successfully delivered", "Success");
               this.singleOwnerRegistrationData = {};
               this.registrationFormFailureMessage = {};
-              this.registrationFormSuccessMessage = "Submitted successfully, our agent will contact you soon";
+              this.registrationFormSuccessMessage = "Submitted successfully, We will contact you soon";
             }
           })
           .catch(error => {
@@ -115,7 +115,7 @@
               // this.$toastr.s("Your message has been successfully delivered", "Success");
               this.singleMerchantRegistrationData = {};
               this.registrationFormFailureMessage = {};
-              this.registrationFormSuccessMessage = "Submitted successfully, our agent will contact you soon";
+              this.registrationFormSuccessMessage = "Submitted successfully, We will contact you soon";
             }
           })
           .catch(error => {

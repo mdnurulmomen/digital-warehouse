@@ -223,9 +223,9 @@
 									:readonly="formSubmitted" 
 									>
 									<option value="" selected="selected"></option>
-									<option value="facility-size-1">< 10,000 sq ft</option>
-									<option value="facility-size-2">10,000 - 50,000 sq ft</option>
-									<option value="facility-size-3">50,000+ sq ft</option>
+									<option value="< 10,000 sq ft">< 10,000 sq ft</option>
+									<option value="10,000 - 50,000 sq ft">10,000 - 50,000 sq ft</option>
+									<option value="50,000+ sq ft">50,000+ sq ft</option>
 								</select>
 
 								<div class="invalid-feedback">
@@ -313,7 +313,25 @@
 					</div>
 				</div>
 
-				<div class="col-md-6 col-sm-12 form-group">
+				<div class="col-md-12 col-sm-12 form-group">
+					<label class="form-label">Company</label>
+					<input 
+					type="text"
+					class="form-control"
+					v-model="singleMerchantRegistrationData.company_name" 
+					placeholder="Place Your Company Name" 
+					:class="!errors.merchant.company_name ? 'is-valid' : 'is-invalid'" 
+					:readonly="formSubmitted" 
+					@change="validateFormInput('company_name')" 
+					/>
+
+					 
+					<div class="invalid-feedback">
+						{{ errors.merchant.company_name }}
+					</div> 
+				</div>
+
+				<div class="col-md-12 col-sm-12 form-group">
 					<label class="form-label">Email*</label>
 					<input
 					type="email"
@@ -347,7 +365,7 @@
 					</div>
 				</div>
 
-				<div class="col-md-12 col-sm-12 form-group">
+				<div class="col-md-6 col-sm-12 form-group">
 					<label class="form-label">Username*</label>
 					<input 
 					type="text" 
@@ -399,74 +417,120 @@
 					</div>
 				</div>
 
-				<div class="col-12 form-group">
-					<label class="form-label">Company*</label>
-					<input 
-					type="text"
-					class="form-control"
-					v-model="singleMerchantRegistrationData.company" 
-					placeholder="Place Your Company Name" 
-					:class="!errors.merchant.company ? 'is-valid' : 'is-invalid'" 
-					:readonly="formSubmitted" 
-					@change="validateFormInput('company')" 
-					/>
+				<div class="col-md-12 col-sm-12 form-group">
+					<label class="form-label
+					form-label-quote">
+					Select Warehouse
+				</label>
+				<select 
+				class="form-control is-valid" 
+				v-model="singleMerchantRegistrationData.warehouse_id" 
+				:readonly="formSubmitted" 
+				>
+				<option value="1" selected>Warehouse - 1</option>
+			</select>
 
-					<div class="invalid-feedback">
-						{{ errors.merchant.company }}
-					</div>
-				</div>
-				
-				<div class="col-md-12 col-sm-12 form-group mb-3">
-					<label class="form-label">
-						Required Size *
-					</label>
-					<select 
-					class="form-control" 
-					:class="!errors.merchant.required_size ? 'is-valid' : 'is-invalid'"
-					v-model="singleMerchantRegistrationData.required_size"
-					:readonly="formSubmitted" 
-					@change="validateFormInput('required_size')" 
-					>
-					<option value="" selected="selected"></option>
-					<option value="facility-size-1">< 10,000 sq ft</option>
-					<option value="facility-size-2">10,000 - 50,000 sq ft</option>
-					<option value="facility-size-3">50,000+ sq ft</option>
-				</select>
-
-				<div class="invalid-feedback">
-					{{ errors.merchant.required_size }}
-				</div>
-			</div>
-
-			<div class="col-md-12 col-sm-12 text-center" v-show="Object.keys(registrationFormFailureMessage).length > 0">
-				<ul>
-					<li 
-					class="text-danger text-start" 
-					v-for="x in registrationFormFailureMessage"
-					>
-					{{ x[0] }}
-				</li>
-			</ul>
+			<!-- 
+			<div class="invalid-feedback">
+				{{ errors.merchant.warehouse }}
+			</div> 
+			-->
 		</div>
 
-		<div class="col-md-12 col-sm-12 text-center" v-show="registrationFormSuccessMessage && Object.keys(registrationFormFailureMessage).length == 0 && Object.keys(errors.owner).length == 0 && Object.keys(errors.merchant).length == 0">
-			<span style="color: #23b8bf">
-				{{ registrationFormSuccessMessage }}
-			</span>
-		</div>
+		<div class="col-md-12 col-sm-12 form-group">
+			<label class="form-label form-label-quote">
+				How you want to store your products? *
+			</label>
+			<select 
+			class="form-control" 
+			v-model="singleMerchantRegistrationData.container_type_id" 
+			:class="!errors.merchant.container_type ? 'is-valid' : 'is-invalid'" 
+			:readonly="formSubmitted" 
+			@change="validateFormInput('container_type')" 
+			>
+			<option disabled selected>Required Space Type</option>
+			<option value="1">Grey Space</option>
+			<option value="2">Rack</option>
+			<option value="3">Pallet</option>
+		</select>
 
-		<div class="col-md-12 col-sm-12 text-center" v-show="! submitForm">
-			<span class="text-danger small">
-				**Please input required fields
-			</span>
+		<div class="invalid-feedback">
+			{{ errors.merchant.container_type }}
 		</div>
+	</div>
 
-		<div class="col-md-12 col-sm-12 text-center">
-			<button type="submit" class="more-btn w-100 btn btn-default" :disabled="formSubmitted">
-				Send Requirements
-			</button>
+	<div class="col-md-12 col-sm-12 form-group">
+		<label class="form-label form-label-quote">
+			Select your preferred rack specification * (LxWxH)
+		</label>
+		<select
+		class="form-control is-valid" 
+		v-model="singleMerchantRegistrationData.container_id" 
+		:readonly="formSubmitted" 
+		>
+		<option disabled selected>Required Rack Size</option>
+		<option value="1">56X28X17cm (100 Pcs Available)</option>
+		<option value="2">86X38X17cm (190 Pcs Available)</option>
+		<option value="3">76X48X17cm (50 Pcs Available)</option>
+	</select>
+
+			<!-- 
+			<div class="invalid-feedback">
+				{{ errors.merchant.container }}
+			</div> 
+		-->
+	</div>
+
+	<div class="col-md-12 col-sm-12 form-group mb-3">
+		<label class="form-label form-label-quote">
+			Roughly how many racks do you need ? *
+		</label>
+
+		<input 
+		type="number" 
+		class="form-control" 
+		v-model="singleMerchantRegistrationData.quantity" 
+		placeholder="Required Rack Number" 
+		:class="!errors.merchant.quantity ? 'is-valid' : 'is-invalid'" 
+		:readonly="formSubmitted" 
+		@change="validateFormInput('quantity')" 
+		/>
+
+		<div class="invalid-feedback">
+			{{ errors.merchant.quantity }}
 		</div>
-	</form>
+	</div> 
+
+
+	<div class="col-md-12 col-sm-12 text-center" v-show="Object.keys(registrationFormFailureMessage).length > 0">
+		<ul>
+			<li 
+			class="text-danger text-start" 
+			v-for="x in registrationFormFailureMessage"
+			>
+			{{ x[0] }}
+		</li>
+	</ul>
+</div>
+
+<div class="col-md-12 col-sm-12 text-center" v-show="registrationFormSuccessMessage && Object.keys(registrationFormFailureMessage).length == 0 && Object.keys(errors.owner).length == 0 && Object.keys(errors.merchant).length == 0">
+	<span style="color: #23b8bf">
+		{{ registrationFormSuccessMessage }}
+	</span>
+</div>
+
+<div class="col-md-12 col-sm-12 text-center" v-show="! submitForm">
+	<span class="text-danger small">
+		**Please input required fields
+	</span>
+</div>
+
+<div class="col-md-12 col-sm-12 text-center">
+	<button type="submit" class="more-btn w-100 btn btn-default" :disabled="formSubmitted">
+		Send Requirements
+	</button>
+</div>
+</form>
 </div>
 <div class="col-md-6 text-end">
 	<img
@@ -560,8 +624,11 @@
 				this.validateFormInput('merchant_user_name');
 				this.validateFormInput('merchant_password');
 				this.validateFormInput('merchant_password_confirmation');
-				this.validateFormInput('company');
-				this.validateFormInput('required_size');
+				this.validateFormInput('company_name');
+				// this.validateFormInput('warehouse');
+				this.validateFormInput('container_type');
+				// this.validateFormInput('container');
+				this.validateFormInput('quantity');
 
 				if (Object.keys(this.errors.merchant).length > 0) {
 					this.submitForm = false;
@@ -853,40 +920,86 @@
 
 					break;
 
-					case 'company' : 
+					case 'company_name' : 
 					
-					if (this.singleMerchantRegistrationData.company && ! this.singleMerchantRegistrationData.company.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+					if (this.singleMerchantRegistrationData.company_name && ! this.singleMerchantRegistrationData.company_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
 
-						this.errors.merchant.company = 'No special characters';
+						this.errors.merchant.company_name = 'No special characters';
 
 					}
 					else{
 						this.submitForm = true;
-						this.$delete(this.errors.merchant, 'company');
+						this.$delete(this.errors.merchant, 'company_name');
 					}
 
 					break;
 
-					case 'required_size' : 
-					
-					if (! this.singleMerchantRegistrationData.required_size) {
+					/*
+					case 'warehouse' :
 
-						this.errors.merchant.required_size = 'Size is required';
+					if (! this.singleMerchantRegistrationData.warehouse) {
+						this.errors.merchant.warehouse = 'Warehouse is required';
+							// this.$set(this.errors.merchant, 'warehouse', 'Warehouse is required');
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.merchant, 'warehouse');
+						}
+
+						break;
+					*/
+
+						case 'container_type' :
+
+						if (! this.singleMerchantRegistrationData.container_type_id) {
+							this.errors.merchant.container_type = 'Space type is required';
+							// this.$set(this.errors.merchant, 'container_type', 'Space type is required');
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors.merchant, 'container_type');
+						}
+
+						break;
+						
+					/*
+					case 'container' :
+
+						if (! this.singleMerchantRegistrationData.container) {
+							this.errors.merchant.container = 'Space size is required';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'container');
+						}
+
+						break;
+						*/
+
+						case 'quantity' :
+
+						if (! this.singleMerchantRegistrationData.quantity) {
+							this.errors.merchant.quantity = 'Quantity is required';
+							// this.$set(this.errors.merchant, 'quantity', 'Quantity is required');
+						}
+						else if (this.singleMerchantRegistrationData.quantity < 1) {
+							this.errors.merchant.quantity = 'Invalid quantity';
+							// this.$set(this.errors.merchant, 'quantity', 'Invalid quantity');
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors.merchant, 'quantity');
+						}
+
+						break;
+						
 
 					}
-					else{
-						this.submitForm = true;
-						this.$delete(this.errors.merchant, 'required_size');
-					}
-
-					break;
-					
 				}
+
 			}
-
 		}
-	}
-</script>
+	</script>
 
-<style lang="css" scoped>
+	<style lang="css" scoped>
 </style>

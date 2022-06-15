@@ -71,9 +71,9 @@ class Merchant extends Authenticatable
         return $this->hasMany(MerchantProduct::class, 'merchant_id', 'id');
     }
 
-    public function spaceRequired()
+    public function requirements()
     {
-        return $this->hasOne(MerchantRequirement::class, 'merchant_id', 'id');
+        return $this->hasMany(MerchantRequirement::class, 'merchant_id', 'id');
     }
     
 

@@ -15,9 +15,14 @@ class CreateMerchantRequirementsTable extends Migration
     {
         Schema::create('merchant_requirements', function (Blueprint $table) {
             $table->mediumIncrements('id');
-            $table->unsignedTinyInteger('company')->nullable();
-            $table->string('required_size');
-            $table->unsignedSmallInteger('merchant_id');
+            $table->string('industry')->nullable();
+            $table->unsignedSmallInteger('warehouse_id')->nullable();
+            $table->unsignedTinyInteger('container_type_id');
+            $table->unsignedTinyInteger('container_id')->nullable();
+            $table->unsignedTinyInteger('quantity');
+            $table->text('message')->nullable();
+            $table->boolean('status')->default(true);   // 1 for not reviewed / 0 for reviewed
+            $table->unsignedInteger('merchant_id');
         });
     }
 
