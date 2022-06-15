@@ -21,7 +21,7 @@ class WebsiteController extends Controller
             'first_name' => 'required_without:last_name|string|max:50',
             'last_name' => 'required_without:first_name|string|max:50',
             'email' => 'required|email|max:50',
-            'contact_no' => 'required|regex:/(01)[0-9]{9}/',
+            'mobile' => 'required|regex:/(01)[0-9]{9}/',
             'subject' => 'required_without:last_name|string|max:255',
             'message' => 'required|string|max:65500'
         ]);
@@ -31,7 +31,7 @@ class WebsiteController extends Controller
         $newQuery->first_name = strtolower($request->first_name);
         $newQuery->last_name = strtolower($request->last_name);
         $newQuery->email = strtolower($request->email);
-        $newQuery->contact_no = $request->contact_no;
+        $newQuery->mobile = $request->mobile;
         $newQuery->subject = strtolower($request->subject);
         $newQuery->message = strtolower($request->message);
 
@@ -47,6 +47,7 @@ class WebsiteController extends Controller
         $request->validate([
             'first_name' => 'required_without:last_name|string|max:100',
             'last_name' => 'required_without:first_name|string|max:100',
+            'company_name' => 'nullable|string|max:100',
             'user_name' => 'required|string|max:100|unique:warehouse_owners,user_name',
             'email' => 'required|string|max:100|unique:warehouse_owners,email',
             'mobile' => 'required|string|max:50|unique:warehouse_owners,mobile',
@@ -59,6 +60,7 @@ class WebsiteController extends Controller
 
         $newOwner->first_name = strtolower($request->first_name);
         $newOwner->last_name = strtolower($request->last_name);
+        $newOwner->company_name = strtolower($request->company_name);
         $newOwner->user_name = strtolower($request->user_name);
         $newOwner->email = strtolower($request->email);
         $newOwner->mobile = $request->mobile;
@@ -88,18 +90,22 @@ class WebsiteController extends Controller
         $request->validate([
             'first_name' => 'required_without:last_name|string|max:100',
             'last_name' => 'required_without:first_name|string|max:100',
+            'company_name' => 'nullable|string|max:100',
             'user_name' => 'required|string|max:100|unique:merchants,user_name',
             'email' => 'required|string|max:100|unique:merchants,email',
             'mobile' => 'required|string|max:50|unique:merchants,mobile',
             'password' => 'required|string|max:255|confirmed',
-            'company' => 'nullable|string|max:255',
-            'required_size' => 'required|string|max:255'
+            'warehouse_id' => 'nullable|numeric|exists:warehouses,id',
+            'container_type_id' => 'required|numeric|exists:container_types,id',
+            'container_id' => 'nullable|numeric|exists:containers,id',
+            'quantity' => 'required|numeric|min:1'
         ]);
 
         $newMerchant = new Merchant();
 
         $newMerchant->first_name = strtolower($request->first_name);
         $newMerchant->last_name = strtolower($request->last_name);
+        $newMerchant->company_name = strtolower($request->company_name);
         $newMerchant->user_name = strtolower($request->user_name);
         $newMerchant->email = strtolower($request->email);
         $newMerchant->mobile = $request->mobile;
@@ -107,9 +113,11 @@ class WebsiteController extends Controller
         
         $newMerchant->save();
 
-        $newMerchant->spaceRequired()->create([
-            'company' => $request->company,
-            'required_size' => $request->required_size
+        $newMerchant->requirements()->create([
+            'warehouse_id' =>  $request->warehouse_id, 
+            'container_type_id' =>  $request->container_type_id, 
+            'container_id' =>  $request->container_id, 
+            'quantity' =>  $request->quantity, 
         ]);
 
         /*
@@ -121,6 +129,57 @@ class WebsiteController extends Controller
 
         return response()->json([
             'name' => ucfirst($newMerchant->first_name).' '.ucfirst($newMerchant->last_name),
+        ], 200);
+    }
+
+    public function submitQuotation(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required_without:last_name|string|max:100',
+            'last_name' => 'required_without:first_name|string|max:100',
+            'company_name' => 'nullable|string|max:100',
+            'email' => 'required|string|max:100',
+            'mobile' => 'required|string|max:50',
+            // 'user_name' => 'required|string|max:100|unique:merchants,user_name',
+            // 'password' => 'required|string|max:255|confirmed',
+            'industry' => 'required|string|max:255',
+            'warehouse_id' => 'required|numeric|exists:warehouses,id',
+            'container_type_id' => 'required|numeric|exists:container_types,id',
+            'container_id' => 'nullable|numeric|exists:containers,id',
+            'quantity' => 'required|numeric',
+            'message' => 'nullable|string|max:6500'
+        ]);
+
+        $merchant = Merchant::where('user_name', strtolower(str_replace(" ","", ($request->first_name.$request->last_name))))
+                    ->orWhere('email', strtolower($request->email))
+                    ->orWhere('mobile', $request->mobile)
+                    ->firstOr(function () use ($request) { 
+                        return Merchant::create([
+                            'first_name' => strtolower($request->first_name),
+                            'last_name' => strtolower($request->last_name),
+                            'company_name' => strtolower($request->company_name),
+                            'user_name' => strtolower(str_replace(" ","", ($request->first_name.$request->last_name))),
+                            'email' => strtolower($request->email),
+                            'mobile' => $request->mobile,
+                            'password' => Hash::make('12345678'),
+                        ]);
+                    });
+
+        $requirement = $merchant->requirements()->firstOrCreate(
+            [
+                'warehouse_id' => $request->warehouse_id,
+                'industry' => strtolower($request->industry),
+                'container_type_id' =>  $request->container_type_id, 
+                'container_id' =>  $request->container_id, 
+                'quantity' =>  $request->quantity, 
+            ],
+            [
+                'message' => strtolower($request->message),
+            ]
+        );
+
+        return response()->json([
+            'name' => ucfirst($merchant->first_name).' '.ucfirst($merchant->last_name),
         ], 200);
     }
 }

@@ -949,57 +949,59 @@
 						break;
 					*/
 
-						case 'container_type' :
+					case 'container_type' :
 
-						if (! this.singleMerchantRegistrationData.container_type_id) {
-							this.errors.merchant.container_type = 'Space type is required';
-							// this.$set(this.errors.merchant, 'container_type', 'Space type is required');
-						}
-						else{
-							this.submitForm = true;
-							this.$delete(this.errors.merchant, 'container_type');
-						}
+					if (! this.singleMerchantRegistrationData.container_type_id) {
+						this.errors.merchant.container_type = 'Space type is required';
+						// this.$set(this.errors.merchant, 'container_type', 'Space type is required');
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'container_type');
+					}
 
-						break;
+					break;
 						
 					/*
 					case 'container' :
 
-						if (! this.singleMerchantRegistrationData.container) {
-							this.errors.merchant.container = 'Space size is required';
-						}
-						else{
-							this.submitForm = true;
-							this.$delete(this.errors, 'container');
-						}
+					if (! this.singleMerchantRegistrationData.container) {
+						this.errors.merchant.container = 'Space size is required';
+					}
+					else{
+						this.submitForm = true;
+						this.$delete(this.errors, 'container');
+					}
 
-						break;
-						*/
+					break;
+					*/
 
-						case 'quantity' :
+					case 'quantity' :
 
-						if (! this.singleMerchantRegistrationData.quantity) {
-							this.errors.merchant.quantity = 'Quantity is required';
-							// this.$set(this.errors.merchant, 'quantity', 'Quantity is required');
-						}
-						else if (this.singleMerchantRegistrationData.quantity < 1) {
-							this.errors.merchant.quantity = 'Invalid quantity';
-							// this.$set(this.errors.merchant, 'quantity', 'Invalid quantity');
-						}
-						else {
-							this.submitForm = true;
-							this.$delete(this.errors.merchant, 'quantity');
-						}
+					if (! this.singleMerchantRegistrationData.quantity) {
+						this.errors.merchant.quantity = 'Quantity is required';
+						// this.$set(this.errors.merchant, 'quantity', 'Quantity is required');
+					}
+					else if (this.singleMerchantRegistrationData.quantity < 1) {
+						this.errors.merchant.quantity = 'Invalid quantity';
+						// this.$set(this.errors.merchant, 'quantity', 'Invalid quantity');
+					}
+					else {
+						this.submitForm = true;
+						this.$delete(this.errors.merchant, 'quantity');
+					}
 
-						break;
+					break;
 						
 
-					}
 				}
 
 			}
-		}
-	</script>
 
-	<style lang="css" scoped>
+		}
+		
+	}
+</script>
+
+<style lang="css" scoped>
 </style>
