@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Storage;
 use App\Models\Merchant;
+use App\Models\Applicant;
+use App\Models\JobApplicant;
 use App\Models\ContactQuery;
 use Illuminate\Http\Request;
 use App\Models\WarehouseOwner;
+use App\Models\ApplicantResume;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 
 class WebsiteController extends Controller
@@ -180,6 +185,74 @@ class WebsiteController extends Controller
 
         return response()->json([
             'name' => ucfirst($merchant->first_name).' '.ucfirst($merchant->last_name),
+        ], 200);
+    }
+
+    public function submitJobApplication(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required_without:last_name|string|max:100',
+            'last_name' => 'required_without:first_name|string|max:100',
+            'email' => 'required|email|max:100',
+            'mobile' => 'required|string|max:50|regex:/(01)[0-9]{9}/',
+            'address' => 'nullable|string|max:255',
+            'educational_highest_level' => 'nullable|string',
+            'resume' => 'required|file|mimes:doc,pdf,docx|max:2048',
+            'job_id' => [
+                'required', 'numeric', 
+                // Rule::exists('jobs', 'id')                     
+                // ->where('status', 1),      
+            ]
+        ]);
+
+        $newApplicant = Applicant::where('email', strtolower($request->email))
+        ->where('mobile', $request->mobile)
+        ->firstOr(function () use ($request) { 
+            return Applicant::create([
+                'first_name' => strtolower($request->first_name),
+                'last_name' => strtolower($request->last_name),
+                'email' => strtolower($request->email),
+                'mobile' => $request->mobile,
+                'address' => $request->address,
+                'educational_highest_level' => $request->educational_highest_level
+            ]);
+        });
+
+        if(Storage::disk('public')->exists($newApplicant->resume->path)){
+            
+            Storage::disk('public')->delete($newApplicant->resume->path);
+
+        }
+
+        $file = $request->file('resume');
+        
+        $path = 'applicants/';
+        $name = $newApplicant->id.'.'.$file->extension();
+        
+        $file->storePubliclyAs($path, $name, 'public');
+
+        ApplicantResume::updateOrCreate(
+            [
+                'applicant_id' => $newApplicant->id
+            ],
+            [
+                'path' => ($path.$name)
+            ]
+        );
+
+        JobApplicant::updateOrCreate(
+            [ 
+                'applicant_id' => $newApplicant->id, 
+                'job_id' => $request->job_id 
+            ], 
+            [
+                'created_at' => now(), 
+                'updated_at' => now() 
+            ]
+        );
+
+        return response()->json([
+            'name' => ucfirst($newApplicant->first_name).' '.ucfirst($newApplicant->last_name),
         ], 200);
     }
 }

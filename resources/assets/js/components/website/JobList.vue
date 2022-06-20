@@ -9,7 +9,7 @@
                 <p>2 jobs</p>
               </div>
             </div>
-            <router-link style="color:#000000" :to="{ name: 'job-details' }">
+            <router-link style="color:#000000" :to="{ name: 'job-details', params: { id: 1 }}">
               <div class="row list-jobs">
                 <div class="col-12 col-md-8">
                   <h6><b>Warehouse Manager</b></h6>
@@ -31,7 +31,7 @@
               </div>
             </router-link>
 
-            <router-link style="color:#000000" :to="{ name: 'job-details' }">
+            <router-link style="color:#000000" :to="{ name: 'job-details', params: { id: 2 } }">
               <div class="row list-jobs">
                 <div class="col-12 col-md-8">
                   <h6><b>Warehouse Picker / Packer</b></h6>

@@ -80,5 +80,6 @@ Route::name('website.')->group(function () {
 	Route::post('/owners', 'WebsiteController@storeOwnerRegistrationRequest')->name('owners');
 	Route::post('/merchants', 'WebsiteController@storeMerchantRegistrationRequest')->name('merchants');
 	Route::post('/quotations', 'WebsiteController@submitQuotation')->name('quotations');
+	Route::post('/jobs', 'WebsiteController@submitJobApplication')->name('jobs');
 
 });
