@@ -30,10 +30,10 @@
       ></button>
     </div>
     <div class="carousel-inner">
-      <div class="carousel-item active bg-1">
+      <div class="carousel-item active bg-1" style="background-image: url('../website/index/banner.jpg')">
         <div class="container-fluid" data-aos="fade-right" data-aos-duration="1000">
           <div class="row align-items-center" style="height: 450px">
-            <div class="col-lg-7 col-9 slider-content slider-content">
+            <div class="col-lg-7 col-9 slider-content">
               <div class="slider-content-margin">
                 <h1 class="text-white">Find Your Perfect Space</h1>
                 <p class="text-white">Search online - see space fast</p>
@@ -45,8 +45,7 @@
           </div>
         </div>
       </div>
-      <div
-      class="carousel-item bg-2">
+      <div class="carousel-item bg-2" style="background-image: url('../website/index/banner-2.jpg')">
       <div class="container-fluid">
         <div class="row align-items-center" style="height: 450px">
           <div class="col-lg-7 col-9 slider-content">
@@ -61,7 +60,7 @@
         </div>
       </div>
     </div>
-    <div class="carousel-item bg-3">
+    <div class="carousel-item bg-3" style="background-image: url('../website/index/banner-3.jpg')">
       <div class="container-fluid">
         <div class="row align-items-center" style="height: 450px">
           <div class="col-lg-7 col-9 slider-content">

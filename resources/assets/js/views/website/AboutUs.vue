@@ -16,7 +16,7 @@
               </p>
             </div>
             <div class="col-md-6" data-aos="zoom-in" data-aos-duration="1000">
-              <img class="img-fluid" :src="'images/about-3.png'" alt="img" />
+              <img class="img-fluid" :src="'website/about/about-3.png'" alt="img" />
             </div>
           </div>
         </div>

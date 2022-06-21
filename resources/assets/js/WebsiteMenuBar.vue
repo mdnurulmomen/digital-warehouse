@@ -14,8 +14,9 @@
       <div class="container">
         <router-link class="navbar-brand" :to="{ name: 'home' }">
           <img
-          :src="'/icon/logo.png'"
-          alt="logo"
+          alt="logo" 
+          style="max-width: 70px" 
+          :src="'system/logo.png'"
           class="d-inline-block align-text-top"
           />
         </router-link>

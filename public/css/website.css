@@ -230,7 +230,7 @@ body {
     }
 
     .bg-1 {
-      background-image: url("../images/banner.jpg");
+      /*background-image: url("../website/index/banner.jpg");*/
       background-position: center;
       background-size: cover;
       height: 450px;
@@ -248,7 +248,7 @@ body {
       opacity: 0.1;
     }
     .bg-jobs {
-      background-image: url("../images/banner.jpg");
+      /*background-image: url("../website/index/banner.jpg");*/
       background-position: center;
       background-size: cover;
       height: 200px;
@@ -267,7 +267,7 @@ body {
     }
 
     .bg-2 {
-      background-image: url("../images/banner-2.jpg");
+      /*background-image: url("../website/index/banner-2.jpg");*/
       background-position: center;
       background-size: cover;
       height: 450px;
@@ -286,7 +286,7 @@ body {
     }
 
     .bg-3 {
-      background-image: url("../images/banner-3.jpg");
+      /*background-image: url("../website/index/banner-3.jpg");*/
       background-position: center;
       background-size: cover;
       height: 450px;
@@ -311,7 +311,7 @@ body {
   }*/
   .slider-content {
     height: 450px;
-    background-image: url("../images/carousel-bg.png");
+    background-image: url("../website/index/carousel-bg.png");
     background-size: cover;
     background-position: right;
     background-repeat: no-repeat;
@@ -323,7 +323,7 @@ body {
   }
   .slider-content-jobs {
     height: 200px;
-    background-image: url("../images/carousel-bg.png");
+    background-image: url("../website/index/carousel-bg.png");
     background-size: cover;
     background-position: right;
     background-repeat: no-repeat;
@@ -537,6 +537,7 @@ body {
     text-align: center;
     color: #fff;
     border-radius: 5px;
+    margin-left: auto;
   }
 
   .network {
@@ -1424,7 +1425,7 @@ body {
   font-weight: 600;
   font-size: 28px;
   color: #2b2b2b;
-  margin-top: 40px;
+  /*margin-top: 40px;*/
   margin-bottom: 20px;
 }
 
@@ -1440,11 +1441,11 @@ body {
 }
 
 .store-img .small-img {
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 
 .btn-width {
-  max-width: 370px;
+  max-width: 150px;
 }
 
 .details-heading {

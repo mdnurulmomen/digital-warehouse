@@ -126,7 +126,7 @@
                   <div class="tab-pane mt-5 fade show active" id="connect-your-brand" role="tabpanel" aria-labelledby="connect-your-brand-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/move-fast.jpg" alt="Move Fast" />
+                        <img class="img-fluid" src="website/services/move-fast.jpg" alt="Move Fast" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Move Fast</h4>
@@ -137,7 +137,7 @@
                   <div class="tab-pane mt-5 fade" id="optimize-inventory" role="tabpanel" aria-labelledby="optimize-inventory-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/set-up-control-tower.jpg" alt="Set up Control Tower" />
+                        <img class="img-fluid" src="website/services/set-up-control-tower.jpg" alt="Set up Control Tower" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Set up Control Tower</h4>
@@ -148,7 +148,7 @@
                   <div class="tab-pane mt-5 fade" id="omnichannel-operations" role="tabpanel" aria-labelledby="omnichannel-operations-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/improve-operations.jpg" alt="Improve Operations" />
+                        <img class="img-fluid" src="website/services/improve-operations.jpg" alt="Improve Operations" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Improve Operations</h4>
@@ -159,7 +159,7 @@
                   <div class="tab-pane mt-5 fade" id="fast-affordable-fulfillment" role="tabpanel" aria-labelledby="fast-affordable-fulfillment-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/fast-affordable-fulfillment.jpg" alt="Fast Affordable Fulfillment" />
+                        <img class="img-fluid" src="website/services/fast-affordable-fulfillment.jpg" alt="Fast Affordable Fulfillment" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Satisfy customer demand for speedy shipping</h4>
@@ -221,7 +221,7 @@
                   <div class="tab-pane mt-5 fade show active" id="order-fulfillment" role="tabpanel" aria-labelledby="order-fulfillment-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/order-fulfillment.jpg" alt="Order Fulfillment" />
+                        <img class="img-fluid" src="website/services/order-fulfillment.jpg" alt="Order Fulfillment" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Order Fulfillment</h4>
@@ -232,7 +232,7 @@
                   <div class="tab-pane mt-5 fade" id="transportation-services" role="tabpanel" aria-labelledby="transportation-services-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/transportation-services.jpg" alt="Transportation Services" />
+                        <img class="img-fluid" src="website/services/transportation-services.jpg" alt="Transportation Services" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Transportation Services</h4>
@@ -243,7 +243,7 @@
                   <div class="tab-pane mt-5 fade" id="agent-service" role="tabpanel" aria-labelledby="agent-service-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/agent-service.jpg" alt="Agent Service" />
+                        <img class="img-fluid" src="website/services/agent-service.jpg" alt="Agent Service" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Agent Service</h4>
@@ -254,7 +254,7 @@
                   <div class="tab-pane mt-5 fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
                     <div class="spec-tabs-content">
                       <div class="col-md-5">
-                        <img class="img-fluid" src="images/warehouse-fulfillment/shipping.jpg" alt="Shipping" />
+                        <img class="img-fluid" src="website/services/shipping.jpg" alt="Shipping" />
                       </div>
                       <div class="col-md-7 content-box">
                         <h4>Shipping</h4>
@@ -314,7 +314,7 @@
                 <div class="tab-pane mt-5 fade show active" id="connect-your-brand2" role="tabpanel" aria-labelledby="connect-your-brand-tab2">
                   <div class="spec-tabs-content">
                     <div class="col-md-5">
-                      <img class="img-fluid" src="images/connect-your-brand.jpg" alt="img" />
+                      <img class="img-fluid" src="website/services/connect-your-brand.jpg" alt="img" />
                     </div>
                     <div class="col-md-7 content-box">
                       <h4>Connect your brand with Flowspace</h4>
@@ -325,7 +325,7 @@
                 <div class="tab-pane mt-5 fade" id="optimize-inventory2" role="tabpanel" aria-labelledby="optimize-inventory-tab2">
                   <div class="spec-tabs-content">
                     <div class="col-md-5">
-                      <img class="img-fluid" src="images/connect-your-brand.jpg" alt="img" />
+                      <img class="img-fluid" src="website/services/connect-your-brand.jpg" alt="img" />
                     </div>
                     <div class="col-md-7 content-box">
                       <h4>Optimize Inventory</h4>
@@ -336,7 +336,7 @@
                 <div class="tab-pane mt-5 fade" id="omnichannel-operations2" role="tabpanel" aria-labelledby="omnichannel-operations-tab2">
                   <div class="spec-tabs-content">
                     <div class="col-md-5">
-                      <img class="img-fluid" src="images/connect-your-brand.jpg" alt="img" />
+                      <img class="img-fluid" src="website/services/connect-your-brand.jpg" alt="img" />
                     </div>
                     <div class="col-md-7 content-box">
                       <h4>Omnichannel Operations</h4>
@@ -347,7 +347,7 @@
                 <div class="tab-pane mt-5 fade" id="fast-affordable-fulfillment2" role="tabpanel" aria-labelledby="fast-affordable-fulfillment-tab2">
                   <div class="spec-tabs-content">
                     <div class="col-md-5">
-                      <img class="img-fluid" src="images/connect-your-brand.jpg" alt="img" />
+                      <img class="img-fluid" src="website/services/connect-your-brand.jpg" alt="img" />
                     </div>
                     <div class="col-md-7 content-box">
                       <h4>Fast, Affordable Fulfillment</h4>

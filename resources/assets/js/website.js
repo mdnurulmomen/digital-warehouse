@@ -72,9 +72,17 @@ const router = new VueRouter({
             component: Warehouses
         },
         {
-            path: '/warehouses/:id?',
+            path: '/warehouses/:id',
             name: 'warehouse-details',
-            component: WarehouseDetails
+            component: WarehouseDetails,
+            beforeEnter: (to, from, next) => {
+                if (to.params.id) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/warehouses');
+                }
+            }
         },
         {
             path: '/contact-us',
@@ -87,9 +95,17 @@ const router = new VueRouter({
             component: Careers
         },
         {
-            path: '/jobs/:id?',
+            path: '/jobs/:id',
             name: 'job-details',
-            component: JobDetails
+            component: JobDetails,
+            beforeEnter: (to, from, next) => {
+                if (to.params.id) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/careers');
+                }
+            }
         },
         {
             path: '/registrations',

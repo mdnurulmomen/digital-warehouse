@@ -8,7 +8,7 @@
   <title>Gudam | Your Warehouse Solution</title>
   <!-- Font Awesome Intigration -->
   <script src="https://kit.fontawesome.com/fbaa2d6b3e.js" crossorigin="anonymous"></script>
-  <link rel="icon" type="image/x-icon" href="{{asset('/icon/favicon.svg')}}">
+  <link rel="icon" type="image/x-icon" href="{{asset('system/favicon.png')}}">
   <!-- Bootstrap Intigration -->
   <link rel="stylesheet" href="{{asset('/css/bootstrap5.min.css')}}" />
   <!-- CSS Intigration  -->

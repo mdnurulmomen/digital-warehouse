@@ -6,7 +6,7 @@
 				<div class="col-12">
 					<h3 class="title mb-5">Gudam Fulfillment Network</h3>
 					<img
-					:src="'/images/map.gif'"
+					:src="'/website/index/map.gif'"
 					alt="img"
 					class="my-5 img-fluid"
 					/>

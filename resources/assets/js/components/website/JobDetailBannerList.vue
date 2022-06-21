@@ -7,8 +7,7 @@
 		data-bs-ride="carousel"
 		>
 			<div class="carousel-inner">
-				<div class="carousel-item active bg-jobs"
-				style="background-image: url(images/bg-2.png)">
+				<div class="carousel-item active bg-jobs" style="background-image: url('/website/career/banner.jpg')">
 					<div class="container-fluid" data-aos="fade-right" data-aos-duration="1000">
 						<div class="row align-items-center" style="height: 200px">
 							<div class="col-lg-7 col-9 slider-content-jobs">

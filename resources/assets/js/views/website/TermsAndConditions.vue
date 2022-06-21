@@ -4,7 +4,7 @@
       <!-- Hero Area Started  -->
       <section
       class="hero-area"
-      style="background-image: url(images/terms-bg.png)"
+      style="background-image: url(website/conditions/terms-bg.png)"
       >
       <div class="container">
         <div class="row g-0">

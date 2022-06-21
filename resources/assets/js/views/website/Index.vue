@@ -7,7 +7,7 @@
     <main>
       <workflow-map/>
       <network-map/>
-      <partner-list/>
+      <customer-list/>
       <query-contact/>
 
       <!-- Warehouse Section Started -->
@@ -239,14 +239,14 @@
   import IndexBanners from '../../components/website/IndexBanners.vue'
   import WorkflowMap from '../../components/website/WorkflowMap.vue'
   import NetworkMap from '../../components/website/NetworkMap.vue'
-  import PartnerList from '../../components/website/PartnerList.vue'
+  import CustomerList from '../../components/website/CustomerList.vue'
 
 	export default {
     components: {
       IndexBanners, 
       WorkflowMap, 
       NetworkMap,
-      PartnerList
+      CustomerList
     },
     mounted() {
       AOS.init({once: true});

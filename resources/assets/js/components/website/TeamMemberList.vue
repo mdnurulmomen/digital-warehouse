@@ -7,7 +7,7 @@
               <div class="main">
                 <div class="team-profile-card mb-5">
                   <div class="img">
-                    <img :src="'images/team/mohammed-abdus-salam.jpg'" alt="profile-img">
+                    <img :src="'website/about/mohammed-abdus-salam.jpg'" alt="profile-img">
                   </div>
                   <div class="team-caption">
                     <h3>Colonel Mohammad Abdus Salam BP (Retd)</h3>
@@ -20,7 +20,7 @@
                 </div>
                 <div class="team-profile-card mb-5">
                   <div class="img">
-                    <img :src="'images/team/samit-bin-salam.jpg'" alt="profile-img">
+                    <img :src="'website/about/samit-bin-salam.jpg'" alt="profile-img">
                   </div>
                   <div class="team-caption">
                     <h3>Samit Bin Salam</h3>

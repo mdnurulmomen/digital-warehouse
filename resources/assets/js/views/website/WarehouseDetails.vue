@@ -5,9 +5,9 @@
 			<section class="store-img">
 				<div class="container">
 					<div class="row">
-						<div class="col-md-8 tab-content" data-aos="zoom-in" data-aos-duration="1000">
+						<div class="col-md-8 tab-content" data-aos="zoom-in" data-aos-duration="1000" style="margin-bottom: 20px">
 							<img
-							class="img-fluid responsive-margin"
+							class="img-fluid"
 							:src="warehousePreviews[0]"
 							alt="img"
 							/>
@@ -27,14 +27,18 @@
 							@click="changePreviewOrder(2)" 
 							alt="img"
 							/>
-							<a href="javascript:void(0);" class="btn-book btn-width mx-auto" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Get A Quote</a>
 						</div>
-						<div class="col-12" data-aos="fade-up" data-aos-duration="1000">
+					</div>
+					<div class="row align-items-center mt-2">
+						<div class="col-md-6" data-aos="fade-up" data-aos-duration="1000">
 							<h3>GHB Building</h3>
 							<p>
 								<span class="me-3"><i class="fas fa-map-marker-alt"></i></span>
 								1/A, HB Tower, Gulsan-1, Dhaka, Bangladesh
 							</p>
+						</div>
+						<div class="col-md-6" data-aos="fade-up" data-aos-duration="1000">
+							<a href="javascript::void(0)" class="btn-book btn-width" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Get A Quote</a>
 						</div>
 					</div>
 				</div>
@@ -51,256 +55,256 @@
 						<div class="modal-body">
 							<!-- Form -->
 							<form 
-								class="row g-3 form-bg form-bg-quote" 
-								@submit.prevent="submitQuotation()" 
-								autocomplete="off" 
+							class="row g-3 form-bg form-bg-quote" 
+							@submit.prevent="submitQuotation()" 
+							autocomplete="off" 
 							>
-								<div class="col-md-6 col-sm-12 form-group">
-									<label class="form-label form-label-quote">First Name *</label>
-									<input 
-									type="text" 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.first_name" 
-									placeholder="Place Your First Name" 
-									:class="!errors.first_name ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('first_name')"  
-									/>
+							<div class="col-md-6 col-sm-12 form-group">
+								<label class="form-label form-label-quote">First Name *</label>
+								<input 
+								type="text" 
+								class="form-control" 
+								v-model="singleWarehouseQuotationData.first_name" 
+								placeholder="Place Your First Name" 
+								:class="!errors.first_name ? 'is-valid' : 'is-invalid'" 
+								:readonly="formSubmitted" 
+								@change="validateFormInput('first_name')"  
+								/>
 
-									<div class="invalid-feedback">
-							        	{{ errors.first_name }}
-							  		</div>
+								<div class="invalid-feedback">
+									{{ errors.first_name }}
 								</div>
-								<div class="col-md-6 col-sm-12 form-group">
-									<label class="form-label form-label-quote">Last Name *</label>
-									<input 
-									type="text" 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.last_name" 
-									placeholder="Place Your Last Name" 
-									:class="!errors.last_name ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('last_name')" 
-									/>
+							</div>
+							<div class="col-md-6 col-sm-12 form-group">
+								<label class="form-label form-label-quote">Last Name *</label>
+								<input 
+								type="text" 
+								class="form-control" 
+								v-model="singleWarehouseQuotationData.last_name" 
+								placeholder="Place Your Last Name" 
+								:class="!errors.last_name ? 'is-valid' : 'is-invalid'" 
+								:readonly="formSubmitted" 
+								@change="validateFormInput('last_name')" 
+								/>
 
-									<div class="invalid-feedback">
-							        	{{ errors.last_name }}
-							  		</div>
+								<div class="invalid-feedback">
+									{{ errors.last_name }}
 								</div>
+							</div>
 
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label form-label-quote">Company *</label>
-									<input 
-									type="text" 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.company_name" 
-									placeholder="Place Your Company Name" 
-									:class="!errors.company_name ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('company_name')" 
-									/>
+							<div class="col-md-12 col-sm-12 form-group">
+								<label class="form-label form-label-quote">Company *</label>
+								<input 
+								type="text" 
+								class="form-control" 
+								v-model="singleWarehouseQuotationData.company_name" 
+								placeholder="Place Your Company Name" 
+								:class="!errors.company_name ? 'is-valid' : 'is-invalid'" 
+								:readonly="formSubmitted" 
+								@change="validateFormInput('company_name')" 
+								/>
 
-									<div class="invalid-feedback">
-							        	{{ errors.company_name }}
-							  		</div>
+								<div class="invalid-feedback">
+									{{ errors.company_name }}
 								</div>
+							</div>
 
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label form-label-quote">Email *</label>
-									<input
-									type="email" 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.email" 
-									placeholder="Place Your Email" 
-									:class="!errors.email ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('email')" 
-									/>
+							<div class="col-md-12 col-sm-12 form-group">
+								<label class="form-label form-label-quote">Email *</label>
+								<input
+								type="email" 
+								class="form-control" 
+								v-model="singleWarehouseQuotationData.email" 
+								placeholder="Place Your Email" 
+								:class="!errors.email ? 'is-valid' : 'is-invalid'" 
+								:readonly="formSubmitted" 
+								@change="validateFormInput('email')" 
+								/>
 
-									<div class="invalid-feedback">
-							        	{{ errors.email }}
-							  		</div>
+								<div class="invalid-feedback">
+									{{ errors.email }}
 								</div>
-								
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label form-label-quote">Contact No *</label>
-									<input
-									type="tel" 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.mobile" 
-									placeholder="Place Your Contact Number" 
-									:class="!errors.mobile ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('mobile')" 
-									/>
+							</div>
 
-									<div class="invalid-feedback">
-							        	{{ errors.mobile }}
-							  		</div>
-								</div>
-								
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label form-label-quote">Industry *</label><br>
-									<select 
-										class="form-control" 
-										v-model="singleWarehouseQuotationData.industry" 
-										:class="!errors.industry ? 'is-valid' : 'is-invalid'" 
-										:readonly="formSubmitted" 
-										@change="validateFormInput('industry')" 
-										>
-										<option disabled selected>Mention Your Industry Name</option>
-										<option value="alcohol-and-soft-drinks">Alcohol and Soft Drinks</option>
-										<option value="apparel">Apparel</option>
-										<option value="arts-and-craft">Arts and Craft</option>
-										<option value="automotive-and-parts">Automotive and Parts</option>
-										<option value="baby-and-toddler">Baby and toddler</option>
-										<option value="cosmetics-and-grooming">Cosmetics and Grooming</option>
-										<option value="fitness-and-sporting-goods">Fitness and Sporting Goods</option>
-										<option value="food">Food</option>
-										<option value="health-and-nutrition">Health and Nutrition</option>
-										<option value="homeware">Homeware</option>
-										<option value="jewellery-and-watches">Jewellery and Watches</option>
-										<option value="male-grooming">Male Grooming</option>
-										<option value="medical">Medical</option>
-										<option value="mobile-phones-and-accessories">Mobile Phones and Accessories</option>
-										<option value="pet-products-foods-and-supplements">Pet Products, Foods and Supplements</option>
-										<option value="tech and Gadgets">Tech and Gadgets</option>
-										<option value="toys-and-games">Toys and Games</option>
-										<option value="other">Other</option>
-									</select>
+							<div class="col-md-12 col-sm-12 form-group">
+								<label class="form-label form-label-quote">Contact No *</label>
+								<input
+								type="tel" 
+								class="form-control" 
+								v-model="singleWarehouseQuotationData.mobile" 
+								placeholder="Place Your Contact Number" 
+								:class="!errors.mobile ? 'is-valid' : 'is-invalid'" 
+								:readonly="formSubmitted" 
+								@change="validateFormInput('mobile')" 
+								/>
 
-									<div class="invalid-feedback">
-							        	{{ errors.industry }}
-							  		</div>
+								<div class="invalid-feedback">
+									{{ errors.mobile }}
 								</div>
-								
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label
-									form-label-quote">
-										Selected Warehouse *
-									</label>
-									<select 
-										class="form-control is-valid" 
-										v-model="singleWarehouseQuotationData.warehouse_id" 
-										:readonly="formSubmitted" 
-										>
-										<option value="1" selected>Warehouse - 1</option>
-									</select>
+							</div>
+
+							<div class="col-md-12 col-sm-12 form-group">
+								<label class="form-label form-label-quote">Industry *</label><br>
+								<select 
+								class="form-control" 
+								v-model="singleWarehouseQuotationData.industry" 
+								:class="!errors.industry ? 'is-valid' : 'is-invalid'" 
+								:readonly="formSubmitted" 
+								@change="validateFormInput('industry')" 
+								>
+								<option disabled selected>Mention Your Industry Name</option>
+								<option value="alcohol-and-soft-drinks">Alcohol and Soft Drinks</option>
+								<option value="apparel">Apparel</option>
+								<option value="arts-and-craft">Arts and Craft</option>
+								<option value="automotive-and-parts">Automotive and Parts</option>
+								<option value="baby-and-toddler">Baby and toddler</option>
+								<option value="cosmetics-and-grooming">Cosmetics and Grooming</option>
+								<option value="fitness-and-sporting-goods">Fitness and Sporting Goods</option>
+								<option value="food">Food</option>
+								<option value="health-and-nutrition">Health and Nutrition</option>
+								<option value="homeware">Homeware</option>
+								<option value="jewellery-and-watches">Jewellery and Watches</option>
+								<option value="male-grooming">Male Grooming</option>
+								<option value="medical">Medical</option>
+								<option value="mobile-phones-and-accessories">Mobile Phones and Accessories</option>
+								<option value="pet-products-foods-and-supplements">Pet Products, Foods and Supplements</option>
+								<option value="tech and Gadgets">Tech and Gadgets</option>
+								<option value="toys-and-games">Toys and Games</option>
+								<option value="other">Other</option>
+							</select>
+
+							<div class="invalid-feedback">
+								{{ errors.industry }}
+							</div>
+						</div>
+
+						<div class="col-md-12 col-sm-12 form-group">
+							<label class="form-label
+							form-label-quote">
+							Selected Warehouse *
+						</label>
+						<select 
+						class="form-control is-valid" 
+						v-model="singleWarehouseQuotationData.warehouse_id" 
+						:readonly="formSubmitted" 
+						>
+						<option value="1" selected>Warehouse - 1</option>
+					</select>
 
 									<!-- 
 									<div class="invalid-feedback">
 							        	{{ errors.warehouse }}
 							  		</div> 
-							  		-->
-								</div>
+							  	-->
+							  </div>
 
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label
-									form-label-quote">
-										How you want to store your products? *
-									</label>
-									<select 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.container_type_id" 
-									:class="!errors.container_type ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('container_type')" 
-									>
-										<option disabled selected>Required Space Type</option>
-										<option value="1">Grey Space</option>
-										<option value="2">Rack</option>
-										<option value="3">Pallet</option>
-									</select>
+							  <div class="col-md-12 col-sm-12 form-group">
+							  	<label class="form-label
+							  	form-label-quote">
+							  	How you want to store your products? *
+							  </label>
+							  <select 
+							  class="form-control" 
+							  v-model="singleWarehouseQuotationData.container_type_id" 
+							  :class="!errors.container_type ? 'is-valid' : 'is-invalid'" 
+							  :readonly="formSubmitted" 
+							  @change="validateFormInput('container_type')" 
+							  >
+							  <option disabled selected>Required Space Type</option>
+							  <option value="1">Grey Space</option>
+							  <option value="2">Rack</option>
+							  <option value="3">Pallet</option>
+							</select>
 
-									<div class="invalid-feedback">
-							        	{{ errors.container_type }}
-							  		</div>
-								</div>
+							<div class="invalid-feedback">
+								{{ errors.container_type }}
+							</div>
+						</div>
 
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label form-label-quote">
-										Select your preferred rack specification * (LxWxH)
-									</label>
-									<select
-									class="form-control is-valid" 
-									v-model="singleWarehouseQuotationData.container_id" 
-									:readonly="formSubmitted" 
-									>
-										<option disabled selected>Required Rack Size</option>
-										<option value="1">56X28X17cm (100 Pcs Available)</option>
-										<option value="2">86X38X17cm (190 Pcs Available)</option>
-										<option value="3">76X48X17cm (50 Pcs Available)</option>
-									</select>
+						<div class="col-md-12 col-sm-12 form-group">
+							<label class="form-label form-label-quote">
+								Select your preferred rack specification * (LxWxH)
+							</label>
+							<select
+							class="form-control is-valid" 
+							v-model="singleWarehouseQuotationData.container_id" 
+							:readonly="formSubmitted" 
+							>
+							<option disabled selected>Required Rack Size</option>
+							<option value="1">56X28X17cm (100 Pcs Available)</option>
+							<option value="2">86X38X17cm (190 Pcs Available)</option>
+							<option value="3">76X48X17cm (50 Pcs Available)</option>
+						</select>
 
 									<!-- 
 									<div class="invalid-feedback">
 							        	{{ errors.container }}
 							  		</div> 
-							  		-->
-								</div>
+							  	-->
+							  </div>
 
-								<div class="col-md-12 col-sm-12 form-group">
-									<label class="form-label form-label-quote">
-										Roughly how many racks do you need ? *
-									</label>
+							  <div class="col-md-12 col-sm-12 form-group">
+							  	<label class="form-label form-label-quote">
+							  		Roughly how many racks do you need ? *
+							  	</label>
 
-									<input 
-									type="number" 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.quantity" 
-									placeholder="Required Rack Number" 
-									:class="!errors.quantity ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('quantity')" 
-									/>
+							  	<input 
+							  	type="number" 
+							  	class="form-control" 
+							  	v-model="singleWarehouseQuotationData.quantity" 
+							  	placeholder="Required Rack Number" 
+							  	:class="!errors.quantity ? 'is-valid' : 'is-invalid'" 
+							  	:readonly="formSubmitted" 
+							  	@change="validateFormInput('quantity')" 
+							  	/>
 
-									<div class="invalid-feedback">
-							        	{{ errors.quantity }}
-							  		</div>
-								</div>
-								<div class="col-md-12 col-sm-12 form-group mb-3">
-									<label class="form-label form-label-quote">Addtional Message</label>
-									<textarea 
-									class="form-control" 
-									v-model="singleWarehouseQuotationData.message" 
-									:class="!errors.message ? 'is-valid' : 'is-invalid'" 
-									:readonly="formSubmitted" 
-									@change="validateFormInput('message')" 
-									rows="4"
-									></textarea>
+							  	<div class="invalid-feedback">
+							  		{{ errors.quantity }}
+							  	</div>
+							  </div>
+							  <div class="col-md-12 col-sm-12 form-group mb-3">
+							  	<label class="form-label form-label-quote">Addtional Message</label>
+							  	<textarea 
+							  	class="form-control" 
+							  	v-model="singleWarehouseQuotationData.message" 
+							  	:class="!errors.message ? 'is-valid' : 'is-invalid'" 
+							  	:readonly="formSubmitted" 
+							  	@change="validateFormInput('message')" 
+							  	rows="4"
+							  	></textarea>
 
-									<div class="invalid-feedback">
-							        	{{ errors.message }}
-							  		</div>
-								</div>
+							  	<div class="invalid-feedback">
+							  		{{ errors.message }}
+							  	</div>
+							  </div>
 
-								<div class="col-md-12 col-sm-12 text-center" v-show="Object.keys(quotationFormFailureMessages).length > 0">
-										<ul>
-											<li 
-											class="text-danger text-start" 
-											v-for="x in quotationFormFailureMessages"
-											>
-											{{ x[0] }}
-										</li>
-									</ul>
-								</div>
+							  <div class="col-md-12 col-sm-12 text-center" v-show="Object.keys(quotationFormFailureMessages).length > 0">
+							  	<ul>
+							  		<li 
+							  		class="text-danger text-start" 
+							  		v-for="x in quotationFormFailureMessages"
+							  		>
+							  		{{ x[0] }}
+							  	</li>
+							  </ul>
+							</div>
 
-								<div class="col-md-12 col-sm-12 text-center" v-show="quotationFormSuccessMessage && Object.keys(quotationFormFailureMessages).length == 0 && Object.keys(errors).length == 0">
-									<span style="color: #23b8bf">
-										{{ quotationFormSuccessMessage }}
-									</span>
-								</div>
+							<div class="col-md-12 col-sm-12 text-center" v-show="quotationFormSuccessMessage && Object.keys(quotationFormFailureMessages).length == 0 && Object.keys(errors).length == 0">
+								<span style="color: #23b8bf">
+									{{ quotationFormSuccessMessage }}
+								</span>
+							</div>
 
-								<div class="col-md-12 col-sm-12 text-end">
-									<button class="quote-btn w-100">Submit Requirement</button>
-								</div>
-							</form>
-							<!-- Form -->
-						</div>
+							<div class="col-md-12 col-sm-12 text-end">
+								<button class="quote-btn w-100">Submit Requirement</button>
+							</div>
+						</form>
+						<!-- Form -->
 					</div>
 				</div>
 			</div>
-			<!-- Modal Desc -->
+		</div>
+		<!-- Modal Desc -->
 
 		<!-- 
 		<section class="details-heading" data-aos="fade-up" data-aos-duration="1000">
@@ -315,16 +319,16 @@
 				</div>
 			</div>
 		</section> 
-		-->
+	-->
 
-<!-- Featurs Section Started  -->
-<section class="features">
-	<div class="container">
-		<div class="row storage-list mb-4" data-aos="fade-up" data-aos-duration="1000">
-			<div class="col-12">
-				<h4 class="mb-4">Features :</h4>
-			</div>
-			<div class="col-md-6">
+	<!-- Featurs Section Started  -->
+	<section class="features">
+		<div class="container">
+			<div class="row storage-list mb-4" data-aos="fade-up" data-aos-duration="1000">
+				<div class="col-12">
+					<h4 class="mb-4">Features :</h4>
+				</div>
+				<div class="col-md-6">
 	            <!-- 
 	            <div class="col-12 warehouse-features d-flex flex-row flex-wrap">
 	                <div class="col-md-6 col-12 p-3">
@@ -433,14 +437,14 @@
 							</div>
 							<div class="col-md-6 col-12 d-flex flex-row flex-wrap">
 								<div class="col-md-8 col-12 text-center p-2" data-aos="zoom-in" data-aos-duration="1000">
-									<img class="img-fluid w-100" :src="'/images/grey-space.jpg'" alt="img">
+									<img class="img-fluid w-100" :src="'/website/warehouses/grey-space.jpg'" alt="img">
 								</div>
 								<div class="col-md-4 col-12">
 									<div class="col-12 p-2" data-aos="zoom-in" data-aos-duration="1000">
-										<img class="img-fluid w-100" :src="'/images/grey-space.jpg'" alt="img">
+										<img class="img-fluid w-100" :src="'/website/warehouses/grey-space.jpg'" alt="img">
 									</div>
 									<div class="col-12 p-2" data-aos="zoom-in" data-aos-duration="1000">
-										<img class="img-fluid w-100" :src="'/images/grey-space.jpg'" alt="img">
+										<img class="img-fluid w-100" :src="'/website/warehouses/grey-space.jpg'" alt="img">
 									</div>
 								</div>
 							</div>
@@ -477,14 +481,14 @@
 							</div>
 							<div class="col-md-6 col-12 d-flex flex-row flex-wrap">
 								<div class="col-md-8 col-12 text-center p-2" data-aos="zoom-in" data-aos-duration="1000">
-									<img class="img-fluid w-100" :src="'/images/rack.jpg'" alt="img">
+									<img class="img-fluid w-100" :src="'/website/warehouses/rack.jpg'" alt="img">
 								</div>
 								<div class="col-md-4 col-12">
 									<div class="col-12 p-2" data-aos="zoom-in" data-aos-duration="1000">
-										<img class="img-fluid w-100" :src="'/images/rack.jpg'" alt="img">
+										<img class="img-fluid w-100" :src="'/website/warehouses/rack.jpg'" alt="img">
 									</div>
 									<div class="col-12 p-2" data-aos="zoom-in" data-aos-duration="1000">
-										<img class="img-fluid w-100" :src="'/images/rack.jpg'" alt="img">
+										<img class="img-fluid w-100" :src="'/website/warehouses/rack.jpg'" alt="img">
 									</div>
 								</div>
 							</div>
@@ -526,14 +530,14 @@
 							</div>
 							<div class="col-md-6 col-12 d-flex flex-row flex-wrap">
 								<div class="col-md-8 col-12 text-center p-2" data-aos="zoom-in" data-aos-duration="1000">
-									<img class="img-fluid w-100" :src="'/images/pallet.jpg'" alt="img">
+									<img class="img-fluid w-100" :src="'/website/warehouses/pallet.jpg'" alt="img">
 								</div>
 								<div class="col-md-4 col-12">
 									<div class="col-12 p-2" data-aos="zoom-in" data-aos-duration="1000">
-										<img class="img-fluid w-100" :src="'/images/pallet.jpg'" alt="img">
+										<img class="img-fluid w-100" :src="'/website/warehouses/pallet.jpg'" alt="img">
 									</div>
 									<div class="col-12 p-2" data-aos="zoom-in" data-aos-duration="1000">
-										<img class="img-fluid w-100" :src="'/images/pallet.jpg'" alt="img">
+										<img class="img-fluid w-100" :src="'/website/warehouses/pallet.jpg'" alt="img">
 									</div>
 								</div>
 							</div>
@@ -657,11 +661,11 @@
 				singleWarehouseQuotationData : singleWarehouseQuotationData,
 
 				warehousePreviews : [
-					'/images/about-us-banner.jpg', '/images/store-img-1.png', '/images/store-img-2.png'
+				'/website/warehouses/about-us-banner.jpg', '/website/warehouses/store-img-1.png', '/website/warehouses/store-img-2.png'
 				],
 
 				quotationFormFailureMessages : {},
-		        quotationFormSuccessMessage : null
+				quotationFormSuccessMessage : null
 			}
 		},
 		
@@ -701,37 +705,37 @@
 				axios
 				.post('/quotations/', this.singleWarehouseQuotationData)
 				.then(response => {
-				if (response.status == 200) {
+					if (response.status == 200) {
 				// this.$toastr.s("Your message has been successfully delivered", "Success");
 				this.singleWarehouseQuotationData = {};
 				this.quotationFormFailureMessages = {};
 				this.quotationFormSuccessMessage = "Submitted successfully, We will contact you soon";
-				}
-				})
+			}
+		})
 				.catch(error => {
-				if (error.response.status == 422) {
+					if (error.response.status == 422) {
 
-				this.quotationFormSuccessMessage = null;
-				this.quotationFormFailureMessages = error.response.data.errors;
+						this.quotationFormSuccessMessage = null;
+						this.quotationFormFailureMessages = error.response.data.errors;
 
-				}
+					}
 				})
 				.finally(response => {
-				this.formSubmitted = false;
+					this.formSubmitted = false;
 				});
 
 			},
 
-		    validateFormInput (formInputName) {
+			validateFormInput (formInputName) {
 
 				this.submitForm = false;
 
 				switch(formInputName) {
-				
+
 					case 'first_name' : 
-						
-						if (! this.singleWarehouseQuotationData.first_name && ! this.singleWarehouseQuotationData.last_name) {
-							
+
+					if (! this.singleWarehouseQuotationData.first_name && ! this.singleWarehouseQuotationData.last_name) {
+
 							// this.errors.first_name = 'First or last name is required'
 							this.$set(this.errors, 'first_name', 'First or last name is required');
 
@@ -750,7 +754,7 @@
 
 						break;
 
-					case 'last_name' : 
+						case 'last_name' : 
 						
 						if (! this.singleWarehouseQuotationData.first_name && ! this.singleWarehouseQuotationData.last_name) {
 							
@@ -772,7 +776,7 @@
 
 						break;
 
-					case 'email' : 
+						case 'email' : 
 						
 						if (! this.singleWarehouseQuotationData.email) {
 							// this.errors.email = 'Email is required';
@@ -789,7 +793,7 @@
 
 						break;
 
-					case 'mobile' :
+						case 'mobile' :
 
 						if (! this.singleWarehouseQuotationData.mobile) {
 							// this.errors.mobile = 'Contact is required';
@@ -806,7 +810,7 @@
 
 						break;
 
-					case 'company_name' :
+						case 'company_name' :
 
 						if (this.singleWarehouseQuotationData.company_name && ! this.singleWarehouseQuotationData.company_name.match(/^[A-Za-z0-9\s\-_,\.;:()]+$/g)) {
 							// this.errors.company = 'No special character';
@@ -819,7 +823,7 @@
 
 						break;
 
-					case 'industry' :
+						case 'industry' :
 
 						if (! this.singleWarehouseQuotationData.industry) {
 							// this.errors.industry = 'Industry is required';
@@ -845,9 +849,9 @@
 						}
 
 						break;
-					*/
+						*/
 
-					case 'container_type' :
+						case 'container_type' :
 
 						if (! this.singleWarehouseQuotationData.container_type_id) {
 							// this.errors.container_type = 'Space type is required';
@@ -872,9 +876,9 @@
 						}
 
 						break;
-					*/
+						*/
 
-					case 'quantity' :
+						case 'quantity' :
 
 						if (! this.singleWarehouseQuotationData.quantity) {
 							// this.errors.quantity = 'Space type is required';
@@ -891,7 +895,7 @@
 
 						break;
 
-					case 'message' :
+						case 'message' :
 
 						if (! this.singleWarehouseQuotationData.message) {
 							// this.errors.message = 'Message is required';
@@ -908,14 +912,14 @@
 
 						break;
 
+					}
+
 				}
 
 			}
 
 		}
+	</script>
 
-	}
-</script>
-
-<style lang="css" scoped>
+	<style lang="css" scoped>
 </style>

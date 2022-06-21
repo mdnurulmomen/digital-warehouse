@@ -4,7 +4,7 @@
         <div class="row">
           <div class="col-lg-3 col-md-6">
             <router-link :to="{ name: 'home' }" class="notransition">
-              <img :src="'/icon/logo.png'" alt="logo"
+              <img :src="'/system/logo.png'" alt="logo"
               />
             </router-link>
             <p class="footer-text">

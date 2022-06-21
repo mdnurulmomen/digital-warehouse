@@ -6,7 +6,7 @@
 				<div class="col-12">
 					<h3 class="title mb-5">Gudam Workflow</h3>
 					<img
-					:src="'/images/work-flow-bg.png'"
+					:src="'/website/index/work-flow-bg.png'"
 					alt="img"
 					class="mt-5 img-fluid"
 					/>

@@ -10,7 +10,7 @@
 								<div class="col-md-5 col-12">
 									<img
 									class="img-fluid"
-									src="/images/warehouse.jpg"
+									src="/website/warehouses/warehouse.jpg"
 									alt="img"
 									/>
 								</div>

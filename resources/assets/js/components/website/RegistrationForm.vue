@@ -46,7 +46,7 @@
 							<div class="col-md-6">
 								<img
 								class="img-fluid reg-img"
-								:src="'/images/owner-reg.jpg'"
+								:src="'/website/registrations/owner-reg.jpg'"
 								alt=""
 								/>
 							</div>
@@ -535,7 +535,7 @@
 <div class="col-md-6 text-end">
 	<img
 	class="img-fluid reg-img"
-	:src="'/images/reg.jpg'"
+	:src="'/website/registrations/merchant-reg.jpg'"
 	alt=""
 	/>
 </div>

@@ -228,6 +228,10 @@
   .side-bar {
     height: auto !important;
   }
+  .btn-book {
+    margin-left: 0;
+    margin-top: 10px;
+  }
 }
 
 @media only screen and (max-width: 991px) {
