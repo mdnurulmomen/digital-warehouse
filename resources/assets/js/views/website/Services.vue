@@ -25,10 +25,6 @@
       ServiceList
     },
 
-    mounted() {
-      AOS.init({once: true});
-    },
-
     data () {
       return {
 

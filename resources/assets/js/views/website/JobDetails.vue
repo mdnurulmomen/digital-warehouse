@@ -105,10 +105,8 @@
       JobDetailBannerList, 
       JobApplyForm
     },
-    mounted(){
-     AOS.init({once: true});
-   },
-   data () {
+    
+    data () {
      return {
       errors : {},
       formSubmitted : false,

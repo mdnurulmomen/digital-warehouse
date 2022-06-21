@@ -22,9 +22,7 @@
       CareerBannerList, 
       JobList
     },
-    mounted() {
-      AOS.init({once: true});
-    },
+    
     data () {
       return {
 

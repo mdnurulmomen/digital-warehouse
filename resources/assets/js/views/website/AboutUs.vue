@@ -1,8 +1,8 @@
 <template>
   <div>
-      <div class="hero-area">
-        <about-us-banner-list/>
-      </div>
+    <div class="hero-area">
+      <about-us-banner-list/>
+    </div>
 
     <main>
       <!-- Description Started  -->
@@ -199,21 +199,19 @@
   import TeamMemberList from '../../components/website/TeamMemberList.vue'
   import JoinUs from '../../components/website/JoinUsComponent.vue'
 
-export default {
-  components: {
+  export default {
+    components: {
       AboutUsBannerList, 
       TeamMemberList, 
       JoinUs
     },
-  mounted(){
-    AOS.init({once: true});
-  },
-  data () {
-    return {
+    
+    data () {
+      return {
 
+      }
     }
   }
-}
 </script>
 
 <style lang="css" scoped>

@@ -30,6 +30,7 @@
         "@ckeditor/ckeditor5-build-classic": "^23.0.0",
         "@ckeditor/ckeditor5-vue": "^1.0.3",
         "@riophae/vue-treeselect": "^0.4.0",
+        "aos": "^2.3.4",
         "chart.js": "^2.9.4",
         "jsbarcode": "^3.11.5",
         "moment": "^2.29.1",

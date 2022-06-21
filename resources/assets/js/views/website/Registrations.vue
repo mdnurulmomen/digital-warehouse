@@ -54,11 +54,7 @@
       RegistrationBannerList, 
       RegistrationForm
     },
-    mounted() {
 
-      AOS.init({once: true});
-
-    },
     data () {
       return {
         formSubmitted : false,

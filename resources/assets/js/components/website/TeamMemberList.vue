@@ -41,9 +41,6 @@
 
 <script>
 export default {
-  mounted(){
-    AOS.init({once: true});
-  },
   data () {
     return {
 

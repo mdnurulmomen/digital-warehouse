@@ -4,9 +4,9 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
+ require('./bootstrap');
 
-window.Vue = require('vue');
+ window.Vue = require('vue');
 // window.toastr = require('vue-toastr');
 
 // importing plugin
@@ -15,6 +15,10 @@ Vue.use(VueRouter)
 
 import VTooltip from 'v-tooltip'
 Vue.use(VTooltip)
+
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+Vue.use(AOS)
 
 /**
  * The following block of code may be used to automatically register your
@@ -53,30 +57,30 @@ Vue.component('copyright-component', require('./components/website/CopyrightComp
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-const router = new VueRouter({
+ const router = new VueRouter({
     mode: 'history',
     routes: [
-        {
-            path: '/',
-            name: 'home',
-            component: Index
-        },
-        {
-            path: '/services',
-            name: 'services',
-            component: Services
-        },
-        {
-            path: '/warehouses',
-            name: 'warehouses',
-            component: Warehouses
-        },
-        {
-            path: '/warehouses/:id',
-            name: 'warehouse-details',
-            component: WarehouseDetails,
-            beforeEnter: (to, from, next) => {
-                if (to.params.id) {
+    {
+        path: '/',
+        name: 'home',
+        component: Index
+    },
+    {
+        path: '/services',
+        name: 'services',
+        component: Services
+    },
+    {
+        path: '/warehouses',
+        name: 'warehouses',
+        component: Warehouses
+    },
+    {
+        path: '/warehouses/:id',
+        name: 'warehouse-details',
+        component: WarehouseDetails,
+        beforeEnter: (to, from, next) => {
+            if (to.params.id) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -123,11 +127,14 @@ const router = new VueRouter({
             component: AboutUs
         },
 
-    ],
-});
+        ],
+    });
 
-const app = new Vue({
+ const app = new Vue({
     el: '#app',
-    components : {WebsiteMenuBar},
+    components : {WebsiteMenuBar}, 
+    mounted() {
+        AOS.init({once: true})
+    },
     router
 });

@@ -72,9 +72,6 @@
 
 <script>
   export default {
-    mounted() {
-      AOS.init({once: true});
-    },
     computed: {
       currentRouteName() {
         return this.$route.name;

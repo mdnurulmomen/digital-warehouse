@@ -15,22 +15,16 @@
   <link rel="stylesheet" href="{{asset('/css/website.css')}}" />
   <!-- Responsive CSS  -->
   <link rel="stylesheet" href="{{asset('/css/responsive.css')}}" />
-  <!-- AOS Animation CSS  -->
-  <link rel="stylesheet" href="{{asset('/css/aos.css')}}" />
 </head>
 <body>
   <div id="app">
-        
+    
     <website-menu-bar/>
 
   </div>
-<!-- AOS Animation Js  -->
-<script src="{{asset('/js/aos.js')}}"></script>
-<script>
-  /*AOS.init({once: true});*/
-</script>
-<script src="{{asset('/js/website.js')}}"></script>
-<!-- Bootstrap JS  -->
-<script src="{{asset('/js/bootstrap5.bundle.min.js')}}"></script>
+
+  <script src="{{asset('/js/website.js')}}"></script>
+  <!-- Bootstrap JS  -->
+  <script src="{{asset('/js/bootstrap5.bundle.min.js')}}"></script>
 </body>
 </html>
