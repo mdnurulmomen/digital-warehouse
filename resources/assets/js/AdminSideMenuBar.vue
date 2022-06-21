@@ -13,7 +13,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-home"></i>
+										<img src="icons/cms/home.png">
 									</span>
 									<span class="pcoded-mtext">Home</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -21,13 +21,13 @@
 								<ul class="pcoded-submenu">
 									<li :class="currentRouteName=='home' ? 'active' : ''">
 										<router-link :to="{ name: 'home' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Home</span>
+											<span class="pcoded-mtext">Overview</span>
 										</router-link>
 									</li>
 
 									<li :class="currentRouteName=='general-dashboar-2' ? 'active' : ''">
 										<router-link :to="{ name: 'general-dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 1</span>
+											<span class="pcoded-mtext">Analytics</span>
 										</router-link>
 									</li>
 								</ul>
@@ -39,7 +39,7 @@
 							>
 								<router-link :to="{ name: 'roles' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-tasks" aria-hidden="true"></i>
+										<img src="icons/cms/roles.png">
 									</span>
 									<span class="pcoded-mtext">
 										Roles
@@ -54,7 +54,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fas fa-warehouse"></i>
+										<img src="icons/cms/warehouses.png">
 									</span>
 									<span class="pcoded-mtext">Warehouse</span>
 								</a>
@@ -115,7 +115,7 @@
 							>
 								<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-user"></i>
+										<img src="icons/cms/managers.png">
 									</span>
 									<span class="pcoded-mtext">
 										Managers
@@ -128,7 +128,7 @@
 							>
 								<router-link :to="{ name: 'mails' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-envelope"></i>
+										<img src="icons/cms/mails.png">
 									</span>
 									<span class="pcoded-mtext">
 										Mails
@@ -141,7 +141,7 @@
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-users"></i>
+										<img src="icons/cms/merchants.png">
 									</span>
 									<span class="pcoded-mtext">
 										Merchants
@@ -156,7 +156,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fab fa-product-hunt"></i>
+										<img src="icons/cms/products.png">
 									</span>
 									<span class="pcoded-mtext">Product</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -224,7 +224,7 @@
 							>
 								<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-truck"></i>
+										<img src="icons/cms/requisitions.png">
 									</span>
 
 									<span class="pcoded-mtext">
@@ -247,7 +247,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fas fa-boxes"></i>
+										<img src="icons/cms/logistics.png">
 									</span>
 									<span class="pcoded-mtext">Logistics</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->

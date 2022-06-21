@@ -22,8 +22,6 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/waves.min.css')}}" type="text/css" media="all">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}">
-	<link rel="stylesheet" href="{{asset('css/font-awesome-4.min.css')}}">
-	<link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/widget.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/cms.css')}}">
@@ -41,9 +39,9 @@
 
 			<nav class="navbar header-navbar pcoded-header">
 				<div class="navbar-wrapper">
-					<div class="navbar-logo">
+					<div class="navbar-logo d-flex">
 						<a href="{{ route('admin.home', 'home') }}">
-							<img class="img-fluid" src="{{asset('system/logo.png')}}" alt="Theme-Logo" width="125px"/>
+							<img class="img-fluid" src="{{asset('system/logo.png')}}" alt="Theme-Logo" width="80px"/>
 						</a>
 						<a class="mobile-menu" id="mobile-collapse" href="#!">
 							<i class="feather icon-menu icon-toggle-right"></i>

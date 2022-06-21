@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-product-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-random'"
+			:icon="'variations'"
 			:title="'variations'" 
 			:message="'All our variations'"
 		></breadcrumb>			

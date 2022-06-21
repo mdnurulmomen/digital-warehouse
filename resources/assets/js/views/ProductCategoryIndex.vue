@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-product-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-list-alt'"
+			:icon="'product-categories'"
 			:title="'product categories'" 
 			:message="'All our product categories'"
 		></breadcrumb>			

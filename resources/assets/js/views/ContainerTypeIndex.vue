@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-warehouse-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-hdd-o'"
+			:icon="'container-types'"
 			:title="'container-types'" 
 			:message="'All our warehouse container-types'"
 		></breadcrumb>			

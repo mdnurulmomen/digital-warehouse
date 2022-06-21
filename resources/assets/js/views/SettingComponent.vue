@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-application-setting-index')">
-
 	<div class="pcoded-content">
-
 		<div class="page-header card">
 			<div class="row align-items-end">
 				<div class="col-lg-8">

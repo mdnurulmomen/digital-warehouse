@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-product-stock-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-store'"
+			:icon="'stocks'"
 			:title="product.name + ' stocks'" 
 			:message="'All ' + product.name + ' stocks for ' + productMerchant.merchant ? productMerchant.merchant.name : ''"
 		></breadcrumb>			

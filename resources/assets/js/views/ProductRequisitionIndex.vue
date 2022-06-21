@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-requisition-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-truck'"
+			:icon="'requisitions'"
 			:title="merchantProduct.product.name + ' requisitions'" 
 			:message="'All ' + merchantProduct.merchant.first_name + ' ' + merchantProduct.merchant.last_name + ' requisitions for ' + merchantProduct.product.name"
 		></breadcrumb>			

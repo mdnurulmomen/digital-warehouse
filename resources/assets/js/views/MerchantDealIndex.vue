@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-merchant-deal-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-handshake-o'"
+			:icon="'deals'"
 			:title="fullName + ' deals'" 
 			:message="'All our deals with ' + fullName"
 		></breadcrumb>			

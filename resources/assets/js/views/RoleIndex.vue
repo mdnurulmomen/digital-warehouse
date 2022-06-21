@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-role-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-tasks'"
+			:icon="'roles'"
 			:title="'roles'" 
 			:message="'All our roles'"
 		></breadcrumb>			

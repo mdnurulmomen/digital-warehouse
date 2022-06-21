@@ -1,10 +1,8 @@
 
 <template>
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
-			:icon="'fa fa-truck'"
+			:icon="'requisitions'"
 			:title="'requisitions'" 
 			:message="'All your requisitions'"
 		></breadcrumb>			

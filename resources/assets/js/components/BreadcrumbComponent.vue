@@ -2,16 +2,23 @@
 	<div class="page-header card">
 		<div class="row align-items-end">
 			<div class="col-lg-8">
-				<div class="page-header-title">
-					<i class="bg-c-blue" :class="icon" aria-hidden="true"></i>
+				<div class="row">
+					<div class="d-inline mr-2">
+						<img :src="'icons/cms/' + icon + '.png'">
+					</div>
+
 					<div class="d-inline">
 						<h5>{{ title | capitalize }}</h5>
-						<span>{{ message | capitalize }}</span>
 					</div>
 				</div>
+
+				<div class="row">
+					<span>{{ message | capitalize }}</span>
+				</div>
 			</div>
+
 			<div class="col-lg-4">
-				<div class="page-header-breadcrumb d-flex justify-content-center">
+				<div class="page-header-breadcrumb text-lg-right text-center">
 					<ul class=" breadcrumb breadcrumb-title">
 						<li class="breadcrumb-item">
 							<router-link :to="{ name: 'home' }">

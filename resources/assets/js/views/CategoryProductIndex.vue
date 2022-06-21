@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-product-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fab fa-product-hunt'"
+			:icon="'products'"
 			:title="category.name + ' products'" 
 			:message="'All products of ' + category.name"
 		></breadcrumb>			

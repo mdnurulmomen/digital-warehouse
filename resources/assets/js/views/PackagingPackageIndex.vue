@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-logistic-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-gift'"
+			:icon="'packaging-packages'"
 			:title="'packaging packages'" 
 			:message="'All our packages for packaging'"
 		></breadcrumb>			

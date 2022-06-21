@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-merchant-product-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-users'"
+			:icon="'merchants'"
 			:title="product.name + ' merchants'" 
 			:message="'All our merchants for ' + product.name | capitalize"
 		></breadcrumb>			

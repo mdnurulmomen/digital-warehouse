@@ -3,7 +3,7 @@
 
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-users'"
+			:icon="'merchants'"
 			:title="'merchants'" 
 			:message="'All our warehouse-merchants'"
 		></breadcrumb>			

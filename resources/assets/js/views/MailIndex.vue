@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-mail-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-envelope'"
+			:icon="'mails'"
 			:title="'mails'" 
 			:message="'All mails sent from panel'"
 		></breadcrumb>			

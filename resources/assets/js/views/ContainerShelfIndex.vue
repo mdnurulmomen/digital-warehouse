@@ -2,8 +2,8 @@
 <template v-if="userHasPermissionTo('view-warehouse-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:title="'containers'" 
-			:message="'All our containers'"
+			:title="'container-shelves'" 
+			:message="'All shelves of expected containers'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">

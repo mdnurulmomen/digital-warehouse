@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-warehouse-asset-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-clock-o'"
+			:icon="'rent-periods'"
 			:title="'rent-periods'" 
 			:message="'All our warehouse rent-periods'"
 		></breadcrumb>			

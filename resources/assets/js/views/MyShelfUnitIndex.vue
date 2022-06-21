@@ -2,8 +2,8 @@
 <template>
 	<div class="pcoded-content">
 		<breadcrumb 
-			:title="'containers'" 
-			:message="'All our containers'"
+			:title="'shelf-units'" 
+			:message="'All units of specific shelf'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">

@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-warehouse-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fas fa-warehouse'"
+			:icon="'warehouses'"
 			:title="'warehouses'" 
 			:message="'All our warehouses'"
 		></breadcrumb>			

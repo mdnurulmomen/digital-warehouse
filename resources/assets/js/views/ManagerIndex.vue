@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-manager-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-user'"
+			:icon="'managers'"
 			:title="'managers'" 
 			:message="'All our warehouse managers'"
 		></breadcrumb>			

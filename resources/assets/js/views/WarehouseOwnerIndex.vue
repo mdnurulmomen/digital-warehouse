@@ -2,7 +2,7 @@
 <template v-if="userHasPermissionTo('view-warehouse-owner-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'fa fa-user'"
+			:icon="'warehouse-owners'"
 			:title="'owners'" 
 			:message="'All our warehouse owners'"
 		></breadcrumb>			
