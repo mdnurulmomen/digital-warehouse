@@ -71,7 +71,7 @@ class Manager extends Authenticatable
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'storage/manager/';
+            $imagePath = 'storage/managers/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

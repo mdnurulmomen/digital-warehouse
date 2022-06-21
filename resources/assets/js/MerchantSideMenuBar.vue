@@ -315,8 +315,3 @@
     }
     
 </script>
-
-<style type="text/css">
-	/*importing global css*/
-	@import "./../css/global.css"
-</style>

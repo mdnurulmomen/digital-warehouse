@@ -62,7 +62,7 @@ class Admin extends Authenticatable
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'storage/admin/';
+            $imagePath = 'storage/admins/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

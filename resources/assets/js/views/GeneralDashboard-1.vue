@@ -122,7 +122,7 @@
                         	-->
 
                         	<div class="col-xl-3 col-md-6">
-                                <div class="card prod-p-card card-red">
+                                <div class="card prod-p-card card-green">
                                     <div class="card-body">
                                         <div class="row align-items-center m-b-30">
                                             <div class="col">
@@ -152,7 +152,7 @@
                             </div>
 
                             <div class="col-xl-3 col-md-6">
-                                <div class="card prod-p-card card-default">
+                                <div class="card prod-p-card card-danger">
                                     <div class="card-body">
                                         <div class="row align-items-center m-b-30">
                                             <div class="col">
@@ -215,6 +215,12 @@
                                                     <tr v-for="merchantProduct in dashboard.limitedStockProducts" :key="'merchant-product-' + merchantProduct.id"
                                                     >
                                                         <td>
+                                                            <img 
+                                                            class="img-thumbnail" 
+                                                            style="width: 40px; margin-right: 5px" 
+                                                            :src="merchantProduct.preview || (merchantProduct.hasOwnProperty('product') && merchantProduct.product.preview) ? merchantProduct.product.preview : '/storage/products/default-product.jpg'"
+                                                            >
+
                                                             {{ merchantProduct.hasOwnProperty('product') ? merchantProduct.product.name : 'NA' | capitalize }}
                                                         </td>
 

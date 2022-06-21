@@ -146,7 +146,7 @@ class Warehouse extends Authenticatable
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'storage/warehouse/';
+            $imagePath = 'storage/warehouses/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
@@ -179,7 +179,7 @@ class Warehouse extends Authenticatable
     {
         if (count($encodedPreviews)) {
             
-            $imagePath = 'storage/warehouse/';
+            $imagePath = 'storage/warehouses/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
@@ -236,7 +236,7 @@ class Warehouse extends Authenticatable
             
             // $storages = json_decode(json_encode($storages));
 
-            $imagePath = 'storage/warehouse/';
+            $imagePath = 'storage/warehouses/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

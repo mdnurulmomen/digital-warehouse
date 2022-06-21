@@ -43,7 +43,7 @@ class ApplicationSetting extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/application/';
+            $imagePath = 'system/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
@@ -59,10 +59,10 @@ class ApplicationSetting extends Model
                 return;
             }
 
-            $img = $img->resize(50, 50);
-            $img->save($imagePath.'application_logo.png', 100);
+            $img = $img->resize(100, 100);
+            $img->save($imagePath.'logo.png', 100);
 
-            $this->attributes['application_logo'] = $imagePath.'application_logo.png';
+            $this->attributes['logo'] = $imagePath.'logo.png';
 
         }
     }
@@ -77,7 +77,7 @@ class ApplicationSetting extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/application/';
+            $imagePath = 'system/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);
@@ -94,9 +94,9 @@ class ApplicationSetting extends Model
             }
 
             $img = $img->resize(32, 32);
-            $img->save($imagePath.'application_favicon.png', 100);
+            $img->save($imagePath.'favicon.png', 100);
 
-            $this->attributes['application_favicon'] = $imagePath.'application_favicon.png';
+            $this->attributes['favicon'] = $imagePath.'favicon.png';
 
         }
     } 

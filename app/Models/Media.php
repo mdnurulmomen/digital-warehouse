@@ -16,7 +16,7 @@ class Media extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'uploads/media/';
+            $imagePath = 'website/media/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

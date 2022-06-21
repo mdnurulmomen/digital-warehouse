@@ -132,7 +132,7 @@
 														              		<div class="col-sm-4 form-group">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.application_logo || 'uploads/application/application_logo.png'" 
+															                  		:src="applicationSettings.application_logo || 'system/logo.png'" 
 															                  		alt="Application logo"
 														                  		>
 														                	</div>
@@ -160,7 +160,7 @@
 														              		<div class="col-sm-4 form-group">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.application_favicon || 'uploads/application/application_favicon.png'" 
+															                  		:src="applicationSettings.application_favicon || 'system/favicon.png'" 
 															                  		alt="Application favicon"
 														                  		>
 														                	</div>
@@ -787,7 +787,7 @@
 																			              		<div class="col-sm-6">
 																			                  		<img 
 																				                  		class="profile-user-img img-fluid" 
-																				                  		:src="media.logo || 'uploads/application/media_logo.png'" 
+																				                  		:src="media.logo || 'website/media_logo.png'" 
 																				                  		alt="Media logo"
 																			                  		>
 																			                	</div>

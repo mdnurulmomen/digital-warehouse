@@ -17,9 +17,8 @@ class CreateOwnerRentableWarehousesTable extends Migration
             $table->mediumIncrements('id');
             $table->unsignedTinyInteger('number_rentable_warehouses');
             $table->string('available_size');
-            $table->boolean('status')->default(0); // reviewed or not
+            $table->tinyInteger('status')->default(0); // 1 for not reviewed / 0 for reviewed / -1 for cancelled
             $table->unsignedSmallInteger('warehouse_owner_id');
-            $table->boolean('status')->default(true);   // 1 for not reviewed / 0 for reviewed
         });
     }
 

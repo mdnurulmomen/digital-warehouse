@@ -12,7 +12,7 @@
 	<meta name="keywords" content="flat ui, admin Admin , Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
 	<meta name="csrf-token" content={{csrf_token()}}>
 
-	<link rel="icon" href="{{ URL::asset('uploads/application/application_favicon.png') }}" type="image/x-icon" sizes="16x16"/>
+	<link rel="icon" href="{{ asset('system/favicon.png') }}" type="image/x-icon" sizes="16x16"/>
 	
 	<!-- Fonts -->
 	{{-- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
@@ -26,7 +26,7 @@
 	<link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/widget.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{asset('css/tooltip.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{asset('css/cms.css')}}">
 </head>
 
 <body>
@@ -43,7 +43,7 @@
 				<div class="navbar-wrapper">
 					<div class="navbar-logo">
 						<a href="{{ route('admin.home', 'home') }}">
-							<img class="img-fluid" src="{{asset('uploads/application/application_logo.png')}}" alt="Theme-Logo" />
+							<img class="img-fluid" src="{{asset('system/logo.png')}}" alt="Theme-Logo" width="125px"/>
 						</a>
 						<a class="mobile-menu" id="mobile-collapse" href="#!">
 							<i class="feather icon-menu icon-toggle-right"></i>
@@ -180,6 +180,7 @@
 				</div>
 			</nav>
 
+			{{-- 
 			<div id="sidebar" class="users p-chat-user showChat">
 				<div class="had-container">
 					<div class="p-fixed users-main">
@@ -247,8 +248,10 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> 
+			--}}
 		 
+			{{-- 
 			<div class="showChat_inner">
 				<div class="media chat-inner-header">
 					<a class="back_chatBox">
@@ -297,7 +300,8 @@
 						</div>
 					</div>
 				</div>
-			</div> 
+			</div>  
+			--}}
 		
 
 			<div id="app">
