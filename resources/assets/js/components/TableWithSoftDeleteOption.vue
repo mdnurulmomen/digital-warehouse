@@ -1,5 +1,4 @@
 <template v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
-	
 	<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
 
 		<!-- <loading v-show="loading"></loading> -->
@@ -104,11 +103,11 @@
 
 							<button type="button" 
 									class="btn btn-grd-warning btn-icon"  
-									v-tooltip.bottom-end="'Move Inside'"
+									v-tooltip.bottom-end="'View Containers'"
 									v-if="$route.name=='warehouses'" 
 									@click="$emit('showContainerShelfDetails', content)"
 							>
-								<i class="fas fa-arrow-alt-circle-up"></i>
+								<img src="icons/cms/containers.png">
 							</button>
 						</td>
 					</tr>

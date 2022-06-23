@@ -1,6 +1,6 @@
 <template>	
 	<!-- modal-createOrEdit-container -->
-	<div class="modal fade" id="container-createOrEdit-modal" v-if="userHasPermissionTo('create-warehouse-asset') || userHasPermissionTo('update-warehouse-asset')" >
+	<div class="modal fade" id="container-createOrEdit-modal" data-backdrop="static" data-keyboard="false" v-if="userHasPermissionTo('create-warehouse-asset') || userHasPermissionTo('update-warehouse-asset')" >
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				

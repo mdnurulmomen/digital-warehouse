@@ -343,7 +343,7 @@
 	 	-->
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="asset-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')">
+		<div class="modal fade" id="asset-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-asset') || userHasPermissionTo('update-product-asset')">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
 					<div class="modal-header">

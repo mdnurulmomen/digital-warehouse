@@ -1,6 +1,6 @@
 <template>
 	<!-- Modal -->
-	<div class="modal fade" id="user-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="user-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -218,9 +218,8 @@
 										  	</span>
 										</div>
 										<div class="col-sm-12">
-											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Previous" v-on:click="step--">
-						                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
-						                  	</button>
+						                  	<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
 											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>

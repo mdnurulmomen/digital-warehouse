@@ -507,7 +507,7 @@
 		</div>
 
 	 	<!--Create, Edit or Approve Modal -->
-		<div class="modal fade" id="merchant-payment-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-payment') || userHasPermissionTo('update-merchant-payment')">
+		<div class="modal fade" id="merchant-payment-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-payment') || userHasPermissionTo('update-merchant-payment')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1037,7 +1037,7 @@
 		</div>
 
 		<!-- View Modal -->
-		<div class="modal fade" id="merchant-payment-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="merchant-payment-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1572,7 +1572,7 @@
 		<!-- Printing Modal Ends -->
 
 		<!-- Filter Modal -->
-		<div class="modal fade" id="payment-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal fade" id="payment-custom-search" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">

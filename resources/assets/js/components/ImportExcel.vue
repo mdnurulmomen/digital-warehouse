@@ -1,7 +1,7 @@
 <template>
   <section>
     <!-- The Modal -->
-    <div class="modal fade" :id="callerPage + '-importing-modal'">
+    <div class="modal fade" :id="callerPage + '-importing-modal'" data-backdrop="static" data-keyboard="false">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <form 

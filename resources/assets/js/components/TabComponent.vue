@@ -1,5 +1,4 @@
 <template>
-
 	<ul class="nav nav-tabs md-tabs" role="tablist">
 		<li class="nav-item" v-for="tabName in tabNames" :key="tabName">
 		    <a 	class="" 
@@ -13,7 +12,6 @@
 			<div class="slide"></div>
 		</li>
 	</ul>
-
 </template>
 
 <script type="text/javascript">

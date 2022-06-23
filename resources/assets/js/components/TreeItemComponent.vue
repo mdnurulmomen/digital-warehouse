@@ -1,6 +1,5 @@
 
 <template>
-
 	<li>
 		<div
 			:class="{'font-weight-bold': ! hasParent}" 
@@ -17,7 +16,6 @@
 			></tree-item>
 		</ul>
 	</li>
-
 </template>
 
 <script type="text/javascript">
