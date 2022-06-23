@@ -1,31 +1,35 @@
 <template>
 	<div class="page-header card">
-		<div class="row align-items-end">
-			<div class="col-lg-8">
+		<div class="row align-items-center">
+			<div class="col-6">
 				<div class="row">
-					<div class="d-inline mr-2">
-						<img :src="'icons/cms/' + icon + '.png'">
-					</div>
+					<div class="col-12 d-flex align-items-center">
+						<div class="d-inline mr-2">
+							<img :src="'icons/cms/' + icon + '.png'">
+						</div>
 
-					<div class="d-inline">
-						<h5>{{ title | capitalize }}</h5>
+						<div class="d-inline">
+							<h5>{{ title | capitalize }}</h5>
+						</div>
 					</div>
 				</div>
 
 				<div class="row">
-					<span>{{ message | capitalize }}</span>
+					<div class="col-12 mt-1">
+						<h6 class="text-nowrap">{{ message | capitalize }}</h6>
+					</div>
 				</div>
 			</div>
 
-			<div class="col-lg-4">
-				<div class="page-header-breadcrumb text-lg-right text-center">
-					<ul class=" breadcrumb breadcrumb-title">
-						<li class="breadcrumb-item">
+			<div class="col-6">
+				<div class="text-right">
+					<ul>
+						<li class="breadcrumb-item d-inline">
 							<router-link :to="{ name: 'home' }">
 								<i class="feather icon-home"></i>
 							</router-link>
 						</li>
-						<li class="breadcrumb-item">
+						<li class="breadcrumb-item d-inline">
 							<router-link :to="{ name: $route.name }">
 								{{ $route.name | capitalize }}
 							</router-link>

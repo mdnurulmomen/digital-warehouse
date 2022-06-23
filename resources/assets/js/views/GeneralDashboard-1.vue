@@ -10,59 +10,53 @@
         -->
 
         <div class="page-header card">
-           <div class="row align-items-end">
-            <div class="col-lg-8">
-             <div class="row">
-                <div class="d-inline mr-2">
-                    <img src="icons/cms/dashboard-1.png">
-                </div>
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12 d-flex align-items-center">
+                            <div class="d-inline mr-2">
+                                <img src="icons/cms/dashboard-1.png">
+                            </div>
 
-                <div class="d-inline">
-                    <h5>Dashboard</h5>
-                </div>
-            </div>
+                            <div class="d-inline">
+                                <h5>Overview</h5>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="row">
-                <span>You may view basic analytics here</span>
+                    <div class="row">
+                        <div class="col-12 mt-1">
+                            <h6 class="text-nowrap">You may view basic analytics here</h6>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-lg-4">
-         <div class="page-header-breadcrumb d-flex justify-content-center">
-          <ul class=" breadcrumb breadcrumb-title">
-           <li class="breadcrumb-item">
-            <a href="index.html"><i class="feather icon-home"></i></a>
-        </li>
-        <li class="breadcrumb-item"><a href="#!">Dashboard</a> </li>
-    </ul>
-</div>
-</div>
-</div>
-</div>
 
-<div class="pcoded-inner-content">
-   <div class="main-body">
-    <div class="page-wrapper">
-     <div class="page-body">
-      <!-- Pending Stocks and Requisitions -->
-      <div class="row">
-       <div class="col-xl-3 col-md-6">
-        <div class="card prod-p-card card-yellow">
-            <div class="card-body">
-                <div class="row align-items-center m-b-30">
-                    <div class="col">
-                        <h6 class="m-b-5 text-white">
-                         Pending Product-Stocks
-                     </h6>
-                     <h3 class="m-b-0 f-w-700 text-white">
-                         {{ dashboard.numberPendingProductStocks || 0 }}
-                     </h3>
-                 </div>
-                 <div class="col-auto">
-                     <router-link :to="{ name: 'products' }">
-                         <i class="fa fa-eye text-c-yellow f-18"></i>
-                     </router-link>
-                 </div>
-             </div>
+        <div class="pcoded-inner-content">
+         <div class="main-body">
+            <div class="page-wrapper">
+               <div class="page-body">
+                  <!-- Pending Stocks and Requisitions -->
+                  <div class="row">
+                     <div class="col-xl-3 col-md-6">
+                        <div class="card prod-p-card card-yellow">
+                            <div class="card-body">
+                                <div class="row align-items-center m-b-30">
+                                    <div class="col">
+                                        <h6 class="m-b-5 text-white">
+                                           Pending Product-Stocks
+                                       </h6>
+                                       <h3 class="m-b-0 f-w-700 text-white">
+                                           {{ dashboard.numberPendingProductStocks || 0 }}
+                                       </h3>
+                                   </div>
+                                   <div class="col-auto">
+                                       <router-link :to="{ name: 'products' }">
+                                           <i class="fa fa-eye text-c-yellow f-18"></i>
+                                       </router-link>
+                                   </div>
+                               </div>
                                         <!-- 
 	                                        <p class="m-b-0 text-white">
 	                                        	<span class="label label-danger m-r-10">
@@ -89,10 +83,10 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'requisitions' }">
-                                                 <i class="fa fa-bullseye text-c-blue f-18"></i>
-                                             </router-link>
-                                         </div>
-                                     </div>
+                                                   <i class="fa fa-bullseye text-c-blue f-18"></i>
+                                               </router-link>
+                                           </div>
+                                       </div>
                                         <!-- 
 	                                        <p class="m-b-0 text-white">
 	                                        	<span class="label label-danger m-r-10">
@@ -142,18 +136,18 @@
                                     <div class="row align-items-center m-b-30">
                                         <div class="col">
                                             <h6 class="m-b-5 text-white">
-                                             Unreceived Dispatches
-                                         </h6>
-                                         <h3 class="m-b-0 f-w-700 text-white">
-                                             {{ dashboard.numberUnreceivedDispatches || 0 }}
-                                         </h3>
-                                     </div>
-                                     <div class="col-auto">
-                                         <router-link :to="{ name: 'requisitions' }">
-                                             <i class="fa fa-thermometer-half text-c-red f-18"></i>
-                                         </router-link>
-                                     </div>
-                                 </div>
+                                               Unreceived Dispatches
+                                           </h6>
+                                           <h3 class="m-b-0 f-w-700 text-white">
+                                               {{ dashboard.numberUnreceivedDispatches || 0 }}
+                                           </h3>
+                                       </div>
+                                       <div class="col-auto">
+                                           <router-link :to="{ name: 'requisitions' }">
+                                               <i class="fa fa-thermometer-half text-c-red f-18"></i>
+                                           </router-link>
+                                       </div>
+                                   </div>
                                         <!-- 
 	                                        <p class="m-b-0 text-white">
 	                                        	<span class="label label-danger m-r-10">
@@ -180,10 +174,10 @@
                                             </div>
                                             <div class="col-auto">
                                             	<router-link :to="{ name: 'requisitions' }">
-                                                 <i class="fa fa-trash text-c-orenge f-18"></i>
-                                             </router-link>
-                                         </div>
-                                     </div>
+                                                   <i class="fa fa-trash text-c-orenge f-18"></i>
+                                               </router-link>
+                                           </div>
+                                       </div>
                                         <!-- 
 	                                        <p class="m-b-0 text-white">
 	                                        	<span class="label label-danger m-r-10">
@@ -475,7 +469,7 @@
 
     data() {
 
-       return {
+     return {
 
         query : '',
         error : '',
@@ -483,20 +477,20 @@
 
         dashboard : {
 
-           numberPendingOwner : 0,
-           numberPendingManagers : 0,
-           numberPendingMerchants : 0,
-           numberPendingWarehouses : 0,
-           numberPendingDispatches : 0,
-           numberPendingRequistiions : 0,
-           numberPendingProductStocks : 0,
-           limitedStockProducts : [],
-           numberUnreceivedDispatches : 0,
-           numberCancelledRequisitions : 0,
+         numberPendingOwner : 0,
+         numberPendingManagers : 0,
+         numberPendingMerchants : 0,
+         numberPendingWarehouses : 0,
+         numberPendingDispatches : 0,
+         numberPendingRequistiions : 0,
+         numberPendingProductStocks : 0,
+         limitedStockProducts : [],
+         numberUnreceivedDispatches : 0,
+         numberCancelledRequisitions : 0,
 
-       }
+     }
 
-   }
+ }
 
 },
 
@@ -509,7 +503,7 @@ created(){
 
         filters: {
 
-           capitalize: function (value) {
+         capitalize: function (value) {
 
             if (!value) return ''
 
@@ -517,38 +511,38 @@ created(){
 
             for (let i = 0; i < words.length; i++) {
 
-             if (words[i]) {
+               if (words[i]) {
 
-                 words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+                   words[i] = words[i][0].toUpperCase() + words[i].substr(1);
 
-             }
+               }
 
+           }
+
+           return words.join(" ");
+
+       }
+
+   },
+
+   methods : {
+
+     getDashboardOneData() {
+
+        this.query = '';
+        this.error = '';
+        this.loading = true;
+        this.dashboard = {};
+
+        axios
+        .get('/api/general-dashboard-one')
+        .then(response => {
+          if (response.status == 200) {
+             this.dashboard = response.data;
          }
-
-         return words.join(" ");
-
-     }
-
- },
-
- methods : {
-
-   getDashboardOneData() {
-
-    this.query = '';
-    this.error = '';
-    this.loading = true;
-    this.dashboard = {};
-
-    axios
-    .get('/api/general-dashboard-one')
-    .then(response => {
-      if (response.status == 200) {
-       this.dashboard = response.data;
-   }
-})
-    .catch(error => {
-      this.error = error.toString();
+     })
+        .catch(error => {
+          this.error = error.toString();
 						// Request made and server responded
 						if (error.response) {
 							console.log(error.response.data);
@@ -566,11 +560,11 @@ created(){
 						}
 
 					})
-    .finally(response => {
-      this.loading = false;
-  });
+        .finally(response => {
+          this.loading = false;
+      });
 
-}
+    }
 
 }
 

@@ -110,7 +110,7 @@
 					<tr 
 				  		v-show="!currentContents.length"
 				  	>
-			    		<td :colspan="columnNames.length+1">
+			    		<td class="text-center" :colspan="columnNames.length+1">
 				      		<div class="alert alert-danger" role="alert">
 				      			Sorry, No data found.
 				      		</div>
