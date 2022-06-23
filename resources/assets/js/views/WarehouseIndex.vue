@@ -81,6 +81,7 @@
 		<!-- modal-createOrEdit-warehouse -->
 		<div 
 			class="modal fade" id="warehouse-createOrEdit-modal" 
+			data-backdrop="static" data-keyboard="false"
 			v-if="userHasPermissionTo('create-warehouse') || userHasPermissionTo('update-warehouse')"
 		>
 			<div class="modal-dialog modal-lg">
@@ -130,7 +131,7 @@
 				  		<!-- form start -->
 						<form 
 							class="form-horizontal" 
-							v-on:submit.prevent="createMode ? storeWarehouse() : updateWarehouse()" 
+							v-on:submit.prevent="verifyFormInput()" 
 							novalidate
 						>
 
@@ -193,8 +194,8 @@
 													v-model="singleWarehouseData.name" 
 													placeholder="Name should be unique" 
 													:class="!errors.warehouse.name  ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('name')" 
-													required="true" 
+													@change="validateFormInput('name')" 
+													@keydown.enter.prevent="nextPage()" 
 												>
 
 												<div class="invalid-feedback">
@@ -210,8 +211,8 @@
 													placeholder="Mobile should be unique" 
 													autocomplete="new-password" 
 													:class="!errors.warehouse.mobile ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('mobile')" 
-													required="true" 
+													@change="validateFormInput('mobile')" 
+													@keydown.enter.prevent="nextPage()" 
 												>
 
 												<div class="invalid-feedback">
@@ -246,8 +247,8 @@
 													v-model="singleWarehouseData.user_name" 
 													placeholder="Username should be unique" 
 													:class="!errors.warehouse.user_name  ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('user_name')" 
-													required="true" 
+													@change="validateFormInput('user_name')" 
+													@keydown.enter.prevent="nextPage()" 
 												>
 
 												<div class="invalid-feedback">
@@ -261,8 +262,8 @@
 													v-model="singleWarehouseData.email" 
 													placeholder="Email should be unique" 
 													:class="!errors.warehouse.email  ? 'is-valid' : 'is-invalid'" 
-													@blur="validateFormInput('email')" 
-													required="true" 
+													@change="validateFormInput('email')" 
+													@keydown.enter.prevent="nextPage()"  
 												>
 
 												<div class="invalid-feedback">
@@ -310,8 +311,8 @@
 														placeholder="Password length should be min 8" 
 														autocomplete="new-password" 
 														:class="!errors.warehouse.password  ? 'is-valid' : 'is-invalid'" 
-														@blur="validateFormInput('password')" 
-														:required="createMode" 
+														@change="validateFormInput('password')" 
+														@keydown.enter.prevent="nextPage()" 
 													>
 
 													<div class="invalid-feedback">
@@ -327,8 +328,8 @@
 														placeholder="Confirm your password" 
 														autocomplete="new-password" 
 														:class="!errors.warehouse.password_confirmation  ? 'is-valid' : 'is-invalid'" 
-														@blur="validateFormInput('password_confirmation')" 
-														:required="createMode" 
+														@change="validateFormInput('password_confirmation')" 
+														@keydown.enter.prevent="nextPage()" 
 													>
 
 													<div class="invalid-feedback">
@@ -337,20 +338,28 @@
 												</div>
 					                        </div>
 										</div>
-						          	</div>  
-							        
-						          	<div class="col-sm-12 p-3 border text-right">
-						          		<div class="text-danger small" v-show="!submitForm">
-									  		Please input required fields
-							          	</div>
-							          	<button 
-							          	type="button" 
-							          	v-on:click="nextPage" 
-							          	class="btn btn-outline-secondary btn-sm btn-round" 
-							          	v-tooltip.bottom-end="'Next'"
-							          	>
-					                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-					                  	</button>
+						          	</div>
+
+						          	<div class="col-sm-12 form-group mb-0 card-footer">
+										<div class="row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+							                  	<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
+												<button 
+									          	type="button" 
+									          	v-on:click="nextPage" 
+									          	class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          	v-tooltip.bottom-end="'Next'"
+									          	>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+											</div>
+										</div>
 						          	</div>
 								</div>
 
@@ -423,7 +432,7 @@
 				                        </div> 
 						          	</div>  
 							        
-						          	<div class="col-sm-12 p-3 border">
+						          	<div class="col-sm-12 form-group mb-0 card-footer">
 						          		<div class="row">
 					          				<div class="col-6">
 							                  	<button 
@@ -536,7 +545,7 @@
 				                        </div>
 						          	</div>  
 
-						          	<div class="col-sm-12 p-3 border">
+						          	<div class="col-sm-12 form-group mb-0 card-footer">
 						          		<div class="row">
 					          				<div class="col-6">
 							                  	<button 
@@ -725,7 +734,7 @@
 			                            </div>   
 						          	</div>  
 							        
-						          	<div class="col-sm-12 p-3 border">
+						          	<div class="col-sm-12 form-group mb-0 card-footer">
 						          		<div class="row">
 					          				<div class="col-6">
 							                  	<button type="button" 
@@ -816,8 +825,8 @@
 																		placeholder="Lenght of container" 
 																		:min="singleWarehouseData.containers[containerIndex].engaged_quantity + singleWarehouseData.containers[containerIndex].partially_engaged" 
 																		:class="!errors.warehouse.containers[containerIndex].container_quantity ? 'is-valid' : 'is-invalid'" 
-																		@blur="validateFormInput('container_quantity')" 
-																		required="true" 
+																		@change="validateFormInput('container_quantity')" 
+																		@keydown.enter.prevent="nextPage()"  
 																	>
 
 																	<div class="invalid-feedback">
@@ -897,6 +906,8 @@
 																									placeholder="Rent price" 
 																									:class="! errors.warehouse.containers[containerIndex]['container_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																									min="0" 
+																									@change="validateFormInput('rent')" 
+																									@keydown.enter.prevent="nextPage()" 
 																								>
 																								<div class="input-group-append">
 																									<span class="input-group-text" id="basic-addon2">{{ general_settings.official_currency_name || 'BDT' | capitalize }}</span>
@@ -955,6 +966,8 @@
 																									placeholder="Rent price" 
 																									:class="!errors.warehouse.containers[containerIndex]['shelf_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																									min="0" 
+																									@change="validateFormInput('rent')" 
+																									@keydown.enter.prevent="nextPage()" 
 																								>
 																								<div class="input-group-append">
 																									<span class="input-group-text" id="basic-addon2">
@@ -1014,6 +1027,8 @@
 																									placeholder="Rent price" 
 																									:class="!errors.warehouse.containers[containerIndex]['unit_rent_' + rentPeriod.name] ? 'is-valid' : 'is-invalid'" 
 																									min="0" 
+																									@change="validateFormInput('rent')" 
+																									@keydown.enter.prevent="nextPage()" 
 																								>
 
 																								<div class="input-group-append">
@@ -1128,7 +1143,7 @@
 						          	</div>
 						          	-->
 
-						          	<div class="col-sm-12 p-3 border">
+						          	<div class="col-sm-12 form-group mb-0 card-footer">
 						          		<div class="row">
 					          				<div class="col-6">
 							                  	<button type="button" 
@@ -2878,6 +2893,28 @@
 				this.singleWarehouseData = object;
 				$('#restore-confirmation-modal').modal('show');
 			},
+			verifyFormInput() {
+
+				this.validateFormInput('container');
+	        	this.validateFormInput('container_quantity');
+	        	this.validateFormInput('rent');
+
+	        	const containerError = (container) => {
+					return Object.keys(container).length > 0
+				};
+
+	        	if (! this.errors.warehouse.containers.some(containerError)) {
+
+        			this.createMode ? this.storeWarehouse() : this.updateWarehouse();	        		
+
+	        	}
+	        	else {
+
+	        		this.submitForm = false;
+
+	        	}
+
+			},
 			storeWarehouse() {
 
 				// this.insertDefaultPermissions(['view-warehouse-asset-index', 'view-warehouse-owner-index']);
@@ -2895,6 +2932,8 @@
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
 							$('#warehouse-createOrEdit-modal').modal('hide');
+
+							this.printWarehouseContainers(this.singleWarehouseData.containers);
 						}
 					})
 					.catch(error => {
@@ -2906,7 +2945,6 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.printWarehouseContainers(this.singleWarehouseData.containers);
 					});
 
 			},
@@ -2927,6 +2965,8 @@
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
 							$('#warehouse-createOrEdit-modal').modal('hide');
+
+							this.printWarehouseContainers(this.singleWarehouseData.containers);
 						}
 					})
 					.catch(error => {
@@ -2938,7 +2978,6 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.printWarehouseContainers(this.singleWarehouseData.containers);
 					});
 
 			},
@@ -3132,18 +3171,20 @@
 					this.validateFormInput('storage_preview');
 					this.validateFormInput('storage_feature');
 				}
+				/*
 				else if (this.step==5) {
 					this.validateFormInput('container');
 		        	this.validateFormInput('container_quantity');
 
 		        	this.validateFormInput('rent');
 
-		        	/*
-		        	this.validateFormInput('container_price');
-		        	this.validateFormInput('shelf_price');
-		        	this.validateFormInput('unit_price');
-		        	*/
+		        	
+		        	// this.validateFormInput('container_price');
+		        	// this.validateFormInput('shelf_price');
+		        	// this.validateFormInput('unit_price');
+		        	
 				}
+				*/
 
 				const errorInArray = (element) => {
 										return element !== null
@@ -3166,13 +3207,16 @@
 				}
 			*/
 
-				if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && !this.errors.warehouse.storage_features.some(errorInArray) && !this.errors.warehouse.storage_types.some(errorInArray) && !this.errors.warehouse.containers.some(containerError) && this.step < 5) {
+				if (this.errors.warehouse.constructor === Object && Object.keys(this.errors.warehouse).length <= 3 && !this.errors.warehouse.storage_features.some(errorInArray) && !this.errors.warehouse.storage_types.some(errorInArray) && this.step < 5) {
 					
 					this.step++;
 					this.submitForm = true;
+
 				}
 				else {
+
 					this.submitForm = false;
+
 				}
 
 			},
@@ -3865,7 +3909,7 @@
 							
 							(warehouseContainer, containerIndex) => {
 
-								if (! warehouseContainer.hasOwnProperty('rents') || Object.keys(warehouseContainer.rents).length === 0 || (Object.keys(warehouseContainer.rents).length === 1 && warehouseContainer.rents[Object.keys(warehouseContainer.rents)[0]]['rent'] < 1)) {
+								if (! warehouseContainer.hasOwnProperty('rents') || Object.keys(warehouseContainer.rents).length === 0 || (Object.keys(warehouseContainer.rents).length === 1 && warehouseContainer.rents[Object.keys(warehouseContainer.rents)[0]]['rent'] < 1) || (Object.keys(warehouseContainer.rents).length > 0 && Object.values(warehouseContainer.rents).every(object => ! object.rent))) {
 
 									this.errors.warehouse.containers[containerIndex]['rent'] = 'One rent is required';
 
