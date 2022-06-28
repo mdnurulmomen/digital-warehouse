@@ -199,14 +199,21 @@
 									</div>
 								</div>
 
-								<div class="col-sm-12 form-group mb-0 text-right card-footer">
-					          		<div class="text-danger small mb-1" v-show="!submitForm">
-								  		Please input required fields
-						          	</div>
-						          	
-						          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
-				                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-				                  	</button>
+					          	<div class="col-sm-12 form-group mb-0 card-footer">
+									<div class="row">
+										<div class="col-sm-12 text-right" v-show="!submitForm">
+											<span class="text-danger small">
+										  		Please input required fields
+										  	</span>
+										</div>
+										<div class="col-sm-12">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
+											<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
+						                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+						                  	</button>
+										</div>
+									</div>
 					          	</div>
 							</div>
 
@@ -578,10 +585,10 @@
 										  	</span>
 										</div>
 										<div class="col-sm-12">
-											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Previous" v-on:click="step--">
+											<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Previous" v-on:click="step--">
 						                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>

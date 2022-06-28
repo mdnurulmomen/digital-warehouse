@@ -126,7 +126,7 @@
 																			
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																			>
@@ -136,7 +136,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Receive'" 
 																				v-if="unconfirmed(content)"
 																				@click="receiveDispatchedProducts(content)"
@@ -196,7 +196,7 @@
 														<div class="col-sm-2">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
@@ -288,7 +288,7 @@
 
 									          	<button 
 									          	type="button" 
-									          	class="btn btn-outline-secondary btn-sm btn-round" 
+									          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 									          	v-tooltip.bottom-end="'Next'" 
 									          	v-on:click="nextPage"
 									          	>
@@ -500,10 +500,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -648,10 +648,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -789,12 +789,12 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 												<button 
 													type="submit" 
-													class="btn btn-primary float-right" 
+													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
 												>
 													Request
@@ -1153,7 +1153,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

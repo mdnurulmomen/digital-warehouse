@@ -112,7 +112,7 @@
 																		
 																		<td>
 																			<button type="button" 
-																					class="btn btn-grd-info btn-icon" 
+																					class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																					v-tooltip.bottom-end="'View Details'" 
 																					@click="showContainerDetails(content)"
 																			>
@@ -120,7 +120,7 @@
 																			</button>
 
 																			<button type="button" 
-																					class="btn btn-grd-primary btn-icon"  
+																					class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon"  
 																					v-tooltip.bottom-end="'Move Inside'"
 																					v-show="content.container_shelf_statuses && content.container_shelf_statuses.length" 
 																					@click="showContainerShelfDetails(content)"
@@ -175,7 +175,7 @@
 														<div class="col-sm-2">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'"
 																@click="pagination.current_page = 1; query === '' ? fetchAllContainers() : searchData()"
 															>
@@ -309,7 +309,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

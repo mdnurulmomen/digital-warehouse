@@ -93,7 +93,7 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																			>
@@ -102,7 +102,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Recommended Dispatch'" 
 																				@click="showDispatchRecommendationForm(content)" 
 																				v-show="content.status==0" 
@@ -113,7 +113,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Approve Dispatch'"  
 																				@click="showDispatchApprovalForm(content)" 
 																				v-show="content.status==1 && content.dispatch.has_approval==0" 
@@ -124,7 +124,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Cancel Requisition'" 
 																				@click="openRequisitionCancelForm(content)" 
 																				v-show="content.status==0" 
@@ -138,7 +138,7 @@
 																  		v-show="!requisitionsToShow.length"
 																  	>
 															    		<td colspan="4">
-																      		<div class="alert alert-danger" role="alert">
+																      		<div class="alert alert-danger text-center" role="alert">
 																      			Sorry, No data found.
 																      		</div>
 																    	</td>
@@ -176,7 +176,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllRequisitions() : searchData()"
 															>
@@ -311,7 +311,7 @@
 
 									          	<button 
 									          	type="button" 
-									          	class="btn btn-outline-secondary btn-sm btn-round" 
+									          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 									          	v-tooltip.bottom-end="'Next'" 
 									          	v-on:click="nextPage"
 									          	>
@@ -563,10 +563,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -716,10 +716,10 @@
 									          	</div>
 								          	</div>
 								          	<div class="col-md-12">
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-								          		<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
+								          		<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" v-tooltip.bottom-end="'Next'"  v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -857,10 +857,10 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-on:click="requisitionHasSerialProduct() ? step-=1 : step-=2">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
-												<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
+												<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm || formSubmitted">
 													Request
 												</button>
 											</div>
@@ -980,7 +980,7 @@
 									          	</div>
 									          	<button 
 										          	type="button" 
-										          	class="btn btn-outline-secondary btn-sm btn-round" 
+										          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 										          	v-tooltip.bottom-end="'Next'" 
 										          	v-on:click="nextPage"
 									          	>
@@ -1491,7 +1491,7 @@
 								          	<div class="col-md-12">
 								          		<button 
 									          		type="button" 
-									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
+									          		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" 
 									          		v-tooltip.bottom-end="'Previous'"
 									          		v-on:click="step-=1" 
 								          		>
@@ -1501,7 +1501,7 @@
 								          		<button 
 									          		type="button" 
 									          		v-on:click="nextPage" 
-									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" 
 									          		v-tooltip.bottom-end="'Next'"
 								          		>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -1714,7 +1714,7 @@
 								          	<div class="col-md-12">
 								          		<button 
 									          		type="button" 
-									          		class="btn btn-outline-secondary btn-sm btn-round float-left" 
+									          		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" 
 									          		v-tooltip.bottom-end="'Previous'"
 									          		v-on:click="step-=1" 
 								          		>
@@ -1722,7 +1722,7 @@
 							                  	</button>
 								          		<button 
 									          		type="button" 
-									          		class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" 
 									          		v-tooltip.bottom-end="'Next'"
 									          		v-on:click="nextPage" 
 								          		>
@@ -1906,7 +1906,7 @@
 											<div class="col-sm-12 d-flex justify-content-between">
 												<button 
 													type="button" 
-													class="btn btn-outline-secondary btn-sm btn-round" 
+													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 													v-tooltip.bottom-end="'Previous'" 
 													v-on:click="(userHasPermissionTo('approve-dispatch') && singleDispatchData.requisition.products.some( requiredProduct => requiredProduct.available_quantity - requiredProduct.quantity > 0 )) ? step-=1 : step-=2"
 												>
@@ -1915,7 +1915,7 @@
 							                  	
 							                  	<button 
 								                  	type="button" 
-								                  	class="btn btn-danger btn-sm btn-round" 
+								                  	class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-sm btn-round" 
 								                  	v-tooltip.bottom-end="'Cancel Requisition'" 
 								                  	@click="openRequisitionCancelForm(singleDispatchData.requisition)"
 							                  	>
@@ -1924,7 +1924,7 @@
 
 												<button 
 													type="submit" 
-													class="btn btn-primary btn-sm btn-round" 
+													class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm btn-round" 
 													:disabled="!submitForm || nondispatchable || formSubmitted"
 												>
 													{{ singleDispatchData.requisition.status==0 ? 'Recommend Dispatch' : singleDispatchData.requisition.status==1 && singleDispatchData.requisition.dispatch.has_approval==0 ? 'Approve Dispatch' : '' }}
@@ -2346,10 +2346,10 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
 						<button 
 							type="button" 
-							class="btn btn-danger" 
+							class="btn waves-effect waves-dark btn-danger btn-outline-danger" 
 							v-tooltip.bottom-end="'Print'"  
 							@click="print"
 						>
@@ -2408,8 +2408,8 @@
 						</div>
 
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-danger">Cancel Requisition</button>
+							<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn waves-effect waves-dark btn-danger btn-outline-danger">Cancel Requisition</button>
 						</div>	
 					</form>
 				</div>

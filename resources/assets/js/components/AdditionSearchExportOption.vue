@@ -5,21 +5,21 @@
 	  			<div class="mr-2">
 	  				<span>
 			  			{{ 
-			  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? ('Searched ' + callerPage + 's List') : (callerPage + 's List')
+			  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? ('Searched ' + callerPage + ' List') : (callerPage + ' List')
 			  			| capitalize }}
 	  				</span>
 	  			</div>
 
 	  			<div class="dropdown">
-					<i class="fas fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown" v-tooltip.bottom-end="'Download ' + callerPage + 's'"></i>
+					<i class="fa fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown" v-tooltip.bottom-end="'Download ' + callerPage"></i>
   					
   					<div class="dropdown-menu">
 						<download-excel 
-			  				class="btn btn-default p-1 dropdown-item active"
+			  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
 							:data="contentsToDownload"
 							:fields="dataToExport" 
-							:worksheet="callerPage + 's Sheet'"
-							:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? ('searched-' + callerPage + 's') : (currentTab + '-' + callerPage + 's' + '-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
+							:worksheet="callerPage + ' Sheet'"
+							:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? ('searched-' + callerPage) : (currentTab + '-' + callerPage + '-list-')) + currentDate + '-page-' + pagination.current_page + '.xls'"
 			  			>
 			  				Excel
 						</download-excel>
@@ -27,7 +27,7 @@
   						<!-- 
   						<download-excel 
   							type="csv"
-			  				class="btn btn-default p-1 dropdown-item disabled"
+			  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item disabled"
 							:data="contentsToDownload"
 							:fields="dataToExport" 
 							worksheet="Requisitions sheet"
@@ -39,10 +39,10 @@
   					</div>
 
   					<i 
-  						class="fas fa-upload fa-lg pr-3 pl-1" 
+  						class="fa fa-upload fa-lg pr-3 pl-1" 
   						v-show="$route.name=='merchant-products'"
   						data-toggle="modal" 
-  						v-tooltip.bottom-end="'Upload ' + callerPage + 's'" 
+  						v-tooltip.bottom-end="'Upload ' + callerPage" 
 						:data-target="'#'+ callerPage +'-importing-modal'"
   					>	
   					</i>
@@ -51,7 +51,7 @@
 	  			<div class="ml-auto d-sm-none">
 	  				<button 
 	  					type="button" 
-			  			class="btn btn-success btn-outline-success btn-sm" 
+			  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
 			  			v-tooltip.bottom-end="'Create New'" 
 			  			:disabled="disableAddButton" 
 			  			@click="$emit('showContentCreateForm')" 
@@ -70,7 +70,7 @@
 				  		class="form-control" 
 				  		pattern="[^'!#$%^()\x22]+" 
 				  		v-model="searchAttributes.search" 
-				  		:placeholder="'Search ' + callerPage + 's'"
+				  		:placeholder="'Search ' + callerPage"
 			  		>
 
 			  		<div class="invalid-feedback">
@@ -109,7 +109,7 @@
 			<div class="col-md-4 text-right d-none d-md-block">
 	  			<button 
 	  				type="button" 
-		  			class="btn btn-success btn-outline-success btn-sm" 
+		  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
 		  			v-tooltip.bottom-end="'Create New'" 
 		  			:disabled="disableAddButton" 
 		  			@click="$emit('showContentCreateForm')" 
@@ -157,14 +157,14 @@
 						<div class="modal-footer">
 							<button 
 								type="button" 
-								class="btn btn-success" 
+								class="btn waves-effect waves-light btn-success btn-outline-success" 
 								@click="resetSearchingDates()" 
 								v-tooltip.bottom-end="'Reset'"
 							>
 		                  		Reset
 		                  	</button>
 
-							<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+							<button type="button" class="btn waves-effect waves-dark btn-primary btn-outline-primary ml-auto" data-dismiss="modal">
 		                  		See Results
 		                  	</button>
 						</div>

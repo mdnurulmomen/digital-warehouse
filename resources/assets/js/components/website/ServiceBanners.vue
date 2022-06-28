@@ -22,13 +22,15 @@
       data-bs-slide-to="1"
       aria-label="Slide 2"
       ></button>
+      <!-- 
       <button
       type="button"
       class="dot"
       data-bs-target="#carouselExampleIndicators"
       data-bs-slide-to="2"
       aria-label="Slide 3"
-      ></button>
+      ></button> 
+      -->
     </div>
     <div class="carousel-inner">
       <div class="carousel-item active bg-1" style="background-image: url('../website/services/banner.jpg')">

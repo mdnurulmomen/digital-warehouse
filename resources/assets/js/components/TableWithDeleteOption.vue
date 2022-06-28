@@ -45,7 +45,7 @@
 						
 						<td>
 							<button type="button" 
-									class="btn btn-grd-info btn-icon" 
+									class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 									v-tooltip.bottom-end="'View Details'"  
 									@click="$emit('showContentDetails', content)" 
 								 	v-show="$route.name!='rent-periods'"
@@ -54,7 +54,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-primary btn-icon" 
+									class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 									v-tooltip.bottom-end="'Edit'" 
 									:disabled="formSubmitted"
 									v-show="!content.deleted_at" 
@@ -65,7 +65,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-danger btn-icon" 
+									class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 									v-tooltip.bottom-end="'Delete'" 
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentDeleteForm', content)" 
@@ -161,7 +161,7 @@
 			<div class="col-sm-2 col-8">
 				<button 
 					type="button" 
-					class="btn btn-primary btn-sm" 
+					class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 					v-tooltip.bottom-end="'Reload'" 
 					@click="pagination.current_page = 1; query === '' ? $emit('fetchAllContents') : $emit('searchData')"
 				>

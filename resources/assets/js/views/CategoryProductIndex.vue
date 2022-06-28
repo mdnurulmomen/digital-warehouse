@@ -44,11 +44,11 @@
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Products'"></i>
+									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Products'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 
-													  				class="btn btn-default p-1 dropdown-item active"
+													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
 																	:data="allProducts"
 																	:fields="dataToExport" 
 																	:worksheet="category.name + 'Products Sheet'"
@@ -62,7 +62,7 @@
 											  			<div class="ml-auto d-sm-none">
 											  				<button 
 											  					type="button" 
-													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-sm" 
 													  			v-tooltip.bottom-end="'Create New'" 
 													  			@click="showContentCreateForm()"
 												  			>
@@ -90,7 +90,7 @@
 
 													<div class="col-md-4 text-right d-none d-md-block">
 											  			<button 
-												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-sm" 
 												  			v-tooltip.bottom-end="'Create New'" 
 												  			@click="showContentCreateForm()"
 											  			>
@@ -149,7 +149,7 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																			>
@@ -158,7 +158,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-product')"
@@ -168,7 +168,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-success btn-icon" 
+																				class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
 																				v-tooltip.bottom-end="'Merchants'"  
 																				@click="goProductMerchants(content)" 
 																				v-if="userHasPermissionTo('view-merchant-product-index')"
@@ -217,7 +217,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; query === '' ? fetchAllProducts() : searchData()"
 															>
@@ -698,7 +698,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															class="btn waves-effect waves-light hor-grd btn-primary btn-outline-primary btn-sm btn-block" 
 															v-tooltip.bottom-end="'Add Variation'" 
 															@click="addMoreVariation()"
 														>
@@ -708,7 +708,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															class="btn waves-effect waves-light hor-grd btn-info btn-outline-info btn-sm btn-block" 
 															v-tooltip.bottom-end="'Remove Variation'" 
 															:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
 															@click="removeVariation()"
@@ -729,10 +729,10 @@
 										</div>
 
 										<div class="col-sm-12">
-						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm|| formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm|| formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -1161,7 +1161,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

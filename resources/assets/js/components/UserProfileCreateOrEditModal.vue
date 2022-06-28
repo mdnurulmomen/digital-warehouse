@@ -218,9 +218,9 @@
 										  	</span>
 										</div>
 										<div class="col-sm-12">
-						                  	<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
 
-											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -514,7 +514,7 @@
 											<button type="button" class="btn btn-outline-secondary btn-sm btn-round" data-toggle="tooltip" data-placement="top" title="Previous" v-on:click="step--">
 						                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>

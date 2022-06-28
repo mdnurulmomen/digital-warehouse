@@ -31,7 +31,7 @@
 					</div>
 					<div class="row align-items-center mt-2">
 						<div class="col-md-6" data-aos="fade-up" data-aos-duration="1000">
-							<h3>GHB Building</h3>
+							<h3>HB Tower</h3>
 							<p>
 								<span class="me-3"><i class="fas fa-map-marker-alt"></i></span>
 								1/A, HB Tower, Gulsan-1, Dhaka, Bangladesh
@@ -178,6 +178,7 @@
 							</div>
 						</div>
 
+						<!-- 
 						<div class="col-md-12 col-sm-12 form-group">
 							<label class="form-label
 							form-label-quote">
@@ -190,13 +191,8 @@
 						>
 						<option value="1" selected>Warehouse - 1</option>
 					</select>
-
-									<!-- 
-									<div class="invalid-feedback">
-							        	{{ errors.warehouse }}
-							  		</div> 
-							  	-->
-							  </div>
+							  </div> 
+							-->
 
 							  <div class="col-md-12 col-sm-12 form-group">
 							  	<label class="form-label
@@ -245,7 +241,7 @@
 
 							  <div class="col-md-12 col-sm-12 form-group">
 							  	<label class="form-label form-label-quote">
-							  		Roughly how many racks do you need ? *
+							  		How many racks do you need ? *
 							  	</label>
 
 							  	<input 

@@ -97,7 +97,7 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																			>
@@ -106,7 +106,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-product')" 
@@ -117,7 +117,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-success btn-icon" 
+																				class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
 																				v-tooltip.bottom-end="'Merchants'"  
 																				@click="goProductMerchants(content)" 
 																				v-show="! content.deleted_at"
@@ -128,7 +128,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Delete'" 
 																				v-show="! content.deleted_at"
 																				:disabled="content.product_immutability"  
@@ -140,7 +140,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Restore'" 
 																				v-show="content.deleted_at"  
 																				@click="openContentRestoreForm(content)" 
@@ -190,7 +190,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; query === '' ? fetchAllProducts() : searchData()"
 															>
@@ -717,7 +717,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															class="btn waves-effect waves-light hor-grd btn-primary btn-outline-primary btn-sm btn-block" 
 															v-tooltip.bottom-end="'Add Variation'" 
 															@click="addMoreVariation()"
 														>
@@ -727,7 +727,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															class="btn waves-effect waves-light hor-grd btn-info btn-outline-info btn-sm btn-block" 
 															v-tooltip.bottom-end="'Remove Variation'" 
 															:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 3"
 															@click="removeVariation()"
@@ -748,10 +748,10 @@
 										</div>
 
 										<div class="col-sm-12">
-						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -1188,7 +1188,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -1952,6 +1952,7 @@
 
 				return false;
 			},
+			/*
 			nextPage() {
 				
 				if (this.step==1) {
@@ -1986,6 +1987,7 @@
 				}
 
 			},
+			*/
 			showRetailContents() {
 				this.currentTab = 'retail';
 				this.showSelectedTabProducts();
@@ -2071,7 +2073,7 @@
 					this.singleProductData.product_category_id = this.singleProductData.category.id;
 				}
 
-				// this.validateFormInput('product_category');
+				this.validateFormInput('product_category');
 			},
 			setProductMerchant() {
 				// console.log('merchant has been triggered');
@@ -2509,7 +2511,7 @@
 							this.allFetchedProducts = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
 							
-							// $('#product-createOrEdit-modal').modal('hide');
+							$('#products-importing-modal').modal('hide');
 						}
 					})
 					.catch(error => {

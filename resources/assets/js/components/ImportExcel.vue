@@ -21,21 +21,31 @@
           <div class="modal-body" style="overflow-x: auto;height:400px;">
             <div class="form-row">
               <div class="col-md-12 mb-3">
-                <label for="validationServer01">Choose Excel File</label>
-                <input 
-                  type="file" 
-                  class="form-control-file" 
-                  :class="! errors.wrong_file ? 'is-valid' : 'is-invalid'"
-                  @change="onFileChange" 
-                  ref="file"
-                >
-
-                <div 
-                  class="invalid-feedback"
-                  style="display: block;" 
-                  v-show="errors.wrong_file"
-                >
-                  {{ errors.wrong_file }}
+                <label for="validationServer01">
+                  Select File 
+                  (
+                  <a class="text-primary" :href="'/storage/samples/' + $route.name + '.xlsx'" download>
+                    Download Sample File
+                  </a>
+                  )
+                </label>
+                <div class="custom-file">
+                  <input 
+                    type="file" 
+                    class="custom-file-input" 
+                    :class="! errors.wrong_file ? 'is-valid' : 'is-invalid'"
+                    @change="onFileChange" 
+                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    ref="file" 
+                  />
+                  <label class="custom-file-label" for="validatedCustomFile">Upload Excel File...</label>
+                  <div 
+                    class="invalid-feedback"
+                    style="display: block;" 
+                    v-show="errors.wrong_file"
+                  >
+                    {{ errors.wrong_file }}
+                  </div>
                 </div>
               </div>
 
@@ -51,8 +61,8 @@
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" :disabled="! submitForm">
+            <button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn waves-effect waves-dark btn-success btn-outline-success" :disabled="! submitForm">
               Upload
             </button>
           </div>
@@ -82,7 +92,7 @@
       callerPage: {
         type: String,
         required: true
-      },
+      }
 
     },
 
@@ -130,8 +140,8 @@
 
       onFileChange(event) {
 
-        this.excelFileToImport = event.target.files ? event.target.files[0] : null;
-
+        this.excelFileToImport = event.target.files.length ? event.target.files[0] : null;
+      
         this.validateFormInput('file');
 
       }, 
@@ -141,7 +151,13 @@
         this.validateFormInput('file');
 
         if (! this.submitForm || Object.keys(this.errors).length > 0) {
+          
+          this.submitForm = false;
+          this.excelFileToImport = null;
+          this.$refs.file.value = null;
+          
           return;
+
         }
 
         let formData = new FormData();
@@ -149,7 +165,7 @@
 
         this.$emit('importExcelFile', formData);
 
-        $('#' + this.callerPage + '-importing-modal').modal('hide');
+        // $('#' + this.callerPage + '-importing-modal').modal('hide');
 
         this.excelFileToImport = null;
         this.$refs.file.value = null;
@@ -167,7 +183,7 @@
           if (! this.excelFileToImport) {
             this.errors.wrong_file = 'File is required';
           }
-          else if (this.excelFileToImport.name.split(".").pop() != "xls" && this.excelFileToImport.name.split(".").pop() != "xlsx") {
+          else if (this.excelFileToImport.name.split(".").pop() != "xls" && this.excelFileToImport.name.split(".").pop() != "xlsx" && this.excelFileToImport.name.split(".").pop() != "csv") {
 
             this.excelFileToImport = null;
             this.errors.wrong_file = 'Only excel file is required';

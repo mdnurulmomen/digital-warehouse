@@ -395,7 +395,7 @@
 						  	</span>
 						</div>
 						<div class="col-sm-12">
-							<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+							<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 								Close
 							</button>
 							<button 

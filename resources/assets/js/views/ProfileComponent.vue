@@ -225,7 +225,7 @@
 																	  	</span>
 																	</div>
 																	<div class="col-sm-12">
-																		<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																		<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																			Update Profile
 																		</button>
 																	</div>
@@ -305,7 +305,7 @@
 														  	</span>
 														</div>
 														<div class="col-sm-12">
-															<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+															<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																Update Password
 															</button>
 														</div>

@@ -126,7 +126,7 @@
 																	
 																	<td>
 																		<button type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'" 
 																				v-show="! content.deleted_at" 
 																				@click="openContentEditForm(content)" 
@@ -136,7 +136,7 @@
 																		</button>
 
 																		<button type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Delete'" 
 																				v-show="! content.deleted_at" 
 																				@click="openContentDeleteForm(content)" 
@@ -146,7 +146,7 @@
 																		</button>
 
 																		<button type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Restore'" 
 																				v-show="content.deleted_at" 
 																				@click="openContentRestoreForm(content)" 
@@ -217,7 +217,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; query === '' ? fetchAllContents() : searchData()"
 															>
@@ -378,10 +378,10 @@
 							  	</span>
 							</div>
 							<div class="col-sm-12">
-								<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+								<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 									Close
 								</button>
-								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+								<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm">
 									Save
 								</button>
 							</div>
@@ -460,7 +460,7 @@
 
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

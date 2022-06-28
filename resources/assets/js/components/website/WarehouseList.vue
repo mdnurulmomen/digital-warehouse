@@ -15,7 +15,7 @@
 									/>
 								</div>
 								<div class="col-md-7 col-12">
-									<h5>GHB Building</h5>
+									<h5>HB Tower</h5>
 									<p>
 										<span><i class="fas fa-map-marker-alt"></i></span>1/A, HB Tower, Gulsan-1, Dhaka, Bangladesh
 									</p>

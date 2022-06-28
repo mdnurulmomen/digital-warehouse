@@ -4,7 +4,7 @@
 		<breadcrumb 
 			:icon="'products'"
 			:title="merchantFullName + ' products'" 
-			:message="'All our products for ' + merchantFullName + ' (' + merchant.user_name + ')' | capitalize"
+			:message="'All products of ' + merchantFullName + ' (' + merchant.user_name + ')' | capitalize"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -38,7 +38,7 @@
 											  					
 											  					<div class="dropdown-menu">
 										  							<download-excel 
-														  				class="btn btn-default p-1 dropdown-item active"
+														  				class="btn btn-grd-default p-1 dropdown-item active"
 																		:data="productsToShow"
 																		:fields="dataToExport" 
 																		:worksheet="merchant.user_name + '-products-sheet'"
@@ -169,7 +169,7 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showProductMerchantDetails(merchantProduct)"
 																			>
@@ -178,7 +178,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openProductMerchantEditForm(merchantProduct)" 
 																				v-if="userHasPermissionTo('update-merchant-product')"
@@ -188,7 +188,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Delete'"  
 																				@click="openProductMerchantDeleteForm(merchantProduct)" 
 																				v-if="userHasPermissionTo('delete-merchant-product')" 
@@ -199,7 +199,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Requisitions'"  
 																				@click="goProductRequisitions(merchantProduct)" 
 																				v-if="userHasPermissionTo('view-requisition-index')"
@@ -209,12 +209,12 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-success btn-icon" 
+																				class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
 																				v-tooltip.bottom-end="'Stocks'"  
 																				@click="goProductStore(merchantProduct)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
-																				<i class='fas fa-store-alt'></i>
+																				<img src="/icons/cms/stocks.png" style="width: 17px">
 																			</button>
 																		</td>
 																	</tr>
@@ -223,7 +223,7 @@
 																  		v-show="! productsToShow.length"
 																  	>
 															    		<td colspan="5">
-																      		<div class="alert alert-danger" role="alert">
+																      		<div class="alert alert-danger text-center" role="alert">
 																      			Sorry, No data found.
 																      		</div>
 																    	</td>
@@ -261,7 +261,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchMerchantAllProducts() : searchData()"
 															>
@@ -693,7 +693,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															class="btn waves-effect waves-light hot-grd btn-primary btn-outline-primary btn-sm btn-block" 
 															v-tooltip.bottom-end="'Add Variation'" 
 															:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.product.variations && singleMerchantProductData.variations.length >= singleMerchantProductData.product.variations.length" 
 															@click="addMoreVariation()"
@@ -705,7 +705,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															class="btn waves-effect waves-light hot-grd btn-info btn-outline-info btn-sm btn-block" 
 															v-tooltip.bottom-end="'Remove Variation'" 
 															:disabled="singleMerchantProductData.variations[singleMerchantProductData.variations.length-1].variation_immutability || singleMerchantProductData.variations.length < 2"
 															@click="removeVariation()"
@@ -726,10 +726,10 @@
 										</div>
 
 										<div class="col-sm-12">
-						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -1331,10 +1331,10 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
 						<button 
 							type="button" 
-							class="btn btn-danger" 
+							class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
 							v-tooltip.bottom-end="'Print'"  
 							@click="print"
 						>
@@ -1813,14 +1813,14 @@
 					<div class="modal-footer">
 						<button 
 							type="button" 
-							class="btn btn-success" 
+							class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
 							@click="resetSearchingDates()" 
 							v-tooltip.bottom-end="'Reset'"
 						>
 	                  		Reset
 	                  	</button>
 
-						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+						<button type="button" class="btn waves-effect waves-dark btn-primary btn-outline-primary ml-auto" data-dismiss="modal">
 	                  		See Results
 	                  	</button>
 					</div>
@@ -1865,8 +1865,8 @@
 						</div>
 
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-danger">Delete</button>
+							<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary">Delete</button>
 						</div>
 					</form>
 				</div>
@@ -3138,6 +3138,8 @@
 
 							}
 							*/
+							
+							$('#products-importing-modal').modal('hide');
 
 						}
 

@@ -23,10 +23,10 @@
 						<h6 class="sub-heading text-secondary">{{ restorationMessage }}</h6>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
 						<button 
 							type="submit" 
-							class="btn btn-warning" 
+							class="btn waves-effect waves-dark btn-warning btn-outline-warning" 
 							:disabled="formSubmitted"
 						>
 							Restore

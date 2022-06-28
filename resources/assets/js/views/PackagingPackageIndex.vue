@@ -253,7 +253,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="query === '' ? fetchAllContents() : searchData()"
 															>
@@ -431,10 +431,10 @@
 							  	</span>
 							</div>
 							<div class="col-sm-12">
-								<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+								<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 									Close
 								</button>
-								<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
+								<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm || formSubmitted">
 									{{ createMode ? 'Save' : 'Update' }}
 								</button>
 							</div>
@@ -494,7 +494,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

@@ -212,7 +212,7 @@
 															              	<button 
 																              	type="submit" 
 																              	:disabled="loading || !submitForm" 
-																              	class="btn btn-primary"
+																              	class="btn waves-effect waves-dark btn-primary btn-outline-primary"
 															              	>
 															              		Update System Settings
 															              	</button>
@@ -411,7 +411,7 @@
 														              	<button 
 															              	type="submit" 
 															              	:disabled="loading || !submitForm" 
-															              	class="btn btn-primary"
+															              	class="btn waves-effect waves-dark btn-primary btn-outline-primary"
 														              	>
 														              		Update Payment Setting
 														              	</button>
@@ -515,7 +515,7 @@
 														              	<button 
 															              	type="submit" 
 															              	:disabled="loading || !submitForm" 
-															              	class="btn btn-primary"
+															              	class="btn waves-effect waves-dark btn-primary btn-outline-primary"
 														              	>
 														              		Update Contact Setting
 														              	</button>
@@ -701,7 +701,7 @@
 															              	<button 
 																              	type="submit" 
 																              	:disabled="loading || !submitForm" 
-																              	class="btn btn-primary"
+																              	class="btn waves-effect waves-dark btn-primary btn-outline-primary"
 															              	>
 															              		Update Delivery Setting
 															              	</button>
@@ -849,7 +849,7 @@
 															              	<button 
 																              	type="submit" 
 																              	:disabled="loading || !submitForm" 
-																              	class="btn btn-primary"
+																              	class="btn waves-effect waves-dark btn-primary btn-outline-primary"
 															              	>
 															              		Update Media Settings
 															              	</button>

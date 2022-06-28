@@ -5,7 +5,7 @@
 				<div class="row">
 					<div class="col-12 d-flex align-items-center">
 						<div class="d-inline mr-2">
-							<img :src="'icons/cms/' + icon + '.png'">
+							<img :src="'/icons/cms/' + icon + '.png'">
 						</div>
 
 						<div class="d-inline">

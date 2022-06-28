@@ -71,7 +71,7 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showProductMerchantDetails(productMerchant)"
 																			>
@@ -80,7 +80,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openProductMerchantEditForm(productMerchant)" 
 																				v-if="userHasPermissionTo('update-merchant-product')"
@@ -90,7 +90,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Delete'"  
 																				@click="openProductMerchantDeleteForm(productMerchant)" 
 																				v-if="userHasPermissionTo('delete-merchant-product')" 
@@ -101,7 +101,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Requisitions'"  
 																				@click="goProductRequisitions(productMerchant)" 
 																				v-if="userHasPermissionTo('view-requisition-index')"
@@ -111,12 +111,12 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-success btn-icon" 
+																				class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
 																				v-tooltip.bottom-end="'Stock'"  
 																				@click="goProductStore(productMerchant)" 
 																				v-if="userHasPermissionTo('view-product-stock-index')"
 																			>
-																				<i class='fas fa-store-alt'></i>
+																				<img src="/icons/cms/stocks.png" style="width: 17px">
 																			</button>
 																		</td>
 																	</tr>
@@ -125,7 +125,7 @@
 																  		v-show="! productAllMerchants.length"
 																  	>
 															    		<td colspan="5">
-																      		<div class="alert alert-danger" role="alert">
+																      		<div class="alert alert-danger text-center" role="alert">
 																      			Sorry, No data found.
 																      		</div>
 																    	</td>
@@ -163,7 +163,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; query === '' ? fetchProductAllMerchants() : searchData()"
 															>
@@ -594,7 +594,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-primary btn-sm btn-block" 
+															class="btn waves-effect waves-light hor-grd btn-primary btn-outline-primary btn-sm btn-block" 
 															v-tooltip.bottom-end="'Create New'" 
 															:disabled="singleMerchantProductData.variations.length >= product.variations.length" 
 															@click="addMoreVariation()"
@@ -606,7 +606,7 @@
 													<div class="form-group col-md-6">
 														<button 
 															type="button" 
-															class="btn waves-effect waves-light hor-grd btn-grd-info btn-sm btn-block" 
+															class="btn waves-effect waves-light hor-grd btn-info btn-outline-info btn-sm btn-block" 
 															v-tooltip.bottom-end="'Remove Variation'" 
 															:disabled="singleMerchantProductData.variations[singleMerchantProductData.variations.length-1].variation_immutability || singleMerchantProductData.variations.length < 2"
 															@click="removeVariation()"
@@ -627,10 +627,10 @@
 										</div>
 
 										<div class="col-sm-12">
-						                  	<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 						                  		Close
 						                  	</button>
-											<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm || formSubmitted">
+											<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm || formSubmitted">
 												{{ createMode ? 'Save' : 'Update' }}
 											</button>
 										</div>
@@ -923,7 +923,7 @@
 													<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-on:click="step-=1">
 								                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 								                  	</button>
-													<button type="submit" class="btn btn-primary float-right" :disabled="!submitForm">
+													<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm">
 														{{ createMode ? 'Save' : 'Update' }}
 													</button>
 												</div>
@@ -1427,7 +1427,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -1469,8 +1469,8 @@
 						</div>
 
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-danger">Delete</button>
+							<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn waves-effect waves-dark btn-danger btn-outline-danger">Delete</button>
 						</div>
 					</form>
 				</div>

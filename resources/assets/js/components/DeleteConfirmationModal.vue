@@ -23,12 +23,12 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary mr-auto" data-dismiss="modal">
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">
 							Close
 						</button>
 						<button 
 							type="submit" 
-							class="btn btn-danger" 
+							class="btn waves-effect waves-dark btn-danger btn-outline-danger" 
 							:disabled="formSubmitted"
 						>
 							Delete

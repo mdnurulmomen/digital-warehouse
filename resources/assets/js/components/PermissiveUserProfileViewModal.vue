@@ -37,7 +37,7 @@
 
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">
+					<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-block btn-sm" data-dismiss="modal">
 						Close
 					</button>
 				</div>

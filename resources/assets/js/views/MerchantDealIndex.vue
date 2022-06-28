@@ -32,11 +32,11 @@
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Deals'"></i>
+									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Deals'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 
-													  				class="btn btn-default p-1 dropdown-item active"
+													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
 																	:data="merchantAllDeals"
 																	:fields="dataToExport" 
 																	worksheet="Deals sheet"
@@ -48,7 +48,7 @@
 										  						<!-- 
 										  						<download-excel 
 										  							type="csv"
-													  				class="btn btn-default p-1 dropdown-item disabled"
+													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item disabled"
 																	:data="merchantAllDeals"
 																	:fields="dataToExport" 
 																	worksheet="Deals sheet"
@@ -63,7 +63,7 @@
 											  			<div class="ml-auto d-sm-none">
 											  				<button 
 											  					v-if="userHasPermissionTo('create-merchant-deal')"
-													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 													  			v-tooltip.bottom-end="'Create New'" 
 													  			@click="showContentCreateForm()"
 												  			>
@@ -119,7 +119,7 @@
 													<div class="col-md-4 text-right d-none d-md-block">
 														<button 
 										  					v-if="userHasPermissionTo('create-merchant-deal')"
-												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 												  			v-tooltip.bottom-end="'Create New'" 
 												  			@click="showDealCreateForm()"
 											  			>
@@ -208,7 +208,7 @@
 																		<td>
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showDealDetails(merchantDeal)"
 																			>
@@ -217,7 +217,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openDealEditForm(merchantDeal)" 
 																				v-if="userHasPermissionTo('update-merchant-deal')" 
@@ -228,7 +228,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Delete'" 
 																				:disabled="formSubmitted || ! removableDeal(merchantDeal)"  
 																				@click="openDealDeleteForm(merchantDeal)" 
@@ -239,7 +239,7 @@
 
 																			<button 
 																				type="button" 
-																				class="btn btn-grd-warning btn-icon" 
+																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Payments'" 
 																				:disabled="formSubmitted"  
 																				@click="goToDealPayments(merchantDeal)" 
@@ -296,7 +296,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; query === '' ? fetchAllMerchantDeals() : searchData()"
 															>
@@ -327,7 +327,7 @@
 		</div>
 
  		<!--Create, Edit or Approve Modal -->
-		<div class="modal fade" id="merchantDeal-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-deal') || userHasPermissionTo('update-merchant-deal')">
+		<div class="modal fade" id="merchantDeal-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-deal') || userHasPermissionTo('update-merchant-deal')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -452,7 +452,7 @@
 									          	<button 
 										          	type="button" 
 										          	v-on:click="nextPage"
-										          	class="btn btn-outline-secondary btn-sm btn-round" 
+										          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 										          	v-tooltip.bottom-end="'Next'" 
 										          	v-show="singleMerchantDealData.payments.length < 2"
 									          	>
@@ -461,7 +461,7 @@
 
 							                  	<button 
 													type="submit" 
-													class="btn btn-primary float-right" 
+													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
 													v-show="! createMode && singleMerchantDealData.payments.length > 1"
 												>
@@ -999,7 +999,7 @@
 															<div class="col-md-6 text-success">
 																<button 
 																	type="button" 
-																	class="btn btn-outline-primary btn-sm btn-block" 
+																	class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm btn-block" 
 																	v-tooltip.bottom-end="'Add Space'" 
 																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1" 
 																	@click="addWarehouseSpace(merchantWarehouseIndex)"
@@ -1010,7 +1010,7 @@
 															<div class="col-md-6 text-danger">
 																<button 
 																	type="button" 
-																	class="btn btn-outline-info btn-sm btn-block" 
+																	class="btn waves-effect waves-dark btn-info btn-outline-info btn-sm btn-block" 
 																	v-tooltip.bottom-end="'Remove Space'" 
 																	:disabled="singleMerchantDealData.warehouses.length > merchantWarehouseIndex + 1 || merchantWarehouse.spaces.length == 1 || ! removableSpace(merchantWarehouse.spaces[merchantWarehouse.spaces.length-1])" 
 																	@click="removeWarehouseSpace(merchantWarehouseIndex)"
@@ -1070,13 +1070,13 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 
 												<button 
 													type="button" 
-													class="btn btn-outline-secondary btn-sm btn-round float-right" 
+													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" 
 													v-tooltip.bottom-end="'Next'" 
 													v-on:click="nextPage" 
 													v-show="singleMerchantDealData.payments.length == 1"
@@ -1306,13 +1306,13 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 
 												<button 
 													type="submit" 
-													class="btn btn-primary float-right" 
+													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
 													v-show="singleMerchantDealData.payments.length < 2"
 												>
@@ -1352,7 +1352,7 @@
  	-->
 
  		<!-- Modal -->
-		<div class="modal fade" id="deal-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal fade" id="deal-custom-search" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1384,11 +1384,11 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" v-tooltip.bottom-end="'Reset'"  @click="resetSearchingDates()">
+						<button type="button" class="btn waves-effect waves-dark btn-success btn-outline-success" v-tooltip.bottom-end="'Reset'"  @click="resetSearchingDates()">
 	                  		Reset
 	                  	</button>
 
-						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+						<button type="button" class="btn waves-effect waves-dark btn-primary btn-outline-primary ml-auto" data-dismiss="modal">
 	                  		See Results
 	                  	</button>
 					</div>
@@ -1397,7 +1397,7 @@
 		</div>
 
  		<!-- View Modal -->
-		<div class="modal fade" id="merchant-deal-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="merchant-deal-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1884,7 +1884,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">
 							Close
 						</button>
 					</div>

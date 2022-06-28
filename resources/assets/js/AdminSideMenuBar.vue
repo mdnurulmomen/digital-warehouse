@@ -13,7 +13,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/home.png">
+										<img width="18px" src="icons/cms/home.png">
 									</span>
 									<span class="pcoded-mtext">Home</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -39,7 +39,7 @@
 							>
 								<router-link :to="{ name: 'roles' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/roles.png">
+										<img width="18px" src="icons/cms/roles.png">
 									</span>
 									<span class="pcoded-mtext">
 										Roles
@@ -54,7 +54,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/warehouses.png">
+										<img width="18px" src="icons/cms/warehouses.png">
 									</span>
 									<span class="pcoded-mtext">Warehouse</span>
 								</a>
@@ -115,7 +115,7 @@
 							>
 								<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/managers.png">
+										<img width="18px" src="icons/cms/managers.png">
 									</span>
 									<span class="pcoded-mtext">
 										Managers
@@ -128,7 +128,7 @@
 							>
 								<router-link :to="{ name: 'mails' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/mails.png">
+										<img width="18px" src="icons/cms/mails.png">
 									</span>
 									<span class="pcoded-mtext">
 										Mails
@@ -141,7 +141,7 @@
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/merchants.png">
+										<img width="18px" src="icons/cms/merchants.png">
 									</span>
 									<span class="pcoded-mtext">
 										Merchants
@@ -156,7 +156,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/products.png">
+										<img width="18px" src="icons/cms/products.png">
 									</span>
 									<span class="pcoded-mtext">Product</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -224,7 +224,7 @@
 							>
 								<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/requisitions.png">
+										<img width="18px" src="icons/cms/requisitions.png">
 									</span>
 
 									<span class="pcoded-mtext">
@@ -247,7 +247,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<img src="icons/cms/logistics.png">
+										<img width="18px" src="icons/cms/logistics.png">
 									</span>
 									<span class="pcoded-mtext">Logistics</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->

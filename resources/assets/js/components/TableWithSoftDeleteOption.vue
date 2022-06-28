@@ -42,7 +42,7 @@
 						
 						<td>
 							<button type="button" 
-									class="btn btn-grd-info btn-icon" 
+									class="btn waves-effect waves-light btn-info btn-outline-info btn-icon" 
 									v-tooltip.bottom-end="'View Details'"  
 									@click="$emit('showContentDetails', content)" 
 								 	v-show="$route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types'"
@@ -51,7 +51,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-primary btn-icon" 
+									class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 									v-tooltip.bottom-end="'Edit'" 
 									:disabled="formSubmitted"
 									v-show="!content.deleted_at" 
@@ -62,7 +62,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-danger btn-icon" 
+									class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 									v-tooltip.bottom-end="'Delete'" 
 									v-show="!content.deleted_at" 
 									@click="$emit('openContentDeleteForm', content)" 
@@ -73,7 +73,7 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-warning btn-icon" 
+									class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 									v-tooltip.bottom-end="'Restore'" 
 									:disabled="formSubmitted"
 									v-show="content.deleted_at" 
@@ -84,30 +84,30 @@
 							</button>
 
 							<button type="button" 
-									class="btn btn-dark btn-icon" 
+									class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
 									v-tooltip.bottom-end="'Merchant-Deals'" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
 							>
-								<i aria-hidden="true" class="fa fa-handshake-o"></i>
+								<img src="icons/cms/deals.png">
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-success btn-icon" 
+									class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 									v-tooltip.bottom-end="'Products'" 
 									@click="$emit('goMerchantProducts', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-product-index')"
 							>
-								<i aria-hidden="true" class="fab fa-product-hunt"></i>
+								<img src="icons/cms/products.png">
 							</button>
 
 							<button type="button" 
-									class="btn btn-grd-warning btn-icon"  
+									class="btn waves-effect waves-dark btn-inverse btn-outline-inverse btn-icon"  
 									v-tooltip.bottom-end="'View Containers'"
 									v-if="$route.name=='warehouses'" 
 									@click="$emit('showContainerShelfDetails', content)"
 							>
-								<img src="icons/cms/containers.png">
+								<img src="icons/cms/containers.png" width="17px">
 							</button>
 						</td>
 					</tr>
@@ -166,7 +166,7 @@
 			<div class="col-sm-2 col-8">
 				<button 
 					type="button" 
-					class="btn btn-primary btn-sm" 
+					class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 					v-tooltip.bottom-end="'Reload'" 
 					@click="pagination.current_page = 1; query === '' ? $emit('fetchAllContents') : $emit('searchData')"
 				>

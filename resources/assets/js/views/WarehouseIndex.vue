@@ -348,12 +348,12 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-							                  	<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+							                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
 
 												<button 
 									          	type="button" 
 									          	v-on:click="nextPage" 
-									          	class="btn btn-outline-secondary btn-sm btn-round float-right" 
+									          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" 
 									          	v-tooltip.bottom-end="'Next'"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -395,7 +395,7 @@
 			                                  		>
 				                                	</multiselect>
 		                              				<!-- 
-		                              				<button type="button" class="btn btn-secondary ml-1" data-toggle="modal" data-target="#user-createOrEdit-modal">
+		                              				<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary ml-1" data-toggle="modal" data-target="#user-createOrEdit-modal">
 				                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
 				                                    	owner
 				                                	</button>
@@ -438,7 +438,7 @@
 							                  	<button 
 							                  		type="button" 
 							                  		v-on:click="step-=1" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -454,7 +454,7 @@
 							                  	<button 
 							                  		type="button" 
 							                  		v-on:click="nextPage" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -551,7 +551,7 @@
 							                  	<button 
 							                  		type="button" 
 							                  		v-on:click="step-=1"
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -567,7 +567,7 @@
 							                  	<button 
 							                  		type="button" 
 							                  		v-on:click="nextPage" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -711,7 +711,7 @@
 														<button 
 															type="button"  
 															@click="addStorage" 
-															class="btn btn-success btn-block btn-sm" 
+															class="btn waves-effect waves-dark btn-success btn-outline-success btn-block btn-sm" 
 															v-tooltip.bottom-end="'More Storage'"
 														>
 															More Storage
@@ -722,7 +722,7 @@
 														<button 
 															type="button" 
 															@click="removeStorage" 
-															class="btn btn-danger btn-block btn-sm" 
+															class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-block btn-sm" 
 															:disabled="singleWarehouseData.storages.length<=1" 
 															v-tooltip.bottom-end="'Remove Storage'"
 														>
@@ -739,7 +739,7 @@
 					          				<div class="col-6">
 							                  	<button type="button" 
 							                  		v-on:click="step-=1" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -754,7 +754,7 @@
 									          	</div>
 							                  	<button type="button" 
 							                  		v-on:click="nextPage"
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -1088,7 +1088,7 @@
 														<button 
 															type="button"  
 															@click="addContainer" 
-															class="btn btn-success btn-block btn-sm" 
+															class="btn waves-effect waves-dark btn-success btn-outline-success btn-block btn-sm" 
 															v-tooltip.bottom-end="'Add Container'"
 														>
 															More Container
@@ -1097,7 +1097,7 @@
 													<div class="form-group col-sm-6">
 														<button 
 															type="button" 
-															class="btn btn-danger btn-block btn-sm" 
+															class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-block btn-sm" 
 															v-tooltip.bottom-end="'Remove Container'"
 															@click="removeContainer" 
 															:disabled="singleWarehouseData.containers.length < 2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
@@ -1117,7 +1117,7 @@
 							                  	<button 
 							                  		type="button" 
 							                  		v-on:click="step-=1" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
@@ -1133,7 +1133,7 @@
 							                  	<button 
 							                  		type="button" 
 							                  		v-on:click="nextPage"
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-tooltip.bottom-end="'Next'"
 							                  	>
 								                    <i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
@@ -1147,7 +1147,7 @@
 						          		<div class="row">
 					          				<div class="col-6">
 							                  	<button type="button" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-on:click="step-=1" 
 							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
@@ -1163,7 +1163,7 @@
 									          	</div>
 							                  	<button 
 							                  		type="submit" 
-							                  		class="btn btn-primary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm btn-round" 
 							                  		:disabled="formSubmitted"
 							                  	>
 								                    {{ createMode ? 'Save' : 'Update' }} Warehouse
@@ -1477,7 +1477,7 @@
 
 					          				<div class="col-6">
 							                  	<button type="button" 
-							                  		class="btn btn-outline-secondary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
 							                  		v-on:click="step-=1" 
 							                  		v-tooltip.bottom-end="'Previous'"
 							                  	>
@@ -1493,7 +1493,7 @@
 									          	</div>
 							                  	<button 
 							                  		type="submit" 
-							                  		class="btn btn-primary btn-sm btn-round" 
+							                  		class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm btn-round" 
 							                  		:disabled="formSubmitted"
 							                  	>
 								                    {{ createMode ? 'Save' : 'Update' }} Warehouse
@@ -1970,7 +1970,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

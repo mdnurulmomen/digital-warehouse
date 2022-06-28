@@ -239,7 +239,7 @@
 																	  	</span>
 																	</div>
 																	<div class="col-sm-12">
-																		<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																		<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																			Update Profile
 																		</button>
 																	</div>
@@ -331,7 +331,7 @@
 															  	</span>
 															</div>
 															<div class="col-sm-12">
-																<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																	Update Deal
 																</button>
 															</div>
@@ -438,7 +438,7 @@
 															  	</span>
 															</div>
 															<div class="col-sm-12">
-																<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																	Update Feature
 																</button>
 															</div>
@@ -586,7 +586,7 @@
 															  	</span>
 															</div>
 															<div class="col-sm-12">
-																<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																	Update Storage
 																</button>
 															</div>
@@ -833,7 +833,7 @@
 															  	</span>
 															</div>
 															<div class="col-sm-12">
-																<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+																<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																	Update Container
 																</button>
 															</div>
@@ -922,7 +922,7 @@
 														  	</span>
 														</div>
 														<div class="col-sm-12">
-															<button type="submit" class="btn btn-primary" :disabled="!submitForm">
+															<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary" :disabled="!submitForm">
 																Update Password
 															</button>
 														</div>

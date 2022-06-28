@@ -3,6 +3,7 @@
 	<div class="pcoded-content">
 		<breadcrumb 
 			:title="'container-shelves'" 
+			:icon="'container-shelves'" 
 			:message="'All shelves of expected containers'"
 		></breadcrumb>			
 
@@ -115,7 +116,7 @@
 																		
 																		<td>
 																			<button type="button" 
-																					class="btn btn-grd-info btn-icon" 
+																					class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																					v-tooltip.bottom-end="'View Details'"  
 																					@click="showShelfDetails(content)"
 																			>
@@ -123,12 +124,12 @@
 																			</button>
 
 																			<button type="button" 
-																					class="btn btn-grd-primary btn-icon" 
+																					class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																					v-tooltip.bottom-end="'Move Inside'"  
 																					v-show="content.container_shelf_unit_statuses.length" 
 																					@click="showShelfUnitDetails(content)"
 																			>
-																				<i class="fas fa-arrow-alt-circle-up"></i>
+																				<img src="/icons/cms/fast-forward.png" width="17px">
 																			</button>
 
 																			<!-- 
@@ -145,7 +146,7 @@
 																  		v-show="!contentsToShow.length"
 																  	>
 															    		<td colspan="3">
-																      		<div class="alert alert-danger" role="alert">
+																      		<div class="alert alert-danger text-center" role="alert">
 																      			Sorry, No data found.
 																      		</div>
 																    	</td>
@@ -179,7 +180,7 @@
 														<div class="col-sm-2">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; query === '' ? fetchContainerAllShelves() : searchData()"
 															>
@@ -338,7 +339,7 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-block btn-sm" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>

@@ -109,10 +109,10 @@
 						  	</span>
 						</div>
 						<div class="col-sm-12 pl-0 pr-0">
-							<button type="button" class="btn btn-secondary float-left" data-dismiss="modal">
+							<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
 								Close
 							</button>
-							<button type="submit" class="btn btn-primary float-right" :disabled="! submitForm || formSubmitted">
+							<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
 								{{ createMode ? 'Save' : 'Update' }}
 							</button>
 						</div>

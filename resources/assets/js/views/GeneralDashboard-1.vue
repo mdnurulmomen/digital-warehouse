@@ -136,7 +136,7 @@
                                     <div class="row align-items-center m-b-30">
                                         <div class="col">
                                             <h6 class="m-b-5 text-white">
-                                               Unreceived Dispatches
+                                               Non-received Dispatches
                                            </h6>
                                            <h3 class="m-b-0 f-w-700 text-white">
                                                {{ dashboard.numberUnreceivedDispatches || 0 }}
@@ -226,7 +226,7 @@
                                                     <td>
                                                         <img 
                                                         class="img-thumbnail" 
-                                                        style="width: 40px; margin-right: 5px" 
+                                                        style="width: 40px; height: 40px; margin-right: 5px" 
                                                         :src="merchantProduct.preview || (merchantProduct.hasOwnProperty('product') && merchantProduct.product.preview) ? merchantProduct.product.preview : '/storage/products/default-product.jpg'"
                                                         >
 

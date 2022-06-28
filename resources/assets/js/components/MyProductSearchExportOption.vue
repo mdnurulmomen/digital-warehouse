@@ -15,7 +15,7 @@
   					
   					<div class="dropdown-menu">
 							<download-excel 
-			  				class="btn btn-default p-1 dropdown-item active"
+			  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
 							:data="contentsToDownload"
 							:fields="dataToExport" 
 							:worksheet="callerPage + 's Sheet'"
@@ -27,7 +27,7 @@
   						<!-- 
   						<download-excel 
   							type="csv"
-			  				class="btn btn-default p-1 dropdown-item disabled"
+			  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item disabled"
 							:data="contentsToDownload"
 							:fields="dataToExport" 
 							worksheet="Requisitions sheet"
@@ -43,7 +43,7 @@
 	  				<!-- 
 	  				<button 
 	  					type="button" 
-			  			class="btn btn-success btn-outline-success btn-sm" 
+			  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 			  			v-tooltip.bottom-end="Create New" 
 			  			:disabled="disableAddButton" 
 			  			@click="$emit('showContentCreateForm')" 
@@ -103,7 +103,7 @@
 	  			<!-- 
 	  			<button 
 	  				type="button" 
-		  			class="btn btn-success btn-outline-success btn-sm" 
+		  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 		  			v-tooltip.bottom-end="Create New" 
 		  			:disabled="disableAddButton" 
 		  			@click="$emit('showContentCreateForm')" 
@@ -152,14 +152,14 @@
 						<div class="modal-footer">
 							<button 
 								type="button" 
-								class="btn btn-success" 
+								class="btn waves-effect waves-dark btn-success btn-outline-success" 
 								@click="resetSearchingDates()" 
 								v-tooltip.bottom-end="'Reset'"
 							>
 		                  		Reset
 		                  	</button>
 
-							<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+							<button type="button" class="btn waves-effect waves-dark btn-primary btn-outline-primary ml-auto" data-dismiss="modal">
 		                  		See Results
 		                  	</button>
 						</div>

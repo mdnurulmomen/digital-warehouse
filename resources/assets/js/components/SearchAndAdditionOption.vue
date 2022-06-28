@@ -7,7 +7,7 @@
 					{{ callerPage | capitalize }} List 
 
 					<i 
-  						class="fas fa-upload fa-lg pr-3 pl-1" 
+  						class="fa fa-upload fa-lg pr-3 pl-1" 
   						v-show="$route.name=='products'" 
   						v-tooltip.bottom-end="'Upload ' + callerPage" 
   						data-toggle="modal" 
@@ -17,7 +17,7 @@
 				</span>
 
 				<button 
-		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
+		  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm ml-auto d-sm-block d-md-none d-lg-none" 
 		  			v-tooltip.bottom-end="'Create New'" 
 		  			:disabled="disableAddButton" 
 		  			@click="$emit('showContentCreateForm')" 
@@ -43,7 +43,7 @@
 	  		</div>
 	  		<div class="col-sm-6 col-md-3 form-group" v-if="userHasPermissionTo('create-' + requiredPermission)">
 	  			<button 
-		  			class="btn btn-success btn-outline-success btn-sm ml-auto d-none d-sm-none d-md-block d-lg-block" 
+		  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm ml-auto d-none d-sm-none d-md-block d-lg-block" 
 		  			v-tooltip.bottom-end="'Create New'" 
 		  			:disabled="disableAddButton" 
 		  			@click="$emit('showContentCreateForm')"

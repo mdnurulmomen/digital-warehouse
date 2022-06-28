@@ -1,8 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-merchant-payment-index')">
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'payments'"
 			:title="'payment'" 
@@ -52,7 +50,7 @@
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 
-													  				class="btn btn-default p-1 dropdown-item active"
+													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
 																	:data="dealAllPayments"
 																	:fields="dataToExport" 
 																	worksheet="Payments sheet"
@@ -64,7 +62,7 @@
 										  						<!-- 
 										  						<download-excel 
 										  							type="csv"
-													  				class="btn btn-default p-1 dropdown-item disabled"
+													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item disabled"
 																	:data="dealAllPayments"
 																	:fields="dataToExport" 
 																	worksheet="Payments sheet"
@@ -79,7 +77,7 @@
 											  			<div class="ml-auto d-sm-none">
 											  				<button 
 											  					v-if="userHasPermissionTo('create-merchant-payment')"
-													  			class="btn btn-success btn-outline-success btn-sm" 
+													  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 													  			v-tooltip.bottom-end="'Create New'" 
 													  			@click="showContentCreateForm()"
 												  			>
@@ -135,7 +133,7 @@
 													<div class="col-md-4 text-right d-none d-md-block">
 														<button 
 										  					v-if="userHasPermissionTo('create-merchant-payment')"
-												  			class="btn btn-success btn-outline-success btn-sm" 
+												  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 												  			v-tooltip.bottom-end="'Create New'" 
 												  			@click="showContentCreateForm()"
 											  			>
@@ -300,7 +298,7 @@
 																	
 																	<td>
 																		<button type="button" 
-																				class="btn btn-grd-info btn-icon" 
+																				class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 																				v-tooltip.bottom-end="'View Details'"  
 																				@click="showContentDetails(content)"
 																		>
@@ -309,7 +307,7 @@
  																		
 
 																		<button type="button" 
-																				class="btn btn-grd-primary btn-icon" 
+																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'" 
 																				@click="openContentEditForm(content)" 
 																				v-if="userHasPermissionTo('update-merchant-payment')" 
@@ -318,7 +316,7 @@
 																		</button>
 
 																		<button type="button" 
-																				class="btn btn-grd-danger btn-icon" 
+																				class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-icon" 
 																				v-tooltip.bottom-end="'Delete'" 
 																				@click="openContentDeleteForm(content)" 
 																				v-if="userHasPermissionTo('delete-merchant-payment')" 
@@ -475,7 +473,7 @@
 														<div class="col-sm-2 col-8">
 															<button 
 																type="button" 
-																class="btn btn-primary btn-sm" 
+																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
 																@click="pagination.current_page = 1; searchAttributes.search === '' ? setDealAllPayments() : searchData()"
 															>
@@ -788,7 +786,7 @@
 								          		<div class="text-danger small mb-1" v-show="!submitForm">
 											  		Please input required fields
 									          	</div>
-									          	<button type="button" class="btn btn-outline-secondary btn-sm btn-round" v-tooltip.bottom-end="'Next'" v-on:click="nextPage">
+									          	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" v-tooltip.bottom-end="'Next'" v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
 								          	</div>
@@ -1014,13 +1012,13 @@
 											  	</span>
 											</div>
 											<div class="col-sm-12">
-												<button type="button" class="btn btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
 
 												<button 
 													type="submit" 
-													class="btn btn-primary float-right" 
+													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
 												>
 													{{ createMode ? 'Make ' : 'Update ' }} Payment
@@ -1383,8 +1381,8 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-danger btn-sm ml-auto" v-tooltip.bottom-end="'Print'" @click="print">Print</button>
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>
+						<button type="button" class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-sm ml-auto" v-tooltip.bottom-end="'Print'" @click="print">Print</button>
 					</div>
 				</div>
 			</div>
@@ -1604,11 +1602,11 @@
 					</div>
 					
 					<div class="modal-footer">
-						<button type="button" class="btn btn-success" v-tooltip.bottom-end="'Reset'"  @click="resetSearchingDates()">
+						<button type="button" class="btn waves-effect waves-dark btn-success btn-outline-success" v-tooltip.bottom-end="'Reset'"  @click="resetSearchingDates()">
 	                  		Reset
 	                  	</button>
 
-						<button type="button" class="btn btn-primary ml-auto" data-dismiss="modal">
+						<button type="button" class="btn waves-effect waves-dark btn-primary btn-outline-primary ml-auto" data-dismiss="modal">
 	                  		See Results
 	                  	</button>
 					</div>
