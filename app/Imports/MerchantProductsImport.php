@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Product;
 use App\Models\Merchant;
+use Illuminate\Validation\Rule;
 use App\Models\ProductVariation;
 use Illuminate\Support\Collection;
 use App\Models\ProductManufacturer;
@@ -24,13 +25,13 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
     {
         return [
         	'name' => 'required|string|exists:products,name',
-            // 'sku' => 'required|string|max:255|unique:merchant_products,sku',
-            'preview' => 'nullable|string|max:255',
-            'manufacturer_name' => 'nullable|string|exists:product_manufacturers,name',
+            // 'sku' => 'nullable|string|max:255',
+            // 'preview' => 'nullable|string|max:255',
+            'manufacturer_name' => 'nullable|string',
             'description' => 'nullable|string|max:255',
-            'warning_quantity' => 'numeric',
-            'discount' => 'numeric|between:0,100',
-            'selling_price' => 'required|numeric',
+            'warning_quantity' => 'nullable|numeric|min:0',
+            'discount' => 'nullable|numeric|between:0,100',
+            'selling_price' => 'required', // numeric / string with ',' (for merchant-variations)
             // 'variations' => [
             // 	Rule::requiredIf(Product::where('name', strtolower($request->name))->first()->has_variations)
             // ],
@@ -51,16 +52,21 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
                         
                         if (empty(strtolower($data['variations'])) || count(explode(',', $data['variations'])) < 2) {
 
-                            $validator->errors()->add($key, "Variations are required");
+                            $validator->errors()->add($key, "Incomplete variations");
                         
                         }
-                        else {
+                        else if (! empty(strtolower($data['variations'])) && count(explode(',', $data['selling_price'])) != count(explode(',', $data['variations']))) {
+
+                            $validator->errors()->add($key, "Selling prices are less than variations");
+                        
+                        }
+                        else {  // if product-variations are valid to add with merchant-products 
 
                             foreach (explode(',', $data['variations']) as $variationKey => $variation) {
                                 
                                 $productVariationExists = ProductVariation::where('product_id', $product->id)
                                 ->whereHas('variation', function ($query) use ($variation) {
-                                    $query->where('name', trim(strtolower($variation), " "));
+                                    $query->where('name', strtolower($variation));
                                 })
                                 ->exists();
 
@@ -71,6 +77,15 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
                                 }
 
                             }
+
+                        }
+
+                    }
+                    else { // product has no variation
+
+                        if (! is_numeric($data['selling_price']) || $data['selling_price'] < 0) {
+                            
+                            $validator->errors()->add($key, "Invalid selling price");
 
                         }
 
@@ -98,7 +113,7 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
             'warning_quantity.*' => 'Warning quantity is invalid.',
             'discount.*' => 'Discount rate is invalid.',
             'selling_price.required' => 'Selling price is required.',
-            'selling_price.*' => 'Selling price is invalid.',
+            // 'selling_price.*' => 'Selling price is invalid.',
             // 'variations.required' => 'Variations are required.',
             // 'variations.*' => 'Variations are invalid.',
         ];
@@ -118,49 +133,70 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
 
             if (! $product->has_variations || ($product->has_variations && count(explode(',', $row['variations'])) > 1)) {
             	
-            	$merchantProduct = $this->merchant->products()->firstOrCreate(
-            		[ 'product_id' => $product->id, 'manufacturer_id' => ($manufacturer ? $manufacturer->id : NULL), ],
-            		[
-            			'sku' => ('MR'.$this->merchant->id.'CT'.$product->category->id.'PR'.$product->id.'MFR'.($manufacturer ? $manufacturer->id : $this->merchant->id)),
-            			'preview' => $row['preview'],
+            	// skipping same record
+                if (! $this->merchant->products()->where('product_id', $product->id)->where('manufacturer_id', ($manufacturer ? $manufacturer->id : NULL))->exists()) {
+                    
+                    $merchantProduct = $this->merchant->products()->create([
+                        'sku' => $this->generateProductSKU($product->product_category_id, $product->id, $this->merchant->id, ($manufacturer ? $manufacturer->id : NULL)),
+
+            			// 'preview' => $row['preview'],
             			'description' => isset($row['description']) ? strtolower($row['description']) : '',
             			'warning_quantity' => $row['warning_quantity'] ?? 100,
             			'available_quantity' => 0,
             			'discount' => $row['discount'] ?? 0,
-            			'selling_price' => $row['selling_price'],
-            		]
-            	);
+            			'selling_price' => $product->has_variations ? min(explode(',', $row['selling_price'])) : $row['selling_price'],
+                        'product_id' => $product->id, 
+                        'manufacturer_id' => ($manufacturer ? $manufacturer->id : NULL)
+                    ]);
 
-                if ($product->has_variations) {
+                    if ($product->has_variations) {
 
-	                foreach (explode(',', $row['variations']) as $variationKey => $variation) {
+    	                foreach (explode(',', $row['variations']) as $variationKey => $variation) {
 
-	                    $productVariation = ProductVariation::where('product_id', $product->id)
-                        ->whereHas('variation', function ($query) use ($variation) {
-						    $query->where('name', strtolower($variation));
-						})
-                        ->first();
+    	                    // product-variation
+                            $productVariation = ProductVariation::where('product_id', $product->id)
+                            ->whereHas('variation', function ($query) use ($variation) {
+    						    $query->where('name', strtolower($variation));
+    						})
+                            ->first();
 
-	                    if ($productVariation) {
-	                        
-	                        $merchantProduct->variations()->firstOrCreate(
-	                            [ 'product_variation_id' => $productVariation->id ],
-	                            [
-	                                'sku' => ($merchantProduct->sku.'VR'.$productVariation->variation_id),
-			            			'preview' => NULL,
-			            			'selling_price' => $merchantProduct->selling_price,
-			            			'available_quantity' => 0
-	                            ]
-	                        );
+    	                    // skipping existing merchant-product-variations
+                            if ($productVariation && ! $merchantProduct->variations()->where('product_variation_id', $productVariation->id)->exists()) {
+    	                        
+    	                        $merchantProduct->variations()->create([
+	                                'sku' => ($merchantProduct->sku.'V'.$productVariation->variation_id),
+			            			// 'preview' => NULL,
+			            			'available_quantity' => 0,
+			            			'selling_price' => explode(',', $row['selling_price'])[$variationKey], 
+                                    'product_variation_id' => $productVariation->id
+                                ]);
 
-	                    }
+    	                    }
 
-	                }
+    	                }
 
-	            }
+    	            }
+
+                }
+
 
             }
 
         }
     }
+
+    protected function generateProductSKU($productCategory, $product, $merchant, $manufacturer = NULL)
+    {
+        if ($productCategory) {
+            
+            // return ('C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer ? $manufacturer : $merchant);
+            // return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+            return ('P'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+
+        }
+
+        // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+        return ('BP'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+    }
+
 }
