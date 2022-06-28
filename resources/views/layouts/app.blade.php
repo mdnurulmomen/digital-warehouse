@@ -13,7 +13,7 @@
     
     <!-- Fonts -->
     {{-- <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet"> --}}
-    <link rel='stylesheet' href='nunito.css'>
+    {{-- <link rel='stylesheet' href='nunito.css'> --}}
 
     <!-- Styles -->
     <link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">

@@ -22,9 +22,9 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/waves.min.css')}}" type="text/css" media="all">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{asset('css/cms.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/widget.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{asset('css/cms.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/font-awesome.min.css')}}">
 </head>
 
@@ -53,7 +53,7 @@
 					</div>
 					<div class="navbar-container container-fluid">
 						<ul class="nav-left">
-							<li class="header-search">
+							{{-- <li class="header-search">
 								<div class="main-search morphsearch-search">
 									<div class="input-group">
 										<span class="input-group-prepend search-close">
@@ -65,7 +65,7 @@
 										</span>
 									</div>
 								</div>
-							</li>
+							</li> --}}
 							<li>
 								<a href="#!" onclick="if (!window.__cfRLUnblockHandlers) return false; javascript:toggleFullScreen()" class="waves-effect waves-light" data-cf-modified-d2d1d6e2f87cbebdf4013b26-="">
 									<i class="full-screen feather icon-maximize"></i>
@@ -327,7 +327,7 @@
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/script.min.js')}}"></script>
 	{{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script> --}}
 	<script src="{{asset('js/rocket-loader.min.js')}}" data-cf-settings="d2d1d6e2f87cbebdf4013b26-|49" defer=""></script>
-	<script src="{{asset('js/bootstrap.min.js')}}" data-cf-settings="d2d1d6e2f87cbebdf4013b26-|49" defer=""></script>
+	{{-- <script src="{{asset('js/bootstrap.min.js')}}" data-cf-settings="d2d1d6e2f87cbebdf4013b26-|49" defer=""></script> --}}
 
 </body>
 
