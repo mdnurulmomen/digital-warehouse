@@ -212,6 +212,16 @@ class ProductController extends Controller
 
         $assetToUpdate->save();
 
+        if ($assetToUpdate->is_perishable && $assetToUpdate->childs->count()) {
+            
+            $assetToUpdate->childs()->update([
+                
+                'is_perishable' => true
+
+            ]);
+
+        }
+
         return $this->showProductAllCategories($perPage);
     }
 
