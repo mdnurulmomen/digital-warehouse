@@ -130,7 +130,7 @@
 														              		<div class="col-sm-4 form-group">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.application_logo || 'system/logo.png'" 
+															                  		:src="applicationSettings.logo || 'system/logo.png'" 
 															                  		alt="Application logo"
 														                  		>
 														                	</div>
@@ -158,7 +158,7 @@
 														              		<div class="col-sm-4 form-group">
 														                  		<img 
 															                  		class="profile-user-img img-fluid" 
-															                  		:src="applicationSettings.application_favicon || 'system/favicon.png'" 
+															                  		:src="applicationSettings.favicon || 'system/favicon.png'" 
 															                  		alt="Application favicon"
 														                  		>
 														                	</div>
@@ -1065,8 +1065,8 @@
 					return;
 				}
 
-				this.applicationSettings.application_logo = this.newLogo;
-				this.applicationSettings.application_favicon = this.newFavicon;
+				this.applicationSettings.logo = this.newLogo;
+				this.applicationSettings.favicon = this.newFavicon;
 
 				axios
 					.put('/system-settings', this.applicationSettings)
@@ -1173,12 +1173,12 @@
 
                 if (filename=='logo') {
                 	reader.onload = (evnt) => {
-	                    this.newLogo = this.applicationSettings.application_logo = evnt.target.result;
+	                    this.newLogo = this.applicationSettings.logo = evnt.target.result;
 	                };
                 }
                 else if (filename=='favicon') {
 	                reader.onload = (evnt) => {
-	                    this.newFavicon = this.applicationSettings.application_favicon = evnt.target.result;
+	                    this.newFavicon = this.applicationSettings.favicon = evnt.target.result;
 	                };
                 }
                 else if (filename=='media' && index >= 0) {

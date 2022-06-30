@@ -4,7 +4,7 @@
 		<breadcrumb 
 			:icon="'requisitions'"
 			:title="merchantProduct.product.name + ' requisitions'" 
-			:message="'All ' + merchantProduct.merchant.first_name + ' ' + merchantProduct.merchant.last_name + ' requisitions for ' + merchantProduct.product.name"
+			:message="merchantProduct.merchant.first_name + ' ' + merchantProduct.merchant.last_name + ' all requisitions for ' + merchantProduct.product.name"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">

@@ -59,7 +59,7 @@ class ApplicationSetting extends Model
                 return;
             }
 
-            $img = $img->resize(100, 100);
+            $img = $img->resize(250, 150);
             $img->save($imagePath.'logo.png', 100);
 
             $this->attributes['logo'] = $imagePath.'logo.png';

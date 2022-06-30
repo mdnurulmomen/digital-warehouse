@@ -102,8 +102,8 @@ class SettingController extends Controller
         $adminSettings->app_name = $request->app_name;
         $adminSettings->copyright_message = $request->copyright_message;
 
-        $adminSettings->application_logo = $request->application_logo;
-        $adminSettings->application_favicon = $request->application_favicon;
+        $adminSettings->application_logo = $request->logo;
+        $adminSettings->application_favicon = $request->favicon;
 
         $adminSettings->save();
 

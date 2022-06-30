@@ -302,24 +302,22 @@
 										</div>
 							        </div>
 
-							        <div class="col-md-12 card-footer">
-								    	<div class="form-row">
-									    	<div class="col-sm-12 text-right">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
+							        <div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small">
 											  		Please input required fields
-									          	</div>
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+							                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
 
-									          	<button 
-									          	type="button" 
-									          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
-									          	v-tooltip.bottom-end="'Next'" 
-									          	v-on:click="nextPage"
-									          	>
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
-								          	</div>
-								    	</div>
-							        </div>
+											</div>
+										</div>
+						          	</div>
 							    </div>
 
 							    <div 

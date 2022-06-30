@@ -62,7 +62,7 @@ class DealController extends Controller
             'payments.*.discount' => 'required|numeric|between:0,100',
             'payments.*.previous_due' => 'numeric|min:0',
             'payments.*.net_payable' => 'required|numeric',
-            'payments.*.paid_amount' => 'required|numeric',
+            'payments.*.paid_amount' => 'required|numeric|min:0',
             // 'payments.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
@@ -252,7 +252,7 @@ class DealController extends Controller
             'payments.*.discount' => 'required|numeric|between:0,100',
             'payments.*.previous_due' => 'required|numeric',
             'payments.*.net_payable' => 'required|numeric',
-            'payments.*.paid_amount' => 'required|numeric',
+            'payments.*.paid_amount' => 'required|numeric|min:0',
             // 'payments.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
@@ -564,7 +564,7 @@ class DealController extends Controller
             'discount' => 'required|numeric|between:0,100',
             'previous_due' => 'numeric',
             'net_payable' => 'numeric',
-            'paid_amount' => 'required|numeric',
+            'paid_amount' => 'required|numeric|min:0',
             // 'current_due' => 'required|numeric',
         ],
 
@@ -646,7 +646,7 @@ class DealController extends Controller
             'discount' => 'required|numeric|between:0,100',
             'previous_due' => 'numeric',
             'net_payable' => 'numeric',
-            'paid_amount' => 'required|numeric',
+            'paid_amount' => 'required|numeric|min:0',
             // 'current_due' => 'required|numeric',
         ],
 
