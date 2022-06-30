@@ -64,7 +64,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-warehouses/{search}/{perPage}', 'WarehouseController@searchAllWarehouses')->name('search-warehouses');
 
 		// merchant-warehouses
-		Route::get('/api/dealt-warehouses/{merchant}/{warehouse?}/{perPage?}', 'WarehouseController@showMerchantWarehouses')->name('merchant-warehouses');
+		Route::get('/api/dealt-warehouses/{merchant}/{warehouse?}/{requiredSpaceType?}/{perPage?}', 'WarehouseController@showMerchantWarehouses')->name('merchant-warehouses');
 
 		// warehouse empty containers
 		Route::get('/api/warehouse-empty-containers/{warehouse?}', 'WarehouseController@showAllWarehouseEmptySpaces')->name('warehouse-empty-containers');

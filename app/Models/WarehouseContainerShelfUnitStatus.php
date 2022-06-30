@@ -9,9 +9,21 @@ class WarehouseContainerShelfUnitStatus extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'engaged' => 'float',
+        'occupied' => 'float',
+    ];
+
+    /*
     public function product()
     {
         return $this->morphOne(WarehouseProduct::class, 'space');
+    }
+    */
+   
+    public function products()
+    {
+        return $this->morphMany(WarehouseProduct::class, 'space');
     }
 
     public function deals()

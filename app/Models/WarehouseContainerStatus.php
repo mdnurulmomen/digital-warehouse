@@ -9,6 +9,11 @@ class WarehouseContainerStatus extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'engaged' => 'float',
+        'occupied' => 'float',
+    ];
+
     public function containerShelfStatuses()
     {
         return $this->hasMany(WarehouseContainerShelfStatus::class, 'warehouse_container_status_id', 'id');
@@ -19,9 +24,16 @@ class WarehouseContainerStatus extends Model
         return $this->hasManyThrough(WarehouseContainerShelfUnitStatus::class,  WarehouseContainerShelfStatus::class, 'warehouse_container_status_id', 'warehouse_container_shelf_status_id');
     }
 
+    /*
     public function product()
     {
         return $this->morphOne(WarehouseProduct::class, 'space');
+    }
+    */
+   
+    public function products()
+    {
+        return $this->morphMany(WarehouseProduct::class, 'space');
     }
 
     public function deals()

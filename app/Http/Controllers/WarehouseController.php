@@ -10,9 +10,10 @@ use App\Models\WarehouseContainerStatus;
 use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\WarehouseCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
-use App\Http\Resources\Web\MerchantWarehouseResource;
 use App\Http\Resources\Web\WarehouseEmptySpaceResource;
 // use App\Http\Resources\Web\WarehouseManagerCollection;
+use App\Http\Resources\Web\MerchantWarehouseAllSpaceResource;
+use App\Http\Resources\Web\MerchantWarehouseEmptySpaceResource;
 
 class WarehouseController extends Controller
 {
@@ -445,17 +446,16 @@ class WarehouseController extends Controller
     }
 
     // merchant-warehouses
-    public function showMerchantWarehouses($merchant, $warehouse = false, $perPage = false)
+    public function showMerchantWarehouses($merchant, $warehouse = false, $requiredSpaceType = 'empty', $perPage = false)
     { 
         if ($perPage) {
             return;
         }
+        else if ($merchant) {
 
-        else if ($warehouse && $merchant) {
-            
-            return MerchantWarehouseResource::customCollection(
+            if (json_decode($warehouse)) { // casting bool from string 'false'
 
-                Warehouse::where('active', true)->where('id', $warehouse)
+                $merchantWarehouses = Warehouse::where('active', true)->where('id', $warehouse)
                 ->where(function ($query) use ($merchant) {
                     $query->whereHas('containers', function ($query1) use ($merchant) {
                         $query1->whereHas('deals', function ($query2) use ($merchant) {
@@ -470,18 +470,13 @@ class WarehouseController extends Controller
                     });
                 })
                 ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
-                ->get(),
+                ->get();
 
-                $merchant
+            }
+            else {
 
-            );
-
-        }
-        else if ($merchant) {
-            
-            return MerchantWarehouseResource::customCollection(
-
-                Warehouse::where('active', true)->whereHas('containers', function ($query) use ($merchant) {
+                $merchantWarehouses = Warehouse::where('active', true)
+                ->whereHas('containers', function ($query) use ($merchant) {
                     $query->whereHas('deals', function ($query1) use ($merchant) {
                         $query1->whereHas('deal', function ($query2) use ($merchant) {
                             $query2->where('merchant_id', $merchant)
@@ -493,11 +488,20 @@ class WarehouseController extends Controller
                     });
                 })
                 ->with([ 'containerStatuses', 'containerStatuses.containerShelfStatuses', 'containerStatuses.containerShelfStatuses.containerShelfUnitStatuses' ])
-                ->get(),
+                ->get();
 
-                $merchant
+            }
 
-            );
+            if ($requiredSpaceType=='all') {
+                    
+                return MerchantWarehouseAllSpaceResource::customCollection($merchantWarehouses, $merchant);
+
+            }
+            else if ($requiredSpaceType=='empty') {
+
+                return MerchantWarehouseEmptySpaceResource::customCollection($merchantWarehouses, $merchant);
+
+            }
 
         }
 

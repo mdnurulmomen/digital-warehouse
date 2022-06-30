@@ -1280,10 +1280,22 @@
 											                                  		:preserve-search="true" 
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
+											                                  		:option-height="104" 
+																					:show-labels="false" 
+											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_containers ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
 											                              		>
+											                              			<template slot="option" slot-scope="props">
+																						<div class="option__desc">
+																							<span class="option__title">{{ props.option.name | capitalize }}</span>
+																							
+																							<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																								{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																							</span>
+																						</div>
+																					</template>
 											                                	</multiselect>
 											                                	<div class="invalid-feedback">
 																			    	{{ errors.products[stockedProductIndex].addresses[spaceIndex].product_containers }}
@@ -1305,11 +1317,23 @@
 											                                  		:options="emptyShelfContainers" 
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
+											                                  		:option-height="104" 
+																					:show-labels="false" 
+											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_container ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
 											                                  		@input="setAvailableShelves(stockedProductIndex, spaceIndex)"
 											                              		>
+											                              			<template slot="option" slot-scope="props">
+																						<div class="option__desc">
+																							<span class="option__title">{{ props.option.name | capitalize }}</span>
+																							
+																							<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																								{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																							</span>
+																						</div>
+																					</template>
 											                                	</multiselect>
 											                                	<div class="invalid-feedback">
 																			    	{{ errors.products[stockedProductIndex].addresses[spaceIndex].product_container }}
@@ -1333,10 +1357,22 @@
 											                                  		:preserve-search="true" 
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
+											                                  		:option-height="104" 
+																					:show-labels="false" 
+											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
 											                              		>
+											                              			<template slot="option" slot-scope="props">
+																						<div class="option__desc">
+																							<span class="option__title">{{ props.option.name | capitalize }}</span>
+																							
+																							<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																								{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																							</span>
+																						</div>
+																					</template>
 											                                	</multiselect>
 											                                	<div class="invalid-feedback">
 																			    	{{ errors.products[stockedProductIndex].addresses[spaceIndex].product_shelves }}
@@ -1381,11 +1417,23 @@
 											                                  		:options="emptyUnitContainers" 
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
+											                                  		:option-height="104" 
+																					:show-labels="false" 
+											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
 											                                  		@input="setAvailableUnitShelves(stockedProductIndex, spaceIndex)" 
 											                              		>
+											                              			<template slot="option" slot-scope="props">
+																						<div class="option__desc">
+																							<span class="option__title">{{ props.option.name | capitalize }}</span>
+																							
+																							<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																								{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																							</span>
+																						</div>
+																					</template>
 											                                	</multiselect>
 											                                	<div class="invalid-feedback">
 																			    	{{ errors.products[stockedProductIndex].addresses[spaceIndex].product_container }}
@@ -1405,11 +1453,23 @@
 											                                  		:options="emptyUnitShelves" 
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
+											                                  		:option-height="104" 
+																					:show-labels="false" 
+											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
 											                                  		@input="setAvailableUnits(stockedProductIndex, spaceIndex)" 
 											                              		>
+											                              			<template slot="option" slot-scope="props">
+																						<div class="option__desc">
+																							<span class="option__title">{{ props.option.name | capitalize }}</span>
+																							
+																							<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																								{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																							</span>
+																						</div>
+																					</template>
 											                                	</multiselect>
 											                                	<div class="invalid-feedback">
 																			    	{{ errors.products[stockedProductIndex].addresses[spaceIndex].product_shelf }}
@@ -1456,10 +1516,22 @@
 											                                  		:preserve-search="true" 
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
+											                                  		:option-height="104" 
+																					:show-labels="false" 
+											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)" 
 											                              		>
+											                              			<template slot="option" slot-scope="props">
+																						<div class="option__desc">
+																							<span class="option__title">{{ props.option.name | capitalize }}</span>
+																							
+																							<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																								{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																							</span>
+																						</div>
+																					</template>
 											                                	</multiselect>
 											                                	<div class="invalid-feedback">
 																			    	{{ errors.products[stockedProductIndex].addresses[spaceIndex].product_units }}
@@ -2373,9 +2445,9 @@
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
-								:src="'/' + general_settings.application_logo" 
+								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'" 
-								width="100px"
+								width="60px"
 							>
 							
 							<h5>
@@ -3596,7 +3668,7 @@
 				}
 
 				axios
-					.get('/api/dealt-warehouses/' + this.singleStockData.merchant.id + '/' + this.singleStockData.warehouse.id)
+					.get('/api/dealt-warehouses/' + this.singleStockData.merchant.id + '/' + this.singleStockData.warehouse.id + '/all')
 					.then(response => {
 						if (response.status == 200) {
 							
@@ -5172,6 +5244,9 @@
 				}
 
 			},
+			customLabel ({ name }) {
+		      return `${name}`
+		    },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;

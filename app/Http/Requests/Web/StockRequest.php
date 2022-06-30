@@ -49,6 +49,34 @@ class StockRequest extends FormRequest
             $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
             $product = $merchantProduct->product;
 
+            $rules['products.'.$stockingProductKey.'.addresses'] = 'required|array|min:1';
+
+            foreach (json_decode(json_encode($stockingProduct->addresses)) as $addressKey => $address) {
+            
+                if ($address->type=='containers') {
+                    $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.containers'] = 'required|array|min:1';
+
+                    foreach ($address->containers as $containerKey => $container) {
+                        $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.containers.'.$containerKey.'.id'] = [
+                            'required', 
+                            Rule::exists('dealt_spaces', 'space_id')
+                            ->where('space_type', 'App\Models\WarehouseContainerStatus')
+                        ];
+                    }
+
+                }
+                else if ($address->type=='shelves') {
+                    $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.container'] = 'required';
+                    $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.container.shelves'] = 'required|array|min:1';
+                }
+                else if ($address->type=='units') {
+                    $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.container'] = 'required';
+                    $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.container.shelf'] = 'required';
+                    $rules['products.'.$stockingProductKey.'.addresses.'.$addressKey.'.container.shelf.units'] = 'required|array|min:1';
+                }
+
+            }
+
             if ($product->has_serials && ! $product->has_variations) {
                 $rules['products.'.$stockingProductKey.'.serials'] = 'required|array|min:'.$stockingProduct->stock_quantity;
             }
@@ -83,7 +111,7 @@ class StockRequest extends FormRequest
 
             }
             if ($product->has_variations) {
-                $rules['products.'.$stockingProductKey.'.variations'] = 'required|array';
+                $rules['products.'.$stockingProductKey.'.variations'] = 'required|array|min:1';
             }
             if ($product->has_variations) {
                 $rules['products.'.$stockingProductKey.'.variations.*.merchant_product_variation_id'] = 'required|integer|exists:merchant_product_variations,id';
@@ -104,39 +132,32 @@ class StockRequest extends FormRequest
                         
                         $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials'] = ['required', 'array'];
 
-                    }
-
-                }
-
-            }
-            if ($product->has_variations && $product->has_serials) {
-
-                foreach ($stockingProduct->variations as $stockingProductVariationKey => $stockingProductVariation) {
-                    
-                    foreach ($stockingProductVariation->serials as $variationSerialkey => $variationSerial) {
+                        foreach ($stockingProductVariation->serials as $variationSerialkey => $variationSerial) {
                         
-                        if (isset($variationSerial->id)) {
-                            // $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no,'.$variationSerial->id;
-                            
-                            $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = [
-                                'required','string','distinct','min:4',
+                            if (isset($variationSerial->id)) {
+                                // $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no,'.$variationSerial->id;
                                 
-                                Rule::unique('product_variation_serials', 'serial_no')
-                                ->where(function ($query) use ($variationSerial) {
-                                    return $query->where('id', '!=', $variationSerial->id);
-                                })
-                                ->ignore(1, 'has_dispatched')
-                            ];
-                        }
-                        else {
-                            // $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no';
-                            
-                            $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = [
-                                'required','string','distinct','min:4',
+                                $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = [
+                                    'required','string','distinct','min:4',
+                                    
+                                    Rule::unique('product_variation_serials', 'serial_no')
+                                    ->where(function ($query) use ($variationSerial) {
+                                        return $query->where('id', '!=', $variationSerial->id);
+                                    })
+                                    ->ignore(1, 'has_dispatched')
+                                ];
+                            }
+                            else {
+                                // $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = 'required|string|distinct|min:4|unique:product_variation_serials,serial_no';
                                 
-                                Rule::unique('product_variation_serials', 'serial_no')->ignore(1, 'has_dispatched')
-                                
-                            ];
+                                $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.serials.'.$variationSerialkey.'.serial_no'] = [
+                                    'required','string','distinct','min:4',
+                                    
+                                    Rule::unique('product_variation_serials', 'serial_no')->ignore(1, 'has_dispatched')
+                                    
+                                ];
+                            }
+
                         }
 
                     }

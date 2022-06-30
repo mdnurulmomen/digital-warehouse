@@ -4,7 +4,7 @@
 		<breadcrumb 
 			:icon="'stocks'"
 			:title="product.name + ' stocks'" 
-			:message="'All ' + product.name + ' stocks for ' + productMerchant.merchant ? productMerchant.merchant.name : ''"
+			:message="('All ' + product.name + ' stocks for ' + (productMerchant.merchant ? productMerchant.merchant.user_name : ''))"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -731,13 +731,21 @@
 										</div>
 									</div>
 
-							    	<div class="col-sm-12 card-footer text-right">
-						          		<div class="text-danger small mb-1" v-show="!submitForm">
-									  		Please input required fields
-							          	</div>
-							          	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" v-tooltip.bottom-end="'Next'">
-					                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-					                  	</button>
+						          	<div class="col-sm-12 form-group mb-0 card-footer">
+										<div class="row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+							                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+											</div>
+										</div>
 						          	</div>
 							    </div>
 
@@ -842,7 +850,7 @@
 														<div class="form-row">
 															<div class="form-group col-md-12 text-center">
 																<img 
-																	:src="showPreview(stockVariation.preview)" 
+																	:src="showPreview(stockVariation.preview, variationIndex)" 
 																	class="img-fluid" 
 																	:alt="stockVariation.variation.name + ' Preview'" 
 																	width="100px"
@@ -973,15 +981,12 @@
 																>
 
 																<div class="input-group-append">
-																	<span class="input-group-text" id="basic-addon2">
-																		<button 
-																			type="button" 
-																			class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
-																			v-tooltip.bottom-end="'Insert Serial'" 
-																			@click="addVariationSerial(stockedVariationIndex)"
-																		>
-																			Enlist
-																		</button>
+																	<span 
+																		class="input-group-text waves-effect waves-light btn-grd-primary"
+																		v-tooltip.bottom-end="'Insert Serial'" 
+																		@click="addVariationSerial(stockedVariationIndex)"
+																	>
+																		Enlist
 																	</span>
 																</div>
 															</div>
@@ -1063,15 +1068,12 @@
 													>
 
 													<div class="input-group-append">
-														<span class="input-group-text" id="basic-addon2">
-															<button 
-																type="button" 
-																class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
-																v-tooltip.bottom-end="'Insert Serial'" 
-																@click="addProductSerial()"
-															>
-																Enlist
-															</button>
+														<span 
+															class="input-group-text waves-effect waves-light btn-grd-primary"
+															v-tooltip.bottom-end="'Insert Serial'" 
+															@click="addVariationSerial(stockedVariationIndex)"
+														>
+															Enlist
 														</span>
 													</div>
 												</div>
@@ -1217,11 +1219,23 @@
 					                                  		:preserve-search="true" 
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
+					                                  		:option-height="104" 
+															:show-labels="false" 
+					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_containers  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@close="validateFormInput('product_containers')" 
 					                              		>
+					                              			<template slot="option" slot-scope="props">
+																<div class="option__desc">
+																	<span class="option__title">{{ props.option.name | capitalize }}</span>
+																	
+																	<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																		{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																	</span>
+																</div>
+															</template>
 					                                	</multiselect>
 					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_containers }}
@@ -1243,12 +1257,24 @@
 					                                  		:options="emptyShelfContainers" 
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
+					                                  		:option-height="104" 
+															:show-labels="false" 
+					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_container ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@input="setAvailableShelves(spaceIndex)"
 					                                  		@close="validateFormInput('product_container')" 
 					                              		>
+					                              			<template slot="option" slot-scope="props">
+																<div class="option__desc">
+																	<span class="option__title">{{ props.option.name | capitalize }}</span>
+																	
+																	<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																		{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																	</span>
+																</div>
+															</template>
 					                                	</multiselect>
 					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_container }}
@@ -1272,11 +1298,23 @@
 					                                  		:preserve-search="true" 
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
+					                                  		:option-height="104" 
+															:show-labels="false" 
+					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@close="validateFormInput('product_shelves')" 
 					                              		>
+					                              			<template slot="option" slot-scope="props">
+																<div class="option__desc">
+																	<span class="option__title">{{ props.option.name | capitalize }}</span>
+																	
+																	<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																		{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																	</span>
+																</div>
+															</template>
 					                                	</multiselect>
 					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_shelves }}
@@ -1315,20 +1353,33 @@
 													<div class="form-group col-md-4">
 														<label for="inputFirstName">Select Parent Container</label>
 														<multiselect 
-					                              			v-model="stockSpace.container"
-					                              			placeholder="Parent Container" 
-					                              			label="name" 
-					                                  		track-by="id" 
-					                                  		:options="emptyUnitContainers" 
-					                                  		:required="true" 
-					                                  		:allow-empty="false" 
-					                                  		class="form-control p-0" 
-					                                  		:class="!errors.stock.addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
-					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
-					                                  		@input="setAvailableUnitShelves(spaceIndex)" 
-					                                  		@close="validateFormInput('product_container')" 
-					                              		>
-					                                	</multiselect>
+															v-model="stockSpace.container"
+															placeholder="Parent Container" 
+															label="name" 
+															track-by="id" 
+															:options="emptyUnitContainers" 
+															:required="true" 
+															:allow-empty="false" 
+															:option-height="104" 
+															:show-labels="false" 
+															:custom-label="customLabel" 
+															class="form-control p-0" 
+															:class="!errors.stock.addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
+															:disabled="singleStockData.addresses.length > (spaceIndex+1)"
+															@input="setAvailableUnitShelves(spaceIndex)" 
+															@close="validateFormInput('product_container')" 
+														>
+															<template slot="option" slot-scope="props">
+																<div class="option__desc">
+																	<span class="option__title">{{ props.option.name | capitalize }}</span>
+																	
+																	<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																		{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																	</span>
+																</div>
+															</template>
+														</multiselect>
+
 					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_container }}
 													    </div>
@@ -1347,12 +1398,24 @@
 					                                  		:options="emptyUnitShelves" 
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
+					                                  		:option-height="104" 
+															:show-labels="false" 
+					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@input="setAvailableUnits(spaceIndex)" 
 					                                  		@close="validateFormInput('product_shelf')" 
 					                              		>
+					                              			<template slot="option" slot-scope="props">
+																<div class="option__desc">
+																	<span class="option__title">{{ props.option.name | capitalize }}</span>
+																	
+																	<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																		{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																	</span>
+																</div>
+															</template>
 					                                	</multiselect>
 					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_shelf }}
@@ -1400,11 +1463,23 @@
 					                                  		:preserve-search="true" 
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
+					                                  		:option-height="104" 
+															:show-labels="false" 
+					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
 					                                  		@close="validateFormInput('product_units')" 
 					                              		>
+					                              			<template slot="option" slot-scope="props">
+																<div class="option__desc">
+																	<span class="option__title">{{ props.option.name | capitalize }}</span>
+																	
+																	<span :class="[props.option.occupied > 0.0 ? 'badge-warning' : 'badge-success', 'badge']">
+																		{{ props.option.occupied > 0.0 ? 'Occupied' : 'Empty' }}
+																	</span>
+																</div>
+															</template>
 					                                	</multiselect>
 					                                	<div class="invalid-feedback">
 													    	{{ errors.stock.addresses[spaceIndex].product_units }}
@@ -2518,8 +2593,8 @@
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
-								width="100px" 
-								:src="'/' + general_settings.application_logo" 
+								width="60px" 
+								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'" 
 							>
 							
@@ -3355,7 +3430,7 @@
 				this.allDealtEmptyWarehouses = [];
 
 				axios
-					.get('/api/dealt-warehouses/' + this.productMerchant.merchant.id)
+					.get('/api/dealt-warehouses/' + this.productMerchant.merchant.id + '/' + false + '/all')
 					.then(response => {
 						if (response.status == 200) {
 							
@@ -3556,7 +3631,7 @@
 							
 							// this.printStockCode(this.singleStockData);		// as there is no stock code then
 
-							// $('#stock-createOrEdit-modal').modal('hide');
+							$('#stock-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -3568,7 +3643,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.fetchMerchantAllWarehouses();
+						// this.fetchMerchantAllWarehouses();
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -3594,6 +3669,8 @@
 							// this.printStockCode(this.singleStockData);		// as there is no stock code then
 
 							$('#stock-createOrEdit-modal').modal('hide');
+
+							this.printStockCode(this.singleStockData);
 						}
 					})
 					.catch(error => {
@@ -3605,8 +3682,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.fetchMerchantAllWarehouses();
-						this.printStockCode(this.singleStockData);
+						// this.fetchMerchantAllWarehouses();
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -3636,7 +3712,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.fetchMerchantAllWarehouses();
+						// this.fetchMerchantAllWarehouses();
 						// this.fetchWarehouseAllContainers();
 					});
 
@@ -4546,10 +4622,10 @@
             	}
 
             },
-            showPreview(imagePath = 'default') {
+            showPreview(imagePath = 'default', variationIndex = false) {
 				
-				if (! imagePath || imagePath == '') {
-					return '/' + this.product.preview;
+				if (! imagePath || imagePath == '') { // null or empty
+					return ('/' + (typeof variationIndex == 'number' ? this.product.variations[variationIndex].preview : this.product.preview));
 				}
 				else if (imagePath == 'default') {
 					return '/' + this.productMerchant.preview;
@@ -4561,6 +4637,9 @@
 				// return '';
 
 			},
+			customLabel ({ name }) {
+		      return `${name}`
+		    },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -4696,7 +4775,7 @@
 				
 					case 'product_address' : 
 
-						if (this.createMode && this.singleStockData.addresses.length < 1) {
+						if (/*this.createMode && */this.singleStockData.addresses.length < 1) {
 							this.submitForm = false;
 							this.errors.stock.product_address = 'Address is required';
 						}
@@ -4714,7 +4793,7 @@
 							
 							(productSpace, index) => {
 
-								if (!productSpace.type) {
+								if (! productSpace.type) {
 									this.errors.stock.addresses[index].product_space_type = 'Space type is required';
 								}
 							/*
@@ -4766,7 +4845,7 @@
 							
 							(productSpace, index) => {
 
-								if ((productSpace.type=='shelves' || productSpace.type=='units') && (!productSpace.container || Object.keys(productSpace.container).length==0)) {
+								if ((productSpace.type=='shelves' || productSpace.type=='units') && (! productSpace.container || Object.keys(productSpace.container).length==0)) {
 									this.errors.stock.addresses[index].product_container = 'Container is required';
 								}
 								else{
@@ -4788,7 +4867,7 @@
 							
 							(productSpace, index) => {
 
-								if (productSpace.type=='shelves' && (!productSpace.container || !productSpace.container.shelves || productSpace.container.shelves.length == 0)) {
+								if (productSpace.type=='shelves' && (! productSpace.container || ! productSpace.container.shelves || productSpace.container.shelves.length == 0)) {
 									this.errors.stock.addresses[index].product_shelves = 'Shelf is required';
 								}
 								else{
@@ -4810,7 +4889,7 @@
 							
 							(productSpace, index) => {
 
-								if (productSpace.type=='units' && (!productSpace.container || !productSpace.container.shelf || Object.keys(productSpace.container.shelf).length==0)) {
+								if (productSpace.type=='units' && (! productSpace.container || ! productSpace.container.shelf || Object.keys(productSpace.container.shelf).length==0)) {
 									this.errors.stock.addresses[index].product_shelf = 'Shelf is required';
 								}
 								else{
@@ -4833,7 +4912,7 @@
 							
 							(productSpace, index) => {
 
-								if (productSpace.type=='units' && (!productSpace.container || !productSpace.container.shelf || !productSpace.container.shelf.units || productSpace.container.shelf.units.length == 0)) {
+								if (productSpace.type=='units' && (! productSpace.container || ! productSpace.container.shelf || !productSpace.container.shelf.units || productSpace.container.shelf.units.length == 0)) {
 									this.errors.stock.addresses[index].product_units = 'Unit is required';
 								}
 								else{

@@ -382,9 +382,9 @@ class ProductStock extends Model
                 
                 $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
-                if (!empty($warehouseExpectedContainer) && $warehouseExpectedContainer->occupied==0.0) {
+                if (! empty($warehouseExpectedContainer) /*&& $warehouseExpectedContainer->occupied==0.0*/) {
                     
-                    $warehouseExpectedContainer->product()->create([
+                    $warehouseExpectedContainer->products()->create([
                         'product_stock_id' => $this->id,
                         'merchant_product_id' => $merchantProduct,
                     ]);
@@ -416,9 +416,9 @@ class ProductStock extends Model
                     
                     $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
-                    if (!empty($warehouseExpectedShelf) && $warehouseExpectedShelf->occupied==0.0) {
+                    if (! empty($warehouseExpectedShelf) /*&& $warehouseExpectedShelf->occupied==0.0*/) {
                         
-                        $warehouseExpectedShelf->product()->create([
+                        $warehouseExpectedShelf->products()->create([
                             'product_stock_id' => $this->id,
                             'merchant_product_id' => $merchantProduct,
                         ]);
@@ -457,9 +457,9 @@ class ProductStock extends Model
                     
                     $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                    if (!empty($warehouseExpectedShelfUnit) && $warehouseExpectedShelfUnit->occupied==0.0) {
+                    if (! empty($warehouseExpectedShelfUnit) /*&& $warehouseExpectedShelfUnit->occupied==0.0*/) {
                         
-                        $warehouseExpectedShelfUnit->product()->create([
+                        $warehouseExpectedShelfUnit->products()->create([
                             'product_stock_id' => $this->id,
                             'merchant_product_id' => $merchantProduct,
                         ]);

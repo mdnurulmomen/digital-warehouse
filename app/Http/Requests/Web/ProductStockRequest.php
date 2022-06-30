@@ -44,10 +44,37 @@ class ProductStockRequest extends FormRequest
             'stock_quantity' => 'required|integer|min:1',
             'unit_buying_price' => 'nullable|numeric',
             // 'product_id' => 'required|numeric|exists:products,id',
+            'addresses' => 'required|array|min:1'
         ];
             
         $merchantProduct = MerchantProduct::findOrFail($this->input('merchant_product_id'));
         $product = $merchantProduct->product;
+
+        foreach (json_decode(json_encode($this->input('addresses'))) as $addressKey => $address) {
+            
+            if ($address->type=='containers') {
+                $rules['addresses.'.$addressKey.'.containers'] = 'required|array|min:1';
+
+                foreach ($address->containers as $containerKey => $container) {
+                    $rules['addresses.'.$addressKey.'.containers.'.$containerKey.'.id'] = [
+                        'required', 
+                        Rule::exists('dealt_spaces', 'space_id')
+                        ->where('space_type', 'App\Models\WarehouseContainerStatus')
+                    ];
+                }
+
+            }
+            else if ($address->type=='shelves') {
+                $rules['addresses.'.$addressKey.'.container'] = 'required';
+                $rules['addresses.'.$addressKey.'.container.shelves'] = 'required|array|min:1';
+            }
+            else if ($address->type=='units') {
+                $rules['addresses.'.$addressKey.'.container'] = 'required';
+                $rules['addresses.'.$addressKey.'.container.shelf'] = 'required';
+                $rules['addresses.'.$addressKey.'.container.shelf.units'] = 'required|array|min:1';
+            }
+
+        }
 
         if ($product->has_serials && ! $product->has_variations) {
             $rules['serials'] = 'required|array|min:'.$this->input('stock_quantity');
@@ -80,7 +107,7 @@ class ProductStockRequest extends FormRequest
             }
         }
         if ($product->has_variations) {
-            $rules['variations'] = 'required|array';
+            $rules['variations'] = 'required|array|min:1';
             
             // $rules['variations.*.id'] = 'required_without:variations.*.merchant_product_variation_id|integer|exists:merchant_product_variations,id';
 
@@ -183,6 +210,11 @@ class ProductStockRequest extends FormRequest
             'stock_quantity.*' => 'Stock quantity is required !',
             'total_stock_quantity.*' => 'Variation total Stock qty is more or less than product qty !',
             'unit_buying_price.*' => 'Buying price should be numeric !',
+            
+            // 'addresses.*.container.shelf.units'] => 'Unit address is invalid',
+            // 'addresses.*.container.shelf.units'] => 'Unit address is invalid',
+            // 'addresses.*.container.shelf.units'] => 'Unit address is invalid',
+
             'serials.required' => 'Product serial is required !',
             
             'serials.*.serial_no' => [
@@ -222,7 +254,7 @@ class ProductStockRequest extends FormRequest
         $validator->after(function ($validator) {
 
             // always
-            if ($this->checkVariationSerialDuplicacy($this)) {
+            if (property_exists($this, 'variations') && count($this->input('variations')) && $this->checkVariationSerialDuplicacy($this)) {
                 
                 $duplicateValue = $this->checkVariationSerialDuplicacy($this);
                 // return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
