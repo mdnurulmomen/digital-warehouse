@@ -26,18 +26,18 @@ class ProductCategory extends Model
     /*
         public function category()
         {
-        	return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
+        	return $this->belongsTo(self::class, 'parent_category_id', 'id')->withTrashed();
         }
     */
 
     public function parent()
     {
-        return $this->belongsTo(ProductCategory::class, 'parent_category_id', 'id')->withTrashed();
+        return $this->belongsTo(self::class, 'parent_category_id', 'id')->withTrashed();
     }
 
     public function childs()
     {
-        return $this->hasMany(ProductCategory::class, 'parent_category_id', 'id');
+        return $this->hasMany(self::class, 'parent_category_id', 'id');
     }
 
     /*public function nestedChilds()

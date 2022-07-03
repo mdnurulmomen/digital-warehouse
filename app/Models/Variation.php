@@ -30,37 +30,37 @@ class Variation extends Model
     /*
         public function variationParent()
         {
-        	return $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+        	return $this->belongsTo(self::class, 'variation_parent_id', 'id')->withTrashed();
         }
     */
     
     public function parent()
     {
-        return $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+        return $this->belongsTo(self::class, 'variation_parent_id', 'id')->withTrashed();
     }
 
     /*
         public function variationChilds()
         {
-        	return $this->hasMany(Variation::class, 'variation_parent_id', 'id');
+        	return $this->hasMany(self::class, 'variation_parent_id', 'id');
         }
     */
    
     public function childs()
     {
-        return $this->hasMany(Variation::class, 'variation_parent_id', 'id');
+        return $this->hasMany(self::class, 'variation_parent_id', 'id');
     }
 
     public function nestedChilds()
     {
-        return $this->hasMany(Variation::class, 'variation_parent_id', 'id')->with('childs');
+        return $this->hasMany(self::class, 'variation_parent_id', 'id')->with('childs');
     }
 
 
     /*
         public function variationGrandParent()
         {
-            $currentAncestor = $this->belongsTo(Variation::class, 'variation_parent_id', 'id')->withTrashed();
+            $currentAncestor = $this->belongsTo(self::class, 'variation_parent_id', 'id')->withTrashed();
 
             while ($currentAncestor->variation_parent_id !== NULL) {
                 
