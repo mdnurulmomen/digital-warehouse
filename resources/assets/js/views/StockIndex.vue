@@ -331,31 +331,6 @@
 										<div class="form-row">
  											<div class="col-sm-12 form-group">
 												<label class="col-form-label font-weight-bold">
-													Select Warehouse :
-												</label>
-												
-												<multiselect 
-			                              			v-model="singleStockData.warehouse"
-			                                  		:options="allWarehouses" 
-			                                  		:custom-label="objectNameWithCapitalized" 
-			                                  		:required="true" 
-			                                  		:allow-empty="false" 
-			                                  		label="name" 
-			                                  		track-by="id" 
-			                              			placeholder="Select Warehouse" 
-			                              			class="form-control p-0" 
-			                                  		:class="! errors.warehouse  ? 'is-valid' : 'is-invalid'"  
-			                                  		@close="validateFormInput('warehouse')"  
-			                              		>
-			                                	</multiselect>
-			                                	
-			                                	<div class="invalid-feedback">
-											    	{{ errors.warehouse }}
-											    </div>
- 											</div>
-
- 											<div class="col-sm-12 form-group">
-												<label class="col-form-label font-weight-bold">
 													Select Merchant :
 												</label>
 												
@@ -376,6 +351,31 @@
 
 			                                	<div class="invalid-feedback">
 											    	{{ errors.merchant }}
+											    </div>
+ 											</div>
+
+ 											<div class="col-sm-12 form-group">
+												<label class="col-form-label font-weight-bold">
+													Select Warehouse :
+												</label>
+												
+												<multiselect 
+			                              			v-model="singleStockData.warehouse"
+			                                  		:options="allWarehouses" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false" 
+			                                  		label="name" 
+			                                  		track-by="id" 
+			                              			placeholder="Select Warehouse" 
+			                              			class="form-control p-0" 
+			                                  		:class="! errors.warehouse  ? 'is-valid' : 'is-invalid'"  
+			                                  		@close="validateFormInput('warehouse')"  
+			                              		>
+			                                	</multiselect>
+			                                	
+			                                	<div class="invalid-feedback">
+											    	{{ errors.warehouse }}
 											    </div>
  											</div>
 
@@ -446,17 +446,21 @@
 												</div>
  											</div>
 										</div>
-								    	 
-								    	<div class="form-row">
-									    	<div class="form-group col-sm-12 mb-2 text-right card-footer">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
+
+										<div class="form-row card-footer">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small">
 											  		Please input required fields
-									          	</div>
-									          	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" v-on:click="nextPage" v-tooltip.bottom-end="'Next'">
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+							                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
-								          	</div>
-								    	</div>
+											</div>
+										</div>
 									</div>
 							    </div>
 
@@ -495,7 +499,7 @@
 														<div class="form-row">
 															<div class="col-md-12 form-group text-center">
 																<img 
-																	:src="stockedProduct.merchant_product ? showPreview(stockedProduct.merchant_product.preview) : ''" 
+																	:src="stockedProduct.merchant_product ? showPreview(stockedProduct.merchant_product.preview, stockedProduct.merchant_product.product.preview) : ''" 
 																	class="img-fluid" 
 																	alt="Product Preview" 
 																	width="100px"
@@ -830,15 +834,12 @@
 																									>
 
 																									<div class="input-group-append">
-																										<span class="input-group-text" id="basic-addon2">
-																											<button 
-																												type="button" 
-																												class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
-																												v-tooltip.bottom-end="'Insert Serial'" 
-																												@click="addVariationSerial(stockedProductIndex, stockedVariationIndex)"
-																											>
-																												Enlist
-																											</button>
+																										<span 
+																											class="input-group-text waves-effect waves-light btn-grd-primary"
+																											v-tooltip.bottom-end="'Insert Serial'" 
+																											@click="addVariationSerial(stockedProductIndex, stockedVariationIndex)"
+																										>
+																											Enlist
 																										</span>
 																									</div>
 																								</div>
@@ -910,15 +911,12 @@
 																			>
 
 																			<div class="input-group-append">
-																				<span class="input-group-text" id="basic-addon2">
-																					<button 
-																						type="button" 
-																						class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
-																						v-tooltip.bottom-end="'Insert Serial'" 
-																						@click="addProductSerial(stockedProductIndex)"
-																					>
-																						Enlist
-																					</button>
+																				<span 
+																					class="input-group-text waves-effect waves-light btn-grd-primary"
+																					v-tooltip.bottom-end="'Insert Serial'" 
+																					@click="addProductSerial(stockedProductIndex)"
+																				>
+																					Enlist
 																				</span>
 																			</div>
 																		</div>
@@ -1281,8 +1279,6 @@
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
 											                                  		:option-height="104" 
-																					:show-labels="false" 
-											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_containers ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
@@ -1318,8 +1314,6 @@
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
 											                                  		:option-height="104" 
-																					:show-labels="false" 
-											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_container ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
@@ -1358,8 +1352,6 @@
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
 											                                  		:option-height="104" 
-																					:show-labels="false" 
-											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
@@ -1418,8 +1410,6 @@
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
 											                                  		:option-height="104" 
-																					:show-labels="false" 
-											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
@@ -1454,8 +1444,6 @@
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
 											                                  		:option-height="104" 
-																					:show-labels="false" 
-											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
@@ -1517,8 +1505,6 @@
 											                                  		:required="true" 
 											                                  		:allow-empty="false" 
 											                                  		:option-height="104" 
-																					:show-labels="false" 
-											                                  		:custom-label="customLabel" 
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)" 
@@ -2441,7 +2427,7 @@
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
 				<div class="card-header">
-					<div class="form-row">
+					<div class="form-row d-flex">
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
@@ -2455,7 +2441,7 @@
 							</h5>
 						</div>
 
-						<div class="col-6">
+						<div class="col-6 align-self-center">
 							<qr-code 
 							:text="singleStockData.invoice_no || ''"
 							:size="50" 
@@ -5219,10 +5205,10 @@
             	}
 
             },
-            showPreview(imagePath = 'default') {
+            showPreview(imagePath = 'default', alternativePreview) {
 				
-				if (! imagePath) {
-					// return this.product.preview ? '/' + this.product.preview : '';
+				if (! imagePath) { // if null
+					return ('/' + alternativePreview);
 				}
 				else if (imagePath.startsWith('data:')) {
 					return imagePath;
@@ -5244,9 +5230,6 @@
 				}
 
 			},
-			customLabel ({ name }) {
-		      return `${name}`
-		    },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;

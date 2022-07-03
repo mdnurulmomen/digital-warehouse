@@ -1220,8 +1220,6 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
 					                                  		:option-height="104" 
-															:show-labels="false" 
-					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_containers  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
@@ -1258,8 +1256,6 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
 					                                  		:option-height="104" 
-															:show-labels="false" 
-					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_container ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
@@ -1299,8 +1295,6 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
 					                                  		:option-height="104" 
-															:show-labels="false" 
-					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
@@ -1361,8 +1355,6 @@
 															:required="true" 
 															:allow-empty="false" 
 															:option-height="104" 
-															:show-labels="false" 
-															:custom-label="customLabel" 
 															class="form-control p-0" 
 															:class="!errors.stock.addresses[spaceIndex].product_container  ? 'is-valid' : 'is-invalid'" 
 															:disabled="singleStockData.addresses.length > (spaceIndex+1)"
@@ -1399,8 +1391,6 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
 					                                  		:option-height="104" 
-															:show-labels="false" 
-					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_shelf  ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
@@ -1464,8 +1454,6 @@
 					                                  		:required="true" 
 					                                  		:allow-empty="false" 
 					                                  		:option-height="104" 
-															:show-labels="false" 
-					                                  		:custom-label="customLabel" 
 					                                  		class="form-control p-0" 
 					                                  		:class="!errors.stock.addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
 					                                  		:disabled="singleStockData.addresses.length > (spaceIndex+1)"
@@ -4637,9 +4625,6 @@
 				// return '';
 
 			},
-			customLabel ({ name }) {
-		      return `${name}`
-		    },
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
