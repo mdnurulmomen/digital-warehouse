@@ -2124,9 +2124,17 @@
 											class="form-row" 
 											v-if="singleStockData.hasOwnProperty('addresses') && singleStockData.addresses.length"
 										>
-											<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
-												Address Detail :
-											</label>
+											<div class="col-md-12">
+												<div class="form-row">
+													<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
+														Address Detail :
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ singleStockData.warehouse ? singleStockData.warehouse.name : '' }}
+													</label>
+												</div>
+											</div>
+													
 											<div class="col-sm-12">
 												<div class="form-row">
 													<div 
@@ -2145,6 +2153,7 @@
 															>
 																<h6>Container Address</h6>
 
+																<!-- 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
 																		Warehouse :
@@ -2152,7 +2161,8 @@
 																	<label class="col-sm-6 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
 																	</label>
-																</div>
+																</div> 
+																-->
 
 																<div class="form-row">
 																	<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
@@ -4055,7 +4065,7 @@
 
 				this.errors.stock.addresses[index] = {};
 
-				this.resetAvailableSpaces();
+				// this.resetAvailableSpaces();	// Disabling omitting used spaces to use is again
 		
 			},
 			resetWarehouseSpaces() {

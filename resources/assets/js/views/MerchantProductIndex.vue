@@ -790,7 +790,7 @@
 											<div class="col-md-8">
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Merchant Name :
+														Merchant :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
@@ -1392,7 +1392,7 @@
 						<div class="col-6">
 							<div class="form-row">
 								<label class="col-4 col-form-label font-weight-bold">
-									Merchant Name :
+									Merchant :
 								</label>
 								<label class="col-8 col-form-label">
 									{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
@@ -1419,15 +1419,6 @@
 							</div>
 							-->
 
-							<div class="form-row" v-show="singleMerchantProductData.description">
-								<label class="col-4 col-form-label font-weight-bold">
-									Description :
-								</label>
-								<label class="col-8 col-form-label">
-									<span v-html="singleMerchantProductData.description"></span>
-								</label>
-							</div>
-
 							<div 
 								class="form-row"
 								v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
@@ -1453,6 +1444,17 @@
 								</label>
 							</div>
 
+							<div class="form-row" v-show="singleMerchantProductData.description">
+								<label class="col-4 col-form-label font-weight-bold">
+									Description :
+								</label>
+								<label class="col-8 col-form-label">
+									<span v-html="singleMerchantProductData.description"></span>
+								</label>
+							</div>
+						</div>
+
+						<div class="col-6">
 							<div class="form-row">
 								<label class="col-4 col-form-label font-weight-bold">
 									Warning Qty :
@@ -1462,9 +1464,7 @@
 									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 								</label>
 							</div>
-						</div>
 
-						<div class="col-6">
 							<div class="form-row">
 								<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
 								<label class="col-8 form-control-plaintext">
@@ -1610,83 +1610,63 @@
 				</div>
 			</div>
 
-			<div class="card" v-show="singleMerchantProductData.has_serials">
+			<div class="card card-body" v-show="singleMerchantProductData.has_serials">
 				<h5 class="card-title">Available Serials</h5>
 
-				<div class="card-text">
-					<div class="form-row">
-						<div class="col-12 col-form-label">
+				<ol 
+					class="form-row card-text"
+					v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
+				>
+					<li 
+						class="col-6 list-group-item"
+						v-for="(productSerial, productSerialIndex) in singleMerchantProductData.serials"
+					>
+						
+						{{ ((productSerialIndex + 1) + '. ' + productSerial.serial_no) }}
+
+						<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+							{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+						</span>
+															
+						<!-- 
+							<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span>  
+						-->
+					</li>	
+				</ol>
+				
+				<div 
+					class="form-row" 
+					v-else-if="singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length"
+				>
+					<div 
+						class="col-md-12 card card-body" 
+						v-for="(merchantProductVariation, variationIndex) in singleMerchantProductData.variations" 
+						:key="'printing-product-variation-index-' + variationIndex + '-printing-variation-' + merchantProductVariation.id"
+					>
+						<h5 class="card-title">{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}</h5>
+						
+						<h6 class="card-subtitle mb-2 text-muted">{{ merchantProductVariation.stock_quantity }}</h6>
+						
+						<div class="card-text">
 							<ol 
-								class="list-group list-group-flush"
-								v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
+								class="form-row"
+								v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
 							>
 								<li 
-									class="list-group-item"
-									v-for="(productSerial, productIndex) in singleMerchantProductData.serials"
+									class="col-6 list-group-item"
+									v-for="(variationSerial, variationSerialIndex) in merchantProductVariation.serials"
 								>
-									
-									{{ productSerial.serial_no }}
+									{{ ((variationSerialIndex + 1) + '. ' + variationSerial.serial_no) }}
 
-									<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
-										{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+									<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+										{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
 									</span>
-																		
+
 									<!-- 
-										<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span>  
+										<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span>  
 									-->
 								</li>	
 							</ol>
-							
-							<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
-								<div 
-									class="col-md-12 form-group" 
-									v-for="(merchantProductVariation, variationIndex) in singleMerchantProductData.variations" 
-									:key="'printing-product-variation-index-' + variationIndex + '-printing-variation-' + merchantProductVariation.id"
-								>
-									<div class="form-row">
-										<div class="card">
-											<div class="card-body">
-												<h5 class="card-title">{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}</h5>
-												
-												<h6 class="card-subtitle mb-2 text-muted">{{ merchantProductVariation.stock_quantity }}</h6>
-												
-												<div class="card-text">
-													<ol 
-														class="list-group list-group-flush"
-														v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
-													>
-														<li 
-															class="list-group-item"
-															v-for="(variationSerial, variationIndex) in merchantProductVariation.serials"
-														>
-															{{ variationSerial.serial_no }}
-
-															<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
-																{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
-															</span>
-
-															<!-- 
-																<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span>  
-															-->
-														</li>	
-													</ol>
-												</div>
-											</div>
-										</div>
-									</div>
-									
-									<!-- 
-									<div class="form-row">
-										<label class="col-form-label font-weight-bold text-right">
-											Available Qty :
-										</label>
-										<label class="col-form-label text-left">
-											{{ merchantProductVariation.available_quantity }}
-										</label>
-									</div>
-									-->
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
