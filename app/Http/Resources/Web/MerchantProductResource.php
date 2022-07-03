@@ -52,6 +52,7 @@ class MerchantProductResource extends JsonResource
             ->sum('available_quantity') : 0,
 
             'available_quantity' => /*$this->when($this->relationLoaded('latestStock'), $this->latestStock->available_quantity ?? 0)*/ $this->relationLoaded('stocks') ? $this->stocks->sum('available_quantity') : $this->available_quantity ?? 0,
+            
             'requested_quantity' => $this->when($this->relationLoaded('nonDispatchedRequests'), $this->nonDispatchedRequests->sum('quantity')),
             
             'dispatched_quantity' => $this->when($this->relationLoaded('dispatchedRequests'), $this->dispatchedRequests->sum('quantity')),

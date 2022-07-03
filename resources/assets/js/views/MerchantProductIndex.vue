@@ -145,8 +145,8 @@
 																</thead>
 
 																<tbody>
-																	<tr v-for="merchantProduct in productsToShow" 
-																		:key="'merchant-product-id' + merchantProduct.id + '-product-id-' + merchantProduct.product.id + '-merchant-id-' + merchantProduct.merchant.id" 
+																	<tr v-for="(merchantProduct, merchantProductIndex) in productsToShow" 
+																		:key="'merchant-product-index-' + merchantProductIndex + '-merchant-product-id' + merchantProduct.id + '-product-id-' + merchantProduct.product.id + '-merchant-id-' + merchantProduct.merchant.id" 
 																		:class="merchantProduct.id==singleMerchantProductData.id ? 'highlighted' : ''"
 																	>
 																		<td>
@@ -558,7 +558,7 @@
 												<div 
 													class="card" 
 													v-for="(merchantProductVariation, index) in singleMerchantProductData.variations" 
-													:key="'merchant-product-variation-index-' + index + '-merchant-product-variation-' + merchantProductVariation.id + '-A'"
+													:key="'creating-or-deleting-merchant-product-variation-index-' + index + '-merchant-product-variation-' + merchantProductVariation.id"
 												>
 													<div class="card-body">
 														<div 
@@ -924,7 +924,10 @@
 													</label>
 												</div>
 
-												<div class="form-row">
+												<div 
+													class="form-row"
+													v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
+												>
 													<label class="col-4 col-form-label font-weight-bold">
 														Selling Price (unit) :
 													</label>
@@ -934,7 +937,10 @@
 													</label>
 												</div>
 
-												<div class="form-row">
+												<div 
+													class="form-row"
+													v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
+												>
 													<label class="col-4 col-form-label font-weight-bold">
 														Discount :
 													</label>
@@ -975,7 +981,7 @@
 															<div 
 																class="col-md-6 ml-auto" 
 																v-for="(merchantProductVariation, merchantProductVariationIndex) in singleMerchantProductData.variations" 
-																:key="'merchant-product-variation-index-' + merchantProductVariationIndex + '-variation-' + merchantProductVariation.id"
+																:key="'viewing-merchant-product-variation-index-' + merchantProductVariationIndex + '-viewing-variation-' + merchantProductVariation.id"
 															>
 																<div class="card">
 																	<div class="card-body">
@@ -1104,7 +1110,7 @@
 													<div 
 														class="col-md-12" 
 														v-for="(merchantProductVariation, variationIndex) in singleMerchantProductData.variations" 
-														:key="'product-variation-index-' + variationIndex + '-C'"
+														:key="'viewing-merchant-product-variation-index-' + variationIndex + '-viewing-variation-' + merchantProductVariation.id"
 													>
 														<div class="form-row">
 															<label class="col-form-label font-weight-bold text-right">
@@ -1158,7 +1164,7 @@
 													<div 
 														class="col-md-6 ml-auto" 
 														v-for="(stockAddress, addressIndex) in singleMerchantProductData.addresses" 
-														:key="'stock-address-' + stockAddress.type + addressIndex"
+														:key="'viewing-address-index-' + addressIndex + '-stock-address-' + stockAddress.type + addressIndex"
 													>
 														<div 
 															class="card" 
@@ -1167,7 +1173,7 @@
 															<div 
 																class="card-body" 
 																v-for="containerAddress in stockAddress.containers" 
-																:key="'container-address-' + containerAddress.id + 'address-index-' + addressIndex + '-stock-id-' + singleMerchantProductData.id"
+																:key="'viewing-address-index-' + addressIndex + '-stock-address-' + stockAddress.type + addressIndex + '-container-address-' + containerAddress.id + 'address-index-' + addressIndex + '-stock-id-' + singleMerchantProductData.id"
 															>
 																<h6>Container Address</h6>
 
@@ -1237,8 +1243,8 @@
 
 																		<ul id="shelf-addresses">
 																			<li 
-																				v-for="shelfAddress in stockAddress.container.shelves" 
-																				:key="'shelf-address-' + shelfAddress.id"
+																				v-for="(shelfAddress, shelfAddressIndex) in stockAddress.container.shelves" 
+																				:key="'viewing-address-index-' + addressIndex + '-stock-address-' + stockAddress.type + addressIndex + '-shelf-address-index-' + shelfAddressIndex + '-shelf-address-' + shelfAddress.id"
 																			>
 
 																				{{ shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) }}
@@ -1295,8 +1301,8 @@
 
 																		<ul id="unit-addresses">
 																			<li 
-																				v-for="unitAddress in stockAddress.container.shelf.units" 
-																				:key="'unit-address-' + unitAddress.id"
+																				v-for="(unitAddress, unitAddressIndex) in stockAddress.container.shelf.units" 
+																				:key="'viewing-address-index-' + addressIndex + '-stock-address-' + stockAddress.type + addressIndex + '-unit-address-index-' + unitAddressIndex + 'unit-address-' + unitAddress.id"
 																			>
 
 																				{{ unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) }}
@@ -1349,12 +1355,12 @@
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
 				<div class="card-header">
-					<div class="form-row">
+					<div class="form-row d-flex">
 						<div class="col-6">
 							<img 
-								width="100px" 
+								width="60px" 
 								class="img-fluid" 
-								:src="'/' + general_settings.application_logo" 
+								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'"
 							>
 							
@@ -1363,7 +1369,7 @@
 							</h5>
 						</div>
 
-						<div class="col-6" v-show="singleMerchantProductData.sku">
+						<div class="col-6 align-self-center" v-show="singleMerchantProductData.sku">
 							<qr-code 
 							:text="singleMerchantProductData.sku || ''"
 							:size="50" 
@@ -1374,401 +1380,418 @@
 				</div>
 			</div>
 
-			<div class="card form-group">
-				<div class="card-body">
-					<h5 class="card-title">{{ singleMerchantProductData.product ? singleMerchantProductData.product.name : 'Product' | capitalize }}</h5>
-					
-					<h6 class="card-subtitle mb-2 text-muted">
-						{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
-					</h6>
+			<div class="card card-body form-group">
+				<h5 class="card-title">{{ singleMerchantProductData.product ? singleMerchantProductData.product.name : 'Product' | capitalize }}</h5>
+				
+				<h6 class="card-subtitle mb-2 text-muted">
+					{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
+				</h6>
 
-					<div class="card-text">
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Merchant Name :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
-							</label>
-						</div>
+				<div class="card-text">
+					<div class="form-row">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Merchant Name :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
+								</label>
+							</div>
 
-						<!-- 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Manufacturer/Brand Name :
-							</label>
-							<label class="col-8 col-form-label">
-								
-							</label>
-						</div> 
+							<!-- 
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Manufacturer/Brand Name :
+								</label>
+								<label class="col-8 col-form-label">
+									
+								</label>
+							</div> 
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Product SKU :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.sku }}
-							</label>
-						</div>
-						-->
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Product SKU :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.sku }}
+								</label>
+							</div>
+							-->
 
-						<div class="form-row" v-show="singleMerchantProductData.description">
-							<label class="col-4 col-form-label font-weight-bold">
-								Description :
-							</label>
-							<label class="col-8 col-form-label">
-								<span v-html="singleMerchantProductData.description"></span>
-							</label>
-						</div>
+							<div class="form-row" v-show="singleMerchantProductData.description">
+								<label class="col-4 col-form-label font-weight-bold">
+									Description :
+								</label>
+								<label class="col-8 col-form-label">
+									<span v-html="singleMerchantProductData.description"></span>
+								</label>
+							</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Warning Qty :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.warning_quantity }}
-								{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
-							</label>
-						</div>
+							<div 
+								class="form-row"
+								v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
+							>
+								<label class="col-4 col-form-label font-weight-bold">
+									Selling Price (unit) :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.selling_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
-							<label class="col-8 form-control-plaintext">
-								<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
-							</label>
-						</div>
+							<div 
+								class="form-row"
+								v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
+							>
+								<label class="col-4 col-form-label font-weight-bold">
+									Discount :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.discount || 0 }} %
+								</label>
+							</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">Has Variation :</label>
-							<label class="col-8 form-control-plaintext">
-								<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
-							</label>
-						</div>
-
-						<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
-							<label class="col-4 col-form-label font-weight-bold">
-								Variations :
-							</label>
-							<div class="col-sm-12">
-								<div class="form-row">
-									<div 
-										class="col-6" 
-										v-for="(merchantProductVariation, merchantProductVariationIndex) in singleMerchantProductData.variations" 
-										:key="'merchant-product-variation-index-' + merchantProductVariationIndex + '-variation-' + merchantProductVariation.id"
-									>
-										<div class="card">
-											<div class="card-body">
-												<!-- 
-												<div class="form-row">
-													<div class="col-sm-12 text-center">
-														<img 
-															class="img-fluid" 
-															:src="'/' + merchantProductVariation.preview || ''"
-															:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
-															width="100px"
-														>
-
-														<p>
-															{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
-														</p>
-													</div>
-												</div> 
-												-->
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Variation :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														SKU :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.sku }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Selling Price (unit) :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.selling_price }}
-														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Available Qty :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Unit Max Price :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.unit_max_price }}
-														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Unit Min Price :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.unit_min_price }}
-														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Unit Avg Price :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.unit_avg_price }}
-														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">
-														Stock Total Cost :
-													</label>
-													<label class="col-8 col-form-label">
-														{{ merchantProductVariation.stock_total_cost }}
-														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-													</label>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Warning Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.warning_quantity }}
+									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+								</label>
 							</div>
 						</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Created on :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.created_at }}
-							</label>
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
+								<label class="col-8 form-control-plaintext">
+									<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">Has Variation :</label>
+								<label class="col-8 form-control-plaintext">
+									<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Created on :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.created_at }}
+								</label>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="card form-group">
-				<div class="card-body">
-					<h5 class="card-title">Stocks</h5>
-					
-					<h6 class="card-subtitle mb-2 text-muted">
-						{{ searchAttributes.dateFrom ? searchAttributes.dateFrom : singleMerchantProductData.created_at }} -- {{ searchAttributes.dateTo ? searchAttributes.dateTo : currentTime }}
-					</h6>
-
-					<div class="card-text">
+			<div 
+				class="card card-body form-group"
+				v-show="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length"
+			>
+				<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations && singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
+					<label class="col-4 col-form-label font-weight-bold">
+						Variations :
+					</label>
+					<div class="col-sm-12">
 						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Starting Qty :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.previous_quantity }}
-								{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
-							</label>
-						</div>
+							<div 
+								class="col-6" 
+								v-for="(merchantProductVariation, merchantProductVariationIndex) in singleMerchantProductData.variations" 
+								:key="'printing-merchant-product-variation-index-' + merchantProductVariationIndex + '-printing-variation-' + merchantProductVariation.id"
+							>
+								<div class="card">
+									<div class="card-body">
+										<!-- 
+										<div class="form-row">
+											<div class="col-sm-12 text-center">
+												<img 
+													class="img-fluid" 
+													:src="'/' + merchantProductVariation.preview || ''"
+													:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
+													width="100px"
+												>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Stocked Qty :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity) }}
-								{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
-							</label>
-						</div>
+												<p>
+													{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+												</p>
+											</div>
+										</div> 
+										-->
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Dispatched Qty :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.dispatched_quantity }}
-								{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Variation :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Pending Requested Qty :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.requested_quantity }}
-								{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												SKU :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.sku }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Available Qty :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
-								{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Selling Price (unit) :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.selling_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Unit Max Price :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.unit_max_price }}
-								{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Available Qty :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit'  }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Unit Min Price :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.unit_min_price }}
-								{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Unit Max Price :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.unit_max_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Unit Avg Price :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.unit_avg_price }}
-								{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Unit Min Price :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.unit_min_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Stock Total Cost :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.stock_total_cost }}
-								{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-							</label>
-						</div>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Unit Avg Price :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.unit_avg_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
 
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Selling Price (unit) :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.selling_price }}
-								{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-4 col-form-label font-weight-bold">
-								Discount :
-							</label>
-							<label class="col-8 col-form-label">
-								{{ singleMerchantProductData.discount || 0 }} %
-							</label>
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Stock Total Cost :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.stock_total_cost }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="card" v-show="singleMerchantProductData.has_serials">
-				<div class="card-body">
-					<h5 class="card-title">Available Serials</h5>
+				<h5 class="card-title">Available Serials</h5>
 
-					<div class="card-text">
-						<div class="form-row">
-							<div class="col-12 col-form-label">
-								<ol 
-									class="list-group list-group-flush"
-									v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
+				<div class="card-text">
+					<div class="form-row">
+						<div class="col-12 col-form-label">
+							<ol 
+								class="list-group list-group-flush"
+								v-if="singleMerchantProductData.hasOwnProperty('serials') && singleMerchantProductData.serials.length"
+							>
+								<li 
+									class="list-group-item"
+									v-for="(productSerial, productIndex) in singleMerchantProductData.serials"
 								>
-									<li 
-										class="list-group-item"
-										v-for="(productSerial, productIndex) in singleMerchantProductData.serials"
-									>
-										
-										{{ productSerial.serial_no }}
+									
+									{{ productSerial.serial_no }}
 
-										<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
-											{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
-										</span>
-																			
-										<!-- 
-											<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span>  
-										-->
-									</li>	
-								</ol>
-								
-								<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
-									<div 
-										class="col-md-12 form-group" 
-										v-for="(merchantProductVariation, variationIndex) in singleMerchantProductData.variations" 
-										:key="'product-variation-index-' + variationIndex + '-c'"
-									>
-										<div class="form-row">
-											<div class="card">
-												<div class="card-body">
-													<h5 class="card-title">{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}</h5>
-													
-													<h6 class="card-subtitle mb-2 text-muted">{{ merchantProductVariation.stock_quantity }}</h6>
-													
-													<div class="card-text">
-														<ol 
-															class="list-group list-group-flush"
-															v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
+									<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+										{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+									</span>
+																		
+									<!-- 
+										<span v-show="(productIndex + 1) < singleMerchantProductData.serials.length">, </span>  
+									-->
+								</li>	
+							</ol>
+							
+							<div class="form-row" v-if="singleMerchantProductData.hasOwnProperty('variations') && singleMerchantProductData.variations.length">
+								<div 
+									class="col-md-12 form-group" 
+									v-for="(merchantProductVariation, variationIndex) in singleMerchantProductData.variations" 
+									:key="'printing-product-variation-index-' + variationIndex + '-printing-variation-' + merchantProductVariation.id"
+								>
+									<div class="form-row">
+										<div class="card">
+											<div class="card-body">
+												<h5 class="card-title">{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}</h5>
+												
+												<h6 class="card-subtitle mb-2 text-muted">{{ merchantProductVariation.stock_quantity }}</h6>
+												
+												<div class="card-text">
+													<ol 
+														class="list-group list-group-flush"
+														v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
+													>
+														<li 
+															class="list-group-item"
+															v-for="(variationSerial, variationIndex) in merchantProductVariation.serials"
 														>
-															<li 
-																class="list-group-item"
-																v-for="(variationSerial, variationIndex) in merchantProductVariation.serials"
-															>
-																{{ variationSerial.serial_no }}
+															{{ variationSerial.serial_no }}
 
-																<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
-																	{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
-																</span>
+															<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+															</span>
 
-																<!-- 
-																	<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span>  
-																-->
-															</li>	
-														</ol>
-													</div>
+															<!-- 
+																<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span>  
+															-->
+														</li>	
+													</ol>
 												</div>
 											</div>
 										</div>
-										
-										<!-- 
-										<div class="form-row">
-											<label class="col-form-label font-weight-bold text-right">
-												Available Qty :
-											</label>
-											<label class="col-form-label text-left">
-												{{ merchantProductVariation.available_quantity }}
-											</label>
-										</div>
-										-->
 									</div>
+									
+									<!-- 
+									<div class="form-row">
+										<label class="col-form-label font-weight-bold text-right">
+											Available Qty :
+										</label>
+										<label class="col-form-label text-left">
+											{{ merchantProductVariation.available_quantity }}
+										</label>
+									</div>
+									-->
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card card-body form-group">
+				<h5 class="card-title">Stocks</h5>
+				
+				<h6 class="card-subtitle mb-2 text-muted">
+					{{ searchAttributes.dateFrom ? searchAttributes.dateFrom : singleMerchantProductData.created_at }} -- {{ searchAttributes.dateTo ? searchAttributes.dateTo : currentTime }}
+				</h6>
+
+				<div class="card-text">
+					<div class="form-row">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Starting Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.previous_quantity }}
+									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Stocked Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.dispatched_quantity) }}
+									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Dispatched Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.dispatched_quantity }}
+									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Pending Requested Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.requested_quantity }}
+									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Available Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ (singleMerchantProductData.available_quantity + singleMerchantProductData.previous_quantity) }}
+									{{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+						</div>
+							
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Unit Max Price :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.unit_max_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Unit Min Price :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.unit_min_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Unit Avg Price :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.unit_avg_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Stock Total Cost :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleMerchantProductData.stock_total_cost }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
 							</div>
 						</div>
 					</div>
@@ -2076,13 +2099,26 @@
 						},
 					},
 
+					"Qty Type": {
+						field: "product",
+						callback: (product) => {
+							return this.$options.filters.capitalize(product.quantity_type)
+						},
+					},
+
 					'Unit Max Price' : 'unit_max_price',
 
 					'Unit Min Price' : 'unit_min_price',
 
 					'Unit Avg Price' : 'unit_avg_price',
 
-					'Stock Total Cost' : 'stock_total_cost',
+					'Stock Total Cost' : 'stock_total_cost', 
+
+					'Currency' : {
+						callback: (object) => {
+							return this.general_settings ? this.general_settings.official_currency_name : 'BDT'
+						},
+					},
 
 					"Variations": {
 

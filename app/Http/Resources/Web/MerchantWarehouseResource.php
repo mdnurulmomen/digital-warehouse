@@ -34,8 +34,8 @@ class MerchantWarehouseResource extends JsonResource
     {
         return [
 
-            'id' => $this->id,
-            'name' => $this->name,
+            'id' => $this->id,      // warehouse id
+            'name' => $this->name,  // warehouse name
             
             'emptyContainers' => 
                 
