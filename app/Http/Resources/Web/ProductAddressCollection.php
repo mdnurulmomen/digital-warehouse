@@ -106,11 +106,11 @@ class ProductAddressCollection extends ResourceCollection
 
         $units = [];       
 
-        foreach ($this->collection as $key => $productAddress) {
+        foreach ($this->collection->unique('space_type', 'space_id') as $key => $productAddress) {
            
             if (strpos($productAddress->space_type, 'ContainerStatus')) {
                 
-                array_push($containers['containers'], $productAddress->space->loadMissing(['warehouseContainer.container', 'warehouseContainer.warehouse']));
+                array_push($containers['containers'], $productAddress->space->loadMissing(['warehouseContainer.container'/*, 'warehouseContainer.warehouse'*/]));
             
             }
 
@@ -132,7 +132,7 @@ class ProductAddressCollection extends ResourceCollection
 
                 ];
 
-                $newShelf['container'] = array_merge($newShelf['container'], $productAddress->space->parentContainer->loadMissing(['warehouseContainer.container', 'warehouseContainer.warehouse'])->toArray());
+                $newShelf['container'] = array_merge($newShelf['container'], $productAddress->space->parentContainer->loadMissing(['warehouseContainer.container'/*, 'warehouseContainer.warehouse'*/])->toArray());
 
                 array_push($shelves, $newShelf);
 
@@ -162,7 +162,7 @@ class ProductAddressCollection extends ResourceCollection
 
                 $newUnit['container']['shelf'] = array_merge($newUnit['container']['shelf'], $productAddress->space->parentShelf->toArray());
             
-                $newUnit['container'] = array_merge($newUnit['container'], $productAddress->space->parentShelf->parentContainer->loadMissing(['warehouseContainer.container', 'warehouseContainer.warehouse'])->toArray());                
+                $newUnit['container'] = array_merge($newUnit['container'], $productAddress->space->parentShelf->parentContainer->loadMissing(['warehouseContainer.container'/*, 'warehouseContainer.warehouse'*/])->toArray());                
 
                 array_push($units, $newUnit);
 
@@ -170,6 +170,7 @@ class ProductAddressCollection extends ResourceCollection
 
         }
 
+        // merging shelves of same container 
         foreach ($shelves as $shelfKey => &$shelf) {
 
             foreach ($shelves as $currentShelfKey => $currentShelf) {
@@ -188,6 +189,7 @@ class ProductAddressCollection extends ResourceCollection
 
         unset($shelf);
 
+        // merging units of same shelf 
         foreach ($units as $unitfKey => &$unit) {
 
             foreach ($units as $currentUnitfKey => $currentUnit) {
