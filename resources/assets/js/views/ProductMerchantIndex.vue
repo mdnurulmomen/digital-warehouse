@@ -247,14 +247,14 @@
 		                                  		selectLabel = "Press/Click"
 		                                  		deselect-label="Can't remove single value" 
 		                                  		class="form-control p-0" 
-		                                  		:class="!errors.product.product_merchant_id  ? 'is-valid' : 'is-invalid'"
+		                                  		:class="!errors.product_merchant_id  ? 'is-valid' : 'is-invalid'"
 		                                  		@close="validateFormInput('product_merchant_id')" 
 		                                  		@input="setProductMerchant"
 		                              		>
 		                                	</multiselect>
 
 		                                	<div class="invalid-feedback">
-										    	{{ errors.product.product_merchant_id }}
+										    	{{ errors.product_merchant_id }}
 										    </div>
 										</div>
 
@@ -284,14 +284,14 @@
 												class="form-control" 
 												v-model="singleMerchantProductData.sku" 
 												placeholder="SKU should be unique" 
-												:class="!errors.product.product_sku ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.product_sku ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_sku')" 
 												required="true" 
 												maxlength="15" 
 											>
 
 											<div class="invalid-feedback">
-									        	{{ errors.product.product_sku }}
+									        	{{ errors.product_sku }}
 									  		</div>
 										</div>
 
@@ -303,7 +303,7 @@
 													class="form-control" 
 													v-model.number="singleMerchantProductData.selling_price" 
 													placeholder="Product Selling Price" 
-													:class="!errors.product.product_price  ? 'is-valid' : 'is-invalid'" 
+													:class="!errors.product_price  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('product_price')" 
 													:disabled="product.category ? false : true"
 												>
@@ -314,8 +314,8 @@
 												</div>
 											</div>
 
-											<div class="invalid-feedback" style="display: block;" v-show="errors.product.product_price">
-									        	{{ errors.product.product_price }}
+											<div class="invalid-feedback" style="display: block;" v-show="errors.product_price">
+									        	{{ errors.product_price }}
 									  		</div>
 										</div>
 									</div>
@@ -330,7 +330,7 @@
 											    	class="form-control" 
 													v-model.number="singleMerchantProductData.discount" 
 													placeholder="Product Discount" 
-													:class="!errors.product.discount ? 'is-valid' : 'is-invalid'" 
+													:class="!errors.discount ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('discount')" 
 													:disabled="product.category ? false : true"
 											    >
@@ -342,9 +342,9 @@
 											<div 
 												class="invalid-feedback" 
 												style="display: block;" 
-												v-show="errors.product.discount"
+												v-show="errors.discount"
 											>
-									        	{{ errors.product.discount }}
+									        	{{ errors.discount }}
 									  		</div>
 										</div>
 
@@ -384,13 +384,13 @@
 															<div class="custom-file">
 															    <input type="file" 
 															    	class="form-control custom-file-input" 
-																	:class="!errors.product.preview  ? 'is-valid' : 'is-invalid'" 
+																	:class="!errors.preview  ? 'is-valid' : 'is-invalid'" 
 														    	 	@change="onProductPreviewChange" 
 														    	 	accept="image/*"
 															    >
 															    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
 															    <div class="invalid-feedback">
-															    	{{ errors.product.preview }}
+															    	{{ errors.preview }}
 															    </div>
 														  	</div>
 														</div>
@@ -406,9 +406,18 @@
 											<ckeditor 
 				                              	class="form-control" 
 				                              	:editor="editor" 
-				                              	v-model="singleMerchantProductData.description"
+				                              	v-model="singleMerchantProductData.description" 
+				                              	@input="validateFormInput('description')"
 				                            >
 			                              	</ckeditor>
+
+			                              	<div 
+			                              		class="invalid-feedback" 
+			                              		style="display: block;" 
+			                              		v-show="errors.description"
+			                              	>
+										    	{{ errors.description }}
+										    </div>
 										</div>
 									</div>
 
@@ -459,7 +468,7 @@
 			                                	</multiselect>
 											</div>
 
-											<div class="form-group col-md-9" v-if="singleMerchantProductData.hasOwnProperty('variations') && errors.product.hasOwnProperty('variations') && singleMerchantProductData.variations.length == errors.product.variations.length">
+											<div class="form-group col-md-9" v-if="singleMerchantProductData.hasOwnProperty('variations') && errors.hasOwnProperty('variations') && singleMerchantProductData.variations.length == errors.variations.length">
 												<div 
 													class="card" 
 													v-for="(merchantProductVariation, index) in singleMerchantProductData.variations" 
@@ -468,7 +477,7 @@
 													<div class="card-body">
 														<div 
 															class="form-row" 
-															v-if="singleMerchantProductData.variations.length == errors.product.variations.length"
+															v-if="singleMerchantProductData.variations.length == errors.variations.length"
 														>	
 															<div class="form-group col-md-12">
 																<label for="inputFirstName">Variaiton</label>
@@ -482,7 +491,7 @@
 							                                  		:options="allVariations" 
 							                                  		:disabled="singleMerchantProductData.variations[index].variation_immutability" 
 							                                  		class="form-control p-0" 
-							                                  		:class="!errors.product.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
+							                                  		:class="!errors.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
 							                                  		:required="true" 
 					                                  				:allow-empty="false" 
 																	@close="changeProductVariation(index)"
@@ -490,7 +499,7 @@
 							                                	</multiselect>
 
 							                                	<div class="invalid-feedback">
-															    	{{ errors.product.variations[index].product_variation_id }}
+															    	{{ errors.variations[index].product_variation_id }}
 															    </div>
 															</div> 
 
@@ -530,7 +539,7 @@
 																				class="form-control" 
 																				v-model.number="merchantProductVariation.selling_price" 
 																				placeholder="Variation Selling Price" 
-																				:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																				:class="!errors.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
 																				@change="validateFormInput('product_variation_price')" 
 																				required="true" 
 																			>
@@ -541,8 +550,8 @@
 																			</div>
 																		</div>
 
-																		<div class="invalid-feedback" style="display: block;" v-show="errors.product.variations[index].product_variation_price">
-																        	{{ errors.product.variations[index].product_variation_price }}
+																		<div class="invalid-feedback" style="display: block;" v-show="errors.variations[index].product_variation_price">
+																        	{{ errors.variations[index].product_variation_price }}
 																  		</div>
 																	</div>
 
@@ -574,13 +583,13 @@
 																		<div class="custom-file">
 																		    <input type="file" 
 																		    	class="form-control custom-file-input" 
-																				:class="!errors.product.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
+																				:class="!errors.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
 																	    	 	@change="onVariationPreviewChange($event, index)" 
 																	    	 	accept="image/*"
 																		    >
 																		    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
 																		    <div class="invalid-feedback">
-																		    	{{ errors.product.variations[index].preview }}
+																		    	{{ errors.variations[index].preview }}
 																		    </div>
 																	  	</div>
 																	</div>
@@ -664,7 +673,7 @@
 										>
 											<div 
 												class="card"
-												v-if="singleMerchantProductData.addresses[index] && errors.product.addresses[index]"
+												v-if="singleMerchantProductData.addresses[index] && errors.addresses[index]"
 											>
 												<div class="card-body">
 
@@ -680,7 +689,7 @@
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
 						                              			placeholder="Containers / Shelves / Units" 
-						                                  		:class="!errors.product.addresses[index].product_space_type  ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_space_type  ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)" 
 						                                  		@input="setProductSpaceType(index)" 
 						                                  		@close="validateFormInput('product_space_type')"
@@ -689,9 +698,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_space_type"
+							                                	v-show="errors.addresses[index].product_space_type"
 						                                	>
-														    	{{ errors.product.addresses[index].product_space_type }}
+														    	{{ errors.addresses[index].product_space_type }}
 														    </div>
 														</div>
 													</div>
@@ -714,7 +723,7 @@
 						                                  		:preserve-search="true" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
-						                                  		:class="!errors.product.addresses[index].product_containers  ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_containers  ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)"
 						                                  		@close="validateFormInput('product_containers')" 
 						                              		>
@@ -722,9 +731,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_containers"
+							                                	v-show="errors.addresses[index].product_containers"
 						                                	>
-														    	{{ errors.product.addresses[index].product_containers }}
+														    	{{ errors.addresses[index].product_containers }}
 														    </div>
 														</div>
 													</div>
@@ -743,7 +752,7 @@
 						                                  		:options="emptyShelfContainers" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
-						                                  		:class="!errors.product.addresses[index].product_container ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_container ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)"
 						                                  		@input="setAvailableShelves(index)"
 						                                  		@close="validateFormInput('product_container')" 
@@ -752,9 +761,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_container"
+							                                	v-show="errors.addresses[index].product_container"
 						                                	>
-														    	{{ errors.product.addresses[index].product_container }}
+														    	{{ errors.addresses[index].product_container }}
 														    </div>
 														</div>
 
@@ -775,7 +784,7 @@
 						                                  		:preserve-search="true" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
-						                                  		:class="!errors.product.addresses[index].product_shelves ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_shelves ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)"
 						                                  		@close="validateFormInput('product_shelves')" 
 						                              		>
@@ -783,9 +792,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_shelves"
+							                                	v-show="errors.addresses[index].product_shelves"
 						                                	>
-														    	{{ errors.product.addresses[index].product_shelves }}
+														    	{{ errors.addresses[index].product_shelves }}
 														    </div>
 														</div>
 													</div>
@@ -801,7 +810,7 @@
 						                                  		:options="emptyUnitContainers" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
-						                                  		:class="!errors.product.addresses[index].product_container  ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_container  ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)"
 						                                  		@input="setAvailableUnitShelves(index)" 
 						                                  		@close="validateFormInput('product_container')" 
@@ -810,9 +819,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_container"
+							                                	v-show="errors.addresses[index].product_container"
 						                                	>
-														    	{{ errors.product.addresses[index].product_container }}
+														    	{{ errors.addresses[index].product_container }}
 														    </div>
 														</div>
 
@@ -829,7 +838,7 @@
 						                                  		:options="emptyUnitShelves" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
-						                                  		:class="!errors.product.addresses[index].product_shelf  ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_shelf  ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)"
 						                                  		@input="setAvailableUnits(index)" 
 						                                  		@close="validateFormInput('product_shelf')" 
@@ -838,9 +847,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_shelf"
+							                                	v-show="errors.addresses[index].product_shelf"
 						                                	>
-														    	{{ errors.product.addresses[index].product_shelf }}
+														    	{{ errors.addresses[index].product_shelf }}
 														    </div>
 														</div>
 
@@ -861,7 +870,7 @@
 						                                  		:preserve-search="true" 
 						                                  		:required="true" 
 						                                  		:allow-empty="false"
-						                                  		:class="!errors.product.addresses[index].product_units ? 'is-valid' : 'is-invalid'" 
+						                                  		:class="!errors.addresses[index].product_units ? 'is-valid' : 'is-invalid'" 
 						                                  		:disabled="singleMerchantProductData.addresses.length > (index+1)"
 						                                  		@close="validateFormInput('product_units')" 
 						                              		>
@@ -869,9 +878,9 @@
 						                                	<div 
 							                                	class="invalid-feedback" 
 							                                	style="display: block;" 
-							                                	v-show="errors.product.addresses[index].product_units"
+							                                	v-show="errors.addresses[index].product_units"
 						                                	>
-														    	{{ errors.product.addresses[index].product_units }}
+														    	{{ errors.addresses[index].product_units }}
 														    </div>
 														</div>
 													</div>
@@ -1572,15 +1581,15 @@
 	        	singleMerchantProductData : singleMerchantProductData,
 
 	        	errors : {
-					product : {
-						// variations : [],
-						
-						/*
-							addresses : [
-								{}
-							],
-						*/
-					},
+					
+					// variations : [],
+					
+					/*
+						addresses : [
+							{}
+						],
+					*/
+					
 				},
 
 				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
@@ -1827,12 +1836,8 @@
 				this.singleMerchantProductData = {};
 
 				this.errors = {
-					
-					product : {
 						
-						// variations : [],
-					
-					},
+					// variations : [],
 
 				};
 
@@ -2036,6 +2041,7 @@
 				this.validateFormInput('product_price');
 				this.validateFormInput('discount');
 				this.validateFormInput('product_merchant_id');
+				this.validateFormInput('description');
 				
 				// this.validateFormInput('product_initial_quantity');
 				// this.validateFormInput('product_available_quantity');
@@ -2051,7 +2057,7 @@
 
 				}
 
-				if (this.errors.product.constructor === Object && ((! this.product.has_variations && Object.keys(this.errors.product).length < 1) || (this.product.has_variations && Object.keys(this.errors.product).length < 2)) && ! this.errorInArray(this.errors.product.variations)) {
+				if (this.errors.constructor === Object && ((! this.product.has_variations && Object.keys(this.errors).length < 1) || (this.product.has_variations && Object.keys(this.errors).length < 2)) && ! this.errorInArray(this.errors.variations)) {
 					// this.step += 1;
 					this.submitForm = true;
 					return true;
@@ -2069,7 +2075,7 @@
 						this.validateFormInput('product_shelves');
 						this.validateFormInput('product_units');
 
-						if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations) && !this.errorInArray(this.errors.product.addresses)) {
+						if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && !this.errorInArray(this.errors.variations) && !this.errorInArray(this.errors.addresses)) {
 
 							return true;
 						
@@ -2114,7 +2120,7 @@
 
 						}
 
-						if (this.errors.product.constructor === Object && Object.keys(this.errors.product).length < 3 && !this.errorInArray(this.errors.product.variations)) {
+						if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && !this.errorInArray(this.errors.variations)) {
 							this.step += 1;
 							this.submitForm = true;
 						}
@@ -2132,7 +2138,7 @@
 					if (this.singleMerchantProductData.addresses.length < 3) {
 
 						this.singleMerchantProductData.addresses.push({});
-						this.errors.product.addresses.push({});
+						this.errors.addresses.push({});
 
 					}
 				},
@@ -2141,7 +2147,7 @@
 					if (this.singleMerchantProductData.addresses.length > 1) {
 
 						this.singleMerchantProductData.addresses.pop();
-						this.errors.product.addresses.pop();
+						this.errors.addresses.pop();
 					
 					}
 					
@@ -2218,20 +2224,16 @@
 
 				this.errors = {
 
-					product : {
-
-					},
-
 				};
 
 				if (object.has_variations && object.hasOwnProperty('variations') && object.variations.length) {
 
-					this.errors.product.variations = [];
+					this.errors.variations = [];
 
 					object.variations.forEach(
 						(merchantProductVariation, merchantProductVariationIndex) => {
 							
-							this.errors.product.variations.push({});
+							this.errors.variations.push({});
 
 						}
 					);
@@ -2262,12 +2264,12 @@
 					// 	{}
 					// ];
 
-					// this.errors.product.variations = [
+					// this.errors.variations = [
 					// 	{}
 					// ];
 					
 					this.$set(this.singleMerchantProductData, 'variations', [ {} ]);
-					this.$set(this.errors.product, 'variations', [ {} ]);
+					this.$set(this.errors, 'variations', [ {} ]);
 
 					this.allVariations = this.product.variations;
 
@@ -2275,7 +2277,7 @@
 				else {
 
 					this.$delete(this.singleMerchantProductData, 'variations');
-					this.$delete(this.errors.product, 'variations');
+					this.$delete(this.errors, 'variations');
 
 				}
 				
@@ -2285,13 +2287,13 @@
 				if (this.singleMerchantProductData.variations.length < this.product.variations.length) {
 					
 					// this.$set(this.singleMerchantProductData.variations, this.singleMerchantProductData.variations.length, {});
-					// this.$set(this.errors.product.variations, this.errors.product.variations.length, {});
+					// this.$set(this.errors.variations, this.errors.variations.length, {});
 
 					// Vue.set(this.singleMerchantProductData.variations, this.singleMerchantProductData.variations.length, {});
-					// Vue.set(this.errors.product.variations, this.errors.product.variations.length, {});
+					// Vue.set(this.errors.variations, this.errors.variations.length, {});
 
 					this.singleMerchantProductData.variations.push({});
-					this.errors.product.variations.push({});
+					this.errors.variations.push({});
 
 				}
 
@@ -2301,11 +2303,11 @@
 				if (this.singleMerchantProductData.variations.length > 1) {	
 					
 					this.singleMerchantProductData.variations.pop();
-					this.errors.product.variations.pop();
+					this.errors.variations.pop();
 
 					this.validateFormInput('product_variation_id');
 
-					if (! this.errorInArray(this.errors.product.variations)) {
+					if (! this.errorInArray(this.errors.variations)) {
 						this.submitForm = true;
 					}
 
@@ -2464,7 +2466,7 @@
 				this.$delete(this.singleMerchantProductData.addresses[index], 'container');
 				this.$delete(this.singleMerchantProductData.addresses[index], 'containers');
 
-				this.errors.product.addresses[index] = {};
+				this.errors.addresses[index] = {};
 
 				this.resetAvailableSpaces();
 		
@@ -2646,12 +2648,12 @@
 	                
 	                reader.readAsDataURL(files[0]);                    
 
-                	this.$delete(this.errors.product, 'preview');
+                	this.$delete(this.errors, 'preview');
 
 		      	}
 		      	else{
 
-		      		this.errors.product.preview = 'File should be image';
+		      		this.errors.preview = 'File should be image';
 
 		      	}
 
@@ -2678,12 +2680,12 @@
 
 	                reader.readAsDataURL(files[0]);
                 	
-                	this.$delete(this.errors.product.variations[index], 'preview');
+                	this.$delete(this.errors.variations[index], 'preview');
 
 		      	}
 		      	else{
 
-		      		this.errors.product.variations[index].preview = 'File should be image';
+		      		this.errors.variations[index].preview = 'File should be image';
 
 		      	}
 
@@ -2715,11 +2717,11 @@
 					case 'product_merchant_id' :
 
 						if (!this.singleMerchantProductData.merchant || Object.keys(this.singleMerchantProductData.merchant).length == 0) {
-							this.errors.product.product_merchant_id = 'Merchant is required';
+							this.errors.product_merchant_id = 'Merchant is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_merchant_id');
+							this.$delete(this.errors, 'product_merchant_id');
 						}
 
 						break;
@@ -2727,11 +2729,11 @@
 					case 'product_sku' :
  
 						if (this.singleMerchantProductData.sku && ! this.singleMerchantProductData.sku.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.product.product_sku = 'No special character';
+							this.errors.product_sku = 'No special character';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_sku');
+							this.$delete(this.errors, 'product_sku');
 						}
 
 						break;
@@ -2739,11 +2741,11 @@
 					case 'product_price' :
 
 						if (this.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)) {
-							this.errors.product.product_price = 'Price is required';
+							this.errors.product_price = 'Price is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_price');
+							this.$delete(this.errors, 'product_price');
 						}
 
 						break;
@@ -2751,11 +2753,26 @@
 					case 'discount' :
 
 						if (this.product.category && (this.singleMerchantProductData.discount > 100 || this.singleMerchantProductData.discount < 0)) {
-							this.errors.product.discount = 'Discount should be between 0 to 100';
+							this.errors.discount = 'Discount should be between 0 to 100';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'discount');
+							this.$delete(this.errors, 'discount');
+						}
+
+						break; 
+
+					case 'description' :
+
+						if (this.singleMerchantProductData.description && ! (/^(.|\s)*[a-zA-Z]+(.|\s)*$/).test(this.singleMerchantProductData.description)) {
+							this.errors.description = 'No special character';
+						}
+						else if (this.singleMerchantProductData.description && this.singleMerchantProductData.description.length > 65500) {
+							this.errors.description = 'Too long description (max:65500)';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'description');
 						}
 
 						break;
@@ -2764,11 +2781,11 @@
 					case 'product_sku' :
 
 						if (this.singleMerchantProductData.sku && !this.singleMerchantProductData.sku.match(/^[a-zA-Z0-9]*$/g)) {
-							this.errors.product.product_sku = 'Invalid code';
+							this.errors.product_sku = 'Invalid code';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_sku');
+							this.$delete(this.errors, 'product_sku');
 						}
 
 						break;
@@ -2778,11 +2795,11 @@
 					case 'product_initial_quantity' :
 
 						if (!this.singleMerchantProductData.initial_quantity || this.singleMerchantProductData.initial_quantity < 1) {
-							this.errors.product.product_initial_quantity = 'Qty is required';
+							this.errors.product_initial_quantity = 'Qty is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_initial_quantity');
+							this.$delete(this.errors, 'product_initial_quantity');
 						}
 
 						break;
@@ -2790,11 +2807,11 @@
 					case 'product_available_quantity' :
 
 						if (!this.singleMerchantProductData.available_quantity || this.singleMerchantProductData.available_quantity < 0 || this.singleMerchantProductData.available_quantity > this.singleMerchantProductData.initial_quantity) {
-							this.errors.product.product_available_quantity = 'Qty is required';
+							this.errors.product_available_quantity = 'Qty is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_available_quantity');
+							this.$delete(this.errors, 'product_available_quantity');
 						}
 
 						break;
@@ -2802,11 +2819,11 @@
 					case 'product_quantity_type' :
 
 						if (!this.singleMerchantProductData.quantity_type) {
-							this.errors.product.product_quantity_type = 'Qty type is required';
+							this.errors.product_quantity_type = 'Qty type is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_quantity_type');
+							this.$delete(this.errors, 'product_quantity_type');
 						}
 
 						break;
@@ -2815,15 +2832,15 @@
 						
 						if (!this.singleMerchantProductData.has_variations) {
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_variation_type');
+							this.$delete(this.errors, 'product_variation_type');
 						}
 						else if (this.singleMerchantProductData.has_variations && (!this.singleMerchantProductData.variation_type || Object.keys(this.singleMerchantProductData.variation_type).length == 0)) {
 							
-							this.errors.product.product_variation_type = 'Variation type is required';
+							this.errors.product_variation_type = 'Variation type is required';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'product_variation_type');
+							this.$delete(this.errors, 'product_variation_type');
 						}
 
 						break;
@@ -2837,7 +2854,7 @@
 
 							if (this.singleMerchantProductData.variations.some(noVariation)) {
 										
-								this.errors.product.variations[this.singleMerchantProductData.variations.findIndex(noVariation)].product_variation_id = 'Variation is required';
+								this.errors.variations[this.singleMerchantProductData.variations.findIndex(noVariation)].product_variation_id = 'Variation is required';
 
 							}
 							else {
@@ -2849,23 +2866,23 @@
 										/*
 											if (merchantProductVariation.hasOwnProperty('product_variation_id') && this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.product_variation_id).length > 0) {
 
-												this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+												this.errors.variations[index].product_variation_id = 'Same Variation selected';
 
 											}
 											else if (this.singleMerchantProductData.variations.filter(obj => obj.variation.id === merchantProductVariation.variation.id).length > 1) {
 
-												this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+												this.errors.variations[index].product_variation_id = 'Same Variation selected';
 
 											}
 										*/
 
 										if (this.singleMerchantProductData.variations.filter(obj => obj.product_variation_id === merchantProductVariation.product_variation_id).length > 1) {
 										
-											this.errors.product.variations[index].product_variation_id = 'Same Variation selected';
+											this.errors.variations[index].product_variation_id = 'Same Variation selected';
 
 										}
 										else {
-											this.$delete(this.errors.product.variations[index], 'product_variation_id');
+											this.$delete(this.errors.variations[index], 'product_variation_id');
 										}
 										
 									}
@@ -2874,14 +2891,14 @@
 
 							}
 							
-							if (!this.errorInArray(this.errors.product.variations)) {
+							if (!this.errorInArray(this.errors.variations)) {
 								this.submitForm = true;
 							}
 
 						}
 						else {
 							this.submitForm = true;
-							this.$delete(this.errors.product, 'variations');
+							this.$delete(this.errors, 'variations');
 						}
 
 						break;
@@ -2895,27 +2912,27 @@
 								(productVariation, index) => {
 
 									if (!productVariation.hasOwnProperty('initial_quantity') || productVariation.initial_quantity < 1) {
-										this.errors.product.variations[index].product_variation_quantity = 'Variation quantity is required';
+										this.errors.variations[index].product_variation_quantity = 'Variation quantity is required';
 									}
 									else if (productVariation.initial_quantity < productVariation.requested_quantity) {
-										this.errors.product.variations[index].product_variation_quantity = 'Qty cant be less than required quantity';
+										this.errors.variations[index].product_variation_quantity = 'Qty cant be less than required quantity';
 									}
 									else {
-										this.$delete(this.errors.product.variations[index], 'product_variation_quantity');
+										this.$delete(this.errors.variations[index], 'product_variation_quantity');
 									}
 
 								}
 								
 							);
 								
-							if (!this.errorInArray(this.errors.product.variations)) {
+							if (!this.errorInArray(this.errors.variations)) {
 								this.submitForm = true;
 							}
 							
 						}
 						else {
 							this.submitForm = true;
-							this.errors.product.variations = [
+							this.errors.variations = [
 								{},
 							];
 						}
@@ -2932,24 +2949,24 @@
 									
 									if (! productVariation.selling_price || productVariation.selling_price < 0) {
 										
-										this.errors.product.variations[index].product_variation_price = 'Variation selling price is required';
+										this.errors.variations[index].product_variation_price = 'Variation selling price is required';
 
 									}
 									else {
-										this.$delete(this.errors.product.variations[index], 'product_variation_price');
+										this.$delete(this.errors.variations[index], 'product_variation_price');
 									}
 
 								}
 							);
 							
-							if (!this.errorInArray(this.errors.product.variations)) {
+							if (!this.errorInArray(this.errors.variations)) {
 								this.submitForm = true;
 							}
 						}
 						else {
 							this.submitForm = true;
-							// this.errors.product.variations = [];
-							this.$delete(this.errors.product, 'variations');
+							// this.errors.variations = [];
+							this.$delete(this.errors, 'variations');
 						}
 
 						break;
@@ -2960,7 +2977,7 @@
 
 						if (this.singleMerchantProductData.has_variations) {
 
-							if (!this.errorInArray(this.errors.product.variations)) {
+							if (!this.errorInArray(this.errors.variations)) {
 
 								let variationTotalQuantity = this.singleMerchantProductData.variations.reduce(
 									(value, currentObject) => {
@@ -2969,17 +2986,17 @@
 								0);
 
 								if (variationTotalQuantity !== this.singleMerchantProductData.initial_quantity) {
-									this.errors.product.variations[this.singleMerchantProductData.variations.length-1].product_variation_quantity = 'Total variation qty should be equal to qty';
+									this.errors.variations[this.singleMerchantProductData.variations.length-1].product_variation_quantity = 'Total variation qty should be equal to qty';
 								}
 								else {
-									this.$delete(this.errors.product.variations[this.singleMerchantProductData.variations.length-1], 'product_variation_quantity');
+									this.$delete(this.errors.variations[this.singleMerchantProductData.variations.length-1], 'product_variation_quantity');
 								}
 							}
 
 						}
 						else {
 							this.submitForm = true;
-							this.errors.product.variations = [
+							this.errors.variations = [
 								{}, {}
 							];
 						}
@@ -2995,21 +3012,21 @@
 							(productSpace, index) => {
 
 								if (!productSpace.type) {
-									this.errors.product.addresses[index].product_space_type = 'Space type is required';
+									this.errors.addresses[index].product_space_type = 'Space type is required';
 								}
 								else if (this.singleMerchantProductData.addresses.filter((obj) => obj.type === productSpace.type).length > 1) {
 
-									this.errors.product.addresses[index].product_space_type = 'Same type selected';
+									this.errors.addresses[index].product_space_type = 'Same type selected';
 								}
 								else {
-									this.$delete(this.errors.product.addresses[index], 'product_space_type');
+									this.$delete(this.errors.addresses[index], 'product_space_type');
 								}
 
 							}
 
 						);
 						
-						if (!this.errorInArray(this.errors.product.addresses)) {
+						if (!this.errorInArray(this.errors.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -3022,17 +3039,17 @@
 							(productSpace, index) => {
 
 								if (productSpace.type=='containers' && (!productSpace.containers || productSpace.containers.length == 0)) {
-									this.errors.product.addresses[index].product_containers = 'Container is required';
+									this.errors.addresses[index].product_containers = 'Container is required';
 								}
 								else{
-									this.$delete(this.errors.product.addresses[index], 'product_containers');
+									this.$delete(this.errors.addresses[index], 'product_containers');
 								}
 
 							}
 
 						);
 
-						if (!this.errorInArray(this.errors.product.addresses)) {
+						if (!this.errorInArray(this.errors.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -3045,16 +3062,16 @@
 							(productSpace, index) => {
 
 								if ((productSpace.type=='shelves' || productSpace.type=='units') && (!productSpace.container || Object.keys(productSpace.container).length==0)) {
-									this.errors.product.addresses[index].product_container = 'Container is required';
+									this.errors.addresses[index].product_container = 'Container is required';
 								}
 								else{
-									this.$delete(this.errors.product.addresses[index], 'product_container');
+									this.$delete(this.errors.addresses[index], 'product_container');
 								}
 
 							}
 						);
 
-						if (!this.errorInArray(this.errors.product.addresses)) {
+						if (!this.errorInArray(this.errors.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -3067,16 +3084,16 @@
 							(productSpace, index) => {
 
 								if (productSpace.type=='shelves' && (!productSpace.container || !productSpace.container.shelves || productSpace.container.shelves.length == 0)) {
-									this.errors.product.addresses[index].product_shelves = 'Shelf is required';
+									this.errors.addresses[index].product_shelves = 'Shelf is required';
 								}
 								else{
-									this.$delete(this.errors.product.addresses[index], 'product_shelves');
+									this.$delete(this.errors.addresses[index], 'product_shelves');
 								}
 
 							}
 						);
 
-						if (!this.errorInArray(this.errors.product.addresses)) {
+						if (!this.errorInArray(this.errors.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -3089,16 +3106,16 @@
 							(productSpace, index) => {
 
 								if (productSpace.type=='units' && (!productSpace.container || !productSpace.container.shelf || Object.keys(productSpace.container.shelf).length==0)) {
-									this.errors.product.addresses[index].product_shelf = 'Shelf is required';
+									this.errors.addresses[index].product_shelf = 'Shelf is required';
 								}
 								else{
-									this.$delete(this.errors.product.addresses[index], 'product_shelf');
+									this.$delete(this.errors.addresses[index], 'product_shelf');
 								}
 
 							}
 						);
 
-						if (!this.errorInArray(this.errors.product.addresses)) {
+						if (!this.errorInArray(this.errors.addresses)) {
 							this.submitForm = true;
 						}
 
@@ -3112,16 +3129,16 @@
 							(productSpace, index) => {
 
 								if (productSpace.type=='units' && (!productSpace.container || !productSpace.container.shelf || !productSpace.container.shelf.units || productSpace.container.shelf.units.length == 0)) {
-									this.errors.product.addresses[index].product_units = 'Unit is required';
+									this.errors.addresses[index].product_units = 'Unit is required';
 								}
 								else{
-									this.$delete(this.errors.product.addresses[index], 'product_units');
+									this.$delete(this.errors.addresses[index], 'product_units');
 								}
 
 							}
 						);
 
-						if (!this.errorInArray(this.errors.product.addresses)) {
+						if (!this.errorInArray(this.errors.addresses)) {
 							this.submitForm = true;
 						}
 

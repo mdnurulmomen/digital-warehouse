@@ -605,7 +605,7 @@ class MerchantController extends Controller
                 }),
             ],
             'discount' => 'nullable|numeric|between:0,100',
-            'description' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:65535',
             'warning_quantity' => 'nullable|numeric',
             'variations' => [
                 'array', 
@@ -716,7 +716,7 @@ class MerchantController extends Controller
                 }),
             ],
             'discount' => 'nullable|numeric|between:0,100',
-            'description' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:65535',
             'warning_quantity' => 'nullable|numeric',
             'variations' => [
                 'array', 
