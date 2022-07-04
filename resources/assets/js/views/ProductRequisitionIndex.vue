@@ -314,6 +314,10 @@
 											</label>
 
 											<div class="form-group col-md-8">
+												<p v-show="singleRequisitionData.created_at">
+													{{ singleRequisitionData.created_at }}
+												</p>
+
 												<v-date-picker 
 													v-model="singleRequisitionData.created_at" 
 													color="red" 
@@ -992,6 +996,10 @@
 											</label>
 
 											<div class="form-group col-md-9">
+												<p v-show="singleDispatchData.requisition.updated_at">
+													{{ singleDispatchData.requisition.updated_at }}
+												</p>
+												
 												<v-date-picker 
 													v-model="singleDispatchData.requisition.updated_at" 
 													color="red" 
@@ -2412,11 +2420,11 @@
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
 				<div class="card-header">
-					<div class="form-row">
+					<div class="form-row d-flex">
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
-								:src="'/' + general_settings.application_logo" 
+								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'"
 							>
 							
@@ -2425,7 +2433,7 @@
 							</h5>
 						</div>
 
-						<div class="col-6">
+						<div class="col-6 align-self-center">
 							<qr-code 
 							:text="singleRequisitionData.subject || ''"
 							:size="50" 

@@ -516,6 +516,10 @@
 														Stock Date :
 													</label>
 													<div class="col-sm-8">
+														<p class="col-form-label" v-show="singleStockData.created_at">
+															{{ singleStockData.created_at }}
+														</p>
+
 														<v-date-picker 
 															v-model="singleStockData.created_at" 
 															color="red" 
@@ -530,8 +534,8 @@
 												</div>
 
 												<div class="form-row" v-show="singleStockData.has_approval==1">
-													<label class="col-sm-4 col-form-label form-group">
-														Stocked Date
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
+														Stocked Date :
 													</label>
 
 													<label class="col-sm-8 col-form-label form-group">
@@ -543,10 +547,14 @@
 													class="form-row" 
 													v-show="userHasPermissionTo('update-product-stock')"
 												>
-													<label class="col-sm-4 col-form-label font-weight-bold form-group text-md-right">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
 														Approval Date :
 													</label>
 													<div class="col-sm-8 form-group">
+														<p class="col-form-label" v-show="singleStockData.updated_at">
+															{{ singleStockData.updated_at }}
+														</p>
+
 														<v-date-picker 
 															v-model="singleStockData.updated_at" 
 															color="red" 
@@ -776,6 +784,10 @@
 																Manufacturing Date :
 															</label>
 															<div class="col-sm-8">
+																<p class="col-form-label" v-show="singleStockData.manufactured_at">
+																	{{ singleStockData.manufactured_at }}
+																</p>
+
 																<v-date-picker 
 																	v-model="singleStockData.manufactured_at" 
 																	color="red" 
@@ -801,6 +813,10 @@
 																Expiring Date :
 															</label>
 															<div class="col-sm-8">
+																<p class="col-form-label" v-show="singleStockData.expired_at">
+																	{{ singleStockData.expired_at }}
+																</p>
+
 																<v-date-picker 
 																	v-model="singleStockData.expired_at" 
 																	color="red" 
@@ -884,6 +900,7 @@
 
 															<div class="form-group col-md-6">
 																<label class="d-block" for="inputFirstName">Expiring Date</label>
+
 																<v-date-picker 
 																	v-model="stockVariation.expired_at" 
 																	color="red" 
@@ -2587,7 +2604,7 @@
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
 				<div class="card-header">
-					<div class="form-row">
+					<div class="form-row d-flex">
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
@@ -2601,7 +2618,7 @@
 							</h5>
 						</div>
 
-						<div class="col-6">
+						<div class="col-6 align-self-center">
 							<qr-code 
 							:text="singleStockData.invoice_no || ''"
 							:size="50" 
@@ -3457,6 +3474,7 @@
 					})
 					.finally(response => {
 						this.loading = false;
+						this.resetWarehouseSpaces();
 					});
 
 			},
@@ -3795,7 +3813,7 @@
 						this.step+=1;
 
 						this.submitForm = true;
-						this.resetWarehouseSpaces();
+						// this.resetWarehouseSpaces();
 						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
 					
 					}

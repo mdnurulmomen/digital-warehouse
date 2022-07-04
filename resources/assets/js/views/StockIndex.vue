@@ -297,7 +297,7 @@
 		</div>
 
  		<!--Create, Edit or Approve Modal -->
-		<div class="modal fade" id="stock-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-stock') || userHasPermissionTo('approve-product-stock') || userHasPermissionTo('update-product-stock')">
+		<div class="modal fade" id="stock-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-product-stock') || userHasPermissionTo('approve-product-stock') || userHasPermissionTo('update-product-stock')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -776,7 +776,8 @@
 								    		<div 
 								    			class="card" 
 								    			v-for="(stockedProduct, stockedProductIndex) in singleStockData.products" 
-												:key="'stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-serial-section'"
+												:key="'stocked-product-index-' + stockedProductIndex + '-product-' + stockedProduct.id + '-serial-section'" 
+												v-show="stockedProduct.has_serials" 
 								    		>
 												<div 
 													class="card-header" 
@@ -1031,7 +1032,10 @@
 																<div class="form-row">
 																	<div class="col-md-6 form-group">
 																		<label class="d-block col-form-label font-weight-bold">
-																			Manufacturing Date
+																			Manufacturing Date : 
+																			<span v-show="stockedProduct.manufactured_at">
+																				{{ stockedProduct.manufactured_at }}
+																			</span>
 																		</label>
 																		
 																		<v-date-picker 
@@ -1055,7 +1059,10 @@
 
 																  	<div class="col-md-6 form-group">
 																		<label class="d-block col-form-label font-weight-bold">
-																			Expiring Date
+																			Expiring Date : 
+																			<span v-show="stockedProduct.expired_at">
+																				{{ stockedProduct.expired_at }}
+																			</span>
 																		</label>
 																		
 																		<v-date-picker 
@@ -1118,7 +1125,12 @@
 
 																		<div class="form-row">
 																			<div class="form-group col-md-6">
-																				<label class="d-block" for="inputFirstName">Manufacturing Date</label>
+																				<label class="d-block" for="inputFirstName">
+																					Manufacturing Date : 
+																					<span v-show="stockVariation.manufactured_at">
+																						{{ stockVariation.manufactured_at }}
+																					</span>
+																				</label>
 																				
 																				<v-date-picker 
 																					v-model="stockVariation.manufactured_at" 
@@ -1140,7 +1152,12 @@
 																			</div>
 
 																			<div class="form-group col-md-6">
-																				<label class="d-block" for="inputFirstName">Expiring Date</label>
+																				<label class="d-block" for="inputFirstName">
+																					Expiring Date : 
+																					<span v-show="stockVariation.expired_at">
+																						{{ stockVariation.expired_at }}
+																					</span>
+																				</label>
 																				<v-date-picker 
 																					v-model="stockVariation.expired_at" 
 																					color="red" 
@@ -1661,7 +1678,7 @@
  		-->
 
  		<!-- View Modal -->
-		<div class="modal fade" id="stock-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="stock-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -2388,7 +2405,7 @@
 		</div>
 
 		<!-- Modal -->
-		<div class="modal fade" id="stock-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal fade" id="stock-custom-search" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -3696,6 +3713,7 @@
 					})
 					.finally(response => {
 						this.loading = false;
+						this.resetWarehouseSpaces();
 					});
 
 			},
@@ -3948,9 +3966,9 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
-							// this.printStockCode(this.singleStockData.products);
-
 							$('#stock-createOrEdit-modal').modal('hide');
+
+							this.printStockCode(this.singleStockData.products);
 						}
 					})
 					.catch(error => {
@@ -3962,7 +3980,7 @@
 					})
 					.finally(response => {
 						this.formSubmitted = false;
-						this.printStockCode(this.singleStockData.products);
+						// this.printStockCode(this.singleStockData.products);
 						// this.fetchMerchantWarehouseAllSpaces();
 						// this.fetchWarehouseAllContainers();
 					});
@@ -5281,7 +5299,7 @@
 								if (! stockedProduct || Object.keys(stockedProduct).length == 0) {
 									this.errors.products[stockedProductIndex].product = 'Product is required';
 								}
-								else if (this.singleStockData.products.some((productTostock, productIndexTostock)=>productTostock.merchant_product_id==stockedProduct.merchant_product_id && productIndexTostock!=stockedProductIndex )) {
+								else if (this.singleStockData.products.some((productTostock, productIndexTostock)=>productTostock.merchant_product_id==stockedProduct.merchant_product_id && productIndexTostock != stockedProductIndex )) {
 
 									this.errors.products[stockedProductIndex].product = 'Same product selected';
 
