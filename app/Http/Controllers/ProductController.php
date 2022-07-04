@@ -1420,7 +1420,13 @@ class ProductController extends Controller
                 $q1->where('invoice_no', 'like', "%$request->search%")
                 ->orWhereHas('stocks', function ($q2) use ($request) {
                     $q2->where('stock_quantity', 'like', "%$request->search%")
-                    ->orWhere('available_quantity', 'like', "%$request->search%");
+                    ->orWhere('available_quantity', 'like', "%$request->search%")
+                    ->orWhere('unit_buying_price', 'like', "%$request->search%")
+                    ->orWhereHas('merchantProduct', function ($q3) use ($request) {
+                        $q3->whereHas('product', function ($q4) use ($request) {
+                            $q4->where('name', 'like', "%$request->search%");
+                        });
+                    });
                 })
                 ->orWhereHas('stocks.serials', function ($q3) use ($request) {
                     $q3->where('serial_no', 'like', "%$request->search%");
@@ -1434,6 +1440,13 @@ class ProductController extends Controller
                 })
                 ->orWhereHas('warehouse', function ($q6) use ($request) {
                     $q6->where('name', 'like', "%$request->search%")
+                    ->orWhere('user_name', 'like', "%$request->search%")
+                    ->orWhere('email', 'like', "%$request->search%")
+                    ->orWhere('mobile', 'like', "%$request->search%");
+                })
+                ->orWhereHas('merchant', function ($q6) use ($request) {
+                    $q6->where('first_name', 'like', "%$request->search%")
+                    ->orWhere('last_name', 'like', "%$request->search%")
                     ->orWhere('user_name', 'like', "%$request->search%")
                     ->orWhere('email', 'like', "%$request->search%")
                     ->orWhere('mobile', 'like', "%$request->search%");
@@ -1593,7 +1606,7 @@ class ProductController extends Controller
                 }),
             ],
             'discount' => 'nullable|numeric|between:0,100',
-            'description' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:65500',
             'warning_quantity' => 'nullable|integer',
             'variations' => [
                 'array', 
@@ -1704,7 +1717,7 @@ class ProductController extends Controller
                 }),
             ],
             'discount' => 'nullable|numeric|between:0,100',
-            'description' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:65500',
             'warning_quantity' => 'nullable|numeric',
             'variations' => [
                 'array', 
