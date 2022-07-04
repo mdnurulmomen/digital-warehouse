@@ -230,7 +230,7 @@ class Requisition extends Model
     {
         foreach ($this->products as $requiredProduct) {
                         
-            if ($requiredProduct->has_serials && ! $requiredProduct->has_variations) {
+            if ($requiredProduct->merchantProduct->product->has_serials && ! $requiredProduct->merchantProduct->product->has_variations) {
                 
                 foreach ($requiredProduct->serials as $requiredProductSerial) {
                     
@@ -241,7 +241,7 @@ class Requisition extends Model
                 }
 
             }
-            else if ($requiredProduct->has_serials && $requiredProduct->has_variations) {
+            else if ($requiredProduct->merchantProduct->product->has_serials && $requiredProduct->merchantProduct->product->has_variations) {
                 
                 foreach ($requiredProduct->variations as $requiredProductVariation) {
                     

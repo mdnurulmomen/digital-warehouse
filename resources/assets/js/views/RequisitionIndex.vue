@@ -208,7 +208,7 @@
 		</div>
 
 		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="requisition-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="requisition-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -289,6 +289,10 @@
 											</label>
 
 											<div class="form-group col-md-8">
+												<p v-show="singleRequisitionData.created_at">
+													{{ singleRequisitionData.created_at }}
+												</p>
+
 												<v-date-picker 
 													v-model="singleRequisitionData.created_at" 
 													color="red" 
@@ -548,9 +552,18 @@
 										<ckeditor 
 			                              	class="form-control" 
 			                              	:editor="editor" 
-			                              	v-model="singleRequisitionData.description"
+			                              	v-model="singleRequisitionData.description" 
+			                              	@input="validateFormInput('description')"
 			                            >
 		                              	</ckeditor>
+
+		                              	<div 
+		                              		class="invalid-feedback" 
+		                              		style="display: block;" 
+		                              		v-show="errors.description"
+		                              	>
+									    	{{ errors.description }}
+									    </div>
 									</div>
 
 									<div class="col-md-12 card-footer">
@@ -876,7 +889,7 @@
 		</div>
 
  		<!--Dispatch Modal -->
-		<div class="modal fade" id="dispatch-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-requisition') || userHasPermissionTo('update-requisition')">
+		<div class="modal fade" id="dispatch-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-requisition') || userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -946,6 +959,10 @@
 											</label>
 
 											<div class="form-group col-md-9">
+												<p v-show="singleDispatchData.requisition.updated_at">
+													{{ singleDispatchData.requisition.updated_at }}
+												</p>
+												
 												<v-date-picker 
 													v-model="singleDispatchData.requisition.updated_at" 
 													color="red" 
@@ -970,23 +987,22 @@
 										</div>
 									</div>
 
-									<div class="col-md-12 card-footer">
-								    	<div class="form-row">
-									    	<div class="col-sm-12 text-right">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
+									<div class="col-sm-12 card-footer">
+										<div class="form-row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small">
 											  		Please input required fields
-									          	</div>
-									          	<button 
-										          	type="button" 
-										          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
-										          	v-tooltip.bottom-end="'Next'" 
-										          	v-on:click="nextPage"
-									          	>
+											  	</span>
+											</div>
+											<div class="col-sm-12">
+							                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
-								          	</div>
-								    	</div>
-							        </div>
+											</div>
+										</div>
+						          	</div>
 							    </div>
 
 						        <div 
@@ -1939,7 +1955,7 @@
 		</div>
 
  		<!-- Requisition View Modal -->
-		<div class="modal fade" id="requisition-view-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="requisition-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -2359,7 +2375,7 @@
 		</div>
 
 		<!-- Cancel Requisitions -->
-		<div class="modal fade" id="cancel-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" v-if="userHasPermissionTo('update-requisition')">
+		<div class="modal fade" id="cancel-confirmation-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" v-if="userHasPermissionTo('update-requisition')">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<form 
@@ -2418,11 +2434,12 @@
 		<div id="sectionToPrint" class="d-none">
 			<div class="card">
 				<div class="card-header">
-					<div class="form-row">
+					<div class="form-row d-flex">
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
-								:src="'/' + general_settings.application_logo" 
+								width="60px" 
+								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'"
 							>
 							
@@ -2431,7 +2448,7 @@
 							</h5>
 						</div>
 
-						<div class="col-6">
+						<div class="col-6 align-self-center">
 							<qr-code 
 							:text="singleRequisitionData.subject || ''"
 							:size="50" 
@@ -3837,24 +3854,34 @@
 					if (this.step==1) {
 						this.validateFormInput('subject');
 						this.validateFormInput('merchant_id');
-						this.validateFormInput('description');
 					}
 					else if (this.step == 2) {
 						this.validateFormInput('product_id');
 						this.validateFormInput('product_quantity');
 						this.validateFormInput('variations_total_quantity');
+						this.validateFormInput('description');
 					}
 					else if (this.step == 3) {
+
 						this.validateFormInput('product_serials');
+
 					}
 
+					if (this.step==1 && ! this.errors.merchant_id && ! this.errors.subject) {
 
-					if (! this.errors.subject && !this.errorInArray(this.errors.products) && this.step < 4) {
-						
-						this.fetchMerchantAllAgents();
 						this.fetchMerchantAllProducts();
+						this.step ++;
 
-						if (this.step != 2 || this.requisitionHasSerialProduct()) {
+					}
+					else if (this.step > 1 && ! this.errorInArray(this.errors.products) && ! this.errors.description && this.step < 4) {
+						
+						if (this.step == 2) {
+							
+							this.fetchMerchantAllAgents();
+
+						}
+
+						if (this.requisitionHasSerialProduct()) {	// step = 2 / 3 (serial)
 
 							this.step += 1;
 						
@@ -3869,7 +3896,9 @@
 					
 					}
 					else {
+
 						this.submitForm = false;
+
 					}
 
 				}
@@ -3879,7 +3908,7 @@
 						this.validateFormInput('requisition_id');
 					}
 
-					if (!this.errors.requisition_id && this.step < 4) {
+					if (! this.errors.requisition_id && this.step < 4) {
 						
 						if (this.step==2) {
 
@@ -4027,7 +4056,7 @@
 		      			user_name = user_name.toString();
 		      		}
 
-		      		return ((first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '') + ' ' + (last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '') + ' ' + (user_name ? (user_name.charAt(0).toUpperCase() + user_name.slice(1)) : ''));
+		      		return ((first_name ? (first_name.charAt(0).toUpperCase() + first_name.slice(1)) : '') + ' ' + (last_name ? (last_name.charAt(0).toUpperCase() + last_name.slice(1)) : '') + ' ' + (user_name ? ('(' + (user_name.charAt(0).toUpperCase() + user_name.slice(1)) + ')') : ''));
 
 		      	}
 		      	else if (name) {
@@ -4476,7 +4505,7 @@
 						if (!this.singleRequisitionData.subject) {
 							this.errors.subject = 'Subject is required';
 						}
-						else if (!this.singleRequisitionData.subject.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						else if (! (/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/).test(this.singleRequisitionData.subject)) {
 							this.errors.subject = 'No special character';
 						}
 						else{
@@ -4485,11 +4514,14 @@
 						}
 
 						break;
-				/*
+				
 					case 'description' :
 
-						if (this.singleRequisitionData.description && !this.singleRequisitionData.description.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						if (this.singleRequisitionData.description && ! (/^(.|\s)*[a-zA-Z]+(.|\s)*$/).test(this.singleRequisitionData.description)) {
 							this.errors.description = 'No special character';
+						}
+						else if (this.singleRequisitionData.description && this.singleRequisitionData.description.length > 255) {
+							this.errors.description = 'Too long description (max:255)';
 						}
 						else{
 							this.submitForm = true;
@@ -4497,7 +4529,7 @@
 						}
 
 						break;
-				*/
+				
 
 					case 'product_id' :
 
@@ -4682,7 +4714,7 @@
 							if (!this.singleRequisitionData.agent || !this.singleRequisitionData.agent.name) {
 								this.errors.agent.agent_name = 'Agent name is required';
 							}
-							else if (!this.singleRequisitionData.agent.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+							else if (! (/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/).test(this.singleRequisitionData.agent.name)) {
 								this.errors.agent.agent_name = 'No special character';
 							}
 							else{
@@ -4705,7 +4737,7 @@
 							if (!this.singleRequisitionData.agent || !this.singleRequisitionData.agent.mobile) {
 								this.errors.agent.agent_mobile = 'Agent mobile is required';
 							}
-							else if (!this.singleRequisitionData.agent.mobile.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
+							else if (! (/\+?(88)?0?1[123456789][0-9]{8}\b/).test(this.singleRequisitionData.agent.mobile)) {
 								this.errors.agent.agent_mobile = 'Invalid mobile number';
 							}
 							else{
