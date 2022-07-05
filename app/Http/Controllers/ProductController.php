@@ -716,9 +716,10 @@ class ProductController extends Controller
 
     public function updateProductStock(ProductStockRequest $request, $stock, $perPage)
     {
-        $stockToUpdate = ProductStock::findOrFail($stock);
-        $merchantExpectedProduct = $stockToUpdate->merchantProduct;
+        $productStockToUpdate = ProductStock::findOrFail($stock);
+        $merchantExpectedProduct = $productStockToUpdate->merchantProduct;
         $product = $merchantExpectedProduct->product;
+        $stockToUpdate = $productStockToUpdate->stock;
 
         /*
         $request->validate([
@@ -810,28 +811,28 @@ class ProductController extends Controller
         ]);
 
         // decreasing quantity
-        if (! $product->has_variations && $stockToUpdate->stock_quantity > $request->stock_quantity) {
+        if (! $product->has_variations && $productStockToUpdate->stock_quantity > $request->stock_quantity) {
             
-            $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
+            $difference = $productStockToUpdate->stock_quantity - $request->stock_quantity;
 
-            if ($difference > $stockToUpdate->available_quantity || $difference > $stockToUpdate->merchantProduct->available_quantity) {
+            if ($difference > $productStockToUpdate->available_quantity || $difference > $productStockToUpdate->merchantProduct->available_quantity) {
 
                 return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
                 
             }
 
         }
-        else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $stockToUpdate)) {
+        else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($request->variations)), $productStockToUpdate)) {
 
             return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
 
         }
 
-        if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($request->serials))) || $this->checkProductSerialDuplicacy($request))) {
+        if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($request->serials))) || $this->checkProductSerialDuplicacy($request))) {
 
-            if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($request->serials)))) {
+            if ($this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($request->serials)))) {
                 
-                $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($request->serials)));
+                $serialNotFound = $this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($request->serials)));
                 return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
             }
@@ -843,11 +844,11 @@ class ProductController extends Controller
             }
 
         }
-        else if ($product->has_serials && $product->has_variations && ($this->checkVariationSerialInvalidity($stockToUpdate, json_decode(json_encode($request->variations))) || $this->checkVariationSerialDuplicacy($request))) {
+        else if ($product->has_serials && $product->has_variations && ($this->checkVariationSerialInvalidity($productStockToUpdate, json_decode(json_encode($request->variations))) || $this->checkVariationSerialDuplicacy($request))) {
             
-            if ($this->checkVariationSerialInvalidity($stockToUpdate, json_decode(json_encode($request->variations)))) {
+            if ($this->checkVariationSerialInvalidity($productStockToUpdate, json_decode(json_encode($request->variations)))) {
                 
-                $serialNotFound = $this->checkVariationSerialInvalidity($stockToUpdate, json_decode(json_encode($request->variations)));
+                $serialNotFound = $this->checkVariationSerialInvalidity($productStockToUpdate, json_decode(json_encode($request->variations)));
                 return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
             }
@@ -870,84 +871,90 @@ class ProductController extends Controller
         }
             
         // increasing quantity
-        if ($request->stock_quantity > $stockToUpdate->stock_quantity) {
+        if ($request->stock_quantity > $productStockToUpdate->stock_quantity) {
 
-            $difference = $request->stock_quantity - $stockToUpdate->stock_quantity;
+            $difference = $request->stock_quantity - $productStockToUpdate->stock_quantity;
 
-            $stockToUpdate->update([
+            $productStockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity, 
-                'available_quantity' => ($stockToUpdate->available_quantity + $difference),
+                'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
                 'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
-            // $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
+            // $this->increaseStockAvailableQuantity($productStockToUpdate, $difference);
 
-            $merchantExpectedProduct->increment('available_quantity', $difference);
+            $stockToUpdate->has_approval ? $merchantExpectedProduct->increment('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $request->stock_quantity); // defferent increments for already approved / not
 
         }
         // decreasing quantity
-        else if ($request->stock_quantity < $stockToUpdate->stock_quantity) {
+        else if ($request->stock_quantity < $productStockToUpdate->stock_quantity) {
 
-            $difference = $stockToUpdate->stock_quantity - $request->stock_quantity;
+            $difference = $productStockToUpdate->stock_quantity - $request->stock_quantity;
 
-            $stockToUpdate->update([
+            $productStockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity, 
-                'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
+                'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
                 'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
-            // $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
+            // $this->decreaseStockAvailableQuantity($productStockToUpdate, $difference);
 
-            $merchantExpectedProduct->decrement('available_quantity', $difference);
-
-        }
-        // approving stock
-        else if($request->stock_quantity == $stockToUpdate->stock_quantity && ! $stockToUpdate->stock->has_approval) {
-
-            $stockToUpdate->update([
-                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
-            ]);
-
-            // $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
-
-            $merchantExpectedProduct->increment('available_quantity', $difference);
+            $stockToUpdate->has_approval ? $merchantExpectedProduct->decrement('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $request->stock_quantity);    // decrement for already approved but increments if about to approve
 
         }
         /*
-        // changing warehouse
-        else if($request->stock_quantity == $stockToUpdate->stock_quantity && $stockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
+        // approving stock
+        else if($request->stock_quantity == $productStockToUpdate->stock_quantity && ! $productStockToUpdate->stock->has_approval) {
 
-            $stockToUpdate->update([
-                'unit_buying_price' => $request->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0,
+            $productStockToUpdate->update([
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+            ]);
+
+            // $this->increaseStockAvailableQuantity($productStockToUpdate, $productStockToUpdate->stock_quantity);
+
+            $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
+
+        }
+        // changing warehouse
+        else if($request->stock_quantity == $productStockToUpdate->stock_quantity && $productStockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
+
+            $productStockToUpdate->update([
+                'unit_buying_price' => $request->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0,
             ]);
 
         }
         */
-        else {
+        else {  // approving stock / updating only price
 
-            $stockToUpdate->update([
+            $productStockToUpdate->update([
                 'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
             ]);
 
+            if (! $stockToUpdate->has_approval) { // approving with requested quantity
+                
+                $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
+
+            }
+
         }
 
-        $this->updateParentStock($stockToUpdate, $currentUser, $request);
+        $this->updateParentStock($productStockToUpdate, $currentUser, $request);
 
         if ($product->has_variations && ! empty($request->variations)) {
 
-            $stockToUpdate->stock_variations = json_decode(json_encode($request->variations));
+            $productStockToUpdate->stock_variations = json_decode(json_encode($request->variations));
 
         }
 
-        if ($stockToUpdate->has_serials && ! $stockToUpdate->has_variations && ! empty($request->serials)) {
+        if ($productStockToUpdate->has_serials && ! $productStockToUpdate->has_variations && ! empty($request->serials)) {
             
-            $stockToUpdate->stock_serials = json_decode(json_encode($request->serials));
+            $productStockToUpdate->stock_serials = json_decode(json_encode($request->serials));
 
         }
 
-        $stockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $stockToUpdate->merchant_product_id);
+        $productStockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $productStockToUpdate->merchant_product_id);
 
-        return $this->showProductAllStocks($stockToUpdate->merchant_product_id, $perPage);
+        return $this->showProductAllStocks($productStockToUpdate->merchant_product_id, $perPage);
     }
 
     public function deleteProductStock($stock, $perPage)
@@ -1143,19 +1150,17 @@ class ProductController extends Controller
     }
 
     public function updateStock(StockRequest $request, $stock, $perPage)
-    {
-        $request['products'] = json_decode(json_encode($request->products));
-        
+    {   
         /*
         // validation
         foreach ($request->products as $productIndex => $stockingProduct) {
                 
-            $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
+            $productStockToUpdate = ProductStock::findOrFail($stockingProduct->id);
             $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
             $product = $merchantProduct->product;
             
             // If Replaced Merchant-Product and available-quantity is gonna be negative
-            if ($stockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id && ! $product->has_variations && $stockToUpdate->stock_quantity > $merchantProduct->available_quantity) {
+            if ($productStockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id && ! $product->has_variations && $productStockToUpdate->stock_quantity > $merchantProduct->available_quantity) {
                 
                 $missingProduct = ucfirst($product->name);
                 return response()->json(['errors'=>["$product->name" => "$missingProduct is not found"]], 422);
@@ -1164,21 +1169,21 @@ class ProductController extends Controller
 
             // already stocked product && reducing stock quantity
             // decreasing qty is more than stock or product available
-            else if ($stockToUpdate->merchant_product_id == $stockingProduct->merchant_product_id && ! $product->has_variations && $stockToUpdate->stock_quantity > $stockingProduct->stock_quantity && ((($stockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $stockToUpdate->available_quantity) || (($stockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $stockToUpdate->merchantProduct->available_quantity))) {
+            else if ($productStockToUpdate->merchant_product_id == $stockingProduct->merchant_product_id && ! $product->has_variations && $productStockToUpdate->stock_quantity > $stockingProduct->stock_quantity && ((($productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $productStockToUpdate->available_quantity) || (($productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $productStockToUpdate->merchantProduct->available_quantity))) {
 
                 return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
 
             }
-            else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $stockToUpdate)) {
+            else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $productStockToUpdate)) {
 
                 return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
 
             }
-            else if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials))) || $this->checkProductDuplicateSerial($stockingProduct))) {
+            else if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($stockingProduct->serials))) || $this->checkProductDuplicateSerial($stockingProduct))) {
 
-                if ($this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
+                if ($this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
                     
-                    $serialNotFound = $this->checkProductSerialInValidity($stockToUpdate, json_decode(json_encode($stockingProduct->serials)));
+                    $serialNotFound = $this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($stockingProduct->serials)));
                     return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
                 }
@@ -1190,11 +1195,11 @@ class ProductController extends Controller
                 }
 
             }
-            else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations))) || $this->checkVariationDuplicateSerial($stockingProduct))) {
+            else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($productStockToUpdate, json_decode(json_encode($stockingProduct->variations))) || $this->checkVariationDuplicateSerial($stockingProduct))) {
                 
-                if ($this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
+                if ($this->checkVariationInvalidSerial($productStockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
                     
-                    $serialNotFound = $this->checkVariationInvalidSerial($stockToUpdate, json_decode(json_encode($stockingProduct->variations)));
+                    $serialNotFound = $this->checkVariationInvalidSerial($productStockToUpdate, json_decode(json_encode($stockingProduct->variations)));
                     return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
                 }
@@ -1218,28 +1223,30 @@ class ProductController extends Controller
             
         }
 
+        $stockToUpdate = Stock::findOrFail($stock);
+
         $request['products'] = json_decode(json_encode($request->products));
 
         foreach ($request->products as $productIndex => $stockingProduct) {
             
-            $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
+            $productStockToUpdate = ProductStock::findOrFail($stockingProduct->id);
             $merchantExpectedProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
             $product = $merchantExpectedProduct->product;
 
             // Replaced Merchant-Product (New)
-            if ($stockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id) {
+            if ($productStockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id) {
 
-                $stockToUpdate->merchantProduct->decrement('available_quantity', $stockToUpdate->stock_quantity);
+                $productStockToUpdate->merchantProduct->decrement('available_quantity', $productStockToUpdate->stock_quantity);
             
-                $stockToUpdate->deleteStockVariations();
+                $productStockToUpdate->deleteStockVariations();
 
-                $stockToUpdate->deleteStockSerials();
+                $productStockToUpdate->deleteStockSerials();
 
-                $stockToUpdate->deleteOldAddresses();
+                $productStockToUpdate->deleteOldAddresses();
 
-                $stockToUpdate->delete();
+                $productStockToUpdate->delete();
 
-                $stockToUpdate = ProductStock::create([
+                $productStockToUpdate = ProductStock::create([
                     'stock_code' => ($merchantExpectedProduct->sku.'S'.($merchantExpectedProduct->stocks->count()+1)),
                     'stock_quantity' => $stockingProduct->stock_quantity,
                     // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $stockingProduct->stock_quantity : $lastAvailableQuantity,
@@ -1251,92 +1258,102 @@ class ProductController extends Controller
                     'stock_id' => $stock
                 ]);
 
-                $merchantExpectedProduct->increment('available_quantity', $stockToUpdate->stock_quantity);
+                $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
                 
             }
-            else if ($stockingProduct->stock_quantity > $stockToUpdate->stock_quantity) {
+            else if ($stockingProduct->stock_quantity > $productStockToUpdate->stock_quantity) {
 
-                $difference = $stockingProduct->stock_quantity - $stockToUpdate->stock_quantity;
+                $difference = $stockingProduct->stock_quantity - $productStockToUpdate->stock_quantity;
 
-                $stockToUpdate->update([
+                $productStockToUpdate->update([
                     'stock_quantity' => $stockingProduct->stock_quantity,
-                    'available_quantity' => ($stockToUpdate->available_quantity + $difference),
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                    'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
                 ]);
 
-                // $this->increaseStockAvailableQuantity($stockToUpdate, $difference);
+                // $this->increaseStockAvailableQuantity($productStockToUpdate, $difference);
                 
-                $merchantExpectedProduct->increment('available_quantity', $difference);
+                $stockToUpdate->has_approval ? $merchantExpectedProduct->increment('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
 
             }
-            else if ($stockingProduct->stock_quantity < $stockToUpdate->stock_quantity) {
+            else if ($stockingProduct->stock_quantity < $productStockToUpdate->stock_quantity) {
 
-                $difference = $stockToUpdate->stock_quantity - $stockingProduct->stock_quantity;
+                $difference = $productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity;
 
-                $stockToUpdate->update([
+                $productStockToUpdate->update([
                     'stock_quantity' => $stockingProduct->stock_quantity,
-                    'available_quantity' => ($stockToUpdate->available_quantity - $difference), 
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                    'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
                 ]);
 
-                // $this->decreaseStockAvailableQuantity($stockToUpdate, $difference);
+                // $this->decreaseStockAvailableQuantity($productStockToUpdate, $difference);
                 
-                $merchantExpectedProduct->decrement('available_quantity', $difference);
+                $stockToUpdate->has_approval ? $merchantExpectedProduct->decrement('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
 
             }
-            else if($stockingProduct->stock_quantity == $stockToUpdate->stock_quantity && ! $stockToUpdate->stock->has_approval) {
+            
+            /*
+            else if($stockingProduct->stock_quantity == $productStockToUpdate->stock_quantity && ! $productStockToUpdate->stock->has_approval) {
 
-                $stockToUpdate->update([
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                $productStockToUpdate->update([
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
                 ]);
 
-                $merchantExpectedProduct->increment('available_quantity', $difference);
+                $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
 
-                // $this->increaseStockAvailableQuantity($stockToUpdate, $stockToUpdate->stock_quantity);
+                // $this->increaseStockAvailableQuantity($productStockToUpdate, $productStockToUpdate->stock_quantity);
 
             }
-            else if($stockingProduct->stock_quantity == $stockToUpdate->stock_quantity && $stockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
+            else if($stockingProduct->stock_quantity == $productStockToUpdate->stock_quantity && $productStockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
 
-                $stockToUpdate->update([
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                $productStockToUpdate->update([
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
                 ]);
 
             }
-            else {
+            */
+           
+            else {  // approving stock / updating only price
 
-                $stockToUpdate->update([
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $stockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                $productStockToUpdate->update([
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
                 ]);
+
+                if (! $stockToUpdate->has_approval) {
+                    
+                    $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
+
+                }
 
             }
 
             if ($product->has_variations && ! empty($stockingProduct->variations)) {
 
-                $stockToUpdate->stock_variations = json_decode(json_encode($stockingProduct->variations));
+                $productStockToUpdate->stock_variations = json_decode(json_encode($stockingProduct->variations));
 
             }
 
-            if ($stockToUpdate->has_serials && ! $stockToUpdate->has_variations && ! empty($stockingProduct->serials)) {
+            if ($productStockToUpdate->has_serials && ! $productStockToUpdate->has_variations && ! empty($stockingProduct->serials)) {
                 
-                $stockToUpdate->stock_serials = json_decode(json_encode($stockingProduct->serials));
+                $productStockToUpdate->stock_serials = json_decode(json_encode($stockingProduct->serials));
 
             }
 
-            $stockToUpdate->setStockAddresses(json_decode(json_encode($stockingProduct->addresses)), $stockToUpdate->merchant_product_id);
+            $productStockToUpdate->setStockAddresses(json_decode(json_encode($stockingProduct->addresses)), $productStockToUpdate->merchant_product_id);
 
         }
 
-        $this->updateParentStock($stockToUpdate, $currentUser, $request);            
+        $this->updateParentStock($productStockToUpdate, $currentUser, $request);            
 
         return $this->showAllStocks($perPage);
     }
@@ -1926,14 +1943,14 @@ class ProductController extends Controller
     */
 
     /*
-    protected function increaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
+    protected function increaseStockAvailableQuantity(ProductStock $productStockToUpdate, $amount)
     {
-        ProductStock::where('merchant_product_id', $stockToUpdate->merchant_product_id)->where('id', '>', $stockToUpdate->id)->increment('available_quantity', $amount);
+        ProductStock::where('merchant_product_id', $productStockToUpdate->merchant_product_id)->where('id', '>', $productStockToUpdate->id)->increment('available_quantity', $amount);
     }
 
-    protected function decreaseStockAvailableQuantity(ProductStock $stockToUpdate, $amount)
+    protected function decreaseStockAvailableQuantity(ProductStock $productStockToUpdate, $amount)
     {
-        ProductStock::where('merchant_product_id', $stockToUpdate->merchant_product_id)->where('id', '>', $stockToUpdate->id)->decrement('available_quantity', $amount);
+        ProductStock::where('merchant_product_id', $productStockToUpdate->merchant_product_id)->where('id', '>', $productStockToUpdate->id)->decrement('available_quantity', $amount);
     }
     */
 
@@ -2181,9 +2198,9 @@ class ProductController extends Controller
     }
     */
 
-    protected function updateParentStock(ProductStock $stockToUpdate, $currentUser, Request $request)
+    protected function updateParentStock(ProductStock $productStockToUpdate, $currentUser, Request $request)
     {
-        $stockToUpdate->stock()->update([
+        $productStockToUpdate->stock()->update([
             'has_approval' => true,
             'approver_type' => get_class($currentUser),
             'approver_id' => $currentUser->id,

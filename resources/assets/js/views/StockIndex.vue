@@ -720,7 +720,7 @@
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-info btn-outline-info btn-sm btn-block" 
 													v-tooltip.bottom-end="'Remove Product'" 
-													:disabled="singleStockData.products.length < 2" 
+													:disabled="(singleStockData.products.length < 2 || (singleStockData.products[singleStockData.products.length-1].stock_quantity > singleStockData.products[singleStockData.products.length-1].available_quantity))" 
 													@click="removeProduct()"
 												>
 													Remove Product

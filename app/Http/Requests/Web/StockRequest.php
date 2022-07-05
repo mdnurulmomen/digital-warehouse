@@ -237,6 +237,10 @@ class StockRequest extends FormRequest
                 // validation
                 foreach (json_decode(json_encode($this->input('products'))) as $productIndex => $stockingProduct) {
                     
+                    if (empty($stockingProduct->id)) {  // newly inserted or replaced (will validate laterly)
+                        continue;
+                    }
+
                     $stockToUpdate = ProductStock::findOrFail($stockingProduct->id);
                     $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
                     $product = $merchantProduct->product;
