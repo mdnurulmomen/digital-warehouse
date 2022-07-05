@@ -148,7 +148,7 @@ class WebsiteController extends Controller
             // 'user_name' => 'required|string|max:100|unique:merchants,user_name',
             // 'password' => 'required|string|max:255|confirmed',
             'industry' => 'required|string|max:255',
-            'warehouse_id' => 'required|numeric|exists:warehouses,id',
+            // 'warehouse_id' => 'required|numeric|exists:warehouses,id',
             'container_type_id' => 'required|numeric|exists:container_types,id',
             'container_id' => 'nullable|numeric|exists:containers,id',
             'quantity' => 'required|numeric',
@@ -172,7 +172,7 @@ class WebsiteController extends Controller
 
         $requirement = $merchant->requirements()->firstOrCreate(
             [
-                'warehouse_id' => $request->warehouse_id,
+                'warehouse_id' => $request->warehouse_id ?? 1,
                 'industry' => strtolower($request->industry),
                 'container_type_id' =>  $request->container_type_id, 
                 'container_id' =>  $request->container_id, 
