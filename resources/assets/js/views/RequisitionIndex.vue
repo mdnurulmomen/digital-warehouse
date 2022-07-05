@@ -1127,7 +1127,7 @@
 												</div>
 											</div>
 
-											<div class="form-row">
+											<div class="form-row" v-show="requiredProduct.has_serials && ! requiredProduct.has_variations && requiredProduct.hasOwnProperty('serials') && requiredProduct.serials.length">
 												<div class="col-md-12">
 													<label for="inputFirstName">
 														Product Serials
@@ -1345,7 +1345,7 @@
 															</div> 
 															-->
 
-															<div class="form-row">
+															<div class="form-row"  v-show="requiredProduct.has_serials && requiredProduct.has_variations">
 																<div class="col-md-12">
 																	<label for="inputFirstName">
 																		{{ productVariation.variation_name | capitalize }} Serials
