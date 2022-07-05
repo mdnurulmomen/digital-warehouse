@@ -95,13 +95,16 @@ class DispatchController extends Controller
             'requisition.products.*.serials' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|array|min:1',
             'requisition.products.*.serials.*.id' => 'exclude_if:requisition.products.*.has_variations,1|required_if:requisition.products.*.has_serials,1|numeric|exists:required_product_serials,id',
 
-            'requisition.products.*.selected_stock' => 'exclude_if:requisition.products.*.has_variations,1|required',
-            'requisition.products.*.selected_stock.stock_code' => [
-                    'exclude_if:requisition.products.*.has_variations,1',
+            'requisition.products.*.selected_stocks' => 'exclude_if:requisition.products.*.has_variations,1|exclude_if:requisition.products.*.has_serials,1|required|array|min:1',
+            'requisition.products.*.selected_stocks.*.stock_code' => [
+                    'exclude_if:requisition.products.*.has_variations,1', 
+                    'exclude_if:requisition.products.*.has_serials,1',
                     Rule::exists('product_stocks', 'stock_code')->where(function ($query) {
                         return $query->where('available_quantity', '>', 0);
                     }),
             ],
+            'requisition.products.*.selected_stocks.*.quantity' => 
+                    'exclude_if:requisition.products.*.has_variations,1|exclude_if:requisition.products.*.has_serials,1|lte:requisition.products.*.selected_stocks.*.available_quantity',
 
             // 'agent' => 'required_if:delivery,0,',
             // 'agent.agent_receipt' => 'required_if:delivery,0,',
@@ -132,13 +135,16 @@ class DispatchController extends Controller
             'requisition.products.*.variations.*.serials.*.id' => 'required_if:requisition.products.*.variations.*.has_serials,1|numeric|exists:required_product_variation_serials,id',
 
 
-            'requisition.products.*.variations.*.selected_stock' => 'required_if:requisition.products.*.has_variations,1',
-            'requisition.products.*.variations.*.selected_stock.stock_code' => [
-                    'required_if:requisition.products.*.has_variations,1',
+            'requisition.products.*.variations.*.selected_stocks' => 'exclude_if:requisition.products.*.has_serials,1|required_if:requisition.products.*.has_variations,1|array|min:1',
+            'requisition.products.*.variations.*.selected_stocks.*.stock_code' => [
+                    'exclude_if:requisition.products.*.has_serials,1',
+                    'required_if:requisition.products.*.has_variations,1', 
                     Rule::exists('product_variation_stocks', 'stock_code')->where(function ($query) {
                         return $query->where('available_quantity', '>', 0);
                     }),
             ],
+            'requisition.products.*.variations.*.selected_stocks.*.quantity' => 
+                    'exclude_if:requisition.products.*.has_variations,1|exclude_if:requisition.products.*.has_serials,1|lte:requisition.products.*.variations.*.selected_stocks.*.available_quantity',
 
 
             'delivery' => 'required_if:requisition.agent,0,',
@@ -379,17 +385,11 @@ class DispatchController extends Controller
 
             $expectedMerchantProduct = MerchantProduct::find($productToDispatch->merchant_product_id);
 
-            // $productAvailableQuantity = /*$expectedMerchantProduct->latestStock->available_quantity*/ $expectedMerchantProduct->available_quantity ?? 0;
+            // $productAvailableQuantity = /* $expectedMerchantProduct->latestStock->available_quantity */ $expectedMerchantProduct->available_quantity ?? 0;
 
             if ($expectedMerchantProduct->available_quantity < $productToDispatch->quantity) {
                 
                 return response()->json(['errors'=>["productSerialError" => ucfirst($expectedMerchantProduct->product->name)." quantity is more than available"]], 422);
-
-            }
-
-            else if (! $expectedMerchantProduct->product->has_variations && (ProductStock::where('stock_code', $productToDispatch->selected_stock->stock_code)->firstOrFail()->merchant_product_id != $expectedMerchantProduct->id || ProductStock::where('stock_code', $productToDispatch->selected_stock->stock_code)->firstOrFail()->available_quantity < $productToDispatch->quantity)) {
-                
-                return response()->json(['errors'=>["productStockCodeError" => ucfirst($expectedMerchantProduct->product->name)." stock code is invalid"]], 422);
 
             }
 
@@ -403,7 +403,8 @@ class DispatchController extends Controller
                                      
                 foreach ($productToDispatch->serials as $productSerialToDispatch) {
                     
-                    $productSerial = RequiredProductSerial::where('id', $productSerialToDispatch->id)->whereHas('serial', function($q){
+                    $productSerial = RequiredProductSerial::where('id', $productSerialToDispatch->id)
+                    ->whereHas('serial', function($q){
                         $q->where('has_dispatched', false);
                     })->exists();
 
@@ -417,11 +418,29 @@ class DispatchController extends Controller
 
             }
 
+            // as stock_codes are only for non-serial products
+            else if (! $expectedMerchantProduct->product->has_variations && ! $expectedMerchantProduct->product->has_serials) {
+                
+                foreach ($productToDispatch->selected_stocks as $selectedProductStockKey => $selectedProductStock) {
+                
+                    $productExpectedStock = ProductStock::where('stock_code', $selectedProductStock->stock_code)->firstOrFail();
+
+                    if ($productExpectedStock->merchant_product_id != $expectedMerchantProduct->id || $productExpectedStock->available_quantity < $selectedProductStock->quantity) {
+                    
+                        return response()->json(['errors'=>["productStockCodeError" => ucfirst($expectedMerchantProduct->product->name)." stock code is invalid"]], 422);
+
+
+                    }
+
+                }
+
+            }
+
             if ($expectedMerchantProduct->product->has_variations && $productToDispatch->has_variations) {
                 
                 foreach ($productToDispatch->variations as $variationToDispatch) {
             
-                    $merchantProductExpectedVariation = $expectedMerchantProduct->variations()->where('id', $variationToDispatch->merchant_product_variation_id)->first();
+                    $merchantProductExpectedVariation = $expectedMerchantProduct->variations()->where('id', $variationToDispatch->merchant_product_variation_id)->first();  // merchant-product-variation
 
                     // $variationAvailableQuantity = /*$merchantProductExpectedVariation->latestStock->available_quantity*/ $merchantProductExpectedVariation->available_quantity ?? 0;
 
@@ -431,22 +450,17 @@ class DispatchController extends Controller
 
                     }
 
-                    else if (ProductVariationStock::where('stock_code', $variationToDispatch->selected_stock->stock_code)->firstOrFail()->merchant_product_variation_id != $merchantProductExpectedVariation->id || ProductVariationStock::where('stock_code', $variationToDispatch->selected_stock->stock_code)->firstOrFail()->available_quantity < $variationToDispatch->quantity) {
-                
-                        return response()->json(['errors'=>["productStockCodeError" => ucfirst($merchantProductExpectedVariation->productVariation->variation->name)." stock code is invalid"]], 422);
-
-                    }
-
                     else if ($variationToDispatch->has_serials && count($variationToDispatch->serials) != $variationToDispatch->quantity) {
                         
                         return response()->json(['errors'=>["variationSerialError" => ucfirst($variationToDispatch->variation_name)." serial is more or less than required"]], 422);
 
                     }
-                    else if ($variationToDispatch->has_serials && count($variationToDispatch->serials)==$variationToDispatch->quantity) {
+                    else if ($variationToDispatch->has_serials && count($variationToDispatch->serials) == $variationToDispatch->quantity) {
                          
                         foreach ($variationToDispatch->serials as $variationSerialToDispatch) {
 
-                            $productVariationSerial = RequiredProductVariationSerial::where('id', $variationSerialToDispatch->id)->whereHas('serial', function($q){
+                            $productVariationSerial = RequiredProductVariationSerial::where('id', $variationSerialToDispatch->id)
+                            ->whereHas('serial', function($q){
                                 $q->where('has_dispatched', false);
                             })->exists();
 
@@ -458,7 +472,25 @@ class DispatchController extends Controller
 
                         }
 
-                    } 
+                    }
+
+                    // as stock_codes are only for non-serial products
+                    else if (! $variationToDispatch->has_serials) {
+
+                        foreach ($variationToDispatch->selected_stocks as $dispatchingVariationKey => $dispatchingVariation) {
+                            
+                            $productVariationExpectedStock = ProductVariationStock::where('stock_code', $dispatchingVariation->stock_code)->firstOrFail();
+
+                            if ($productVariationExpectedStock->merchant_product_variation_id != $merchantProductExpectedVariation->id || $productVariationExpectedStock->available_quantity < $dispatchingVariation->quantity) {
+                                
+                                return response()->json(['errors'=>["productStockCodeError" => ucfirst($merchantProductExpectedVariation->productVariation->variation->name)." stock code is invalid"]], 422);
+
+
+                            }
+
+                        }
+
+                    }
 
                 }
 

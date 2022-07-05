@@ -34,4 +34,9 @@ class RequiredProductVariation extends Model
     {
         return $this->hasMany(RequiredProductVariationSerial::class, 'required_product_variation_id', 'id');
     }
+
+    public function stocks()
+    {
+        return $this->hasMany(RequiredProductVariationStock::class, 'required_product_variation_id', 'id');
+    }
 }

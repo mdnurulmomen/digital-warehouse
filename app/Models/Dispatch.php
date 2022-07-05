@@ -326,7 +326,7 @@ class Dispatch extends Model
     }
     */
    
-    protected function deductProductStockQuantity($dispatchingProduct, $quantityToDeduct)
+    protected function deductProductStockQuantity($dispatchingProduct)
     {
         // while ($quantityToDeduct > 0) {
             
@@ -353,21 +353,64 @@ class Dispatch extends Model
             ->first();
             */
            
-            $productStockToDeduct = ProductStock::where('stock_code', $dispatchingProduct->selected_stock->stock_code)->firstOrFail();
-                     
+            $requiredProduct = RequiredProduct::find($dispatchingProduct->id);
 
-            // \Log::info('Merchant-Product id: '.$merchantExpectedProduct->id.'. Oldest product-stock id: '.$productStockToDeduct->id.'. Quantity to deduct is: '.$quantityToDeduct.'. But oldest product-stock available qty is :'.$productStockToDeduct->available_quantity);
-
-            if ($productStockToDeduct->available_quantity >= $quantityToDeduct) { 
-
-                $productStockToDeduct->decrement('available_quantity', $quantityToDeduct);
+            // $requiredProduct->stocks()->delete();
+           
+            if (! $dispatchingProduct->has_serials) {
                 
-                // $merchantExpectedProduct->decrement('available_quantity', $quantityToDeduct);
-                // $quantityToDeduct = 0;
+                foreach ($dispatchingProduct->selected_stocks as $selectedProductStockKey => $selectedProductStock) {
+                    
+                    $productStockToDeduct = ProductStock::where('stock_code', $selectedProductStock->stock_code)->firstOrFail();
 
-                RequiredProduct::findOrFail($dispatchingProduct->id)->update([
-                    'selected_stock_code' => $dispatchingProduct->selected_stock->stock_code
-                ]);
+                    // \Log::info('Merchant-Product id: '.$merchantExpectedProduct->id.'. Oldest product-stock id: '.$productStockToDeduct->id.'. Quantity to deduct is: '.$quantityToDeduct.'. But oldest product-stock available qty is :'.$productStockToDeduct->available_quantity);
+
+                    // if ($productStockToDeduct->available_quantity >= $selectedProductStock->quantity) { 
+
+                    $productStockToDeduct->decrement('available_quantity', $selectedProductStock->quantity);
+                    
+                    // $merchantExpectedProduct->decrement('available_quantity', $quantityToDeduct);
+                    // $quantityToDeduct = 0;
+
+                    /*
+                    RequiredProduct::findOrFail($dispatchingProduct->id)->update([
+                        'selected_stock_code' => $dispatchingProduct->selected_stock->stock_code
+                    ]);
+                    */
+
+                    $requiredProduct->stocks()->create([
+                        'selected_stock_code' => $selectedProductStock->stock_code,
+                        'quantity' => $selectedProductStock->quantity,
+                    ]);
+
+                    // }
+
+                }
+
+            }
+
+            else {
+
+                foreach ($dispatchingProduct->serials as $dispatchingProductSerialKey => $dispatchingProductSerial) {
+                    
+                    $requiredProductSerial = RequiredProductSerial::find($dispatchingProductSerial->id);
+                    $productStockToDeduct = $requiredProductSerial->serial->productStock;
+
+                    $productStockToDeduct->decrement('available_quantity');
+
+                    $requiredProductStock = RequiredProductStock::firstOrCreate(
+                        [
+                            'selected_stock_code' => $productStockToDeduct->stock_code,
+                            'required_product_id' => $requiredProduct->id,
+                        ],
+                        [
+                            'quantity' => 0
+                        ]
+                    );
+
+                    $requiredProductStock->increment('quantity');
+
+                }
 
             }
 
@@ -421,29 +464,75 @@ class Dispatch extends Model
             ->oldest('id')
             ->first();
             */
+           
+            $requiredProductVariation = RequiredProductVariation::find($variationToDispatch->id);
 
-            $variationStockToDeduct = ProductVariationStock::where('stock_code', $variationToDispatch->selected_stock->stock_code)->firstOrFail();
-
-            // if ($variationStockToDeduct->available_quantity >= $quantityToDeduct) {                
-
-                $variationStockToDeduct->decrement('available_quantity', $quantityToDeduct);
-                $variationStockToDeduct->productStock()->decrement('available_quantity', $quantityToDeduct);
-
-                RequiredProductVariation::findOrFail($variationToDispatch->id)->update([
-                    'selected_stock_code' => $variationToDispatch->selected_stock->stock_code
-                ]);
-
-                // \Log::info('Product Stock id : '.$variationStockToDeduct->productStock->id.'. Quantity deducted is : '.$quantityToDeduct.'. Now Product Stock Available Quantity : '.$variationStockToDeduct->productStock->available_quantity);
+            if (! $variationToDispatch->has_serials) {
                 
-                /*
-                $variationStockToDeduct->productStock()->update([
-                    'available_quantity' => $variationStockToDeduct->productStock->available_quantity - $quantityToDeduct,
-                ]);
-                */
-                
-                // $quantityToDeduct = 0;
+                foreach ($variationToDispatch->selected_stocks as $variationSelectedStockKey => $variationSelectedStock) {
+                    
+                    $variationStockToDeduct = ProductVariationStock::where('stock_code', $variationSelectedStock->stock_code)->firstOrFail();
 
-            // }
+                    // if ($variationStockToDeduct->available_quantity >= $quantityToDeduct) {                
+
+                    $variationStockToDeduct->decrement('available_quantity', $variationSelectedStock->quantity);
+                    $variationStockToDeduct->productStock()->decrement('available_quantity', $variationSelectedStock->quantity);
+
+                    /*
+                    RequiredProductVariation::findOrFail($variationToDispatch->id)->update([
+                        'selected_stock_code' => $variationToDispatch->selected_stock->stock_code
+                    ]);
+                    */
+                   
+                    $requiredProductVariation->stocks()->create([
+                        'selected_stock_code' => $variationSelectedStock->stock_code,
+                        'quantity' => $variationSelectedStock->quantity  
+                    ]);
+
+                    // \Log::info('Product Stock id : '.$variationStockToDeduct->productStock->id.'. Quantity deducted is : '.$quantityToDeduct.'. Now Product Stock Available Quantity : '.$variationStockToDeduct->productStock->available_quantity);
+                    
+                    /*
+                    $variationStockToDeduct->productStock()->update([
+                        'available_quantity' => $variationStockToDeduct->productStock->available_quantity - $quantityToDeduct,
+                    ]);
+                    */
+                    
+                    // $quantityToDeduct = 0;
+
+                    // }
+
+                } 
+
+            }
+
+            else {
+
+                foreach ($variationToDispatch->serials as $dispatchingVariationSerialKey => $dispatchingVariationSerial) {
+                    
+                    $requiredProductVariationSerial = RequiredProductVariationSerial::find($dispatchingVariationSerial->id);
+                    $variationStockToDeduct = $requiredProductVariationSerial->serial->variationStock;
+                    $productStockToDeduct = $variationStockToDeduct->productStock;
+
+                    $variationStockToDeduct->decrement('available_quantity');
+                    $productStockToDeduct->decrement('available_quantity');
+
+                    $requiredProductVariationStock = RequiredProductVariationStock::firstOrCreate(
+                        [
+                            'selected_stock_code' => $variationStockToDeduct->stock_code,
+                            'required_product_variation_id' => $requiredProductVariation->id,
+                        ],
+                        [
+                            'quantity' => 0
+                        ]
+                    );
+
+                    $requiredProductVariationStock->increment('quantity');
+
+                }
+
+            }
+
+
             
             /*
             else if ($variationStockToDeduct->available_quantity < $quantityToDeduct) {

@@ -40,6 +40,11 @@ class RequiredProduct extends Model
         return $this->hasMany(RequiredProductSerial::class, 'required_product_id', 'id');
     }
 
+    public function stocks()
+    {
+        return $this->hasMany(RequiredProductStock::class, 'required_product_id', 'id');
+    }
+
     public function preferredPackage()
     {
         return $this->hasOne(RequiredProductPackage::class, 'required_product_id', 'id');

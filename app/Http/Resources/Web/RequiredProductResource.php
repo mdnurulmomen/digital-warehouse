@@ -28,12 +28,13 @@ class RequiredProductResource extends JsonResource
             'has_serials' => $product->has_serials,
             'available_stocks' => $this->when($merchantProduct->relationLoaded('stocks'), $merchantProduct->stocks),
             'packaging_service' => $this->packaging_service,
-            'selected_stock_code' => $this->when($this->selected_stock_code, $this->selected_stock_code),
+            // 'selected_stock_code' => $this->when($this->selected_stock_code, $this->selected_stock_code),
+            'selected_stocks' => $this->when($this->stocks->count(), $this->stocks), 
             'preferred_package' => $this->when($this->packaging_service, $this->preferredPackage ? new PackagingPackageResource($this->preferredPackage->loadMissing('package')) : NULL),
             'dispatched_package' => $this->when($this->packaging_service, $this->dispatchedPackage ? new PackagingPackageResource($this->dispatchedPackage->loadMissing('package')) : NULL),
             'serials' => $this->when($product->has_serials && ! $product->has_variations, $this->serials->loadMissing('serial')),
             'variations' => $this->when($product->has_variations, RequiredProductVariationResource::collection($this->variations)),
-            'addresses' => new ProductAddressCollection($merchantProduct->addresses),
+            'addresses' => new ProductAddressCollection($merchantProduct->addresses), 
             'requisition_id' => $this->requisition_id,
         ];
     }

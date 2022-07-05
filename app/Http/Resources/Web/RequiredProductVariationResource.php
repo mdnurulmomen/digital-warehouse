@@ -27,7 +27,8 @@ class RequiredProductVariationResource extends JsonResource
             'serials' => $this->when($product->has_serials, $this->serials->loadMissing('serial')),
             'available_quantity' => /*$merchantProductVariation->latestStock->available_quantity*/ $merchantProductVariation->available_quantity,
             'available_stocks' => $this->when($merchantProductVariation->relationLoaded('stocks'), $merchantProductVariation->stocks),
-            'selected_stock_code' => $this->when($this->selected_stock_code, $this->selected_stock_code),
+            // 'selected_stock_code' => $this->when($this->selected_stock_code, $this->selected_stock_code),
+            'selected_stocks' => $this->when($this->stocks->count(), $this->stocks),
         ];
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRequiredProductVariationsTable extends Migration
+class CreateRequiredProductStocksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateRequiredProductVariationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('required_product_variations', function (Blueprint $table) {
+        Schema::create('required_product_stocks', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedMediumInteger('merchant_product_variation_id');
-            $table->unsignedMediumInteger('quantity');
-            // $table->boolean('has_serials')->default(false);
-            // $table->string('selected_stock_code')->nullable();
+            $table->string('selected_stock_code');
+            $table->unsignedMediumInteger('quantity');      // deducted quantity
             $table->unsignedInteger('required_product_id');
         });
     }
@@ -30,6 +28,6 @@ class CreateRequiredProductVariationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('required_product_variations');
+        Schema::dropIfExists('required_product_stocks');
     }
 }
