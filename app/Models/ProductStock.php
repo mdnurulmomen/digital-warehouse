@@ -149,6 +149,11 @@ class ProductStock extends Model
                             $merchantProductExpectedVariation->decrement('available_quantity', $difference);
                         
                         }
+                        else {
+
+                            $merchantProductExpectedVariation->increment('available_quantity', $stockVariation->stock_quantity);
+
+                        }
 
                     }
                     // increasing quantity
@@ -173,7 +178,11 @@ class ProductStock extends Model
                             $merchantProductExpectedVariation->increment('available_quantity', $difference);
 
                         }
+                        else {
 
+                            $merchantProductExpectedVariation->increment('available_quantity', $stockVariation->stock_quantity);
+
+                        }
 
                     }
                     // same quantity

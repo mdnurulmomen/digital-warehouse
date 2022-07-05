@@ -122,6 +122,7 @@ class StockRequest extends FormRequest
             if ($product->has_variations && array_sum(array_column($stockingProduct->variations, 'stock_quantity')) != $stockingProduct->stock_quantity) {
                 $rules['products.'.$stockingProductKey.'.variations.*.total_stock_quantity'] = 'required|integer|min:'.array_sum(array_column($stockingProduct->variations, 'stock_quantity'));
             }
+            // Variation Serial Duplicacy
             if ($product->has_variations && $product->has_serials) {
 
                 foreach ($stockingProduct->variations as $stockingProductVariationKey => $stockingProductVariation) {

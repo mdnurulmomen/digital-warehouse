@@ -146,19 +146,9 @@ class ProductStockRequest extends FormRequest
                     
                     // $rules['variations.'.$stockingProductVariationKey.'.serials'] = 'required|array|exclude_if:variations.*.stock_quantity,';
                     
-                    $rules['variations.'.$stockingProductVariationKey.'.serials'] = ['required', 'array', new ProductVariationSerialRule()];
+                    $rules['variations.'.$stockingProductVariationKey.'.serials'] = ['required', 'array'];
 
                 }
-
-            }
-
-        }
-        */
-        /*
-        // ProductVariationSerialRule
-        if ($product->has_variations && $product->has_serials) {
-
-            foreach (json_decode(json_encode($this->input('variations'))) as $stockingProductVariationKey => $stockingProductVariation) {
                 
                 foreach ($stockingProductVariation->serials as $variationSerialkey => $variationSerial) {
                     
