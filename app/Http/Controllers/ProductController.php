@@ -1001,7 +1001,7 @@ class ProductController extends Controller
 
         $productStockToDelete->deleteOldAddresses();
 
-        if ($productStockToDelete->stock->stocks->count() < 2) {
+        if ($productStockToDelete->stock->stocks->count() < 2) {    //  if this is the only product-stock in parent-stock
             
             $productStockToDelete->stock->delete();
 
@@ -1151,70 +1151,6 @@ class ProductController extends Controller
 
     public function updateStock(StockRequest $request, $stock, $perPage)
     {   
-        /*
-        // validation
-        foreach ($request->products as $productIndex => $stockingProduct) {
-                
-            $productStockToUpdate = ProductStock::findOrFail($stockingProduct->id);
-            $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
-            $product = $merchantProduct->product;
-            
-            // If Replaced Merchant-Product and available-quantity is gonna be negative
-            if ($productStockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id && ! $product->has_variations && $productStockToUpdate->stock_quantity > $merchantProduct->available_quantity) {
-                
-                $missingProduct = ucfirst($product->name);
-                return response()->json(['errors'=>["$product->name" => "$missingProduct is not found"]], 422);
-
-            }
-
-            // already stocked product && reducing stock quantity
-            // decreasing qty is more than stock or product available
-            else if ($productStockToUpdate->merchant_product_id == $stockingProduct->merchant_product_id && ! $product->has_variations && $productStockToUpdate->stock_quantity > $stockingProduct->stock_quantity && ((($productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $productStockToUpdate->available_quantity) || (($productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity) > $productStockToUpdate->merchantProduct->available_quantity))) {
-
-                return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
-
-            }
-            else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($stockingProduct->variations)), $productStockToUpdate)) {
-
-                return response()->json(['errors'=>["invalidVariationData" => "Trying to update immutable variation or less than minimum"]], 422);
-
-            }
-            else if ($product->has_serials && ! $product->has_variations && ($this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($stockingProduct->serials))) || $this->checkProductDuplicateSerial($stockingProduct))) {
-
-                if ($this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($stockingProduct->serials)))) {
-                    
-                    $serialNotFound = $this->checkProductSerialInValidity($productStockToUpdate, json_decode(json_encode($stockingProduct->serials)));
-                    return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
-
-                }
-                else {
-
-                    $duplicateValue = $this->checkProductDuplicateSerial($stockingProduct);
-                    return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
-
-                }
-
-            }
-            else if ($product->has_serials && $product->has_variations && ($this->checkVariationInvalidSerial($productStockToUpdate, json_decode(json_encode($stockingProduct->variations))) || $this->checkVariationDuplicateSerial($stockingProduct))) {
-                
-                if ($this->checkVariationInvalidSerial($productStockToUpdate, json_decode(json_encode($stockingProduct->variations)))) {
-                    
-                    $serialNotFound = $this->checkVariationInvalidSerial($productStockToUpdate, json_decode(json_encode($stockingProduct->variations)));
-                    return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
-
-                }
-                else {
-
-                    $duplicateValue = $this->checkVariationDuplicateSerial($stockingProduct);
-                    return response()->json(['errors'=>["$duplicateValue" => "$duplicateValue serial is taken"]], 422);
-
-                }
-                
-            }
-
-        }
-        */
-
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
 
         if (empty($currentUser)) {
@@ -1225,112 +1161,114 @@ class ProductController extends Controller
 
         $stockToUpdate = Stock::findOrFail($stock);
 
+        $stockToUpdate->stocks()->delete(); // primarily deleting products-stocks
+
         $request['products'] = json_decode(json_encode($request->products));
 
         foreach ($request->products as $productIndex => $stockingProduct) {
-            
-            $productStockToUpdate = ProductStock::findOrFail($stockingProduct->id);
+
             $merchantExpectedProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
             $product = $merchantExpectedProduct->product;
-
-            // Replaced Merchant-Product (New)
-            if ($productStockToUpdate->merchant_product_id != $stockingProduct->merchant_product_id) {
-
-                $productStockToUpdate->merchantProduct->decrement('available_quantity', $productStockToUpdate->stock_quantity);
             
-                $productStockToUpdate->deleteStockVariations();
-
-                $productStockToUpdate->deleteStockSerials();
-
-                $productStockToUpdate->deleteOldAddresses();
-
-                $productStockToUpdate->delete();
-
-                $productStockToUpdate = ProductStock::create([
+            if (empty($stockingProduct->id)) {      // added new product-stock
+                
+                $productStockToUpdate = $stockToUpdate->stocks()->create([
                     'stock_code' => ($merchantExpectedProduct->sku.'S'.($merchantExpectedProduct->stocks->count()+1)),
                     'stock_quantity' => $stockingProduct->stock_quantity,
-                    // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $stockingProduct->stock_quantity : $lastAvailableQuantity,
                     'available_quantity' => $stockingProduct->stock_quantity,
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
-                    'merchant_product_id' => $merchantExpectedProduct->id,
-                    'stock_id' => $stock
+                    'merchant_product_id' => $merchantExpectedProduct->id
                 ]);
-
-                $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
-                
-            }
-            else if ($stockingProduct->stock_quantity > $productStockToUpdate->stock_quantity) {
-
-                $difference = $stockingProduct->stock_quantity - $productStockToUpdate->stock_quantity;
-
-                $productStockToUpdate->update([
-                    'stock_quantity' => $stockingProduct->stock_quantity,
-                    'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
-                    'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
-                    'expired_at' => $stockingProduct->expired_at ?? NULL,
-                ]);
-
-                // $this->increaseStockAvailableQuantity($productStockToUpdate, $difference);
-                
-                $stockToUpdate->has_approval ? $merchantExpectedProduct->increment('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
-
-            }
-            else if ($stockingProduct->stock_quantity < $productStockToUpdate->stock_quantity) {
-
-                $difference = $productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity;
-
-                $productStockToUpdate->update([
-                    'stock_quantity' => $stockingProduct->stock_quantity,
-                    'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
-                    'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
-                    'expired_at' => $stockingProduct->expired_at ?? NULL,
-                ]);
-
-                // $this->decreaseStockAvailableQuantity($productStockToUpdate, $difference);
-                
-                $stockToUpdate->has_approval ? $merchantExpectedProduct->decrement('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
-
-            }
-            
-            /*
-            else if($stockingProduct->stock_quantity == $productStockToUpdate->stock_quantity && ! $productStockToUpdate->stock->has_approval) {
-
-                $productStockToUpdate->update([
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
-                    'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
-                    'expired_at' => $stockingProduct->expired_at ?? NULL,
-                ]);
-
-                $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
-
-                // $this->increaseStockAvailableQuantity($productStockToUpdate, $productStockToUpdate->stock_quantity);
-
-            }
-            else if($stockingProduct->stock_quantity == $productStockToUpdate->stock_quantity && $productStockToUpdate->stock->warehouse_id != $request['warehouse']['id']) {
-
-                $productStockToUpdate->update([
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
-                    'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
-                    'expired_at' => $stockingProduct->expired_at ?? NULL,
-                ]);
-
-            }
-            */
-           
-            else {  // approving stock / updating only price
-
-                $productStockToUpdate->update([
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
-                    'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
-                    'expired_at' => $stockingProduct->expired_at ?? NULL,
-                ]);
-
-                if (! $stockToUpdate->has_approval) {
                     
+                $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
+
+            }
+
+            else {
+                
+                $productStockToUpdate = ProductStock::withTrashed()->findOrFail($stockingProduct->id);
+
+                if ($productStockToUpdate->merchant_product_id == $stockingProduct->merchant_product_id) { 
+                    
+                    if ($stockingProduct->stock_quantity > $productStockToUpdate->stock_quantity) {
+
+                        $difference = $stockingProduct->stock_quantity - $productStockToUpdate->stock_quantity;
+
+                        $productStockToUpdate->update([
+                            'stock_quantity' => $stockingProduct->stock_quantity,
+                            'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
+                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                            'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
+                            'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                            'deleted_at' => NULL
+                        ]);
+
+                        // $this->increaseStockAvailableQuantity($productStockToUpdate, $difference);
+                        
+                        $stockToUpdate->has_approval ? $merchantExpectedProduct->increment('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
+
+                    }
+                    else if ($stockingProduct->stock_quantity < $productStockToUpdate->stock_quantity) {
+
+                        $difference = $productStockToUpdate->stock_quantity - $stockingProduct->stock_quantity;
+
+                        $productStockToUpdate->update([
+                            'stock_quantity' => $stockingProduct->stock_quantity,
+                            'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
+                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                            'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
+                            'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                            'deleted_at' => NULL
+                        ]);
+
+                        // $this->decreaseStockAvailableQuantity($productStockToUpdate, $difference);
+                        
+                        $stockToUpdate->has_approval ? $merchantExpectedProduct->decrement('available_quantity', $difference) : $merchantExpectedProduct->increment('available_quantity', $stockingProduct->stock_quantity);
+
+                    }
+                    else {  // approving stock / updating only price
+
+                        $productStockToUpdate->update([
+                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                            'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
+                            'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                            'deleted_at' => NULL
+                        ]);
+
+                        if (! $stockToUpdate->has_approval) {
+                            
+                            $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
+
+                        }
+
+                    }
+
+                }
+                else { // replaced / swaped merchant-product
+                    
+                    $productStockToUpdate->merchantProduct->decrement('available_quantity', $productStockToUpdate->stock_quantity);
+            
+                    $productStockToUpdate->deleteStockVariations();
+
+                    $productStockToUpdate->deleteStockSerials();
+
+                    $productStockToUpdate->deleteOldAddresses();
+
+                    $productStockToUpdate->delete();
+
+                    $productStockToUpdate = ProductStock::create([
+                        'stock_code' => ($merchantExpectedProduct->sku.'S'.($merchantExpectedProduct->stocks->count()+1)),
+                        'stock_quantity' => $stockingProduct->stock_quantity,
+                        'available_quantity' => $stockingProduct->stock_quantity,
+                        'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                        'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
+                        'expired_at' => $stockingProduct->expired_at ?? NULL,
+                        'merchant_product_id' => $merchantExpectedProduct->id,
+                        'stock_id' => $stock
+                    ]);
+
                     $merchantExpectedProduct->increment('available_quantity', $productStockToUpdate->stock_quantity);
 
                 }
@@ -1343,7 +1281,7 @@ class ProductController extends Controller
 
             }
 
-            if ($productStockToUpdate->has_serials && ! $productStockToUpdate->has_variations && ! empty($stockingProduct->serials)) {
+            if ($product->has_serials && ! $product->has_variations && ! empty($stockingProduct->serials)) {
                 
                 $productStockToUpdate->stock_serials = json_decode(json_encode($stockingProduct->serials));
 
@@ -1353,7 +1291,22 @@ class ProductController extends Controller
 
         }
 
-        $this->updateParentStock($productStockToUpdate, $currentUser, $request);            
+        $this->updateParentStock($productStockToUpdate, $currentUser, $request);
+
+        // deleting still soft-deleted stocks
+        foreach ($stockToUpdate->stocks()->onlyTrashed()->get() as $trashedProductStockKey => $trashedProductStock) {
+
+            $trashedProductStock->merchantProduct->decrement('available_quantity', $trashedProductStock->stock_quantity);
+            
+            $trashedProductStock->deleteStockVariations();
+
+            $trashedProductStock->deleteStockSerials();
+
+            $trashedProductStock->deleteOldAddresses();
+
+            $trashedProductStock->forceDelete();
+
+        }
 
         return $this->showAllStocks($perPage);
     }

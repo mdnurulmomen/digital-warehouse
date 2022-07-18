@@ -260,16 +260,17 @@ class ProductStockRequest extends FormRequest
                 $product = $merchantExpectedProduct->product;
 
                 // decreasing quantity
-                if (! $product->has_variations && $stockToUpdate->stock_quantity > $this->stock_quantity) {
+                if (! $product->has_variations && $stockToUpdate->stock_quantity > $this->stock_quantity && ($stockToUpdate->stock_quantity - $this->stock_quantity) > $stockToUpdate->available_quantity) {
                     
-                    $difference = $stockToUpdate->stock_quantity - $this->stock_quantity;
+                    // $difference = $stockToUpdate->stock_quantity - $this->stock_quantity;
 
-                    if ($difference > $stockToUpdate->available_quantity || $difference > /*$stockToUpdate->merchantProduct->latestStock->available_quantity*/ $stockToUpdate->merchantProduct->available_quantity) {
+                    // if ($difference > $stockToUpdate->available_quantity || $difference > /*$stockToUpdate->merchantProduct->latestStock->available_quantity*/ $stockToUpdate->merchantProduct->available_quantity) {
 
                         // return response()->json(['errors'=>["invalidValue" => "Stock quantity is less than minimum"]], 422);
+                        
                         $validator->errors()->add("invalidValue", "Stock quantity is less than minimum");
                         
-                    }
+                    // }
 
                 }
                 else if($product->has_variations && $this->findVariationInvalidQuantity(json_decode(json_encode($this->variations)), $stockToUpdate)) {
@@ -279,11 +280,11 @@ class ProductStockRequest extends FormRequest
 
                 }
 
-                if ($product->has_serials && ! $product->has_variations && ($this->checkProductRequiredSerial($stockToUpdate, json_decode(json_encode($this->serials))) /*|| $this->checkProductSerialDuplicacy($this)*/)) {
+                if ($product->has_serials && ! $product->has_variations && ($this->checkProductRequiredSerialMissing($stockToUpdate, json_decode(json_encode($this->serials))) /*|| $this->checkProductSerialDuplicacy($this)*/)) {
 
-                    // if ($this->checkProductRequiredSerial($stockToUpdate, json_decode(json_encode($this->serials)))) {
+                    // if ($this->checkProductRequiredSerialMissing($stockToUpdate, json_decode(json_encode($this->serials)))) {
                         
-                        $serialNotFound = $this->checkProductRequiredSerial($stockToUpdate, json_decode(json_encode($this->serials)));
+                        $serialNotFound = $this->checkProductRequiredSerialMissing($stockToUpdate, json_decode(json_encode($this->serials)));
                         // return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
                         $validator->errors()->add("$serialNotFound", "$serialNotFound serial not found");
 
@@ -298,11 +299,11 @@ class ProductStockRequest extends FormRequest
                     */
 
                 }
-                else if ($product->has_serials && $product->has_variations && ($this->checkVariationRequiredSerial($stockToUpdate, json_decode(json_encode($this->variations))) /*|| $this->checkVariationSerialDuplicacy($this)*/)) {
+                else if ($product->has_serials && $product->has_variations && $this->checkVariationRequiredSerialMissing($stockToUpdate, json_decode(json_encode($this->variations))) /*|| $this->checkVariationSerialDuplicacy($this)*/) {
                     
-                    // if ($this->checkVariationRequiredSerial($stockToUpdate, json_decode(json_encode($this->variations)))) {
+                    // if ($this->checkVariationRequiredSerialMissing($stockToUpdate, json_decode(json_encode($this->variations)))) {
                         
-                        $serialNotFound = $this->checkVariationRequiredSerial($stockToUpdate, json_decode(json_encode($this->variations)));
+                        $serialNotFound = $this->checkVariationRequiredSerialMissing($stockToUpdate, json_decode(json_encode($this->variations)));
                         $validator->errors()->add("$serialNotFound", "$serialNotFound serial not found");
                         // return response()->json(['errors'=>["$serialNotFound" => "$serialNotFound serial not found"]], 422);
 
@@ -325,21 +326,33 @@ class ProductStockRequest extends FormRequest
 
     protected function findVariationInvalidQuantity($stockVariaitons = [], ProductStock $productStock)
     {
-        if (count($stockVariaitons) && $productStock->variations->count()) {
+        if (count($stockVariaitons) && $productStock->variations->count() && $productStock->variations()->where(function ($query) {$query->whereRaw('stock_quantity > available_quantity');})->exists()) {
             
             $stockVariationCollection = collect($stockVariaitons);
 
-            foreach ($productStock->variations as $productVariationExistingStockKey => $productVariationExistingStock) {
+            foreach ($productStock->variations()->where(function ($query) {$query->whereRaw('stock_quantity > available_quantity');})->get() as $productVariationExistingStockKey => $productVariationExistingStock) {
                 
-                $merchantProductVariation = $productVariationExistingStock->merchantProductVariation;
+                // $merchantProductVariation = $productVariationExistingStock->merchantProductVariation;
                 // $expectedVariationeLatestStock = $merchantProductVariation->latestStock;
 
                 $expectedVariationInputedStock = $stockVariationCollection->first(function ($object, $key) use ($productVariationExistingStock) {
                     return $object->merchant_product_variation_id == $productVariationExistingStock->merchant_product_variation_id;
                 });
 
+                if (empty($expectedVariationInputedStock)) {
+                    
+                    return "Missing required variation"; // true
+
+                }
+                // decreasing quantity is less than available
+                else if (! empty($expectedVariationInputedStock) && $expectedVariationInputedStock->stock_quantity < $productVariationExistingStock->available_quantity) {
+                    
+                    return "Quantity is less than required";
+
+                }
+
                 // replaced variation-stock but replacing-variation available quantity is less than existing quantity
-                if (empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $merchantProductVariation->available_quantity < $productVariationExistingStock->stock_quantity) {
+                // if (empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $merchantProductVariation->available_quantity < $productVariationExistingStock->stock_quantity) {
                     
                     /*
                     // MerchantProductVariation which has only stock but already dispatched, cant be replaced
@@ -358,24 +371,24 @@ class ProductStockRequest extends FormRequest
                     return false;
                     */
                    
-                    return true;
+                    // return true;
 
-                }
+                // }
                 // decreased
-                else if (! empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $productVariationExistingStock->stock_quantity > $expectedVariationInputedStock->stock_quantity) {
+                // else if (! empty($expectedVariationInputedStock) && $merchantProductVariation->dispatchedRequests->count() && $productVariationExistingStock->stock_quantity > $expectedVariationInputedStock->stock_quantity) {
 
                     // new quantity is less than stock available quantity
-                    if ($productVariationExistingStock->stock_quantity > $productVariationExistingStock->available_quantity && $expectedVariationInputedStock->stock_quantity < $productVariationExistingStock->available_quantity) {
+                    // if ($productVariationExistingStock->stock_quantity > $productVariationExistingStock->available_quantity && $expectedVariationInputedStock->stock_quantity < $productVariationExistingStock->available_quantity) {
                         
-                        return true;
+                        // return true;
 
-                    }
+                    // }
                     // has multiple stocks, but deducted quantity is more than ultimate available quantity
-                    else if (($merchantProductVariation->available_quantity < ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) /*|| $merchantProductVariation->stocks()->where('id', '>', $expectedVariationInputedStock->id)->where('available_quantity', '<', $expectedVariationInputedStock->stock_quantity)->exists()*/) {
+                    // else if (($merchantProductVariation->available_quantity < ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) /*|| $merchantProductVariation->stocks()->where('id', '>', $expectedVariationInputedStock->id)->where('available_quantity', '<', $expectedVariationInputedStock->stock_quantity)->exists()*/) {
                         
-                        return true;
+                        // return true;
 
-                    }
+                    // }
                     // only stock but deducted quantity is less than dispatched
                     /*
                     else if ($merchantProductVariation->stocks->count() < 2 && $merchantProductVariation->dispatchedRequests->sum('quantity') > ($productVariationExistingStock->stock_quantity - $expectedVariationInputedStock->stock_quantity)) {
@@ -387,7 +400,7 @@ class ProductStockRequest extends FormRequest
 
                     // return false;
 
-                }
+                // }
 
             }
 
@@ -398,7 +411,7 @@ class ProductStockRequest extends FormRequest
         return false;
     }
 
-    protected function checkProductRequiredSerial(ProductStock $productStock, $productSerials)
+    protected function checkProductRequiredSerialMissing(ProductStock $productStock, $productSerials)
     {
         if ($productStock->serials()->where(function ($query) {$query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);})->exists()) {
             
@@ -420,6 +433,8 @@ class ProductStockRequest extends FormRequest
 
             }
 
+            return false;
+
         }
 
         return false;
@@ -439,7 +454,7 @@ class ProductStockRequest extends FormRequest
         return false;
     }
 
-    protected function checkVariationRequiredSerial(ProductStock $productStock, $stockVariations)
+    protected function checkVariationRequiredSerialMissing(ProductStock $productStock, $stockVariations)
     {
         if ($productStock->variations()->whereHas('serials', function ($query) {
             $query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);
@@ -451,7 +466,7 @@ class ProductStockRequest extends FormRequest
 
                 $productVariationToCheck = $this->getVariationExpectedKey($stockVariations, $productStockVariation->id);
 
-                if ($productVariationToCheck!==false && ! collect($stockVariations[$productVariationToCheck]->serials)->isEmpty()) {
+                if ($productVariationToCheck !== false && ! collect($stockVariations[$productVariationToCheck]->serials)->isEmpty()) {
                     
                     $productVariationSerialCollection = collect($stockVariations[$productVariationToCheck]->serials);
                     

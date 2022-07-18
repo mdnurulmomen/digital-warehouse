@@ -3,14 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductVariationStock extends Model
 {   
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
+    use SoftDeletes;
+    
     public $timestamps = false;
 
     protected $guarded = ['id'];

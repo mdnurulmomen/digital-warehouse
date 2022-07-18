@@ -280,13 +280,9 @@
 																<tfoot>
 																	<tr>	
 																		<th>Date</th>
-
 																		<th>Stock Qty</th>
-
 																		<!-- <th>Available Qty</th> -->
-
 																		<th>Approved</th>
-
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -582,8 +578,7 @@
 																@keydown.enter.prevent="nextPage" 
 																@change="validateFormInput('product_stock_quantity')" 
 																required="true" 
-																:readonly="! createMode && allStocks.length && singleStockData.primary_quantity > allStocks[allStocks.length-1].available_quantity" 
-																:min="createMode ? 1 : allStocks.length ? singleStockData.primary_quantity - allStocks[allStocks.length-1].available_quantity : 0"
+																:min="createMode ? 1 : singleStockData.available_quantity" 
 															>
 															<div class="input-group-append">
 																<span class="input-group-text">
@@ -686,8 +681,7 @@
 																	@change="validateFormInput('product_variation_quantity')" 
 																	@keydown.enter.prevent="nextPage" 
 																	required="true" 
-																	:readonly="! createMode && allStocks.length && allStocks[allStocks.length-1].variations.length > variationIndex && stockVariation.primary_quantity > allStocks[allStocks.length-1].variations[variationIndex].available_quantity" 
-																	:min="createMode ? 1 : allStocks.length && allStocks[allStocks.length-1].variations.length > variationIndex ? (stockVariation.primary_quantity - allStocks[allStocks.length-1].variations[variationIndex].available_quantity) : 1"
+																	:min="createMode ? 1 : stockVariation.available_quantity"
 																>
 
 																<div class="invalid-feedback">
@@ -3603,6 +3597,7 @@
 				
 				this.singleStockData = JSON.parse(JSON.stringify(object));
 
+				/*
 				this.singleStockData.primary_quantity = this.singleStockData.stock_quantity;
 
 				if (this.singleStockData.hasOwnProperty('variations') && this.singleStockData.variations.length) {
@@ -3614,6 +3609,7 @@
 					);
 
 				}
+				*/
 
 				// this.singleStockData.product_id = this.product.id;
 
@@ -4664,13 +4660,22 @@
 						if (!this.singleStockData.stock_quantity || this.singleStockData.stock_quantity < 1) {
 							this.errors.stock.product_stock_quantity = 'Stock quantity is required';
 						}
+						/*
 						else if(! this.createMode && ((this.singleStockData.primary_quantity - this.singleStockData.stock_quantity) > this.allStocks[this.allStocks.length-1].available_quantity)){
 
 							this.errors.stock.product_stock_quantity = 'Stock quantity is less than minimum ' + (this.singleStockData.primary_quantity - this.allStocks[this.allStocks.length-1].available_quantity);
 						}
+						*/
+						else if (! this.createMode && this.singleStockData.stock_quantity && this.singleStockData.available_quantity && this.singleStockData.stock_quantity < this.singleStockData.available_quantity) {
+
+							this.errors.stock.product_stock_quantity = 'Stock quantity is less than minimum ' + this.singleStockData.available_quantity;
+
+						}
 						else{
+
 							this.submitForm = true;
 							this.$delete(this.errors.stock, 'product_stock_quantity');
+						
 						}
 
 						break;
@@ -4685,9 +4690,16 @@
 									if (productVariation.stock_quantity < 0) {
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is invalid';
 									}
+									/*
 									else if(! this.createMode && this.allStocks.length && this.allStocks[this.allStocks.length-1].variations.length > index && ((productVariation.primary_quantity - productVariation.stock_quantity) > this.allStocks[this.allStocks.length-1].variations[index].available_quantity)){
 
 										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is less than minimum ' + (productVariation.primary_quantity-this.allStocks[this.allStocks.length-1].variations[index].available_quantity);
+									}
+									*/
+									else if (! this.createMode && productVariation.stock_quantity && productVariation.available_quantity && productVariation.stock_quantity < productVariation.available_quantity) {
+
+										this.errors.stock.variations[index].product_variation_quantity = 'Variation quantity is less than minimum ' + productVariation.available_quantity;
+
 									}
 									else {
 										this.$delete(this.errors.stock.variations[index], 'product_variation_quantity');

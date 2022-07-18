@@ -25,6 +25,7 @@ class CreateProductStocksTable extends Migration
             $table->date('manufactured_at')->nullable();
             $table->date('expired_at')->nullable();
             $table->unsignedInteger('stock_id');
+            $table->softDeletes();
         });
     }
 

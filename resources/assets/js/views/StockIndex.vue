@@ -523,7 +523,8 @@
 									                                  		track-by="id" 
 									                              			placeholder="Select Product" 
 									                              			class="form-control p-0" 
-									                                  		:class="! errors.products[stockedProductIndex].product ? 'is-valid' : 'is-invalid'"  
+									                                  		:class="! errors.products[stockedProductIndex].product ? 'is-valid' : 'is-invalid'" 
+									                                  		:disabled="Boolean(! createMode && stockedProduct.stock_quantity && stockedProduct.available_quantity && stockedProduct.stock_quantity != stockedProduct.available_quantity)" 
 									                                  		@input="resetProductProperties(stockedProductIndex)" 
 									                              		>
 									                                	</multiselect>
@@ -544,6 +545,7 @@
 																				v-model.number="stockedProduct.stock_quantity" 
 																				placeholder="Product Quantity" 
 																				:class="! errors.products[stockedProductIndex].product_stock_quantity ? 'is-valid' : 'is-invalid'" 
+																				:min="createMode ? 1 : stockedProduct.available_quantity" 
 																				@keydown.enter.prevent="nextPage" 
 																				required="true" 
 																			>
@@ -644,6 +646,7 @@
 																						v-model.number="stockedVariation.stock_quantity" 
 																						placeholder="Variation Qty" 
 																						:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
+																						:min="createMode ? 1 : stockedVariation.available_quantity" 
 																						@keydown.enter.prevent="nextPage" 
 																						required="true" 
 																					>
@@ -720,7 +723,7 @@
 													type="button" 
 													class="btn waves-effect waves-light hor-grd btn-info btn-outline-info btn-sm btn-block" 
 													v-tooltip.bottom-end="'Remove Product'" 
-													:disabled="(singleStockData.products.length < 2 || (singleStockData.products[singleStockData.products.length-1].stock_quantity > singleStockData.products[singleStockData.products.length-1].available_quantity))" 
+													:disabled="(singleStockData.products.length < 2 || (singleStockData.products[singleStockData.products.length-1].stock_quantity != singleStockData.products[singleStockData.products.length-1].available_quantity))" 
 													@click="removeProduct()"
 												>
 													Remove Product
@@ -3968,6 +3971,12 @@
 
 							$('#stock-createOrEdit-modal').modal('hide');
 
+							let singleStockUpdatedData = this.allStocks.find(
+								stock => stock.id == this.singleStockData.id
+							);
+
+							this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
+
 							this.printStockCode(this.singleStockData.products);
 						}
 					})
@@ -5324,6 +5333,11 @@
 								if (! stockedProduct.stock_quantity || stockedProduct.stock_quantity < 1) {
 									this.errors.products[stockedProductIndex].product_stock_quantity = 'Stock quantity is required';
 								}
+								else if (! this.createMode && stockedProduct.stock_quantity && stockedProduct.available_quantity && stockedProduct.stock_quantity < stockedProduct.available_quantity) {
+
+									this.errors.products[stockedProductIndex].product_stock_quantity = 'Stock quantity is less than minimum ' + stockedProduct.available_quantity;
+
+								}
 								/*
 								else if(! this.createMode && ((stockedProduct.primary_quantity - stockedProduct.stock_quantity) > this.allStocks[this.allStocks.length-1].available_quantity)){
 
@@ -5365,6 +5379,11 @@
 												this.errors.products[stockedProductIndex].variations[stockedProductVariationIndex].product_variation_quantity = 'Variation quantity is less than minimum ' + (stockedProductVariation.primary_quantity-this.allStocks[this.allStocks.length-1].variations[stockedProductVariationIndex].available_quantity);
 											}
 											*/
+											else if (! this.createMode && stockedProductVariation.stock_quantity && stockedProductVariation.available_quantity && stockedProductVariation.stock_quantity < stockedProductVariation.available_quantity) {
+
+												this.errors.products[stockedProductIndex].variations[stockedProductVariationIndex].product_variation_quantity = 'Variation quantity is less than minimum ' + stockedProductVariation.available_quantity;
+
+											}
 											else {
 												// this.errors.products[stockedProductIndex].variations[index].product_variation_quantity = null;
 												this.$delete(this.errors.products[stockedProductIndex].variations[stockedProductVariationIndex], 'product_variation_quantity');

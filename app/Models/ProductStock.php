@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\MerchantProduct;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\MerchantProductVariation;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductStock extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
 
     protected $guarded = ['id'];
@@ -47,7 +48,7 @@ class ProductStock extends Model
 
                 // $this->decreaseSuccessorStockVariations($variation, $variation->stock_quantity);
                 $this->deleteStockVariationSerials($variation);
-                $variation->delete();
+                $variation->forceDelete();
 
             }
 
@@ -62,12 +63,16 @@ class ProductStock extends Model
 
             // update / old stock
             if ($this->variations()->count()) {
+
+                $this->variations()->delete();  // primarily deleting variations
                 
                 foreach ($variations as $stockVariation) {
                     
-                    $merchantProductExpectedVariation = MerchantProductVariation::findOrFail($stockVariation->merchant_product_variation_id);
+                    // $merchantProductExpectedVariation = MerchantProductVariation::findOrFail($stockVariation->merchant_product_variation_id);
 
-                    $variationExistingStock = $this->variations()->where('merchant_product_variation_id', $stockVariation->merchant_product_variation_id)->first();
+                    $variationExistingStock = $this->variations()->withTrashed()->where('merchant_product_variation_id', $stockVariation->merchant_product_variation_id)->first();
+
+                    $merchantProductExpectedVariation = $variationExistingStock->merchantProductVariation;
 
                     /*
                     // decreasing quantity
@@ -140,6 +145,7 @@ class ProductStock extends Model
                             'manufactured_at' => $stockVariation->manufactured_at ?? NULL,
                             'expired_at' => $stockVariation->expired_at ?? NULL,
                             'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
+                            'deleted_at' => NULL
                         ]);
 
                         // $this->decreaseSuccessorStockVariations($variationExistingStock, $difference);
@@ -156,6 +162,7 @@ class ProductStock extends Model
                         }
 
                     }
+
                     // increasing quantity
                     else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity < $stockVariation->stock_quantity) {
                         
@@ -168,12 +175,13 @@ class ProductStock extends Model
                             'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
                             'manufactured_at' => $stockVariation->manufactured_at ?? NULL,
                             'expired_at' => $stockVariation->expired_at ?? NULL,
-                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id,
+                            'merchant_product_variation_id' => $stockVariation->merchant_product_variation_id, 
+                            'deleted_at' => NULL
                         ]);
 
                         // $this->increaseSuccessorStockVariations($variationExistingStock, $difference);
 
-                        if ($stockHasApproval) {
+                        if ($stockHasApproval) {    // already approved stock / not
                             
                             $merchantProductExpectedVariation->increment('available_quantity', $difference);
 
@@ -185,13 +193,15 @@ class ProductStock extends Model
                         }
 
                     }
-                    // same quantity
+
+                    // same quantity, may be only approving
                     else if (! empty($variationExistingStock) && $variationExistingStock->stock_quantity == $stockVariation->stock_quantity) {
                         
                         $variationExistingStock->update([
                             'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
                             'manufactured_at' => $stockVariation->manufactured_at ?? NULL,
                             'expired_at' => $stockVariation->expired_at ?? NULL,
+                            'deleted_at' => NULL
                         ]);
 
                         if (! $stockHasApproval) {
@@ -201,6 +211,7 @@ class ProductStock extends Model
                         }
 
                     }
+
                     // adding existing variation new stock
                     else if(empty($variationExistingStock)) {
 
@@ -225,6 +236,18 @@ class ProductStock extends Model
                     if ($this->merchantProduct->product->has_serials) {
                         
                         $this->setProductVariationSerialNumbers($stockVariation->serials, $variationExistingStock ?? $productVariationStock);                   
+
+                    }
+
+                }
+
+                // Finally deleting still deleted variation-stocks
+                foreach ($this->variations()->onlyTrashed()->get() as $trashedVariationStock) {
+                    
+                    if ($trashedVariationStock->stock_quantity == $trashedVariationStock->available_quantity && ! $trashedVariationStock->serials()->where(function ($query) {$query->where('has_requisitions', 1)->orWhere('has_dispatched', 1);})->exists()) {
+                            
+                        $trashedVariationStock->serials()->forceDelete();
+                        $trashedVariationStock->forceDelete();   
 
                     }
 
@@ -265,7 +288,6 @@ class ProductStock extends Model
                             $this->setProductVariationSerialNumbers($stockVariation->serials, $variationNewStock);
 
                         }
-
 
                     }
 

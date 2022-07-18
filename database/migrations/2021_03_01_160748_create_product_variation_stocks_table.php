@@ -24,6 +24,7 @@ class CreateProductVariationStocksTable extends Migration
             $table->date('manufactured_at')->nullable();
             $table->date('expired_at')->nullable();
             $table->unsignedInteger('product_stock_id');
+            $table->softDeletes();
         });
     }
 
