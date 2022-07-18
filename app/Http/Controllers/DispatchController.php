@@ -13,17 +13,18 @@ use App\Models\ProductVariationStock;
 use App\Models\RequiredProductVariation;
 use App\Jobs\BroadcastRequisitionDispatch;
 use App\Models\RequiredProductVariationSerial;
-use App\Http\Resources\Web\RequisitionCollection;
+// use App\Http\Resources\Web\RequisitionCollection;
 
 class DispatchController extends Controller
 {
     public function __construct()
     {
-        $this->middleware("permission:view-dispatch-index")->only(['showAllDispatches', 'searchAllDispatches']);
+        // $this->middleware("permission:view-dispatch-index")->only(['showAllDispatches', 'searchAllDispatches']);
         $this->middleware("permission:recommend-dispatch")->only('makeDispatch');
         // $this->middleware("permission:approve-dispatch")->only('updateDispatch');
     }
 
+    /*
     // Requisition (Admin)
     public function showAllRequisitions($perPage = false)
     {       
@@ -31,11 +32,13 @@ class DispatchController extends Controller
 
             return [
 
-                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
-                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
+                'pending' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct.product', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent'])->where('status', 0)->paginate($perPage)),  
+
+                'dispatched' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct.product', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', 1)->whereHas('dispatch', function ($query) {
                         $query->where('has_approval', 1);
                     })->paginate($perPage)),  
-                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])->where('status', -1)->paginate($perPage)),  
+
+                'cancelled' => new RequisitionCollection(Requisition::with(['updater', 'products.merchantProduct.product', 'products.variations.merchantProductVariation.productVariation.variation', 'delivery', 'agent'])->where('status', -1)->paginate($perPage)),  
             
             ];
 
@@ -54,6 +57,7 @@ class DispatchController extends Controller
 
         }
     }
+    */
 
     public function makeDispatch(Request $request, $perPage)
     {
@@ -257,7 +261,8 @@ class DispatchController extends Controller
         }
 
         // return $this->showAllDispatches($perPage);
-        return $this->showAllRequisitions($perPage);
+        // return $this->showAllRequisitions($perPage);
+        return redirect()->route('admin.requisitions.index', ['perPage' => $perPage]);
     }
 
     /*
@@ -362,6 +367,7 @@ class DispatchController extends Controller
         }
     */
 
+    /*
     public function searchAllDispatches($search, $perPage)
     {
         $query = Requisition::with(['products.product', 'products.variations.productVariation', 'delivery', 'agent', 'dispatch.delivery', 'dispatch.return'])
@@ -378,6 +384,7 @@ class DispatchController extends Controller
             'all' => new RequisitionCollection($query->paginate($perPage)),
         ];
     }
+    */
 
     protected function validateRequiredProducts($products = [])
     {
