@@ -959,14 +959,14 @@
 												</div>
 
 												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
+													<label class="col-4 col-form-label font-weight-bold">Serials :</label>
 													<label class="col-sm-6 form-control-plaintext">
 														<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
 													</label>
 												</div>
 
 												<div class="form-row">
-													<label class="col-4 col-form-label font-weight-bold">Has Variation :</label>
+													<label class="col-4 col-form-label font-weight-bold">Variation :</label>
 													<label class="col-sm-6 form-control-plaintext">
 														<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
 													</label>
@@ -1475,14 +1475,14 @@
 							</div>
 
 							<div class="form-row">
-								<label class="col-4 col-form-label font-weight-bold">Has Serials :</label>
+								<label class="col-4 col-form-label font-weight-bold">Serials :</label>
 								<label class="col-8 form-control-plaintext">
 									<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_serials ? 'Available' : 'NA' }}</span>
 								</label>
 							</div>
 
 							<div class="form-row">
-								<label class="col-4 col-form-label font-weight-bold">Has Variation :</label>
+								<label class="col-4 col-form-label font-weight-bold">Variation :</label>
 								<label class="col-8 form-control-plaintext">
 									<span :class="[singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.has_variations ? 'Available' : 'NA' }}</span>
 								</label>

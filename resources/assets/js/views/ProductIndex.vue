@@ -1136,14 +1136,14 @@
 								</div>
 
 								<div class="form-row">
-									<label class="col-sm-4 col-form-label font-weight-bold text-right">Has Serial :</label>
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">Serial :</label>
 									<label class="col-sm-6 form-control-plaintext">
 										<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
 									</label>
 								</div>
 
 								<div class="form-row">
-									<label class="col-sm-4 col-form-label font-weight-bold text-right">Has Variation :</label>
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">Variation :</label>
 									<label class="col-sm-6 form-control-plaintext">
 										<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
 									</label>
