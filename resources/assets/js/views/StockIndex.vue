@@ -883,6 +883,14 @@
 																									</li>
 																								</ul>
 																							</div>
+
+																							<div 
+																								class="invalid-feedback text-center" 
+																								style="display: block;" 
+																								v-show="errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_serials"
+																							>
+																					        	{{ errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_serials }}
+																					  		</div>
 																						</div>
 																					</div>
 																				</div>
@@ -960,6 +968,14 @@
 																			</li>
 																		</ul>
 																	</div>
+
+																	<div 
+																		class="invalid-feedback text-center" 
+																		style="display: block;" 
+																		v-show="errors.products[stockedProductIndex].product_serials"
+																	>
+															        	{{ errors.products[stockedProductIndex].product_serials }}
+															  		</div>
 																</div>
 															</div>
 														</div>
@@ -4209,8 +4225,11 @@
 				}
 				else if (this.step == 3) {
 
-					this.validateFormInput('product_serial');
-					this.validateFormInput('product_variation_serial');
+					// this.validateFormInput('product_serial');
+					// this.validateFormInput('product_variation_serial');
+					
+					this.validateFormInput('product_serials');
+					this.validateFormInput('product_variation_serials');
 
 					if (this.errors.constructor === Object && Object.keys(this.errors).length < 2 && ! this.errorInProductsArray(this.errors.products)) {
 
@@ -4968,7 +4987,7 @@
 					// this.$set(this.errors.variations[stockedVariationIndex].product_variation_serial, 'Invalid serial number');
 
 				}
-				else if (this.variationNewSerial[stockedVariationIndex] && this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials.some((variationSerial) => variationSerial.serial_no == this.variationNewSerial[stockedVariationIndex])) {
+				else if (this.variationNewSerial[stockedVariationIndex] && this.singleStockData.products.some(stockingProduct=>stockingProduct.has_variations && stockingProduct.variations.some(stockingProductVariation => stockingProductVariation.serials.some(variationSerial => variationSerial.serial_no == this.variationNewSerial[stockedVariationIndex]))) /*&& this.singleStockData.products[stockedProductIndex].variations[stockedVariationIndex].serials.some((variationSerial) => variationSerial.serial_no == this.variationNewSerial[stockedVariationIndex])*/) {
 
 					// this.$set(this.errors.variations[stockedVariationIndex].product_variation_serial, stockedVariationIndex, 'Duplicate serial number');
 					
@@ -5765,6 +5784,115 @@
 
 												// this.errors.variations = [];
 												this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serial');
+
+											}
+
+										}
+
+									);
+
+								}
+								else {
+
+									// this.submitForm = true;
+
+									// this.errors.products[stockedProductIndex].variations = [];
+									this.$delete(this.errors.products[stockedProductIndex], 'variations');
+
+									/*
+									stockedProduct.variations.forEach(
+										(stockedProduct, stockedProductIndex) => {
+											
+											stockedProduct.variations.forEach(
+
+												(stockVariation, stockVariationIndex) => {
+
+													// this.errors.variations[stockVariationIndex].product_variation_serial = [];
+													this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serial');
+
+												}
+
+											);
+
+										}
+									);
+									*/
+								
+								}
+
+							}
+
+						);
+
+						if (! this.errorInProductsArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+
+					case 'product_serials' :
+
+						this.singleStockData.products.forEach(
+							(stockedProduct, stockedProductIndex) => {
+								
+								if (stockedProduct.has_serials && ! stockedProduct.has_variations) {
+									
+									if (stockedProduct.serials.some(productSerial=> ! productSerial.serial_no)) {
+
+										this.errors.products[stockedProductIndex].product_serials ? this.errors.products[stockedProductIndex].product_serials = 'Serials are less than  required' : this.$set(this.errors.products[stockedProductIndex], 'product_serials', 'Serials are less than  required');
+									
+									}
+									else {
+
+										this.$delete(this.errors.products[stockedProductIndex], 'product_serials');
+
+									}
+
+								}
+								else {
+
+									this.$delete(this.errors.products[stockedProductIndex], 'product_serials');
+								
+								}
+							
+							}
+						
+						);
+
+						if (! this.errorInProductsArray(this.errors.products)) {
+							this.submitForm = true;
+						}
+
+						break;
+					
+					case 'product_variation_serials' :
+
+						this.singleStockData.products.forEach(
+							(stockedProduct, stockedProductIndex) => {
+								
+								if (stockedProduct.has_serials && stockedProduct.has_variations && stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length) {
+									
+									stockedProduct.variations.forEach(
+									
+										(stockVariation, stockVariationIndex) => {
+
+											if (stockVariation.stock_quantity > 0) {
+
+												if (stockVariation.serials.some(variationSerial=> ! variationSerial.serial_no || variationSerial.serial_no == '')) {
+
+													this.errors.products[stockedProductIndex].variations[stockVariationIndex].product_variation_serials ? this.errors.products[stockedProductIndex].variations[stockVariationIndex].product_variation_serials = 'Serials are less than  required' : this.$set(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serials', 'Serials are less than  required');
+
+												}
+												else {
+
+													this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serials');
+
+												}
+												
+											}
+											else {
+
+												this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serials');
 
 											}
 

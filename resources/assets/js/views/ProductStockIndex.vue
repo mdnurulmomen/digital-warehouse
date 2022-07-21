@@ -857,17 +857,19 @@
 														class="card-body"
 														v-show="stockVariation.stock_quantity > 0"
 													>
+														<!-- 
 														<div class="form-row">
 															<div class="form-group col-md-12 text-center">
 																<img 
 																	:src="showPreview(stockVariation.preview, variationIndex)" 
 																	class="img-fluid" 
-																	:alt="stockVariation.variation.name + ' Preview'" 
+																	:alt="$options.filters.capitalize(stockVariation.variation.name) + ' Preview'" 
 																	width="100px"
 																>
 																<p class="text-center">{{ stockVariation.variation.name | capitalize }}</p>
 															</div>
-														</div>
+														</div> 
+														-->
 
 														<div class="form-row">
 															<div class="form-group col-md-6">
@@ -2604,7 +2606,7 @@
 								class="img-fluid" 
 								width="60px" 
 								:src="'/' + general_settings.logo" 
-								:alt="general_settings.app_name + ' Logo'" 
+								:alt="$options.filters.capitalize(general_settings.app_name) + ' Logo'" 
 							>
 							
 							<h5>
@@ -4634,10 +4636,21 @@
             	}
 
             },
-            showPreview(imagePath = 'default', variationIndex = false) {
+            showPreview(imagePath = 'default', variationIndex = -1) {
 				
 				if (! imagePath || imagePath == '') { // null or empty
-					return ('/' + (typeof variationIndex == 'number' ? this.product.variations[variationIndex].preview : this.product.preview));
+					
+					if (variationIndex > -1) {
+
+						return ('/' + this.product.variations[variationIndex].preview);
+
+					}
+					else {
+
+						return ('/' + this.product.preview);
+
+					}
+
 				}
 				else if (imagePath == 'default') {
 					return '/' + this.productMerchant.preview;
@@ -4757,7 +4770,7 @@
 							this.singleStockData.variations.forEach(
 								(stockVariation, stockVariationIndex) => {
 
-									if (stockVariation.stock_quantity > 0 && stockVariation.stock_quantity != stockVariation.serials.length) {
+									if (stockVariation.stock_quantity > 0 && (stockVariation.stock_quantity != stockVariation.serials.length || stockVariation.serials.some(stockVariationSerial=>! stockVariationSerial.serial_no))) {
 
 										this.errors.stock.variations[stockVariationIndex].product_total_serials = 'Serials are more or less than quantity';
 
@@ -4782,7 +4795,7 @@
 							// this.submitForm = true;
 							// this.errors.stock.variations = [];
 
-							if (! this.productMerchant.has_variations && this.singleStockData.stock_quantity > 0 && this.singleStockData.stock_quantity != this.singleStockData.serials.length) {
+							if (! this.productMerchant.has_variations && this.singleStockData.stock_quantity > 0 && (this.singleStockData.stock_quantity != this.singleStockData.serials.length || singleStockData.serials.some(stockSerial=>! stockSerial.serial_no))) {
 
 								this.errors.stock.product_total_serials = 'Serials are more or less than quantity';
 
