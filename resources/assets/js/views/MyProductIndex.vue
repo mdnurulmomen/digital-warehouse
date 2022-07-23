@@ -1022,11 +1022,11 @@
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='retail') {
-					this.productsToShow = this.allFetchedProducts.retail.data;
+					this.productsToShow = this.allFetchedProducts.retail ? this.allFetchedProducts.retail.data : [];
 					this.pagination = this.allFetchedProducts.retail;
 				}
 				else {
-					this.productsToShow = this.allFetchedProducts.bulk.data;
+					this.productsToShow = this.allFetchedProducts.bulk ? this.allFetchedProducts.bulk.data : [];
 					this.pagination = this.allFetchedProducts.bulk;
 				}
 

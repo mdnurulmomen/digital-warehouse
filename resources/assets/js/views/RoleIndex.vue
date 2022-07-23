@@ -1427,7 +1427,7 @@
     		showSelectedTabContents() {
 				
 				// if (this.currentTab=='current') {
-					this.contentsToShow = this.allFetchedContents.current.data;
+					this.contentsToShow = this.allFetchedContents.current ? this.allFetchedContents.current.data : [];
 					this.pagination = this.allFetchedContents.current;
 				// }
 				// else {

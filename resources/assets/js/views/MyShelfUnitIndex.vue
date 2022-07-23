@@ -3,6 +3,7 @@
 	<div class="pcoded-content">
 		<breadcrumb 
 			:title="'shelf-units'" 
+			:icon="'shelf-units'" 
 			:message="'All units of specific shelf'"
 		></breadcrumb>			
 
@@ -10,11 +11,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -52,7 +51,9 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query === ''">
+												<loading v-show="loading"></loading>
+												
+												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query === '' && ! loading">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
 															data-toggle="tab" 
@@ -85,7 +86,7 @@
 													</li>
 												</ul>
 
-												<div class="tab-content card-block pl-0 pr-0">
+												<div class="tab-content card-block pl-0 pr-0" v-show="! loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -438,14 +439,14 @@
 			showSelectedTabContents() {
 				
 				if (this.currentTab=='empty') {
-					this.contentsToShow = this.allFetchedContents.empty.data;
+					this.contentsToShow = this.allFetchedContents.empty ? this.allFetchedContents.empty.data : [];
 					this.pagination = this.allFetchedContents.empty;
 				}else if (this.currentTab=='partial') {
-					this.contentsToShow = this.allFetchedContents.partial.data;
+					this.contentsToShow = this.allFetchedContents.partial ? this.allFetchedContents.partial.data : [];
 					this.pagination = this.allFetchedContents.partial;
 				}
 				else {
-					this.contentsToShow = this.allFetchedContents.occupied.data;
+					this.contentsToShow = this.allFetchedContents.occupied ? this.allFetchedContents.occupied.data : [];
 					this.pagination = this.allFetchedContents.occupied;
 				}
 

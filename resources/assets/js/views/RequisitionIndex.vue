@@ -38,7 +38,7 @@
 												<loading v-show="loading"></loading>
 												
 										  		<tab 
-										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading /* && ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
+										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading /* ! searchAttributes.showPendingRequisitions && ! searchAttributes.showCancelledRequisitions && ! searchAttributes.showDispatchedRequisitions && ! searchAttributes.showProduct */" 
 										  			:tab-names="['pending', 'dispatched', 'cancelled']" 
 										  			:current-tab="'pending'" 
 
@@ -3340,7 +3340,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.allFetchedRequisitions = response.data;
-							this.showSelectedTabProducts();
+							this.showSelectedTabContents();
 						}
 					})
 					.catch(error => {
@@ -3804,7 +3804,7 @@
 							
 							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
-							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabContents();
 
 							$('#requisition-createOrEdit-modal').modal('hide');
 						}
@@ -3842,7 +3842,7 @@
 
 							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
-							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabContents();
 							
 							$('#dispatch-createOrEdit-modal').modal('hide');
 						}
@@ -3883,7 +3883,7 @@
 
 							this.pagination.current_page = 1; 
 							this.allFetchedRequisitions = response.data;
-							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabContents();
 							
 							$('#cancel-confirmation-modal').modal('hide');
 							$('#dispatch-createOrEdit-modal').modal('hide');
@@ -4059,19 +4059,19 @@
 				this.singleRequisitionData = { ...object };
 				$('#requisition-view-modal').modal('show');
 			},
-			showSelectedTabProducts() {
+			showSelectedTabContents() {
 				
 				if (this.currentTab=='pending') {
-					this.requisitionsToShow = this.allFetchedRequisitions.pending.data;
-					this.pagination = this.allFetchedRequisitions.pending;
+					this.requisitionsToShow = this.allFetchedRequisitions.pending ? this.allFetchedRequisitions.pending.data : [];
+					this.pagination = this.allFetchedRequisitions.pending ?? {};
 				}
 				else if (this.currentTab=='cancelled') {
-					this.requisitionsToShow = this.allFetchedRequisitions.cancelled.data;
-					this.pagination = this.allFetchedRequisitions.cancelled;
+					this.requisitionsToShow = this.allFetchedRequisitions.cancelled ? this.allFetchedRequisitions.cancelled.data : [];
+					this.pagination = this.allFetchedRequisitions.cancelled ?? {};
 				}
 				else {
-					this.requisitionsToShow = this.allFetchedRequisitions.dispatched.data;
-					this.pagination = this.allFetchedRequisitions.dispatched;
+					this.requisitionsToShow = this.allFetchedRequisitions.dispatched ? this.allFetchedRequisitions.dispatched.data : [];
+					this.pagination = this.allFetchedRequisitions.dispatched ?? {};
 				}
 
 			},
@@ -4236,15 +4236,15 @@
 			},
 			showPendingContents() {
 				this.currentTab = 'pending';
-				this.showSelectedTabProducts();
+				this.showSelectedTabContents();
 			},
 			showDispatchedContents() {
 				this.currentTab = 'dispatched';
-				this.showSelectedTabProducts();
+				this.showSelectedTabContents();
 			},
 			showCancelledContents() {
 				this.currentTab = 'cancelled';
-				this.showSelectedTabProducts();
+				this.showSelectedTabContents();
 			},
 			removeSpace(requiredProductIndex) {	
 				

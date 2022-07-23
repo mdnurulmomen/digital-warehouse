@@ -35,8 +35,10 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
+										  		<loading v-show="loading"></loading>
+										  		
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="query === '' && ! loading" 
 										  			:tab-names="['retail', 'bulk', 'trashed']" 
 										  			:current-tab="'retail'" 
 
@@ -44,8 +46,6 @@
 										  			@showBulkContents="showBulkContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
-
-										  		<loading v-show="loading"></loading>
 
 												<!-- 
 												<table-with-soft-delete-option 
@@ -1880,16 +1880,16 @@
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='retail') {
-					this.productsToShow = this.allFetchedProducts.retail.data;
-					this.pagination = this.allFetchedProducts.retail;
+					this.productsToShow = this.allFetchedProducts.retail ? this.allFetchedProducts.retail.data : [];
+					this.pagination = this.allFetchedProducts.retail ?? {};
 				}
 				else if (this.currentTab=='trashed') {
-					this.productsToShow = this.allFetchedProducts.trashed.data;
-					this.pagination = this.allFetchedProducts.trashed;
+					this.productsToShow = this.allFetchedProducts.trashed ? this.allFetchedProducts.trashed.data : [];
+					this.pagination = this.allFetchedProducts.trashed ?? {};
 				}
 				else {
-					this.productsToShow = this.allFetchedProducts.bulk.data;
-					this.pagination = this.allFetchedProducts.bulk;
+					this.productsToShow = this.allFetchedProducts.bulk ? this.allFetchedProducts.bulk.data : [];
+					this.pagination = this.allFetchedProducts.bulk ?? {};
 				}
 
 			},

@@ -212,7 +212,7 @@
 			pagination: {
 				type: Object,
 				required: true,
-				default: {}
+				default: () => ({})
 			},
 			requiredPermission: {
 				type: String,

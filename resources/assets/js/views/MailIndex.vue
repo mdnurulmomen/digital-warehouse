@@ -33,8 +33,10 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
+										  		<loading v-show="loading"></loading>
+
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="query === '' && ! loading" 
 										  			:tab-names="['manual', 'automated', 'failed']" 
 										  			:current-tab="currentTab" 
 
@@ -42,8 +44,6 @@
 										  			@showAutomatedContents="showAutomatedContents" 
 										  			@showFailedContents="showFailedContents" 
 										  		></tab> 
-
-										  		<loading v-show="loading"></loading>
 										  		 
 										  		<table-with-delete-option 
 										  			:query="query" 
@@ -545,15 +545,15 @@
     		showSelectedTabContents() {
 				
 				if (this.currentTab=='manual') {
-					this.contentsToShow = this.allFetchedContents.manual.data;
+					this.contentsToShow = this.allFetchedContents.manual ? this.allFetchedContents.manual.data : [];
 					this.pagination = this.allFetchedContents.manual;
 				}
 				else if (this.currentTab=='automated') {
-					this.contentsToShow = this.allFetchedContents.automated.data;
+					this.contentsToShow = this.allFetchedContents.automated ? this.allFetchedContents.automated.data : [];
 					this.pagination = this.allFetchedContents.automated;
 				}
 				else {
-					this.contentsToShow = this.allFetchedContents.failed.data;
+					this.contentsToShow = this.allFetchedContents.failed ? this.allFetchedContents.failed.data : [];
 					this.pagination = this.allFetchedContents.failed;
 				}
 

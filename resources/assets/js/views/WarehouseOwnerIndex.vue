@@ -34,8 +34,10 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
+										  		<loading v-show="loading"></loading>
+
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="query === '' && ! loading" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
 
@@ -43,8 +45,6 @@
 										  			@showPendingContents="showPendingContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
-
-										  		<loading v-show="loading"></loading>
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
@@ -393,15 +393,15 @@
     		showSelectedTabContents() {
 				
 				if (this.currentTab=='approved') {
-					this.contentsToShow = this.allFetchedContents.approved.data;
+					this.contentsToShow = this.allFetchedContents.approved ? this.allFetchedContents.approved.data : [];
 					this.pagination = this.allFetchedContents.approved;
 				}
 				else if (this.currentTab=='pending') {
-					this.contentsToShow = this.allFetchedContents.pending.data;
+					this.contentsToShow = this.allFetchedContents.pending ? this.allFetchedContents.pending.data : [];
 					this.pagination = this.allFetchedContents.pending;
 				}
 				else {
-					this.contentsToShow = this.allFetchedContents.trashed.data;
+					this.contentsToShow = this.allFetchedContents.trashed ? this.allFetchedContents.trashed.data : [];
 					this.pagination = this.allFetchedContents.trashed;
 				}
 

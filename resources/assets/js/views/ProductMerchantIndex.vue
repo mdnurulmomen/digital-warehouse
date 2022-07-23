@@ -11,7 +11,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row">

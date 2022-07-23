@@ -11,9 +11,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row" v-show="!loading">
@@ -42,8 +39,10 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
+										  		<loading v-show="loading"></loading>
+
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="query === '' && ! loading" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
 
@@ -73,7 +72,7 @@
 										  		</table-with-soft-delete-option>
  												-->
 										  		
-										  		<div class="tab-content card-block pl-0 pr-0">
+										  		<div class="tab-content card-block pl-0 pr-0" v-show="! loading">
 													<div class="table-responsive">
 														<table class="table table-striped table-bordered nowrap text-center">
 															<thead>
@@ -947,15 +946,15 @@
     		showSelectedTabContents() {
 				
 				if (this.currentTab=='approved') {
-					this.contentsToShow = this.allFetchedWarehouses.approved.data;
+					this.contentsToShow = this.allFetchedWarehouses.approved ? this.allFetchedWarehouses.approved.data : [];
 					this.pagination = this.allFetchedWarehouses.approved;
 				}
 				else if (this.currentTab=='pending') {
-					this.contentsToShow = this.allFetchedWarehouses.pending.data;
+					this.contentsToShow = this.allFetchedWarehouses.pending ? this.allFetchedWarehouses.pending.data : [];
 					this.pagination = this.allFetchedWarehouses.pending;
 				}
 				else if (this.currentTab=='trashed') {
-					this.contentsToShow = this.allFetchedWarehouses.trashed.data;
+					this.contentsToShow = this.allFetchedWarehouses.trashed ? this.allFetchedWarehouses.trashed.data : [];
 					this.pagination = this.allFetchedWarehouses.trashed;
 				}
 

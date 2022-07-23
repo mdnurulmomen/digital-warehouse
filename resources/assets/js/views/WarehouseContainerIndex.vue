@@ -11,11 +11,9 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-						<loading v-show="loading"></loading>
-
 						<alert v-show="error" :error="error"></alert>
 				
-					  	<div class="row" v-show="!loading">
+					  	<div class="row">
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
@@ -51,7 +49,9 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
-												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query==''">
+												<loading v-show="loading"></loading>
+												
+												<ul class="nav nav-tabs md-tabs" role="tablist" v-show="query=='' && ! loading">
 													<li class="nav-item">
 													    <a 	class="active nav-link" 
 															data-toggle="tab" 
@@ -62,6 +62,7 @@
 														</a>
 														<div class="slide"></div>
 													</li>
+
 													<li class="nav-item">
 													    <a 	class="nav-link" 
 															data-toggle="tab" 
@@ -72,6 +73,7 @@
 														</a>
 														<div class="slide"></div>
 													</li>
+
 													<li class="nav-item">
 													    <a 	class="nav-link" 
 															data-toggle="tab" 
@@ -84,7 +86,7 @@
 													</li>
 												</ul>
 
-												<div class="tab-content card-block pl-0 pr-0">
+												<div class="tab-content card-block pl-0 pr-0" v-show="! loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -195,9 +197,7 @@
 														</div>
 													</div>
 												</div>
-
 											</div>
-
 										</div>
 									</div>
 								</div>

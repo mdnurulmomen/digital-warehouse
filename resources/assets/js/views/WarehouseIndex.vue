@@ -33,8 +33,10 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
+										  		<loading v-show="loading"></loading>
+
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="query === '' && ! loading" 
 										  			:tab-names="['approved', 'pending', 'trashed']" 
 										  			:current-tab="currentTab" 
 
@@ -42,8 +44,6 @@
 										  			@showPendingContents="showPendingContents" 
 										  			@showTrashedContents="showTrashedContents" 
 										  		></tab>
-
-										  		<loading v-show="loading"></loading>
 
 										  		<table-with-soft-delete-option 
 										  			:query="query" 
@@ -707,18 +707,27 @@
 											
 		                              		<div class="col-sm-12 form-group">
 											  	<div class="form-row">
-													<div class="form-group col-sm-6">
-														<button 
+													<div class="form-group col-sm-6 text-center text-warning">
+														<!-- <button 
 															type="button"  
 															@click="addStorage" 
 															class="btn waves-effect waves-dark btn-success btn-outline-success btn-block btn-sm" 
 															v-tooltip.bottom-end="'More Storage'"
 														>
 															More Storage
-														</button>	
+														</button> -->
+
+														<i 
+															class="fa fa-plus-circle fa-2x" 
+															aria-hidden="true" 
+															style="cursor:pointer" 
+															v-tooltip.bottom-end="'Add Storage'" 
+															@click="addStorage"
+														></i>
 													</div>
 
-													<div class="form-group col-sm-6">
+													<div class="form-group col-sm-6 text-center text-danger">
+														<!-- 
 														<button 
 															type="button" 
 															@click="removeStorage" 
@@ -727,7 +736,16 @@
 															v-tooltip.bottom-end="'Remove Storage'"
 														>
 															Remove Storage
-														</button>	
+														</button> 
+														-->
+
+														<i 
+															class="fa fa-minus-circle fa-2x" 
+															aria-hidden="true" 
+															:style="{ cursor : singleWarehouseData.storages.length<=1 ? 'not-allowed' : 'pointer' }" 
+															v-tooltip.bottom-end="'Remove Storage'" 
+															@click="removeStorage"
+														></i>	
 													</div>
 												</div>
 		                              		</div>
@@ -1084,7 +1102,8 @@
 
 		                              		<div class="col-md-12 form-group">
 											  	<div class="form-row">
-													<div class="form-group col-sm-6">
+													<div class="form-group col-sm-6 text-center text-warning">
+														<!-- 
 														<button 
 															type="button"  
 															@click="addContainer" 
@@ -1092,9 +1111,19 @@
 															v-tooltip.bottom-end="'Add Container'"
 														>
 															More Container
-														</button>	
+														</button> 
+														-->
+
+														<i 
+															class="fa fa-plus-circle fa-2x" 
+															aria-hidden="true" 
+															style="cursor:pointer" 
+															v-tooltip.bottom-end="'Add Container'" 
+															@click="addContainer"
+														></i>
 													</div>
-													<div class="form-group col-sm-6">
+													<div class="form-group col-sm-6 text-center text-danger">
+														<!-- 
 														<button 
 															type="button" 
 															class="btn waves-effect waves-dark btn-danger btn-outline-danger btn-block btn-sm" 
@@ -1103,7 +1132,17 @@
 															:disabled="singleWarehouseData.containers.length < 2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1"
 														>
 															Remove Container
-														</button>	
+														</button> 
+														-->
+
+														<i 
+															class="fa fa-minus-circle fa-2x" 
+															aria-hidden="true" 
+															v-tooltip.bottom-end="'Remove Container'"
+															@click="removeContainer" 
+															:style="{ cursor : singleWarehouseData.containers.length < 2 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].engaged_quantity > 1 || singleWarehouseData.containers[singleWarehouseData.containers.length-1].partially_engaged > 1 ? 'not-allowed' : 'pointer' }" 
+														>	
+														</i>	
 													</div>
 												</div>
 		                              		</div>
@@ -3062,15 +3101,15 @@
     		showSelectedTabContents() {
 				
 				if (this.currentTab=='approved') {
-					this.contentsToShow = this.allFetchedWarehouses.approved.data;
+					this.contentsToShow = this.allFetchedWarehouses.approved ? this.allFetchedWarehouses.approved.data : [];
 					this.pagination = this.allFetchedWarehouses.approved;
 				}
 				else if (this.currentTab=='pending') {
-					this.contentsToShow = this.allFetchedWarehouses.pending.data;
+					this.contentsToShow = this.allFetchedWarehouses.pending ? this.allFetchedWarehouses.pending.data : [];
 					this.pagination = this.allFetchedWarehouses.pending;
 				}
 				else {
-					this.contentsToShow = this.allFetchedWarehouses.trashed.data;
+					this.contentsToShow = this.allFetchedWarehouses.trashed ? this.allFetchedWarehouses.trashed.data : [];
 					this.pagination = this.allFetchedWarehouses.trashed;
 				}
 

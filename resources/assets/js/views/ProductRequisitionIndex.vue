@@ -11,7 +11,6 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
 						<alert v-show="error" :error="error"></alert>
 				
 					  	<div class="row">
@@ -3856,15 +3855,15 @@
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='pending') {
-					this.requisitionsToShow = this.allFetchedRequisitions.pending.data;
+					this.requisitionsToShow = this.allFetchedRequisitions.pending ? this.allFetchedRequisitions.pending.data : [];
 					this.pagination = this.allFetchedRequisitions.pending;
 				}
 				else if (this.currentTab=='cancelled') {
-					this.requisitionsToShow = this.allFetchedRequisitions.cancelled.data;
+					this.requisitionsToShow = this.allFetchedRequisitions.cancelled ? this.allFetchedRequisitions.cancelled.data : [];
 					this.pagination = this.allFetchedRequisitions.cancelled;
 				}
 				else {
-					this.requisitionsToShow = this.allFetchedRequisitions.dispatched.data;
+					this.requisitionsToShow = this.allFetchedRequisitions.dispatched ? this.allFetchedRequisitions.dispatched.data : [];
 					this.pagination = this.allFetchedRequisitions.dispatched;
 				}
 

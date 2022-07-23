@@ -12,8 +12,7 @@
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
-
-						<loading v-show="loading"></loading>
+						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
 				
@@ -53,8 +52,10 @@
 											</div>
 											
 											<div class="col-sm-12 col-lg-12">
+										  		<loading v-show="loading"></loading>
+
 										  		<tab 
-										  			v-show="query === ''" 
+										  			v-show="query === '' && ! loading" 
 										  			:tab-names="['retail', 'bulk']" 
 										  			:current-tab="'retail'" 
 
@@ -82,7 +83,7 @@
 										  		</table-with-soft-delete-option>
  											-->
 
- 												<div class="tab-content card-block pl-0 pr-0">
+ 												<div class="tab-content card-block pl-0 pr-0" v-show="! loading">
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -2017,11 +2018,11 @@
 			showSelectedTabProducts() {
 				
 				if (this.currentTab=='retail') {
-					this.productsToShow = this.allFetchedProducts.retail.data;
+					this.productsToShow = this.allFetchedProducts.retail ? this.allFetchedProducts.retail.data : [];
 					this.pagination = this.allFetchedProducts.retail;
 				}
 				else {
-					this.productsToShow = this.allFetchedProducts.bulk.data;
+					this.productsToShow = this.allFetchedProducts.bulk ? this.allFetchedProducts.bulk.data : [];
 					this.pagination = this.allFetchedProducts.bulk;
 				}
 
