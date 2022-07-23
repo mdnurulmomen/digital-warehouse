@@ -586,13 +586,13 @@ class WarehouseController extends Controller
             $query->where('warehouse_id', $warehouse);
         });
 
-        $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+        $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'products.merchantProduct.product'])
         ->where('occupied', 0.5)
         ->whereHas('warehouseContainer', function ($query) use ($warehouse) {
             $query->where('warehouse_id', $warehouse);
         });
 
-        $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+        $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'products.merchantProduct.product'])
         ->where('occupied', 1)
         ->whereHas('warehouseContainer', function ($query) use ($warehouse) {
             $query->where('warehouse_id', $warehouse);
@@ -621,7 +621,7 @@ class WarehouseController extends Controller
     {
         // $currentWarehouse = \Auth::guard('warehouse')->user();
 
-        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'products.merchantProduct.product'])
                 ->where(function ($query1) use ($search) {
                     $query1->where('name', 'like', "%$search%")
                       ->orWhereHas('warehouseContainer.container', function ($query2) use ($search) {
@@ -669,12 +669,12 @@ class WarehouseController extends Controller
                                             ->where('warehouse_container_status_id', $expectedContainer->id)
                                             ->paginate($perPage);
 
-            $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+            $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'products.merchantProduct.product'])
                                             ->where('occupied', 0.5)
                                             ->where('warehouse_container_status_id', $expectedContainer->id)
                                             ->paginate($perPage);
 
-            $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+            $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'products.merchantProduct.product'])
                                             ->where('occupied', 1)
                                             ->where('warehouse_container_status_id', $expectedContainer->id)
                                             ->paginate($perPage);
@@ -707,7 +707,7 @@ class WarehouseController extends Controller
 
             // if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
 
-            $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+            $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'products.merchantProduct.product'])
                                     ->where(function ($query) use ($search) {
                                         $query->where('name', 'like', "%$search%")
                                               ->orWhereHas('containerShelfUnitStatuses', function ($query2) use ($search) {
@@ -742,15 +742,15 @@ class WarehouseController extends Controller
 
             // if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
                 
-                $emptyUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.0)
+                $emptyUnits = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')->where('occupied', 0.0)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
-                $partialUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.5)
+                $partialUnits = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')->where('occupied', 0.5)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
-                $engagedUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 1)
+                $engagedUnits = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')->where('occupied', 1)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
@@ -782,7 +782,7 @@ class WarehouseController extends Controller
 
             // if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
 
-                $query = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')
+                $query = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')
                                             ->where('name', 'like', "%$search%")
                                             ->where('warehouse_container_shelf_status_id', $expectedShelf->id);
 
@@ -814,14 +814,14 @@ class WarehouseController extends Controller
                                                 })
                                                 ->paginate($perPage);
 
-            $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+            $partialContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'products.merchantProduct.product'])
                                                 ->where('occupied', 0.5)
                                                 ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
                                                     $query->where('warehouse_id', $currentWarehouse->id);
                                                 })
                                                 ->paginate($perPage);
 
-            $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+            $engagedContainers = WarehouseContainerStatus::with(['containerShelfStatuses', 'products.merchantProduct.product'])
                                                 ->where('occupied', 1)
                                                 ->whereHas('warehouseContainer', function ($query) use ($currentWarehouse) {
                                                     $query->where('warehouse_id', $currentWarehouse->id);
@@ -842,7 +842,7 @@ class WarehouseController extends Controller
     {
         $currentWarehouse = \Auth::guard('warehouse')->user();
 
-        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'product.merchantProduct.product'])
+        $query = WarehouseContainerStatus::with(['containerShelfStatuses', 'products.merchantProduct.product'])
                 ->where(function ($query1) use ($search) {
                     $query1->where('name', 'like', "%$search%")
                       ->orWhereHas('warehouseContainer.container', function ($query2) use ($search) {
@@ -880,12 +880,12 @@ class WarehouseController extends Controller
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
-                $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                $partialShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'products.merchantProduct.product'])
                                                 ->where('occupied', 0.5)
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
 
-                $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                $engagedShelves = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'products.merchantProduct.product'])
                                                 ->where('occupied', 1)
                                                 ->where('warehouse_container_status_id', $expectedContainer->id)
                                                 ->paginate($perPage);
@@ -918,7 +918,7 @@ class WarehouseController extends Controller
 
             if ($expectedContainer && $expectedContainer->warehouseContainer->warehouse_id==$currentWarehouse->id) {
 
-                $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'product.merchantProduct.product'])
+                $query = WarehouseContainerShelfStatus::with(['containerShelfUnitStatuses', 'products.merchantProduct.product'])
                                         ->where(function ($query) use ($search) {
                                             $query->where('name', 'like', "%$search%")
                                                   ->orWhereHas('containerShelfUnitStatuses', function ($query2) use ($search) {
@@ -953,15 +953,15 @@ class WarehouseController extends Controller
 
             if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
                 
-                $emptyUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.0)
+                $emptyUnits = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')->where('occupied', 0.0)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
-                $partialUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 0.5)
+                $partialUnits = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')->where('occupied', 0.5)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
-                $engagedUnits = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')->where('occupied', 1)
+                $engagedUnits = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')->where('occupied', 1)
                                                 ->where('warehouse_container_shelf_status_id', $expectedShelf->id)
                                                 ->paginate($perPage);
 
@@ -993,7 +993,7 @@ class WarehouseController extends Controller
 
             if ($expectedShelf && $expectedShelf->warehouseContainer->warehouse_id==$currentWarehouse->id) {
 
-                $query = WarehouseContainerShelfUnitStatus::with('product.merchantProduct.product')
+                $query = WarehouseContainerShelfUnitStatus::with('products.merchantProduct.product')
                                             ->where('name', 'like', "%$search%")
                                             ->where('warehouse_container_shelf_status_id', $expectedShelf->id);
 
