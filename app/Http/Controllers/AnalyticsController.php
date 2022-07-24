@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Manager;
-use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Dispatch;
 use App\Models\Warehouse;
@@ -29,50 +28,36 @@ class AnalyticsController extends Controller
 
     public function getGeneralDashboardOneData()
     {
-        $owners = $this->getOwnerStatusChartData();
-        $managers = $this->getManagerStatusChartData();
-        $merchants = $this->getMerchantStatusChartData();
-    	$warehouses = $this->getWarehouseStatusChartData();
+        $ownerStates = $this->getOwnerStatusChartData();
+        $managerStates = $this->getManagerStatusChartData();
+        $merchantStates = $this->getMerchantStatusChartData();
+    	$warehouseStates = $this->getWarehouseStatusChartData();
         
-    	$numberPendingDispatches = Dispatch::where('has_approval', 0)->count();
+    	// $numberPendingDispatches = Dispatch::where('has_approval', 0)->count();
     	$numberPendingRequistiions = Requisition::where('status', 0)->count();
         $numberPendingProductStocks = ProductStock::whereHas('stock', function ($query) {
             $query->where('has_approval', 0);
         })->count();
 
-        $limitedStockProducts = MerchantProduct::with(['product', 'merchant', 'manufacturer'])
-        ->doesntHave('stocks')
-        ->orWhereColumn('available_quantity', '<=', 'warning_quantity')
-        ->get();
 
         $numberUnreceivedDispatches = ProductDelivery::where('receiving_confirmation', false)->count() + ProductReturn::where('receiving_confirmation', false)->count();
 
         $numberCancelledRequisitions = Requisition::where('status', -1)->count() + Dispatch::where('has_approval', -1)->count();
 
-        // // stock in
-        // $stockIns = $this->getRecentStockInChartData();
-
-        // // stock out
-        // $stockOuts = $this->getRecentStockOutChartData();
-
-        // // warehouses
-        // $warehouseAnalyticDatas = $this->getWarehouseNotRentedContainerChartData();
+        $warehouseUnrentedContainerChartData = $this->getWarehouseNotRentedContainerChartData();
 
     	return response()->json([
 
-    		// 'stockIns' => $stockIns,
-      //       'stockOuts' => $stockOuts,
-            // 'warehouses' => $warehouseAnalyticDatas,
-            'owners' => $owners, 
-            'managers' => $managers, 
-            'merchants' => $merchants, 
-            'warehouses' => $warehouses, 
-    		'numberPendingDispatches' => $numberPendingDispatches,
+            'ownerStates' => $ownerStates, 
+            'managerStates' => $managerStates, 
+            'merchantStates' => $merchantStates, 
+            'warehouseStates' => $warehouseStates, 
+    		// 'numberPendingDispatches' => $numberPendingDispatches,
     		'numberPendingRequistiions' => $numberPendingRequistiions,
             'numberPendingProductStocks' => $numberPendingProductStocks,
-            'limitedStockProducts' => $limitedStockProducts,
             'numberUnreceivedDispatches' => $numberUnreceivedDispatches,
     		'numberCancelledRequisitions' => $numberCancelledRequisitions,
+            'warehouseUnrentedContainers' => $warehouseUnrentedContainerChartData,
             
     	], 200);
     }
@@ -80,22 +65,35 @@ class AnalyticsController extends Controller
     public function getGeneralDashboardTwoData()
     {
         // stock in
-        $stockIns = $this->getRecentStockInChartData();
+        // $stockIns = $this->getRecentStockInChartData();
 
         // stock out
-        $stockOuts = $this->getRecentStockOutChartData();
-
-        // warehouses
-        $warehouseAnalyticDatas = $this->getWarehouseNotRentedContainerChartData();
+        // $stockOuts = $this->getRecentStockOutChartData();
 
         return response()->json([
 
-            'stockIns' => $stockIns,
-            'stockOuts' => $stockOuts,
-            'warehouses' => $warehouseAnalyticDatas,
+            // 'stockIns' => $stockIns,
+            // 'stockOuts' => $stockOuts,
             
         ]);
 
+    }
+
+    protected function showMerchantLimitedProducts($merchant, $perPage)
+    {
+        $limitedStockProducts = MerchantProduct::with(['product', 'merchant', 'manufacturer'])
+        ->where('merchant_id', $merchant)
+        ->where(function ($query) {
+            $query->doesntHave('stocks')
+            ->orWhereColumn('available_quantity', '<=', 'warning_quantity');
+        }) 
+        ->paginate($perPage);
+
+        return response()->json([
+
+            'limitedStockProducts' => $limitedStockProducts
+            
+        ]);
     }
 
     protected function getRecentStockInChartData()

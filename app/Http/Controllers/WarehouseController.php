@@ -512,7 +512,7 @@ class WarehouseController extends Controller
     // warehouse-empty-contaners
     public function showAllWarehouseEmptySpaces($warehouse = false) {
             
-        if($warehouse){
+        if ($warehouse) {
 
             /*
                 $emptyContainers = WarehouseContainerStatus::whereHas('warehouseContainer.warehouse',                    function ($query) use ($warehouse) {

@@ -205,15 +205,6 @@ Route::name('admin.')->group(function () {
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches.store');
 		// Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
-		// warehouse-managers
-		/*
-			Route::get('/api/warehouse-managers/{perPage?}','WarehouseController@showAllWarehouseManagers')->name('warehouse-managers');
-			// Route::post('/warehouse-managers/{perPage}','WarehouseController@storeNewWarehouseManager')->name('warehouse-managers');	
-			Route::put('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@updateWarehouseManager')->name('warehouse-managers');	
-			Route::delete('/warehouse-managers/{warehouse}/{perPage}','WarehouseController@deleteWarehouseManager')->name('warehouse-managers');
-			Route::get('/api/search-warehouse-managers/{search}/{perPage}','WarehouseController@searchAllWarehouseManagers')->name('search-warehouse-managers');
-		*/
-
 		// roles
 		Route::get('/api/roles/{perPage?}','RoleController@showAllRoles')->name('roles.index');
 		Route::post('/roles/{perPage}','RoleController@storeNewRole')->name('roles.store');	
@@ -276,6 +267,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one.show');
 		// second dashboard
 		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
+		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.show');
 
 		// imports
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
