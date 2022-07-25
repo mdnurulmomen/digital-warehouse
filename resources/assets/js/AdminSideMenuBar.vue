@@ -9,7 +9,7 @@
 						<ul class="pcoded-item pcoded-left-item">
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['home', 'general-dashboar-2'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['home', 'analytics'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
@@ -25,8 +25,8 @@
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='general-dashboar-2' ? 'active' : ''">
-										<router-link :to="{ name: 'general-dashboar-2' }" class="waves-effect waves-dark">
+									<li :class="currentRouteName=='analytics' ? 'active' : ''">
+										<router-link :to="{ name: 'analytics' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Analytics</span>
 										</router-link>
 									</li>

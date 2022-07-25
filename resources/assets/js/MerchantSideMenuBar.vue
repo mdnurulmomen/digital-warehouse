@@ -12,7 +12,7 @@
 						<ul class="pcoded-item pcoded-left-item">
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['home', 'general-dashboar-1', 'general-dashboar-2'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['home', 'overview', 'analytics'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
@@ -28,15 +28,15 @@
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='general-dashboard-1' ? 'active' : ''" v-if="userHasPermissionTo('view-general-dashboard-one')">
-										<router-link :to="{ name: 'general-dashboard-1' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
+									<li :class="currentRouteName=='overview' ? 'active' : ''" v-if="userHasPermissionTo('view-general-dashboard-one')">
+										<router-link :to="{ name: 'overview' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Overview</span>
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='general-dashboard-2' ? 'active' : ''" v-if="userHasPermissionTo('view-general-dashboard-two')">
-										<router-link :to="{ name: 'general-dashboard-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 3</span>
+									<li :class="currentRouteName=='analytics' ? 'active' : ''" v-if="userHasPermissionTo('view-general-dashboard-two')">
+										<router-link :to="{ name: 'analytics' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Analytics</span>
 										</router-link>
 									</li>
 								</ul>
