@@ -21,7 +21,7 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('create-product-asset-index') || userHasPermissionTo('create-product-asset')"
+											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')"
 											  		:query="query" 
 											  		:caller-page="'variation type'" 
 											  		:required-permission="'product-asset'" 

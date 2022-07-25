@@ -1,7 +1,5 @@
 <template v-if="userHasPermissionTo('view-' + requiredPermission + '-index')">
-	
 	<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
-
 		<!-- <loading v-show="loading"></loading> -->
 		
 		<div class="table-responsive">
@@ -26,7 +24,9 @@
 							</a>
 						</th>
 						
-						<th>
+						<th 
+							v-show="$route.name!='rent-periods' || (userHasPermissionTo('update-' + requiredPermission) || userHasPermissionTo('delete-' + requiredPermission))"
+						>
 							Actions
 						</th>
 					</tr>
@@ -43,7 +43,9 @@
 							<span v-html="getColumnValue(content, columnValue)"></span>
 						</td>
 						
-						<td>
+						<td
+							v-show="$route.name!='rent-periods' || (userHasPermissionTo('update-' + requiredPermission) || userHasPermissionTo('delete-' + requiredPermission))"
+						>
 							<button type="button" 
 									class="btn waves-effect waves-dark btn-info btn-outline-info btn-icon" 
 									v-tooltip.bottom-end="'View Details'"  
@@ -136,7 +138,9 @@
 								</span>
 							</a>
 						</th>
-						<th>
+						<th
+							v-show="$route.name!='rent-periods' || (userHasPermissionTo('update-' + requiredPermission) || userHasPermissionTo('delete-' + requiredPermission))"
+						>
 							Actions
 						</th>
 					</tr>

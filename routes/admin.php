@@ -190,21 +190,6 @@ Route::name('admin.')->group(function () {
 		Route::delete('/stocks/{stock}/{perPage}', 'ProductController@deleteStock')->name('stocks.delete');
 		Route::post('/api/search-stocks/{perPage}', 'ProductController@searchAllStocks')->name('search-stocks');
 
-		// requisition
-		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions.index');
-		Route::post('/requisitions/{perPage}', 'RequisitionController@makeNewRequisition')->name('requisitions.store');
-		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions.update');
-		Route::post('/search-requisitions/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
-
-		// Merchant-Requisitions
-		Route::get('/api/merchant-product-requisitions/{merchantProduct}/{perPage?}', 'RequisitionController@showMerchantProductAllRequisitions')->name('merchant-product-requisitions.index');
-		Route::post('/search-merchant-product-requisitions/{perPage?}', 'RequisitionController@searchMerchantProductAllRequisitions')->name('search-merchant-product-requisitions');
-
-		// dispatch
-		// Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
-		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches.store');
-		// Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
-
 		// roles
 		Route::get('/api/roles/{perPage?}','RoleController@showAllRoles')->name('roles.index');
 		Route::post('/roles/{perPage}','RoleController@storeNewRole')->name('roles.store');	
@@ -243,6 +228,24 @@ Route::name('admin.')->group(function () {
 		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products.delete');
 		Route::post('/search-merchant-products/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('search-merchant-products');
 
+		// merchant-agents
+		Route::get('/api/merchant-agents/{merchant}/{perPage?}', 'MerchantController@showMerchantAllAgents')->name('merchant-agents.index');
+
+		// requisition
+		Route::get('/api/requisitions/{perPage?}', 'RequisitionController@showAllRequisitions')->name('requisitions.index');
+		Route::post('/requisitions/{perPage}', 'RequisitionController@makeNewRequisition')->name('requisitions.store');
+		Route::put('/requisitions/{requisition}/{perPage}', 'RequisitionController@cancelRequisition')->name('requisitions.update');
+		Route::post('/search-requisitions/{perPage?}', 'RequisitionController@searchAllRequisitions')->name('search-requisitions');
+
+		// Merchant-Requisitions
+		Route::get('/api/merchant-product-requisitions/{merchantProduct}/{perPage?}', 'RequisitionController@showMerchantProductAllRequisitions')->name('merchant-product-requisitions.index');
+		Route::post('/search-merchant-product-requisitions/{perPage?}', 'RequisitionController@searchMerchantProductAllRequisitions')->name('search-merchant-product-requisitions');
+
+		// dispatch
+		// Route::get('/api/dispatches/{perPage?}', 'DispatchController@showAllDispatches')->name('dispatches');
+		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches.store');
+		// Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
+
 		// merchant-deals
 		Route::get('/api/merchant-deals/{merchant}/{perPage?}','DealController@showMerchantAllDeals')->name('merchant-deals.index');
 		Route::post('/merchant-deals/{perPage}','DealController@storeMerchantDeal')->name('merchant-deals.store');	
@@ -256,9 +259,6 @@ Route::name('admin.')->group(function () {
 		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments.update');	
 		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments.delete');
 		Route::post('/api/search-deal-payments/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
-
-		// merchant-agents
-		Route::get('/api/merchant-agents/{merchant}/{perPage?}', 'MerchantController@showMerchantAllAgents')->name('merchant-agents.index');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions.index');

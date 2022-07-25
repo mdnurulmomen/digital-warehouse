@@ -21,7 +21,7 @@
 
 											<div class="col-sm-12 sub-title">
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('create-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
+											  		v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('create-warehouse-asset')" 
 											  		:query="query" 
 											  		:caller-page="'storage type'" 
 											  		:disable-add-button="formSubmitted" 

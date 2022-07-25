@@ -8,7 +8,7 @@
 
 					<i 
   						class="fa fa-upload fa-lg pr-3 pl-1" 
-  						v-show="$route.name=='products'" 
+  						v-show="$route.name=='products' && userHasPermissionTo('create-' + requiredPermission)" 
   						v-tooltip.bottom-end="'Upload ' + callerPage" 
   						data-toggle="modal" 
 						:data-target="'#'+ callerPage +'-importing-modal'" 
@@ -28,7 +28,8 @@
 	  			</button>
 	  		</div>
 	  		<div 
-		  		class="col-sm-6 col-md-6 was-validated form-group" 
+		  		class="was-validated form-group" 
+		  		:class="userHasPermissionTo('create-' + requiredPermission) ? 'col-sm-6 col-md-6' : 'col-sm-9 col-md-9'" 
 		  		v-if="$route.name=='delivery-companies' || $route.name=='packaging-packages' || userHasPermissionTo('view-' + requiredPermission + '-index')"
 	  		>
 	  			<input 	type="text" 

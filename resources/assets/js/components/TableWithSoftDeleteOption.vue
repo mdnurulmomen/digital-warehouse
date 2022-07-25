@@ -24,7 +24,10 @@
 								</span>
 							</a>
 						</th>
-						<th>
+
+						<th 
+							v-show="($route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types') || (userHasPermissionTo('update-' + requiredPermission) || userHasPermissionTo('delete-' + requiredPermission))"
+						>
 							Actions
 						</th>
 					</tr>
@@ -40,7 +43,9 @@
 							{{ getColumnValue(content, columnValue) }}
 						</td>
 						
-						<td>
+						<td
+							v-show="($route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types') || (userHasPermissionTo('update-' + requiredPermission) || userHasPermissionTo('delete-' + requiredPermission))"
+						>
 							<button type="button" 
 									class="btn waves-effect waves-light btn-info btn-outline-info btn-icon" 
 									v-tooltip.bottom-end="'View Details'"  
@@ -141,7 +146,10 @@
 								</span>
 							</a>
 						</th>
-						<th>
+
+						<th
+							v-show="($route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types') || (userHasPermissionTo('update-' + requiredPermission) || userHasPermissionTo('delete-' + requiredPermission))"
+						>
 							Actions
 						</th>
 					</tr>

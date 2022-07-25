@@ -1,22 +1,19 @@
 <template>
-
 	<div class="pcoded-main-container">
 		<div class="pcoded-wrapper">
-
 			<nav class="pcoded-navbar">
 				<div class="nav-list">
-						
 					<div class="pcoded-inner-navbar main-menu">
 						<div class="pcoded-navigation-label">Navigation</div>
 
 						<ul class="pcoded-item pcoded-left-item">
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['home', 'general-dashboar-1', 'general-dashboar-2'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['home', 'overview', 'analytics'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="feather icon-home"></i>
+										<img width="18px" src="icons/cms/home.png">
 									</span>
 									<span class="pcoded-mtext">Home</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -27,28 +24,28 @@
 											<span class="pcoded-mtext">Home</span>
 										</router-link>
 									</li>
-									<li :class="currentRouteName=='general-dashboar-1' ? 'active' : ''" v-if="userHasPermissionTo('view-general-dashboard-one')">
-										<router-link :to="{ name: 'general-dashboar-1' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 1</span>
+
+									<li :class="currentRouteName=='overview' ? 'active' : ''">
+										<router-link :to="{ name: 'overview' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Overview</span>
 										</router-link>
 									</li>
-									<li :class="currentRouteName=='general-dashboar-2' ? 'active' : ''" v-if="userHasPermissionTo('view-general-dashboard-two')">
-										<router-link :to="{ name: 'general-dashboar-2' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Dashboard 2</span>
+
+									<li :class="currentRouteName=='analytics' ? 'active' : ''">
+										<router-link :to="{ name: 'analytics' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Analytics</span>
 										</router-link>
 									</li>
 								</ul>
 							</li>
 
-							<!-- special routes -->
-							
 							<li 
 								:class="currentRouteName=='roles' ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-role-index')"
 							>
 								<router-link :to="{ name: 'roles' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-tasks" aria-hidden="true"></i>
+										<img width="18px" src="icons/cms/roles.png">
 									</span>
 									<span class="pcoded-mtext">
 										Roles
@@ -58,19 +55,19 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['owners', 'warehouses', 'storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['owners', 'warehouses', 'storage-types', 'container-types', 'containers', 'rent-periods', 'warehouse-containers', 'warehouse-container-shelves', 'warehouse-container-shelf-units'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-warehouse-asset-index') || userHasPermissionTo('view-warehouse-owner-index') || userHasPermissionTo('view-warehouse-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fas fa-warehouse"></i>
+										<img width="18px" src="icons/cms/warehouses.png">
 									</span>
 									<span class="pcoded-mtext">Warehouse</span>
 								</a>
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['storage-types', 'containers', 'rent-periods'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['rent-periods', 'storage-types', 'container-types', 'containers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-warehouse-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -91,9 +88,15 @@
 												</router-link>
 											</li>
 
+											<li :class="currentRouteName=='container-types' ? 'active' : ''">
+												<router-link :to="{ name: 'container-types' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Container Types</span>
+												</router-link>
+											</li>
+
 											<li :class="currentRouteName=='containers' ? 'active' : ''">
 												<router-link :to="{ name: 'containers' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Container Types</span>
+													<span class="pcoded-mtext">Containers</span>
 												</router-link>
 											</li>
 										</ul>
@@ -105,7 +108,7 @@
 										</router-link>
 									</li>
 
-									<li :class="currentRouteName=='warehouses' ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-index')">
+									<li :class="['warehouses', 'warehouse-containers', 'warehouse-container-shelves', 'warehouse-container-shelf-units'].includes(currentRouteName) ? 'active' : ''" v-if="userHasPermissionTo('view-warehouse-index')">
 										<router-link :to="{ name: 'warehouses' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Warehouses</span>
 										</router-link>
@@ -118,10 +121,23 @@
 							>
 								<router-link :to="{ name: 'managers' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-user"></i>
+										<img width="18px" src="icons/cms/managers.png">
 									</span>
 									<span class="pcoded-mtext">
 										Managers
+									</span>
+								</router-link>
+							</li>
+
+							<li :class="currentRouteName=='mails' ? 'active' : ''" 
+								v-if="userHasPermissionTo('view-mail-index')"
+							>
+								<router-link :to="{ name: 'mails' }" class="waves-effect waves-dark">
+									<span class="pcoded-micon">
+										<img width="18px" src="icons/cms/mails.png">
+									</span>
+									<span class="pcoded-mtext">
+										Mails
 									</span>
 								</router-link>
 							</li>
@@ -131,7 +147,7 @@
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-users"></i>
+										<img width="18px" src="icons/cms/merchants.png">
 									</span>
 									<span class="pcoded-mtext">
 										Merchants
@@ -141,12 +157,12 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['products', 'product-merchants', 'product-stocks', 'product-categories', 'category-products', 'variation-types', 'variations', 'product-manufacturers'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations', 'products', 'product-merchants', 'product-stocks', 'stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('view-product-asset-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fab fa-product-hunt"></i>
+										<img width="18px" src="icons/cms/products.png">
 									</span>
 									<span class="pcoded-mtext">Product</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -154,7 +170,7 @@
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['product-categories', 'category-products', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-product-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -196,23 +212,35 @@
 										<router-link :to="{ name: 'products' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Products</span>
 										</router-link>
+									</li>
+
+									<li 
+										:class="['stocks'].includes(currentRouteName) ? 'active' : ''" 
+										v-if="userHasPermissionTo('view-product-stock-index')"
+									>
+										<router-link :to="{ name: 'stocks' }" class="waves-effect waves-dark">
+											<span class="pcoded-mtext">Stocks</span>
+										</router-link>
 									</li>									
 								</ul>
 							</li>
 
-							<li :class="currentRouteName=='requisitions' ? 'active' : ''" 
+							<li :class="(currentRouteName=='requisitions' || currentRouteName=='product-requisitions') ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-requisition-index')"
 							>
 								<router-link :to="{ name: 'requisitions' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fa fa-truck"></i>
+										<img width="18px" src="icons/cms/requisitions.png">
 									</span>
+
 									<span class="pcoded-mtext">
 										Requisitions
 									</span>
+
 									<span class="pcoded-badge label label-warning" v-show="currentRouteName!='requisitions' && newRequisition.length">
 										{{ newRequisition.length }}
 									</span>
+									
 									<span class="pcoded-badge label label-success" v-show="currentRouteName!='requisitions' && newAcceptance.length">
 										{{ newAcceptance.length }}
 									</span>
@@ -225,7 +253,7 @@
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
-										<i class="fas fa-boxes"></i>
+										<img width="18px" src="icons/cms/logistics.png">
 									</span>
 									<span class="pcoded-mtext">Logistics</span>
 									<!-- <span class="pcoded-badge label label-warning">NEW</span> -->
@@ -246,30 +274,95 @@
 							</li>
 						</ul>
 					</div>
-
 				</div>
 			</nav>
 
 			<router-view></router-view>
 
-			<div id="styleSelector">
-			</div>
-
+			<div id="styleSelector"></div>
 		</div>
 	</div>
-
 </template>
 
 <script>
 
     export default {
 
+    	data() {
+
+	        return {
+
+	        	newAcceptance : [],
+	        	newRequisition : [],
+
+	        }
+
+		},
+
+    	created() {
+
+    		Echo.private(`new-requisition`)
+		    .listen('NewRequisitionMade', (e) => {
+		        
+		        if (this.currentRouteName!='requisitions') {
+
+			        this.newRequisition.push(e);
+
+		        }else {
+
+		        	this.newRequisition = [];
+
+		        }
+
+		    });
+			
+			if (this.userHasPermissionTo('view-dispatch-index')) {
+
+			    Echo.private(`product-received`)
+			    .listen('ProductReceived', (e) => {
+			        
+			        if (this.currentRouteName!='requisitions') {
+
+				        this.newAcceptance.push(e);
+
+			        }else {
+
+						this.newAcceptance = [];			        	
+
+			        }
+
+			    });	    
+
+			}
+
+    	},
+
     	computed: {
+
 		    currentRouteName() {
+
 		        return this.$route.name;
+		    
 		    }
+
+		},
+
+		watch: {
+
+			$route(to, from) {
+			  // react to route changes...
+			  
+			  if (to.name=='requisitions') {
+
+			  	this.newAcceptance = [];
+				this.newRequisition = [];
+
+			  }
+
+			}
+			
 		}
 
     }
-    
+
 </script>

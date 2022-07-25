@@ -51,7 +51,6 @@
 											  	-->
 
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-logistic-asset-index') || userHasPermissionTo('create-logistic-asset')" 
 											  		:query="query" 
 											  		:caller-page="'Delivery Company'" 
 											  		:required-permission = "'logistic-asset'" 

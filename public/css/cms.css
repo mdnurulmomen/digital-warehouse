@@ -1,4 +1,6 @@
-.tooltip {
+@import url(https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;
+
+400;500;600;700;800&display=swap);.tooltip {
   display: block !important;
   z-index: 10000;
 }
@@ -116,5 +118,14 @@ span.badge {
 .table tr th:first-child,
 .table tr td:first-child {
   text-align: left;
+}
+
+.table div.alert.alert-danger {
+  text-align: center;
+}
+
+body,
+.pcoded .pcoded-navbar {
+  font-family: "Open Sans", sans-serif;
 }
 

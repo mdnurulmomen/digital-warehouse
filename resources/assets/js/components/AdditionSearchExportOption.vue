@@ -40,7 +40,7 @@
 
   					<i 
   						class="fa fa-upload fa-lg pr-3 pl-1" 
-  						v-show="$route.name=='merchant-products'"
+  						v-show="$route.name=='merchant-products' && userHasPermissionTo('create-' + requiredPermission)"
   						data-toggle="modal" 
   						v-tooltip.bottom-end="'Upload ' + callerPage" 
 						:data-target="'#'+ callerPage +'-importing-modal'"

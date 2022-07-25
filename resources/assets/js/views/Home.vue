@@ -1,7 +1,7 @@
 <template>
 	<div class="pcoded-content">
 		<div class="page-header card">
-  			<p>This is homepage</p>
+  			<p>Homepage</p>
   		</div>
 	</div>
 </template>

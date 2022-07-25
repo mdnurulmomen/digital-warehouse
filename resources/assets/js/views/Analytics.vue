@@ -60,7 +60,7 @@
                 -->
 
                 <!-- Limited Products -->
-                <div class="row">
+                <div class="row" v-if="userHasPermissionTo('view-merchant-product-index')">
                 	<div class="col-md-12">
                 		<div class="card table-card">
                 			<div class="card-header">
@@ -321,6 +321,13 @@
 	    	},
 	    	fetchAllMerchants() {
 
+	    		if (! this.userHasPermissionTo('view-merchant-index')) {
+
+	    			this.error = 'Sorry, You do not have enough permissions to view merchants';
+	    			return;
+
+	    		}
+
 	    		this.error = '';
 	    		this.loading = true;
 	    		this.allMerchants = [];
@@ -357,6 +364,13 @@
 
 	    	},
 	    	fetchSelectedMerchantProducts() {
+
+	    		if (! this.userHasPermissionTo('view-merchant-product-index')) {
+
+	    			this.error = 'Sorry, You do not have enough permissions to view merchant-products';
+	    			return;
+
+	    		}
 
 	    		this.error = '';
 	    		this.loading = true;

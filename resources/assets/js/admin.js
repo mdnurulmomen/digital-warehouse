@@ -76,8 +76,8 @@ Vue.component('permissive-user-profile-create-or-edit-modal', require('./compone
 
 import AdminSideMenuBar from './AdminSideMenuBar'
 
-import GeneralDashboardOne from './views/GeneralDashboard-1'
-import GeneralDashboardTwo from './views/GeneralDashboard-2'
+import Overview from './views/Overview'
+import Analytics from './views/Analytics'
 import Profile from './views/ProfileComponent'
 import UnAuthorized from './views/403'
 import NotFound from './views/404'
@@ -128,16 +128,16 @@ const router = new VueRouter({
         {
             path: '/home',
             name: 'home',
-            component: GeneralDashboardOne,
+            component: Overview,
             meta: { 
                 // authRequired: true 
                 // requiredPermission: 'view-dashboard-one-index' // home for admin
             },
         },
         {
-            path: '/general-dashboard-2',
-            name: 'general-dashboar-2',
-            component: GeneralDashboardTwo,
+            path: '/analytics',
+            name: 'analytics',
+            component: Analytics,
             meta: { 
                 // authRequired: true 
                 // requiredPermission: 'view-general-dashboard-two'  // as Admin
