@@ -118,13 +118,13 @@
 					    			<!-- container measurement -->
 						    		<div class="form-row">
 						    			<div class="col-sm-12 form-group">	
-						    				<label for="phone">Cntnr. Length</label>
+						    				<label for="phone">Length</label>
 											
 						    				<div class="input-group mb-0">
 						    					<input type="number" 
 													class="form-control" 
 													v-model.number="singleAssetData.length" 
-													placeholder="Lenght of container" 
+													placeholder="Length of container" 
 													:class="!errors.container.length ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('container_length')" 
 													required="true" 
@@ -147,13 +147,13 @@
 						    			</div>
 						    		
 						    			<div class="col-sm-12 form-group">	
-						    				<label for="phone">Cntnr. Width</label>
+						    				<label for="phone">Width</label>
 
 						    				<div class="input-group mb-0">
 												<input type="number" 
 													class="form-control" 
 													v-model.number="singleAssetData.width" 
-													placeholder="Lenght of container" 
+													placeholder="Width of container" 
 													:class="!errors.container.width ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('container_width')" 
 													required="true" 
@@ -175,13 +175,13 @@
 						    			</div>
 						    		
 						    			<div class="col-sm-12 form-group">	
-						    				<label for="phone">Cntnr. Height</label>
+						    				<label for="phone">Height</label>
 
 						    				<div class="input-group mb-0">
 												<input type="number" 
 													class="form-control" 
 													v-model.number="singleAssetData.height" 
-													placeholder="Lenght of container" 
+													placeholder="Height of container" 
 													:class="!errors.container.height ? 'is-valid' : 'is-invalid'" 
 													@blur="validateFormInput('container_height')" 
 													required="true" 

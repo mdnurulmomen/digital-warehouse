@@ -678,7 +678,7 @@
 															</div>
 
 															<div class="form-row" v-if="singleWarehouseData.storages[index].feature">
-																<div class="col-md-12 form-group">
+																<div class="col-md-12">
 																	<label>Features</label>
 
 																	<ckeditor 
@@ -695,7 +695,6 @@
 																  	</div>
 																</div>
 															</div>
-
 												    	</div>
 												  	</div>
 											  	</transition-group>

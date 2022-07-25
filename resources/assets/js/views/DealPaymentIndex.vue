@@ -46,7 +46,7 @@
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Payments'"></i>
+									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Payments'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 
@@ -1396,7 +1396,8 @@
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
-								:src="'/' + general_settings.application_logo" 
+								width="60px" 
+								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'"
 							>
 							
