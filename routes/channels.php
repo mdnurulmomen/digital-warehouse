@@ -21,7 +21,7 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 
 Broadcast::channel('new-requisition', function ($user) {
     return true;
-}, ['guards' => ['admin', 'merchant', 'manager', 'warehouse', 'owner']]);
+}, ['guards' => ['admin', 'manager', 'warehouse']]);
 
 Broadcast::channel('new-dispatch.{merchantId}', function ($user, $merchantId) {
     return (int) $user->id === (int) $merchantId;
@@ -29,4 +29,4 @@ Broadcast::channel('new-dispatch.{merchantId}', function ($user, $merchantId) {
 
 Broadcast::channel('product-received', function ($user) {
     return true;
-}, ['guards' => ['admin', 'merchant', 'manager', 'warehouse', 'owner']]);
+}, ['guards' => ['admin', 'manager', 'warehouse']]);

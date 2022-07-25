@@ -499,7 +499,7 @@ class WarehouseController extends Controller
             }
             else if ($requiredSpaceType=='empty') {
 
-                return MerchantWarehouseEmptySpaceResource::customCollection($merchantWarehouses, $merchant);
+                // return MerchantWarehouseEmptySpaceResource::customCollection($merchantWarehouses, $merchant);
 
             }
 
