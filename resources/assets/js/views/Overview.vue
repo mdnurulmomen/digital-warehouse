@@ -1,4 +1,4 @@
-<template v-if="userHasPermissionTo('view-gereral-dashboard-one')">
+<template>
     <div class="pcoded-content">
 
 <div class="page-header card">
@@ -31,7 +31,7 @@
        <div class="page-body">
           <!-- Pending Stocks and Requisitions -->
           <div class="row">
-             <div class="col-xl-3 col-md-6">
+             <div class="col-xl-3 col-md-6" v-show="userHasPermissionTo('view-product-stock-index')">
                 <div class="card prod-p-card card-yellow">
                     <div class="card-body">
                         <div class="row align-items-center m-b-30">
@@ -61,7 +61,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-xl-3 col-md-6">
+                            <div class="col-xl-3 col-md-6" v-show="userHasPermissionTo('view-requisition-index')">
                                 <div class="card prod-p-card card-blue">
                                     <div class="card-body">
                                         <div class="row align-items-center m-b-30">
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
 
-                        <div class="col-xl-3 col-md-6">
+                        <div class="col-xl-3 col-md-6" v-show="userHasPermissionTo('view-dispatch-index')">
                             <div class="card prod-p-card card-green">
                                 <div class="card-body">
                                     <div class="row align-items-center m-b-30">
@@ -121,7 +121,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-xl-3 col-md-6">
+                            <div class="col-xl-3 col-md-6" v-show="userHasPermissionTo('view-requisition-index')">
                                 <div class="card prod-p-card card-danger">
                                     <div class="card-body">
                                         <div class="row align-items-center m-b-30">
@@ -154,7 +154,7 @@
 
                     <!-- Pending Users (Chart) -->
                     <div class="row">
-                        <div class="col-xl-3 col-md-6" v-if="dashboard.ownerStates">
+                        <div class="col-xl-3 col-md-6" v-if="dashboard.ownerStates && userHasPermissionTo('view-warehouse-owner-index')">
                             <div class="card comp-card">
                                 <div class="card-body">
                                     <doughnut-chart :data="dashboard.ownerStates" :styles="{height: '300px', width: '100%', position: 'relative' }" />
@@ -165,7 +165,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6" v-if="dashboard.warehouseStates">
+                        <div class="col-xl-3 col-md-6" v-if="dashboard.warehouseStates && userHasPermissionTo('view-warehouse-index')">
                             <div class="card comp-card">
                                 <div class="card-body">
                                     <doughnut-chart :data="dashboard.warehouseStates" :styles="{height: '300px', width: '100%', position: 'relative' }" />
@@ -176,7 +176,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6" v-if="dashboard.merchantStates">
+                        <div class="col-xl-3 col-md-6" v-if="dashboard.merchantStates && userHasPermissionTo('view-merchant-index')">
                             <div class="card comp-card">
                                 <div class="card-body">
                                     <doughnut-chart :data="dashboard.merchantStates" :styles="{height: '300px', width: '100%', position: 'relative' }" />
@@ -187,7 +187,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6" v-if="dashboard.managerStates">
+                        <div class="col-xl-3 col-md-6" v-if="dashboard.managerStates && userHasPermissionTo('view-manager-index')">
                             <div class="card comp-card">
                                 <div class="card-body">
                                     <doughnut-chart :data="dashboard.managerStates" :styles="{height: '300px', width: '100%', position: 'relative' }" />
@@ -201,7 +201,7 @@
 
                     <!-- Warehouse Unused Container Percentages -->
                     
-                    <div class="row" v-if="dashboard.hasOwnProperty('warehouseUnrentedContainers') && dashboard.warehouseUnrentedContainers.length">
+                    <div class="row" v-if="dashboard.hasOwnProperty('warehouseUnrentedContainers') && dashboard.warehouseUnrentedContainers.length && userHasPermissionTo('view-warehouse-index')">
                         <div class="col-xl-12">
                             <div class="card proj-progress-card">
                                 <div class="card-block">

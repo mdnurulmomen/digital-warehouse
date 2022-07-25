@@ -131,7 +131,7 @@ const router = new VueRouter({
             component: Overview,
             meta: { 
                 // authRequired: true 
-                // requiredPermission: 'view-dashboard-one-index' // home for admin
+                // requiredPermission: 'view-dashboard-one-index' // public for admin & manager (conditionally)
             },
         },
         {
@@ -140,7 +140,7 @@ const router = new VueRouter({
             component: Analytics,
             meta: { 
                 // authRequired: true 
-                // requiredPermission: 'view-general-dashboard-two'  // as Admin
+                // requiredPermission: 'view-dashboard-dashboard-two'  // public for admin & manager (conditionally)
             },
         },
         {

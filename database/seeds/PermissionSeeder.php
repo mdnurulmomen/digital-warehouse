@@ -59,10 +59,12 @@ class PermissionSeeder extends Seeder
                 'Permission',  // view
             ];
 
+            /*
             $modelsViewable2 = [
                 'General-Dashboard-One',  // view
                 'General-Dashboard-Two',  // view
             ];
+            */
 
             $modelsViewableAndDeletable = [
                 'Mail',  // AppMail // view / delete 
@@ -142,6 +144,7 @@ class PermissionSeeder extends Seeder
 
             }
 
+            /*
             foreach ($modelsViewable2 as $model) {
                 
                 Permission::insert([
@@ -151,6 +154,7 @@ class PermissionSeeder extends Seeder
                 ]);
 
             }
+            */
 
             foreach ($modelsViewableAndDeletable as $model) {
                 

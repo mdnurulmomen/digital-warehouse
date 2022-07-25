@@ -521,6 +521,7 @@
 										</div>
 
 										<!-- Viewable 2 -->
+										<!-- 
 										<div 
 											class="col-md-6" 
 											v-for="model in modelsViewable2" 
@@ -528,7 +529,6 @@
 										>
 											<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-											<!-- view -->
 											<div class="form-check">
 												<input 
 													type="checkbox" 
@@ -538,7 +538,8 @@
 												>
 												<label>{{ modelName('view-' + model) }}</label>
 											</div>
-										</div>
+										</div> 
+										-->
 
 										<!-- Viewable And Deletable -->
 										<div 
@@ -919,6 +920,7 @@
 									</div>
 
 									<!-- Viewable 2 -->
+									<!-- 
 									<div 
 										class="col-md-6" 
 										v-for="model in modelsViewable2" 
@@ -926,7 +928,6 @@
 									>
 										<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-										<!-- view -->
 										<p class="m-0">
 											<span v-show="permissionExists('view-' + model)" class="text-success">
 												<i class="fa fa-check" aria-hidden="true"></i>
@@ -936,7 +937,8 @@
 											</span>
 											{{ modelName('view-' + model) }}
 										</p>
-									</div>
+									</div> 
+									-->
 
 									<!-- Viewable And Deletable -->
 									<div 
@@ -999,10 +1001,10 @@
 											<label>{{ modelName('view-' + model + '-list') }}</label> 
 											-->
 
-											<span v-show="permissionExists('view-' + model)" class="text-success">
+											<span v-show="permissionExists('view-' + model + '-index')" class="text-success">
 												<i class="fa fa-check" aria-hidden="true"></i>
 											</span>
-											<span v-show="!permissionExists('view-' + model)" class="text-danger">
+											<span v-show="!permissionExists('view-' + model + '-index')" class="text-danger">
 												<i class="fa fa-times" aria-hidden="true"></i>
 											</span>
 											{{ modelName('view-' + model) }}
@@ -1095,10 +1097,12 @@
 	                'Permission',  // view
 	            ],
 
+	            /*
 	            modelsViewable2 : [
 	                'General-Dashboard-One',  // view
 	                'General-Dashboard-Two'  // view
 	            ],
+	            */
 
 	            modelsViewableAndDeletable : [
 	                'Mail',  // AppMail / view / delete

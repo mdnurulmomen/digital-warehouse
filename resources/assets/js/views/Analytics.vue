@@ -1,4 +1,4 @@
-<template v-if="userHasPermissionTo('view-gereral-dashboard-two')">
+<template>
 	<div class="pcoded-content">
 		<div class="page-header card">
 			<div class="row align-items-center">
@@ -114,7 +114,7 @@
                 					</td>
 
                 					<td>
-                						<span :class="[! merchantProduct || merchantProduct.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']">
+                						<span :class="[! merchantProduct || merchantProduct.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']" style="font-size: 100%;">
                 							{{ ! merchantProduct || merchantProduct.available_quantity == 0 ? 'Stock Out' : merchantProduct.available_quantity }}
                 						</span>
                 					</td>

@@ -76,7 +76,6 @@ Vue.component('permissive-user-profile-create-or-edit-modal', require('./compone
 
 import ManagerSideMenuBar from './ManagerSideMenuBar'
 
-import ManagerHome from './views/Home'
 import Overview from './views/Overview'
 import Analytics from './views/Analytics'
 import Profile from './views/ProfileComponent'
@@ -129,15 +128,10 @@ const router = new VueRouter({
         {
             path: '/home',
             name: 'home',
-            component: ManagerHome
-        },
-        {
-            path: '/overview',
-            name: 'overview',
             component: Overview,
             meta: { 
                 // authRequired: true 
-                requiredPermission: 'view-general-dashboard-one' // home for manager
+                // requiredPermission: 'view-general-dashboard-one' // public for admin & manager(conditionally)
             },
         },
         {
@@ -146,7 +140,7 @@ const router = new VueRouter({
             component: Analytics,
             meta: { 
                 // authRequired: true 
-                requiredPermission: 'view-general-dashboard-two'  // as manager
+                // requiredPermission: 'view-general-dashboard-two'  // public for admin & manager(conditionally)
             },
         },
         {

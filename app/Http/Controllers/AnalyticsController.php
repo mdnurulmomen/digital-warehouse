@@ -16,6 +16,7 @@ use App\Models\ProductDelivery;
 
 class AnalyticsController extends Controller
 {
+    /*
     public function __construct()
     {
         if (! \Auth::guard('admin')->check()) {
@@ -25,6 +26,7 @@ class AnalyticsController extends Controller
 
         }
     }
+    */
 
     public function getGeneralDashboardOneData()
     {

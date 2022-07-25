@@ -507,6 +507,7 @@
 												</div>
 
 												<!-- Viewable 2 -->
+												<!-- 
 												<div 
 													class="col-md-6" 
 													v-for="model in modelsViewable2" 
@@ -514,7 +515,6 @@
 												>
 													<p class="font-weight-bold mt-4 mb-3">{{ modelName(model) }}</p>
 
-													<!-- view -->
 													<div class="form-check">
 														<input 
 															type="checkbox" 
@@ -524,7 +524,8 @@
 														>
 														<label>{{ modelName('view-' + model) }}</label>
 													</div>
-												</div>
+												</div> 
+												-->
 
 												<!-- Viewable And Deletable -->
 												<div 
@@ -696,10 +697,12 @@
 	                'Permission',  // view
 	            ],
 
+	            /*
 	            modelsViewable2 : [
 	                'General-Dashboard-One',  // view
 	                'General-Dashboard-Two'  // view
 	            ],
+	            */
 
 	            modelsViewableAndDeletable : [
 	                'Mail',  // AppMail / view / delete
