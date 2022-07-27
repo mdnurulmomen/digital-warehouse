@@ -2,27 +2,30 @@
 <html lang="en">
 
 <head>
-	<title>Gudam | Merchant Template</title>
+	<title>{{ ucfirst($general_settings->app_name) }} | Merchant Template</title>
 
 	<meta charset="utf-8">
 	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="description" content="Gudam merchant template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
-	<meta name="keywords" content="flat ui, merchant, Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
+	<meta name="keywords" content="flat ui, merchant Merchant, Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
 	<meta name="csrf-token" content={{csrf_token()}}>
 
-	<link rel="icon" href="{{ URL::asset('uploads/application/application_favicon.png') }}" type="image/x-icon" sizes="16x16"/>
+	<link rel="icon" href="{{ asset('system/favicon.png') }}" type="image/x-icon" sizes="16x16"/>
+	
+	<!-- Fonts -->
 	{{-- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Quicksand:500,700" rel="stylesheet"> --}}
+	{{-- <link rel='stylesheet' href='nunito.css'> --}}
+	
 	<link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('css/waves.min.css')}}" type="text/css" media="all">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/feather.css')}}">
-	<link rel="stylesheet" href="{{asset('css/font-awesome-4.min.css')}}">
-	<link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{asset('css/cms.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/widget.css')}}">
-	{{-- <link rel="stylesheet" type="text/css" href="{{asset('css/app.css')}}"> --}}
+	<link rel="stylesheet" type="text/css" href="{{asset('css/font-awesome.min.css')}}">
 </head>
 
 <body>
@@ -37,9 +40,9 @@
 
 			<nav class="navbar header-navbar pcoded-header">
 				<div class="navbar-wrapper">
-					<div class="navbar-logo">
+					<div class="navbar-logo d-flex">
 						<a href="{{ route('merchant.home', 'home') }}">
-							<img class="img-fluid" src="{{asset('uploads/application/application_logo.png')}}" alt="Theme-Logo" />
+							<img class="img-fluid" src="{{asset('system/logo.png')}}" alt="App-Logo" width="60px"/>
 						</a>
 						<a class="mobile-menu" id="mobile-collapse" href="#!">
 							<i class="feather icon-menu icon-toggle-right"></i>
@@ -50,7 +53,7 @@
 					</div>
 					<div class="navbar-container container-fluid">
 						<ul class="nav-left">
-							<li class="header-search">
+							{{-- <li class="header-search">
 								<div class="main-search morphsearch-search">
 									<div class="input-group">
 										<span class="input-group-prepend search-close">
@@ -62,7 +65,7 @@
 										</span>
 									</div>
 								</div>
-							</li>
+							</li> --}}
 							<li>
 								<a href="#!" onclick="if (!window.__cfRLUnblockHandlers) return false; javascript:toggleFullScreen()" class="waves-effect waves-light" data-cf-modified-d2d1d6e2f87cbebdf4013b26-="">
 									<i class="full-screen feather icon-maximize"></i>
@@ -133,6 +136,11 @@
 									</div>
 									<ul class="show-notification profile-notification dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
 										<li>
+											<a onclick="showSetting()" href="javascript:void(0)">
+												<i class="feather icon-settings"></i> Settings
+											</a>
+										</li>
+										<li>
 											<a onclick="showProfile()" href="javascript:void(0)">
 												<i class="feather icon-user"></i> Profile
 											</a>
@@ -161,7 +169,6 @@
 		                                    <form id="merchant-logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
 		                                        @csrf
 		                                    </form>
-
 										</li>
 									</ul>
 								</div>
@@ -171,7 +178,7 @@
 				</div>
 			</nav>
 
-		{{-- 
+			{{-- 
 			<div id="sidebar" class="users p-chat-user showChat">
 				<div class="had-container">
 					<div class="p-fixed users-main">
@@ -192,7 +199,7 @@
 							<div class="main-friend-list">
 								<div class="media userlist-box waves-effect waves-light" data-id="1" data-status="online" data-username="Josephin Doe">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius img-radius" src="{{asset('jpg/avatar-3.jpg')}}" alt="Generic placeholder image ">
+										<img class="media-object img-radius img-radius" src="{{asset('')}}" alt="Generic placeholder image ">
 										<div class="live-status bg-success"></div>
 									</a>
 									<div class="media-body">
@@ -201,7 +208,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="2" data-status="online" data-username="Lary Doe">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-success"></div>
 									</a>
 									<div class="media-body">
@@ -210,7 +217,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="3" data-status="online" data-username="Alice">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-4.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-success"></div>
 									</a>
 									<div class="media-body">
@@ -219,7 +226,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="4" data-status="offline" data-username="Alia">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-3.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-default"></div>
 									</a>
 									<div class="media-body">
@@ -228,7 +235,7 @@
 								</div>
 								<div class="media userlist-box waves-effect waves-light" data-id="5" data-status="offline" data-username="Suzen">
 									<a class="media-left" href="#!">
-										<img class="media-object img-radius" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+										<img class="media-object img-radius" src="{{asset('')}}" alt="Generic placeholder image">
 										<div class="live-status bg-default"></div>
 									</a>
 									<div class="media-body">
@@ -239,8 +246,10 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> 
+			--}}
 		 
+			{{-- 
 			<div class="showChat_inner">
 				<div class="media chat-inner-header">
 					<a class="back_chatBox">
@@ -250,7 +259,7 @@
 				<div class="main-friend-chat">
 					<div class="media chat-messages">
 						<a class="media-left photo-table" href="#!">
-							<img class="media-object img-radius img-radius m-t-5" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+							<img class="media-object img-radius img-radius m-t-5" src="{{asset('')}}" alt="Generic placeholder image">
 						</a>
 						<div class="media-body chat-menu-content">
 							<div class="">
@@ -269,7 +278,7 @@
 					</div>
 					<div class="media chat-messages">
 						<a class="media-left photo-table" href="#!">
-							<img class="media-object img-radius img-radius m-t-5" src="{{asset('jpg/avatar-2.jpg')}}" alt="Generic placeholder image">
+							<img class="media-object img-radius img-radius m-t-5" src="{{asset('')}}" alt="Generic placeholder image">
 						</a>
 						<div class="media-body chat-menu-content">
 							<div class="">
@@ -290,17 +299,22 @@
 					</div>
 				</div>
 			</div>  
-		--}}
+			--}}
 		
+
 			<div id="app">
+				
 				<merchant-side-menu-bar></merchant-side-menu-bar>
+
 			</div>
+
 		</div>
 	</div>
 
 	<!-- Scripts -->
 	<script type="text/javascript">
-		window.localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));
+		localStorage.setItem("merchant", JSON.stringify(@json($merchant)));
+		localStorage.setItem("general_settings", JSON.stringify(@json($general_settings)));
 	</script>
     <script src="{{ mix('js/merchant.js') }}"></script>
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/jquery-ui.min.js')}}"></script>
@@ -311,6 +325,7 @@
 	<script type="d2d1d6e2f87cbebdf4013b26-text/javascript" src="{{asset('js/script.min.js')}}"></script>
 	{{-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13" type="d2d1d6e2f87cbebdf4013b26-text/javascript"></script> --}}
 	<script src="{{asset('js/rocket-loader.min.js')}}" data-cf-settings="d2d1d6e2f87cbebdf4013b26-|49" defer=""></script>
+	{{-- <script src="{{asset('js/bootstrap.min.js')}}" data-cf-settings="d2d1d6e2f87cbebdf4013b26-|49" defer=""></script> --}}
 
 </body>
 

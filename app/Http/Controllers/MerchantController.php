@@ -8,9 +8,11 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Warehouse;
 use App\Models\Requisition;
-// use App\Models\ProductStock;
+use App\Models\MerchantDeal;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductSerial;
+use App\Models\MerchantPayment;
 use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
 use App\Models\RequisitionAgent;
@@ -18,9 +20,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File; 
 use App\Jobs\BroadcastNewRequisition;
 use App\Models\ProductVariationSerial;
+use App\Models\WarehouseContainerStatus;
+use App\Http\Resources\Web\DealCollection;
+use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\MyProductResource;
 use App\Http\Resources\Web\MyProductCollection;
+use App\Http\Resources\Web\DealPaymentCollection;
+use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Jobs\BroadcastProductReceiveConfirmation;
+use App\Http\Resources\Web\ProductStockCollection;
 use App\Http\Resources\Web\MyRequisitionCollection;
 use App\Http\Resources\Web\MerchantProductResource;
 use App\Http\Resources\Web\MerchantProductCollection;
@@ -202,17 +210,27 @@ class MerchantController extends Controller
             
             return [
 
-                'retail' => new MyProductCollection(MerchantProduct::where('merchant_id', $currentMerchant->id)
+                'retail' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $currentMerchant->id)
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
+                                                        ->with(['serials', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.serials'])
+                                                        ->with(['stocks' => function ($query1) {
+                                                            $query1->where('available_quantity', '>', 0);
+                                                         
+                                                        }])
+                                                        ->with(['variations.stocks' => function ($query2) {
+                                                            $query2->where('available_quantity', '>', 0);
+                                                         
+                                                        }])
                                                         ->paginate($perPage)),
                 
-                'bulk' => new MyProductCollection(MerchantProduct::where('merchant_id', $currentMerchant->id)
+                'bulk' => new MerchantProductCollection(MerchantProduct::where('merchant_id', $currentMerchant->id)
                                                         ->whereHas('product', function ($query) {
                                                             $query->whereNull('product_category_id')
                                                                 ->orWhere('product_category_id', 0);
                                                         })
+                                                        ->with(['stocks', 'nonDispatchedRequests', 'dispatchedRequests'])
                                                        ->paginate($perPage)),
             ];
 
@@ -259,8 +277,8 @@ class MerchantController extends Controller
 
         $currentMerchant = \Auth::user();
 
-        $query = MerchantProduct::where('merchant_id', $currentMerchant->id);
-
+        $query = MerchantProduct::where('merchant_id', $currentMerchant->id)
+                ->with(['serials', 'stocks', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.stocks', 'variations.serials']);
 
         if ($request->search) {
             
@@ -268,6 +286,7 @@ class MerchantController extends Controller
                 $query1->where('sku', 'like', "%$request->search%")
                 ->orWhere('description', 'like', "%$request->search%")
                 ->orWhere('warning_quantity', 'like', "%$request->search%")
+                ->orWhere('discount', 'like', "%$request->search%")
                 ->orWhere('selling_price', 'like', "%$request->search%")
                 ->orWhereHas('manufacturer', function ($query2) use ($request) {
                     $query2->where('name', 'like', "%$request->search%");
@@ -283,22 +302,171 @@ class MerchantController extends Controller
 
         }
 
-        if ($request->dateFrom) {
+        if ($request->dateFrom && $request->dateTo) {
             
-            $query->whereDate('created_at', '>=', $request->dateFrom);
+            $query->where(function ($query1) use ($request) {
+                $query1->whereDate('created_at', '>=', $request->dateFrom)
+                ->whereDate('created_at', '<=', $request->dateTo)
+                ->orWhereHas('stocks', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom)
+                        ->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            })
+            ->with(['serials' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom)
+                        ->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }])
+            ->with(['stocks' => function ($query1) use ($request) {
+                $query1->whereHas('stock', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom)
+                    ->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['nonDispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('requisition', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom)
+                    ->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['dispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('dispatch', function ($query2) use ($request) {
+                    $query2->whereDate('updated_at', '>=', $request->dateFrom)
+                    ->whereDate('updated_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['variations.serials' => function ($query1) use ($request) {
+                $query1->whereHas('variationStock', function ($query2) use ($request) {
+                    $query2->whereHas('productStock', function ($query3) use ($request) {
+                        $query3->whereHas('stock', function ($query4) use ($request) {
+                            $query4->whereDate('created_at', '>=', $request->dateFrom)
+                            ->whereDate('created_at', '<=', $request->dateTo);
+                        });
+                    });
+                });
+            }])
+            ->with(['variations.stocks' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom)
+                        ->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }]);
 
         }
 
-        if ($request->dateTo) {
+        else if ($request->dateFrom && empty($request->dateTo)) {
             
-            $query->whereDate('created_at', '<=', $request->dateTo);
+            $query->where(function ($query1) use ($request) {
+                $query1->whereDate('created_at', '>=', $request->dateFrom)
+                ->orWhereHas('stocks', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom);
+                    });
+                });
+            })
+            ->with(['serials' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom);
+                    });
+                });
+            }])
+            ->with(['stocks' => function ($query1) use ($request) {
+                $query1->whereHas('stock', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom);
+                });
+            }])
+            ->with(['nonDispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('requisition', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '>=', $request->dateFrom);
+                });
+            }])
+            ->with(['dispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('dispatch', function ($query2) use ($request) {
+                    $query2->whereDate('updated_at', '>=', $request->dateFrom);
+                });
+            }])
+            ->with(['variations.serials' => function ($query1) use ($request) {
+                $query1->whereHas('variationStock', function ($query2) use ($request) {
+                    $query2->whereHas('productStock', function ($query3) use ($request) {
+                        $query3->whereHas('stock', function ($query4) use ($request) {
+                            $query4->whereDate('created_at', '>=', $request->dateFrom);
+                        });
+                    });
+                });
+            }])
+            ->with(['variations.stocks' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '>=', $request->dateFrom);
+                    });
+                });
+            }]);
 
         }
 
+        else if (empty($request->dateFrom) && $request->dateTo) {
+            
+            $query->where(function ($query1) use ($request) {
+                $query1->whereDate('created_at', '<=', $request->dateTo)
+                ->orWhereHas('stocks', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            })
+            ->with(['serials' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }])
+            ->with(['stocks' => function ($query1) use ($request) {
+                $query1->whereHas('stock', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['nonDispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('requisition', function ($query2) use ($request) {
+                    $query2->whereDate('created_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['dispatchedRequests' => function ($query1) use ($request) {
+                $query1->whereHas('dispatch', function ($query2) use ($request) {
+                    $query2->whereDate('updated_at', '<=', $request->dateTo);
+                });
+            }])
+            ->with(['variations.serials' => function ($query1) use ($request) {
+                $query1->whereHas('variationStock', function ($query2) use ($request) {
+                    $query2->whereHas('productStock', function ($query3) use ($request) {
+                        $query3->whereHas('stock', function ($query4) use ($request) {
+                            $query4->whereDate('created_at', '<=', $request->dateTo);
+                        });
+                    });
+                });
+            }])
+            ->with(['variations.stocks' => function ($query1) use ($request) {
+                $query1->whereHas('productStock', function ($query2) use ($request) {
+                    $query2->whereHas('stock', function ($query3) use ($request) {
+                        $query3->whereDate('created_at', '<=', $request->dateTo);
+                    });
+                });
+            }]);
+
+        }
 
         return [
-            'all' => new MyProductCollection($query->paginate($perPage)),  
+            'all' => (new MerchantProductCollection($query->paginate($perPage)))->setFromDate($request->dateFrom),  
         ];
+
     }
     
     // My-Agents (web.php)
@@ -830,9 +998,7 @@ class MerchantController extends Controller
             'merchant_id' => 'required|numeric|exists:merchants,id'
         ]); 
 
-        $expectedMerchant = Merchant::findOrFail($request->merchant_id);
-
-        $query = MerchantProduct::where('merchant_id', $expectedMerchant->id)
+        $query = MerchantProduct::where('merchant_id', $request->merchant_id)
                 ->with(['merchant', 'addresses', 'serials', 'stocks', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.stocks', 'variations.serials']);
 
         if ($request->search) {
@@ -1021,6 +1187,264 @@ class MerchantController extends Controller
         return [
             'all' => (new MerchantProductCollection($query->paginate($perPage)))->setFromDate($request->dateFrom),  
         ];
+    }
+
+    // Product-Stock
+    public function showMyProductAllStocks($productMerchant, $perPage)
+    {
+        $currentMerchant =  \Auth::user();
+        $merchantExpectedProduct = MerchantProduct::findOrFail($productMerchant);
+
+        if ($merchantExpectedProduct->merchant_id == $currentMerchant->id) {
+            
+            return new ProductStockCollection(ProductStock::with(['variations', 'serials'])->where('merchant_product_id', $productMerchant)->latest('id')->paginate($perPage));
+
+        }
+
+        return response()->json(['errors'=>["invalidProduct" => "Invalid product query"]], 422);
+
+    }
+
+    public function searchMyProductAllStocks(Request $request, $merchantProduct, $perPage)
+    {
+        $request->validate([
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+        $currentMerchant =  \Auth::user();
+        $merchantExpectedProduct = MerchantProduct::findOrFail($merchantProduct);
+
+        if ($merchantExpectedProduct->merchant_id != $currentMerchant->id) {
+            
+            return response()->json(['errors'=>["invalidProduct" => "Invalid product query"]], 422);
+
+        }
+
+        $query = ProductStock::with(['variations', 'serials'])
+                        ->where('merchant_product_id', $merchantProduct);
+
+        if ($request->search) {
+            
+            $query->where(function($q) use ($request) {
+                $q->where('stock_code', 'like', "%$request->search%")
+                ->orWhere('stock_quantity', 'like', "%$request->search%")
+                ->orWhere('available_quantity', 'like', "%$request->search%")
+                ->orWhere('unit_buying_price', 'like', "%$request->search%")
+                ->orWhereHas('serials', function ($query2) use ($request) {
+                    $query2->where('serial_no', 'like', "%$request->search%");
+                })
+                ->orWhereHas('variations', function ($query3) use ($request) {
+                    $query3->where('stock_code', 'like', "%$request->search%")
+                        ->orWhere('stock_quantity', 'like', "%$request->search%")
+                        ->orWhere('available_quantity', 'like', "%$request->search%")
+                        ->orWhere('unit_buying_price', 'like', "%$request->search%")
+                        ->orWhereHas('serials', function ($query4) use ($request) {
+                            $query4->where('serial_no', 'like', "%$request->search%");
+                        });
+                });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereHas('stock', function ($q) use ($request) {
+                $q->where('created_at', '>=', $request->dateFrom);
+            });
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereHas('stock', function ($q) use ($request) {
+                $q->where('created_at', '<=', $request->dateTo);
+            });
+
+        }
+
+        return response()->json([
+            'all' => new ProductStockCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
+    // My-Deal
+    public function showMyAllDeals($perPage)
+    {
+        $currentMerchant = \Auth::user();
+
+        return new DealCollection(
+            MerchantDeal::where('merchant_id', $currentMerchant->id)
+            ->with(['spaces', 'payments'])
+            ->with(['rentPeriod' => function($query) {
+                $query->withTrashed();
+            }])
+            ->latest()->paginate($perPage)
+        );
+    }
+
+    public function searchMyAllDeals(Request $request, $perPage)
+    {
+        $request->validate([
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+        $currentMerchant = \Auth::user();
+
+        $query = MerchantDeal::with(['spaces', 'payments'])->where('merchant_id', $currentMerchant->id);
+
+        if ($request->search) {
+            
+            $query->where(function($query5) use ($request) {
+                $query5->whereHas('merchant', function ($query6) use ($request) {
+                    $query6->where('first_name', 'like', "%$request->search%")
+                    ->orWhere('last_name', 'like', "%$request->search%")
+                    ->orWhere('user_name', 'like', "%$request->search%")
+                    ->orWhere('email', 'like', "%$request->search%")
+                    ->orWhere('mobile', 'like', "%$request->search%");
+                })
+                ->orWhereHas('spaces', function ($query2) use ($request) {
+                    $query2->whereHasMorph(
+                        'space',
+                        [ WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class ],
+                        function ($query3) use ($request) {
+                            $query3->where('name', 'like', "%$request->search%")
+                            ->orWhereHas('warehouseContainer.container', function ($query8) use ($request) {
+                                $query8->where('name', 'like', "%$request->search%");
+                            });
+                        }
+                    );
+                })
+                ->orWhereHas('payments', function ($query4) use ($request) {
+                    $query4->where('invoice_no', 'like', "%$request->search%")
+                    ->orWhere('number_installment', 'like', "%$request->search%")
+                    ->orWhere('date_from', 'like', "%$request->search%")
+                    ->orWhere('date_to', 'like', "%$request->search%")
+                    ->orWhere('total_rent', 'like', "%$request->search%")
+                    ->orWhere('discount', 'like', "%$request->search%")
+                    ->orWhere('previous_due', 'like', "%$request->search%")
+                    ->orWhere('net_payable', 'like', "%$request->search%")
+                    ->orWhere('paid_amount', 'like', "%$request->search%")
+                    ->orWhere('current_due', 'like', "%$request->search%");
+                });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereDate('created_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereDate('created_at', '<=', $request->dateTo);
+
+        }
+
+        return response()->json([
+            'all' => new DealCollection($query->latest()->paginate($perPage)),  
+        ], 200);
+    }
+
+    // My-Deal-Payments
+    public function showMyDealAllPayments($deal, $perPage = false)
+    {
+        if ($perPage) {
+            
+            $currentMerchant = \Auth::user();
+
+            $merchantExpectedDeal = MerchantDeal::findOrFail($deal);
+
+            if ($merchantExpectedDeal->merchant_id == $currentMerchant->id) {
+                
+                return new DealPaymentCollection(
+                    MerchantPayment::with(['rents'])->whereHas('deal', function ($query) use ($deal) {
+                        $query->where('merchant_deal_id', $deal);
+                    })->latest('paid_at')->paginate($perPage)
+                );
+
+            }
+
+            return response()->json(['errors'=>["invalidDeal" => "Invalid deal query"]], 422);
+
+        }
+    }
+
+    public function searchMyDealAllPayments(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_deal_id' => 'required|exists:merchant_deals,id',
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+        $currentMerchant = \Auth::user();
+
+        $merchantExpectedDeal = MerchantDeal::findOrFail($request->merchant_deal_id);
+
+        if ($merchantExpectedDeal->merchant_id != $currentMerchant->id) {
+            
+            return response()->json(['errors'=>["invalidDeal" => "Invalid deal query"]], 422);
+
+        }
+
+        $query = MerchantPayment::with(['rents'])->whereHas('deal', function ($query1) use ($request) {
+            $query1->where('merchant_deal_id', $request->merchant_deal_id);
+        });
+
+        if ($request->search) {
+            
+            $query->where(function($query2) use ($request) {
+                $query2->where('invoice_no', 'like', "%$request->search%")
+                ->orWhere('number_installment', 'like', "%$request->search%")
+                ->orWhere('date_from', 'like', "%$request->search%")
+                ->orWhere('date_to', 'like', "%$request->search%")
+                ->orWhere('total_rent', 'like', "%$request->search%")
+                ->orWhere('discount', 'like', "%$request->search%")
+                ->orWhere('previous_due', 'like', "%$request->search%")
+                ->orWhere('net_payable', 'like', "%$request->search%")
+                ->orWhere('paid_amount', 'like', "%$request->search%")
+                ->orWhere('current_due', 'like', "%$request->search%")
+                ->orWhereHas('rents', function ($query3) use ($request) {
+                    $query3->where('rent', 'like', "%$request->search%");
+                });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereDate('paid_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereDate('paid_at', '<=', $request->dateTo);
+
+        }
+
+        return response()->json([
+            'all' => new DealPaymentCollection($query->latest('paid_at')->paginate($perPage)),  
+        ], 200);
     }
 
     protected function validateProductSerials($products = [])

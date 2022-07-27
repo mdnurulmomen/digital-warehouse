@@ -11,7 +11,7 @@
 	  			</div>
 
 	  			<div class="dropdown">
-					<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Requisitions'"></i>
+					<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Requisitions'"></i>
   					
   					<div class="dropdown-menu">
 							<download-excel 

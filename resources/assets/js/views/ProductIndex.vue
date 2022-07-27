@@ -1,4 +1,3 @@
-
 <template v-if="userHasPermissionTo('view-product-index')">
 
 	<div class="pcoded-content">

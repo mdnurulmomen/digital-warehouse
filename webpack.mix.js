@@ -16,7 +16,8 @@ mix.js('resources/assets/js/admin.js', 'public/js')
     .js('resources/assets/js/owner.js', 'public/js')
     .js('resources/assets/js/warehouse.js', 'public/js')
     .js('resources/assets/js/manager.js', 'public/js')
-    .js('resources/assets/js/website.js', 'public/js');
+    .js('resources/assets/js/website.js', 'public/js')
+    .sass('resources/assets/sass/cms.scss', 'public/js');
 
 if (mix.inProduction()) {
     // will automatically append a unique hash to the filenames

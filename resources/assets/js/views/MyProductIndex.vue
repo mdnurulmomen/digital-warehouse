@@ -1,18 +1,17 @@
 
 <template>
-
 	<div class="pcoded-content">
-
 		<breadcrumb 
 			:icon="'products'"
 			:title="'products'" 
-			:message="'All our products'"
+			:message="'All your products'"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
 			<div class="main-body">
 				<div class="page-wrapper">	
 					<div class="page-body">
+						<!-- <loading v-show="loading"></loading> -->
 
 						<alert v-show="error" :error="error"></alert>
 				
@@ -20,23 +19,101 @@
 							<div class="col-sm-12">
 							  	<div class="card">
 									<div class="card-block">
-										<div class="row">	
-											<my-product-search-export-option
-										  		:search-attributes="searchAttributes" 
-										  		:caller-page="'my-products'" 
-										  		:data-to-export="dataToExport" 
-										  		:contents-to-download="productsToShow" 
-										  		:pagination="pagination" 
-										  		:current-tab="currentTab"
-										  		
-										  		@searchData="pagination.current_page = 1; searchData($event)" 
-										  		@fetchAllContents="pagination.current_page = 1; fetchAllProducts()"
-											/>
+										<div class="row">
+											<div class="col-sm-12 sub-title">
+												<!-- 
+												<div class="row form-group">
+											  		<div class="col-sm-6 d-flex align-items-center form-group">
+											  			<div class="mr-2">
+											  				<span>
+													  			{{ 
+													  				( searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Products List' : 'Products List'
+													  			}}
+											  				</span>
+											  			</div>
+
+											  			<div class="ml-auto ml-sm-0">
+											  				<div class="dropdown">
+										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
+											  					
+											  					<div class="dropdown-menu">
+										  							<download-excel 
+														  				class="btn btn-grd-default p-1 dropdown-item active"
+																		:data="productsToShow"
+																		:fields="dataToExport" 
+																		:worksheet="merchant.user_name + '-products-sheet'"
+																		:name="merchant.user_name + '-' + ((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-products-' : (currentTab + '-products-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
+														  			>
+														  				Excel
+																	</download-excel>
+											  					</div>
+											  				</div>
+											  			</div>
+											  		</div>
+
+											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
+											  			<div class="ml-sm-auto mr-3">
+										  					<input 	
+																type="text" 
+														  		class="form-control" 
+														  		pattern="[^'!#$%^()\x22]+" 
+														  		v-model="searchAttributes.search" 
+														  		placeholder="Search Products"
+													  		>
+
+													  		<div class="invalid-feedback">
+														  		Please search with releavant input
+														  	</div>
+											  			</div>
+
+														<div class="ml-auto ml-sm-0">
+															
+															<ul class="nav nav-pills">
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-1"
+																		@click="setTodayDate()" 
+																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
+																	>
+																		Today
+																	</a>
+																</li>
+
+																<li class="nav-item">
+																	<a 
+																		href="javascript:void(0)"
+																		class="nav-link p-0" 
+																		data-toggle="modal" 
+																		data-target="#product-custom-search"
+																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
+																	>
+																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
+																	</a>
+																</li>
+															</ul>
+													  	</div>
+													</div>
+											  	</div> 
+											  	-->
+
+											  	<my-product-search-export-option
+											  		:search-attributes="searchAttributes" 
+											  		:caller-page="'my-products'" 
+											  		:data-to-export="dataToExport" 
+											  		:contents-to-download="productsToShow" 
+											  		:pagination="pagination" 
+											  		:current-tab="currentTab"
+											  		
+											  		@searchData="pagination.current_page = 1; searchData($event)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllProducts()"
+												/>
+											</div>
 											
 											<div class="col-sm-12 col-lg-12">
 												<loading v-show="loading"></loading>
 
-										  		<tab 
+												<tab 
 										  			v-show="searchAttributes.search === '' && ! searchAttributes.dateFrom && ! searchAttributes.dateTo && ! loading" 
 										  			:tab-names="['retail', 'bulk']" 
 										  			:current-tab="'retail'" 
@@ -79,6 +156,15 @@
 																				@click="showContentDetails(content)"
 																			>
 																				<i class="fa fa-eye"></i>
+																			</button>
+
+																			<button 
+																				type="button" 
+																				class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
+																				v-tooltip.bottom-end="'Stocks'"  
+																				@click="goProductStore(content)" 
+																			>
+																				<img src="/icons/cms/stocks.png" style="width: 17px">
 																			</button>
 																		</td>
 																    
@@ -146,290 +232,19 @@
 								</div>
 							</div>
 						</div>
-					</div> 
+					</div>
 				</div>
 			</div>
 		</div>
 
- 		<!-- View Modal -->
-		<div class="modal fade" id="product-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+ 		<!--Create Or Edit Modal -->
+		<!-- 
+		<div class="modal fade" id="product-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-product') || userHasPermissionTo('update-merchant-product')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">{{ singleProductData.name | capitalize }} Details</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-
-					<div class="modal-body">
-						<div class="card">
-							<div class="card-body">
-										
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Type :
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.category ? singleProductData.category.name : 'Bulk Products'  | capitalize}}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Merchant :
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.merchant ? singleProductData.merchant.user_name : 'None' | capitalize }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Name :
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.name | capitalize }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Description :
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										<span v-html="singleProductData.description"></span>
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										SKU Code :
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.sku }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Price :
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.selling_price || 'NA' }}
-										{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-									</label>
-								</div>
-
-								<!-- 
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Primary Qty
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.initial_quantity + ' ' + singleProductData.quantity_type }} 
-									</label>
-								</div>
- 								-->
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Available Qty:
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.available_quantity + ' ' + singleProductData.quantity_type }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Dispatched Qty:
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.dispatched_quantity + ' ' + singleProductData.quantity_type }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Requested Qty:
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										{{ singleProductData.requested_quantity + ' ' + singleProductData.quantity_type }}
-									</label>
-								</div>
-
-								<div class="form-row" v-show="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Available Serials:
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										<span 
-											v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
-										>
-											<span v-for="(productSerial, productIndex) in singleProductData.serials">
-												{{ productSerial }}
-												<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span> 
-											</span>	
-										</span>
-									</label>
-								</div>
-
-								<div class="form-row" v-show="singleProductData.has_serials && singleProductData.hasOwnProperty('dispatched_serials') && singleProductData.dispatched_serials.length">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Dispatched Serials:
-									</label>
-									<label class="col-sm-6 col-form-label text-left">
-										<span 
-											v-if="singleProductData.has_serials && singleProductData.hasOwnProperty('dispatched_serials') && singleProductData.dispatched_serials.length"
-										>
-											<span v-for="(dispatchedProductSerial, dispatchedProductIndex) in singleProductData.dispatched_serials">
-												{{ dispatchedProductSerial }}
-												<span v-show="(dispatchedProductIndex + 1) < singleProductData.dispatched_serials.length">, </span> 
-											</span>	
-										</span>
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">Has Variation :</label>
-									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[(singleProductData.has_variations && singleProductData.variations.length) ? 'badge-success' : 'badge-danger', 'badge']">{{ (singleProductData.has_variations && singleProductData.variations.length) ? 'Available' : 'NA' }}</span>
-									</label>
-								</div>
-
-								<div 
-									class="form-row" 
-									v-if="singleProductData.has_variations && singleProductData.variations.length"
-								>
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Variations :
-									</label>
-									<div class="col-sm-12">
-										<div class="form-row">
-											
-											<div 
-												class="col-md-6 ml-auto" 
-												v-for="(productVariation, variationIndex) in singleProductData.variations" 
-												:key="'product-variation-' + variationIndex"
-											>
-												<div class="card">
-													<div class="card-body">
-														
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																Name :
-															</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.variation ? productVariation.variation.name : 'NA' | capitalize }}
-															</label>
-														</div>
-
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																SKU :
-															</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.sku }}
-															</label>
-														</div>
-
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">Price :</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.selling_price }}
-																{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-															</label>
-														</div>
-
-														<!-- 
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">Primary Qty :</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.initial_quantity + ' ' + singleProductData.quantity_type }}
-															</label>
-														</div>
- 														-->
-
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">Available Qty :</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.available_quantity + ' ' + singleProductData.quantity_type }}
-															</label>
-														</div>
-
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">Dispatched Qty :</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.dispatched_quantity + ' ' + singleProductData.quantity_type }}
-															</label>
-														</div>
-
-														<div class="form-row">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">Requested Qty :</label>
-															<label class="col-sm-6 col-form-label text-left">
-																{{ productVariation.requested_quantity + ' ' + singleProductData.quantity_type }}
-															</label>
-														</div>
-
-														<div class="form-row" v-show="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																Available Serials :
-															</label>
-															<label class="col-sm-6 col-form-label text-left">
-																<span 
-																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('serials') && productVariation.serials.length"
-																>
-																	<span v-for="(productVariationSerial, productVariationIndex) in productVariation.serials">
-																		{{ productVariationSerial }}
-																		<span v-show="(productVariationIndex + 1) < productVariation.serials.length">, </span> 
-																	</span>	
-																</span>
-															</label>
-														</div>
-
-														<div class="form-row" v-show="singleProductData.has_serials && productVariation.hasOwnProperty('dispatched_serials') && productVariation.dispatched_serials.length">
-															<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																Dispatched Serials :
-															</label>
-															<label class="col-sm-6 col-form-label text-left">
-																<span 
-																	v-if="singleProductData.has_serials && productVariation.hasOwnProperty('dispatched_serials') && productVariation.dispatched_serials.length"
-																>
-																	<span v-for="(dispatchedProductVariationSerial, dispatchedProductVariationIndex) in productVariation.dispatched_serials">
-																		{{ dispatchedProductVariationSerial }}
-																		<span v-show="(dispatchedProductVariationIndex + 1) < productVariation.dispatched_serials.length">, </span> 
-																	</span>	
-																</span>
-															</label>
-														</div>
-													</div>
-												</div>
-											</div>
-
-										</div>
-									</div>
-								</div>								
-							
-							</div>
-						</div>
-					</div>
-
-					<div class="modal-footer">
-						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-block" data-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Create Request Modal -->
-		<!-- 
-		<div class="modal fade" id="request-createOrEdit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
 						<h5 class="modal-title">
-							Make New Request
+							{{ merchantFullName | capitalize }} {{ createMode ? ' New ' : ' Update ' | capitalize }} Product
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -438,59 +253,191 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="submitRequest" 
+						v-on:submit.prevent="createMode ? storeMerchantProduct() : updateMerchantProduct()" 
 						autocomplete="off" 
+						novalidate="true" 
 					>
-
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
+							<div class="form-row">
+								<div class="form-group col-sm-12">
+					        		<label for="inputUsername">Selected Merchant</label>
+						        	<multiselect 
+                              			v-model="merchant" 
+                              			class="form-control p-0 is-valid" 
+                              			placeholder="Product Name" 
+                                  		:custom-label="objectNameWithCapitalized" 
+                                  		:options="[]" 
+                                  		:allow-empty="false" 
+                                  		:disabled="true" 
+                              		>
+                                	</multiselect>
+					        	</div>
+							</div>
+
+					        <div class="form-row">
+					        	<div class="form-group col-md-6">
+									<label for="inputUsername">Product Name</label>
+									<multiselect 
+                              			v-model="singleProductData.product"
+                              			placeholder="Merchant Product" 
+                                  		label="user_name" 
+                                  		track-by="id" 
+                                  		:custom-label="objectNameWithCapitalized" 
+                                  		:options="allProducts" 
+                                  		:required="true" 
+                                  		:allow-empty="false"
+                                  		selectLabel = "Press/Click"
+                                  		deselect-label="Can't remove single value" 
+                                  		class="form-control p-0" 
+                                  		:class="! errors.merchant_product_id  ? 'is-valid' : 'is-invalid'"
+                                  		@close="validateFormInput('merchant_product_id')" 
+                                  		@input="setMerchantProduct"
+                              		>
+                                	</multiselect>
+
+                                	<div class="invalid-feedback">
+								    	{{ errors.merchant_product_id }}
+								    </div>
+								</div>
+
+								<div class="form-group col-md-6">
+									<label for="inputUsername">Manufacturer/Brand Name</label>
+
+									<multiselect 
+                              			v-model="singleProductData.manufacturer"
+                              			placeholder="Manufacturer" 
+                                  		label="name" 
+                                  		track-by="id" 
+                                  		:custom-label="objectNameWithCapitalized" 
+                                  		:options="allManufacturers" 
+                                  		selectLabel = "Press/Click"
+                                  		deselect-label="Press/Click To Remove" 
+                                  		class="form-control p-0 is-valid" 
+                                  		@input="setProductManufacturer"
+                              		>
+                                	</multiselect>
+								</div>
+					        </div>
 
 							<div class="form-row">
-								<div class="form-group col-md-12">
-									<label for="inputUsername">Request for</label>
-									<multiselect 
-	                          			v-model="singleRequestData.requested_product"
-	                          			placeholder="Product Name" 
-	                              		label="name" 
-	                              		track-by="id" 
-	                              		:custom-label="objectNameWithCapitalized" 
-	                              		:options="totalProducts" 
-	                              		:required="true" 
-	                              		:allow-empty="false"
-	                              		selectLabel = "Press/Click"
-	                              		deselect-label="Can't remove single value" 
-	                              		:class="!errors.request.requested_product  ? 'is-valid' : 'is-invalid'"
-	                              		@close="validateFormInput('requested_product')" 
-	                              		@input="setRequestedProduct"
-	                          		>
-	                            	</multiselect>
+								<div class="form-group col-md-6">
+									<label for="inputFirstName">Product SKU (max:15)</label>
+									<input type="text" 
+										class="form-control" 
+										v-model="singleProductData.sku" 
+										placeholder="SKU should be unique" 
+										:class="!errors.product_sku ? 'is-valid' : 'is-invalid'" 
+										@change="validateFormInput('product_sku')" 
+										required="true" 
+										maxlength="15" 
+									>
 
-	                            	<div 
-	                                	class="invalid-feedback" 
-	                                	style="display: block;" 
-	                                	v-show="errors.request.requested_product"
-	                            	>
-								    	{{ errors.request.requested_product }}
-								    </div>
+									<div class="invalid-feedback">
+							        	{{ errors.product_sku }}
+							  		</div>
+								</div>
+
+								<div class="form-group col-md-6">
+									<label for="inputFirstName">Selling Price (unit)</label>
+
+									<div class="input-group mb-0">
+										<input type="number" 
+											class="form-control" 
+											v-model.number="singleProductData.selling_price" 
+											placeholder="Product Selling Price" 
+											:class="!errors.product_price ? 'is-valid' : 'is-invalid'" 
+											@change="validateFormInput('product_price')" 
+											:disabled="singleProductData.hasOwnProperty('product') && singleProductData.product.product_category_id ? false : true"
+										>
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</span>
+										</div>
+									</div>
+
+									<div 
+										class="invalid-feedback" 
+										style="display: block;" 
+										v-show="errors.product_price" 
+									>
+							        	{{ errors.product_price }}
+							  		</div>
 								</div>
 							</div>
 
 							<div class="form-row">
-								<div class="form-group col-md-12">
-									<label for="inputFirstName">Subject</label>
-									<input type="text" 
-										class="form-control" 
-										v-model="singleRequestData.subject" 
-										placeholder="A suitable subject" 
-										:class="!errors.request.request_subject  ? 'is-valid' : 'is-invalid'" 
-										@change="validateFormInput('request_subject')" 
-										required="true" 
-									>
+								<div class="form-group col-md-6">
+									<label for="inputFirstName">Discount</label>
 
-									<div class="invalid-feedback">
-							        	{{ errors.request.request_subject }}
+									<div class="input-group mb-0">
+									    <input 
+									    	type="number" 
+									    	class="form-control" 
+											v-model.number="singleProductData.discount" 
+											placeholder="Product Discount" 
+											:class="!errors.discount ? 'is-valid' : 'is-invalid'" 
+											@change="validateFormInput('discount')" 
+											:disabled="singleProductData.hasOwnProperty('product') && singleProductData.product.product_category_id ? false : true"
+									    >
+									    <div class="input-group-append">
+									      	<span class="input-group-text">%</span>
+									    </div>
+									</div>
+
+									<div 
+										class="invalid-feedback" 
+										style="display: block;" 
+										v-show="errors.discount"
+									>
+							        	{{ errors.discount }}
 							  		</div>
+								</div>
+
+								<div class="form-group col-md-6">
+									<label for="inputFirstName">Warning Qty</label>
+									<input type="number" 
+										class="form-control is-valid" 
+										v-model.number="singleProductData.warning_quantity" 
+										placeholder="Product Warning Qty" 
+									>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="col-md-12">
+									<div class="card">
+								    	<div class="card-body">
+								    		<div class="form-row d-flex align-items-center text-center">
+												<div class="form-group col-md-6">
+													<img 
+														width="100px" 
+														class="img-fluid" 
+														ref="merchantProductPreview" 
+														:src="showPreview(singleProductData.preview)"
+														alt="Product Preview" 
+													>
+												</div>
+												
+												<div class="form-group col-md-6">
+													<div class="custom-file">
+													    <input type="file" 
+													    	class="form-control custom-file-input" 
+															:class="! errors.preview  ? 'is-valid' : 'is-invalid'" 
+												    	 	@change="onProductPreviewChange" 
+												    	 	accept="image/*"
+													    >
+													    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+													    <div class="invalid-feedback">
+													    	{{ errors.preview }}
+													    </div>
+												  	</div>
+												</div>
+											</div>
+								    	</div>
+								  	</div>
 								</div>
 							</div>
 
@@ -500,43 +447,1187 @@
 									<ckeditor 
 		                              	class="form-control" 
 		                              	:editor="editor" 
-		                              	v-model="singleRequestData.description"
+		                              	v-model="singleProductData.description" 
+		                              	@input="validateFormInput('description')"
 		                            >
 	                              	</ckeditor>
+
+	                              	<div 
+	                              		class="invalid-feedback" 
+	                              		style="display: block;" 
+	                              		v-show="errors.description"
+	                              	>
+								    	{{ errors.description }}
+								    </div>
 								</div>
 							</div>
 
-						</div>
-						<div class="modal-footer flex-column">
-							<div class="col-sm-12 text-right" v-show="!submitForm">
-								<span class="text-danger small">
-							  		Please input required fields
-							  	</span>
+							<div class="form-control form-group" v-if="singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials">
+								<div class="form-row mt-2">
+									<div class="col-md-12 text-center">
+										<toggle-button 
+											v-model="singleProductData.product.has_serials" 
+											:width=200 
+											:sync="true"
+											:color="{checked: 'orange', unchecked: 'green'}"
+											:labels="{checked: 'Has Serial', unchecked: 'No Serial'}" 
+											:disabled="true" 
+										/>
+									</div>
+								</div>
 							</div>
-							<div class="col-sm-12">
-								<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
-									Close
-								</button>
-								<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="!submitForm">
-									Save
-								</button>
-							</div>
-						</div>
 
+							<div class="form-control form-group" v-if="singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations">
+								<div class="form-row mt-3">
+									<div class="form-group col-md-12 text-center">
+										<toggle-button 
+											v-model="singleProductData.product.has_variations" 
+											:width=200 
+											:sync="true"
+											:color="{checked: 'green', unchecked: 'blue'}"
+											:labels="{checked: 'Has Variation', unchecked: 'No Variation'}" 
+											:disabled="true" 
+										/>
+									</div>
+								</div>
+								
+								<div class="form-row">
+									<div class="form-group col-md-3">
+										<label for="inputFirstName">Variation Type</label>
+										<multiselect 
+	                              			v-model="singleProductData.product.variation_type"
+	                              			placeholder="Choose Type" 
+	                                  		label="name" 
+	                                  		track-by="id" 
+	                                  		:custom-label="objectNameWithCapitalized" 
+	                                  		:options="[]" 
+	                                  		:required="true" 
+	                                  		:allow-empty="false"
+	                                  		class="form-control p-0 is-valid" 
+	                                  		:disabled="true"
+	                              		>
+	                                	</multiselect>
+									</div>
+
+									<div class="form-group col-md-9" v-if="singleProductData.hasOwnProperty('variations') && errors.hasOwnProperty('variations') && singleProductData.variations.length == errors.variations.length">
+										<div 
+											class="card" 
+											v-for="(merchantProductVariation, index) in singleProductData.variations" 
+											:key="'creating-or-deleting-merchant-product-variation-index-' + index + '-merchant-product-variation-' + merchantProductVariation.id"
+										>
+											<div class="card-body">
+												<div 
+													class="form-row" 
+													v-if="singleProductData.variations.length == errors.variations.length"
+												>	
+													<div class="form-group col-md-12">
+														<label for="inputFirstName">Variaiton</label>
+
+														<multiselect 
+					                              			v-model="merchantProductVariation.variation"
+					                              			placeholder="Select Variation" 
+					                                  		label="name" 
+					                                  		track-by="id" 
+					                                  		:custom-label="objectNameWithCapitalized" 
+					                                  		:options="allVariations" 
+					                                  		:disabled="singleProductData.variations[index].variation_immutability" 
+					                                  		class="form-control p-0" 
+					                                  		:class="! errors.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
+					                                  		:required="true" 
+			                                  				:allow-empty="false"
+					                                  		@close="validateFormInput('product_variation_id')" 
+					                              		>
+					                                	</multiselect>
+
+					                                	<div class="invalid-feedback">
+													    	{{ errors.variations[index].product_variation_id }}
+													    </div>
+													</div> 
+													
+													<div class="form-group col-md-12">
+														<div class="form-row">
+															<div class="form-group col-md-6">
+																<label for="inputFirstName">Selling Price (unit)</label>
+
+																<div class="input-group mb-0">
+																	<input type="number" 
+																		class="form-control" 
+																		v-model.number="merchantProductVariation.selling_price" 
+																		placeholder="Variation Selling Price" 
+																		:class="!errors.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
+																		@change="validateFormInput('product_variation_price')" 
+																		required="true" 
+																	>
+																	<div class="input-group-append">
+																		<span class="input-group-text" id="basic-addon2">
+																			{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																		</span>
+																	</div>
+																</div>
+
+																<div 
+																	class="invalid-feedback" 
+																	style="display: block;"
+																	v-show="errors.variations[index].product_variation_price" 
+																>
+														        	{{ errors.variations[index].product_variation_price }}
+														  		</div>	
+															</div>
+
+															<div class="form-group col-md-6">
+																<label for="inputFirstName">SKU (max:15)</label>
+														
+																<input type="text" 
+																	class="form-control is-valid" 
+																	v-model="merchantProductVariation.sku" 
+																	placeholder="Variation Unique SKU" 
+																	maxlength="15" 
+																>
+															</div>
+														</div>
+													</div>
+
+													<div class="form-group col-md-12">
+														<div class="form-row text-center d-flex">
+															<div class="col-md-6 form-group">
+																<img 
+																	width="100px" 
+																	class="img-fluid" 
+																	:src="showPreview(merchantProductVariation.preview)"
+																	alt="Variation Preview" 
+																	:ref="'merchantProductVariationPreview-' + index" 
+																>
+															</div>
+															<div class="col-md-6 form-group align-self-center">
+																<div class="custom-file">
+																    <input type="file" 
+																    	class="form-control custom-file-input" 
+																		:class="!errors.variations[index].preview  ? 'is-valid' : 'is-invalid'" 
+															    	 	@change="onVariationPreviewChange($event, index)" 
+															    	 	accept="image/*"
+																    >
+																    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
+																    <div class="invalid-feedback">
+																    	{{ errors.variations[index].preview }}
+																    </div>
+															  	</div>
+															</div>
+														</div>
+													</div>							
+												</div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hot-grd btn-primary btn-outline-primary btn-sm btn-block" 
+													v-tooltip.bottom-end="'Add Variation'" 
+													:disabled="singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations && singleProductData.product.variations && singleProductData.variations.length >= singleProductData.product.variations.length" 
+													@click="addMoreVariation()"
+												>
+													Add Variation
+												</button>
+											</div>
+
+											<div class="form-group col-md-6">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-light hot-grd btn-info btn-outline-info btn-sm btn-block" 
+													v-tooltip.bottom-end="'Remove Variation'" 
+													:disabled="singleProductData.variations[singleProductData.variations.length-1].variation_immutability || singleProductData.variations.length < 2"
+													@click="removeVariation()"
+												>
+													Remove Variation
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-row card-footer">
+								<div class="col-sm-12 text-right" v-show="! submitForm">
+									<span class="text-danger small mb-1">
+								  		Please input required fields
+								  	</span>
+								</div>
+
+								<div class="col-sm-12">
+				                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
+				                  		Close
+				                  	</button>
+									<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
+										{{ createMode ? 'Save' : 'Update' }}
+									</button>
+								</div>
+							</div>
+						</div>
 					</form>
 				</div>
 			</div>
 		</div> 
 		-->
+		<!-- End Create Or Edit Modal -->
 
+ 		<!-- View Modal -->
+		<div class="modal fade" id="merchant-product-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">{{ singleProductData.hasOwnProperty('product') ? singleProductData.product.name : 'NA' | capitalize }} Details</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
+					<div class="modal-body">
+						<div class="card">
+							<div class="card-body">
+								<ul 
+									class="nav nav-tabs tabs justify-content-center" role="tablist" 
+									v-show="singleProductData.has_serials"
+								>
+									<li class="nav-item">
+										<a class="nav-link active" data-toggle="tab" href="#merchant-product-profile" role="tab">
+											Profile
+										</a>
+									</li>
+
+									<li class="nav-item" v-show="singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials">
+										<a class="nav-link" data-toggle="tab" href="#product-serial" role="tab">
+											Serials
+										</a>
+									</li>
+								</ul>
+
+								<div :class="singleProductData.has_serials ? 'tab-content tabs' : ''" class="card-block">
+									<div class="tab-pane active" id="merchant-product-profile" role="tabpanel">
+										<div class="form-row d-flex">
+											<div class="col-md-4 align-self-center text-center">
+												<img 
+													width="100px" 
+													:src="'/' + singleProductData.preview" 
+													class="img-fluid" 
+													alt="Product Preview" 
+												>
+											</div>
+
+											<div class="col-md-8">
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Merchant :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ merchant.user_name || 'Merchant' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Manufacturer/Brand Name :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.manufacturer ? singleProductData.manufacturer.name : 'own product' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row" v-show="singleProductData.sku">
+													<label class="col-4 col-form-label font-weight-bold">
+														Product SKU :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.sku }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Description :
+													</label>
+													<label class="col-8 col-form-label">
+														<span v-html="singleProductData.description"></span>
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Warning Qty :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.warning_quantity }}
+														{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Starting Qty :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.previous_quantity }}
+														{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Stocked Qty :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ (singleProductData.available_quantity + singleProductData.dispatched_quantity) }}
+														{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Dispatched Qty :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.dispatched_quantity }}
+														{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Pending Requested Qty :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.requested_quantity }}
+														{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Available Qty :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ (singleProductData.available_quantity + singleProductData.previous_quantity) }}
+														{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Unit Max Price :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.unit_max_price }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Unit Min Price :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.unit_min_price }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Unit Avg Price :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.unit_avg_price }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Stock Total Cost :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.stock_total_cost }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div 
+													class="form-row"
+													v-show="singleProductData.hasOwnProperty('product') && ! singleProductData.product.has_variations"
+												>
+													<label class="col-4 col-form-label font-weight-bold">
+														Selling Price (unit) :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.selling_price }} 
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div 
+													class="form-row"
+													v-show="singleProductData.hasOwnProperty('product') && ! singleProductData.product.has_variations"
+												>
+													<label class="col-4 col-form-label font-weight-bold">
+														Discount :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.discount || 0 }} %
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">Serials :</label>
+													<label class="col-sm-6 form-control-plaintext">
+														<span :class="[singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials ? 'Available' : 'NA' }}</span>
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">Variation :</label>
+													<label class="col-sm-6 form-control-plaintext">
+														<span :class="[singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations ? 'Available' : 'NA' }}</span>
+													</label>
+												</div>
+
+												<div class="form-row">
+													<label class="col-4 col-form-label font-weight-bold">
+														Created on :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleProductData.created_at }}
+													</label>
+												</div>
+
+												<div class="form-row" v-if="singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations && singleProductData.hasOwnProperty('variations') && singleProductData.variations.length">
+													<label class="col-4 col-form-label font-weight-bold">
+														Variations :
+													</label>
+													<div class="col-sm-12">
+														<div class="form-row">
+															<div 
+																class="col-md-6 ml-auto" 
+																v-for="(merchantProductVariation, merchantProductVariationIndex) in singleProductData.variations" 
+																:key="'viewing-merchant-product-variation-index-' + merchantProductVariationIndex + '-viewing-variation-' + merchantProductVariation.id"
+															>
+																<div class="card">
+																	<div class="card-body">
+																		<div class="form-row">
+																			<div class="col-sm-12 text-center">
+																				<img 
+																					class="img-fluid" 
+																					:src="'/' + merchantProductVariation.preview || ''"
+																					:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
+																					width="100px"
+																				>
+
+																				<p>
+																					{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+																				</p>
+																			</div>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Variation :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				SKU :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.sku }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Selling Price (unit) :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.selling_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Available Qty :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Unit Max Price :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.unit_max_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Unit Min Price :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.unit_min_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Unit Avg Price :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.unit_avg_price }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Variation-Stock Total Cost :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.stock_total_cost }}
+																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="tab-pane" id="product-serial" role="tabpanel" v-show="singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials">
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												{{ (searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Stocked' : 'Available' }} Serials :
+											</label>
+											<div class="col-8 col-form-label">
+												<ol 
+													v-if="singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
+												>
+													<li v-for="(productSerial, productIndex) in singleProductData.serials">
+														{{ productSerial.serial_no }}
+
+														<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+															{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+														</span>
+
+														<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span> 
+													</li>	
+												</ol>
+												
+												<div class="form-row" v-if="singleProductData.hasOwnProperty('variations') && singleProductData.variations.length">
+													<div 
+														class="col-md-12" 
+														v-for="(merchantProductVariation, variationIndex) in singleProductData.variations" 
+														:key="'viewing-merchant-product-variation-index-' + variationIndex + '-viewing-variation-' + merchantProductVariation.id"
+													>
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }} |
+															</label>
+
+															<label class="col-form-label text-left">
+																{{ merchantProductVariation.stock_quantity }}
+																<ol 
+																	v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
+																>
+																	<li v-for="(variationSerial, variationIndex) in merchantProductVariation.serials">
+																		{{ variationSerial.serial_no }}
+
+																		<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+																			{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+																		</span>
+
+																		<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span> 
+																	</li>	
+																</ol>
+															</label>
+														</div>
+														
+														<!-- 
+														<div class="form-row">
+															<label class="col-form-label font-weight-bold text-right">
+																Available Qty :
+															</label>
+															<label class="col-form-label text-left">
+																{{ merchantProductVariation.available_quantity }}
+															</label>
+														</div>
+														-->
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+						<button 
+							type="button" 
+							class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
+							v-tooltip.bottom-end="'Print'"  
+							@click="print"
+						>
+							Print
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Printing Section -->
+		<div id="sectionToPrint" class="d-none">
+			<div class="card">
+				<div class="card-header">
+					<div class="form-row d-flex">
+						<div class="col-6">
+							<img 
+								width="60px" 
+								class="img-fluid" 
+								:src="'/' + general_settings.logo" 
+								:alt="general_settings.app_name + ' Logo'"
+							>
+							
+							<h5>
+								Merchant Product Details
+							</h5>
+						</div>
+
+						<div class="col-6 align-self-center" v-show="singleProductData.sku">
+							<qr-code 
+							:text="singleProductData.sku || ''"
+							:size="50" 
+							class="float-right"
+							></qr-code>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card card-body form-group">
+				<h5 class="card-title">{{ singleProductData.product ? singleProductData.product.name : 'Product' | capitalize }}</h5>
+				
+				<h6 class="card-subtitle mb-2 text-muted">
+					{{ singleProductData.manufacturer ? singleProductData.manufacturer.name : 'own product' | capitalize }}
+				</h6>
+
+				<div class="card-text">
+					<div class="form-row">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Merchant :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ merchant.user_name || 'Merchant' | capitalize }}
+								</label>
+							</div>
+
+							<!-- 
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Manufacturer/Brand Name :
+								</label>
+								<label class="col-8 col-form-label">
+									
+								</label>
+							</div> 
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Product SKU :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.sku }}
+								</label>
+							</div>
+							-->
+
+							<div 
+								class="form-row"
+								v-show="singleProductData.hasOwnProperty('product') && ! singleProductData.product.has_variations"
+							>
+								<label class="col-4 col-form-label font-weight-bold">
+									Selling Price (unit) :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.selling_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div 
+								class="form-row"
+								v-show="singleProductData.hasOwnProperty('product') && ! singleProductData.product.has_variations"
+							>
+								<label class="col-4 col-form-label font-weight-bold">
+									Discount :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.discount || 0 }} %
+								</label>
+							</div>
+
+							<div class="form-row" v-show="singleProductData.description">
+								<label class="col-4 col-form-label font-weight-bold">
+									Description :
+								</label>
+								<label class="col-8 col-form-label">
+									<span v-html="singleProductData.description"></span>
+								</label>
+							</div>
+						</div>
+
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Warning Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.warning_quantity }}
+									{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">Serials :</label>
+								<label class="col-8 form-control-plaintext">
+									<span :class="[singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.hasOwnProperty('product') && singleProductData.product.has_serials ? 'Available' : 'NA' }}</span>
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">Variation :</label>
+								<label class="col-8 form-control-plaintext">
+									<span :class="[singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations ? 'Available' : 'NA' }}</span>
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Created on :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.created_at }}
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div 
+				class="card card-body form-group"
+				v-show="singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations && singleProductData.hasOwnProperty('variations') && singleProductData.variations.length"
+			>
+				<div class="form-row" v-if="singleProductData.hasOwnProperty('product') && singleProductData.product.has_variations && singleProductData.hasOwnProperty('variations') && singleProductData.variations.length">
+					<label class="col-4 col-form-label font-weight-bold">
+						Variations :
+					</label>
+					<div class="col-sm-12">
+						<div class="form-row">
+							<div 
+								class="col-6" 
+								v-for="(merchantProductVariation, merchantProductVariationIndex) in singleProductData.variations" 
+								:key="'printing-merchant-product-variation-index-' + merchantProductVariationIndex + '-printing-variation-' + merchantProductVariation.id"
+							>
+								<div class="card">
+									<div class="card-body">
+										<!-- 
+										<div class="form-row">
+											<div class="col-sm-12 text-center">
+												<img 
+													class="img-fluid" 
+													:src="'/' + merchantProductVariation.preview || ''"
+													:alt="merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' + 'Preview'" 
+													width="100px"
+												>
+
+												<p>
+													{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+												</p>
+											</div>
+										</div> 
+										-->
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Variation :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												SKU :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.sku }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Selling Price (unit) :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.selling_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Available Qty :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleProductData.product ? singleProductData.product.quantity_type : 'unit'  }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Unit Max Price :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.unit_max_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Unit Min Price :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.unit_min_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Unit Avg Price :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.unit_avg_price }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
+											<label class="col-4 col-form-label font-weight-bold">
+												Stock Total Cost :
+											</label>
+											<label class="col-8 col-form-label">
+												{{ merchantProductVariation.stock_total_cost }}
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card card-body" v-show="singleProductData.has_serials">
+				<h5 class="card-title">Available Serials</h5>
+
+				<ol 
+					class="form-row card-text"
+					v-if="singleProductData.hasOwnProperty('serials') && singleProductData.serials.length"
+				>
+					<li 
+						class="col-6 list-group-item"
+						v-for="(productSerial, productSerialIndex) in singleProductData.serials"
+					>
+						
+						{{ ((productSerialIndex + 1) + '. ' + productSerial.serial_no) }}
+
+						<span :class="[productSerial.has_dispatched ? 'badge badge-danger' : productSerial.has_requisitions ? 'badge badge-warning' : '']">
+							{{ productSerial.has_dispatched ? 'Dispatched' : productSerial.has_requisitions ? 'Requested' : '' }}
+						</span>
+															
+						<!-- 
+							<span v-show="(productIndex + 1) < singleProductData.serials.length">, </span>  
+						-->
+					</li>	
+				</ol>
+				
+				<div 
+					class="form-row" 
+					v-else-if="singleProductData.hasOwnProperty('variations') && singleProductData.variations.length"
+				>
+					<div 
+						class="col-md-12 card card-body" 
+						v-for="(merchantProductVariation, variationIndex) in singleProductData.variations" 
+						:key="'printing-product-variation-index-' + variationIndex + '-printing-variation-' + merchantProductVariation.id"
+					>
+						<h5 class="card-title">{{ merchantProductVariation.variation ? merchantProductVariation.variation.name : 'NA' | capitalize }}</h5>
+						
+						<h6 class="card-subtitle mb-2 text-muted">{{ merchantProductVariation.stock_quantity }}</h6>
+						
+						<div class="card-text">
+							<ol 
+								class="form-row"
+								v-if="merchantProductVariation.hasOwnProperty('serials') && merchantProductVariation.serials.length"
+							>
+								<li 
+									class="col-6 list-group-item"
+									v-for="(variationSerial, variationSerialIndex) in merchantProductVariation.serials"
+								>
+									{{ ((variationSerialIndex + 1) + '. ' + variationSerial.serial_no) }}
+
+									<span :class="[variationSerial.has_dispatched ? 'badge badge-danger' : variationSerial.has_requisitions ? 'badge badge-warning' : '']">
+										{{ variationSerial.has_dispatched ? 'Dispatched' : variationSerial.has_requisitions ? 'Requested' : '' }}
+									</span>
+
+									<!-- 
+										<span v-show="(variationIndex + 1) < merchantProductVariation.serials.length">, </span>  
+									-->
+								</li>	
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card card-body form-group">
+				<h5 class="card-title">Stocks</h5>
+				
+				<h6 class="card-subtitle mb-2 text-muted">
+					{{ searchAttributes.dateFrom ? searchAttributes.dateFrom : singleProductData.created_at }} -- {{ searchAttributes.dateTo ? searchAttributes.dateTo : currentTime }}
+				</h6>
+
+				<div class="card-text">
+					<div class="form-row">
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Starting Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.previous_quantity }}
+									{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Stocked Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ (singleProductData.available_quantity + singleProductData.dispatched_quantity) }}
+									{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Dispatched Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.dispatched_quantity }}
+									{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Pending Requested Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.requested_quantity }}
+									{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Available Qty :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ (singleProductData.available_quantity + singleProductData.previous_quantity) }}
+									{{ singleProductData.product ? singleProductData.product.quantity_type : 'unit' }}
+								</label>
+							</div>
+						</div>
+							
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Unit Max Price :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.unit_max_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Unit Min Price :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.unit_min_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Unit Avg Price :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.unit_avg_price }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-4 col-form-label font-weight-bold">
+									Stock Total Cost :
+								</label>
+								<label class="col-8 col-form-label">
+									{{ singleProductData.stock_total_cost }}
+									{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Printing Section -->
+
+		<!-- Filter Modal -->
+		<!-- 
+		<div class="modal fade" id="product-custom-search" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">Custom Search</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-row">
+							<div class="col-12 text-center">
+								<p>
+									Timelaps
+								</p>
+								 
+								<v-date-picker 
+									v-model="searchAttributes.dates" 
+									color="red" 
+									is-dark
+									is-range 
+									is-inline
+									:max-date="new Date()" 
+									:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }"
+									:attributes="[ { key: 'today', dot: true, dates: new Date() } ]" 
+									@input="setSearchingDates()"
+								/> 
+							</div>					
+						</div>
+					</div>
+					
+					<div class="modal-footer">
+						<button 
+							type="button" 
+							class="btn waves-effect waves-dark btn-primary btn-outline-primary" 
+							@click="resetSearchingDates()" 
+							v-tooltip.bottom-end="'Reset'"
+						>
+	                  		Reset
+	                  	</button>
+
+						<button type="button" class="btn waves-effect waves-dark btn-primary btn-outline-primary ml-auto" data-dismiss="modal">
+	                  		See Results
+	                  	</button>
+					</div>
+				</div>
+			</div>
+		</div> 
+		-->
+
+		<!-- 		
+		<delete-confirmation-modal 
+			v-if="userHasPermissionTo('delete-merchant-product')" 
+			:csrf="csrf" 
+			:submit-method-name="'deleteProductMerchant'" 
+			:content-to-delete="singleProductData"
+			:restoration-message="'Warning : You can not restore this item !'" 
+			
+			@deleteProductMerchant="deleteProductMerchant($event)" 
+		></delete-confirmation-modal> 
+		-->
+
+		<!-- Delete Modal -->
+		<div class="modal fade" id="delete-confirmation-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<form 
+						class="form-horizontal" 
+						v-on:submit.prevent="deleteProductMerchant" 
+						autocomplete="off"
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-header bg-danger">
+							<h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+
+						<div class="modal-body text-center">
+							<h4 class="text-danger">Want to delete '{{ singleProductData.hasOwnProperty('product') ? singleProductData.product.name : '' | capitalize }}' ?</h4>
+							<h6 class="sub-heading text-secondary">Warning : You can not restore this item !</h6>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary mr-auto" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary">Delete</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
-
 </template>
 
 <script type="text/javascript">
 
 	import axios from 'axios';
-	// import Multiselect from 'vue-multiselect';
+	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
@@ -549,23 +1640,26 @@
     	// available_quantity : null,
     	// quantity_type : null,
     	// has_variations : null,
-  		// variations : [
-		// 	{},
-		// ],
+    	
+    	// product : {},
+    	// variations : [],
+		
+		/*
+			addresses : [
+				{},
+			],
+		*/
+	
     	// product_category_id : null,
     	// merchant_id : null,
     	// category : {},
     	// merchant : {},
     };
 
-    let singleRequestData = {
-
-    };
-
 	export default {
 
 	    components: { 
-			// multiselect : Multiselect,
+			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
 		},
 
@@ -573,19 +1667,14 @@
 
 	        return {
 
+	        	// step : 1,
 	        	// query : '',
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
+
 	        	currentTab : 'retail',
 
-	        	submitForm : true,
-
-	        	// currentUser : {},
-
-	        	editor: ClassicEditor,
-
-	        	totalProducts : [],
 	        	productsToShow : [],
 	        	allFetchedProducts : [],
 
@@ -594,36 +1683,22 @@
 		      	},
 
 	        	singleProductData : singleProductData,
-	        	singleRequestData : singleRequestData,
-
-	        	errors : {
-					request : {
-
-					}
-				},
 
 				searchAttributes : {
 
 	        		dates : {},
 	        		search : '',
 		        	dateTo : null,
-		        	dateFrom : null,
-		        	
-		        	/*
-			        	showPendingRequisitions : false,
-			        	showCancelledRequisitions : false,
-			        	showDispatchedRequisitions : false,
-			        	showProduct : null,
-		        	*/
+		        	dateFrom : null
 
 	        	},
 
 				dataToExport: {
 
 					"Product": {
-						field: "name",
-						callback: (name) => {
-							return this.$options.filters.capitalize(name)
+						field: "product",
+						callback: (product) => {
+							return this.$options.filters.capitalize(product.name)
 						},
 					},
 					
@@ -641,7 +1716,7 @@
 
 					SKU: 'sku',
 
-					Price: 'selling_price',
+					// Price: 'selling_price',
 
 					"Discount": {
 						field: "discount",
@@ -655,16 +1730,64 @@
 						},
 					},
 
-					"Available Qty": 'available_quantity',
-
-					"Qty Type": {
+					'Starting Qty': {
 						callback: (object) => {
 							if (object) {
-								return object.quantity_type ?? 'Unit'
+								return object.previous_quantity
 							}
 							else{
-								return;
+								return 0;
 							}
+						},
+					},
+
+					
+					'Stocked Qty': {
+						callback: (object) => {
+							if (object) {
+								return (object.available_quantity + object.dispatched_quantity)
+							}
+							else{
+								return 0;
+							}
+						},
+					},
+
+					'Dispatched': 'dispatched_quantity',
+
+					'Pending Requests': 'requested_quantity',
+
+					// "Available Qty": 'available_quantity',
+					
+					'Available Qty': {
+						callback: (object) => {
+							if (object) {
+								return (object.previous_quantity + object.available_quantity)
+							}
+							else{
+								return 0;
+							}
+						},
+					},
+
+					"Qty Type": {
+						field: "product",
+						callback: (product) => {
+							return this.$options.filters.capitalize(product.quantity_type)
+						},
+					},
+
+					'Unit Max Price' : 'unit_max_price',
+
+					'Unit Min Price' : 'unit_min_price',
+
+					'Unit Avg Price' : 'unit_avg_price',
+
+					'Stock Total Cost' : 'stock_total_cost', 
+
+					'Currency' : {
+						callback: (object) => {
+							return this.general_settings ? this.general_settings.official_currency_name : 'BDT'
 						},
 					},
 
@@ -680,7 +1803,7 @@
 					
 									(objectVariation, variationIndex) => {
 
-										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + (objectVariation.available_quantity + ' ' + (object.product ? object.product.quantity_type : 'unit')) + "\n\n");
+										infosToReturn += ((variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n" + 'Available Qty: ' + ((objectVariation.available_quantity + objectVariation.previous_quantity) + ' ' + (object.product ? object.product.quantity_type : 'unit')) + ", \n" + 'Unit Max Price: ' + objectVariation.unit_max_price + ", \n" + 'Unit Min Price: ' + objectVariation.unit_min_price + ", \n" + 'Unit Avg Price: ' + objectVariation.unit_avg_price + ", \n"   + 'Variation-Stock Total Cost: ' + objectVariation.stock_total_cost + ' ' + this.general_settings.official_currency_name  + "\n\n");
 
 									}
 									
@@ -709,14 +1832,14 @@
 
 							if (object.has_serials && ! object.has_variations && object.serials.length) {
 
-								infosToReturn += `Serials:
-								`;
+								infosToReturn += (((this.searchAttributes.dateFrom || this.searchAttributes.dateTo) ? 'Stocked' : 'Available') + ` Serials:
+																`);
 
 								object.serials.forEach(
 			
-									(serial, serialIndex) => {
+									(objectSerial, objectSerialIndex) => {
 
-										infosToReturn +=  (serialIndex + 1) + ". " + serial  + "\n";					
+										infosToReturn +=  (objectSerialIndex + 1) + ". " + objectSerial.serial_no + (objectSerial.has_dispatched ? ' (Dispatched)' : '')  + "\n";					
 
 									}
 									
@@ -732,13 +1855,13 @@
 
 										if (object.has_serials && objectVariation.serials.length) {
 
-											infosToReturn += this.$options.filters.capitalize(objectVariation.variation.name) + " Serials:\n";
+											infosToReturn += ((this.$options.filters.capitalize(objectVariation.variation.name) + (this.searchAttributes.dateFrom || this.searchAttributes.dateTo) ? 'Stocked' : 'Available') + " Serials:\n");
 
 											objectVariation.serials.forEach(
 						
 												(variationSerial, variationSerialIndex) => {
 
-													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial + "\n";					
+													infosToReturn +=  (variationSerialIndex + 1) + ". " + variationSerial.serial_no + (variationSerial.has_dispatched ? ' (Dispatched)' : '') + "\n";					
 
 												}
 												
@@ -753,9 +1876,26 @@
 								);
 
 							}
+
+							else {
+
+								infosToReturn += "NA";	
+							
+							}
 							
 							return infosToReturn;
 
+						},
+					},
+
+					"Qty Type": {
+						callback: (object) => {
+							if (object) {
+								return object.product ? object.product.quantity_type : 'Unit'
+							}
+							else{
+								return;
+							}
 						},
 					},
 
@@ -767,13 +1907,31 @@
 					},
 					*/
 
-					'Total Dispatched': 'dispatched_quantity',
-
-					'Pending Requests': 'requested_quantity',
-
 					"Created": 'created_at',
 					
 				},
+
+				printingStyles : {
+				    
+				    // name: 'Test Name',
+				    
+				    specs: [
+				        'fullscreen=yes',
+				        // 'titlebar=yes',
+				        'scrollbars=yes'
+				    ],
+
+				    styles: [
+				    	"/css/bootstrap.min.css",
+				    ],
+
+				    timeout: 1000, // default timeout before the print window appears
+					autoClose: true, // if false, the window will not close after printing
+					windowTitle: 'Requisition Details' 
+
+				},
+
+				merchant : JSON.parse(window.localStorage.getItem('merchant')),
 
 				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
@@ -785,13 +1943,32 @@
 		
 		created(){
 
-			this.fetchAllProducts();
-			// this.getCurrentUser();
-		
+			this.fetchMyAllProducts();
+
+		},
+
+		computed: {
+
+			merchantFullName: function() {
+
+				return this.merchant ? (this.merchant.first_name + ' ' + this.merchant.last_name) : 'No Name';
+
+			},
+
+			currentTime: function() {
+
+				let date = new Date();
+				// return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+				return date.getFullYear() + '/' +  (date.getMonth() + 1) + '/' + date.getDate();
+
+			},
+
 		},
 
 		filters: {
+
 			capitalize: function (value) {
+
 				if (!value) return ''
 
 				const words = value.split(" ");
@@ -807,110 +1984,15 @@
 				}
 
 				return words.join(" ");
+
 			}
-		},
-
-		watch : {
-
-			'searchAttributes.search' : function(val){
-				
-				this.pagination.current_page = 1;
-
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllProducts();
-
-				}
-				else {
-
-					let format = /[`!@#$%^&*+\=\[\]{};':"\\|,.<>\/?~]/;
-
-					if (! format.test(val)) {
-
-						this.searchData();
-					
-					}
-
-				}
-
-			},
-			
-			'searchAttributes.dateFrom' : function(val){
-				
-				this.pagination.current_page = 1;
-
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllProducts();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
-
-			},
-
-			'searchAttributes.dateTo' : function(val){
-				
-				this.pagination.current_page = 1;
-
-				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
-
-					this.fetchAllProducts();
-
-				}
-				else {
-
-					this.searchData();
-						
-				}
-
-			},
 
 		},
 		
 		methods : {
-			
-		/*
-			getCurrentUser() {
 
-				axios
-					.get('/api/current-user/')
-					.then(response => {
-						if (response.status == 200) {
-							this.currentUser = response.data.user;
-							this.fetchAllProducts();
-						}
-					})
-					.catch(error => {
-						this.error = error.toString();
-						// Request made and server responded
-						if (error.response) {
-							console.log(error.response.data);
-							console.log(error.response.status);
-							console.log(error.response.headers);
-							console.log(error.response.data.errors[x]);
-						} 
-						// The request was made but no response was received
-						else if (error.request) {
-							console.log(error.request);
-						} 
-						// Something happened in setting up the request that triggered an Error
-						else {
-							console.log('Error', error.message);
-						}
+			fetchMyAllProducts() {
 
-					})
-					.finally(response => {
-						this.loading = false;
-					});
-
-			},
-		*/
-			fetchAllProducts() {
-				
 				// this.query = '';
 				this.error = '';
 				this.loading = true;
@@ -923,7 +2005,6 @@
 						if (response.status == 200) {
 							this.allFetchedProducts = response.data;
 							this.showSelectedTabProducts();
-							this.setTotalProducts();
 						}
 					})
 					.catch(error => {
@@ -950,46 +2031,16 @@
 					});
 
 			},
-    		showContentDetails(object) {		
+			showContentDetails(object) {		
 				this.singleProductData = { ...object };
 				// this.singleProductData = Object.assign({}, this.singleProductData, object);
-				$('#product-view-modal').modal('show');
+				$('#merchant-product-view-modal').modal('show');
 			},
-			/*
-				showRequestCreateForm() {
-					$('#request-createOrEdit-modal').modal('show');
-				},
-				submitRequest() {
+			searchData(emitedObject=false) {
 
-					if (!this.verifyUserInput()) {
-						this.submitForm = false;
-						return;
-					}
-
-					axios
-						.post('/requests/' + this.perPage, this.singleRequestData)
-						.then(response => {
-							if (response.status == 200) {
-								this.$toastr.s("New request has been stored", "Success");
-								// this.allFetchedProducts = response.data;
-								// this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
-								$('#request-createOrEdit-modal').modal('hide');
-							}
-						})
-						.catch(error => {
-							if (error.response.status == 422) {
-								for (var x in error.response.data.errors) {
-									this.$toastr.w(error.response.data.errors[x], "Warning");
-								}
-					      	}
-						})
-						.finally(response => {
-							this.fetchAllContainers();
-						});
-
-				},
-			*/
-			searchData() {
+				if (Object.keys(emitedObject).length) {
+					this.searchAttributes=emitedObject;
+				}
 
 				this.error = '';
 				this.allFetchedProducts = [];
@@ -1011,15 +2062,23 @@
 				
 				this.pagination.current_page = 1;
 
-				if (this.searchAttributes.search === '') {
-					this.fetchAllProducts();
+				if (this.searchAttributes.search === '' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
+					this.fetchMyAllProducts();
 				}
 				else {
 					this.searchData();
 				}
-				
+
     		},
-			showSelectedTabProducts() {
+    		showRetailContents() {
+				this.currentTab = 'retail';
+				this.showSelectedTabProducts();
+			},
+			showBulkContents() {
+				this.currentTab = 'bulk';
+				this.showSelectedTabProducts();
+			},
+    		showSelectedTabProducts() {
 				
 				if (this.currentTab=='retail') {
 					this.productsToShow = this.allFetchedProducts.retail ? this.allFetchedProducts.retail.data : [];
@@ -1031,77 +2090,80 @@
 				}
 
 			},
-			setTotalProducts() {
+			goProductRequisitions(object) {
 
-				this.totalProducts = [];
-				this.totalProducts = this.allFetchedProducts.retail.data.concat(this.allFetchedProducts.bulk.data)
+				// console.log(object);
+				this.$router.push({ name: 'product-requisitions', params: { productId: object.product ? object.product.id : null , merchantId: this.merchant.id, merchantProduct: object }});
 
 			},
-			showRetailContents() {
-				this.currentTab = 'retail';
-				this.showSelectedTabProducts();
-			},
-			showBulkContents() {
-				this.currentTab = 'bulk';
-				this.showSelectedTabProducts();
-			},
-		    setRequestedProduct() {
-		    	if (this.singleProductData.requested_product && Object.keys(this.singleProductData.requested_product).length > 0) {
-		    		this.singleProductData.requested_product_id = this.singleProductData.requested_product.id;
-		    	}
-		    },
-		    verifyUserInput() {
-				this.validateFormInput('requested_product');
-				this.validateFormInput('request_subject');
+			goProductStore(object) {
 
-				if (this.errors.request.constructor === Object && Object.keys(this.errors.request).length < 1) {
+				// console.log(object);
+				this.$router.push({ name: 'my-product-stocks', params: { productMerchant: object, product: object.product, merchantProductId: object.id }});
 
-					return true;
+			},
+			showPreview(imagePath = 'default') {
 				
+				if (imagePath != null && imagePath.startsWith('data:')) {
+					return imagePath;
+				}
+				else {
+					return '/' + imagePath;
 				}
 
-				return false;
+				// return '';
+
 			},
-			objectNameWithCapitalized ({ name }) {
-		      	if (name) {
-				    name = name.toString()
-				    return name.charAt(0).toUpperCase() + name.slice(1)
-		      	}
-		      	else 
-		      		return ''
-		    },
-		    validateFormInput (formInputName) {
+			resetSearchingDates(){
 
-				this.submitForm = false;
+            	this.searchAttributes.dates = {};
+				this.searchAttributes.dateTo = null;
+				this.searchAttributes.dateFrom = null;				
 
-				switch(formInputName) {
+            },
+            setSearchingDates(){
 
-					case 'requested_product' :
+            	if (Object.keys(this.searchAttributes.dates).length > 0 && this.searchAttributes.dates.hasOwnProperty('start') && this.searchAttributes.dates.hasOwnProperty('end')) {
 
-						if (!this.singleProductData.requested_product || Object.keys(this.singleProductData.requested_product).length == 0) {
-							this.errors.request.requested_product = 'Product is required';
-						}
-						else{
-							this.submitForm = true;
-							this.$delete(this.errors.request, 'requested_product');
-						}
-
-						break;
-
-					case 'request_subject' :
-
-						if (!this.singleProductData.request_subject || !this.singleProductData.request_subject.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.request.request_subject = 'No special character';
-						}
-						else{
-							this.submitForm = true;
-							this.$delete(this.errors.request, 'request_subject');
-						}
-
-						break;
+					this.searchAttributes.dateTo = this.searchAttributes.dates.end;
+					this.searchAttributes.dateFrom = this.searchAttributes.dates.start;
+						
 				}
-			}
+				else {
 
+					this.resetSearchingDates();
+
+				}
+
+            },
+            setTodayDate() {
+            	
+            	if (this.searchAttributes.dateFrom != this.currentTime || this.searchAttributes.dateTo) {
+	            	
+	            	// this.searchAttributes.dateTo = null; 
+	            	this.searchAttributes.dates = {};
+	            	this.searchAttributes.dateTo = null;
+	            	this.searchAttributes.dateFrom = this.currentTime;
+
+            	}
+            	else {
+
+	            	this.searchAttributes.dateFrom = null
+
+            	}
+
+            },
+            print() {
+
+				// this.printingStyles.name = `${ this.singleProductData.subject } Details`;
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singleProductData.product.name } Details`);
+
+				this.$htmlToPaper('sectionToPrint', this.printingStyles);
+
+				$('#product-view-modal').modal('hide');
+
+			}
+            
 		}
   	}
 
@@ -1109,4 +2171,15 @@
 
 <style scoped>
 	@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
+	.fade-enter-active {
+  		transition: all .3s ease;
+	}
+	.fade-leave-active {
+  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	}
+	.fade-enter, .fade-leave-to {
+  		transform: translateX(10px);
+  		opacity: 0;
+	}
 </style>

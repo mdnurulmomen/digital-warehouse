@@ -35,7 +35,7 @@ class ProductStockResource extends JsonResource
             'variations' => $this->when($product->has_variations, ProductVariationStockResource::collection($this->variations->loadMissing('merchantProductVariation.productVariation.variation'))),
             'invoice_no' => $stock->invoice_no,
             'warehouse' => (new MerchantWarehouseResource($stock->warehouse))->customResource($this->merchantProduct->merchant_id),
-            'addresses' => new ProductAddressCollection($this->addresses),
+            'addresses' => $this->when($this->relationLoaded('addresses'), new ProductAddressCollection($this->addresses)),
             'keeper' => $stock->keeper,
             'approver' => $this->when($stock->has_approval, $stock->approver),    // -1 / 1
             'created_at' => $stock->created_at->format('Y.m.d H:i:s'),
