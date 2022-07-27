@@ -319,7 +319,8 @@
 														class="form-control" 
 														v-model.number="requiredProduct.quantity" 
 														placeholder="Product Total Quantity" 
-														readonly="true"
+														readonly="true" 
+														required="true" 
 													>
 												</div>
 
@@ -331,29 +332,10 @@
 														type="number" 
 														class="form-control" 
 														v-model.number="requiredProduct.available_quantity" 
-														readonly="true"
+														readonly="true" 
+														required="true" 
 													>
 												</div>
-
-											<!-- 
-												<div class="form-group col-md-4">
-													<label for="inputFirstName">
-														Dispatched Total Quantity
-													</label>
-													<input 
-														type="number" 
-														class="form-control" 
-														v-model.number="requiredProduct.product_dispatched_quantity" 
-														placeholder="Product Total Quantity" 
-														:class="!errors.products[productIndex].total_dispatched_quantity ? 'is-valid' : 'is-invalid'" 
-														@input="validateFormInput('total_dispatched_quantity')" 
-													>
-													<div class="invalid-feedback">
-												    	{{ errors.products[productIndex].total_dispatched_quantity }}
-												    </div>
-												</div>
- 											-->
-
 											</div>
 
 											<div class="card" v-if="requiredProduct.has_variations && requiredProduct.variations.length">
@@ -387,6 +369,7 @@
 																v-model.number="requiredProduct.variations[variationIndex].quantity" 
 																placeholder="Variation Quantity" 
 																readonly="true" 
+																required="true" 
 															>
 														</div>
 														<div class="form-group col-md-4">
@@ -397,6 +380,7 @@
 																v-model.number="requiredProduct.variations[variationIndex].available_quantity" 
 																placeholder="Dispatched Quantity" 
 																readonly="true" 
+																required="true" 
 															>
 														</div>
 
@@ -736,34 +720,6 @@
 												>
 											</div>
 										</div>
-
-										<!-- 
-										<div class="form-row d-flex">
-											<div class="form-group col-md-6">
-												<img class="img-fluid" 
-													:src="singleDispatchedReqData.agent.agent_receipt || ''"
-													alt="agent_receipt" 
-												>
-											</div>
-
-											<div class="form-group col-md-6  align-self-center">
-												<div class="custom-file">
-												    <input type="file" 
-												    	class="form-control custom-file-input" 
-														:class="!errors.agent.agent_receipt  ? 'is-valid' : 'is-invalid'" 
-											    	 	@change="onAgentReceiptChange" 
-											    	 	accept="image/*"
-												    >
-												    <label class="custom-file-label">
-												    	Agent Receipt...
-												    </label>
-												    <div class="invalid-feedback">
-												    	{{ errors.agent.agent_receipt }}
-												    </div>
-											  	</div>
-											</div>
-										</div>
-										-->
 									</div>
 
 									<div 
@@ -808,24 +764,7 @@
 											</div>
 										</div>
 
-										<div class="form-row">	
-											<!-- 
-											<div class="form-group col-md-6">
-												<label for="inputFirstName">Destination</label>
-												<input 
-													type="text" 
-													class="form-control" 
-													v-model="singleDispatchedReqData.delivery.address" 
-													placeholder="Delivery Address" 
-													:class="!errors.delivery.delivery_address ? 'is-valid' : 'is-invalid'"
-													@change="validateFormInput('delivery_address')"
-												>
-												<div class="invalid-feedback">
-											    	{{ errors.delivery.delivery_address }}
-											    </div>
-											</div>
- 											-->
-
+										<div class="form-row">
 											<div class="form-group col-md-6">
 												<label for="inputFirstName">
 													Delivery Price

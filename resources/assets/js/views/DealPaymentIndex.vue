@@ -810,6 +810,7 @@
 															<input 
 																type="text" 
 																class="form-control" 
+																required="true" 
 																v-model="dealTotalCurrentRent" 
 																:disabled="true"
 																aria-label="Amount Per Installment" 
@@ -827,6 +828,7 @@
 																class="form-control" 
 																v-model.number="singlePaymentData.number_installment" 
 																placeholder="Number Installment" 
+																required="true" 
 																:min="1" 
 																:class="! errors.number_installment ? 'is-valid' : 'is-invalid'" 
 																@change="resetTotalRent();setRentExpiryDate()"
@@ -879,6 +881,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
+																required="true" 
 																v-model.number="singlePaymentData.total_rent" 
 																placeholder="Total Rent" 
 																:disabled="true"
@@ -963,6 +966,7 @@
 																class="form-control is-valid" 
 																v-model.number="singlePaymentData.paid_amount" 
 																placeholder="Paid Amount" 
+																min="0" 
 																:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
 																@change="validateFormInput('paid_amount')" 
 																required="true" 
@@ -2471,9 +2475,9 @@
 
 					case 'paid_amount' : 
 						
-						if(! this.singlePaymentData.paid_amount || this.singlePaymentData.paid_amount < 1){
+						if(this.singlePaymentData.paid_amount && this.singlePaymentData.paid_amount < 0){
 							
-							this.errors.paid_amount = 'Paid amount is required';
+							this.errors.paid_amount = 'Invalid amount';
 
 						}
 						else {

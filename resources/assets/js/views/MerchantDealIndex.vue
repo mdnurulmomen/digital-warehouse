@@ -1109,6 +1109,7 @@
 																v-model.number="singleMerchantDealData.payments[0].number_installment" 
 																min:1
 																placeholder="# rent period to pay" 
+																required="true" 
 																:class="! errors.payment.number_installment ? 'is-valid' : 'is-invalid'" 
 																@change="resetTotalRent()"
 															>
@@ -1172,6 +1173,7 @@
 																class="form-control is-valid" 
 																v-model.number="singleMerchantDealData.payments[0].total_rent" 
 																placeholder="Total Rent" 
+																required="true" 
 																:disabled="true"
 															>
 
@@ -1233,6 +1235,7 @@
 																class="form-control is-valid" 
 																v-model.number="singleMerchantDealData.payments[0].net_payable" 
 																placeholder="Net Payable" 
+																required="true" 
 																:disabled="true"
 															>
 
@@ -1254,9 +1257,9 @@
 																class="form-control" 
 																v-model.number="singleMerchantDealData.payments[0].paid_amount" 
 																placeholder="Paid Amount" 
+																min="0" 
 																:class="! errors.payment.paid_amount ? 'is-valid' : 'is-invalid'" 
-																@change="validateFormInput('paid_amount')" 
-																required="true" 
+																@change="validateFormInput('paid_amount')"  
 															>
 
 									    					<div class="input-group-append">

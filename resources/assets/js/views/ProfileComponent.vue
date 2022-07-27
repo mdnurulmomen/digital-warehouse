@@ -165,9 +165,10 @@
 																                  		type="email" 
 																                  		class="form-control" 
 																                  		v-model="user.email" 
-																                  		placeholder="Email" required="true" 
+																                  		placeholder="Email" 
 																                  		:class="!errors.user.email  ? 'is-valid' : 'is-invalid'" 
 														                  				@change="validateFormInput('email')"
+																                  		required="true" 
 																                  	>
 																                  	<div class="invalid-feedback">
 																			        	{{ errors.user.email }}
@@ -184,9 +185,9 @@
 																	                  	class="form-control" 
 																	                  	v-model="user.mobile" 
 																	                  	placeholder="Mobile" 
-																	                  	required="true" 
 																	                  	:class="!errors.user.mobile  ? 'is-valid' : 'is-invalid'" 
-														                  				@change="validateFormInput('mobile')"
+														                  				@change="validateFormInput('mobile')" 
+														                  				required="true" 
 																                  	>
 																                  	<div class="invalid-feedback">
 																			        	{{ errors.user.mobile }}
@@ -205,9 +206,9 @@
 																	                  	class="form-control" 
 																	                  	v-model="user.user_name" 
 																	                  	placeholder="Unique Username" 
-																	                  	required="true" 
 																	                  	:class="!errors.user.user_name  ? 'is-valid' : 'is-invalid'" 
 													                  					@change="validateFormInput('user_name')"
+																	                  	required="true" 
 																                  	>
 																                  	<div class="invalid-feedback">
 																			        	{{ errors.user.user_name }}
@@ -252,9 +253,9 @@
 												                  	class="form-control" 
 												                  	v-model="password.current_password" 
 												                  	placeholder="Current Password" 
-												                  	required="true" 
 												                  	:class="!errors.user.current_password  ? 'is-valid' : 'is-invalid'" 
 									                  				@change="validateFormInput('current_password')"
+												                  	required="true" 
 											                  	>
 											                  	<div class="invalid-feedback">
 														        	{{ errors.user.current_password }}
@@ -269,9 +270,9 @@
 												                  	class="form-control" 
 												                  	v-model="password.password" 
 												                  	placeholder="New Password" 
-												                  	required="true" 
 												                  	:class="!errors.user.password  ? 'is-valid' : 'is-invalid'" 
 									                  				@change="validateFormInput('password')"
+												                  	required="true" 
 											                  	>
 											                  	<div class="invalid-feedback">
 														        	{{ errors.user.password }}
@@ -286,9 +287,9 @@
 												                  	class="form-control" 
 												                  	v-model="password.password_confirmation" 
 												                  	placeholder="Confirm Password" 
-												                  	required="true" 
 												                  	:class="!errors.user.password_confirmation  ? 'is-valid' : 'is-invalid'" 
 									                  				@change="validateFormInput('password_confirmation')"
+												                  	required="true" 
 											                  	>
 											                  	<div class="invalid-feedback">
 														        	{{ errors.user.password_confirmation }}

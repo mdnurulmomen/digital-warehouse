@@ -594,7 +594,7 @@ class DealController extends Controller
             'discount' => $request->discount,
             'previous_due' => $dealRecentPayment->current_due ?? 0,
             'net_payable' => $request->net_payable ?? 0,
-            'paid_amount' => $request->paid_amount,
+            'paid_amount' => $request->paid_amount ?? 0,
             'current_due' => ($request->net_payable - $request->paid_amount),
         ]);
 
@@ -686,7 +686,7 @@ class DealController extends Controller
             'discount' => $request->discount,
             // 'previous_due' => $dealRecentPayment->current_due,
             'net_payable' => $request->net_payable ?? 0,
-            'paid_amount' => $request->paid_amount,
+            'paid_amount' => $request->paid_amount ?? 0,
             'current_due' => ($request->net_payable - $request->paid_amount),
         ]);
 

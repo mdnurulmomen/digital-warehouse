@@ -19,37 +19,6 @@
 									<div class="card-block">
 										<div class="row">
 											<div class="col-sm-12 sub-title">
-											  	<!-- 
-											  	<div class="row d-flex align-items-center text-center">
-											  		<div class="col-sm-3 form-group">	
-															Delivery Companies List
-											  		</div>
-
-											  		<div class="col-sm-6 was-validated form-group">
-											  			<input 	type="text" 
-														  		v-model="query" 
-														  		pattern="[^'!#$%^()\x22]+" 
-														  		class="form-control" 
-														  		placeholder="Search"
-													  	>
-													  	<div class="invalid-feedback">
-													  		Please search with releavant input
-													  	</div>
-											  		</div>
-											  		
-											  		<div class="col-sm-3 form-group" v-if="userHasPermissionTo('create-logistic-asset')">
-											  			<button 
-												  			class="btn btn-success btn-outline-success btn-sm" 
-												  			v-tooltip.bottom-end="'Create New'" 
-												  			@click="showContentCreateForm()"
-											  			>
-											  				<i class="fa fa-plus"></i>
-											  				New Company
-											  			</button>
-											  		</div>
-											  	</div> 
-											  	-->
-
 											  	<search-and-addition-option 
 											  		:query="query" 
 											  		:caller-page="'Delivery Company'" 
@@ -335,9 +304,9 @@
 										class="form-control" 
 										v-model="singleAssetData.name" 
 										placeholder="Name should be unique" 
+										required="true" 
 										:class="!errors.asset.name  ? 'is-valid' : 'is-invalid'" 
 										@change="validateFormInput('name')" 
-										required="true" 
 									>
 
 									<div class="invalid-feedback">
@@ -352,10 +321,10 @@
 									<div class="input-group mb-0">
 										<input type="number" 
 											class="form-control" 
+											required="true" 
 											v-model="singleAssetData.commission" 
 											:class="!errors.asset.commission  ? 'is-valid' : 'is-invalid'" 
 											@change="validateFormInput('commission')" 
-											required="true" 
 										>
 										<div class="input-group-append">
 											<span class="input-group-text">%</span>

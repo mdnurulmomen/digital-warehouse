@@ -30,6 +30,12 @@ import { routeNeedsPermission, userHasPermissionTo } from './public.js'
 import VueHtmlToPaper from 'vue-html-to-paper';
 Vue.use(VueHtmlToPaper);
 
+import JsBarcode from 'jsbarcode'
+Vue.component('JsBarcode', JsBarcode)
+
+import VueQRCodeComponent from 'vue-qrcode-component'
+Vue.component('qr-code', VueQRCodeComponent)
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -42,23 +48,31 @@ Vue.use(VueHtmlToPaper);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Registering component globally
+// Vue.component('barcode', require('vue-barcode'));
 Vue.component('download-excel', require('vue-json-excel').default);
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('alert', require('./components/AlertComponent.vue').default);
 Vue.component('loading', require('./components/LoadingComponent.vue').default);
+// Vue.component('import-excel', require('./components/ImportExcel.vue').default);
 Vue.component('tree-item', require('./components/TreeItemComponent.vue').default);
 Vue.component('pagination', require('./components/PaginationComponent.vue').default);
 Vue.component('breadcrumb', require('./components/BreadcrumbComponent.vue').default);
 Vue.component('asset-view-modal', require('./components/AssetViewModal.vue').default);
 Vue.component('v-date-picker', require('v-calendar/lib/components/date-picker.umd'));
 Vue.component('user-profile-view-modal', require('./components/UserProfileViewModal.vue').default);
+// Vue.component('table-with-delete-option', require('./components/TableWithDeleteOption.vue').default);
+// Vue.component('mail-create-modal', require('./components/MailCreateModal.vue').default);
+// Vue.component('container-type-view-modal', require('./components/ContainerTypeViewModal.vue').default);
 Vue.component('asset-create-or-edit-modal', require('./components/AssetCreateOrEditModal.vue').default);
 Vue.component('delete-confirmation-modal', require('./components/DeleteConfirmationModal.vue').default);
 Vue.component('search-and-addition-option', require('./components/SearchAndAdditionOption.vue').default);
-Vue.component('addition-search-export-option', require('./components/AdditionSearchExportOption.vue').default);
 Vue.component('restore-confirmation-modal', require('./components/RestoreConfirmationModal.vue').default);
+Vue.component('addition-search-export-option', require('./components/AdditionSearchExportOption.vue').default);
 Vue.component('table-with-soft-delete-option', require('./components/TableWithSoftDeleteOption.vue').default);
 Vue.component('user-profile-create-or-edit-modal', require('./components/UserProfileCreateOrEditModal.vue').default);
+// Vue.component('permissive-user-profile-view-modal', require('./components/PermissiveUserProfileViewModal.vue').default);
+// Vue.component('permissive-user-profile-create-or-edit-modal', require('./components/PermissiveUserProfileCreateOrEditModal.vue').default);
+// Vue.component('container-type-create-or-edit-modal', require('./components/ContainerTypeCreateOrEditModal.vue').default);
 
 // Special Components
 Vue.component('my-product-search-export-option', require('./components/MyProductSearchExportOption.vue').default);
@@ -69,35 +83,18 @@ import MerchantSideMenuBar from './MerchantSideMenuBar'
 import MerchantHome from './views/Home'
 import Profile from './views/ProfileComponent'
 import MyProductIndex from './views/MyProductIndex'
+import MyProductStockIndex from './views/MyProductStockIndex'
 import MyRequisitionIndex from './views/MyRequisitionIndex'
+import MyDealIndex from './views/MyDealIndex'
+import MyDealPaymentIndex from './views/MyDealPaymentIndex'
+import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'     // public
+import PackagingPackageIndex from './views/PackagingPackageIndex'   // public
 import UnAuthorized from './views/403'
 import NotFound from './views/404'
 
-// special components
-import ApplicationSetting from './views/SettingComponent'
-import WarehouseOwnerIndex from './views/WarehouseOwnerIndex'
-import ManagerIndex from './views/ManagerIndex'
-import MerchantIndex from './views/MerchantIndex'
-import StorageTypeIndex from './views/StorageTypeIndex'
-import ContainerIndex from './views/ContainerTypeIndex'
-import WarehouseIndex from './views/WarehouseIndex'
-import RentPeriodIndex from './views/RentPeriodIndex'
-import VariationTypeIndex from './views/VariationTypeIndex'
-import VariationIndex from './views/VariationIndex'
-import ProductCategoryIndex from './views/ProductCategoryIndex'
-import ProductManufacturerIndex from './views/ProductManufacturerIndex'
-import ProductIndex from './views/ProductIndex'
-import CategoryProductIndex from './views/CategoryProductIndex'
-import RequisitionIndex from './views/RequisitionIndex'
+
 // import DispatchIndex from './views/DispatchIndex'
-import ProductStockIndex from './views/ProductStockIndex'
-import ProductMerchantIndex from './views/ProductMerchantIndex'
-import MerchantProductIndex from './views/MerchantProductIndex'
-import RoleIndex from './views/RoleIndex'
-import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
-import PackagingPackageIndex from './views/PackagingPackageIndex'
-import MerchantDealIndex from './views/MerchantDealIndex'
-import DealPaymentIndex from './views/DealPaymentIndex'
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -124,278 +121,48 @@ const router = new VueRouter({
             component: MyProductIndex,
         },
         {
+            path: '/my-product-stocks/:merchantProductId',
+            name: 'my-product-stocks',
+            component: MyProductStockIndex,
+            props: true,
+            
+            beforeEnter: (to, from, next) => {
+                if (to.params.product && to.params.productMerchant && to.params.merchantProductId) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/my-products');
+                }
+            }
+        },
+        {
             path: '/my-requisitions',
             name: 'my-requisitions',
             component: MyRequisitionIndex,
         },
+        {
+            path: '/my-deals',
+            name: 'my-deals',
+            component: MyDealIndex,
+        },
+        {
+            path: '/my-deal-payments/:dealId',
+            name: 'my-deal-payments',
+            component: MyDealPaymentIndex,
+            props: true,
+
+            beforeEnter: (to, from, next) => {
+                if (to.params.deal && to.params.dealId) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/my-deals');
+                }
+            }
+        },
         
         // special routes
         
-        {
-            path: '/settings',
-            name: 'settings',
-            component: ApplicationSetting,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-application-setting-index' 
-            },
-        },
-        {
-            path: '/storage-types',
-            name: 'storage-types',
-            component: StorageTypeIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-warehouse-asset-index' 
-            }
-        },
-        {
-            path: '/containers',
-            name: 'containers',
-            component: ContainerIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-warehouse-asset-index' 
-            }
-        },
-        {
-            path: '/rent-periods',
-            name: 'rent-periods',
-            component: RentPeriodIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-warehouse-asset-index' 
-            }
-        },
-        {
-            path: '/variation-types',
-            name: 'variation-types',
-            component: VariationTypeIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-asset-index' 
-            }
-        },
-        {
-            path: '/variations',
-            name: 'variations',
-            component: VariationIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-asset-index' 
-            }
-        },
-        {
-            path: '/warehouse-owners',
-            name: 'owners',
-            component: WarehouseOwnerIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-warehouse-owner-index' 
-            }
-        },
-        {
-            path: '/managers',
-            name: 'managers',
-            component: ManagerIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-manager-index' 
-            }
-        },
-        {
-            path: '/merchants',
-            name: 'merchants',
-            component: MerchantIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-merchant-index' 
-            }
-        },
-        {
-            path: '/warehouses',
-            name: 'warehouses',
-            component: WarehouseIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-warehouse-index' 
-            }
-        },
-        /*
-            {
-                path: '/warehouse-managers',
-                name: 'warehouse-managers',
-                component: WarehouseManagerIndex,
-                meta: {
-                    // authRequired: true,
-                    requiredPermission: 'view-warehouse-manager-index' 
-                }
-            },
-        */
-        {
-            path: '/product-categories',
-            name: 'product-categories',
-            component: ProductCategoryIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-asset-index' 
-            }
-        },
-        {
-            path: '/product-manufacturers',
-            name: 'product-manufacturers',
-            component: ProductManufacturerIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-asset-index' 
-            }
-        },
-        {
-            path: '/product-categories/:categoryName',
-            name: 'category-products',
-            component: CategoryProductIndex,
-            props: true,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-index' 
-            },
-            beforeEnter: (to, from, next) => {
-                if (to.params.category && to.params.categoryName) {
-                    next(); // <-- everything good, proceed
-                }
-                else {
-                    next('/product-categories');
-                }
-            }
-        },
-        {
-            path: '/products',
-            name: 'products',
-            component: ProductIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-index' 
-            }
-        },
-        {
-            path: '/requisitions',
-            name: 'requisitions',
-            component: RequisitionIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-requisition-index' 
-            }
-        },
-        /*
-            {
-                path: '/dispatches',
-                name: 'dispatches',
-                component: DispatchIndex,
-                meta: {
-                    // authRequired: true,
-                    requiredPermission: 'view-dispatch-index' 
-                }
-            },
-        */
-        {
-            path: '/product-stocks/:merchantName',
-            name: 'product-stocks',
-            component: ProductStockIndex,
-            props: true,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-stock-index' 
-            },
-            beforeEnter: (to, from, next) => {
-                if (to.params.product && to.params.merchantName && to.params.productMerchant) {
-                    next(); // <-- everything good, proceed
-                }
-                else {
-                    next('/products');
-                }
-            }
-        },
-        {
-            path: '/product-merchants/:productName',
-            name: 'product-merchants',
-            component: ProductMerchantIndex,
-            props: true,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-merchant-product-index' 
-            },
-            beforeEnter: (to, from, next) => {
-                if (to.params.product) {
-                    next(); // <-- everything good, proceed
-                }
-                else {
-                    next('/products');
-                }
-            }
-        },
-        {
-            path: '/merchant-products/:merchantName',
-            name: 'merchant-products',
-            component: MerchantProductIndex,
-            props: true,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-merchant-product-index' 
-            },
-            beforeEnter: (to, from, next) => {
-                if (to.params.merchant) {
-                    next(); // <-- everything good, proceed
-                }
-                else {
-                    next('/merchants');
-                }
-            }
-        },
-        {
-            path: '/roles',
-            name: 'roles',
-            component: RoleIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-role-index' 
-            }
-        },
-        {
-            path: '/merchant-deals/:merchantName',
-            name: 'merchant-deals',
-            component: MerchantDealIndex,
-            props: true,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-merchant-deal-index' 
-            },
-            beforeEnter: (to, from, next) => {
-                if (to.params.merchant && to.params.merchantName) {
-                    next(); // <-- everything good, proceed
-                }
-                else {
-                    next('/merchants');
-                }
-            }
-        },
-        {
-            path: '/deal-payments/:merchantName/:dealDate',
-            name: 'deal-payments',
-            component: DealPaymentIndex,
-            props: true,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-merchant-payment-index' 
-            },
-            beforeEnter: (to, from, next) => {
-                if (to.params.merchantName && to.params.dealDate && to.params.deal) {
-                    next(); // <-- everything good, proceed
-                }
-                else {
-                    next({ name : 'merchant-deals', params: { merchantName: to.params.merchantName }});
-                }
-            }
-        },
         
         // view packages is permissible for all
         {

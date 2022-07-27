@@ -277,7 +277,6 @@
 						class="form-horizontal" 
 						v-on:submit.prevent="createMode ? storeProduct() : updateAsset()" 
 						autocomplete="off" 
-						novalidate="true" 
 					>
 						<input type="hidden" name="_token" :value="csrf">
 
@@ -331,9 +330,9 @@
 												class="form-control" 
 												v-model="singleProductData.name" 
 												placeholder="Name should be unique" 
+												required="true" 
 												:class="!errors.product.product_name ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_name')" 
-												required="true" 
 											>
 
 											<div class="invalid-feedback">
@@ -383,83 +382,6 @@
 										    </div>
 										</div>
 										 -->
-									</div>
-
-									<div class="form-row">
-										<!-- 
-										<div class="form-group col-md-6">
-											<label for="inputFirstName">SKU/Barcode</label>
-											<input type="text" 
-												class="form-control" 
-												v-model="singleProductData.sku" 
-												placeholder="Unique code" 
-												:class="!errors.product.product_sku  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_sku')" 
-												required="true" 
-											>
-
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_sku }}
-									  		</div>
-										</div>
- 										-->
-									</div>
-
-									<div class="form-row">
-										<!-- 
-										<div class="form-group col-md-6">
-											<label for="inputFirstName">Price</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleProductData.price" 
-												placeholder="Product price" 
-												:readonly="productMode=='bulk product'" 
-												:class="!errors.product.product_price ? 'is-valid' : 'is-invalid'"
-												@change="validateFormInput('product_price')" 
-												required="true" 
-											>
-
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_price }}
-									  		</div>
-										</div>
- 										-->
-									</div>
-
-									<div class="form-row">
-										<!-- 
-										<div class="form-group col-md-6">
-											<label for="inputFirstName">Qty</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleProductData.initial_quantity" 
-												placeholder="Product initial qty" 
-												:class="!errors.product.product_initial_quantity  ? 'is-valid' : 'is-invalid'" 
-												:readonly="!createMode" 
-												@change="validateFormInput('product_initial_quantity')" 
-												required="true" 
-											>
-
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_initial_quantity }}
-									  		</div>
-										</div>
-										<div class="form-group col-md-4">
-											<label for="inputFirstName">Available quantity</label>
-											<input type="number" 
-												class="form-control" 
-												v-model.number="singleProductData.available_quantity" 
-												placeholder="Product available quantity" 
-												:class="!errors.product.product_available_quantity  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('product_available_quantity')" 
-												required="true" 
-											>
-
-											<div class="invalid-feedback">
-									        	{{ errors.product.product_available_quantity }}
-									  		</div>
-										</div>
-										-->
 									</div>
 
 									<div class="form-row">
@@ -634,62 +556,7 @@
 																	  	</div>
 																	</div>
 																</div>
-															</div>
-
-															<!-- 
-															<div 
-																class="form-group col-md-3"
-																v-if="singleProductData.variations[index] && errors.product.variations[index]"
-															>
-																<label for="inputFirstName">Qty</label>
-																<input type="number" 
-																	class="form-control" 
-																	v-model.number="singleProductData.variations[index].initial_quantity" 
-																	:min="singleProductData.variations[index].requested_quantity"
-																	:max="singleProductData.initial_quantity" 
-																	placeholder="Product Qty" 
-																	:class="!errors.product.variations[index].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
-																	@change="validateFormInput('product_variation_quantity')" 
-																	required="true" 
-																>
-
-																<div class="invalid-feedback">
-														        	{{ errors.product.variations[index].product_variation_quantity }}
-														  		</div>
-															</div>
-															-->
-															<!-- 
-															<div 
-																class="form-group col-md-4"
-																v-if="singleProductData.variations[index] && errors.product.variations[index]"
-															>
-																<label for="inputFirstName">Price</label>
-																<input type="number" 
-																	class="form-control" 
-																	v-model.number="singleProductData.variations[index].price" 
-																	placeholder="Product Price" 
-																	:class="!errors.product.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
-																	@change="validateFormInput('product_variation_price')" 
-																	required="true" 
-																>
-
-																<div class="invalid-feedback">
-														        	{{ errors.product.variations[index].product_variation_price }}
-														  		</div>
-															</div>
-
-															<div 
-																class="form-group col-md-4"
-																v-if="singleProductData.variations[index] && errors.product.variations[index]"
-															>
-																<label for="inputFirstName">SKU</label>
-																<input type="text" 
-																	class="form-control is-valid" 
-																	v-model="singleProductData.variations[index].sku" 
-																	placeholder="Unique SKU" 
-																>
-															</div>
-															 -->									
+															</div>									
 														</div>
 													</div>
 												</div>

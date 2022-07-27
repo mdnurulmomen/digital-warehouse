@@ -1,6 +1,5 @@
 
 <template>
-
 	<div class="pcoded-content">
 		<breadcrumb 
 			:title="'containers'" 

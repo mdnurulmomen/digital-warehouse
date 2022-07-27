@@ -577,8 +577,8 @@
 																:class="!errors.stock.product_stock_quantity  ? 'is-valid' : 'is-invalid'" 
 																@keydown.enter.prevent="nextPage" 
 																@change="validateFormInput('product_stock_quantity')" 
-																required="true" 
 																:min="createMode ? 1 : singleStockData.available_quantity" 
+																required="true" 
 															>
 															<div class="input-group-append">
 																<span class="input-group-text">
@@ -680,7 +680,6 @@
 																	:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 																	@change="validateFormInput('product_variation_quantity')" 
 																	@keydown.enter.prevent="nextPage" 
-																	required="true" 
 																	:min="createMode ? 1 : stockVariation.available_quantity"
 																>
 
@@ -989,7 +988,6 @@
 																	:class="! errors.stock.variations[stockedVariationIndex].product_variation_serial ? 'is-valid' : 'is-invalid'" 
 																	@keydown.enter.prevent="addVariationSerial(stockedVariationIndex)" 
 																	@change="validateFormInput('product_variation_serial')" 
-																	required="true" 
 																	:disabled="stockedVariation.serials.length>=stockedVariation.stock_quantity && stockedVariation.serials.every(variationSerial=>variationSerial.serial_no)"
 																>
 
@@ -1070,7 +1068,6 @@
 												<div class="input-group mb-0">
 													<input 
 														type="text" 
-														required="true" 
 														class="form-control" 
 														v-model="productNewSerial" 
 														placeholder="Product Serial number" 

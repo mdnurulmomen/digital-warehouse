@@ -1069,7 +1069,8 @@
 															class="form-control is-valid" 
 															v-model.number="requiredProduct.quantity" 
 															placeholder="Product Total Quantity" 
-															readonly="true"
+															readonly="true" 
+															required="true" 
 														>
 														<div class="input-group-append">
 															<span class="input-group-text">
@@ -1090,7 +1091,8 @@
 															class="form-control" 
 															:class="requiredProduct.quantity > requiredProduct.available_quantity ? 'is-invalid' : 'is-valid'"
 															v-model.number="requiredProduct.available_quantity" 
-															readonly="true"
+															readonly="true" 
+															required="true" 
 														>
 														<div class="input-group-append">
 															<span class="input-group-text">
@@ -1164,7 +1166,8 @@
 																class="form-control" 
 																:class="! errors.products[requiredProductIndex].stock_codes[requiredProductStockIndex].quantity ? 'is-valid' : 'is-invalid'" 
 																placeholder="Dispatched Quantity" 
-																@change="validateFormInput('product_stock_quantity')"
+																@change="validateFormInput('product_stock_quantity')" 
+																required="true" 
 															>
 															<div class="invalid-feedback">
 														    	{{ errors.products[requiredProductIndex].stock_codes[requiredProductStockIndex].quantity }}
@@ -1306,6 +1309,7 @@
 																			v-model.number="requiredProduct.variations[requiredProductVariationIndex].quantity" 
 																			placeholder="Variation Quantity" 
 																			readonly="true" 
+																			required="true" 
 																		>
 																		<div class="input-group-append">
 																			<span class="input-group-text">
@@ -1327,6 +1331,7 @@
 																			v-model.number="requiredProductVariation.available_quantity" 
 																			placeholder="Dispatch Quantity" 
 																			readonly="true" 
+																			required="true" 
 																		>
 																		<div class="input-group-append">
 																			<span class="input-group-text">
@@ -1402,7 +1407,8 @@
 																				class="form-control" 
 																				:class="! errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_codes[requiredProductVariationStockIndex].quantity ? 'is-valid' : 'is-invalid'" 
 																				placeholder="Deducted Quantity" 
-																				@change="validateFormInput('variation_stock_quantity')"
+																				@change="validateFormInput('variation_stock_quantity')" 
+																				required="true" 
 																			>
 																			<div class="invalid-feedback">
 																		    	{{ errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_codes[requiredProductVariationStockIndex].quantity }}

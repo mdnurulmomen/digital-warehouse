@@ -21,82 +21,6 @@
 									<div class="card-block">
 										<div class="row">
 											<div class="col-sm-12 sub-title">
-												<!-- 
-												<div class="row form-group">
-											  		<div class="col-sm-6 d-flex align-items-center form-group">
-											  			<div class="mr-2">
-											  				<span>
-													  			{{ 
-													  				( searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Products List' : 'Products List'
-													  			}}
-											  				</span>
-											  			</div>
-
-											  			<div class="ml-auto ml-sm-0">
-											  				<div class="dropdown">
-										  						<i class="fas fa-download fa-lg dropdown-toggle" data-toggle="dropdown"></i>
-											  					
-											  					<div class="dropdown-menu">
-										  							<download-excel 
-														  				class="btn btn-grd-default p-1 dropdown-item active"
-																		:data="productsToShow"
-																		:fields="dataToExport" 
-																		:worksheet="merchant.user_name + '-products-sheet'"
-																		:name="merchant.user_name + '-' + ((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-products-' : (currentTab + '-products-list-')) + currentTime + '-page-' + pagination.current_page + '.xls'"
-														  			>
-														  				Excel
-																	</download-excel>
-											  					</div>
-											  				</div>
-											  			</div>
-											  		</div>
-
-											  		<div class="col-sm-6 was-validated d-flex align-items-center form-group">
-											  			<div class="ml-sm-auto mr-3">
-										  					<input 	
-																type="text" 
-														  		class="form-control" 
-														  		pattern="[^'!#$%^()\x22]+" 
-														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Products"
-													  		>
-
-													  		<div class="invalid-feedback">
-														  		Please search with releavant input
-														  	</div>
-											  			</div>
-
-														<div class="ml-auto ml-sm-0">
-															
-															<ul class="nav nav-pills">
-																<li class="nav-item">
-																	<a 
-																		href="javascript:void(0)"
-																		class="nav-link p-1"
-																		@click="setTodayDate()" 
-																		:class="{ 'active': searchAttributes.dateFrom == currentTime && ! searchAttributes.dateTo }"
-																	>
-																		Today
-																	</a>
-																</li>
-
-																<li class="nav-item">
-																	<a 
-																		href="javascript:void(0)"
-																		class="nav-link p-0" 
-																		data-toggle="modal" 
-																		data-target="#product-custom-search"
-																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
-																	>
-																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
-																	</a>
-																</li>
-															</ul>
-													  	</div>
-													</div>
-											  	</div> 
-											  	-->
-
 											  	<addition-search-export-option
 													v-if="userHasPermissionTo('view-merchant-product-index') || userHasPermissionTo('create-merchant-product')" 
 											  		:search-attributes="searchAttributes" 
@@ -384,7 +308,6 @@
 										placeholder="SKU should be unique" 
 										:class="!errors.product_sku ? 'is-valid' : 'is-invalid'" 
 										@change="validateFormInput('product_sku')" 
-										required="true" 
 										maxlength="15" 
 									>
 
@@ -401,6 +324,7 @@
 											class="form-control" 
 											v-model.number="singleMerchantProductData.selling_price" 
 											placeholder="Product Selling Price" 
+											required="true" 
 											:class="!errors.product_price ? 'is-valid' : 'is-invalid'" 
 											@change="validateFormInput('product_price')" 
 											:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.product_category_id ? false : true"
@@ -634,9 +558,9 @@
 																		class="form-control" 
 																		v-model.number="merchantProductVariation.selling_price" 
 																		placeholder="Variation Selling Price" 
+																		required="true" 
 																		:class="!errors.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
 																		@change="validateFormInput('product_variation_price')" 
-																		required="true" 
 																	>
 																	<div class="input-group-append">
 																		<span class="input-group-text" id="basic-addon2">

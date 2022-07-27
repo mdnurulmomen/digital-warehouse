@@ -78,9 +78,9 @@
 			</div>
 		</div>
 
-		<!-- modal-createOrEdit-warehouse -->
+		<!-- modal-create-Or-edit-warehouse -->
 		<div 
-			class="modal fade" id="warehouse-createOrEdit-modal" 
+			class="modal fade" id="warehouse-create-or-edit-modal" 
 			data-backdrop="static" data-keyboard="false"
 			v-if="userHasPermissionTo('create-warehouse') || userHasPermissionTo('update-warehouse')"
 		>
@@ -105,16 +105,16 @@
 								        	<div class="progress-bar bg-info" style="width:20%" v-show="step>=1">
 								          		Profile
 								        	</div>
-								        	<div class="progress-bar bg-danger" style="width:10%" v-show="step>=2">
+								        	<div class="progress-bar bg-danger" style="width:15%" v-show="step>=2">
 								          		Contract
 								        	</div>
-								        	<div class="progress-bar bg-warning" style="width:10%" v-show="step>=3">
+								        	<div class="progress-bar bg-warning" style="width:20%" v-show="step>=3">
 								          		Features
 								        	</div>
-								        	<div class="progress-bar bg-primary" style="width:20%" v-show="step>=4">
+								        	<div class="progress-bar bg-primary" style="width:15%" v-show="step>=4">
 								          		Storages
 								        	</div>
-								        	<div class="progress-bar bg-success" style="width:30%" v-show="step>=5">
+								        	<div class="progress-bar bg-success" style="width:20%" v-show="step>=5">
 								          		Containers
 								        	</div>
 								        	<!-- 
@@ -128,11 +128,10 @@
 							</div>
 						</div>
 						
-				  		<!-- form start -->
+				  		<!-- create-or-edit form start -->
 						<form 
 							class="form-horizontal" 
 							v-on:submit.prevent="verifyFormInput()" 
-							novalidate
 						>
 
 							<input type="hidden" name="_token" :value="csrf">
@@ -163,7 +162,8 @@
 														    	class="form-control custom-file-input" 
 																:class="!errors.warehouse.site_map_preview  ? 'is-valid' : 'is-invalid'" 
 													    	 	@change="onSiteMapChange" 
-													    	 	accept="image/*"
+													    	 	accept="image/*" 
+													    	 	required="true" 
 														    >
 														    <label class="custom-file-label">Choose Preview...</label>
 														    <div class="invalid-feedback">
@@ -193,6 +193,7 @@
 													class="form-control" 
 													v-model="singleWarehouseData.name" 
 													placeholder="Name should be unique" 
+													required="true" 
 													:class="!errors.warehouse.name  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('name')" 
 													@keydown.enter.prevent="nextPage()" 
@@ -210,6 +211,7 @@
 													v-model="singleWarehouseData.mobile" 
 													placeholder="Mobile should be unique" 
 													autocomplete="new-password" 
+													required="true" 
 													:class="!errors.warehouse.mobile ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('mobile')" 
 													@keydown.enter.prevent="nextPage()" 
@@ -246,6 +248,7 @@
 													class="form-control" 
 													v-model="singleWarehouseData.user_name" 
 													placeholder="Username should be unique" 
+													required="true" 
 													:class="!errors.warehouse.user_name  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('user_name')" 
 													@keydown.enter.prevent="nextPage()" 
@@ -261,6 +264,7 @@
 													class="form-control" 
 													v-model="singleWarehouseData.email" 
 													placeholder="Email should be unique" 
+													required="true" 
 													:class="!errors.warehouse.email  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('email')" 
 													@keydown.enter.prevent="nextPage()"  
@@ -310,6 +314,7 @@
 														v-model="singleWarehouseData.password" 
 														placeholder="Password length should be min 8" 
 														autocomplete="new-password" 
+														required="true" 
 														:class="!errors.warehouse.password  ? 'is-valid' : 'is-invalid'" 
 														@change="validateFormInput('password')" 
 														@keydown.enter.prevent="nextPage()" 
@@ -327,6 +332,7 @@
 														v-model="singleWarehouseData.password_confirmation" 
 														placeholder="Confirm your password" 
 														autocomplete="new-password" 
+														required="true" 
 														:class="!errors.warehouse.password_confirmation  ? 'is-valid' : 'is-invalid'" 
 														@change="validateFormInput('password_confirmation')" 
 														@keydown.enter.prevent="nextPage()" 
@@ -840,6 +846,7 @@
 																		class="form-control" 
 																		v-model.number="singleWarehouseData.containers[containerIndex].quantity" 
 																		placeholder="Lenght of container" 
+																		required="true" 
 																		:min="singleWarehouseData.containers[containerIndex].engaged_quantity + singleWarehouseData.containers[containerIndex].partially_engaged" 
 																		:class="!errors.warehouse.containers[containerIndex].container_quantity ? 'is-valid' : 'is-invalid'" 
 																		@change="validateFormInput('container_quantity')" 
@@ -2885,7 +2892,7 @@
 
 				// this.resetAllPermissions();
 
-				$('#warehouse-createOrEdit-modal').modal('show');
+				$('#warehouse-create-or-edit-modal').modal('show');
 
 			},
 			openContentEditForm(object) {
@@ -2920,7 +2927,7 @@
 				// this.resetAllPermissions();
 				// this.disableExistingRolePermissions();
 
-				$('#warehouse-createOrEdit-modal').modal('show');
+				$('#warehouse-create-or-edit-modal').modal('show');
 				
 			},
 			openContentDeleteForm(object) {
@@ -2969,7 +2976,7 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							$('#warehouse-createOrEdit-modal').modal('hide');
+							$('#warehouse-create-or-edit-modal').modal('hide');
 
 							this.printWarehouseContainers(this.singleWarehouseData.containers);
 						}
@@ -3002,7 +3009,7 @@
 							this.allFetchedWarehouses = response.data;
 							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
 
-							$('#warehouse-createOrEdit-modal').modal('hide');
+							$('#warehouse-create-or-edit-modal').modal('hide');
 
 							this.printWarehouseContainers(this.singleWarehouseData.containers);
 						}
@@ -3630,7 +3637,10 @@
 
 					case 'name' :
 
-						if (this.singleWarehouseData.name && !this.singleWarehouseData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
+						if (!this.singleWarehouseData.name) {
+							this.errors.warehouse.name = 'Name is required';
+						}
+						else if (!this.singleWarehouseData.name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
 							this.errors.warehouse.name = 'No special character';
 						}
 						else{

@@ -318,9 +318,9 @@
 										class="form-control" 
 										v-model="singleAssetData.name" 
 										placeholder="Name should be unique" 
+										required="true" 
 										:class="!errors.asset.name ? 'is-valid' : 'is-invalid'" 
 										@change="validateFormInput('name')" 
-										required="true" 
 									>
 
 									<div class="invalid-feedback">

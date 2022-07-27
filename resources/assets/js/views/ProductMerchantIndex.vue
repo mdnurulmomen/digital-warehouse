@@ -285,7 +285,6 @@
 												placeholder="SKU should be unique" 
 												:class="!errors.product_sku ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('product_sku')" 
-												required="true" 
 												maxlength="15" 
 											>
 

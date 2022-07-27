@@ -313,7 +313,6 @@
 						class="form-horizontal" 
 						@submit.prevent="createMode ? storeStock() : updateStock()" 
 						autocomplete="off" 
-						novalidate="true" 
 					>
 						<input type="hidden" name="_token" :value="csrf">
 
@@ -544,10 +543,10 @@
 																				class="form-control" 
 																				v-model.number="stockedProduct.stock_quantity" 
 																				placeholder="Product Quantity" 
+																				required="true" 
 																				:class="! errors.products[stockedProductIndex].product_stock_quantity ? 'is-valid' : 'is-invalid'" 
 																				:min="createMode ? 1 : stockedProduct.available_quantity" 
 																				@keydown.enter.prevent="nextPage" 
-																				required="true" 
 																			>
 																			<div class="input-group-append">
 																				<span class="input-group-text">
@@ -648,7 +647,6 @@
 																						:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 																						:min="createMode ? 1 : stockedVariation.available_quantity" 
 																						@keydown.enter.prevent="nextPage" 
-																						required="true" 
 																					>
 																					<div class="input-group-append">
 																						<span class="input-group-text">
@@ -832,8 +830,7 @@
 																										:placeholder="stockedVariation.variation.name + ' Serial Number' | capitalize" 
 																										v-model="variationNewSerial[stockedVariationIndex]"
 																										:class="! errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_serial ? 'is-valid' : 'is-invalid'" 
-																										@keydown.enter.prevent="addVariationSerial(stockedProductIndex, stockedVariationIndex)"  
-																										required="true" 
+																										@keydown.enter.prevent="addVariationSerial(stockedProductIndex, stockedVariationIndex)" 
 																										:disabled="stockedVariation.serials.length>=stockedVariation.stock_quantity && stockedVariation.serials.every(variationSerial=>variationSerial.serial_no)"
 																									>
 
@@ -913,7 +910,6 @@
 																		<div class="input-group mb-0">
 																			<input 
 																				type="text" 
-																				required="true" 
 																				class="form-control" 
 																				v-model="productNewSerial" 
 																				:placeholder="stockedProduct.merchant_product.product.name + 'Serial number' | capitalize" 

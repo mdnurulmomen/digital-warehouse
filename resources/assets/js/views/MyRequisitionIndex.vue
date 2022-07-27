@@ -267,9 +267,9 @@
 													class="form-control" 
 													v-model="singleRequisitionData.subject" 
 													placeholder="Relevant Subject" 
+													required="true" 
 													:class="!errors.subject  ? 'is-valid' : 'is-invalid'" 
 													@input="validateFormInput('subject')" 
-													required="true" 
 												>
 
 												<div class="invalid-feedback">
@@ -350,10 +350,10 @@
 														class="form-control" 
 														v-model.number="requiredProduct.total_quantity" 
 														placeholder="Product Total Quantity" 
-														:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
-														@change="validateFormInput('product_quantity')" 
 														required="true" 
 														min="0" 
+														:class="!errors.products[productIndex].product_quantity  ? 'is-valid' : 'is-invalid'" 
+														@change="validateFormInput('product_quantity')" 
 														:max="requiredProduct.merchant_product.available_quantity - requiredProduct.merchant_product.requested_quantity"
 													>
 													<div class="invalid-feedback">
@@ -393,8 +393,8 @@
 																class="form-control" 
 																v-model.number="requiredProduct.merchant_product.variations[variationIndex].required_quantity" 
 																placeholder="Variation Quantity" 
-																:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
 																min="0" 
+																:class="!errors.products[productIndex].variation_quantities[variationIndex] ? 'is-valid' : 'is-invalid'" 
 																:max="productVariation.available_quantity - productVariation.requested_quantity" 
 																@change="validateFormInput('variations_total_quantity')" 
 															>

@@ -1087,7 +1087,8 @@
 															class="form-control is-valid" 
 															v-model.number="requiredProduct.quantity" 
 															placeholder="Product Total Quantity" 
-															readonly="true"
+															readonly="true" 
+															required="true" 
 														>
 														<div class="input-group-append">
 															<span class="input-group-text">
@@ -1108,7 +1109,8 @@
 															class="form-control" 
 															:class="requiredProduct.quantity > requiredProduct.available_quantity ? 'is-invalid' : 'is-valid'"
 															v-model.number="requiredProduct.available_quantity" 
-															readonly="true"
+															readonly="true" 
+															required="true" 
 														>
 														<div class="input-group-append">
 															<span class="input-group-text">
@@ -1233,6 +1235,7 @@
 																			v-model.number="requiredProduct.variations[variationIndex].quantity" 
 																			placeholder="Variation Quantity" 
 																			readonly="true" 
+																			required="true" 
 																		>
 																		<div class="input-group-append">
 																			<span class="input-group-text">
@@ -1254,6 +1257,7 @@
 																			v-model.number="productVariation.available_quantity" 
 																			placeholder="Dispatch Quantity" 
 																			readonly="true" 
+																			required="true" 
 																		>
 																		<div class="input-group-append">
 																			<span class="input-group-text">
