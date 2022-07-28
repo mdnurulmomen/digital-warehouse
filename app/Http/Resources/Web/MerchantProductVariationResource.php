@@ -26,6 +26,7 @@ class MerchantProductVariationResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
+            'upc' => $this->when($this->upc, $this->upc),
             'preview' => $this->preview,
             'selling_price' => $this->selling_price,
             'product_variation_id' => $this->product_variation_id,

@@ -765,6 +765,17 @@ class MerchantController extends Controller
                 }),
                 */
             ],
+
+            'upc' => [
+                'nullable', 'numeric', 'max:999999999999', 'digits:12',
+                
+                /*
+                Rule::unique('merchant_products', 'upc')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
+                }),
+                */
+            ],
+
             'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
             'selling_price' => [ 'nullable', 'numeric', 
@@ -811,6 +822,47 @@ class MerchantController extends Controller
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
 
+        if ($request->upc) {        // same upc for other products / manufacturers
+        
+            if (! empty($request->manufacturer_id)) {
+               
+                $sameUPCExists = MerchantProduct::where('upc', $request->upc)
+                ->where(function ($query) use ($request) {
+                    $query->where('product_id', '!=', $request->product_id)
+                          ->orWhere('manufacturer_id', '!=', $request->manufacturer_id);
+                })
+                ->exists();
+
+            }
+            else {
+
+                $sameUPCExists = MerchantProduct::where('upc', $request->upc)->where('product_id', '!=', $request->product_id)->exists();
+
+            }
+
+            if ($sameUPCExists) {
+                
+                return response()->json(['errors'=>["engaged" => "UPC is taken."]], 422);
+
+            }
+
+        }
+
+        if ($product->has_variations) {
+            
+            // same upc for other product-variations
+            foreach (json_decode(json_encode($request->variations)) as $merchantProductVariationKey => $merchantProductVariation) {
+                
+                if (! empty($merchantProductVariation->upc) && MerchantProductVariation::where('upc', $merchantProductVariation->upc)->where('product_variation_id', '!=', $merchantProductVariation->variation->id)->exists()) {
+                    
+                    return response()->json(['errors'=>["engaged" => ucfirst($merchantProductVariation->productVariation->variation->name)." upc is taken."]], 422);
+
+                }
+
+            }
+
+        }
+
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
 
         if (empty($currentUser)) {
@@ -822,6 +874,7 @@ class MerchantController extends Controller
         $productNewMerchant = MerchantProduct::create([
 
             'sku' => ! empty($request->sku) ? strtoupper($request->sku) : $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
+            'upc' => $request->upc,
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'manufacturer_id' => $request->manufacturer_id, 
@@ -876,6 +929,17 @@ class MerchantController extends Controller
                 */
                 Rule::unique('merchant_products', 'sku')->ignore($productMerchant),
             ], 
+
+            'upc' => [
+                'nullable', 'numeric', 'max:999999999999', 'digits:12', 
+                
+                /*
+                Rule::unique('merchant_products', 'upc')->where(function ($query) use($request) {
+                    return $query->where('product_id', $request->product_id)->where('merchant_id', $request->merchant_id)->where('manufacturer_id', $request->manufacturer_id);
+                })->ignore($productMerchant),
+                */ 
+            ],
+
             'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
             'selling_price' => [ 'nullable', 'numeric', 
@@ -897,6 +961,7 @@ class MerchantController extends Controller
                 'required_without:variations.*.variation.id',
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
+
             'variations.*.selling_price' => 'required_with:variations|numeric',
             'variations.*.sku' => 'sometimes|nullable|string|max:15',
         ],
@@ -922,6 +987,58 @@ class MerchantController extends Controller
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
 
+        if ($request->upc) {        // same upc for other products / manufacturers
+        
+            if (! empty($request->manufacturer_id)) {
+               
+                $sameUPCExists = MerchantProduct::where('id', '!=', $productMerchant)
+                ->where('upc', $request->upc)
+                ->where(function ($query) use ($request) {
+                    $query->where('product_id', '!=', $request->product_id)
+                          ->orWhere('manufacturer_id', '!=', $request->manufacturer_id);
+                })
+                ->exists();
+
+            }
+            else {
+
+                $sameUPCExists = MerchantProduct::where('id', '!=', $productMerchant)
+                ->where('upc', $request->upc)
+                ->where('product_id', '!=', $request->product_id)
+                ->exists();
+
+            }
+
+            if ($sameUPCExists) {
+                
+                return response()->json(['errors'=>["engaged" => "UPC is taken."]], 422);
+
+            }
+
+        }
+
+        if ($product->has_variations) {
+            
+            // same upc for other product-variations
+            foreach (json_decode(json_encode($request->variations)) as $merchantProductVariationKey => $merchantProductVariation) {
+                
+                // new variation
+                if (empty($merchantProductVariation->id) && ! empty($merchantProductVariation->upc) && MerchantProductVariation::where('upc', $merchantProductVariation->upc)->where('product_variation_id', '!=', $merchantProductVariation->variation->id)->exists()) {
+                    
+                    return response()->json(['errors'=>["engaged" => ucfirst($merchantProductVariation->productVariation->variation->name)." upc is taken."]], 422);
+
+                }
+                // old variation
+                else if (! empty($merchantProductVariation->id) && ! empty($merchantProductVariation->upc) && MerchantProductVariation::where('upc', $merchantProductVariation->upc)->where('product_variation_id', '!=', $merchantProductVariation->product_variation_id)->where('id', '!=', $merchantProductVariation->id)->exists()) {
+                    
+                    return response()->json(['errors'=>["engaged" => ucfirst($merchantProductVariation->productVariation->variation->name)." upc is taken."]], 422);
+
+                }
+
+            }
+
+        }
+
         $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
 
         if (empty($currentUser)) {
@@ -935,6 +1052,7 @@ class MerchantController extends Controller
         $productMerchantToUpdate->update([
 
             'sku' => ! empty($request->sku) ? strtoupper($request->sku) : $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
+            'upc' => $request->upc,
             'manufacturer_id' => $request->manufacturer_id, 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 

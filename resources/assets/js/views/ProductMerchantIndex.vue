@@ -216,7 +216,7 @@
 
 						<div class="modal-body">
 									<div class="form-row">
-										<div class="form-group col-sm-12">
+										<div class="form-group col-sm-6">
 							        		<label for="inputUsername">Selected Product</label>
 								        	<multiselect 
 		                              			v-model="product" 
@@ -229,9 +229,7 @@
 		                              		>
 		                                	</multiselect>
 							        	</div>
-									</div>
-
-							        <div class="form-row">
+							        	
 							        	<div class="form-group col-md-6">
 											<label for="inputUsername">Merchant</label>
 											<multiselect 
@@ -256,7 +254,9 @@
 										    	{{ errors.product_merchant_id }}
 										    </div>
 										</div>
+									</div>
 
+							        <div class="form-row">
 										<div class="form-group col-md-6">
 											<label for="inputUsername">Manufacturer/Brand Name</label>
 
@@ -274,6 +274,23 @@
 		                              		>
 		                                	</multiselect>
 										</div>
+
+										<div class="form-group col-md-6">
+											<label for="inputFirstName">UPC</label>
+											<input type="number" 
+												class="form-control" 
+												v-model="singleMerchantProductData.upc" 
+												placeholder="Universal Product Code" 
+												:class="!errors.product_upc ? 'is-valid' : 'is-invalid'" 
+												@change="validateFormInput('product_upc')" 
+												min="100000000001" 
+												max="999999999999"
+											>
+
+											<div class="invalid-feedback">
+									        	{{ errors.product_upc }}
+									  		</div>
+										</div> 
 							        </div>
 
 									<div class="form-row">
@@ -478,27 +495,48 @@
 															v-if="singleMerchantProductData.variations.length == errors.variations.length"
 														>	
 															<div class="form-group col-md-12">
-																<label for="inputFirstName">Variaiton</label>
+																<div class="form-row">
+																	<div class="form-group col-md-6">
+																		<label for="inputFirstName">Variaiton</label>
 
-																<multiselect 
-							                              			v-model="merchantProductVariation.variation"
-							                              			placeholder="Select Variation" 
-							                                  		label="name" 
-							                                  		track-by="id" 
-							                                  		:custom-label="objectNameWithCapitalized" 
-							                                  		:options="allVariations" 
-							                                  		:disabled="singleMerchantProductData.variations[index].variation_immutability" 
-							                                  		class="form-control p-0" 
-							                                  		:class="!errors.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
-							                                  		:required="true" 
-					                                  				:allow-empty="false" 
-																	@close="changeProductVariation(index)"
-							                              		>
-							                                	</multiselect>
+																		<multiselect 
+									                              			v-model="merchantProductVariation.variation"
+									                              			placeholder="Select Variation" 
+									                                  		label="name" 
+									                                  		track-by="id" 
+									                                  		:custom-label="objectNameWithCapitalized" 
+									                                  		:options="allVariations" 
+									                                  		:disabled="singleMerchantProductData.variations[index].variation_immutability" 
+									                                  		class="form-control p-0" 
+									                                  		:class="!errors.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'" 
+									                                  		:required="true" 
+							                                  				:allow-empty="false" 
+																			@close="changeProductVariation(index)"
+									                              		>
+									                                	</multiselect>
 
-							                                	<div class="invalid-feedback">
-															    	{{ errors.variations[index].product_variation_id }}
-															    </div>
+									                                	<div class="invalid-feedback">
+																	    	{{ errors.variations[index].product_variation_id }}
+																	    </div>
+																	</div>
+
+																	<div class="form-group col-sm-6">
+																		<label for="inputFirstName">UPC</label>
+																		<input type="number" 
+																			class="form-control" 
+																			v-model="merchantProductVariation.upc" 
+																			placeholder="Universal Product Code" 
+																			:class="!errors.variations[index].product_variation_upc ? 'is-valid' : 'is-invalid'" 
+																			@change="validateFormInput('product_variation_upc')" 
+																			min="100000000001" 
+																			max="999999999999" 
+																		>
+
+																		<div class="invalid-feedback">
+																        	{{ errors.variations[index].product_variation_upc }}
+																  		</div>
+																	</div> 
+																</div>
 															</div> 
 
 															<!-- 
@@ -1030,6 +1068,18 @@
 													</label>
 												</div>
 
+												<div 
+													class="form-row" 
+													v-show="singleMerchantProductData.upc"
+												>
+													<label class="col-4 col-form-label font-weight-bold">
+														UPC :
+													</label>
+													<label class="col-8 col-form-label">
+														{{ singleMerchantProductData.upc }}
+													</label>
+												</div>
+
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
 														Description :
@@ -1160,6 +1210,18 @@
 																			</label>
 																			<label class="col-sm-8 col-form-label">
 																				{{ merchantProductVariation.sku }}
+																			</label>
+																		</div>
+
+																		<div 
+																			class="form-row" 
+																			v-show="merchantProductVariation.upc"
+																		>
+																			<label class="col-4 col-form-label font-weight-bold">
+																				UPC :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ merchantProductVariation.upc }}
 																			</label>
 																		</div>
 
@@ -2039,6 +2101,7 @@
 				this.validateFormInput('product_price');
 				this.validateFormInput('discount');
 				this.validateFormInput('product_merchant_id');
+				this.validateFormInput('product_upc');
 				this.validateFormInput('description');
 				
 				// this.validateFormInput('product_initial_quantity');
@@ -2051,6 +2114,7 @@
 					// this.validateFormInput('product_variation_type');
 					// this.validateFormInput('product_variation_quantity');
 					this.validateFormInput('product_variation_price');
+					this.validateFormInput('product_variation_upc');
 					// this.validateFormInput('product_variation_total_quantity');
 
 				}
@@ -2727,6 +2791,21 @@
 
 						break;
 
+					case 'product_upc' :
+
+						if (this.singleMerchantProductData.upc && ! this.singleMerchantProductData.upc.match(/^\d+$/g)) {
+							this.errors.product_upc = 'No alphabets, only numeric';
+						}
+						else if (this.singleMerchantProductData.upc && this.singleMerchantProductData.toString().length != 12) {
+							this.errors.product_upc = 'Invalid code, should be 12 digits';
+						}
+						else{
+							this.submitForm = true;
+							this.$delete(this.errors, 'product_upc');
+						}
+
+						break;
+
 					case 'product_sku' :
  
 						if (this.singleMerchantProductData.sku && ! this.singleMerchantProductData.sku.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
@@ -2955,6 +3034,40 @@
 									}
 									else {
 										this.$delete(this.errors.variations[index], 'product_variation_price');
+									}
+
+								}
+							);
+							
+							if (!this.errorInArray(this.errors.variations)) {
+								this.submitForm = true;
+							}
+						}
+						else {
+							this.submitForm = true;
+							// this.errors.variations = [];
+							this.$delete(this.errors, 'variations');
+						}
+
+						break;
+
+					case 'product_variation_upc' :
+
+						if (this.singleMerchantProductData.product && this.singleMerchantProductData.product.has_variations && this.singleMerchantProductData.hasOwnProperty('variations') && this.singleMerchantProductData.variations.length) {
+
+							this.singleMerchantProductData.variations.forEach(
+								(productVariation, index) => {
+									
+									if (productVariation.upc && ! productVariation.upc.match(/^\d+$/g)) {
+										
+										this.errors.variations[index].product_variation_upc = 'No alphabets, only numeric';
+
+									}
+									else if (productVariation.upc && productVariation.toString().length != 12) {
+										this.errors.variations[index].product_variation_upc = 'Invalid code, should be 12 digits';
+									}
+									else {
+										this.$delete(this.errors.variations[index], 'product_variation_upc');
 									}
 
 								}

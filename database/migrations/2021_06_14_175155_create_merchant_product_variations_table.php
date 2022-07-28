@@ -16,6 +16,7 @@ class CreateMerchantProductVariationsTable extends Migration
         Schema::create('merchant_product_variations', function (Blueprint $table) {
             $table->increments('id');
             $table->string('sku'); // scanned or generated on product-code & merchant code
+            $table->string('upc')->nullable(); // universal product code
             $table->string('preview')->nullable();
             // $table->string('description')->nullable(); // short description about what has been stored (may be hints for identification / bulk products)
             $table->unsignedMediumInteger('available_quantity')->default(0);

@@ -19,6 +19,7 @@ class Product extends Model
     // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warehouseContainer.container'];
 
     protected $casts = [
+        'upc' => 'integer',
         'has_serials' => 'boolean',
         'has_variations' => 'boolean',
     ];
@@ -34,6 +35,14 @@ class Product extends Model
     }
 
     /**
+     * Get all of the merchant-products who has this variation.
+     */
+    public function merchantProducts()
+    {
+        return $this->hasMany(MerchantProduct::class, 'product_id', 'id');
+    }
+
+    /**
      * Get all of the merchants who has this product.
      */
     public function merchants()
@@ -44,7 +53,7 @@ class Product extends Model
     // immutable product
     public function getProductImmutabilityAttribute()
     {
-        if ($this->merchants()->count()) {
+        if ($this->merchantProducts()->count()) {
 
             return true;
              
@@ -59,7 +68,7 @@ class Product extends Model
 
             if ($this->getProductImmutabilityAttribute()) {
                 
-                foreach ($this->variations() as $productVariation) {
+                foreach ($this->variations as $productVariation) {
                     
                     if (! $productVariation->variation_immutability) {
 
@@ -85,7 +94,7 @@ class Product extends Model
                 $productVariation = $this->variations()->updateOrCreate(
                     
                     [ 'variation_id' => $productNewVariation->variation->sub_variation->id ?? $productNewVariation->variation->id ],
-                    [ 'preview' => $previewPath ]
+                    [ 'preview' => $previewPath, 'upc' => $productNewVariation->upc ]
 
                 );
 

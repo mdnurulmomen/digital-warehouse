@@ -197,7 +197,7 @@
 													:class="!errors.warehouse.name  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('name')" 
 													@keydown.enter.prevent="nextPage()" 
-												>
+												/>
 
 												<div class="invalid-feedback">
 										        	{{ errors.warehouse.name }}

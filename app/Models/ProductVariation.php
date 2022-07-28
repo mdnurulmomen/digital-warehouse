@@ -23,15 +23,17 @@ class ProductVariation extends Model
     /**
      * Get all of the merchant-products who has this variation.
      */
-    public function merchantProducts()
+    public function merchantProductVariations()
     {
         return $this->hasMany(MerchantProductVariation::class, 'product_variation_id', 'id');
     }
 
     public function getVariationImmutabilityAttribute()
     {
-        if ($this->merchantProducts()->count()) {
-            return true;   
+        if ($this->merchantProductVariations()->count()) {
+
+            return true; 
+              
         }
 
         return false;

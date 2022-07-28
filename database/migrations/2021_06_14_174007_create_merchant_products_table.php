@@ -16,6 +16,7 @@ class CreateMerchantProductsTable extends Migration
         Schema::create('merchant_products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('sku'); // scanned or generated on product-code & merchant code
+            $table->string('upc')->nullable(); // universal product code
             $table->string('preview')->nullable();
             $table->unsignedMediumInteger('manufacturer_id')->nullable();
             $table->text('description')->nullable(); // short description about what has been stored (may be hints for identification / bulk products)
