@@ -313,6 +313,7 @@
 						class="form-horizontal" 
 						@submit.prevent="createMode ? storeStock() : updateStock()" 
 						autocomplete="off" 
+						novalidate="true" 
 					>
 						<input type="hidden" name="_token" :value="csrf">
 
@@ -507,7 +508,7 @@
 
 															<div class="col-md-12">
 																<div class="row">
-																	<div class="col-md-4 form-group">
+																	<div class="col-md-3 form-group">
 																		<label class="col-form-label font-weight-bold">
 																			Select Product :
 																		</label>
@@ -523,7 +524,7 @@
 									                              			placeholder="Select Product" 
 									                              			class="form-control p-0" 
 									                                  		:class="! errors.products[stockedProductIndex].product ? 'is-valid' : 'is-invalid'" 
-									                                  		:disabled="Boolean(! createMode && stockedProduct.stock_quantity && stockedProduct.available_quantity && stockedProduct.stock_quantity != stockedProduct.available_quantity)" 
+									                                  		:disabled="Boolean(! createMode && stockedProduct.stock_quantity && stockedProduct.hasOwnProperty('available_quantity') && stockedProduct.stock_quantity != stockedProduct.available_quantity)" 
 									                                  		@input="resetProductProperties(stockedProductIndex)" 
 									                              		>
 									                                	</multiselect>
@@ -533,7 +534,7 @@
 																  		</div>
 																	</div>
 
-																	<div class="col-md-4 form-group">
+																	<div class="col-md-3 form-group">
 																		<label class="col-form-label font-weight-bold">
 																			Stock Qty :
 																		</label>
@@ -543,10 +544,11 @@
 																				class="form-control" 
 																				v-model.number="stockedProduct.stock_quantity" 
 																				placeholder="Product Quantity" 
-																				required="true" 
 																				:class="! errors.products[stockedProductIndex].product_stock_quantity ? 'is-valid' : 'is-invalid'" 
 																				:min="createMode ? 1 : stockedProduct.available_quantity" 
 																				@keydown.enter.prevent="nextPage" 
+																				:readonly="stockedProduct.available_quantity==0" 
+																				required="true" 
 																			>
 																			<div class="input-group-append">
 																				<span class="input-group-text">
@@ -563,7 +565,21 @@
 																  		</div>
 																	</div>
 
-																	<div class="col-md-4 form-group">
+																	<div class="col-md-3 form-group">
+																		<label class="col-form-label font-weight-bold">
+																			Stock Code :
+																		</label>
+
+																		<input type="text" 
+																			class="form-control is-valid" 
+																			v-model.number="stockedProduct.stock_code" 
+																			placeholder="Unique Code" 
+																			@keydown.enter.prevent="nextPage" 
+																			maxlength="10" 
+																		>
+																	</div>
+
+																	<div class="col-md-3 form-group">
 																		<label class="col-form-label font-weight-bold">
 																			Buying Price (unit) :
 																		</label>
@@ -621,7 +637,7 @@
 																>	
 																	<div class="col-sm-12">
 																		<div class="form-row">	
-																			<div class="form-group col-md-4">
+																			<div class="form-group col-md-3">
 																				<label for="inputFirstName">Variaiton</label>
 																				<multiselect 
 											                              			v-model="stockedVariation.variation"
@@ -636,7 +652,7 @@
 											                                	</multiselect>
 																			</div>
 
-																			<div class="form-group col-md-4">
+																			<div class="form-group col-md-3">
 																				<label for="inputFirstName">Variation Qty</label>
 
 																				<div class="input-group mb-0">
@@ -660,7 +676,19 @@
 																		  		</div>
 																			</div>
 
-																			<div class="form-group col-md-4">
+																			<div class="form-group col-md-3">
+																				<label for="inputFirstName">Stock Code</label>
+																				
+																				<input type="text" 
+																					class="form-control is-valid" 
+																					v-model.number="stockedVariation.stock_code" 
+																					placeholder="Unique Code" 
+																					@keydown.enter.prevent="nextPage" 
+																					maxlength="10" 
+																				>
+																			</div>
+
+																			<div class="form-group col-md-3">
 																				<label for="inputFirstName">Buying Price (unit)</label>
 
 																				<div class="input-group mb-0">
@@ -3944,9 +3972,19 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
-							// this.printStockCode(this.singleStockData.products);
-
 							$('#stock-createOrEdit-modal').modal('hide');
+
+							let singleStockUpdatedData = this.allStocks.find(
+								stock => stock.id == this.singleStockData.id
+							);
+
+							if (typeof singleStockUpdatedData !== 'undefined') {
+
+								this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
+
+								this.printStockCode(this.singleStockData.products);
+
+							}
 						}
 					})
 					.catch(error => {
@@ -3987,9 +4025,13 @@
 								stock => stock.id == this.singleStockData.id
 							);
 
-							this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
+							if (typeof singleStockUpdatedData !== 'undefined') {
 
-							this.printStockCode(this.singleStockData.products);
+								this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
+
+								this.printStockCode(this.singleStockData.products);
+
+							}
 						}
 					})
 					.catch(error => {
@@ -4123,8 +4165,13 @@
 
 					if (this.errors.constructor === Object && Object.keys(this.errors).length < 2) {
 
-						this.fetchMerchantAllProducts();
-						this.fetchMerchantWarehouseAllSpaces();
+						if (! this.allProducts.length) {	// already loaded / not
+
+							this.fetchMerchantAllProducts();
+							this.fetchMerchantWarehouseAllSpaces();
+
+						}
+
 						
 						this.submitForm = true;
 						this.step++;
@@ -4500,11 +4547,11 @@
 
 							// this.$set(this.errors.products[stockedProductIndex], 'addresses', []);	
 
-							stockedProduct.addresses.forEach(
-								(productAddress, index) => {
-									this.errors.products[stockedProductIndex].addresses.push({});
-								}
-							);
+						stockedProduct.addresses.forEach(
+							(productAddress, index) => {
+								this.errors.products[stockedProductIndex].addresses.push({});
+							}
+						);
 							
 						// }
 						/*
@@ -5455,6 +5502,7 @@
 											// this.errors.products[stockedProductIndex].variations[stockedProduct.variations.length-1].product_variation_quantity = null;
 										
 											this.$delete(this.errors.products[stockedProductIndex].variations[stockedProduct.variations.length-1], 'product_variation_quantity');
+											
 										}
 
 									}
@@ -5792,27 +5840,27 @@
 
 									// this.submitForm = true;
 
-									// this.errors.products[stockedProductIndex].variations = [];
-									this.$delete(this.errors.products[stockedProductIndex], 'variations');
+									if (! stockedProduct.has_variations) {
 
-									/*
-									stockedProduct.variations.forEach(
-										(stockedProduct, stockedProductIndex) => {
-											
-											stockedProduct.variations.forEach(
+										this.errors.products[stockedProductIndex].variations = [];
+										// this.$delete(this.errors.products[stockedProductIndex], 'variations');
 
-												(stockVariation, stockVariationIndex) => {
+									}
+									else {	
+										
+										stockedProduct.variations.forEach(
 
-													// this.errors.variations[stockVariationIndex].product_variation_serial = [];
-													this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serial');
+											(stockVariation, stockVariationIndex) => {
 
-												}
+												// this.errors.variations[stockVariationIndex].product_variation_serial = [];
+												this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serial');
+												this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serials');
 
-											);
+											}
 
-										}
-									);
-									*/
+										);	
+
+									}
 								
 								}
 
@@ -5901,27 +5949,27 @@
 
 									// this.submitForm = true;
 
-									// this.errors.products[stockedProductIndex].variations = [];
-									this.$delete(this.errors.products[stockedProductIndex], 'variations');
+									if (! stockedProduct.has_variations) {
 
-									/*
-									stockedProduct.variations.forEach(
-										(stockedProduct, stockedProductIndex) => {
-											
-											stockedProduct.variations.forEach(
+										this.errors.products[stockedProductIndex].variations = [];
+										// this.$delete(this.errors.products[stockedProductIndex], 'variations');
 
-												(stockVariation, stockVariationIndex) => {
+									}
+									else {	
+										
+										stockedProduct.variations.forEach(
 
-													// this.errors.variations[stockVariationIndex].product_variation_serial = [];
-													this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serial');
+											(stockVariation, stockVariationIndex) => {
 
-												}
+												// this.errors.variations[stockVariationIndex].product_variation_serial = [];
+												this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serial');
+												this.$delete(this.errors.products[stockedProductIndex].variations[stockVariationIndex], 'product_variation_serials');
 
-											);
+											}
 
-										}
-									);
-									*/
+										);	
+
+									}
 								
 								}
 

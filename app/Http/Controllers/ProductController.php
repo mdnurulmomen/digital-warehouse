@@ -656,7 +656,7 @@ class ProductController extends Controller
 
         // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
         if (empty($currentUser)) {
 
@@ -681,7 +681,7 @@ class ProductController extends Controller
         ]);
 
         $productNewStock = $newStock->stocks()->create([
-            'stock_code' => ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
+            'stock_code' => $request->stock_code ?? ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
             'stock_quantity' => $request->stock_quantity,
             // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'available_quantity' => $request->stock_quantity,
@@ -862,7 +862,7 @@ class ProductController extends Controller
         }
         */
 
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
         if (empty($currentUser)) {
 
@@ -1079,7 +1079,7 @@ class ProductController extends Controller
 
     public function storeStock(StockRequest $request, $perPage)
     {
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
         if (empty($currentUser)) {
 
@@ -1114,7 +1114,7 @@ class ProductController extends Controller
             // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
             $productNewStock = $newStock->stocks()->create([
-                'stock_code' => ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
+                'stock_code' => $storingProduct->stock_code ?? ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
                 'stock_quantity' => $storingProduct->stock_quantity,
                 // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $storingProduct->stock_quantity : $lastAvailableQuantity,
                 'available_quantity' => $storingProduct->stock_quantity,
@@ -1151,7 +1151,7 @@ class ProductController extends Controller
 
     public function updateStock(StockRequest $request, $stock, $perPage)
     {   
-        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? Auth::user();
+        $currentUser = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
         if (empty($currentUser)) {
 

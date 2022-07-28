@@ -578,6 +578,7 @@
 																@keydown.enter.prevent="nextPage" 
 																@change="validateFormInput('product_stock_quantity')" 
 																:min="createMode ? 1 : singleStockData.available_quantity" 
+																:readonly="singleStockData.available_quantity==0" 
 																required="true" 
 															>
 															<div class="input-group-append">
@@ -592,6 +593,22 @@
 														>
 												        	{{ errors.stock.product_stock_quantity }}
 												  		</div>
+													</div>
+												</div>
+
+												<div class="form-row form-group">
+													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
+														Stock Code :
+													</label>
+
+													<div class="col-sm-8">
+														<input type="text" 
+															class="form-control is-valid" 
+															v-model.number="singleStockData.stock_code" 
+															placeholder="Unique Code" 
+															@keydown.enter.prevent="nextPage" 
+															maxlength="10" 
+														>
 													</div>
 												</div>
 
@@ -642,7 +659,9 @@
 														/>
 													</div>
 												</div>
+											</div>
 
+											<div class="col-sm-12">
 												<div class="form-row" v-if="productMerchant.has_variations">
 													<div 
 														class="form-group col-md-12" 
@@ -653,7 +672,7 @@
 															v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 															:key="'product-variation-index-' + variationIndex + 'A'"
 														>	
-															<div class="form-group col-md-4">
+															<div class="form-group col-md-3">
 																<label for="inputFirstName">Variaiton</label>
 																<multiselect 
 							                              			v-model="singleStockData.variations[variationIndex].variation"
@@ -669,7 +688,7 @@
 															</div>
 
 															<div 
-																class="form-group col-md-4"
+																class="form-group col-md-3"
 															>
 																<label for="inputFirstName">Variation Qty</label>
 																
@@ -688,8 +707,20 @@
 														  		</div>
 															</div>
 
+															<div class="form-group col-md-3">
+																<label for="inputFirstName">Stock Code</label>
+																
+																<input type="text" 
+																	class="form-control is-valid" 
+																	v-model.number="singleStockData.variations[variationIndex].stock_code" 
+																	placeholder="Unique Code" 
+																	@keydown.enter.prevent="nextPage" 
+																	maxlength="10" 
+																>
+															</div>
+
 															<div 
-																class="form-group col-md-4"
+																class="form-group col-md-3"
 															>
 																<label for="inputFirstName">Buying Price (unit)</label>
 
@@ -3639,10 +3670,21 @@
 
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
-							
-							// this.printStockCode(this.singleStockData);		// as there is no stock code then
 
 							$('#stock-createOrEdit-modal').modal('hide');
+
+							let singleStockUpdatedData = this.allStocks.find(
+								stock => stock.id == this.singleStockData.id
+							);
+
+							if (typeof singleStockUpdatedData !== 'undefined') {
+
+								this.$set(this, 'singleStockData', singleStockUpdatedData);
+
+								this.printStockCode(this.singleStockData);
+
+							}
+
 						}
 					})
 					.catch(error => {
@@ -3677,11 +3719,20 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setAvailableContents(response);
 
-							// this.printStockCode(this.singleStockData);		// as there is no stock code then
-
 							$('#stock-createOrEdit-modal').modal('hide');
 
-							this.printStockCode(this.singleStockData);
+							let singleStockUpdatedData = this.allStocks.find(
+								stock => stock.id == this.singleStockData.id
+							);
+
+							if (typeof singleStockUpdatedData !== 'undefined') {
+
+								this.$set(this, 'singleStockData', singleStockUpdatedData);
+
+								this.printStockCode(this.singleStockData);
+
+							}
+
 						}
 					})
 					.catch(error => {

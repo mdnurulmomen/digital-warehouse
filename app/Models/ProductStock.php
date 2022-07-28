@@ -216,7 +216,7 @@ class ProductStock extends Model
                     else if(empty($variationExistingStock)) {
 
                         $productVariationStock = $this->variations()->create([
-                            'stock_code' => ($this->stock_code.'V'.$stockVariation->merchant_product_variation_id),
+                            'stock_code' => $stockVariation->stock_code ?? ($this->stock_code.'V'.$stockVariation->merchant_product_variation_id),
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => $stockVariation->stock_quantity, 
                             'unit_buying_price' => $stockVariation->unit_buying_price ?? $variationExistingStock->merchantProductVariation->selling_price ?? 0,
@@ -265,7 +265,7 @@ class ProductStock extends Model
                         // $variationLastAvailableValue = /*MerchantProductVariation::findOrFail($stockVariation->id)->latestStock->available_quantity*/ $merchantProductExpectedVariation->available_quantity ?? 0;
 
                         $variationNewStock = $this->variations()->create([
-                            'stock_code' => ($this->stock_code.'V'.$stockVariation->id),
+                            'stock_code' => $stockVariation->stock_code ?? ($this->stock_code.'V'.$stockVariation->id),
                             'stock_quantity' => $stockVariation->stock_quantity,
                             'available_quantity' => $stockVariation->stock_quantity, 
                             'unit_buying_price' => $stockVariation->unit_buying_price ?? $merchantProductExpectedVariation->selling_price ?? 0,
