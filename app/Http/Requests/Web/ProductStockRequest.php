@@ -46,6 +46,17 @@ class ProductStockRequest extends FormRequest
             // 'product_id' => 'required|numeric|exists:products,id',
             'addresses' => 'required|array|min:1'
         ];
+
+        if (! empty($this->input('id')) && $this->route('stock')) {
+            
+            $rules['stock_code'] = 'nullable|string|max:10|unique:product_stocks,stock_code,'.$this->input('id');
+
+        }
+        else {
+
+            $rules['stock_code'] = 'nullable|string|max:10|unique:product_stocks,stock_code';
+
+        }
             
         $merchantProduct = MerchantProduct::findOrFail($this->input('merchant_product_id'));
         $product = $merchantProduct->product;
@@ -106,36 +117,53 @@ class ProductStockRequest extends FormRequest
 
             }
         }
+
         if ($product->has_variations) {
+
             $rules['variations'] = 'required|array|min:1';
             
             // $rules['variations.*.id'] = 'required_without:variations.*.merchant_product_variation_id|integer|exists:merchant_product_variations,id';
 
             // $rules['variations.*.merchant_product_variation_id'] = 'required_without:variations.*.id|integer|exists:merchant_product_variations,id';
 
+            $rules['variations.*.stock_quantity'] = 'sometimes|integer|min:0';
+
+            $rules['variations.*.unit_buying_price'] = 'sometimes|numeric|min:0';
+
+            if (array_sum(array_column($this->input('variations'), 'stock_quantity')) != $this->input('stock_quantity')) {
+
+                $rules['total_stock_quantity'] = 'required|integer|min:'.array_sum(array_column($this->input('variations'), 'stock_quantity'));
+
+            }
+
             foreach (json_decode(json_encode($this->input('variations'))) as $stockingProductVariationKey => $stockingProductVariation) {
                 
-                if (empty($stockingProductVariation->merchant_product_variation_id)) {
+                if (empty($stockingProductVariation->merchant_product_variation_id)) {  // updating
                     
                     $rules['variations.'.$stockingProductVariationKey.'.id'] = 'required|integer|exists:merchant_product_variations,id';
 
                 }
-                else {
+                else {  // creating
 
                     $rules['variations.'.$stockingProductVariationKey.'.merchant_product_variation_id'] = 'required|integer|exists:merchant_product_variations,id';
 
                 }
 
+                if (! empty($stockingProductVariation->id) && $this->route('stock')) {
+            
+                    $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code,'.$stockingProductVariation->id;
+
+                }
+                else {
+
+                    $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code';
+
+                }
+
             }
 
-            $rules['variations.*.stock_quantity'] = 'sometimes|integer|min:0';
-            $rules['variations.*.unit_buying_price'] = 'sometimes|numeric|min:0';
         }
-        if ($product->has_variations && array_sum(array_column($this->input('variations'), 'stock_quantity')) != $this->input('stock_quantity')) {
-
-            $rules['total_stock_quantity'] = 'required|integer|min:'.array_sum(array_column($this->input('variations'), 'stock_quantity'));
-
-        }
+        
         /*
         // Variation Serial Duplicacy
         if ($product->has_variations && $product->has_serials) {

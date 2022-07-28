@@ -7,6 +7,8 @@
 // Bootstrap
 // @import '~bootstrap/scss/bootstrap';
 
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+
 .tooltip {
   display: block !important;
   z-index: 10000;
@@ -135,8 +137,6 @@ span.badge, {
     text-align:center
   }
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
 body, .pcoded .pcoded-navbar {
   font-family: 'Open Sans', sans-serif;
