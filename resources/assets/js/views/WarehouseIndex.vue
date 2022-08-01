@@ -132,6 +132,7 @@
 						<form 
 							class="form-horizontal" 
 							v-on:submit.prevent="verifyFormInput()" 
+							novalidate="true" 
 						>
 
 							<input type="hidden" name="_token" :value="csrf">

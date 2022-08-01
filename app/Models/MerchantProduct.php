@@ -13,6 +13,10 @@ class MerchantProduct extends Model
     
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'upc' => 'integer',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');

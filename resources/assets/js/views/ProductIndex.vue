@@ -24,6 +24,9 @@
 											  		:query="query" 
 											  		:caller-page="'products'" 
 											  		:required-permission = "'product'" 
+											  		:data-to-export="dataToExport" 
+											  		:contents-to-download="productsToShow" 
+											  		:pagination="pagination" 
 											  		:disable-add-button="allProductCategories.length==0 ? true : false" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
@@ -76,6 +79,7 @@
 																<thead>
 																	<tr>
 																		<th>Name</th>
+																		<th>Category</th>
 																		<th># Merchants</th>
 																		<th>Actions</th>
 																	</tr>
@@ -88,6 +92,8 @@
 																		:class="content.id==singleProductData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ content.name | capitalize }}</td>
+
+																		<td>{{ content.category ? content.category.name : '' | capitalize }}</td>
 																		
 																		<td>
 																			{{ content.merchants_count || 0 }}
@@ -153,7 +159,7 @@
 																	<tr 
 																  		v-show="!productsToShow.length"
 																  	>
-															    		<td colspan="3">
+															    		<td colspan="4">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -164,6 +170,7 @@
 																<tfoot>
 																	<tr>	
 																		<th>Name</th>
+																		<th>Category</th>
 																		<th># Merchants</th>
 																		<th>Actions</th>
 																	</tr>
@@ -1143,14 +1150,14 @@
 								<div class="form-row">
 									<label class="col-sm-4 col-form-label font-weight-bold text-right">Serial :</label>
 									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : 'NA' }}</span>
+										<span :class="[singleProductData.has_serials ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_serials ? 'Available' : '--' }}</span>
 									</label>
 								</div>
 
 								<div class="form-row">
 									<label class="col-sm-4 col-form-label font-weight-bold text-right">Variation :</label>
 									<label class="col-sm-6 form-control-plaintext">
-										<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : 'NA' }}</span>
+										<span :class="[singleProductData.has_variations ? 'badge-info' : 'badge-primary', 'badge']">{{ singleProductData.has_variations ? 'Available' : '--' }}</span>
 									</label>
 								</div>
 
@@ -1293,6 +1300,80 @@
 						],
 						*/
 					},
+				},
+
+				dataToExport: {
+					
+					"Name": {
+						field: "name",
+						callback: (name) => {
+							
+							return this.$options.filters.capitalize(name);
+
+						},
+					},
+
+					"Category": {
+						field: "category",
+						
+						callback: (category) => {
+							if (category) {
+								return this.$options.filters.capitalize(category.name);
+							}
+
+							else {
+								return '--';
+							}
+						},
+					},
+
+					'Quantity Type' : 'quantity_type', 
+
+					"Serials": {
+						field: "has_serials",
+						
+						callback: (has_serials) => {
+							if (has_serials) {
+								return 'Available';
+							}
+
+							else {
+								return '--';
+							}
+						},
+					},
+
+					"Variations": {
+
+						callback: (object) => {
+
+							let infosToReturn = '';
+
+							if (object.has_variations && object.variations.length) {
+
+								object.variations.forEach(
+					
+									(objectVariation, variationIndex) => {
+
+										infosToReturn += (variationIndex + 1) + '. ' + this.$options.filters.capitalize(objectVariation.variation.name) + ", \n";
+
+									}
+									
+								);
+
+
+							}
+							else {
+
+								infosToReturn += 'NA';
+
+							}
+							
+							return infosToReturn;
+
+						},
+					},
+					
 				},
 
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

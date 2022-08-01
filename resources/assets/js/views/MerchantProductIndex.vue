@@ -337,11 +337,11 @@
 									<label for="inputFirstName">Selling Price (unit)</label>
 
 									<div class="input-group mb-0">
-										<input type="number" 
+										<input 
+											type="number" 
 											class="form-control" 
 											v-model.number="singleMerchantProductData.selling_price" 
 											placeholder="Product Selling Price" 
-											required="true" 
 											:class="!errors.product_price ? 'is-valid' : 'is-invalid'" 
 											@change="validateFormInput('product_price')" 
 											:disabled="singleMerchantProductData.hasOwnProperty('product') && singleMerchantProductData.product.product_category_id ? false : true"
@@ -592,11 +592,11 @@
 																<label for="inputFirstName">Selling Price (unit)</label>
 
 																<div class="input-group mb-0">
-																	<input type="number" 
+																	<input 
+																		type="number" 
 																		class="form-control" 
 																		v-model.number="merchantProductVariation.selling_price" 
 																		placeholder="Variation Selling Price" 
-																		required="true" 
 																		:class="!errors.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
 																		@change="validateFormInput('product_variation_price')" 
 																	>
@@ -909,7 +909,7 @@
 
 												<div 
 													class="form-row"
-													v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
+													v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations && singleMerchantProductData.selling_price"
 												>
 													<label class="col-4 col-form-label font-weight-bold">
 														Selling Price (unit) :
@@ -1013,7 +1013,10 @@
 																			</label>
 																		</div>
 
-																		<div class="form-row">
+																		<div 
+																			class="form-row"
+																			v-show="merchantProductVariation.selling_price"
+																		>
 																			<label class="col-4 col-form-label font-weight-bold">
 																				Selling Price (unit) :
 																			</label>
@@ -1416,7 +1419,7 @@
 
 							<div 
 								class="form-row"
-								v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations"
+								v-show="singleMerchantProductData.hasOwnProperty('product') && ! singleMerchantProductData.product.has_variations && singleMerchantProductData.selling_price"
 							>
 								<label class="col-4 col-form-label font-weight-bold">
 									Selling Price (unit) :
@@ -1563,7 +1566,10 @@
 											</label>
 										</div>
 
-										<div class="form-row">
+										<div 
+											class="form-row"
+											v-show="merchantProductVariation.selling_price"
+										>
 											<label class="col-4 col-form-label font-weight-bold">
 												Selling Price (unit) :
 											</label>
@@ -2043,8 +2049,6 @@
 					},
 
 					SKU: 'sku',
-
-					// Price: 'selling_price',
 
 					"Discount": {
 						field: "discount",
@@ -3236,8 +3240,8 @@
 
 					case 'product_price' :
 
-						if (this.singleMerchantProductData.hasOwnProperty('product') && this.singleMerchantProductData.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)) {
-							this.errors.product_price = 'Price is required';
+						if (this.singleMerchantProductData.selling_price && this.singleMerchantProductData.selling_price < 0 /*this.singleMerchantProductData.hasOwnProperty('product') && this.singleMerchantProductData.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)*/) {
+							this.errors.product_price = 'Invalid selling price';
 						}
 						else{
 							this.submitForm = true;
@@ -3435,9 +3439,9 @@
 							this.singleMerchantProductData.variations.forEach(
 								(productVariation, index) => {
 									
-									if (! productVariation.selling_price || productVariation.selling_price < 0) {
+									if (/*! productVariation.selling_price || */ productVariation.selling_price && productVariation.selling_price < 0) {
 										
-										this.errors.variations[index].product_variation_price = 'Variation selling price is required';
+										this.errors.variations[index].product_variation_price = 'Invalid selling price';
 
 									}
 									else {

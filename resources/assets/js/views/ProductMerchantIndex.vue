@@ -314,7 +314,8 @@
 											<label for="inputFirstName">Selling Price (unit)</label>
 
 									  		<div class="input-group mb-0">
-												<input type="number" 
+												<input 
+													type="number" 
 													class="form-control" 
 													v-model.number="singleMerchantProductData.selling_price" 
 													placeholder="Product Selling Price" 
@@ -571,13 +572,13 @@
 																		<label for="inputFirstName">Selling Price (unit)</label>
 
 																  		<div class="input-group mb-0">
-																			<input type="number" 
+																			<input 
+																				type="number" 
 																				class="form-control" 
 																				v-model.number="merchantProductVariation.selling_price" 
 																				placeholder="Variation Selling Price" 
 																				:class="!errors.variations[index].product_variation_price ? 'is-valid' : 'is-invalid'" 
 																				@change="validateFormInput('product_variation_price')" 
-																				required="true" 
 																			>
 																			<div class="input-group-append">
 																				<span class="input-group-text" id="basic-addon2">
@@ -1125,7 +1126,10 @@
 													</label>
 												</div>	
 
-												<div class="form-row">
+												<div 
+													class="form-row" 
+													v-show="singleMerchantProductData.selling_price"
+												>
 													<label class="col-sm-4 col-form-label font-weight-bold">
 														Selling Price (unit) :
 													</label>
@@ -1225,7 +1229,10 @@
 																			</label>
 																		</div>
 
-																		<div class="form-row">
+																		<div 
+																			class="form-row"
+																			v-show="merchantProductVariation.selling_price"
+																		>
 																			<label class="col-sm-4 col-form-label font-weight-bold">
 																				Selling Price (unit) :
 																			</label>
@@ -2820,8 +2827,8 @@
 
 					case 'product_price' :
 
-						if (this.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)) {
-							this.errors.product_price = 'Price is required';
+						if (this.singleMerchantProductData.selling_price && this.singleMerchantProductData.selling_price < 0 /*this.product.category && (! this.singleMerchantProductData.selling_price || this.singleMerchantProductData.selling_price < 0)*/) {
+							this.errors.product_price = 'Invalid selling price';
 						}
 						else{
 							this.submitForm = true;
@@ -3027,9 +3034,9 @@
 							this.singleMerchantProductData.variations.forEach(
 								(productVariation, index) => {
 									
-									if (! productVariation.selling_price || productVariation.selling_price < 0) {
+									if (productVariation.selling_price && productVariation.selling_price < 0 /*! productVariation.selling_price || productVariation.selling_price < 0*/) {
 										
-										this.errors.variations[index].product_variation_price = 'Variation selling price is required';
+										this.errors.variations[index].product_variation_price = 'Invalid selling price';
 
 									}
 									else {

@@ -19,7 +19,7 @@ class PackagingPackage extends Model
     {
         if ($encodedImageFile) {
             
-            $imagePath = 'storage/packaging_packages/';
+            $imagePath = 'storage/packaging-packages/';
 
             if(!File::isDirectory($imagePath)){
                 File::makeDirectory($imagePath, 0777, true, true);

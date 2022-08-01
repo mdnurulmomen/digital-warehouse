@@ -19,7 +19,6 @@ class Product extends Model
     // protected $with = ['category', 'merchant', 'variations.variation', 'addresses.space.warehouseContainer.container'];
 
     protected $casts = [
-        'upc' => 'integer',
         'has_serials' => 'boolean',
         'has_variations' => 'boolean',
     ];
@@ -94,7 +93,7 @@ class Product extends Model
                 $productVariation = $this->variations()->updateOrCreate(
                     
                     [ 'variation_id' => $productNewVariation->variation->sub_variation->id ?? $productNewVariation->variation->id ],
-                    [ 'preview' => $previewPath, 'upc' => $productNewVariation->upc ]
+                    [ 'preview' => $previewPath ]
 
                 );
 

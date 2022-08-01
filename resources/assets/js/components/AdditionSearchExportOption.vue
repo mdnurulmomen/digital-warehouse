@@ -39,7 +39,7 @@
   					</div>
 
   					<i 
-  						class="fa fa-upload fa-lg pr-3 pl-1" 
+  						class="fa fa-upload fa-lg" 
   						v-show="$route.name=='merchant-products' && userHasPermissionTo('create-' + requiredPermission)"
   						data-toggle="modal" 
   						v-tooltip.bottom-end="'Upload ' + callerPage" 

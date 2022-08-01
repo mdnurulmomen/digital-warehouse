@@ -778,10 +778,12 @@ class MerchantController extends Controller
 
             'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
-            'selling_price' => [ 'nullable', 'numeric', 
+            'selling_price' => [ 'nullable', 'numeric', 'min:0'
+                /*
                 Rule::requiredIf(function () use ($product) {
                     return $product->product_category_id != NULL;
                 }),
+                */
             ],
             'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:65535',
@@ -797,7 +799,7 @@ class MerchantController extends Controller
                 'required_with:variations', 
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
-            'variations.*.selling_price' => 'required_with:variations|numeric',
+            'variations.*.selling_price' => 'nullable|numeric|min:0',
             'variations.*.sku' => 'sometimes|nullable|string|max:15|unique:merchant_product_variations,sku',
         ],
         [
@@ -814,11 +816,11 @@ class MerchantController extends Controller
             'sku.*' => 'SKU is invalid', 
 
             'manufacturer_id' => 'Manufacturer is invalid', 
-            'selling_price' => 'Product selling price is required',
+            'selling_price' => 'Invalid selling price',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Variation name is required',
             'variations.*.variation.id.*' => 'Invalid variations, please reload',
-            'variations.*.selling_price' => 'Variation selling price is required',
+            'variations.*.selling_price' => 'Invalid selling price',
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
 
@@ -942,10 +944,12 @@ class MerchantController extends Controller
 
             'manufacturer_id' => 'nullable|numeric|exists:product_manufacturers,id',
             // 'selling_price' => 'required|numeric',
-            'selling_price' => [ 'nullable', 'numeric', 
+            'selling_price' => [ 'nullable', 'numeric', 'min:0'
+                /*
                 Rule::requiredIf(function () use ($product) {
                     return $product->product_category_id != NULL;
                 }),
+                */
             ],
             'discount' => 'nullable|numeric|between:0,100',
             'description' => 'nullable|string|max:65535',
@@ -962,7 +966,7 @@ class MerchantController extends Controller
                 Rule::exists('product_variations', 'id')->where('product_id', $product->id), 
             ],
 
-            'variations.*.selling_price' => 'required_with:variations|numeric',
+            'variations.*.selling_price' => 'nullable|numeric|min:0',
             'variations.*.sku' => 'sometimes|nullable|string|max:15',
         ],
         [
@@ -979,11 +983,11 @@ class MerchantController extends Controller
             'sku.*' => 'SKU is invalid', 
 
             'manufacturer_id' => 'Manufacturer is invalid', 
-            'selling_price' => 'Product selling price is required',
+            'selling_price' => 'Invalid selling price',
             'warning_quantity' => 'Warning quantity should be numeric',
             'variations.*.variation' => 'Variation name is required',
             'variations.*.variation.id.*' => 'Invalid variations, please reload',
-            'variations.*.selling_price' => 'Variation selling price is required',
+            'variations.*.selling_price' => 'Invalid selling price',
             'variations.*.sku' => 'Invalid variation SKU',
         ]);
 
