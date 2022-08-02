@@ -48,11 +48,10 @@
   					</i>
   				</div>
 
-	  			<div class="ml-auto d-sm-none">
+	  			<div class="ml-auto d-sm-none" v-tooltip.bottom-end="'Create New'">
 	  				<button 
 	  					type="button" 
 			  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
-			  			v-tooltip.bottom-end="'Create New'" 
 			  			:disabled="disableAddButton" 
 			  			@click="$emit('showContentCreateForm')" 
 			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
@@ -107,17 +106,18 @@
 			</div>
 
 			<div class="col-md-4 text-right d-none d-md-block">
-	  			<button 
-	  				type="button" 
-		  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
-		  			v-tooltip.bottom-end="'Create New'" 
-		  			:disabled="disableAddButton" 
-		  			@click="$emit('showContentCreateForm')" 
-		  			v-if="userHasPermissionTo('create-' + requiredPermission)"
-	  			>
-	  				<i class="fa fa-plus"></i>
-	  				New {{ callerPage | capitalize }}
-	  			</button>
+	  			<div v-tooltip.bottom-end="'Create New'">
+		  			<button 
+		  				type="button" 
+			  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
+			  			:disabled="disableAddButton" 
+			  			@click="$emit('showContentCreateForm')" 
+			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+		  			>
+		  				<i class="fa fa-plus"></i>
+		  				New {{ callerPage | capitalize }}
+		  			</button>
+	  			</div>
 			</div>
 	  	</div>
 
