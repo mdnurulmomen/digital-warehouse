@@ -266,7 +266,7 @@ Route::name('admin.')->group(function () {
 		// first dashboard
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one.show');
 		// second dashboard
-		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
+		Route::get('/api/general-dashboard-two/{merchant}/{date?}','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
 		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.show');
 
 		// imports

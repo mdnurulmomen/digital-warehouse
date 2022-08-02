@@ -64,21 +64,20 @@ class AnalyticsController extends Controller
     	], 200);
     }
 
-    public function getGeneralDashboardTwoData()
+    public function getGeneralDashboardTwoData($merchant, $date = NULL)
     {
         // stock in
-        // $stockIns = $this->getRecentStockInChartData();
+        $stockIns = $this->getRecentStockInChartData($merchant, $date);
 
         // stock out
-        // $stockOuts = $this->getRecentStockOutChartData();
+        $stockOuts = $this->getRecentStockOutChartData($merchant, $date);
 
         return response()->json([
 
-            // 'stockIns' => $stockIns,
-            // 'stockOuts' => $stockOuts,
+            'stockIns' => $stockIns,
+            'stockOuts' => $stockOuts,
             
         ]);
-
     }
 
     protected function showMerchantLimitedProducts($merchant, $perPage)
@@ -98,7 +97,7 @@ class AnalyticsController extends Controller
         ]);
     }
 
-    protected function getRecentStockInChartData()
+    protected function getRecentStockInChartData($merchant, $date = NULL)
     {
         $stockIns = [
         
@@ -110,7 +109,7 @@ class AnalyticsController extends Controller
 
                 0 => [
 
-                    "label" => "Last week stock in's",
+                    "label" => filter_var($merchant, FILTER_VALIDATE_BOOLEAN) && ! empty($date) ? "Stock in's" : "Last week stock in's",
 
                     "data" => [ 
                         // 300, 
@@ -128,11 +127,25 @@ class AnalyticsController extends Controller
             ]
         ];
 
-        $stockedProducts = MerchantProduct::whereHas('stocks.stock', function ($query) {
+        if (filter_var($merchant, FILTER_VALIDATE_BOOLEAN) && ! empty($date)) {
             
-            $query->where('created_at', '>=', now()->subDays(7));
-           
-        })->get();
+            $stockedProducts = MerchantProduct::where('merchant_id', $merchant)
+            ->whereHas('stocks.stock', function ($query) use ($date) {
+                
+                $query->whereDate('created_at', '=', $date);
+               
+            })->get();
+
+        }
+        else {
+
+            $stockedProducts = MerchantProduct::whereHas('stocks.stock', function ($query) {
+                
+                $query->whereDate('created_at', '=', date('Y-m-d'));
+               
+            })->get();
+
+        }
 
         foreach ($stockedProducts as $merchantProduct) {
             
@@ -145,7 +158,7 @@ class AnalyticsController extends Controller
         return $stockIns;
     }
 
-    protected function getRecentStockOutChartData()
+    protected function getRecentStockOutChartData($merchant, $date = NULL)
     {
         $stockOuts = [
         
@@ -157,7 +170,7 @@ class AnalyticsController extends Controller
 
                 0 => [
 
-                    "label" => "Last week stock out's",
+                    "label" => filter_var($merchant, FILTER_VALIDATE_BOOLEAN) && ! empty($date) ? "Stock out's" : "Last week stock out's",
 
                     "data" => [ 
                         // 300, 
@@ -175,28 +188,26 @@ class AnalyticsController extends Controller
             ]
         ];
 
-        $dispatchedRequisitions = Requisition::where('status', 1)->where('created_at', '>=', now()->subDays(7))->get();
+        if (filter_var($merchant, FILTER_VALIDATE_BOOLEAN) && ! empty($date)) {
+            
+            $dispatchedRequisitions = Requisition::where('status', 1)->where('merchant_id', $merchant)->whereDate('created_at', '=', $date)->get();
+
+        }
+        else {
+
+            $dispatchedRequisitions = Requisition::where('status', 1)->whereDate('created_at', '=', date('Y-m-d'))->get();
+
+        }
 
         foreach ($dispatchedRequisitions as $dispatchedRequisition) {
         
-            
             foreach ($dispatchedRequisition->products as $requiredProduct) {
                 
                 if (! in_array(ucwords($requiredProduct->merchantProduct->product->name), $stockOuts['labels'])) {
                     
                     $stockOuts['labels'][] = ucwords($requiredProduct->merchantProduct->product->name);
 
-                    $stockOuts['datasets'][0]['data'][] = Requisition::with(['products' => function ($query) use ($requiredProduct) {
-                                                            $query->where('merchant_product_id', $requiredProduct->merchant_product_id);
-                                                        }])
-                                                        ->where('status', 1)->where('created_at', '>=', now()->subDays(7))
-                                                        ->whereHas('products', function ($query) use ($requiredProduct) {
-                                                            $query->where('merchant_product_id', $requiredProduct->merchant_product_id);
-                                                        })
-                                                        ->get()
-                                                        ->pluck('products')
-                                                        ->collapse()
-                                                        ->sum('quantity');
+                    $stockOuts['datasets'][0]['data'][] = $dispatchedRequisitions->pluck('products')->collapse()->sum('quantity');
 
                     $stockOuts['datasets'][0]['backgroundColor'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
 

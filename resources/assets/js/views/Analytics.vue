@@ -28,177 +28,229 @@
 			<div class="main-body">
 				<div class="page-wrapper">
 					<div class="page-body">
-						<!-- 
-						<div class="row">
-							<div class="col-md-6 col-xl-6">
-								<div class="card" v-if="dashboard.hasOwnProperty('stockIns')">
-									<div class="card-body">
-										<div class="row align-items-center">
+						<div 
+						class="card" 
+						v-if="userHasPermissionTo('view-product-stock-index') && userHasPermissionTo('view-dispatch-index')"
+						>
+						<div class="card-header text-center">
+							<div class="row">
+								<div class="col-sm-12 form-group">
+									<p class="font-weight-bold">Change Merchant & Date to view more</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<select 
+									class="form-control" 
+									v-model="stockMerchant" 
+									@change="fetchStocksData()"
+									>
+									<option disabled :value="{}">Choose Merchant</option>
+									<option 
+									v-for="(merchant, merchantIndex) in allMerchants" 
+									:value="merchant" 
+									:key="'bar-selected-merchant-index-' + merchantIndex + '-merchant-' + merchant.id"
+									>
+									{{ merchant.user_name | capitalize }}
+								</option>
+							</select>
+						</div>
 
-                                        <bar-chart :data="dashboard.stockIns" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                	<p class="text-center">Last week stock in's</p>
-                                </div>
-                            </div>
-                        </div>
+						<div class="col-md-6 text-right">
+							<v-date-picker 
+							v-model="dateSelected"
+							color="red" 
+							is-dark
+							is-inline
+							:max-date="new Date()" 
+							:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+							:attributes="[ { key: 'today', dot: true } ]" 
+							@input="fetchStocksData()"
+							>
+							<template v-slot="{ inputValue, inputEvents }">
+								<input
+								class="px-2 py-1 border rounded"
+								:value="inputValue"
+								v-on="inputEvents"
+								/>
+							</template>
+						</v-date-picker>
+					</div>
+				</div>
+			</div>
 
-                        <div class="col-md-6 col-xl-6">
-                        	<div class="card" v-if="dashboard.hasOwnProperty('stockOuts')">
-                        		<div class="card-body">
-                        			<div class="row align-items-center">
-                                        <bar-chart :data="dashboard.stockOuts" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                	<p class="text-center">Last week stock out's</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> 
-                -->
+			<div class="card-body">
+				<loading v-show="loading"></loading>
 
-                <!-- Limited Products -->
-                <div class="row" v-if="userHasPermissionTo('view-merchant-product-index')">
-                	<div class="col-md-12">
-                		<div class="card table-card">
-                			<div class="card-header">
-                				<h5>{{ merchantSelected.user_name || 'Merchant' | capitalize }} Limited Products</h5>
-                				<div class="card-header-right">
-                					<select
-                					class="form-control" 
-                					v-model="merchantSelected" 
-                					@change="fetchSelectedMerchantProducts()"
-                					>
-                					<option disabled :value="{}">Choose Merchant</option>
-                					<option 
-	                					v-for="(merchant, merchantIndex) in allMerchants" 
-	                					:value="merchant" 
-	                					:key="'selected-merchant-index-' + merchantIndex + '-merchant-' + merchant.id"
-                					>
-                					{{ merchant.user_name | capitalize }}
-                				</option>
-                			</select>
-                		</div>
-                	</div>
-                	<div class="card-block p-b-0">
-                		<div class="table-responsive">
-                			<table class="table table-hover m-b-0 text-center">
-                				<thead>
-                					<tr>
-                						<th>Product</th>
-                						<th>Code/SKU</th>
-                						<th>Manufacturer</th>
-                						<!-- <th>Merchant</th> -->
-                						<th>Status</th>
-                					</tr>
-                				</thead>
-                				<tbody>
-                					<tr v-for="merchantProduct in limitedStockProducts" :key="'merchant-product-' + merchantProduct.id"
-                					>
-                					<td>
-                						<img 
-                						class="img-thumbnail" 
-                						style="width: 40px; height: 40px; margin-right: 5px" 
-                						:src="merchantProduct.preview || (merchantProduct.hasOwnProperty('product') && merchantProduct.product.preview) ? merchantProduct.product.preview : '/storage/products/default-product.jpg'"
-                						>
+				<div class="row" v-show="!loading">
+					<div class="col-md-6 col-xl-6">
+						<div class="card" v-if="dashboard.hasOwnProperty('stockIns')">
+							<div class="card-body">
+								<div class="row align-items-center">
+									<bar-chart :data="dashboard.stockIns" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+								</div>
+							</div>
+							<div class="card-footer">
+								<p class="text-center">Last week stock in's</p>
+							</div>
+						</div>
+					</div>
 
-                						{{ merchantProduct.hasOwnProperty('product') ? merchantProduct.product.name : 'NA' | capitalize }}
-                					</td>
+					<div class="col-md-6 col-xl-6">
+						<div class="card" v-if="dashboard.hasOwnProperty('stockOuts')">
+							<div class="card-body">
+								<div class="row align-items-center">
+									<bar-chart :data="dashboard.stockOuts" :styles="{ height: '300px', width: '100%', position: 'relative' }" />
+								</div>
+							</div>
+							<div class="card-footer">
+								<p class="text-center">Last week stock out's</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                					<td>{{ merchantProduct.sku }}</td>
+		<!-- Limited Products -->
+		<div class="row" v-if="userHasPermissionTo('view-merchant-product-index')">
+			<div class="col-md-12">
+				<div class="card table-card">
+					<div class="card-header">
+						<h5>{{ productMerchant.user_name || 'Merchant' | capitalize }} Limited Products</h5>
+						<div class="card-header-right">
+							<select
+							class="form-control" 
+							v-model="productMerchant" 
+							@change="fetchSelectedMerchantProducts()"
+							>
+							<option disabled :value="{}">Choose Merchant</option>
+							<option 
+							v-for="(merchant, merchantIndex) in allMerchants" 
+							:value="merchant" 
+							:key="'selected-merchant-index-' + merchantIndex + '-merchant-' + merchant.id"
+							>
+							{{ merchant.user_name | capitalize }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class="card-block p-b-0">
+				<loading v-show="loading"></loading>
 
-                					<td>
-                						{{ merchantProduct.hasOwnProperty('manufacturer') && merchantProduct.manufacturer ? merchantProduct.manufacturer.name : 'Own Product' | capitalize }}
-                					</td>
+				<div class="table-responsive" v-show="!loading">
+					<table class="table table-hover m-b-0 text-center">
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>Code/SKU</th>
+								<th>Manufacturer</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="merchantProduct in limitedStockProducts" :key="'merchant-product-' + merchantProduct.id"
+							>
+							<td>
+								<img 
+								class="img-thumbnail" 
+								style="width: 40px; height: 40px; margin-right: 5px" 
+								:src="merchantProduct.preview || (merchantProduct.hasOwnProperty('product') && merchantProduct.product.preview) ? merchantProduct.product.preview : '/storage/products/default-product.jpg'"
+								>
 
-                					<td>
-                						<span :class="[! merchantProduct || merchantProduct.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']" style="font-size: 100%;">
-                							{{ ! merchantProduct || merchantProduct.available_quantity == 0 ? 'Stock Out' : merchantProduct.available_quantity }}
-                						</span>
-                					</td>
-                				</tr>
-                				
-                				<tr 
-                				v-show="Object.keys(merchantSelected).length && ! limitedStockProducts.length"
-                				>
-                				<td colspan="4">
-                					<div class="alert alert-danger" role="alert">
-                						Sorry, No data found.
-                					</div>
-                				</td>
-                			</tr>
+								{{ merchantProduct.hasOwnProperty('product') ? merchantProduct.product.name : 'NA' | capitalize }}
+							</td>
 
-                			<tr 
-                			v-show="! Object.keys(merchantSelected).length && ! limitedStockProducts.length"
-                			>
-                			<td colspan="4">
-                				<div class="alert alert-danger" role="alert">
-                					No Merchant Selected.
-                				</div>
-                			</td>
-                		</tr>
-                	</tbody>
+							<td>{{ merchantProduct.sku }}</td>
 
-                	<tfoot>
-                		<tr>
-                			<th>Product</th>
-                			<th>Code/SKU</th>
-                			<th>Manufacturer</th>
-                			<th>Status</th>
-                		</tr>
-                	</tfoot>
-                </table>
-            </div>
-        </div>
+							<td>
+								{{ merchantProduct.hasOwnProperty('manufacturer') && merchantProduct.manufacturer ? merchantProduct.manufacturer.name : 'Own Product' | capitalize }}
+							</td>
 
-        <div class="card-footer">
-        	<div class="row d-flex align-items-center align-content-center">
-        		<div class="col-sm-2 col-4">
-        			<select 
-        			class="form-control" 
-        			v-model.number="perPage" 
-        			@change="changeNumberContents"
-        			>
-        			<option>10</option>
+							<td>
+								<span :class="[! merchantProduct || merchantProduct.available_quantity == 0 ? 'badge-danger' : 'badge-warning', 'badge']" style="font-size: 100%;">
+									{{ ! merchantProduct || merchantProduct.available_quantity == 0 ? 'Stock Out' : merchantProduct.available_quantity }}
+								</span>
+							</td>
+						</tr>
 
-        			<option>20</option>
+						<tr 
+						v-show="Object.keys(productMerchant).length && ! limitedStockProducts.length"
+						>
+						<td colspan="4">
+							<div class="alert alert-danger" role="alert">
+								Sorry, No data found.
+							</div>
+						</td>
+					</tr>
 
-        			<option>30</option>
+					<tr 
+					v-show="! Object.keys(productMerchant).length && ! limitedStockProducts.length"
+					>
+					<td colspan="4">
+						<div class="alert alert-danger" role="alert">
+							No Merchant Selected.
+						</div>
+					</td>
+				</tr>
+			</tbody>
 
-        			<option>40</option>
+			<tfoot>
+				<tr>
+					<th>Product</th>
+					<th>Code/SKU</th>
+					<th>Manufacturer</th>
+					<th>Status</th>
+				</tr>
+			</tfoot>
+		</table>
 
-        			<option>50</option>
-        		</select>
-        	</div>
-        	<div class="col-sm-2 col-8">
-        		<button 
-        		type="button" 
-        		class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
-        		v-tooltip.bottom-end="'Reload'" 
-        		@click="pagination.current_page = 1; fetchSelectedMerchantProducts()"
-        		>
-        		Reload
-        		<i class="fa fa-sync"></i>
-        	</button>
-        </div>
-        <div class="col-sm-8 col-12 text-right form-group">
-        	<pagination
-        	v-if="pagination.last_page > 1"
-        	:pagination="pagination"
-        	:offset="5"
-        	@paginate="fetchSelectedMerchantProducts()"
-        	>
-        </pagination>
-    </div>
+		<div class="card-footer">
+			<div class="row d-flex align-items-center align-content-center">
+				<div class="col-sm-2 col-4">
+					<select 
+					class="form-control" 
+					v-model.number="perPage" 
+					@change="changeNumberContents"
+					>
+					<option>10</option>
+
+					<option>20</option>
+
+					<option>30</option>
+
+					<option>40</option>
+
+					<option>50</option>
+				</select>
+			</div>
+			<div class="col-sm-2 col-8">
+				<button 
+				type="button" 
+				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
+				v-tooltip.bottom-end="'Reload'" 
+				@click="pagination.current_page = 1; fetchSelectedMerchantProducts()"
+				>
+				Reload
+				<i class="fa fa-sync"></i>
+			</button>
+		</div>
+		<div class="col-sm-8 col-12 text-right form-group">
+			<pagination
+			v-if="pagination.last_page > 1"
+			:pagination="pagination"
+			:offset="5"
+			@paginate="fetchSelectedMerchantProducts()"
+			>
+		</pagination>
+	</div>
 </div>
 </div>
 </div>
 </div>
 </div>
-
-
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -209,18 +261,18 @@
 <script>
 	
 	// import PieChart from '../components/PieChart.vue'
-	// import BarChart from '../components/BarChart.vue'
+	import BarChart from '../components/BarChart.vue'
 
 	export default {
 
-		/*
+		
 		components : {
 
-			PieChart,
+			// PieChart,
 			BarChart,
 
 		},
-		*/
+		
 
 		data() {
 
@@ -231,18 +283,23 @@
 
 				dashboard : {
 
-	        		// stockIns : {},
-	        		// stockOuts : {}
+					stockIns : {},
+					stockOuts : {}
 
-	        	},
+				},
 
-	        	pagination: {
-	        		current_page: 1
-	        	},
+				pagination: {
+					current_page: 1
+				},
 
-	        	perPage : 10,
-	        	allMerchants : [],
-	        	merchantSelected : {},
+				perPage : 10,
+				allMerchants : [],
+
+	        	// dateSelected: '',
+	        	stockMerchant : {},
+	        	productMerchant : {},
+	        	dateSelected: new Date().getFullYear() + '-' +  (new Date().getMonth() + 1) + '-' + new Date().getDate(),
+	        	
 	        	limitedStockProducts : [],
 
 	        }
@@ -251,7 +308,7 @@
 
 	    created(){
 
-	    	// this.getDashboardTwoData();
+	    	this.fetchStocksData();
 	    	this.fetchAllMerchants();		
 
 	    },
@@ -280,16 +337,21 @@
 
 	    methods : {
 
-	    	getDashboardTwoData() {
+	    	fetchStocksData() {
 
-	    		this.query = '';
+	    		if (! this.userHasPermissionTo('view-product-stock-index') || ! this.userHasPermissionTo('view-dispatch-index')) {
+
+	    			this.error = 'Sorry, You do not have enough permissions to view merchant-products or dispatches';
+	    			return;
+
+	    		}
+
 	    		this.error = '';
 	    		this.loading = true;
-
 	    		this.dashboard = {};
 
 	    		axios
-	    		.get('/api/general-dashboard-two')
+	    		.get('/api/general-dashboard-two/' + (this.stockMerchant.id ?? false) + '/' + this.dateSelected)
 	    		.then(response => {
 	    			if (response.status == 200) {
 	    				this.dashboard = response.data;
@@ -365,25 +427,18 @@
 	    	},
 	    	fetchSelectedMerchantProducts() {
 
-	    		if (! this.userHasPermissionTo('view-merchant-product-index')) {
-
-	    			this.error = 'Sorry, You do not have enough permissions to view merchant-products';
-	    			return;
-
-	    		}
-
 	    		this.error = '';
 	    		this.loading = true;
 	    		this.limitedStockProducts = [];
 
-	    		if (! Object.keys(this.merchantSelected).length) {
+	    		if (! Object.keys(this.productMerchant).length) {
 
 	    			return;
 
 	    		}
 
 	    		axios
-	    		.get('/api/merchant-limited-products/' + this.merchantSelected.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+	    		.get('/api/merchant-limited-products/' + this.productMerchant.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 	    		.then(response => {
 	    			if (response.status == 200) {
 	    				this.pagination = response.data.limitedStockProducts;
@@ -416,12 +471,11 @@
 	    	},
 
 	    	changeNumberContents() {
-				
-				this.pagination.current_page = 1;
 
-				this.fetchSelectedMerchantProducts();
+	    		this.pagination.current_page = 1;
+	    		this.fetchSelectedMerchantProducts();
 
-    		},
+	    	},
 
 	    }
 
