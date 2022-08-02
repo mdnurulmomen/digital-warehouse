@@ -318,9 +318,9 @@ class MerchantProduct extends Model
                     [ 'product_variation_id' => $merchantProductNewVariation->product_variation_id ?? $merchantProductNewVariation->variation->id ],
                     [ 
                         'sku' => $merchantProductNewVariation->sku ?? $this->generateProductVariationSKU($this->merchant_id, $this->product->category->id, $this->product_id, $merchantProductNewVariation->variation->id), 
-                        'upc' => $merchantProductNewVariation->upc,
+                        'upc' => $merchantProductNewVariation->upc ?? NULL,
                         'preview' => $previewPath,
-                        'selling_price' => $merchantProductNewVariation->selling_price, 
+                        'selling_price' => $merchantProductNewVariation->selling_price ?? 0, 
                     ]
 
                 );

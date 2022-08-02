@@ -284,6 +284,7 @@ class MerchantController extends Controller
             
             $query->where(function ($query1) use ($request) {
                 $query1->where('sku', 'like', "%$request->search%")
+                ->orWhere('upc', 'like', "%$request->search%")
                 ->orWhere('description', 'like', "%$request->search%")
                 ->orWhere('warning_quantity', 'like', "%$request->search%")
                 ->orWhere('discount', 'like', "%$request->search%")
@@ -876,7 +877,7 @@ class MerchantController extends Controller
         $productNewMerchant = MerchantProduct::create([
 
             'sku' => ! empty($request->sku) ? strtoupper($request->sku) : $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
-            'upc' => $request->upc,
+            'upc' => $request->upc ?? NULL,
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
             'manufacturer_id' => $request->manufacturer_id, 
@@ -1056,7 +1057,7 @@ class MerchantController extends Controller
         $productMerchantToUpdate->update([
 
             'sku' => ! empty($request->sku) ? strtoupper($request->sku) : $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
-            'upc' => $request->upc,
+            'upc' => $request->upc ?? NULL,
             'manufacturer_id' => $request->manufacturer_id, 
             // 'merchant_product_preview' => $request->preview, 
             'description' => strtolower($request->description), 
@@ -1127,6 +1128,7 @@ class MerchantController extends Controller
             
             $query->where(function ($query1) use ($request) {
                 $query1->where('sku', 'like', "%$request->search%")
+                ->orWhere('upc', 'like', "%$request->search%")
                 ->orWhere('description', 'like', "%$request->search%")
                 ->orWhere('warning_quantity', 'like', "%$request->search%")
                 ->orWhere('discount', 'like', "%$request->search%")

@@ -607,6 +607,7 @@
 															v-model.number="singleStockData.stock_code" 
 															placeholder="Unique Code" 
 															@keydown.enter.prevent="nextPage" 
+															@blur="singleStockData.stock_code=singleStockData.stock_code.trim()" 
 															maxlength="10" 
 														>
 													</div>
@@ -675,7 +676,7 @@
 															<div class="form-group col-md-3">
 																<label for="inputFirstName">Variaiton</label>
 																<multiselect 
-							                              			v-model="singleStockData.variations[variationIndex].variation"
+							                              			v-model="stockVariation.variation"
 							                              			placeholder="Select Variation" 
 							                                  		label="name" 
 							                                  		track-by="id" 
@@ -694,7 +695,7 @@
 																
 																<input type="number" 
 																	class="form-control" 
-																	v-model.number="singleStockData.variations[variationIndex].stock_quantity" 
+																	v-model.number="stockVariation.stock_quantity" 
 																	placeholder="Variation Qty" 
 																	:class="!errors.stock.variations[variationIndex].product_variation_quantity ? 'is-valid' : 'is-invalid'" 
 																	@change="validateFormInput('product_variation_quantity')" 
@@ -712,9 +713,10 @@
 																
 																<input type="text" 
 																	class="form-control is-valid" 
-																	v-model.number="singleStockData.variations[variationIndex].stock_code" 
+																	v-model.number="stockVariation.stock_code" 
 																	placeholder="Unique Code" 
 																	@keydown.enter.prevent="nextPage" 
+																	@blur="stockVariation.stock_code=stockVariation.stock_code.trim()" 
 																	maxlength="10" 
 																>
 															</div>
@@ -728,7 +730,7 @@
 																	<input 
 																		type="number" 
 																		class="form-control is-valid" 
-																		v-model.number="singleStockData.variations[variationIndex].unit_buying_price" 
+																		v-model.number="stockVariation.unit_buying_price" 
 																		placeholder="Variation Buying Price" 
 																		min="1" 
 																		@keydown.enter.prevent="nextPage" 
@@ -3679,9 +3681,9 @@
 
 							if (typeof singleStockUpdatedData !== 'undefined') {
 
-								this.$set(this, 'singleStockData', singleStockUpdatedData);
+								// this.$set(this, 'singleStockData', singleStockUpdatedData);
 
-								this.printStockCode(this.singleStockData);
+								this.printStockCode(singleStockUpdatedData);
 
 							}
 
@@ -3727,9 +3729,9 @@
 
 							if (typeof singleStockUpdatedData !== 'undefined') {
 
-								this.$set(this, 'singleStockData', singleStockUpdatedData);
+								// this.$set(this, 'singleStockData', singleStockUpdatedData);
 
-								this.printStockCode(this.singleStockData);
+								this.printStockCode(singleStockUpdatedData);
 
 							}
 

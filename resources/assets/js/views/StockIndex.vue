@@ -576,6 +576,7 @@
 																			placeholder="Unique Code" 
 																			@keydown.enter.prevent="nextPage" 
 																			maxlength="10" 
+																			@blur="stockedProduct.stock_code=stockedProduct.stock_code.trim()" 
 																		>
 																	</div>
 
@@ -685,6 +686,7 @@
 																					placeholder="Unique Code" 
 																					@keydown.enter.prevent="nextPage" 
 																					maxlength="10" 
+																					@blur="stockedVariation.stock_code=stockedVariation.stock_code.trim()" 
 																				>
 																			</div>
 
@@ -3490,7 +3492,7 @@
 			capitalize: function (value) {
 				if (!value) return ''
 
-				const words = value.split(" ");
+				const words = value.toString().split(" ");
 
 				for (let i = 0; i < words.length; i++) {
 				    
@@ -3980,9 +3982,9 @@
 
 							if (typeof singleStockUpdatedData !== 'undefined') {
 
-								this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
+								// this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
 
-								this.printStockCode(this.singleStockData.products);
+								this.printStockCode(singleStockUpdatedData.products);
 
 							}
 						}
@@ -4027,9 +4029,9 @@
 
 							if (typeof singleStockUpdatedData !== 'undefined') {
 
-								this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
+								// this.$set(this.singleStockData, 'products', singleStockUpdatedData.products);
 
-								this.printStockCode(this.singleStockData.products);
+								this.printStockCode(singleStockUpdatedData.products);
 
 							}
 						}
@@ -4165,7 +4167,7 @@
 
 					if (this.errors.constructor === Object && Object.keys(this.errors).length < 2) {
 
-						if (! this.allProducts.length) {	// already loaded / not
+						if (! this.allProducts.length || (this.singleStockData.hasOwnProperty('merchant') && this.allProducts[0].hasOwnProperty('merchant_id') && this.allProducts[0].merchant_id != this.singleStockData.merchant.id)) {	// already loaded / not
 
 							this.fetchMerchantAllProducts();
 							this.fetchMerchantWarehouseAllSpaces();
@@ -5173,9 +5175,8 @@
     		objectNameWithCapitalized ({ name, variation, user_name, product }) {
 		      	
 		      	if (name) {
-				    name = name.toString()
 				    
-				    const words = name.split(" ");
+				    const words = name.toString().split(" ");
 
 					for (let i = 0; i < words.length; i++) {
 					    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
@@ -5195,9 +5196,8 @@
 				    return variation_name.charAt(0).toUpperCase() + variation_name.slice(1)
 		      	}
 		      	else if (user_name) {
-				    user_name = user_name.toString()
 				    
-				    const words = user_name.split(" ");
+				    const words = user_name.toString().split(" ");
 
 					for (let i = 0; i < words.length; i++) {
 					    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
@@ -5206,8 +5206,8 @@
 					return words.join(" ");
 		      	}
 		      	else if (product) {
-		      		var product_name = product.name.toString();
-		      		const words = product_name.split(" ");
+
+		      		const words = product.name ? product.name.toString().split(" ") : [];
 
 					for (let i = 0; i < words.length; i++) {
 					    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
@@ -5223,7 +5223,7 @@
 				
 				if (!name) return ''
 
-				const words = name.split(" ");
+				const words = name.toString().split(" ");
 
 				for (let i = 0; i < words.length; i++) {
 				    words[i] = words[i][0].toUpperCase() + words[i].substr(1);

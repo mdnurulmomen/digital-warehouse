@@ -682,7 +682,7 @@ class ProductController extends Controller
         ]);
 
         $productNewStock = $newStock->stocks()->create([
-            'stock_code' => $request->stock_code ?? ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
+            'stock_code' => (! empty($request->stock_code) ? strtoupper(trim($request->stock_code)) : ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1))),
             'stock_quantity' => $request->stock_quantity,
             // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'available_quantity' => $request->stock_quantity,
@@ -1008,7 +1008,7 @@ class ProductController extends Controller
 
         }
 
-        $productStockToDelete->delete();
+        $productStockToDelete->forceDelete();
 
         return $this->showProductAllStocks($productStockToDelete->merchant_product_id, $perPage);
     }
@@ -1115,7 +1115,7 @@ class ProductController extends Controller
             // $lastAvailableQuantity = /*$merchantProduct->latestStock->available_quantity*/ $merchantProduct->available_quantity ?? 0;
 
             $productNewStock = $newStock->stocks()->create([
-                'stock_code' => $storingProduct->stock_code ?? ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1)),
+                'stock_code' => (! empty($storingProduct->stock_code) ? strtoupper(trim($storingProduct->stock_code)) : ($merchantProduct->sku.'S'.($merchantProduct->stocks->count()+1))),
                 'stock_quantity' => $storingProduct->stock_quantity,
                 // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $storingProduct->stock_quantity : $lastAvailableQuantity,
                 'available_quantity' => $storingProduct->stock_quantity,
@@ -1363,7 +1363,7 @@ class ProductController extends Controller
 
             }
 
-            $productStockToDelete->delete();    
+            $productStockToDelete->forceDelete();    
 
         }
 
@@ -1390,7 +1390,8 @@ class ProductController extends Controller
             $query->where(function ($q1) use ($request) {
                 $q1->where('invoice_no', 'like', "%$request->search%")
                 ->orWhereHas('stocks', function ($q2) use ($request) {
-                    $q2->where('stock_quantity', 'like', "%$request->search%")
+                    $q2->where('stock_code', 'like', "%$request->search%")
+                    ->orWhere('stock_quantity', 'like', "%$request->search%")
                     ->orWhere('available_quantity', 'like', "%$request->search%")
                     ->orWhere('unit_buying_price', 'like', "%$request->search%")
                     ->orWhereHas('merchantProduct', function ($q3) use ($request) {

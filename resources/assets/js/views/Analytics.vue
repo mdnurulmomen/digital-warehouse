@@ -427,15 +427,15 @@
 	    	},
 	    	fetchSelectedMerchantProducts() {
 
-	    		this.error = '';
-	    		this.loading = true;
-	    		this.limitedStockProducts = [];
-
 	    		if (! Object.keys(this.productMerchant).length) {
 
 	    			return;
 
 	    		}
+	    		
+	    		this.error = '';
+	    		this.loading = true;
+	    		this.limitedStockProducts = [];
 
 	    		axios
 	    		.get('/api/merchant-limited-products/' + this.productMerchant.id + '/' + this.perPage + "?page=" + this.pagination.current_page)

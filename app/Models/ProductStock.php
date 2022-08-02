@@ -40,7 +40,7 @@ class ProductStock extends Model
 
     public function deleteStockVariations()
     {
-        if ($this->variations()->count()) {
+        if ($this->variations->count()) {
             
             foreach ($this->variations as $variation) {
 
@@ -62,7 +62,7 @@ class ProductStock extends Model
             $stockHasApproval = $this->stock->has_approval;
 
             // update / old stock
-            if ($this->variations()->count()) {
+            if ($this->variations->count()) {
 
                 $this->variations()->delete();  // primarily deleting variations
                 
@@ -398,7 +398,7 @@ class ProductStock extends Model
 
     public function deleteStockSerials()
     {
-        if ($this->serials()->count() && ! $this->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
+        if ($this->serials->count() && ! $this->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
             
             $this->serials()->forceDelete();
 
@@ -436,7 +436,7 @@ class ProductStock extends Model
     {
         if ($container) {
 
-            if (count($container->shelves) === WarehouseContainerStatus::find($container->id)->containerShelfStatuses()->count()) {
+            if (count($container->shelves) === WarehouseContainerStatus::find($container->id)->containerShelfStatuses->count()) {
                 
                 $this->setProductContainers([ $container ], $merchantProduct);
 
@@ -475,7 +475,7 @@ class ProductStock extends Model
     {
         if ($container) {
 
-            if (count($container->shelf->units) === WarehouseContainerShelfStatus::find($container->shelf->id)->containerShelfUnitStatuses()->count()) {
+            if (count($container->shelf->units) === WarehouseContainerShelfStatus::find($container->shelf->id)->containerShelfUnitStatuses->count()) {
                 
                 $container->{"shelves"} = [ $container->shelf, ];
                 
@@ -647,7 +647,7 @@ class ProductStock extends Model
 
     protected function deleteStockVariationSerials(ProductVariationStock $productVariationStock)
     {
-        if ($productVariationStock->serials()->count() && ! $productVariationStock->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
+        if ($productVariationStock->serials->count() && ! $productVariationStock->serials()->where(function($q) { $q->where('has_requisitions', 1)->orWhere('has_dispatched', 1); })->exists()) {
             
             $productVariationStock->serials()->forceDelete();
 
