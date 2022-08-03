@@ -95,7 +95,7 @@ class Dispatch extends Model
                         
                         // $this->deductProductStockQuantity($merchantExpectedProduct, $dispatchingProduct->quantity);
                         
-                        $this->deductProductStockQuantity($dispatchingProduct, $dispatchingProduct->quantity);
+                        $this->deductProductStockQuantity($dispatchingProduct);
 
                     }
 
@@ -135,7 +135,7 @@ class Dispatch extends Model
                                
                                 // $this->deductVariationStockQuantity($merchantProductExpectedVariation, $variationToDispatch->quantity);
 
-                                $this->deductVariationStockQuantity($variationToDispatch, $variationToDispatch->quantity);
+                                $this->deductVariationStockQuantity($variationToDispatch);
 
                                 // dispatching variation-serials
                                 if ($variationToDispatch->has_serials && count($variationToDispatch->serials)==$variationToDispatch->quantity) {
@@ -433,7 +433,7 @@ class Dispatch extends Model
         // }
     }
 
-    protected function deductVariationStockQuantity($variationToDispatch, $quantityToDeduct)
+    protected function deductVariationStockQuantity($variationToDispatch)
     {
         // while ($quantityToDeduct > 0) {
             
