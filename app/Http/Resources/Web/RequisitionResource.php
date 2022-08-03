@@ -23,6 +23,7 @@ class RequisitionResource extends JsonResource
             'creator' => $this->creator,
             'updater' =>  $this->when($this->status, $this->updater),
             'merchant_id' => $this->merchant_id,
+            'merchant_name' => $this->merchant->user_name,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'products' => RequiredProductResource::collection($this->products),

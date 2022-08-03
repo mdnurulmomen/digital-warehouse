@@ -54,6 +54,7 @@
 																<thead>
 																	<tr>
 																		<th>Subject</th>
+																		<th>Merchant</th>
 																		<th>Status</th>
 																		<th>Confirmation</th>
 																		<th>Actions</th>
@@ -67,6 +68,10 @@
 																	>
 																		<td>
 																			{{ content.subject | capitalize }}
+																		</td>
+
+																		<td>
+																			{{ content.merchant_name | capitalize }}
 																		</td>
 
 																		<td>
@@ -137,7 +142,7 @@
 																	<tr 
 																  		v-show="!requisitionsToShow.length"
 																  	>
-															    		<td colspan="4">
+															    		<td colspan="5">
 																      		<div class="alert alert-danger text-center" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -148,7 +153,8 @@
 
 																<tfoot>
 																	<tr>	
-																		<th>Name</th>
+																		<th>Subject</th>
+																		<th>Merchant</th>
 																		<th>Status</th>
 																		<th>Confirmation</th>
 																		<th>Actions</th>
@@ -1178,9 +1184,9 @@
 
 												<div 
 													class="col-sm-12 form-group text-center text-danger" 
-													v-show="errors.products[requiredProductIndex].stock_code"
+													v-show="errors.products[requiredProductIndex].code"
 												>
-													{{ errors.products[requiredProductIndex].stock_code }}
+													{{ errors.products[requiredProductIndex].code }}
 												</div>
 
 												<div class="col-sm-12 form-group">
@@ -1420,9 +1426,9 @@
 
 															<div 
 																class="col-sm-12 form-group text-center text-danger"
-																v-show="errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_code"
+																v-show="errors.products[requiredProductIndex].variations[requiredProductVariationIndex].code"
 															>
-																{{ errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_code }}
+																{{ errors.products[requiredProductIndex].variations[requiredProductVariationIndex].code }}
 															</div>
 
 															<div class="col-sm-12 form-group">
@@ -2154,6 +2160,15 @@
 										</div>
 
 										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Merchant :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleRequisitionData.merchant_name | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">Status :</label>
 											<label class="col-sm-6 col-form-label">
 												<span :class="[singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==1 ? 'badge-success' : singleRequisitionData.status==1 && singleRequisitionData.dispatch.has_approval==0 ? 'badge-warning' : singleRequisitionData.status==0 ? 'badge-danger' : 'badge-default', 'badge']">
@@ -2733,6 +2748,15 @@
 						</div>
 
 						<div class="col-6">
+							<div class="form-row">
+								<label class="col-sm-6 col-form-label font-weight-bold text-right">
+									Merchant :
+								</label>
+								<label class="col-sm-6 col-form-label">
+									{{ singleRequisitionData.merchant_name | capitalize }}
+								</label>
+							</div>
+
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold text-right">
 									Service :
@@ -5284,12 +5308,12 @@
 
 										if (! requiredProduct.selected_stocks || ! requiredProduct.selected_stocks.length) {
 
-											this.$set(this.errors.products[requiredProductIndex], 'stock_code', 'Stock code is required');	// global error message
+											this.$set(this.errors.products[requiredProductIndex], 'code', 'Stock code is required');	// global error message
 
 										}
 										else {
 
-											this.$delete(this.errors.products[requiredProductIndex], 'stock_code');
+											this.$delete(this.errors.products[requiredProductIndex], 'code');
 
 											requiredProduct.selected_stocks.forEach(
 									
@@ -5326,7 +5350,8 @@
 
 									else {
 
-										this.$delete(this.errors.products[requiredProductIndex], 'stock_code');
+										this.$delete(this.errors.products[requiredProductIndex], 'code');
+										
 										this.$delete(this.errors.products[requiredProductIndex], 'stock_codes');
 
 									}
@@ -5410,12 +5435,12 @@
 
 												if (! requiredProduct.has_serials && requiredProductVariation.quantity > 0 && (! requiredProductVariation.selected_stocks || ! requiredProductVariation.selected_stocks.length)) {
 
-													this.$set(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'stock_code', 'Stock code is required');	// global error msg
+													this.$set(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'code', 'Stock code is required');	// global error msg
 
 												}
 												else if (! requiredProduct.has_serials && requiredProductVariation.quantity > 0) {
 
-													this.$delete(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'stock_code');
+													this.$delete(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'code');
 
 													requiredProductVariation.selected_stocks.forEach(
 											
@@ -5449,7 +5474,7 @@
 												}
 												else {
 
-													this.$delete(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'stock_code');
+													this.$delete(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'code');
 
 													this.$set(this.errors.products[requiredProductIndex].variations[requiredProductVariationIndex], 'stock_codes', []);
 

@@ -24,6 +24,11 @@ class Requisition extends Model
      * @return void
      */
     
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class, 'merchant_id', 'id');
+    }
+
     public function products()
     {
         return $this->hasMany(RequiredProduct::class, 'requisition_id', 'id');

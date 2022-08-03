@@ -725,7 +725,7 @@ class MerchantController extends Controller
         return MerchantProductResource::collection(
             MerchantProduct::where('merchant_id', $expectedMerchant->id)
             ->where('available_quantity', '>', 0)
-            ->with(['merchant', 'variations', 'variations.nonDispatchedRequests', 'nonDispatchedRequests', 'dispatchedRequests'])
+            ->with(['merchant', 'nonDispatchedRequests', 'dispatchedRequests', 'variations', 'variations.nonDispatchedRequests'])
             ->with(['serials' => function ($query) {
                 $query->where('has_requisitions', 0)->where('has_dispatched', 0);
             }])
