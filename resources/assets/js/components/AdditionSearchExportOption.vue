@@ -54,11 +54,47 @@
 			  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
 			  			:disabled="disableAddButton" 
 			  			@click="$emit('showContentCreateForm')" 
-			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+			  			v-if="userHasPermissionTo('create-' + requiredPermission) && $route.name != 'merchant-products'"
 		  			>
 		  				<i class="fa fa-plus"></i>
 		  				New {{ callerPage | capitalize }}
 		  			</button>
+
+		  			<div 
+		  				class="dropdown" 
+		  				v-if="userHasPermissionTo('create-' + requiredPermission) && $route.name=='merchant-products'"
+		  			>
+		  				<button class="btn btn-success btn-outline-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+		  					New {{ callerPage | capitalize }}
+		  					<span class="caret"></span>
+		  				</button>
+		  				<ul class="dropdown-menu">
+		  					<li class="dropdown-item">
+		  						<button 
+					  				type="button" 
+						  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
+						  			:disabled="disableAddButton" 
+						  			@click="$emit('showContentCreateForm')" 
+					  			>
+					  				<i class="fa fa-plus"></i>
+					  				Single {{ callerPage | capitalize }}
+					  			</button>
+		  					</li>
+
+		  					<li class="dropdown-item">
+		  						<button 
+					  				type="button" 
+						  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
+						  			:disabled="disableAddButton" 
+						  			@click="$emit('showMultipleContentCreateForm')" 
+					  			>
+					  				<i class="fa fa-plus"></i>
+					  				<i class="fa fa-plus"></i>
+					  				Multiple {{ callerPage | capitalize }}
+					  			</button>
+		  					</li>
+		  				</ul>
+		  			</div>
 	  			</div>
 	  		</div>
 
@@ -112,11 +148,47 @@
 			  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
 			  			:disabled="disableAddButton" 
 			  			@click="$emit('showContentCreateForm')" 
-			  			v-if="userHasPermissionTo('create-' + requiredPermission)"
+			  			v-if="userHasPermissionTo('create-' + requiredPermission) && $route.name != 'merchant-products'"
 		  			>
 		  				<i class="fa fa-plus"></i>
 		  				New {{ callerPage | capitalize }}
 		  			</button>
+
+		  			<div 
+		  				class="dropdown" 
+		  				v-if="userHasPermissionTo('create-' + requiredPermission) && $route.name=='merchant-products'"
+		  			>
+		  				<button class="btn btn-success btn-outline-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+		  					New {{ callerPage | capitalize }}
+		  					<span class="caret"></span>
+		  				</button>
+		  				<ul class="dropdown-menu">
+		  					<li class="dropdown-item">
+		  						<button 
+					  				type="button" 
+						  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
+						  			:disabled="disableAddButton" 
+						  			@click="$emit('showContentCreateForm')" 
+					  			>
+					  				<i class="fa fa-plus"></i>
+					  				Single {{ callerPage | capitalize }}
+					  			</button>
+		  					</li>
+
+		  					<li class="dropdown-item">
+		  						<button 
+					  				type="button" 
+						  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm" 
+						  			:disabled="disableAddButton" 
+						  			@click="$emit('showMultipleContentCreateForm')" 
+					  			>
+					  				<i class="fa fa-plus"></i>
+					  				<i class="fa fa-plus"></i>
+					  				Multiple {{ callerPage | capitalize }}
+					  			</button>
+		  					</li>
+		  				</ul>
+		  			</div>
 	  			</div>
 			</div>
 	  	</div>

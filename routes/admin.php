@@ -224,6 +224,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products.index');
 		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.show');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products.store');	
+		Route::post('/merchant-multiple-products/{perPage}', 'MerchantController@storeMerchantMultipleProducts')->name('merchant-products.multiple-store');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products.update');
 		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products.delete');
 		Route::post('/search-merchant-products/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('search-merchant-products');

@@ -737,6 +737,56 @@ class MerchantController extends Controller
         );
     }
 
+    public function storeMerchantMultipleProducts(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_id' => 'required|exists:merchants,id',
+            'merchantMultipleProducts' => 'required|array|min:1',
+            'merchantMultipleProducts.*' => 'required|numeric|exists:products,id',
+        ]);
+
+        foreach ($request->merchantMultipleProducts as $productKey => $productId) {
+
+            $product = Product::findOrFail($productId);
+        
+            if (! MerchantProduct::where('merchant_id', $request->merchant_id)->where('product_id', $product->id)->exists()) {
+                
+                $productNewMerchant = MerchantProduct::create([
+
+                    'sku' => $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
+                    'warning_quantity' => 0,
+                    'selling_price' => NULL,
+                    'discount' => 0,
+                    'product_id' => $product->id,
+                    'merchant_id' => $request->merchant_id,
+                    'created_at' => now()->format('Y-m-d')
+
+                ]);
+
+                if ($product->has_variations) {
+                    
+                    foreach ($product->variations as $productVariationKey => $productVariation) {
+                        
+                        $merchantProductVariation = $productNewMerchant->variations()->create([
+
+                            'sku' => ($productNewMerchant->sku.'V'.$productVariation->variation->id), 
+                            'available_quantity' => 0,
+                            'selling_price' => 0,
+                            'product_variation_id' => $productVariation->id
+
+                        ]);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return $this->showMerchantAvailableProducts($request->merchant_id, $perPage);
+    }
+
     public function storeMerchantNewProduct(Request $request, $perPage)
     {
         $product = Product::findOrFail($request->product_id);

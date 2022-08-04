@@ -33,6 +33,7 @@
 											  		:current-tab="currentTab"
 											  		
 											  		@showContentCreateForm="showProductMerchantCreateForm" 
+											  		@showMultipleContentCreateForm="showProductMerchantMultipleCreateForm" 
 											  		@searchData="pagination.current_page = 1; searchData($event)" 
 											  		@fetchAllContents="pagination.current_page = 1; fetchMerchantAllProducts()" 
 											  		@importExcelFile="importExcelFile($event)" 
@@ -706,6 +707,130 @@
 								</div>
 							</div>
 							<!-- </transition-group> -->
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!--Multiple Create Modal -->
+		<div class="modal fade" id="multiple-product-create-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-product') || userHasPermissionTo('update-merchant-product')">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							{{ merchantFullName | capitalize }} {{ createMode ? ' New ' : ' Update ' | capitalize }} Product
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+						
+					<form 	
+						class="form-horizontal" 
+						v-on:submit.prevent="storeMerchantMerchantProduct()" 
+						autocomplete="off" 
+						novalidate="true" 
+					>
+						<input type="hidden" name="_token" :value="csrf">
+
+						<div class="modal-body">
+							<div class="form-row">
+								<div class="form-group col-sm-12">
+					        		<label for="inputUsername">Selected Merchant</label>
+						        	<multiselect 
+                              			v-model="merchant" 
+                              			class="form-control p-0 is-valid" 
+                              			placeholder="Product Name" 
+                                  		:custom-label="objectNameWithCapitalized" 
+                                  		:options="[]" 
+                                  		:allow-empty="false" 
+                                  		:disabled="true" 
+                              		>
+                                	</multiselect>
+					        	</div>
+							</div>
+
+					        <div class="form-row">
+								<div class="form-group col-md-12">
+									<div class="table-responsive">
+										<table class="table table-striped table-bordered nowrap text-center">
+											<thead>
+												<tr>
+													<th>Select</th>
+													<th>Name</th>
+													<th>Category</th>
+													<th>Serials</th>
+													<th>Variations</th>
+												</tr>
+											</thead>
+
+											<tbody>
+												<tr 
+													v-for="(product, productIndex) in allProducts" 
+													:key="'multiple-product-index-' + productIndex + '-product-' + product.id" 
+													:class="singleMerchantProductData.hasOwnProperty('merchantMultipleProducts') && singleMerchantProductData.merchantMultipleProducts.includes(product.id) ? 'highlighted' : ''"
+												>
+													<td>
+														<input type="checkbox" :value="product.id" v-model="singleMerchantProductData.merchantMultipleProducts">
+													</td>
+
+													<td>{{ product.name | capitalize }}</td>
+
+													<td>{{ product.category ? product.category.name : '' | capitalize }}</td>
+													
+													<td>
+														{{ product.has_serials ? 'Available' : '--' }}
+													</td>
+													
+													<td>
+														<li v-for="productVariation in product.variations">
+															{{ productVariation.variation ? productVariation.variation.name : '--' | capitalize }}
+														</li>
+													</td>
+												</tr>
+
+												<tr 
+											  		v-show="! allProducts.length"
+											  	>
+										    		<td colspan="4">
+											      		<div class="alert alert-danger" role="alert">
+											      			Sorry, No product found.
+											      		</div>
+											    	</td>
+											  	</tr>
+											</tbody>
+
+											<tfoot>
+												<tr>
+													<th>Select</th>
+													<th>Name</th>
+													<th>Category</th>
+													<th>Serials</th>
+													<th>Variations</th>
+												</tr>
+											</tfoot>
+										</table>
+									</div>
+								</div>
+					        </div>
+
+							<div class="form-row card-footer">
+								<div class="col-sm-12 text-right" v-show="! submitForm">
+									<span class="text-danger small mb-1">
+								  		Please input required fields
+								  	</span>
+								</div>
+
+								<div class="col-sm-12">
+				                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
+				                  		Close
+				                  	</button>
+									<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
+										Add Product
+									</button>
+								</div>
+							</div>
 						</div>
 					</form>
 				</div>
@@ -2540,6 +2665,19 @@
 
 				$('#product-createOrEdit-modal').modal('show');
 			},
+			showProductMerchantMultipleCreateForm() {
+				// this.step = 1;
+				this.createMode = true;
+	        	this.submitForm = true;
+	        	this.formSubmitted = false;
+
+	        	this.singleMerchantProductData = {
+					merchant_id : this.merchant.id,
+					merchantMultipleProducts : []
+				};
+				
+				$('#multiple-product-create-modal').modal('show');
+			},
 			openProductMerchantEditForm(object) {
 				// this.step = 1;
 				this.createMode = false;
@@ -2585,6 +2723,46 @@
 							*/
 
 							$('#product-createOrEdit-modal').modal('hide');
+						}
+
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
+
+			},
+			storeMerchantMerchantProduct() {
+
+				if (! this.singleMerchantProductData.hasOwnProperty('merchantMultipleProducts') || this.singleMerchantProductData.merchantMultipleProducts.length < 1) {
+
+					this.submitForm = false;
+					return;
+
+				}
+
+				this.formSubmitted = true;
+
+				axios
+					.post('/merchant-multiple-products/' + this.perPage, this.singleMerchantProductData)
+					.then(response => {
+
+						if (response.status == 200) {
+
+							this.$toastr.s("New products has been added", "Success");
+							
+							this.pagination.current_page = 1; 
+							this.merchantAllProducts = response.data;
+							this.searchAttributes.search !== '' ? this.searchData() : this.showSelectedTabProducts();
+
+							$('#multiple-product-create-modal').modal('hide');
 						}
 
 					})
