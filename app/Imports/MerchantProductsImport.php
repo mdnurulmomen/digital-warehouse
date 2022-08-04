@@ -27,11 +27,11 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
         	'name' => 'required|string|exists:products,name',
             // 'sku' => 'nullable|string|max:255',
             // 'preview' => 'nullable|string|max:255',
-            'manufacturer_name' => 'nullable|string',
-            'description' => 'nullable|string|max:255',
+            'manufacturer_name' => 'nullable|string|exists:product_manufacturers,name',
+            'description' => 'nullable|string|max:65500',
             'warning_quantity' => 'nullable|numeric|min:0',
             'discount' => 'nullable|numeric|between:0,100',
-            'selling_price' => 'required', // numeric / string with ',' (for merchant-variations)
+            // 'selling_price' => 'required', // numeric / string with ',' (for merchant-variations)
             // 'variations' => [
             // 	Rule::requiredIf(Product::where('name', strtolower($request->name))->first()->has_variations)
             // ],
@@ -40,7 +40,7 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
 
     public function withValidator($validator){
         
-        // if (! $validator->fails()) {
+        if (! $validator->fails()) {
             
             $validator->after(function ($validator) {
                 
@@ -55,7 +55,7 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
                             $validator->errors()->add($key, "Incomplete variations");
                         
                         }
-                        else if (! empty(strtolower($data['variations'])) && count(explode(',', $data['selling_price'])) != count(explode(',', $data['variations']))) {
+                        else if (! empty(strtolower($data['variations'])) && ! empty($data['selling_price']) && count(explode(',', $data['selling_price'])) != count(explode(',', $data['variations']))) {
 
                             $validator->errors()->add($key, "Selling prices are less than variations");
                         
@@ -83,7 +83,7 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
                     }
                     else { // product has no variation
 
-                        if (! is_numeric($data['selling_price']) || $data['selling_price'] < 0) {
+                        if ($data['selling_price'] < 0) {
                             
                             $validator->errors()->add($key, "Invalid selling price");
 
@@ -95,7 +95,7 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
                 
             });
 
-        // }
+        }
 
     }
 
@@ -112,7 +112,6 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
             'manufacturer_name.*' => 'Manufacturer name is invalid.',
             'warning_quantity.*' => 'Warning quantity is invalid.',
             'discount.*' => 'Discount rate is invalid.',
-            'selling_price.required' => 'Selling price is required.',
             // 'selling_price.*' => 'Selling price is invalid.',
             // 'variations.required' => 'Variations are required.',
             // 'variations.*' => 'Variations are invalid.',
@@ -141,10 +140,10 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
 
             			// 'preview' => $row['preview'],
             			'description' => isset($row['description']) ? strtolower($row['description']) : '',
-            			'warning_quantity' => $row['warning_quantity'] ?? 100,
+            			'warning_quantity' => $row['warning_quantity'] ?? 0,
             			'available_quantity' => 0,
             			'discount' => $row['discount'] ?? 0,
-            			'selling_price' => $product->has_variations ? min(explode(',', $row['selling_price'])) : $row['selling_price'],
+            			'selling_price' => $product->has_variations && ! empty($row['selling_price']) && count(explode(',', $row['selling_price'])) ? min(explode(',', $row['selling_price'])) : (! empty($row['selling_price']) ? $row['selling_price'] : NULL),
                         'product_id' => $product->id, 
                         'manufacturer_id' => ($manufacturer ? $manufacturer->id : NULL)
                     ]);
@@ -167,7 +166,7 @@ class MerchantProductsImport implements ToCollection, WithValidation, WithHeadin
 	                                'sku' => ($merchantProduct->sku.'V'.$productVariation->variation_id),
 			            			// 'preview' => NULL,
 			            			'available_quantity' => 0,
-			            			'selling_price' => explode(',', $row['selling_price'])[$variationKey], 
+			            			'selling_price' => (! empty($row['selling_price']) && count(explode(',', $row['selling_price'])) > $variationKey) ? explode(',', $row['selling_price'])[$variationKey] : 0, 
                                     'product_variation_id' => $productVariation->id
                                 ]);
 
