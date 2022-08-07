@@ -754,6 +754,7 @@ class MerchantController extends Controller
                 $productNewMerchant = MerchantProduct::create([
 
                     'sku' => $this->generateProductSKU($product->product_category_id, $product->id, $request->merchant_id, $request->manufacturer_id), 
+                    'description' => '',
                     'warning_quantity' => 0,
                     'selling_price' => NULL,
                     'discount' => 0,
@@ -1679,15 +1680,27 @@ class MerchantController extends Controller
     protected function generateProductSKU($productCategory, $product, $merchant, $manufacturer = NULL)
     {
         if ($productCategory) {
-            
-            // return ('C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer ? $manufacturer : $merchant);
+
+            // return 'C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer;
             // return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
-            return ('P'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+            $generatedSKU = ('P'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+
+        }
+        
+        else {
+
+            // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+            $generatedSKU = ('BP'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+
+        }
+        
+        if (MerchantProduct::where('sku', $generatedSKU)->exists()) {
+            
+            $this->generateProductSKU($productCategory, rand(1, Product::count()), rand(1, Merchant::count()), $manufacturer);
 
         }
 
-        // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
-        return ('BP'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+        return $generatedSKU;
     }
 
 }

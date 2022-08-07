@@ -6,6 +6,7 @@ use App\Models\Stock;
 use App\Models\Admin;
 use App\Models\Manager;
 use App\Models\Product;
+use App\Models\Merchant;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 // use App\Models\ProductSerial;
@@ -2034,12 +2035,24 @@ class ProductController extends Controller
 
             // return 'C'.$productCategory.'P'.$product.'M'.$merchant.'M'.$manufacturer;
             // return ('P'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
-            return ('P'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+            $generatedSKU = ('P'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
 
         }
         
-        // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
-        return ('BP'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+        else {
+
+            // return ('BP'.$product.'M'.$merchant.'MF'.($manufacturer ? $manufacturer : $merchant));
+            $generatedSKU = ('BP'.$product.'M'.$merchant.($manufacturer ? $manufacturer : $merchant));
+
+        }
+        
+        if (MerchantProduct::where('sku', $generatedSKU)->exists()) {
+            
+            $this->generateProductSKU($productCategory, rand(1, Product::count()), rand(1, Merchant::count()), $manufacturer);
+
+        }
+
+        return $generatedSKU;
     }
 
     /*
