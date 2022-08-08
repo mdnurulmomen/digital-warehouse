@@ -29,7 +29,7 @@ class ProductResource extends JsonResource
             'quantity_type' => $this->quantity_type,
             'has_serials' => $this->has_serials,
             'has_variations' => $this->has_variations,
-            'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations()->first()->variation->type : 'NA'),
+            'variation_type' => $this->when($this->has_variations, $this->variations->count() ? $this->variations->first()->variation->type : 'NA'),
             'variations' => $this->when($this->has_variations, ProductVariationResource::collection($this->variations->loadMissing('variation'))),
             'product_immutability' => $this->product_immutability,
             'product_category_id' => $this->product_category_id,

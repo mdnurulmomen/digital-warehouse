@@ -1,6 +1,6 @@
 
 <template v-if="userHasPermissionTo('view-merchant-product-index')">
-	<div class="pcoded-content">
+	<div class="pcoded-content modal-open">
 		<breadcrumb 
 			:icon="'products'"
 			:title="merchantFullName + ' products'" 
@@ -218,7 +218,7 @@
 		</div>
 
  		<!--Create Or Edit Modal -->
-		<div class="modal fade" id="product-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-product') || userHasPermissionTo('update-merchant-product')">
+		<div class="modal fade" id="merchant-product-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-product') || userHasPermissionTo('update-merchant-product')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -728,7 +728,7 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="storeMerchantMerchantProduct()" 
+						v-on:submit.prevent="storeMerchantMultipleProduct()" 
 						autocomplete="off" 
 						novalidate="true" 
 					>
@@ -737,17 +737,37 @@
 						<div class="modal-body">
 							<div class="form-row">
 								<div class="form-group col-sm-12">
-					        		<label for="inputUsername">Selected Merchant</label>
-						        	<multiselect 
-                              			v-model="merchant" 
-                              			class="form-control p-0 is-valid" 
-                              			placeholder="Product Name" 
-                                  		:custom-label="objectNameWithCapitalized" 
-                                  		:options="[]" 
-                                  		:allow-empty="false" 
-                                  		:disabled="true" 
-                              		>
-                                	</multiselect>
+									<div class="form-row form-group">
+					        			<label class="col-6">Selected Merchant</label>
+										
+						        		<div class="col-6 text-right">
+							        		<button 
+							        			type="button"  
+									  			class="btn waves-effect waves-light btn-success btn-outline-success btn-sm ml-auto" 
+									  			v-tooltip.bottom-end="'Create New'"
+									  			@click="showProductCreateForm()" 
+									  			v-if="userHasPermissionTo('create-product')"
+								  			>
+								  				<i class="fa fa-plus"></i>
+								  				New Product
+								  			</button>
+						        		</div>
+									</div>
+
+									<div class="form-row">
+										<div class="col-sm-12">
+								        	<multiselect 
+		                              			v-model="merchant" 
+		                              			class="form-control p-0 is-valid" 
+		                              			placeholder="Product Name" 
+		                                  		:custom-label="objectNameWithCapitalized" 
+		                                  		:options="[]" 
+		                                  		:allow-empty="false" 
+		                                  		:disabled="true" 
+		                              		>
+		                                	</multiselect>
+										</div>
+									</div>	
 					        	</div>
 							</div>
 
@@ -772,7 +792,12 @@
 													:class="singleMerchantProductData.hasOwnProperty('merchantMultipleProducts') && singleMerchantProductData.merchantMultipleProducts.includes(product.id) ? 'highlighted' : ''"
 												>
 													<td>
-														<input type="checkbox" :value="product.id" v-model="singleMerchantProductData.merchantMultipleProducts">
+														<input 
+															type="checkbox" 
+															:value="product.id" 
+															v-model="singleMerchantProductData.merchantMultipleProducts" 
+															@change="checkMultipleProductEmptyness() ? submitForm = false : submitForm = true"
+														>
 													</td>
 
 													<td>{{ product.name | capitalize }}</td>
@@ -793,7 +818,7 @@
 												<tr 
 											  		v-show="! allProducts.length"
 											  	>
-										    		<td colspan="4">
+										    		<td colspan="5">
 											      		<div class="alert alert-danger" role="alert">
 											      			Sorry, No product found.
 											      		</div>
@@ -827,7 +852,7 @@
 				                  		Close
 				                  	</button>
 									<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
-										Add Product
+										Add Products
 									</button>
 								</div>
 							</div>
@@ -836,6 +861,15 @@
 				</div>
 			</div>
 		</div>
+
+		<product-create-or-edit-modal 
+ 			:csrf="csrf" 
+ 			:formSubmitted="formSubmitted" 
+ 			:singleProductData="singleProductData" 
+ 			:allVariationTypes="allVariationTypes" 
+ 			:allProductCategories="allProductCategories" 
+ 			@storeProduct="storeProduct()" 
+ 		/>
 
  		<!-- View Modal -->
 		<div class="modal fade" id="merchant-product-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -2034,6 +2068,32 @@
 	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+	import ProductCreateOrEditModal from '../components/ProductCreateOrEditModal';
+
+    let singleProductData = {
+    	// name : null,
+    	// description : null,
+    	// sku : null,
+    	// price : null,
+    	// initial_quantity : null,
+    	// available_quantity : null,
+    	// quantity_type : null,
+    	// has_variations : null,
+    	
+    	preview : null,
+    	variations : [],
+		
+		/*
+		addresses : [
+			{},
+		],
+		*/
+	
+    	// product_category_id : null,
+    	// merchant_id : null,
+    	// category : {},
+    	// merchant : {},
+    };
 
     let singleMerchantProductData = {
     	// name : null,
@@ -2063,6 +2123,7 @@
 	export default {
 
 	    components: { 
+			ProductCreateOrEditModal,
 			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
 		},
@@ -2098,7 +2159,8 @@
 	        	submitForm : true,
 	        	formSubmitted : false,
 
-	        	// allVariationTypes : [],
+	        	allVariationTypes : [],
+	        	allProductCategories : [],
 	        	
 	        	allProducts : [],
 	        	allVariations : [],
@@ -2122,6 +2184,7 @@
 		        	current_page: 1
 		      	},
 
+	        	singleProductData : singleProductData,
 	        	singleMerchantProductData : singleMerchantProductData,
 
 	        	errors : {
@@ -2400,9 +2463,11 @@
 
 			this.fetchAllProducts();
 			this.fetchAllManufacturers();
+			this.fetchAllVariationTypes();
 			// this.setProductVariation();
 			// this.fetchAllContainers();
 			this.fetchMerchantAllProducts();
+			this.fetchProductAllCategories();
 
 		},
 
@@ -2582,6 +2647,96 @@
 					});
 
 			},
+			fetchAllVariationTypes() {
+
+				if (! this.userHasPermissionTo('view-product-asset-index')) {
+
+					this.error = 'You do not have permission to view variation types';
+					return;
+
+				}
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allVariationTypes = [];
+				
+				axios
+					.get('/api/variation-types/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allVariationTypes = response.data.data.filter(variationType=>variationType.variations.length > 1) ?? [];
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchProductAllCategories() {
+
+				if (! this.userHasPermissionTo('view-product-asset-index')) {
+
+					this.error = 'You do not have permission to view product-categories';
+					return;
+
+				}
+				
+				this.query = '';
+				this.error = '';
+				this.loading = true;
+				this.allProductCategories = [];
+				
+				axios
+					.get('/api/product-categories/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allProductCategories = response.data.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 			
 			/*
 				fetchAllContainers() {
@@ -2645,6 +2800,56 @@
 				this.singleMerchantProductData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
+			showProductCreateForm() {
+
+				// this.createMode = true;
+	        	// this.submitForm = true;
+	        	
+				this.singleProductData = {
+				
+					// name : null,
+			    	// description : null,
+			    	// sku : null,
+			    	// price : null,
+			    	// initial_quantity : null,
+			    	// available_quantity : null,
+			    	// quantity_type : null,
+			    	// has_variations : null,
+			    	
+			    	preview : null,
+
+			    	variations : [],
+					
+					/*
+					addresses : [
+						{},
+					],
+					*/
+				
+			    	// product_category_id : null,
+			    	// merchant_id : null,
+			    	// category : {},
+			    	// merchant : {},
+				
+				};
+
+				/*
+				this.errors = {
+					
+					variations : [],
+					
+					
+					// addresses : [
+					//	{},
+					// ],
+					
+
+				};
+				*/
+
+				$('#product-createOrEdit-modal').modal('show');			// Load up a new modal...	
+
+			},
 			showProductMerchantCreateForm() {
 				// this.step = 1;
 				this.createMode = true;
@@ -2663,7 +2868,7 @@
 
 				// this.setProductVariation();
 
-				$('#product-createOrEdit-modal').modal('show');
+				$('#merchant-product-createOrEdit-modal').modal('show');
 			},
 			showProductMerchantMultipleCreateForm() {
 				// this.step = 1;
@@ -2689,13 +2894,44 @@
 
 				this.singleMerchantProductData = JSON.parse(JSON.stringify(object));
 
-				$('#product-createOrEdit-modal').modal('show');
+				$('#merchant-product-createOrEdit-modal').modal('show');
+			},
+			storeProduct() {
+
+				this.formSubmitted = true;
+
+				axios
+					.post('/products/' + this.perPage, this.singleProductData)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New product has been stored", "Success");
+
+							this.pagination.current_page = 1; 
+							this.allFetchedProducts = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabProducts();
+
+							this.fetchAllProducts();
+
+							$('#product-createOrEdit-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+					});
+
 			},
 			storeMerchantProduct() {
 				
 				if (!this.verifyUserInput()) {
-					// this.submitForm = false;
-					// this.formSubmitted = false;
+					this.submitForm = false;
+					this.formSubmitted = false;
 					return;
 				}
 
@@ -2722,7 +2958,7 @@
 							}
 							*/
 
-							$('#product-createOrEdit-modal').modal('hide');
+							$('#merchant-product-createOrEdit-modal').modal('hide');
 						}
 
 					})
@@ -2739,11 +2975,23 @@
 					});
 
 			},
-			storeMerchantMerchantProduct() {
+			checkMultipleProductEmptyness() {
 
 				if (! this.singleMerchantProductData.hasOwnProperty('merchantMultipleProducts') || this.singleMerchantProductData.merchantMultipleProducts.length < 1) {
 
+					return true;		// Empty
+
+				}
+
+				return false;
+
+			},
+			storeMerchantMultipleProduct() {
+
+				if (this.checkMultipleProductEmptyness()) {
+
 					this.submitForm = false;
+					this.formSubmitted = false;
 					return;
 
 				}
@@ -2781,9 +3029,9 @@
 			},
 			updateMerchantProduct() {
 				
-				if (!this.verifyUserInput()) {
-					// this.submitForm = false;
-					// this.formSubmitted = false;
+				if (! this.verifyUserInput()) {
+					this.submitForm = false;
+					this.formSubmitted = false;
 					return;
 				}
 
@@ -2810,7 +3058,7 @@
 							}
 							*/
 
-							$('#product-createOrEdit-modal').modal('hide');
+							$('#merchant-product-createOrEdit-modal').modal('hide');
 							
 						}
 

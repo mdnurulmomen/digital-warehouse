@@ -61,7 +61,7 @@ class Product extends Model
         return false;
     }
 
-    public function setProductVariationsAttribute($productNewVariations = array())
+    public function setProductVariationsAttribute($productNewVariations = [])
     {
         if (count($productNewVariations)) {
 
@@ -86,9 +86,11 @@ class Product extends Model
             
             // $variations = json_decode(json_encode($variations));
 
-            foreach ($productNewVariations as $productNewVariation) {
+            foreach ($productNewVariations as $productNewVariationKey => $productNewVariation) {
 
                 $previewPath = $this->saveProductVariationPreview($productNewVariation->preview ?? NULL, $productNewVariation->variation);
+
+                // \Log::info('Variation Index: '.$productNewVariationKey.'. Preview Path: '.$previewPath);
 
                 $productVariation = $this->variations()->updateOrCreate(
                     
@@ -152,7 +154,7 @@ class Product extends Model
             $imagePath = 'storage/products/';
 
             if(!File::isDirectory($imagePath)){
-                File::makeDirectory($imagePath, 0777, true, true);
+                File::makeDirectory($imagePath, 0755, true, true);
             }
 
             try 
@@ -180,7 +182,7 @@ class Product extends Model
             $imagePath = 'storage/products/';
 
             if(!File::isDirectory($imagePath)){
-                File::makeDirectory($imagePath, 0777, true, true);
+                File::makeDirectory($imagePath, 0755, true, true);
             }
 
             try 
@@ -195,6 +197,8 @@ class Product extends Model
 
             // $img = $img->resize(300, 300);
             $img->save($imagePath.str_replace(' ', '_', strtolower($this->name.'_'.$variation->name)).'.jpg');
+
+            // \Log::debug($imagePath.str_replace(' ', '_', strtolower($this->name.'_'.$variation->name)).'.jpg');
 
             return $imagePath.str_replace(' ', '_', strtolower($this->name.'_'.$variation->name)).'.jpg';
 
