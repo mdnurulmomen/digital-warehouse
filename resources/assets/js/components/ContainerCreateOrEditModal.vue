@@ -310,6 +310,60 @@
 									        	{{ errors.container.shelf.quantity }}
 									  		</div>
 						    			</div>
+
+						    			<div class="col-sm-12 form-group">
+						    				<label for="phone">Shelves Length</label>
+						    				
+						    				<div class="input-group mb-0">
+												<input 
+													type="number" 
+													class="form-control is-valid" 
+													:value="singleAssetData.length" 
+													:readonly="true"
+												>
+						    					<div class="input-group-append">
+						    						<span class="input-group-text">
+						    							{{ general_settings.default_measure_unit }}
+						    						</span>
+						    					</div>
+						    				</div>
+						    			</div>
+
+						    			<div class="col-sm-12 form-group">
+						    				<label for="phone">Shelves Width</label>
+						    				
+						    				<div class="input-group mb-0">
+												<input 
+													type="number" 
+													class="form-control is-valid" 
+													:value="singleAssetData.width" 
+													:readonly="true"
+												>
+												<div class="input-group-append">
+						    						<span class="input-group-text">
+						    							{{ general_settings.default_measure_unit }}
+						    						</span>
+						    					</div>
+						    				</div>
+						    			</div>
+
+						    			<div class="col-sm-12 form-group">
+						    				<label for="phone">Shelves Height</label>
+											
+											<div class="input-group mb-0">
+												<input 
+													type="number" 
+													class="form-control is-valid" 
+													:value="singleAssetData.height/singleAssetData.shelf.quantity" 
+													:readonly="true"
+												>
+												<div class="input-group-append">
+						    						<span class="input-group-text">
+						    							{{ general_settings.default_measure_unit }}
+						    						</span>
+						    					</div>
+											</div>
+						    			</div>
 						    		</div>
 						    		<!-- shelf has unit -->
 						    		<div class="form-row">
@@ -381,6 +435,63 @@
 											<div class="invalid-feedback">
 									        	{{ errors.container.shelf.unit.quantity }}
 									  		</div>
+						    			</div>
+
+						    			<div class="col-sm-12 form-group">
+						    				<label for="phone">Unit Length</label>
+						    				
+						    				<div class="input-group mb-0">
+												<input 
+													type="number" 
+													class="form-control is-valid" 
+													:value="singleAssetData.length/singleAssetData.shelf.unit.quantity" 
+													:readonly="true"
+												>
+
+												<div class="input-group-append">
+						    						<span class="input-group-text">
+						    							{{ general_settings.default_measure_unit }}
+						    						</span>
+						    					</div>
+						    				</div>
+						    			</div>
+
+						    			<div class="col-sm-12 form-group">
+						    				<label for="phone">Unit Width</label>
+						    				
+						    				<div class="input-group mb-0">
+												<input 
+													type="number" 
+													class="form-control is-valid" 
+													:value="singleAssetData.width" 
+													:readonly="true"
+												>
+
+												<div class="input-group-append">
+						    						<span class="input-group-text">
+						    							{{ general_settings.default_measure_unit }}
+						    						</span>
+						    					</div>
+						    				</div>
+						    			</div>
+
+						    			<div class="col-sm-12 form-group">
+						    				<label for="phone">Unit Height</label>
+											
+											<div class="input-group mb-0">
+												<input 
+													type="number" 
+													class="form-control is-valid" 
+													:value="singleAssetData.height/singleAssetData.shelf.quantity" 
+													:readonly="true"
+												>
+
+												<div class="input-group-append">
+						    						<span class="input-group-text">
+						    							{{ general_settings.default_measure_unit }}
+						    						</span>
+						    					</div>
+											</div>
 						    			</div>
 						    		</div>
 							    		
