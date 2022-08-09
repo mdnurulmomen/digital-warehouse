@@ -254,12 +254,19 @@ Route::name('admin.')->group(function () {
 		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals.delete');
 		Route::post('/search-merchant-deals/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
 
-		// deal-payments
-		Route::get('/api/deal-payments/{deal}/{perPage?}', 'DealController@showDealAllPayments')->name('deal-payments.index');
-		Route::post('/deal-payments/{perPage}', 'DealController@storeDealNewPayment')->name('deal-payments.store');	
-		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments.update');	
-		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments.delete');
-		Route::post('/api/search-deal-payments/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+		// deal-instalments
+		Route::get('/api/deal-instalments/{deal}/{perPage?}', 'DealController@showDealAllInstalments')->name('deal-instalments.index');
+		Route::post('/deal-instalments/{perPage}', 'DealController@storeDealNewInstalment')->name('deal-instalments.store');	
+		Route::put('/deal-instalments/{instalment}/{perPage}', 'DealController@updateDealInstalment')->name('deal-instalments.update');	
+		Route::delete('/deal-instalments/{instalment}/{perPage}', 'DealController@deleteDealInstalment')->name('deal-instalments.delete');
+		Route::post('/api/search-deal-instalments/{perPage}', 'DealController@searchDealAllInstalments')->name('search-deal-instalments');
+
+		// instalment-payments
+		Route::get('/api/instalment-payments/{instalment}/{perPage?}', 'DealController@showInstalmentAllPayments')->name('instalment-payments.index');
+		Route::post('/instalment-payments/{perPage}', 'DealController@storeInstalmentNewPayment')->name('instalment-payments.store');	
+		Route::put('/instalment-payments/{payment}/{perPage}', 'DealController@updateInstalmentPayment')->name('instalment-payments.update');	
+		Route::delete('/instalment-payments/{payment}/{perPage}', 'DealController@deleteInstalmentPayment')->name('instalment-payments.delete');
+		Route::post('/api/search-instalment-payments/{perPage}', 'DealController@searchInstalmentAllPayments')->name('search-instalment-payments');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions.index');

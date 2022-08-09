@@ -4,7 +4,7 @@
 		<breadcrumb 
 			:icon="'payments'"
 			:title="'payment'" 
-			:message="'All payments of ' + merchantName + ' for the deal ' + dealName"
+			:message="('All payments of ' + merchantName + ' for the instalment ' + (instalment.name ? instalment.name : ''))"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -173,81 +173,9 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('previous_due')"
-																		> 
-																			Due
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('total_rent')"
-																		> 
-																			Rent
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('discount')"
-																		> 
-																			Discount
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('net_payable')"
-																		> 
-																			Payable
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
 																			@click="changeIntegersOrder('paid_amount')"
 																		> 
-																			Total Paid
+																			Paid
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -258,6 +186,10 @@
 																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
 																			</span>
 																		</a>
+																	</th>
+
+																	<th>
+																		Paid at
 																	</th>
 																	
 																	<th v-if="userHasPermissionTo('update-merchant-payment') || userHasPermissionTo('delete-merchant-payment')">
@@ -277,23 +209,11 @@
 																	</td>
 
 																	<td>
-																		{{ content.previous_due }}
+																		{{ content.paid_amount }}
 																	</td>
 
 																	<td>
-																		{{ content.total_rent }}
-																	</td>
-
-																	<td>
-																		{{ content.discount }}
-																	</td>
-
-																	<td>
-																		{{ content.net_payable }}
-																	</td>
-
-																	<td>
-																		{{ content.total_paid_amount }}
+																		{{ content.paid_at }}
 																	</td>
 																	
 																	<td>
@@ -338,85 +258,13 @@
 															</tbody>
 
 															<tfoot>
-																<tr>	
+																<tr>
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
 																			@click="changeNamesOrder"
 																		> 
-																			Name
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('previous_due')"
-																		> 
-																			Due
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('total_rent')"
-																		> 
-																			Rent
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('discount')"
-																		> 
-																			Discount
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('net_payable')"
-																		> 
-																			Payable
+																			Invoice
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -434,7 +282,7 @@
 																			href="javascript:void(0)" 
 																			@click="changeIntegersOrder('paid_amount')"
 																		> 
-																			Total Paid
+																			Paid
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -445,6 +293,10 @@
 																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
 																			</span>
 																		</a>
+																	</th>
+
+																	<th>
+																		Paid at
 																	</th>
 																	
 																	<th v-if="userHasPermissionTo('update-merchant-payment') || userHasPermissionTo('delete-merchant-payment')">
@@ -526,512 +378,107 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-							<transition-group name="fade">	
-								<div 
-									class="row" 
-									v-bind:key="'merchant-deal-modal-step-' + 1" 
-									v-show="! loading && step==1" 
-								>
-									<h2 class="mx-auto mb-4 lead">Dealt Spaces</h2>
+							<div 
+								class="row" 
+								v-show="!loading" 
+							>
+								<!-- payment -->
+								<div class="col-md-12">
+									<div class="card">
+										<div class="card-body">
+											<div class="form-row">
+												<div class="form-group col-md-6">
+													<label for="inputFirstName">Current Due</label>
 
-									<div class="col-md-12">
-										<div 
-											class="form-row" 
-											v-if="deal.hasOwnProperty('warehouses') && Array.isArray(deal.warehouses) && deal.warehouses.length"
-										>
-											<div class="col-sm-12">
-												<div 
-													class="form-row" 
-													v-for="(merchantWarehouse, merchantWarehouseIndex) in deal.warehouses" 
-													:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-create-or-edit'"
-												>
-													<div class="col-md-12">
-														<div class="card">
-															<div class="card-title">
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Warehouse :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ merchantWarehouse.name ? $options.filters.capitalize(merchantWarehouse.name) : 'NA' }}
-																	</label>
-																</div>
-															</div>
-																
-															<div class="card-body pt-0">
-																<div class="form-row" v-if="merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length">
-																	<div 
-																		class="col-md-6 ml-auto" 
-																		v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
-																		:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-view'"
-																	>
-																		<div 
-																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length"
-																		>
-																			<div 
-																				class="card-body" 
-																				v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
-																				:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
-																			>
-																				<h6 class="text-center">Containers</h6>
+													<div class="input-group mb-0">
+														<input type="number" 
+														class="form-control is-valid" 
+														v-model.number="singlePaymentData.current_due" 
+														placeholder="Current Due" 
+														readonly="true"
+														>
 
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container Name :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.name | capitalize }}
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container Type :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.hasOwnProperty('warehouse_container') && warehouseContainer.warehouse_container.hasOwnProperty('container') ? $options.filters.capitalize(warehouseContainer.warehouse_container.container.name) : 'NA' }}
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container # :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
-																					</label>
-																				</div>
-																				 
-																				<div class="form-row" v-show="createMode">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Current Rent :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 'NA' }}
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Rent Period :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.name : 'NA' | capitalize }}
-																					</label>
-																				</div>
-																			</div>
-																		</div>
-
-																		<div 
-																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') &&  warehouseSpace.container.hasOwnProperty('warehouse_container')"
-																		>
-																			<div class="card-body">
-																				<h6 class="text-center">Shelves</h6>
-																				
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container Type :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container # :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
-																					</label>
-																				</div>
-
-																				<div 
-																					class="form-row" 
-																					v-if="warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length"
-																				>
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Shelf # :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						<ul id="shelf-addresses">
-																							<li 
-																								v-for="shelfAddress in warehouseSpace.container.shelves" 
-																								:key="'shelf-address-' + shelfAddress.id"
-																							>
-
-																								{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																								
-																							</li>
-																						</ul>
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Rent Period :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ (warehouseSpace.container && warehouseSpace.container.selected_rent) ? warehouseSpace.container.selected_rent.name : 'NA' | capitalize }}
-																					</label>
-																				</div>
-
-																				<div class="form-row" v-show="createMode">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Current Rent :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
-																					</label>
-																				</div>
-																			</div>
-																		</div>
-
-																		<div 
-																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
-																		>
-																			<div class="card-body">
-																				<h6 class="text-center">Units</h6>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container Type :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Container # :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Shelf # :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.shelf.name ? warehouseSpace.container.shelf.name.substring(warehouseSpace.container.shelf.name.lastIndexOf("-")+1) : 'NA' }}
-																					</label>
-																				</div>
-
-																				<div class="form-row" v-if="warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Unit # :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						<ul id="unit-addresses">
-																							<li 
-																								v-for="unitAddress in warehouseSpace.container.shelf.units" 
-																								:key="'unit-address-' + unitAddress.id"
-																							>
-
-																								{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																								
-																							</li>
-																						</ul>
-																					</label>
-																				</div>
-
-																				<div class="form-row">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Rent Period :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ (warehouseSpace.container && warehouseSpace.container.selected_rent) ? warehouseSpace.container.selected_rent.name : 'NA' | capitalize }}
-																					</label>
-																				</div>
-																				 
-																				<div class="form-row" v-show="createMode">
-																					<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																						Current Rent :
-																					</label>
-																					<label class="col-sm-6 col-form-label">
-																						{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
-																					</label>
-																				</div>
-																			</div>
-																		</div>
-																	</div>
-																</div>		
-															</div>
+														<div class="input-group-append">
+															<span class="input-group-text">
+																{{ general_settings.official_currency_name | capitalize }}
+															</span>
 														</div>
 													</div>
 												</div>
+
+												<div class="form-group col-md-6">
+													<label for="inputFirstName">Paid Amount</label>
+
+													<div class="input-group mb-0">
+								    					<input type="number" 
+															class="form-control is-valid" 
+															v-model.number="singlePaymentData.paid_amount" 
+															placeholder="Paid Amount" 
+															:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
+															@change="validateFormInput('paid_amount')" 
+															required="true" 
+															min="1" 
+														>
+
+								    					<div class="input-group-append">
+								    						<span class="input-group-text">
+								    							{{ general_settings.official_currency_name | capitalize }}
+								    						</span>
+								    					</div>
+								    				</div>
+
+								    				<div class="invalid-feedback">
+												    	{{ errors.paid_amount }}
+												    </div>
+												</div>
+
+												<div class="form-group col-md-6">
+													<label for="inputFirstName">Remaining Due</label>
+
+													<div class="input-group mb-0">
+								    					<input type="number" 
+															class="form-control is-valid" 
+															:value="singlePaymentData.current_due - singlePaymentData.paid_amount" 
+															placeholder="Previous Dues" 
+															:disabled="true"
+														>
+
+								    					<div class="input-group-append">
+								    						<span class="input-group-text">
+								    							{{ general_settings.official_currency_name | capitalize }}
+								    						</span>
+								    					</div>
+								    				</div>
+												</div>
 											</div>
 										</div>
+									</div>
+								</div>
 
-										<div class="form-row" v-else>
-											<div 
-												class="col-md-12 text-center" 
+								<div class="col-sm-12 card-footer">
+									<div class="form-row">
+										<div class="col-sm-12 text-right" v-show="!submitForm">
+											<span class="text-danger small mb-1">
+										  		Please input required fields
+										  	</span>
+										</div>
+										<div class="col-sm-12">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm" data-dismiss="modal" v-tooltip.bottom-end="'Close'">
+						                  		Close
+						                  	</button>
+
+											<button 
+												type="submit" 
+												class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
+												:disabled="!submitForm || formSubmitted"
 											>
-												<p class="text-danger">
-													No Space Found.
-												</p>
-											</div>
-										</div>
-									</div>
-
-									<div class="col-md-12 card-footer pb-0">
-										<div class="form-row">
-									    	<div class="form-group col-sm-12 text-right">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
-											  		Please input required fields
-									          	</div>
-									          	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" v-tooltip.bottom-end="'Next'" v-on:click="nextPage">
-							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
-							                  	</button>
-								          	</div>
-								    	</div>
-									</div>
-								</div>
-
-								<div 
-									class="row" 
-									v-bind:key="'merchant-deal-modal-step-' + 2" 
-									v-show="!loading && step==2" 
-								>
-									<!-- payment -->
-									<div class="col-md-12">
-										<div class="card">
-											<div class="card-block">
-												<div class="form-row">
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Current Rent / installment</label>
-														<div class="input-group">
-															<input 
-																type="text" 
-																class="form-control" 
-																required="true" 
-																v-model="dealTotalCurrentRent" 
-																:disabled="true"
-																aria-label="Amount Per Installment" 
-															>
-															<div class="input-group-append">
-																<span class="input-group-text">{{ general_settings.official_currency_name }}</span>
-															</div>
-														</div>
-													</div>
-
-													<div class="form-group col-md-6">
-														<label for="inputFirstName"># Installment</label>
-														<div class="input-group mb-1">
-															<input type="number" 
-																class="form-control" 
-																v-model.number="singlePaymentData.number_installment" 
-																placeholder="Number Installment" 
-																required="true" 
-																:min="1" 
-																:class="! errors.number_installment ? 'is-valid' : 'is-invalid'" 
-																@change="resetTotalRent();setRentExpiryDate()"
-															>
-															<div class="input-group-append">
-																<span class="input-group-text"> {{ (deal.rent_period && deal.rent_period.name) ? deal.rent_period.name : 'NA' }} </span>
-															</div>
-														</div>
-														<div class="invalid-feedback" style="display:block" v-show="errors.number_installment">
-													    	{{ errors.number_installment }}
-													    </div>
-													</div>
-												</div>
-
-												<div class="form-row">
-													<div class="col-sm-6 form-group">
-														<label for="inputFirstName">Issue From</label>
-														<div class="date">
-															<datepicker 
-																v-model="singlePaymentData.date_from" 
-																:initialView="'month'"
-																:minimumView="'day'" 
-																:maximumView="'year'" 
-																placeholder="Start Date" 
-																:disabled="true" 
-																@input="setRentExpiryDate" 
-															>	
-															</datepicker>
-														</div>
-													</div>
-
-													<div class="col-sm-6 form-group">
-														<label for="inputFirstName">Expired at</label>
-														<div class="date">
-															<datepicker 
-																v-model="singlePaymentData.date_to" 
-																:disabled="true"
-															>	
-															</datepicker>
-														</div>
-													</div>
-												</div>
-											</div>
-
-											<div class="card-body">
-												<div class="form-row">
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Total Rent</label>
-
-														<div class="input-group mb-0">
-									    					<input type="number" 
-																class="form-control is-valid" 
-																required="true" 
-																v-model.number="singlePaymentData.total_rent" 
-																placeholder="Total Rent" 
-																:disabled="true"
-															>
-
-									    					<div class="input-group-append">
-									    						<span class="input-group-text">
-									    							{{ general_settings.official_currency_name }}
-									    						</span>
-									    					</div>
-									    				</div>
-													</div>
-
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Discount</label>
-														<div class="input-group mb-1">
-															<input type="number" 
-																class="form-control" 
-																v-model.number="singlePaymentData.discount" 
-																placeholder="Discount" 
-																:min="0" 
-																:max="100" 
-																:class="! errors.discount ? 'is-valid' : 'is-invalid'" 
-																@change="resetTotalRent()"
-															>
-															<div class="input-group-append">
-																<span class="input-group-text"> % </span>
-															</div>
-														</div>
-														<div class="invalid-feedback" style="display:block" v-show="errors.discount">
-													    	{{ errors.discount }}
-													    </div>
-													</div>
-												</div>
-
-												<div class="form-row">
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Last Due</label>
-
-														<div class="input-group mb-0">
-									    					<input type="number" 
-																class="form-control is-valid" 
-																v-model.number="singlePaymentData.previous_due" 
-																placeholder="Previous Due" 
-																:disabled="true"
-															>
-
-									    					<div class="input-group-append">
-									    						<span class="input-group-text">
-									    							{{ general_settings.official_currency_name }}
-									    						</span>
-									    					</div>
-									    				</div>
-													</div>
-
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Net Payable</label>
-
-														<div class="input-group mb-0">
-									    					<input type="number" 
-																class="form-control is-valid" 
-																v-model.number="singlePaymentData.net_payable" 
-																placeholder="Net Payable" 
-																:disabled="true"
-															>
-
-									    					<div class="input-group-append">
-									    						<span class="input-group-text">
-									    							{{ general_settings.official_currency_name }}
-									    						</span>
-									    					</div>
-									    				</div>
-													</div>
-												</div>
-
-												<div class="form-row">
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Paid Amount</label>
-
-														<div class="input-group mb-0">
-									    					<input type="number" 
-																class="form-control is-valid" 
-																v-model.number="singlePaymentData.total_paid_amount" 
-																placeholder="Paid Amount" 
-																min="0" 
-																:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
-																@change="validateFormInput('paid_amount')" 
-																required="true" 
-															>
-
-									    					<div class="input-group-append">
-									    						<span class="input-group-text">
-									    							{{ general_settings.official_currency_name }}
-									    						</span>
-									    					</div>
-									    				</div>
-
-									    				<div class="invalid-feedback">
-													    	{{ errors.paid_amount }}
-													    </div>
-													</div>
-
-													<div class="form-group col-md-6">
-														<label for="inputFirstName">Current Due</label>
-
-														<div class="input-group mb-0">
-									    					<input type="number" 
-																class="form-control is-valid" 
-																:value="singlePaymentData.net_payable - singlePaymentData.total_paid_amount" 
-																placeholder="Previous Dues" 
-																:disabled="true"
-															>
-
-									    					<div class="input-group-append">
-									    						<span class="input-group-text">
-									    							{{ general_settings.official_currency_name }}
-									    						</span>
-									    					</div>
-									    				</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-									</div>
-
-									<div class="col-sm-12 card-footer">
-										<div class="form-row">
-											<div class="col-sm-12 text-right" v-show="!submitForm">
-												<span class="text-danger small mb-1">
-											  		Please input required fields
-											  	</span>
-											</div>
-											<div class="col-sm-12">
-												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" v-tooltip.bottom-end="'Previous'"  v-on:click="step-=1">
-							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
-							                  	</button>
-
-												<button 
-													type="submit" 
-													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
-													:disabled="!submitForm || formSubmitted"
-												>
-													{{ createMode ? 'Make ' : 'Update ' }} Payment
-												</button>
-											</div>
+												{{ createMode ? 'Make ' : 'Update ' }} Payment
+											</button>
 										</div>
 									</div>
 								</div>
-							</transition-group>
+							</div>
+							
 						</div>
 					</form>
 				</div>
@@ -1060,75 +507,17 @@
 							</label>
 						</div>
 
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								# Installment :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.number_installment }}
-							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								Date From :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.date_from }}
-							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								Date To :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.date_to }}
-							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								Total Rent :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.total_rent }} {{ general_settings.official_currency_name }}
-							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								Discount :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.discount }} %
-							</label>
-						</div>
-
+						<!-- 
 						<div class="form-row">
 							<label class="col-6 col-form-label font-weight-bold text-right">
 								Last Due :
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
+								{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								Net Payeble :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
-							</label>
-						</div>
+						</div> 
+						-->
 
 						<div class="form-row">
 							<label class="col-6 col-form-label font-weight-bold text-right">
@@ -1136,7 +525,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.total_paid_amount }} {{ general_settings.official_currency_name }}
+								{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
 						</div>
 
@@ -1146,7 +535,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
+								{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
 						</div>
 
@@ -1160,228 +549,27 @@
 							</label>
 						</div>
 
-						<div 
-							class="form-row" 
-							v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length"
-						>
-							<div 
-								class="col-sm-6" 
-								v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
-								:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
-							>
-								<div class="card card-body">
-									<div class="form-row">
-										<label class="col-6 col-form-label font-weight-bold text-right">
-											Space Type :
-										</label>
-
-										<label class="col-6 col-form-label">
-											{{ paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA' }}
-										</label>	
-									</div>
-
-									<div class="form-row">
-										<label class="col-6 col-form-label font-weight-bold text-right">
-											Space Name :
-										</label>
-
-										<label class="col-6 col-form-label">
-											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
-										</label>	
-									</div>
-								
-									<div class="form-row">
-										<label class="col-6 col-form-label font-weight-bold text-right">
-											Rent :
-										</label>
-
-										<label class="col-6 col-form-label">
-											{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
-										</label>	
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- 
 						<div class="form-row">
-							<div class="col-md-12 text-center">
-								<label class="font-weight-bold">
-									Spaces Details :
-								</label>
-							</div>
+							<label class="col-6 col-form-label font-weight-bold text-right">
+								Issuer :
+							</label>
+
+							<label class="col-6 col-form-label">
+								{{ singlePaymentData.issuer ? (singlePaymentData.issuer.first_name + singlePaymentData.issuer.last_name) : '--' }} 
+								({{ singlePaymentData.issuer ? singlePaymentData.issuer.user_name : '--' }})
+							</label>
 						</div>
 
-						<div 
-							class="form-row" 
-							v-if="deal.hasOwnProperty('warehouses') && Array.isArray(deal.warehouses) && deal.warehouses.length"
-						>
-							<div class="col-sm-12">
-								<div 
-									class="form-row" 
-									v-for="(merchantWarehouse, merchantWarehouseIndex) in deal.warehouses" 
-									:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-create-or-edit'"
-								>
-									<div class="col-md-12">
-										<div class="card">
-											<div class="card-title">
-												<div class="form-row">
-													<div class="col-md-12 pl-3">
-														<label class="font-weight-bold col-form-label">
-															{{ merchantWarehouse.name ? $options.filters.capitalize(merchantWarehouse.name) : 'NA' }}
-														</label>
-													</div>
-												</div>
-											</div>
-												
-											<div class="card-body pt-0">
-												<div class="form-row" v-if="merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length">
-													<div 
-														class="col-md-6 ml-auto" 
-														v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
-														:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-view'"
-													>
-														<div 
-															class="card" 
-															v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length"
-														>
-															<div 
-																class="card-body" 
-																v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
-																:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
-															>
-																<h6 class="text-center">Containers Details</h6>
+						<div class="form-row" v-show="singlePaymentData.updater">
+							<label class="col-6 col-form-label font-weight-bold text-right">
+								Updater :
+							</label>
 
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Container Type :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseContainer.hasOwnProperty('warehouse_container') && warehouseContainer.warehouse_container.hasOwnProperty('container') ? $options.filters.capitalize(warehouseContainer.warehouse_container.container.name) : 'NA' }}
-																	</label>
-																</div>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Container # :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
-																	</label>
-																</div>
-															</div>
-														</div>
-
-														<div 
-															class="card" 
-															v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') &&  warehouseSpace.container.hasOwnProperty('warehouse_container')"
-														>
-															<div class="card-body">
-																<h6 class="text-center">Shelves Details</h6>
-																
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Container Type :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
-																	</label>
-																</div>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Container # :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
-																	</label>
-																</div>
-
-																<div 
-																	class="form-row" 
-																	v-if="warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length"
-																>
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Shelf # :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		<ul id="shelf-addresses">
-																			<li 
-																				v-for="shelfAddress in warehouseSpace.container.shelves" 
-																				:key="'shelf-address-' + shelfAddress.id"
-																			>
-
-																				{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																				
-																			</li>
-																		</ul>
-																	</label>
-																</div>
-															</div>
-														</div>
-
-														<div 
-															class="card" 
-															v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
-														>
-															<div class="card-body">
-																<h6 class="text-center">Units Details</h6>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Container Type :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
-																	</label>
-																</div>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Container # :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
-																	</label>
-																</div>
-
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Shelf # :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ warehouseSpace.container.shelf.name ? warehouseSpace.container.shelf.name.substring(warehouseSpace.container.shelf.name.lastIndexOf("-")+1) : 'NA' }}
-																	</label>
-																</div>
-
-																<div class="form-row" v-if="warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Unit # :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		<ul id="unit-addresses">
-																			<li 
-																				v-for="unitAddress in warehouseSpace.container.shelf.units" 
-																				:key="'unit-address-' + unitAddress.id"
-																			>
-
-																				{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																				
-																			</li>
-																		</ul>
-																	</label>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>		
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>	 
-						-->
+							<label class="col-6 col-form-label">
+								{{ singlePaymentData.updater ? (singlePaymentData.updater.first_name + singlePaymentData.updater.last_name) : '--' }} 
+								({{ singlePaymentData.updater ? singlePaymentData.updater.user_name : '--' }})
+							</label>
+						</div>
 					</div>
 
 					<div class="modal-footer">
@@ -1423,45 +611,17 @@
 				<div class="card-body">
 					<div class="form-row form-group">
 						<div class="col-6">
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold">
-									Total Rent :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.total_rent }} {{ general_settings.official_currency_name }}
-								</label>
-							</div>
-
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold">
-									Discount :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.discount }} %
-								</label>
-							</div>
-
+							<!-- 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold">
 									Last Due :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
+									{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
-							</div>
-
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold">
-									Net Payeble :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
-								</label>
-							</div>
+							</div> 
+							-->
 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold">
@@ -1469,7 +629,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.total_paid_amount }} {{ general_settings.official_currency_name }}
+									{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 
@@ -1479,7 +639,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
+									{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 						</div>
@@ -1497,36 +657,6 @@
 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold text-right">
-									# Installment :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.number_installment }}
-								</label>
-							</div>
-
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-right">
-									Rent from :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.date_from }}
-								</label>
-							</div>
-
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-right">
-									Rent To :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.date_to }}
-								</label>
-							</div>
-
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold text-right">
 									Paid at :
 								</label>
 
@@ -1534,41 +664,146 @@
 									{{ singlePaymentData.paid_at }} 
 								</label>
 							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Issuer :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.issuer ? (singlePaymentData.issuer.first_name + singlePaymentData.issuer.last_name) : '--' | capitalize }} 
+									({{ singlePaymentData.issuer ? singlePaymentData.issuer.user_name : '--' | capitalize }})
+								</label>
+							</div>
+
+							<div class="form-row" v-show="singlePaymentData.updater">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Updater :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ singlePaymentData.updater ? (singlePaymentData.updater.first_name + singlePaymentData.updater.last_name) : '--' | capitalize }} 
+									({{ singlePaymentData.updater ? singlePaymentData.updater.user_name : '--' | capitalize }})
+								</label>
+							</div>
 						</div>
 					</div>
+
+					<hr/>
 
 					<div class="form-row">
-						<div class="col-12">
-							<table class="table table-striped table-bordered nowrap text-center">
-								<thead>
-									<tr>
-										<th>Space Type</th>
-										<th>Space Name</th>
-										<th>Rent</th>
-									</tr>
-								</thead>
+						<!-- 
+						<label class="col-sm-12 col-form-label font-weight-bold">
+							Instalment Summery
+						</label> 
+						-->
 
-								<tbody>
-									<tr 
-										v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
-										:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
-									>	
-										<td>
-											{{ (paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
-										</td>
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Instalment
+								</label>
 
-										<td>
-											{{ paymentRent.dealt_space ? paymentRent.dealt_space.name : 'NA' | capitalize }}
-										</td>
-										
-										<td>
-											{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
-										</td>
-									</tr>
-								</tbody>
-							</table>							
+								<label class="col-6 col-form-label">
+									{{ instalment.name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									# Instalment:
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ instalment.number_installment }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Rent From :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ instalment.date_from }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Rent To :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ instalment.date_to }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold">
+									Total Rent :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ instalment.total_rent }} 
+									{{ general_settings.official_currency_name | capitalize }}
+								</label>
+							</div>
 						</div>
-					</div>
+
+						<div class="col-6">
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Discount :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ instalment.discount }}%
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Net Payable :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ instalment.net_payable }} 
+									{{ general_settings.official_currency_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Total Paid :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ 
+										dealAllPayments.reduce((accumulator, object) => {
+										  	return accumulator + object.paid_amount;
+										}, 0)
+									}} 
+									{{ general_settings.official_currency_name | capitalize }}
+								</label>
+							</div>
+
+							<div class="form-row">
+								<label class="col-6 col-form-label font-weight-bold text-right">
+									Remaining Payable :
+								</label>
+
+								<label class="col-6 col-form-label">
+									{{ 
+										(instalment.net_payable -  dealAllPayments.reduce((accumulator, object) => {
+										  	return accumulator + object.paid_amount;
+										}, 0))
+									}} 
+									{{ general_settings.official_currency_name | capitalize }}
+								</label>
+							</div>
+						</div>
+					</div> 
 				</div>
 			</div>
 		</div>
@@ -1638,25 +873,12 @@
 	import Datepicker from 'vuejs-datepicker';
 
     let singlePaymentData = {
-    	
-		number_installment : 1,
-		date_from : 1,
-		date_to : 1,
-		total_rent : 0, // generated from selected spaces
-		discount : 0,	// percentage 
-    	previous_due : 0,
-		net_payable : 0,
-		total_paid_amount : 0,
+    	 
+    	// previous_due : 0,
+		paid_amount : 0,
 		current_due : 0,
-		// merchant_deal_id : null,
 		// paid_at : null,
-		rents : [
-			{
-				// rent : 0,
-				// dealt_space_id : null,
-				// merchant_payment_id : null
-			},
-		]
+		// merchant_deal_instalment_id : null,
 
     };
 
@@ -1668,12 +890,8 @@
 
 		props: {
 
-			deal:{
+			instalment:{
 				type: Object,
-				required: true,
-			},
-			dealName:{
-				type: String,
 				required: true,
 			},
 			merchantName:{
@@ -1687,7 +905,6 @@
 
 	        return {
 
-	        	step : 1,
 	        	error : '',
     			perPage : 10,
 	        	loading : false,
@@ -1712,7 +929,7 @@
 
 		      	},
 
-	        	dealTotalCurrentRent : 0,
+	        	// dealTotalCurrentRent : 0,
 
 	        	singlePaymentData : singlePaymentData, 
 
@@ -1736,53 +953,13 @@
 
 					Invoice: 'invoice_no',
 
-					"# Installment": 'number_installment',
+					// "Prev. Due": 'previous_due',
 
-					"Issued From": 'date_from',
-
-					"Expired At": 'date_to',
-
-					"Total Rent": 'total_rent',
-
-					Discount: 'discount',
-
-					"Prev. Due": 'previous_due',
-
-					"Net Payable": 'net_payable',
-
-					"Paid": 'total_paid_amount',
+					"Paid": 'paid_amount',
 
 					Due: 'current_due',
 
 					"Paid at": 'paid_at',
-
-					"Rents": {
-						field: "rents",
-						callback: (rents) => {
-
-							if (rents && rents.length) {
-								
-								var infosToReturn = '';
-
-								rents.forEach(
-					
-									(paymentRent, paymentRentIndex) => {
-
-										infosToReturn += "Space Type: " + (paymentRent.dealt_space ? (paymentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(paymentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + "\n Space Name: "  + this.$options.filters.capitalize(paymentRent.dealt_space.name) + "\n Rent: " + paymentRent.rent + "\n";
-
-									}
-									
-								);
-
-								return infosToReturn;
-
-							}
-							else {
-								return 'No Rents Found.'
-							}
-
-						},
-					},
 					
 				},
 
@@ -1826,7 +1003,7 @@
 
 		mounted(){
 
-			this.getDealTotalRents();
+			// this.getDealTotalRents();
 
 		},
 
@@ -1937,7 +1114,7 @@
 				// this.allFetchedContents = [];
 				
 				axios
-					.get('/api/deal-payments/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/instalment-payments/' + this.instalment.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// this.allFetchedContents = response.data;
@@ -1976,7 +1153,7 @@
 				this.dealtSpacesAndRents = [];
 				
 				axios
-					.get('/api/deal-payments/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/instalment-payments/' + this.instalment.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.dealtSpacesAndRents = response.data;
@@ -2008,13 +1185,14 @@
 
 			},
 			*/
+			/*
 			getDealTotalRents() {
 
 				this.dealTotalCurrentRent = 0;
 				
-				if (this.deal.warehouses.length > 0) {
+				if (this.instalment.warehouses.length > 0) {
 
-					this.deal.warehouses.forEach(
+					this.instalment.warehouses.forEach(
 						(merchantWarehouse, merchantWarehouseIndex) => {
 							merchantWarehouse.spaces.forEach(
 								(warehouseSpace, warehouseSpaceIndex) => {
@@ -2049,6 +1227,7 @@
 				}
 
 			},
+			*/
 			searchData() {
 
 				this.error = '';
@@ -2056,10 +1235,10 @@
 				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
 				// this.pagination.current_page = 1;
-				this.searchAttributes.merchant_deal_id = this.deal.id;
+				this.searchAttributes.merchant_deal_instalment_id = this.instalment.id;
 				
 				axios
-				.post("/api/search-deal-payments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post("/api/search-instalment-payments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
 					this.dealAllPayments = response.data.all.data;
@@ -2079,35 +1258,17 @@
 			},
 			showContentCreateForm() {
 
-				this.step = 1;
 				this.createMode = true;
 
-				let dealLastPayment = this.dealAllPayments.length ? this.dealAllPayments[this.dealAllPayments.length-1] : {};
+				// let dealLastPayment = this.dealAllPayments.length ? this.dealAllPayments[this.dealAllPayments.length-1] : {};
 
 				this.singlePaymentData = {
 
-					number_installment : 1,
-					date_from : dealLastPayment.date_to ?? this.today,
-					date_to : null,
-					total_rent : this.dealTotalCurrentRent, // generated from selected spaces
-					discount : 0,	// percentage 
-					previous_due : dealLastPayment.current_due ?? 0,	// as new deal
-					net_payable : this.dealTotalCurrentRent + (dealLastPayment.current_due ?? 0),
-					total_paid_amount : 0,
-					current_due : 0,
-					merchant_deal_id : this.deal.id,
+					// previous_due : 0,
+					paid_amount : 0,
+					current_due : this.instalment.current_due,
 					// paid_at : null,
-					
-					/*
-					// gonna get from table when creating at server
-					rents : [
-						{
-							rent : 0,
-							// dealt_space_id : null,
-							// merchant_payment_id : null
-						},
-					]
-					*/
+					merchant_deal_instalment_id : this.instalment.id,
 
 				};
 
@@ -2115,14 +1276,13 @@
 		      		
 		      	};
 
-		      	this.setRentExpiryDate();
+		      	// this.setRentExpiryDate();
 
 				$('#merchant-payment-createOrEdit-modal').modal('show');
 
 			},
 			openContentEditForm(object) {
 				
-				this.step = 1;
 				this.createMode = false;
 
 				this.singlePaymentData = object;
@@ -2146,7 +1306,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.post('/deal-payments/' + this.perPage, this.singlePaymentData)
+					.post('/instalment-payments/' + this.perPage, this.singlePaymentData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New payment has been added", "Success");
@@ -2155,7 +1315,7 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 
-							this.print();
+							// this.print();
 							
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
@@ -2184,7 +1344,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.put('/deal-payments/' + this.singlePaymentData.id + '/' + this.perPage, this.singlePaymentData)
+					.put('/instalment-payments/' + this.singlePaymentData.id + '/' + this.perPage, this.singlePaymentData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Payment has been updated", "Success");
@@ -2193,7 +1353,7 @@
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 
-							this.print();
+							// this.print();
 
 							$('#merchant-payment-createOrEdit-modal').modal('hide');
 						}
@@ -2213,10 +1373,10 @@
 			deleteAsset(singlePaymentData) {
 				
 				axios
-					.delete('/deal-payments/' + singlePaymentData.id + '/' + this.perPage)
+					.delete('/instalment-payments/' + singlePaymentData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Storage type has been deleted", "Success");
+							this.$toastr.s("Payment has been deleted", "Success");
 							// this.allFetchedContents = response.data;
 							
 							this.pagination.current_page = 1; 
@@ -2236,9 +1396,9 @@
 			},
 			verifyUserInput() {
 
-				this.validateFormInput('discount');
+				// this.validateFormInput('discount');
 				this.validateFormInput('paid_amount');
-				this.validateFormInput('number_installment');
+				// this.validateFormInput('number_installment');
 
 				if (this.errors.constructor === Object && Object.keys(this.errors).length < 1) {
 
@@ -2251,7 +1411,7 @@
 			},
 			setDealAllPayments() {
 
-				this.dealAllPayments = this.deal.payments;
+				this.dealAllPayments = this.instalment.payments;
 
 			},
             changeNumberContents() {
@@ -2274,6 +1434,7 @@
 				this.pagination = response.data;
 
 			},
+			/*
 			nextPage() {
 
 				if (this.step > 1) {
@@ -2285,11 +1446,13 @@
 				this.step++;
 
 			},
+			*/
+			/*
 			setRentExpiryDate() {
 
 				var moment = require('moment');
 
-				let daysToIncrease = this.singlePaymentData.number_installment * this.deal.rent_period.number_days;
+				let daysToIncrease = this.singlePaymentData.number_installment * this.instalment.rent_period.number_days;
 
 				this.singlePaymentData.date_from = moment(this.singlePaymentData.date_from).format('YYYY-MM-DD');
 
@@ -2297,6 +1460,8 @@
 				
 				
 			},
+			*/
+			/*
 			resetTotalRent() {
 				
 				this.validateFormInput('discount');
@@ -2313,6 +1478,7 @@
 				}
 				
 			},
+			*/
 			changeNamesOrder() {
 
 				if (this.ascending) {
@@ -2475,7 +1641,7 @@
 
 					case 'paid_amount' : 
 						
-						if(this.singlePaymentData.total_paid_amount && this.singlePaymentData.total_paid_amount < 0){
+						if(this.singlePaymentData.paid_amount && this.singlePaymentData.paid_amount < 1){
 							
 							this.errors.paid_amount = 'Invalid amount';
 
@@ -2484,37 +1650,6 @@
 
 							this.submitForm = true;
 							this.$delete(this.errors, 'paid_amount');
-
-						}
-
-						break;
-
-					case 'number_installment' : 
-						
-						if(! this.singlePaymentData.number_installment || this.singlePaymentData.number_installment < 1){
-							
-							this.errors.number_installment = 'Rent installment number is required';
-
-						}
-						else {
-
-							this.submitForm = true;
-							this.$delete(this.errors, 'number_installment');
-
-						}
-
-						break;
-
-					case 'discount' : 
-						
-						if(this.singlePaymentData.discount && (this.singlePaymentData.discount < 0 || this.singlePaymentData.discount > 100)){
-
-							this.errors.discount = 'Discount should be between 0 to 100';
-						}
-						else {
-
-							this.submitForm = true;
-							this.$delete(this.errors, 'discount');
 
 						}
 

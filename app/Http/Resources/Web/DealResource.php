@@ -37,7 +37,7 @@ class DealResource extends JsonResource
                 }])
                 ->get()
             ),
-            'payments' => DealPaymentResource::collection($this->payments)
+            'instalments' => DealInstalmentResource::collection($this->instalments)
         ];
     }
 }

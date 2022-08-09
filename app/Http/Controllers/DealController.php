@@ -10,12 +10,13 @@ use App\Models\MerchantDeal;
 use Illuminate\Http\Request;
 use App\Models\MerchantPayment;
 use Illuminate\Validation\Rule;
-use App\Models\MerchantPaymentDetail;
+use App\Models\MerchantDealInstalment;
 use App\Models\WarehouseContainerStatus;
 use App\Http\Resources\Web\DealCollection;
 use App\Models\WarehouseContainerShelfStatus;
-use App\Http\Resources\Web\DealPaymentCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
+use App\Http\Resources\Web\DealInstalmentCollection;
+use App\Http\Resources\Web\MerchantPaymentCollection;
 
 class DealController extends Controller
 {
@@ -28,19 +29,25 @@ class DealController extends Controller
         $this->middleware("permission:delete-merchant-deal")->only('deleteMerchantDeal');
 
         // Deal-Payment
-        $this->middleware("permission:view-merchant-payment-index")->only(['showDealAllPayments', 'searchDealAllPayments']);
-        $this->middleware("permission:create-merchant-payment")->only('storeDealNewPayment');
-        $this->middleware("permission:update-merchant-payment")->only('updateDealPayment');
-        $this->middleware("permission:delete-merchant-payment")->only('deleteDealPayment');       
+        $this->middleware("permission:view-merchant-payment-index")->only(['showDealAllInstalments', 'searchDealAllInstalments', 'showInstalmentAllPayments', 'searchInstalmentAllPayments']);
+        $this->middleware("permission:create-merchant-payment")->only(['storeDealNewInstalment', 'storeInstalmentNewPayment']);
+        $this->middleware("permission:update-merchant-payment")->only(['updateDealInstalment', 'updateInstalmentPayment']);
+        $this->middleware("permission:delete-merchant-payment")->only(['deleteDealInstalment', 'deleteInstalmentPayment']);
     }
 
     // Merchant-Deal
     public function showMerchantAllDeals($merchant, $perPage)
     {
-        return new DealCollection(MerchantDeal::where('merchant_id', $merchant)->with(['spaces', 'payments'])->with(['rentPeriod' => function($query) {
+        return new DealCollection(
+            MerchantDeal::where('merchant_id', $merchant)
+            ->with(['spaces', 'instalments'])
+            ->with([
+                'rentPeriod' => function($query) {
                     $query->withTrashed();
-        }])
-        ->latest()->paginate($perPage));
+                }
+            ])
+            ->latest()->paginate($perPage)
+        );
     }
 
     public function storeMerchantDeal(Request $request, $perPage)
@@ -54,16 +61,16 @@ class DealController extends Controller
             'sale_percentage' => 'required_if:e_commerce_fulfillment,1|min:0|max:100',
             'rent_period_id' => 'required|exists:rent_periods,id|exists:rents,rent_period_id',
             
-            'payments' => 'required|array|min:1',
-            'payments.*.number_installment' => 'required|numeric',
-            'payments.*.date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
-            'payments.*.date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
-            'payments.*.total_rent' => 'required|numeric',
-            'payments.*.discount' => 'required|numeric|between:0,100',
-            'payments.*.previous_due' => 'numeric|min:0',
-            'payments.*.net_payable' => 'required|numeric',
-            'payments.*.paid_amount' => 'required|numeric|min:0',
-            // 'payments.*.current_due' => 'required|numeric',
+            'instalments' => 'required|array|min:1',
+            'instalments.*.number_installment' => 'required|numeric',
+            'instalments.*.date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'instalments.*.date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'instalments.*.total_rent' => 'required|numeric',
+            'instalments.*.discount' => 'required|numeric|between:0,100',
+            // 'instalments.*.previous_due' => 'numeric|min:0',
+            'instalments.*.net_payable' => 'required|numeric',
+            'instalments.*.paid_amount' => 'required|numeric|min:0',
+            // 'instalments.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
             'warehouses.*.id' => 'required|exists:warehouses',
@@ -134,16 +141,16 @@ class DealController extends Controller
         ],
 
         [
-            'payments' => 'Payment is required !',
-            // 'payments.*.current_due' => 'Stock quantity is required !',
-            'payments.*.number_installment' => 'Number installment is required',
-            'payments.*.date_from' => 'Rent counting date is required',
-            'payments.*.date_to' => 'Rent ending date is required',
-            'payments.*.discount' => 'Discount rate should be between 0 to 100',
-            'payments.*.net_payable' => 'Net payable is invalid',
-            'payments.*.paid_amount' => 'Paid amount is invalid',
-            'payments.*.previous_due' => 'Previous due is invalid',
-            'payments.*.total_rent' => 'Total rent is invalid',
+            'instalments' => 'Instalment is required !',
+            // 'instalments.*.current_due' => 'Stock quantity is required !',
+            'instalments.*.number_installment' => 'Number instalment is required',
+            'instalments.*.date_from' => 'Rent counting date is required',
+            'instalments.*.date_to' => 'Rent ending date is required',
+            'instalments.*.discount' => 'Discount rate should be between 0 to 100',
+            'instalments.*.net_payable' => 'Net payable is invalid',
+            'instalments.*.paid_amount' => 'Paid amount is invalid',
+            // 'instalments.*.previous_due' => 'Previous due is invalid',
+            'instalments.*.total_rent' => 'Total rent is invalid',
 
             'warehouses' => 'Warehouse is required',
             'warehouses.*.id' => 'Warehouse id is Invalid',
@@ -185,20 +192,34 @@ class DealController extends Controller
             'created_at' => now()
         ]);
 
-        $request['payments'] = json_decode(json_encode($request->payments)); 
+        $request['instalments'] = json_decode(json_encode($request->instalments)); 
 
-        $dealNewPayment = $newDeal->payments()->create([
-            'invoice_no' => $newDeal->name.'P1',
-            'number_installment' => $request->payments[0]->number_installment,
-            'date_from' => $request->payments[0]->date_from,
-            'date_to' => $request->payments[0]->date_to,
-            'total_rent' => $request->payments[0]->total_rent,
-            'discount' => $request->payments[0]->discount,
-            'previous_due' => 0,
-            'net_payable' => $request->payments[0]->net_payable,
-            'paid_amount' => $request->payments[0]->paid_amount,
-            'current_due' => ($request->payments[0]->net_payable - $request->payments[0]->paid_amount),
+        $dealNewInstalment = $newDeal->instalments()->create([
+            'name' => ($newDeal->name.'I'.($newDeal->instalments->count() + 1)),
+            'number_installment' => $request->instalments[0]->number_installment,
+            'date_from' => $request->instalments[0]->date_from,
+            'date_to' => $request->instalments[0]->date_to,
+            'total_rent' => $request->instalments[0]->total_rent,
+            'discount' => $request->instalments[0]->discount,
+            // 'previous_due' => 0,
+            'net_payable' => $request->instalments[0]->net_payable,
+            'total_paid_amount' => $request->instalments[0]->paid_amount,
+            'current_due' => ($request->instalments[0]->net_payable - $request->instalments[0]->paid_amount),
         ]);
+
+        if ($request->instalments[0]->paid_amount > 0) {
+            
+            $user = $request->user();
+
+            $merchantPayment = $dealNewInstalment->payments()->create([
+                'invoice_no' => ($dealNewInstalment->name.'P'.($dealNewInstalment->payments->count() + 1)),
+                'paid_amount' => $request->instalments[0]->paid_amount,
+                'current_due' => $dealNewInstalment->current_due,
+                'issuer_type' => get_class($user),
+                'issuer_id' => $user->id,
+            ]);
+
+        }
 
         if ($newDeal->active) {
             
@@ -210,15 +231,15 @@ class DealController extends Controller
                     
                     if($warehouseSpace->type == 'containers') {
 
-                        $this->setDealtContainers($warehouseSpace->containers, $newDeal, $dealNewPayment);
+                        $this->setDealtContainers($warehouseSpace->containers, $newDeal, $dealNewInstalment);
                     }
                     else if($warehouseSpace->type == 'shelves') {
         
-                        $this->setDealtShelves($warehouseSpace, $newDeal, $dealNewPayment);
+                        $this->setDealtShelves($warehouseSpace, $newDeal, $dealNewInstalment);
                     }
                     else if ($warehouseSpace->type == 'units') {
                         
-                        $this->setDealtUnits($warehouseSpace, $newDeal, $dealNewPayment);
+                        $this->setDealtUnits($warehouseSpace, $newDeal, $dealNewInstalment);
                     }
                     else {
                         // \Log::info("No Type");
@@ -244,16 +265,16 @@ class DealController extends Controller
             'sale_percentage' => 'required_if:e_commerce_fulfillment,1|min:0|max:100',
             'rent_period_id' => 'required|exists:rent_periods,id|exists:rents,rent_period_id',
             
-            'payments' => 'required|array|min:1',
-            'payments.*.number_installment' => 'required|numeric',
-            'payments.*.date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
-            'payments.*.date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
-            'payments.*.total_rent' => 'required|numeric',
-            'payments.*.discount' => 'required|numeric|between:0,100',
-            'payments.*.previous_due' => 'required|numeric',
-            'payments.*.net_payable' => 'required|numeric',
-            'payments.*.paid_amount' => 'required|numeric|min:0',
-            // 'payments.*.current_due' => 'required|numeric',
+            'instalments' => 'required|array|min:1',
+            'instalments.*.number_installment' => 'required|numeric',
+            'instalments.*.date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'instalments.*.date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'instalments.*.total_rent' => 'required|numeric',
+            'instalments.*.discount' => 'required|numeric|between:0,100',
+            // 'instalments.*.previous_due' => 'required|numeric',
+            'instalments.*.net_payable' => 'required|numeric',
+            'instalments.*.paid_amount' => 'required|numeric|min:0',
+            // 'instalments.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
             'warehouses.*.id' => 'required|exists:warehouses',
@@ -324,16 +345,16 @@ class DealController extends Controller
         ],
 
         [
-            'payments' => 'Payment is required !',
-            // 'payments.*.current_due' => 'Stock quantity is required !',
-            'payments.*.number_installment' => 'Number installment is required',
-            'payments.*.date_from' => 'Rent counting date is required',
-            'payments.*.date_to' => 'Rent ending date is required',
-            'payments.*.discount' => 'Discount rate should be between 0 to 100',
-            'payments.*.net_payable' => 'Net payable is invalid',
-            'payments.*.paid_amount' => 'Paid amount is invalid',
-            'payments.*.previous_due' => 'Previous due is invalid',
-            'payments.*.total_rent' => 'Total rent is invalid',
+            'instalments' => 'Payment is required !',
+            // 'instalments.*.current_due' => 'Stock quantity is required !',
+            'instalments.*.number_installment' => 'Number instalment is required',
+            'instalments.*.date_from' => 'Rent counting date is required',
+            'instalments.*.date_to' => 'Rent ending date is required',
+            'instalments.*.discount' => 'Discount rate should be between 0 to 100',
+            'instalments.*.net_payable' => 'Net payable is invalid',
+            'instalments.*.paid_amount' => 'Paid amount is invalid',
+            // 'instalments.*.previous_due' => 'Previous due is invalid',
+            'instalments.*.total_rent' => 'Total rent is invalid',
 
             'warehouses' => 'Warehouse is required',
             'warehouses.*.id' => 'Warehouse id is Invalid',
@@ -366,7 +387,6 @@ class DealController extends Controller
         ]);
 
         $dealToUpdate = MerchantDeal::findOrFail($deal);
-        $dealRecentPayment = $dealToUpdate->payments()->latest('paid_at')->first();
 
         $dealToUpdate->update([
             'active' => $request->active,
@@ -377,24 +397,39 @@ class DealController extends Controller
             'merchant_id' => $request->merchant_id,
         ]);
 
-        if ($dealToUpdate->payments->count() < 2 && $dealToUpdate->active) {
-
-            $request['payments'] = json_decode(json_encode($request->payments)); 
-
-            $dealRecentPaymentUpdated = $dealRecentPayment->update([
-                'number_installment' => $request->payments[0]->number_installment,
-                'date_from' => $request->payments[0]->date_from,
-                'date_to' => $request->payments[0]->date_to,
-                'total_rent' => $request->payments[0]->total_rent,
-                'discount' => $request->payments[0]->discount,
-                'previous_due' => 0,
-                'net_payable' => $request->payments[0]->net_payable,
-                'paid_amount' => $request->payments[0]->paid_amount,
-                'current_due' => ($request->payments[0]->net_payable - $request->payments[0]->paid_amount),
-            ]);
+        if ($dealToUpdate->instalments->count() == 1 && $dealToUpdate->active) {
             
+            $dealRecentInstalment = $dealToUpdate->instalments()->firstOrFail();
+
+            $request['instalments'] = json_decode(json_encode($request->instalments)); 
+
+            $dealRecentInstalment->update([
+                'number_installment' => $request->instalments[0]->number_installment,
+                'date_from' => $request->instalments[0]->date_from,
+                'date_to' => $request->instalments[0]->date_to,
+                'total_rent' => $request->instalments[0]->total_rent,
+                'discount' => $request->instalments[0]->discount,
+                // 'previous_due' => 0,
+                'net_payable' => $request->instalments[0]->net_payable,
+                'total_paid_amount' => $dealRecentInstalment->payments->count() > 1 ? $dealRecentInstalment->total_paid_amount : $request->instalments[0]->paid_amount,
+                'current_due' => $dealRecentInstalment->payments->count() > 1 ? $dealRecentInstalment->current_due : ($request->instalments[0]->net_payable - $request->instalments[0]->paid_amount),
+            ]);
+
+            if ($dealRecentInstalment->payments->count() == 1) {
+                
+                $user = $request->user();
+
+                $dealRecentInstalment->payments()->first()->update([
+                    'paid_amount' => $request->instalments[0]->paid_amount,
+                    'current_due' => $dealRecentInstalment->current_due,
+                    'updater_type' => get_class($user),
+                    'updater_id' => $user->id,
+                ]);
+
+            }
+
             // Reseting current spaces
-            $this->resetDealtSpaces($dealToUpdate, $dealRecentPayment);
+            $this->resetDealtSpaces($dealToUpdate, $dealRecentInstalment);
 
             $request['warehouses'] = json_decode(json_encode($request->warehouses));
 
@@ -404,15 +439,15 @@ class DealController extends Controller
                     
                     if($warehouseSpace->type == 'containers') {
 
-                        $this->setDealtContainers($warehouseSpace->containers, $dealToUpdate, $dealRecentPayment);
+                        $this->setDealtContainers($warehouseSpace->containers, $dealToUpdate, $dealRecentInstalment);
                     }
                     else if($warehouseSpace->type == 'shelves') {
         
-                        $this->setDealtShelves($warehouseSpace, $dealToUpdate, $dealRecentPayment);
+                        $this->setDealtShelves($warehouseSpace, $dealToUpdate, $dealRecentInstalment);
                     }
                     else if ($warehouseSpace->type == 'units') {
                         
-                        $this->setDealtUnits($warehouseSpace, $dealToUpdate, $dealRecentPayment);
+                        $this->setDealtUnits($warehouseSpace, $dealToUpdate, $dealRecentInstalment);
                     }
                     else {
                         // \Log::info("No Type");
@@ -424,11 +459,11 @@ class DealController extends Controller
            
         }
         
-        // Deactivated
+        // Only Deactivated
         else if (! $dealToUpdate->active) {
 
             // Reseting current spaces
-            $this->retrieveDealtSpaces($dealToUpdate, $dealRecentPayment);
+            $this->retrieveDealtSpaces($dealToUpdate, $dealRecentInstalment);
             
         }
 
@@ -439,9 +474,9 @@ class DealController extends Controller
     {
         $dealToDelete = MerchantDeal::findOrFail($deal);
 
-        if ($dealToDelete->payments->count() > 1) {
+        if ($dealToDelete->instalments->count() > 1) {
             
-           return response()->json(['errors'=>["undeletableDeal" => "Deal has multiple payments"]], 422);
+           return response()->json(['errors'=>["undeletableDeal" => "Deal has multiple instalments"]], 422);
             
         }
         else if ($dealToDelete->spaces->count() && $dealToDelete->spaces()->whereHasMorph('space',[ WarehouseContainerStatus::class, WarehouseContainerShelfStatus::class, WarehouseContainerShelfUnitStatus::class ],function ($query1) {$query1->where('occupied', '!=', 0.0);})->exists()) {
@@ -453,16 +488,13 @@ class DealController extends Controller
 
             $merchantId = $dealToDelete->merchant_id;
             
-            $dealRecentPayment = $dealToDelete->payments()->first();
-
-            if ($dealRecentPayment) {
-               
-                $this->resetDealtSpaces($dealToDelete, $dealRecentPayment);
-                $dealRecentPayment->rents()->delete();
-                $dealRecentPayment->delete();
-
-            }
-
+            $dealRecentInstalment = $dealToDelete->instalments()->firstOrFail();      // instalments
+ 
+            $dealRecentInstalment->rents()->delete();                           
+            $dealRecentInstalment->payments()->delete();
+            $this->resetDealtSpaces($dealToDelete, $dealRecentInstalment);      // spaces
+            $dealRecentInstalment->delete();
+            
             $dealToDelete->delete();
 
         }
@@ -483,7 +515,7 @@ class DealController extends Controller
         ]);
 
 
-        $query = MerchantDeal::with(['spaces', 'payments'])->where('merchant_id', $request->merchant_id);
+        $query = MerchantDeal::with(['spaces', 'instalments'])->where('merchant_id', $request->merchant_id);
 
         if ($request->search) {
             
@@ -507,17 +539,21 @@ class DealController extends Controller
                         }
                     );
                 })
-                ->orWhereHas('payments', function ($query4) use ($request) {
-                    $query4->where('invoice_no', 'like', "%$request->search%")
-                    ->orWhere('number_installment', 'like', "%$request->search%")
-                    ->orWhere('date_from', 'like', "%$request->search%")
-                    ->orWhere('date_to', 'like', "%$request->search%")
+                ->orWhereHas('instalments', function ($query4) use ($request) {
+                    $query4->where('number_installment', 'like', "%$request->search%")
+                    ->orWhereDate('date_from', '=', "$request->search")
+                    ->orWhereDate('date_to', '=', "$request->search")
                     ->orWhere('total_rent', 'like', "%$request->search%")
                     ->orWhere('discount', 'like', "%$request->search%")
-                    ->orWhere('previous_due', 'like', "%$request->search%")
+                    // ->orWhere('previous_due', 'like', "%$request->search%")
                     ->orWhere('net_payable', 'like', "%$request->search%")
-                    ->orWhere('paid_amount', 'like', "%$request->search%")
-                    ->orWhere('current_due', 'like', "%$request->search%");
+                    ->orWhere('total_paid_amount', 'like', "%$request->search%")
+                    ->orWhere('current_due', 'like', "%$request->search%")
+                    ->orWhereHas('payments', function ($query3) use ($request) {
+                        $query3->where('invoice_no', 'like', "%$request->search%")
+                        ->orWhere('paid_amount', 'like', "%$request->search%")
+                        ->orWhere('current_due', 'like', "%$request->search%");
+                    });
                 });
             });
 
@@ -540,20 +576,21 @@ class DealController extends Controller
         ], 200);
     }
 
-    public function showDealAllPayments($deal, $perPage = false)
+    // Deal-Instalments
+    public function showDealAllInstalments($deal, $perPage = false)
     {
         if ($perPage) {
             
-            return new DealPaymentCollection(
-                MerchantPayment::with(['rents'])->whereHas('deal', function ($query) use ($deal) {
+            return new DealInstalmentCollection(
+                MerchantDealInstalment::with(['payments', 'rents'])->whereHas('deal', function ($query) use ($deal) {
                     $query->where('merchant_deal_id', $deal);
-                })->latest('paid_at')->paginate($perPage)
+                })->paginate($perPage)
             );
 
         }
     }
 
-    public function storeDealNewPayment(Request $request, $perPage)
+    public function storeDealNewInstalment(Request $request, $perPage)
     {
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
@@ -561,81 +598,96 @@ class DealController extends Controller
             'date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'total_rent' => 'required|numeric',
-            'discount' => 'required|numeric|between:0,100',
-            'previous_due' => 'numeric',
+            'discount' => 'nullable|numeric|between:0,100',
+            // 'previous_due' => 'numeric',
             'net_payable' => 'numeric',
-            'paid_amount' => 'required|numeric|min:0',
+            'total_paid_amount' => 'required|numeric|min:0',
             // 'current_due' => 'required|numeric',
         ],
 
         [
             // 'current_due' => 'Stock quantity is required !',
-            'merchant_deal_id.*' => 'Payment deal is required',
-            'number_installment' => 'Rent installment number is required',
+            'merchant_deal_id.*' => 'Merchant deal is required',
+            'number_installment' => 'Rent instalment number is required',
             'date_from' => 'Rent issueing date is required',
             'date_to' => 'Rent expiring date is required',
             'total_rent' => 'Total rent is invalid',
             'discount' => 'Discount rate should be between 0 to 100',
-            'previous_due' => 'Previous due is invalid',
+            // 'previous_due' => 'Previous due is invalid',
             'net_payable' => 'Net payable is invalid',
-            'paid_amount' => 'Paid amount is invalid',
+            'total_paid_amount' => 'Paid amount is invalid',
         ]);
 
-        $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
+        $merchantDeal = MerchantDeal::find($request->merchant_deal_id);
 
-        $dealRecentPayment = $paymentDeal->payments()->has('rents')->latest('id')->first();
+        $dealRecentInstalment = $merchantDeal->instalments()->has('rents')->latest('id')->first();
 
-        $dealNewPayment = $paymentDeal->payments()->create([
-            'invoice_no' => $paymentDeal->name.'P'.($paymentDeal->payments->count() + 1),
+        $dealNewInstalment = $merchantDeal->instalments()->create([
+            'name' => ($merchantDeal->name.'I'.($merchantDeal->instalments->count() + 1)),
             'number_installment' => $request->number_installment,
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,
             'total_rent' => $request->total_rent,
-            'discount' => $request->discount,
-            'previous_due' => $dealRecentPayment->current_due ?? 0,
+            'discount' => $request->discount ?? 0,
+            // 'previous_due' => $dealRecentInstalment->current_due ?? 0,
             'net_payable' => $request->net_payable ?? 0,
-            'paid_amount' => $request->paid_amount ?? 0,
-            'current_due' => ($request->net_payable - $request->paid_amount),
+            'total_paid_amount' => $request->total_paid_amount ?? 0,
+            'current_due' => ($request->net_payable - $request->total_paid_amount),
         ]);
 
-        foreach ($paymentDeal->containers as $dealContainerIndex => $dealContainer) {
+        if ($dealNewInstalment->total_paid_amount > 0) {
             
-            $currentRent = $dealContainer->warehouseContainer->rents->where('rent_period_id', $paymentDeal->rent_period_id)->first();
+            $user = $request->user();
 
-            $payementNewRent = $dealNewPayment->rents()->create([
+            $instalmentNewPayment = $dealNewInstalment->payments()->create([
+                'invoice_no' => ($dealNewInstalment->name.'P'.($dealNewInstalment->payments->count() + 1)),
+                // 'previous_due' => 0,    // first payment
+                'paid_amount' => $request->total_paid_amount ?? 0,
+                'current_due' => $dealNewInstalment->current_due,
+                'issuer_type' => get_class($user),
+                'issuer_id' => $user->id,
+            ]);
+
+        }
+
+        // instalment-rents
+        foreach ($merchantDeal->containers as $dealContainerIndex => $dealContainer) {
+            
+            $currentRent = $dealContainer->warehouseContainer->rents->where('rent_period_id', $merchantDeal->rent_period_id)->first();
+
+            $payementNewRent = $dealNewInstalment->rents()->create([
                 'rent' => $currentRent->rent ?? 0,
                 'dealt_space_id' => $dealContainer->id
             ]);
 
         }
 
-        foreach ($paymentDeal->shelves as $dealShelfIndex => $dealShelf) {
+        foreach ($merchantDeal->shelves as $dealShelfIndex => $dealShelf) {
             
-            $currentRent = $dealShelf->warehouseContainer->shelf->rents->where('rent_period_id', $paymentDeal->rent_period_id)->first();
+            $currentRent = $dealShelf->warehouseContainer->shelf->rents->where('rent_period_id', $merchantDeal->rent_period_id)->first();
 
-            $payementNewRent = $dealNewPayment->rents()->create([
+            $payementNewRent = $dealNewInstalment->rents()->create([
                 'rent' => $currentRent->rent ?? 0,
                 'dealt_space_id' => $dealShelf->id
             ]);
 
         }
 
-
-        foreach ($paymentDeal->units as $dealUnitIndex => $dealUnit) {
+        foreach ($merchantDeal->units as $dealUnitIndex => $dealUnit) {
             
-            $currentRent = $dealUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $paymentDeal->rent_period_id)->first();
+            $currentRent = $dealUnit->warehouseContainer->shelf->unit->rents->where('rent_period_id', $merchantDeal->rent_period_id)->first();
 
-            $payementNewRent = $dealNewPayment->rents()->create([
+            $payementNewRent = $dealNewInstalment->rents()->create([
                 'rent' => $currentRent->rent ?? 0,
                 'dealt_space_id' => $dealUnit->id
             ]);
 
         }
 
-        return $this->showDealAllPayments($request->merchant_deal_id, $perPage);
+        return $this->showDealAllInstalments($request->merchant_deal_id, $perPage);
     }
 
-    public function updateDealPayment(Request $request, $payment, $perPage)
+    public function updateDealInstalment(Request $request, $instalment, $perPage)
     {
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
@@ -643,75 +695,71 @@ class DealController extends Controller
             'date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'total_rent' => 'required|numeric',
-            'discount' => 'required|numeric|between:0,100',
-            'previous_due' => 'numeric',
+            'discount' => 'nullable|numeric|between:0,100',
+            // 'previous_due' => 'numeric',
             'net_payable' => 'numeric',
-            'paid_amount' => 'required|numeric|min:0',
+            'total_paid_amount' => 'required|numeric|min:0',
             // 'current_due' => 'required|numeric',
         ],
 
         [
             // 'current_due' => 'Stock quantity is required !',
             'merchant_deal_id.*' => 'Payment deal is required',
-            'number_installment' => 'Rent installment number is required',
+            'number_installment' => 'Rent instalment number is required',
             'date_from' => 'Rent issueing date is required',
             'date_to' => 'Rent expiring date is required',
             'total_rent' => 'Total rent is invalid',
             'discount' => 'Discount rate should be between 0 to 100',
-            'previous_due' => 'Previous due is invalid',
+            // 'previous_due' => 'Previous due is invalid',
             'net_payable' => 'Net payable is invalid',
-            'paid_amount' => 'Paid amount is invalid',
+            'total_paid_amount' => 'Paid amount is invalid',
         ]);
 
-        $paymentDeal = MerchantDeal::find($request->merchant_deal_id);
-        $paymentToUpdate = $paymentDeal->payments()->where('id', $payment)->firstOrFail();
+        $merchantDeal = MerchantDeal::find($request->merchant_deal_id);
+        $instalmentToUpdate = $merchantDeal->instalments()->where('id', $instalment)->firstOrFail();
 
-        if (($paymentToUpdate->discount < $request->discount) || ($paymentToUpdate->net_payable > $request->net_payable) || ($paymentToUpdate->paid_amount < $request->paid_amount)) {
-            
-            $this->decreaseNextPaymentDues($paymentToUpdate->current_due - ($request->net_payable - $request->paid_amount), $paymentToUpdate->paid_at);
-
-        }
-        else if (($paymentToUpdate->discount > $request->discount) || ($paymentToUpdate->net_payable < $request->net_payable) || ($paymentToUpdate->paid_amount > $request->paid_amount)) {
-            
-            $this->increaseNextPaymentDues(($request->net_payable - $request->paid_amount) - $paymentToUpdate->current_due, $paymentToUpdate->paid_at);
-
-        }
-
-        $dealNewPayment = $paymentToUpdate->update([
-            // 'invoice_no' => $paymentDeal->name.'-PY-'.($paymentDeal->payments->count() + 1),
+        $instalmentToUpdate->update([
             'number_installment' => $request->number_installment,
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,
             'total_rent' => $request->total_rent,
-            'discount' => $request->discount,
+            'discount' => $request->discount ?? 0,
             // 'previous_due' => $dealRecentPayment->current_due,
             'net_payable' => $request->net_payable ?? 0,
-            'paid_amount' => $request->paid_amount ?? 0,
-            'current_due' => ($request->net_payable - $request->paid_amount),
+            'total_paid_amount' => $instalmentToUpdate->payments->count() > 1 ? $instalmentToUpdate->total_paid_amount : $request->total_paid_amount ?? 0,
+            'current_due' => $instalmentToUpdate->payments->count() > 1 ? $instalmentToUpdate->current_due : ($request->net_payable - $request->total_paid_amount),
         ]);
 
-        return $this->showDealAllPayments($request->merchant_deal_id, $perPage);
-    }
-
-    public function deleteDealPayment($payment, $perPage)
-    {
-        $dealPaymentToDelete = MerchantPayment::findOrFail($payment);
-        $paymentDeal = $dealPaymentToDelete->deal;
-
-        if ($paymentDeal->payments->count() < 2) {
+        if ($instalmentToUpdate->payments->count() == 1) {
             
-            return response()->json(['errors'=>["undeletableDeal" => "One payment is required"]], 422);
+            $user = $request->user();
+
+            $instalmentToUpdate->payments()->update([
+                'paid_amount' => $request->total_paid_amount ?? 0,
+                'current_due' => $instalmentToUpdate->current_due,
+                'updater_type' => get_class($user),
+                'updater_id' => $user->id,
+            ]);
 
         }
 
-        $this->decreaseNextPaymentDues($dealPaymentToDelete->current_due, $dealPaymentToDelete->paid_at);
-        $dealPaymentToDelete->rents()->delete();
-        $dealPaymentToDelete->delete();
-
-        return $this->showDealAllPayments($paymentDeal->id, $perPage);
+        return $this->showDealAllInstalments($request->merchant_deal_id, $perPage);
     }
 
-    public function searchDealAllPayments(Request $request, $perPage)
+    public function deleteDealInstalment($instalment, $perPage)
+    {
+        $dealInstalmentToDelete = MerchantDealInstalment::findOrFail($instalment);
+
+        $deal = $dealInstalmentToDelete->deal;
+
+        $dealInstalmentToDelete->rents()->delete();
+        $dealInstalmentToDelete->payments()->delete();
+        $dealInstalmentToDelete->delete();
+
+        return $this->showDealAllInstalments($deal->id, $perPage);
+    }
+
+    public function searchDealAllInstalments(Request $request, $perPage)
     {
         $request->validate([
             'merchant_deal_id' => 'required|exists:merchant_deals,id',
@@ -724,26 +772,189 @@ class DealController extends Controller
             // 'showProduct' => 'nullable|string', 
         ]);
 
-        $query = MerchantPayment::with(['rents'])->whereHas('deal', function ($query1) use ($request) {
+        $query = MerchantDealInstalment::with(['rents', 'payments'])
+        ->whereHas('deal', function ($query1) use ($request) {
             $query1->where('merchant_deal_id', $request->merchant_deal_id);
         });
 
         if ($request->search) {
             
             $query->where(function($query2) use ($request) {
-                $query2->where('invoice_no', 'like', "%$request->search%")
+                $query2->where('name', 'like', "%$request->search%")
                 ->orWhere('number_installment', 'like', "%$request->search%")
-                ->orWhere('date_from', 'like', "%$request->search%")
-                ->orWhere('date_to', 'like', "%$request->search%")
+                ->orWhereDate('date_from', '=', "$request->search")
+                ->orWhereDate('date_to', '=', "$request->search")
                 ->orWhere('total_rent', 'like', "%$request->search%")
                 ->orWhere('discount', 'like', "%$request->search%")
-                ->orWhere('previous_due', 'like', "%$request->search%")
+                // ->orWhere('previous_due', 'like', "%$request->search%")
                 ->orWhere('net_payable', 'like', "%$request->search%")
-                ->orWhere('paid_amount', 'like', "%$request->search%")
+                ->orWhere('total_paid_amount', 'like', "%$request->search%")
                 ->orWhere('current_due', 'like', "%$request->search%")
                 ->orWhereHas('rents', function ($query3) use ($request) {
                     $query3->where('rent', 'like', "%$request->search%");
+                })
+                ->orWhereHas('payments', function ($query4) use ($request) {
+                    $query4->where('invoice_no', 'like', "%$request->search%")
+                    ->orWhere('paid_amount', 'like', "%$request->search%")
+                    ->orWhere('current_due', 'like', "%$request->search%");
                 });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereDate('created_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereDate('created_at', '<=', $request->dateTo);
+
+        }
+
+        return response()->json([
+            'all' => new DealInstalmentCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
+    // Instalment-Payments
+    public function showInstalmentAllPayments($instalment, $perPage = false)
+    {
+        if ($perPage) {
+            
+            return new MerchantPaymentCollection(
+                MerchantPayment::where('merchant_deal_instalment_id', $instalment)->latest('paid_at')->paginate($perPage)
+            );
+
+        }
+    }
+
+    public function storeInstalmentNewPayment(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_deal_instalment_id' => 'required|exists:merchant_deal_instalments,id',
+            'paid_amount' => 'required|numeric|min:1',
+            // 'current_due' => 'required|numeric',
+        ],
+
+        [
+            // 'current_due' => 'Stock quantity is required !',
+            'merchant_deal_instalment_id.*' => 'Deal instalment is required',
+            'paid_amount' => 'Paid amount is invalid',
+        ]);
+
+        $dealInstalment = MerchantDealInstalment::find($request->merchant_deal_instalment_id);
+
+        if ($dealInstalment->current_due < $request->paid_amount) {
+            
+            return response()->json(['errors'=>["invalidAmount" => "Paid amount is more than due"]], 422);
+
+        }
+
+        $user = $request->user();
+
+        $dealNewPayment = $dealInstalment->payments()->create([
+            'invoice_no' => ($dealInstalment->name.'P'.($dealInstalment->payments->count() + 1)),
+            'paid_amount' => $request->paid_amount,
+            'current_due' => ($dealInstalment->current_due - $request->paid_amount),
+            'issuer_type' => get_class($user),
+            'issuer_id' => $user->id,
+        ]);
+
+        $dealInstalment->update([
+            'total_paid_amount' => ($dealInstalment->total_paid_amount + $request->paid_amount),
+            'current_due' => ($dealInstalment->current_due - $request->paid_amount),
+        ]);
+
+        return $this->showInstalmentAllPayments($dealInstalment->id, $perPage);
+    }
+
+    public function updateInstalmentPayment(Request $request, $payment, $perPage)
+    {
+        $request->validate([
+            'merchant_deal_instalment_id' => 'required|exists:merchant_deal_instalments,id',
+            'paid_amount' => 'required|numeric|min:1',
+            // 'current_due' => 'required|numeric',
+        ],
+
+        [
+            // 'current_due' => 'Stock quantity is required !',
+            'merchant_deal_instalment_id.*' => 'Deal instalment is required',
+            'paid_amount' => 'Paid amount is invalid',
+        ]);
+
+        $dealInstalment = MerchantDealInstalment::find($request->merchant_deal_instalment_id);
+        $paymentToUpdate = $dealInstalment->payments()->where('id', $payment)->firstOrFail();
+        $difference = $request->paid_amount - $paymentToUpdate->paid_amount;  // - / +  
+        
+        // increasing value is more than required
+        if ($difference > 0 && $dealInstalment->current_due < $difference) {        
+            
+            return response()->json(['errors'=>["invalidAmount" => "Paid amount is more than due"]], 422);
+
+        }
+
+        $dealInstalment->update([
+            'total_paid_amount' => $dealInstalment->total_paid_amount + $difference,
+            'current_due' => $dealInstalment->current_due - $difference,        // as can be + / -
+        ]);
+
+        $user = $request->user();
+
+        $paymentToUpdate->update([
+            'paid_amount' => $request->paid_amount,
+            'current_due' => ($dealInstalment->net_payable - ($dealInstalment->payments()->where('id', '<=', $paymentToUpdate->id)->sum('paid_amount') + $difference)),       // as can be + / -
+            'updater_type' => get_class($user),
+            'updater_id' => $user->id,
+        ]);
+
+        $this->adjustSuccessorDues($paymentToUpdate->id, $dealInstalment, $user);
+
+        return $this->showInstalmentAllPayments($dealInstalment->id, $perPage);
+    }
+
+    public function deleteInstalmentPayment($payment, $perPage)
+    {
+        $dealPaymentToDelete = MerchantPayment::findOrFail($payment);
+        $dealInstalment = $dealPaymentToDelete->instalment;
+
+        $dealInstalment->update([
+            'total_paid_amount' => ($dealInstalment->total_paid_amount - $dealPaymentToDelete->paid_amount),
+            'current_due' => ($dealInstalment->current_due + $dealPaymentToDelete->paid_amount),
+        ]);
+
+        $deletingPaymentId = $dealPaymentToDelete->id;
+
+        $dealPaymentToDelete->delete();
+
+        $this->adjustSuccessorDues($deletingPaymentId, $dealInstalment);
+
+        return $this->showInstalmentAllPayments($dealInstalment->id, $perPage);
+    }
+
+    public function searchInstalmentAllPayments(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_deal_instalment_id' => 'required|exists:merchant_deal_instalments,id',
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+        $query = MerchantPayment::where('merchant_deal_instalment_id', $request->merchant_deal_instalment_id);
+
+        if ($request->search) {
+            
+            $query->where(function($query2) use ($request) {
+                $query2->where('invoice_no', 'like', "%$request->search%")
+                ->orWhere('paid_amount', 'like', "%$request->search%")
+                ->orWhere('current_due', 'like', "%$request->search%");
             });
 
         }
@@ -761,11 +972,26 @@ class DealController extends Controller
         }
 
         return response()->json([
-            'all' => new DealPaymentCollection($query->latest('paid_at')->paginate($perPage)),  
+            'all' => new MerchantPaymentCollection($query->latest('paid_at')->paginate($perPage)),  
         ], 200);
     }
 
-    protected function retrieveDealtSpaces(MerchantDeal $deal, MerchantPayment $payment)
+    protected function adjustSuccessorDues($paymentStartingId, MerchantDealInstalment $dealInstalment, $user = NULL)
+    {
+        // instalment next-payments
+        foreach (MerchantPayment::where('merchant_deal_instalment_id', $dealInstalment->id)->where('id', '>', $paymentStartingId)->get() as $successorPaymentKey => $successorPayment) {
+            
+            $successorPayment->update([
+                // 'paid_amount' => $request->paid_amount,
+                'current_due' => ($dealInstalment->net_payable - ($dealInstalment->payments()->where('id', '<=', $successorPayment->id)->sum('paid_amount'))),
+                'updater_type' => empty($user) ? NULL : get_class($user),
+                'updater_id' => empty($user) ? NULL : $user->id,
+            ]);
+
+        }
+    }
+
+    protected function retrieveDealtSpaces(MerchantDeal $deal, MerchantDealInstalment $instalment)
     {
         // containers
         foreach ($deal->containers as $merchantContainerKey => $merchantContainer) {
@@ -887,7 +1113,7 @@ class DealController extends Controller
         }
     }
 
-    protected function resetDealtSpaces(MerchantDeal $deal, MerchantPayment $payment)
+    protected function resetDealtSpaces(MerchantDeal $deal, MerchantDealInstalment $instalment)
     {
         // containers
         foreach ($deal->containers as $merchantContainerKey => $merchantContainer) {
@@ -900,7 +1126,7 @@ class DealController extends Controller
                     'engaged' => 0
                 ]);
 
-                $addedContainer->updateContainerStatus(0);
+                $addedContainer->updateContainerStatus(0);      // update container-shelves & units
 
                 // if current rent of same type container at same warehouse is using anywhere else
                 $sameTypeContainerUsingSameRentPeriod = DealtSpace::where('warehouse_container_id', $addedContainer->warehouse_container_id)
@@ -912,13 +1138,14 @@ class DealController extends Controller
 
                 if (! $sameTypeContainerUsingSameRentPeriod) {
                     
+                   // update container rent activness
                    $addedContainer->warehouseContainer->rents->where('rent_period_id', $merchantContainer->deal->rent_period_id)->first()->update([
                         'active' => 0
                    ]); 
 
                 }
 
-                $payment->rents()->where('dealt_space_id', $merchantContainer->id)->delete();
+                // $instalment->rents()->where('dealt_space_id', $merchantContainer->id)->delete();
 
                 $merchantContainer->delete();   // delete dealt space
 
@@ -955,7 +1182,7 @@ class DealController extends Controller
 
                     }
 
-                    $payment->rents()->where('dealt_space_id', $merchantShelf->id)->delete();
+                    // $instalment->rents()->where('dealt_space_id', $merchantShelf->id)->delete();
 
                     // Parent Container
                     $addedShelf->parentContainer->updateParentContainer($addedShelf->parentContainer);
@@ -995,7 +1222,7 @@ class DealController extends Controller
 
                     }
 
-                    $payment->rents()->where('dealt_space_id', $merchantUnit->id)->delete();
+                    // $instalment->rents()->where('dealt_space_id', $merchantUnit->id)->delete();
 
                     // Parent Shelf
                     $addedUnit->parentShelf->parentContainer->updateParentShelf($addedUnit->parentShelf);
@@ -1009,7 +1236,7 @@ class DealController extends Controller
         }
     }
 
-    protected function setDealtContainers($containers = [], MerchantDeal $deal, MerchantPayment $payment)
+    protected function setDealtContainers($containers = [], MerchantDeal $deal, MerchantDealInstalment $instalment)
     {
         if (count($containers)) {
             
@@ -1017,7 +1244,7 @@ class DealController extends Controller
                         
                 $expectedContainer = WarehouseContainerStatus::find($warehouseContainer->id);
                 
-                if (!empty($expectedContainer) && $expectedContainer->engaged==0.0) {
+                if (!empty($expectedContainer) && $expectedContainer->engaged == 0.0) {
                     
                     $newSpaces = $expectedContainer->deals()->create([
                         // 'rent_period_id' => $warehouseContainer->selected_rent->rent_period_id,
@@ -1033,9 +1260,9 @@ class DealController extends Controller
                     $expectedContainer->updateContainerStatus(1); 
 
                     $rentPeriod = RentPeriod::find($warehouseContainer->selected_rent->rent_period_id);
-                    // $lastPayment = $payment->rents()->where('dealt_space_id', )->latest()->first();
+                    // $lastPayment = $instalment->rents()->where('dealt_space_id', )->latest()->first();
                     
-                    $containerNewRent = $payment->rents()->create([
+                    $containerNewRent = $instalment->rents()->create([
                         // 'issued_from' => $deal->created_at,
                         // 'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                         'rent' => $warehouseContainer->selected_rent->rent,
@@ -1054,13 +1281,13 @@ class DealController extends Controller
 
     }
 
-    protected function setDealtShelves($warehouseSpace, MerchantDeal $deal, MerchantPayment $payment)
+    protected function setDealtShelves($warehouseSpace, MerchantDeal $deal, MerchantDealInstalment $instalment)
     {
         if (count($warehouseSpace->container->shelves)) {
 
             if (count($warehouseSpace->container->shelves) === WarehouseContainerStatus::find($warehouseSpace->container->id)->containerShelfStatuses()->count()) {
                 
-                $this->setDealtContainers([ $warehouseSpace->container ], $deal, $payment);
+                $this->setDealtContainers([ $warehouseSpace->container ], $deal, $instalment);
 
             }
             else {
@@ -1086,7 +1313,7 @@ class DealController extends Controller
             
                         $containerExpectedShelf->parentContainer->updateChildUnits($containerExpectedShelf, 1);
                         
-                        $shelfNewRent = $payment->rents()->create([
+                        $shelfNewRent = $instalment->rents()->create([
                             // 'issued_from' => $deal->created_at,
                             // 'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
@@ -1109,7 +1336,7 @@ class DealController extends Controller
 
     }
 
-    protected function setDealtUnits($warehouseSpace, MerchantDeal $deal, MerchantPayment $payment) 
+    protected function setDealtUnits($warehouseSpace, MerchantDeal $deal, MerchantDealInstalment $instalment) 
     {
         if ($warehouseSpace->container->shelf->units) {
 
@@ -1117,7 +1344,7 @@ class DealController extends Controller
                 
                 $warehouseSpace->container->{"shelves"} = [ $warehouseSpace->container->shelf ];
                 
-                $this->setDealtShelves($warehouseSpace, $deal, $payment);
+                $this->setDealtShelves($warehouseSpace, $deal, $instalment);
 
             }
             else {
@@ -1141,7 +1368,7 @@ class DealController extends Controller
                             'engaged' => 1
                         ]);
 
-                        $unitNewRent = $payment->rents()->create([
+                        $unitNewRent = $instalment->rents()->create([
                             // 'issued_from' => $deal->created_at,
                             // 'expired_at' => $deal->created_at->addDays($rentPeriod->number_days),
                             'rent' => $warehouseSpace->container->selected_rent->rent,
@@ -1160,38 +1387,6 @@ class DealController extends Controller
                 ]);
 
             }
-
-        }
-
-    }
-
-    protected function decreaseNextPaymentDues($amountToDeduct, $date)
-    {
-        $nextPaymentsToUpdate = MerchantPayment::where('paid_at', '>', $date)->get();
-
-        foreach ($nextPaymentsToUpdate as $merchantPaymentKey => $nextPaymentToUpdate) {
-            
-            $nextPaymentToUpdate->update([
-                'previous_due' => $nextPaymentToUpdate->previous_due - $amountToDeduct,
-                'net_payable' => $nextPaymentToUpdate->net_payable - $amountToDeduct,
-                'current_due' => $nextPaymentToUpdate->current_due - $amountToDeduct
-            ]);
-
-        }
-
-    }
-
-    protected function increaseNextPaymentDues($amountToAdd, $date)
-    {
-        $nextPaymentsToUpdate = MerchantPayment::where('paid_at', '>', $date)->get();
-
-        foreach ($nextPaymentsToUpdate as $merchantPaymentKey => $nextPaymentToUpdate) {
-            
-            $nextPaymentToUpdate->update([
-                'previous_due' => $nextPaymentToUpdate->previous_due + $amountToAdd,
-                'net_payable' => $nextPaymentToUpdate->net_payable + $amountToAdd,
-                'current_due' => $nextPaymentToUpdate->current_due + $amountToAdd,
-            ]);
 
         }
 

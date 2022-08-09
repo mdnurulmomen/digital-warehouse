@@ -13,21 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::name('manager.')->group(function () {
+Route::name('admin.')->group(function () {
+    
+    Route::middleware(['guest:admin'])->group(function () {
 
-    Route::middleware(['guest:manager'])->group(function () {
-	    
 	    Route::get('/', function () {
-	       return view('auth.login', ['url' => 'manager']); 
+	       return view('auth.login', ['url' => 'admin']); 
 	    })->name('login');
 
-		Route::post('/', 'Auth\LoginController@managerLogin')->name('login');
+	    Route::post('/', 'Auth\LoginController@adminLogin')->name('login');
 
 	});
 
-	Route::middleware(['auth:manager'])->group(function () {
-	    
-		Route::get('/{any}', 'HomeController@managerHome')->name('home');
+	Route::middleware(['auth:admin'])->group(function () {
+		
+		Route::get('/{any}', 'HomeController@adminHome')->name('home');
 		
 		Route::get('/api/mails/{perPage?}', 'MailController@showAllMails')->name('mails.index');
 		Route::post('/mails/{perPage}', 'MailController@sendDynamicMail')->name('mails.store');
@@ -35,9 +35,9 @@ Route::name('manager.')->group(function () {
 		Route::get('api/search-mails/{query}/{perPage}', 'MailController@searchAllMails')->name('search-mails');
 
 		// profile
-		Route::get('/api/profile', 'ProfileController@showManagerProfile')->name('profile.show');	
-		Route::put('/profile', 'ProfileController@updateManagerProfile')->name('profile.update');	
-		Route::post('/password', 'ProfileController@updateManagerPassword')->name('password.update');
+		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile.show');	
+		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile.update');	
+		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password.update');
 
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings.show');
@@ -224,6 +224,7 @@ Route::name('manager.')->group(function () {
 		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products.index');
 		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.show');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products.store');	
+		Route::post('/merchant-multiple-products/{perPage}', 'MerchantController@storeMerchantMultipleProducts')->name('merchant-products.multiple-store');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products.update');
 		Route::delete('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@deleteMerchantProduct')->name('merchant-products.delete');
 		Route::post('/search-merchant-products/{perPage}', 'MerchantController@searchMerchantAllProducts')->name('search-merchant-products');
@@ -253,12 +254,19 @@ Route::name('manager.')->group(function () {
 		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals.delete');
 		Route::post('/search-merchant-deals/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
 
-		// deal-payments
-		Route::get('/api/deal-payments/{deal}/{perPage?}', 'DealController@showDealAllPayments')->name('deal-payments.index');
-		Route::post('/deal-payments/{perPage}', 'DealController@storeDealNewPayment')->name('deal-payments.store');	
-		Route::put('/deal-payments/{payment}/{perPage}', 'DealController@updateDealPayment')->name('deal-payments.update');	
-		Route::delete('/deal-payments/{payment}/{perPage}', 'DealController@deleteDealPayment')->name('deal-payments.delete');
-		Route::post('/api/search-deal-payments/{perPage}', 'DealController@searchDealAllPayments')->name('search-deal-payments');
+		// deal-instalments
+		Route::get('/api/deal-instalments/{deal}/{perPage?}', 'DealController@showDealAllInstalments')->name('deal-instalments.index');
+		Route::post('/deal-instalments/{perPage}', 'DealController@storeDealNewInstalment')->name('deal-instalments.store');	
+		Route::put('/deal-instalments/{instalment}/{perPage}', 'DealController@updateDealInstalment')->name('deal-instalments.update');	
+		Route::delete('/deal-instalments/{instalment}/{perPage}', 'DealController@deleteDealInstalment')->name('deal-instalments.delete');
+		Route::post('/api/search-deal-instalments/{perPage}', 'DealController@searchDealAllInstalments')->name('search-deal-instalments');
+
+		// instalment-payments
+		Route::get('/api/instalment-payments/{instalment}/{perPage?}', 'DealController@showInstalmentAllPayments')->name('instalment-payments.index');
+		Route::post('/instalment-payments/{perPage}', 'DealController@storeInstalmentNewPayment')->name('instalment-payments.store');	
+		Route::put('/instalment-payments/{payment}/{perPage}', 'DealController@updateInstalmentPayment')->name('instalment-payments.update');	
+		Route::delete('/instalment-payments/{payment}/{perPage}', 'DealController@deleteInstalmentPayment')->name('instalment-payments.delete');
+		Route::post('/api/search-instalment-payments/{perPage}', 'DealController@searchInstalmentAllPayments')->name('search-instalment-payments');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions.index');
@@ -266,24 +274,24 @@ Route::name('manager.')->group(function () {
 		// first dashboard
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one.show');
 		// second dashboard
-		Route::get('/api/general-dashboard-two','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
+		Route::get('/api/general-dashboard-two/{merchant}/{date?}','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
 		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.show');
 
 		// imports
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
 		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
 
-		// manager logout
+		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 		Route::fallback(function () {
 			$access_token = Illuminate\Support\Str::random(60);
-        	$roles = \Auth::guard('manager')->user()->roles;
-        	$permissions = Auth::guard('manager')->user()->permissions;
+        	$roles = \Auth::guard('admin')->user()->roles;
+        	$permissions = Auth::guard('admin')->user()->permissions;
         	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
-			return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
+			return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		});
-	
+
 	});
 
 });

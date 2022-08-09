@@ -462,7 +462,7 @@ class WarehouseController extends Controller
                             $query2->whereHas('deal', function ($query3) use ($merchant) {
                                 $query3->where('merchant_id', $merchant)
                                         ->where('active', 1)
-                                        ->whereHas('payments', function ($query4) {
+                                        ->whereHas('instalments', function ($query4) {
                                             $query4->whereDate('date_to', '>=', today());
                                         });
                             });
@@ -481,7 +481,7 @@ class WarehouseController extends Controller
                         $query1->whereHas('deal', function ($query2) use ($merchant) {
                             $query2->where('merchant_id', $merchant)
                                     ->where('active', 1)
-                                    ->whereHas('payments', function ($query3) {
+                                    ->whereHas('instalments', function ($query3) {
                                         $query3->whereDate('date_to', '>=', today());
                                     });
                         });

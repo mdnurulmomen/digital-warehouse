@@ -9,7 +9,7 @@
 						<ul class="pcoded-item pcoded-left-item">
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['home', 'overview', 'analytics'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
+								:class="['home', 'analytics'].includes(currentRouteName) ? 'active pcoded-trigger' : ''"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
@@ -21,12 +21,6 @@
 								<ul class="pcoded-submenu">
 									<li :class="currentRouteName=='home' ? 'active' : ''">
 										<router-link :to="{ name: 'home' }" class="waves-effect waves-dark">
-											<span class="pcoded-mtext">Home</span>
-										</router-link>
-									</li>
-
-									<li :class="currentRouteName=='overview' ? 'active' : ''">
-										<router-link :to="{ name: 'overview' }" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Overview</span>
 										</router-link>
 									</li>
@@ -142,7 +136,7 @@
 								</router-link>
 							</li>
 
-							<li :class="['merchants', 'merchant-deals', 'deal-payments', 'merchant-products'].includes(currentRouteName) ? 'active' : ''" 
+							<li :class="['merchants', 'merchant-deals', 'deal-instalments', 'instalment-payments', 'merchant-products'].includes(currentRouteName) ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-merchant-index')"
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">

@@ -56,22 +56,23 @@
 							</select>
 						</div>
 
-						<div class="col-md-6 text-right">
+						<div class="col-md-6">
 							<v-date-picker 
-							v-model="dateSelected"
-							color="red" 
-							is-dark
-							is-inline
-							:max-date="new Date()" 
-							:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
-							:attributes="[ { key: 'today', dot: true } ]" 
-							@input="fetchStocksData()"
+								v-model="dateSelected" 
+								mode="date" 
+								color="red" 
+								is-dark
+								is-inline
+								:max-date="new Date()" 
+								:model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" 
+								:attributes="[ { key: 'today', dot: true } ]" 
+								@input="fetchStocksData()"
 							>
 							<template v-slot="{ inputValue, inputEvents }">
 								<input
-								class="px-2 py-1 border rounded"
-								:value="inputValue"
-								v-on="inputEvents"
+									class="px-2 py-1 border rounded"
+									:value="inputValue"
+									v-on="inputEvents"
 								/>
 							</template>
 						</v-date-picker>

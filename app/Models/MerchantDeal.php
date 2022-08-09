@@ -33,6 +33,11 @@ class MerchantDeal extends Model
             $deal->save();
         });
     }
+
+    public function instalments() 
+    {
+        return $this->hasMany(MerchantDealInstalment::class, 'merchant_deal_id', 'id');
+    }
     
     public function spaces() 
     {
@@ -52,11 +57,6 @@ class MerchantDeal extends Model
     public function units() 
     {
         return $this->spaces()->where('space_type', 'App\Models\WarehouseContainerShelfUnitStatus');
-    }
-    
-    public function payments() 
-    {
-    	return $this->hasMany(MerchantPayment::class, 'merchant_deal_id', 'id');
     }
 
     public function merchant() 

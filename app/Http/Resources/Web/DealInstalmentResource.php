@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DealPaymentResource extends JsonResource
+class DealInstalmentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,20 +15,24 @@ class DealPaymentResource extends JsonResource
     public function toArray($request)
     {
         return [
+
             'id' => $this->id,
-            'invoice_no' => $this->invoice_no,
+            'name' => $this->name,
             'number_installment' => $this->number_installment,
-            'date_from' => $this->date_from->format('Y-m-d H:i:s'),
-            'date_to' => $this->date_to->format('Y-m-d H:i:s'),
+            'date_from' => $this->date_from->format('Y-m-d'),
+            'date_to' => $this->date_to->format('Y-m-d'),
             'total_rent' => $this->total_rent,
             'discount' => $this->discount,
-            'previous_due' => $this->previous_due,
+            // 'previous_due' => $this->previous_due,
             'net_payable' => $this->net_payable,
-            'paid_amount' => $this->paid_amount,
+            // 'total_paid_amount' => $this->fragments->sum('paid_amount'),
+            'total_paid_amount' => $this->total_paid_amount,
             'current_due' => $this->current_due,
-            'rents' => DealPaymentDetailResource::collection($this->rents),
+            'payments' => MerchantPaymentResource::collection($this->payments),
+            'rents' => DealInstalmentRentResource::collection($this->rents),
             'merchant_deal_id' => $this->merchant_deal_id,
-            'paid_at' => $this->paid_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s')
+
         ];
     }
 }
