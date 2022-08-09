@@ -247,7 +247,7 @@
 																			href="javascript:void(0)" 
 																			@click="changeIntegersOrder('paid_amount')"
 																		> 
-																			Paid
+																			Total Paid
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -293,7 +293,7 @@
 																	</td>
 
 																	<td>
-																		{{ content.paid_amount }}
+																		{{ content.total_paid_amount }}
 																	</td>
 																	
 																	<td>
@@ -434,7 +434,7 @@
 																			href="javascript:void(0)" 
 																			@click="changeIntegersOrder('paid_amount')"
 																		> 
-																			Paid
+																			Total Paid
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -964,7 +964,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singlePaymentData.paid_amount" 
+																v-model.number="singlePaymentData.total_paid_amount" 
 																placeholder="Paid Amount" 
 																min="0" 
 																:class="! errors.paid_amount ? 'is-valid' : 'is-invalid'" 
@@ -990,7 +990,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																:value="singlePaymentData.net_payable - singlePaymentData.paid_amount" 
+																:value="singlePaymentData.net_payable - singlePaymentData.total_paid_amount" 
 																placeholder="Previous Dues" 
 																:disabled="true"
 															>
@@ -1136,7 +1136,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
+								{{ singlePaymentData.total_paid_amount }} {{ general_settings.official_currency_name }}
 							</label>
 						</div>
 
@@ -1469,7 +1469,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
+									{{ singlePaymentData.total_paid_amount }} {{ general_settings.official_currency_name }}
 								</label>
 							</div>
 
@@ -1646,7 +1646,7 @@
 		discount : 0,	// percentage 
     	previous_due : 0,
 		net_payable : 0,
-		paid_amount : 0,
+		total_paid_amount : 0,
 		current_due : 0,
 		// merchant_deal_id : null,
 		// paid_at : null,
@@ -1750,7 +1750,7 @@
 
 					"Net Payable": 'net_payable',
 
-					"Paid": 'paid_amount',
+					"Paid": 'total_paid_amount',
 
 					Due: 'current_due',
 
@@ -2093,7 +2093,7 @@
 					discount : 0,	// percentage 
 					previous_due : dealLastPayment.current_due ?? 0,	// as new deal
 					net_payable : this.dealTotalCurrentRent + (dealLastPayment.current_due ?? 0),
-					paid_amount : 0,
+					total_paid_amount : 0,
 					current_due : 0,
 					merchant_deal_id : this.deal.id,
 					// paid_at : null,
@@ -2475,7 +2475,7 @@
 
 					case 'paid_amount' : 
 						
-						if(this.singlePaymentData.paid_amount && this.singlePaymentData.paid_amount < 0){
+						if(this.singlePaymentData.total_paid_amount && this.singlePaymentData.total_paid_amount < 0){
 							
 							this.errors.paid_amount = 'Invalid amount';
 

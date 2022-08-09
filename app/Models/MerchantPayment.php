@@ -15,6 +15,11 @@ class MerchantPayment extends Model
     	return $this->hasMany(MerchantPaymentRent::class, 'merchant_payment_id', 'id');
     }
 
+    public function fragments() 
+    {
+        return $this->hasMany(MerchantPaymentFragment::class, 'merchant_payment_id', 'id');
+    }
+
     public function deal()
     {
         return $this->belongsTo(MerchantDeal::class, 'merchant_deal_id', 'id');
