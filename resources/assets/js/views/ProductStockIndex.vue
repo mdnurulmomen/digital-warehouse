@@ -607,7 +607,7 @@
 															v-model.number="singleStockData.stock_code" 
 															placeholder="Unique Code" 
 															@keydown.enter.prevent="nextPage" 
-															@blur="singleStockData.stock_code=singleStockData.stock_code.trim()" 
+															@blur="removeWhiteSpace(singleStockData.stock_code)" 
 															maxlength="10" 
 														>
 													</div>
@@ -716,7 +716,7 @@
 																	v-model.number="stockVariation.stock_code" 
 																	placeholder="Unique Code" 
 																	@keydown.enter.prevent="nextPage" 
-																	@blur="stockVariation.stock_code=stockVariation.stock_code.trim()" 
+																	@blur="removeWhiteSpace(stockVariation.stock_code)" 
 																	maxlength="10" 
 																>
 															</div>
@@ -3500,7 +3500,7 @@
 					})
 					.finally(response => {
 						this.loading = false;
-						this.resetWarehouseSpaces();
+						// this.resetWarehouseSpaces();
 					});
 
 			},
@@ -3861,7 +3861,7 @@
 						this.step+=1;
 
 						this.submitForm = true;
-						// this.resetWarehouseSpaces();
+						this.resetWarehouseSpaces();
 						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
 					
 					}
@@ -4201,6 +4201,7 @@
 				}
 
 			},
+			/*
 			resetAvailableSpaces() {
 
 				this.resetWarehouseSpaces();
@@ -4439,6 +4440,7 @@
 					}
 				);
 			},
+			*/
 			addProductSerial() {
 
 				this.validateFormInput('product_serial');
@@ -4493,6 +4495,15 @@
 				if (this.singleStockData.serials.length > productSerialIndex) {
 
 					this.$delete(this.singleStockData.serials[productSerialIndex], 'serial_no');
+
+				}
+
+			},
+			removeWhiteSpace(properties) {
+
+				if (properties) {
+					
+					properties = properties.trim();
 
 				}
 
