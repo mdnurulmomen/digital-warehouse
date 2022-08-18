@@ -19,6 +19,7 @@
 									<div class="card-block">
 										<div class="row">											
 											<div class="col-sm-12 sub-title">
+											  	<!-- 
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')" 
 											  		:query="query" 
@@ -28,6 +29,23 @@
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event, 1)" 
 											  		@fetchAllContents="pagination.current_page=1; fetchAllContents()"
+											  	></search-and-addition-option> 
+											  	-->
+
+											  	<search-and-addition-option 
+											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')" 
+											  		:query="query" 
+											  		:caller-page="'product-category'" 
+											  		:required-permission = "'product-asset'" 
+											  		:data-to-export="dataToExport" 
+											  		:contents-to-download="contentsToShow" 
+											  		:pagination="pagination" 
+											  		:disable-add-button="false" 
+											  		
+											  		@showContentCreateForm="showContentCreateForm" 
+											  		@searchData="pagination.current_page = 1; searchData($event, 1)" 
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()" 
+											  		@importExcelFile="importExcelFile($event)" 
 											  	></search-and-addition-option>
 											</div>
 											
@@ -581,6 +599,44 @@
 					asset : {},
 				},
 
+				dataToExport: {
+					
+					'Name': {
+						field: 'name',
+						
+						callback: (name) => {
+							
+							return this.$options.filters.capitalize(name);
+
+						}
+					},
+
+					'Perishable': {
+						field: "is_perishable",
+						
+						callback: (is_perishable) => {
+							if (is_perishable) {
+								return 'Yes';
+							}
+
+							else {
+								return '--';
+							}
+						},
+					},
+					
+					'Parent': {
+						field: 'parent',
+						
+						callback: (parent) => {
+							
+							return parent.name ? this.$options.filters.capitalize(parent.name) : '--';
+
+						},
+					}
+					
+				},
+
 	            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
 	        }
@@ -1070,6 +1126,39 @@
 				else {
 					this.$set(this.singleAssetData, 'is_perishable', false);
 				}
+
+			},
+			importExcelFile(fileToExport) {
+
+				// console.log(fileToExport);
+
+				this.formSubmitted = true;
+
+				fileToExport.set('perPage', this.perPage);
+
+				axios
+					.post('/import-product-categories', fileToExport)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New categories has been stored", "Success");
+
+							this.allFetchedContents = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
+							$('#product-category-importing-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
 
 			},
 			validateFormInput (formInputName) {

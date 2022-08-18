@@ -10,11 +10,11 @@
 				</div>
 
 				<div class="dropdown">
-					<i class="fa fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown" v-tooltip.bottom-end="'Download ' + callerPage" v-show="$route.name=='products' && userHasPermissionTo('view-' + requiredPermission + '-index')"></i>
+					<i class="fa fa-download fa-lg dropdown-toggle p-1" data-toggle="dropdown" v-tooltip.bottom-end="'Download ' + callerPage" v-show="($route.name=='products' || $route.name=='product-categories') && userHasPermissionTo('view-' + requiredPermission + '-index')"></i>
   					
   					<div 
   						class="dropdown-menu"
-  						v-show="$route.name=='products' && userHasPermissionTo('view-' + requiredPermission + '-index')"
+  						v-show="($route.name=='products' || $route.name=='product-categories') && userHasPermissionTo('view-' + requiredPermission + '-index')"
   					>
 						<download-excel 
 			  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
@@ -42,7 +42,7 @@
 
   					<i 
   						class="fa fa-upload fa-lg" 
-  						v-show="$route.name=='products' && userHasPermissionTo('create-' + requiredPermission)" 
+  						v-show="($route.name=='products' || $route.name=='product-categories') && userHasPermissionTo('create-' + requiredPermission)" 
   						v-tooltip.bottom-end="'Upload ' + callerPage" 
   						data-toggle="modal" 
 						:data-target="'#'+ callerPage +'-importing-modal'" 
@@ -213,9 +213,7 @@
 
 				this.$emit('importExcelFile', fileToExport);
 
-				/*
-				this.formSubmitted = true;
-				 */
+				// this.formSubmitted = true;
 
 			},
 

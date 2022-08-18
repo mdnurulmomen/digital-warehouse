@@ -13,21 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::name('admin.')->group(function () {
+Route::name('manager.')->group(function () {
     
-    Route::middleware(['guest:admin'])->group(function () {
+    Route::middleware(['guest:manager'])->group(function () {
 
 	    Route::get('/', function () {
-	       return view('auth.login', ['url' => 'admin']); 
+	       return view('auth.login', ['url' => 'manager']); 
 	    })->name('login');
 
-	    Route::post('/', 'Auth\LoginController@adminLogin')->name('login');
+	    Route::post('/', 'Auth\LoginController@managerLogin')->name('login');
 
 	});
 
-	Route::middleware(['auth:admin'])->group(function () {
+	Route::middleware(['auth:manager'])->group(function () {
 		
-		Route::get('/{any}', 'HomeController@adminHome')->name('home');
+		Route::get('/{any}', 'HomeController@managerHome')->name('home');
 		
 		Route::get('/api/mails/{perPage?}', 'MailController@showAllMails')->name('mails.index');
 		Route::post('/mails/{perPage}', 'MailController@sendDynamicMail')->name('mails.store');
@@ -35,9 +35,9 @@ Route::name('admin.')->group(function () {
 		Route::get('api/search-mails/{query}/{perPage}', 'MailController@searchAllMails')->name('search-mails');
 
 		// profile
-		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile.show');	
-		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile.update');	
-		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password.update');
+		Route::get('/api/profile', 'ProfileController@showManagerProfile')->name('profile.show');	
+		Route::put('/profile', 'ProfileController@updateManagerProfile')->name('profile.update');	
+		Route::post('/password', 'ProfileController@updateManagerPassword')->name('password.update');
 
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings.show');
@@ -280,16 +280,17 @@ Route::name('admin.')->group(function () {
 		// imports
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
 		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
+		Route::post('import-product-categories', 'ImportController@importProductCategories')->name('import-product-categories');
 
-		// admin logout
+		// manager logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 		Route::fallback(function () {
 			$access_token = Illuminate\Support\Str::random(60);
-        	$roles = \Auth::guard('admin')->user()->roles;
-        	$permissions = Auth::guard('admin')->user()->permissions;
+        	$roles = \Auth::guard('manager')->user()->roles;
+        	$permissions = Auth::guard('manager')->user()->permissions;
         	$generalSettings = \App\Models\ApplicationSetting::firstOrCreate([]);
-			return view('layouts.admin', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
+			return view('layouts.manager', ['permissions' => $permissions, 'roles' => $roles, 'access_token' => $access_token, 'general_settings' => $generalSettings]);
 		});
 
 	});

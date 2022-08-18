@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Imports\ProductsImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\MerchantProductsImport;
+use App\Imports\ProductCategoriesImport;
 use App\Http\Resources\Web\ProductCollection;
 
 class ImportController extends Controller
@@ -21,6 +22,22 @@ class ImportController extends Controller
         // Merchant-Product
         // $this->middleware("permission:view-product-index")->only(['exportProducts']);
         $this->middleware("permission:create-merchant-product")->only(['importMerchantProducts']);
+
+        // Merchant-Product
+        // $this->middleware("permission:view-product-index")->only(['exportProducts']);
+        $this->middleware("permission:create-product-asset")->only(['importProductCategories']);
+    }
+
+    public function importProductCategories(Request $request) 
+    {
+        $request->validate([
+            'perPage' => 'required|integer',
+            'excelFileToImport' => 'required|file|mimes:xls,xlsx'
+        ]);
+
+        Excel::import(new ProductCategoriesImport, $request->file('excelFileToImport'));
+
+        return redirect()->route('admin.product-categories.index', [$request->perPage]);
     }
 
     public function importProducts(Request $request) 
@@ -32,7 +49,7 @@ class ImportController extends Controller
 
         Excel::import(new ProductsImport, $request->file('excelFileToImport'));
 
-        return redirect()->route('admin.products.show', [$request->perPage]);
+        return redirect()->route('admin.products.index', [$request->perPage]);
     }
 
     public function importMerchantProducts(Request $request) 
@@ -47,6 +64,6 @@ class ImportController extends Controller
 
         Excel::import(new MerchantProductsImport($merchant), $request->file('excelFileToImport'));
 
-        return redirect()->route('admin.merchant-products.show', [$request->merchant_id, $request->perPage]);
+        return redirect()->route('admin.merchant-products.index', [$request->merchant_id, $request->perPage]);
     }
 }

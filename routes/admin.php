@@ -145,7 +145,7 @@ Route::name('admin.')->group(function () {
 		Route::patch('/variations/{asset}/{perPage}', 'AssetController@restoreVariation')->name('variations.restore');
 		Route::get('/api/search-variations/{search}/{perPage}', 'AssetController@searchAllVariations')->name('search-variations');
 
-		// product-category
+		// product-manufacturers
 		Route::get('/api/manufacturers/{perPage?}', 'ProductController@showAllManufacturers')->name('manufacturers.index');
 		Route::post('/manufacturers/{perPage}', 'ProductController@storeNewManufacturer')->name('manufacturers.store');	
 		Route::put('/manufacturers/{asset}/{perPage}', 'ProductController@updateManufacturer')->name('manufacturers.update');	
@@ -168,7 +168,7 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/search-category-products/{category}/{search}/{perPage?}', 'ProductController@searchCategoryAllProducts')->name('search-category-products');
 
 		// product
-		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products.show');
+		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products.index');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products.store');	
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products.update');
 		Route::delete('/products/{product}/{perPage}', 'ProductController@deleteProduct')->name('products.delete');
@@ -180,7 +180,6 @@ Route::name('admin.')->group(function () {
 		Route::post('/product-stocks/{perPage}', 'ProductController@storeProductStock')->name('product-stocks.store');
 		Route::put('/product-stocks/{stock}/{perPage}', 'ProductController@updateProductStock')->name('product-stocks.update');
 		Route::delete('/product-stocks/{stock}/{perPage}', 'ProductController@deleteProductStock')->name('product-stocks.delete');
-		// Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
 		Route::post('/api/search-product-stocks/{productMerchant}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
 
 		// stock
@@ -222,7 +221,7 @@ Route::name('admin.')->group(function () {
 
 		// merchant-products
 		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products.index');
-		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.show');
+		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.index');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products.store');	
 		Route::post('/merchant-multiple-products/{perPage}', 'MerchantController@storeMerchantMultipleProducts')->name('merchant-products.multiple-store');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products.update');
@@ -275,11 +274,12 @@ Route::name('admin.')->group(function () {
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one.show');
 		// second dashboard
 		Route::get('/api/general-dashboard-two/{merchant}/{date?}','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
-		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.show');
+		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.index');
 
 		// imports
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
 		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
+		Route::post('import-product-categories', 'ImportController@importProductCategories')->name('import-product-categories');
 
 		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
