@@ -4,7 +4,7 @@
 		<breadcrumb 
 			:icon="'deals'"
 			:title="fullName + ' deals'" 
-			:message="'All our deals with ' + fullName"
+			:message="'All our space-deals with ' + fullName"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -26,7 +26,7 @@
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
-													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Deals List' : 'Deals List'
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Space-Deals List' : 'Space-Deals List'
 													  			}}
 											  				</span>
 											  			</div>
@@ -358,19 +358,20 @@
 
 									<div class="col-md-12">
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-6 col-form-label font-weight-bold text-right">
 												Merchant Name :
 											</label>
-											<label class="col-sm-6 col-form-label">
+											<label class="col-6 col-form-label">
 												{{ merchant ? fullName : 'NA' | capitalize }}
 											</label>
 										</div>
 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										<!-- 
+										<div class="form-row form-group">
+											<label class="col-6 col-form-label font-weight-bold text-right">
 												E-Commerce Fullfillment :
 											</label>
-											<div class="col-sm-6">
+											<div class="col-6 col-form-label">
 												<toggle-button 
 													v-model="singleMerchantDealData.e_commerce_fulfillment" 
 													:width=150 
@@ -381,11 +382,11 @@
 											</div>
 										</div>
 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Percentage :
+										<div class="form-row form-group">
+											<label class="col-6 col-form-label font-weight-bold text-right">
+												Sale Percentage :
 											</label>
-											<div class="col-sm-6">
+											<div class="col-6">
 												<div class="input-group mb-1">
 													<input type="number" 
 														class="form-control" 
@@ -411,11 +412,43 @@
 											</div>
 										</div>
 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										<div class="form-row form-group">
+											<label class="col-6 col-form-label font-weight-bold text-right">
+												Fullfillment Charge :
+											</label>
+											<div class="col-6">
+												<div class="input-group mb-1">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singleMerchantDealData.purchase_support_charge" 
+														placeholder="Purchasing Suppoprt Charge" 
+														:min="0" 
+														:max="100" 
+														:class="! errors.purchase_support_charge ? 'is-valid' : 'is-invalid'" 
+														:disabled="! singleMerchantDealData.purchase_support"
+														@change="validateFormInput('purchase_support_charge')" 
+													>
+													<div class="input-group-append">
+														<span class="input-group-text"> 
+															{{ general_settings.official_currency_name }}
+														</span>
+													</div>
+												</div>
+												<div 
+													class="invalid-feedback" 
+													style="display:block" 
+													v-show="errors.purchase_support_charge"
+												>
+											    	{{ errors.purchase_support_charge }}
+											    </div>
+											</div>
+										</div>
+
+										<div class="form-row form-group">
+											<label class="col-6 col-form-label font-weight-bold text-right">
 												Purchase Support :
 											</label>
-											<div class="col-sm-6">
+											<div class="col-6 col-form-label">
 												<toggle-button 
 													v-model="singleMerchantDealData.purchase_support" 
 													:width=150 
@@ -426,41 +459,44 @@
 											</div>
 										</div>
 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Percentage :
+										<div class="form-row form-group">
+											<label class="col-6 col-form-label font-weight-bold text-right">
+												Support Charge :
 											</label>
-											<div class="col-sm-6">
+											<div class="col-6">
 												<div class="input-group mb-1">
 													<input type="number" 
 														class="form-control" 
-														v-model.number="singleMerchantDealData.sale_percentage" 
-														placeholder="Sale Percentage" 
+														v-model.number="singleMerchantDealData.purchase_support_charge" 
+														placeholder="Purchasing Suppoprt Charge" 
 														:min="0" 
 														:max="100" 
-														:class="! errors.sale_percentage ? 'is-valid' : 'is-invalid'" 
-														:disabled="! singleMerchantDealData.e_commerce_fulfillment"
-														@change="validateFormInput('sale_percentage')" 
+														:class="! errors.purchase_support_charge ? 'is-valid' : 'is-invalid'" 
+														:disabled="! singleMerchantDealData.purchase_support"
+														@change="validateFormInput('purchase_support_charge')" 
 													>
 													<div class="input-group-append">
-														<span class="input-group-text"> % </span>
+														<span class="input-group-text"> 
+															{{ general_settings.official_currency_name }}
+														</span>
 													</div>
 												</div>
 												<div 
 													class="invalid-feedback" 
 													style="display:block" 
-													v-show="errors.sale_percentage"
+													v-show="errors.purchase_support_charge"
 												>
-											    	{{ errors.sale_percentage }}
+											    	{{ errors.purchase_support_charge }}
 											    </div>
 											</div>
-										</div>
-										
+										</div> 
+										-->
+
 										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+											<label class="col-6 col-form-label font-weight-bold text-right">
 												Auto Renewal :
 											</label>
-											<div class="col-sm-6">
+											<div class="col-6 col-form-label">
 												<toggle-button 
 													v-model="singleMerchantDealData.auto_renewal" 
 													:width=150 
@@ -471,11 +507,11 @@
 											</div>
 										</div> 
 
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										<div class="form-row form-group">
+											<label class="col-6 col-form-label font-weight-bold text-right">
 												Status :
 											</label>
-											<div class="col-sm-6">
+											<div class="col-6 col-form-label">
 												<toggle-button 
 													v-model="singleMerchantDealData.active" 
 													:width=150 
@@ -488,16 +524,22 @@
 									</div>
 
 									<div class="col-md-12 card-footer mt-4 pb-0">
-										<div class="form-row">
-									    	<div class="form-group col-sm-12 text-right">
-								          		<div class="text-danger small mb-1" v-show="!submitForm">
+										<div class="row">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small">
 											  		Please input required fields
-									          	</div>
+											  	</span>
+											</div>
 
-									          	<button 
+											<div class="col-sm-12">
+												<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-left" data-dismiss="modal">
+													Close
+												</button>
+												
+												<button 
 										          	type="button" 
 										          	v-on:click="nextPage"
-										          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
+										          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-right btn-sm btn-round" 
 										          	v-tooltip.bottom-end="'Next'" 
 										          	v-show="singleMerchantDealData.instalments.length < 2"
 									          	>
@@ -512,8 +554,8 @@
 												>
 													{{ createMode ? 'Make ' : 'Update ' }} Deal
 												</button>
-								          	</div>
-								    	</div>
+											</div>
+										</div>
 									</div>
 							    </div>
 						     
@@ -523,35 +565,6 @@
 									v-show="! loading && step==2 && singleMerchantDealData.instalments.length==1" 
 								>
 									<h2 class="mx-auto mb-4 lead">Rent Space</h2>
-
-									<div class="col-md-12">
-										<div class="form-row">
-											<div class="col-md-12 form-group">
-												<label for="inputFirstName">
-													Rent Package
-												</label>
-
-												<multiselect 
-													v-model="singleMerchantDealData.rent_period"
-													:options="allRentPeriods" 
-													:custom-label="objectNameWithCapitalized" 
-													:required="true" 
-													:allow-empty="false" 
-													placeholder="Select Rent Period" 
-													class="form-control p-0" 
-													:class="! errors.rent_period ? 'is-valid' : 'is-invalid'"  
-													@close="validateFormInput('rent_period')" 
-													@input="resetRentPackage()" 
-													:disabled="singleMerchantDealData.instalments.length > 1"
-												>
-												</multiselect>
-
-												<div class="invalid-feedback">
-													{{ errors.rent_period }}
-												</div>
-											</div>
-										</div>
-									</div>
 
 									<div 
 										class="col-md-12"
@@ -563,8 +576,35 @@
 											v-if="merchantWarehouse && errors.warehouses[merchantWarehouseIndex]"
 										>
 											<div class="card-body">
+												<div class="form-row">
+													<div class="col-md-12 form-group text-center">
+														<label for="inputFirstName">
+															Rent Package
+														</label>
+
+														<multiselect 
+															v-model="singleMerchantDealData.rent_period"
+															:options="allRentPeriods" 
+															:custom-label="objectNameWithCapitalized" 
+															:required="true" 
+															:allow-empty="false" 
+															placeholder="Select Rent Period" 
+															class="form-control p-0" 
+															:class="! errors.rent_period ? 'is-valid' : 'is-invalid'"  
+															@close="validateFormInput('rent_period')" 
+															@input="resetRentPackage()" 
+															:disabled="singleMerchantDealData.instalments.length > 1"
+														>
+														</multiselect>
+
+														<div class="invalid-feedback">
+															{{ errors.rent_period }}
+														</div>
+													</div>
+												</div>
+
 												<div class="form-row ml-3 mr-3">
-													<div class="form-group col-md-12 text-center">
+													<div class="col-md-12 form-group text-center">
 														<label for="inputUsername">Select Warehouse</label>
 
 														<multiselect 

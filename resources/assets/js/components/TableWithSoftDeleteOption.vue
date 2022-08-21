@@ -90,7 +90,7 @@
 
 							<button type="button" 
 									class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
-									v-tooltip.bottom-end="'Merchant-Deals'" 
+									v-tooltip.bottom-end="'Space-Deals'" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-deal-index')"
 							>

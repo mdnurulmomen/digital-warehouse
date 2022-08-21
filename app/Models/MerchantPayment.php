@@ -19,4 +19,9 @@ class MerchantPayment extends Model
     {
         return $this->morphTo();
     }
+
+    public function updater()
+    {
+        return $this->morphTo();
+    }
 }
