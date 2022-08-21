@@ -607,7 +607,7 @@
 															v-model.number="singleStockData.stock_code" 
 															placeholder="Unique Code" 
 															@keydown.enter.prevent="nextPage" 
-															@blur="removeWhiteSpace(singleStockData.stock_code)" 
+															@blur="singleStockData.stock_code=removeWhiteSpace(singleStockData.stock_code)" 
 															maxlength="10" 
 														>
 													</div>
@@ -716,7 +716,7 @@
 																	v-model.number="stockVariation.stock_code" 
 																	placeholder="Unique Code" 
 																	@keydown.enter.prevent="nextPage" 
-																	@blur="removeWhiteSpace(stockVariation.stock_code)" 
+																	@blur="stockVariation.stock_code=removeWhiteSpace(stockVariation.stock_code)" 
 																	maxlength="10" 
 																>
 															</div>
@@ -4501,7 +4501,8 @@
 
 				if (properties) {
 					
-					properties = properties.trim();
+					// properties = properties.trim();
+					return properties.trim();
 
 				}
 
