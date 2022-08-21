@@ -59,11 +59,11 @@ class MerchantController extends Controller
             
             return response()->json([
 
-        		'approved' => Merchant::withCount('deals')->where('active', 1)->latest()->paginate($perPage),
+        		'approved' => Merchant::withCount('deals')->withCount('products')->where('active', 1)->latest()->paginate($perPage),
 
-                'pending' => Merchant::withCount('deals')->where('active', 0)->latest()->paginate($perPage),
+                'pending' => Merchant::withCount('deals')->withCount('products')->where('active', 0)->latest()->paginate($perPage),
 
-        		'trashed' => Merchant::withCount('deals')->onlyTrashed()->latest()->paginate($perPage),
+        		'trashed' => Merchant::withCount('deals')->withCount('products')->onlyTrashed()->latest()->paginate($perPage),
 
         	], 200);
 

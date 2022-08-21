@@ -50,8 +50,8 @@
 										  			:query="query" 
 										  			:loading="loading" 
 										  			:per-page="perPage" 
-										  			:column-names="['name', 'username', 'email', 'mobile', '# deals']" 
-										  			:column-values-to-show="['full_name', 'user_name', 'email', 'mobile', 'number_deals']" 
+										  			:column-names="['username', 'mobile', '# deals', '# products']" 
+										  			:column-values-to-show="['user_name', 'mobile', 'number_deals', 'number_products']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission = "'merchant'" 
@@ -114,7 +114,7 @@
 		<user-profile-view-modal 
 			:user="'merchant'" 
 			:profile-to-view="singleUserDetails" 
-			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at']"
+			:properties-to-show="['first Name', 'last Name', 'username', 'email', 'mobile', 'status', 'registered at', '# deals', '# products']"
 		></user-profile-view-modal>
 	</div>
 </template>

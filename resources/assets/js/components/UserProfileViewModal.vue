@@ -118,6 +118,14 @@
 				else if (property.match(/status/gi)) {
 					return this.profileToView.active ? 'Approved' : 'Pending';
 				}
+
+				else if (property.match(/deals/gi)) {
+					return this.profileToView.deals_count || 0;
+				}
+
+				else if (property.match(/products/gi)) {
+					return this.profileToView.products_count || 0;
+				}
 				
 				/*
 				else if (property.match(/roles/gi)) {

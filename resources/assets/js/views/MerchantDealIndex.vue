@@ -380,33 +380,48 @@
 												/>
 											</div>
 										</div>
-										
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Auto Renewal :
-											</label>
-											<div class="col-sm-6">
-												<toggle-button 
-													v-model="singleMerchantDealData.auto_renewal" 
-													:width=150 
-													:sync="true"
-													:color="{checked: '#fcba03', unchecked: '#6c757d'}"
-													:labels="{checked: 'Auto Renew', unchecked: 'No Renew'}"  
-												/>
-											</div>
-										</div> 
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Status :
+												Percentage :
+											</label>
+											<div class="col-sm-6">
+												<div class="input-group mb-1">
+													<input type="number" 
+														class="form-control" 
+														v-model.number="singleMerchantDealData.sale_percentage" 
+														placeholder="Sale Percentage" 
+														:min="0" 
+														:max="100" 
+														:class="! errors.sale_percentage ? 'is-valid' : 'is-invalid'" 
+														:disabled="! singleMerchantDealData.e_commerce_fulfillment"
+														@change="validateFormInput('sale_percentage')" 
+													>
+													<div class="input-group-append">
+														<span class="input-group-text"> % </span>
+													</div>
+												</div>
+												<div 
+													class="invalid-feedback" 
+													style="display:block" 
+													v-show="errors.sale_percentage"
+												>
+											    	{{ errors.sale_percentage }}
+											    </div>
+											</div>
+										</div>
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Purchase Support :
 											</label>
 											<div class="col-sm-6">
 												<toggle-button 
-													v-model="singleMerchantDealData.active" 
+													v-model="singleMerchantDealData.purchase_support" 
 													:width=150 
 													:sync="true"
-													:color="{checked: 'green', unchecked: 'red'}"
-													:labels="{checked: 'Active', unchecked: 'Deactive'}"  
+													:color="{checked: '#229bbf', unchecked: '#6c757d'}"
+													:labels="{checked: 'Enabled', unchecked: 'Disabled'}"  
 												/>
 											</div>
 										</div>
@@ -438,6 +453,36 @@
 												>
 											    	{{ errors.sale_percentage }}
 											    </div>
+											</div>
+										</div>
+										
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Auto Renewal :
+											</label>
+											<div class="col-sm-6">
+												<toggle-button 
+													v-model="singleMerchantDealData.auto_renewal" 
+													:width=150 
+													:sync="true"
+													:color="{checked: '#fcba03', unchecked: '#6c757d'}"
+													:labels="{checked: 'Auto Renew', unchecked: 'No Renew'}"  
+												/>
+											</div>
+										</div> 
+
+										<div class="form-row">
+											<label class="col-sm-6 col-form-label font-weight-bold text-right">
+												Status :
+											</label>
+											<div class="col-sm-6">
+												<toggle-button 
+													v-model="singleMerchantDealData.active" 
+													:width=150 
+													:sync="true"
+													:color="{checked: 'green', unchecked: 'red'}"
+													:labels="{checked: 'Active', unchecked: 'Deactive'}"  
+												/>
 											</div>
 										</div>
 									</div>

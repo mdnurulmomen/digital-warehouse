@@ -328,6 +328,9 @@
 				else if (columnValue.match(/number_deals/gi)) {
 					return object.deals_count ?? 0;
 				}
+				else if (columnValue.match(/number_products/gi)) {
+					return object.products_count ?? 0;
+				}
 				else if (columnValue.match(/number_days/gi)) {
 					return object.number_days ?? 0;
 				}
