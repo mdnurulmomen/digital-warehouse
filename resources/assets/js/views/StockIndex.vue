@@ -575,8 +575,8 @@
 																			v-model.number="stockedProduct.stock_code" 
 																			placeholder="Unique Code" 
 																			@keydown.enter.prevent="nextPage" 
+																			@change="removeWhiteSpace(stockedProduct.stock_code)" 
 																			maxlength="10" 
-																			@blur="stockedProduct.stock_code=stockedProduct.stock_code.trim()" 
 																		>
 																	</div>
 
@@ -672,7 +672,11 @@
 																					</div>
 																				</div>
 
-																				<div class="invalid-feedback">
+																				<div 
+																					class="invalid-feedback" 
+																					style="display: block;" 
+																					v-show="errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity"
+																				>
 																		        	{{ errors.products[stockedProductIndex].variations[stockedVariationIndex].product_variation_quantity }}
 																		  		</div>
 																			</div>
@@ -685,8 +689,8 @@
 																					v-model.number="stockedVariation.stock_code" 
 																					placeholder="Unique Code" 
 																					@keydown.enter.prevent="nextPage" 
+																					@change="removeWhiteSpace(stockedVariation.stock_code)" 
 																					maxlength="10" 
-																					@blur="stockedVariation.stock_code=stockedVariation.stock_code.trim()" 
 																				>
 																			</div>
 
@@ -4427,6 +4431,15 @@
 						}
 
 					}
+
+				}
+
+			},
+			removeWhiteSpace(properties) {
+
+				if (properties) {
+					
+					properties = properties.trim();
 
 				}
 

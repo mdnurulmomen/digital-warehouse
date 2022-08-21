@@ -49,13 +49,14 @@ class ProductCategoriesImport implements ToModel, WithValidation, WithHeadingRow
         // parent category
         if (! empty($row['parent_category_name']) && preg_match("/[a-z]/i", $row['parent_category_name']) && strlen($row['parent_category_name']) > 2) {
             
-            $parentCategory = ProductCategory::withTrashed()->firstOrNew(
+            $parentCategory = ProductCategory::withTrashed()->updateOrCreate(
                 [
                     'name' => strtolower($row['parent_category_name']),
+                ],
+                [
+                   'deleted_at' => NULL 
                 ]
             );
-
-            $parentCategory->save();
 
         }
 

@@ -42,7 +42,7 @@ class MerchantWarehouseResource extends JsonResource
                 $this->containerStatuses()->where('occupied', 0.0)->whereHas('deals', function ($query1) {
                     $query1->whereHas('deal', function ($query2) {
                         $query2->where('merchant_id', self::$merchant)
-                        ->whereHas('payments', function ($query3) {
+                        ->whereHas('instalments', function ($query3) {
                             $query3->whereDate('date_to', '>=', today());
                         });
                     });
@@ -56,7 +56,7 @@ class MerchantWarehouseResource extends JsonResource
                     $query->whereHas('deals', function ($query1) {
                         $query1->whereHas('deal', function ($query2) {
                             $query2->where('merchant_id', self::$merchant)
-                            ->whereHas('payments', function ($query3) {
+                            ->whereHas('instalments', function ($query3) {
                                 $query3->whereDate('date_to', '>=', today());
                             });
                         });
@@ -67,7 +67,7 @@ class MerchantWarehouseResource extends JsonResource
                     $query1->where('occupied', 0.0)->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
                             $query3->where('merchant_id', self::$merchant)
-                            ->whereHas('payments', function ($query4) {
+                            ->whereHas('instalments', function ($query4) {
                                 $query4->whereDate('date_to', '>=', today());
                             });
                         });
@@ -80,7 +80,7 @@ class MerchantWarehouseResource extends JsonResource
                                 $query->whereHas('parentContainer.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query3) {
+                                        ->whereHas('instalments', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -88,7 +88,7 @@ class MerchantWarehouseResource extends JsonResource
                                 ->orWhereHas('deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
                                         $query3->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query4) {
+                                        ->whereHas('instalments', function ($query4) {
                                             $query4->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -102,7 +102,7 @@ class MerchantWarehouseResource extends JsonResource
                                 $query->whereHas('parentShelf.parentContainer.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query3) {
+                                        ->whereHas('instalments', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -110,7 +110,7 @@ class MerchantWarehouseResource extends JsonResource
                                 ->orWhereHas('parentShelf.deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
                                         $query3->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query4) {
+                                        ->whereHas('instalments', function ($query4) {
                                             $query4->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -126,7 +126,7 @@ class MerchantWarehouseResource extends JsonResource
                     $query->whereHas('deals', function ($query1) {
                         $query1->whereHas('deal', function ($query2) {
                             $query2->where('merchant_id', self::$merchant)
-                            ->whereHas('payments', function ($query3) {
+                            ->whereHas('instalments', function ($query3) {
                                 $query3->whereDate('date_to', '>=', today());
                             });
                         });
@@ -141,7 +141,7 @@ class MerchantWarehouseResource extends JsonResource
                     $query1->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
                             $query3->where('merchant_id', self::$merchant)
-                            ->whereHas('payments', function ($query4) {
+                            ->whereHas('instalments', function ($query4) {
                                 $query4->whereDate('date_to', '>=', today());
                             });
                         });
@@ -155,7 +155,7 @@ class MerchantWarehouseResource extends JsonResource
                     ->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
                             $query3->where('merchant_id', self::$merchant)
-                            ->whereHas('payments', function ($query4) {
+                            ->whereHas('instalments', function ($query4) {
                                 $query4->whereDate('date_to', '>=', today());
                             });
                         });
@@ -170,7 +170,7 @@ class MerchantWarehouseResource extends JsonResource
                                     $query2->whereHas('deals', function ($query3) {
                                         $query3->whereHas('deal', function ($query4) {
                                             $query4->where('merchant_id', self::$merchant)
-                                            ->whereHas('payments', function ($query5) {
+                                            ->whereHas('instalments', function ($query5) {
                                                 $query5->whereDate('date_to', '>=', today());
                                             });
                                         });
@@ -178,7 +178,7 @@ class MerchantWarehouseResource extends JsonResource
                                     ->orWhereHas('parentShelf.deals', function ($query1) {
                                         $query1->whereHas('deal', function ($query2) {
                                             $query2->where('merchant_id', self::$merchant)
-                                            ->whereHas('payments', function ($query3) {
+                                            ->whereHas('instalments', function ($query3) {
                                                 $query3->whereDate('date_to', '>=', today());
                                             });
                                         });
@@ -186,7 +186,7 @@ class MerchantWarehouseResource extends JsonResource
                                     ->orWhereHas('parentShelf.parentContainer.deals', function ($query1) {
                                         $query1->whereHas('deal', function ($query2) {
                                             $query2->where('merchant_id', self::$merchant)
-                                            ->whereHas('payments', function ($query3) {
+                                            ->whereHas('instalments', function ($query3) {
                                                 $query3->whereDate('date_to', '>=', today());
                                             });
                                         });
@@ -202,7 +202,7 @@ class MerchantWarehouseResource extends JsonResource
                                 $query->whereHas('deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
                                         $query3->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query4) {
+                                        ->whereHas('instalments', function ($query4) {
                                             $query4->whereDate('date_to', '>=', now());
                                         });
                                     });
@@ -210,7 +210,7 @@ class MerchantWarehouseResource extends JsonResource
                                 ->orWhereHas('parentShelf.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query3) {
+                                        ->whereHas('instalments', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -218,7 +218,7 @@ class MerchantWarehouseResource extends JsonResource
                                 ->orWhereHas('parentShelf.parentContainer.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('payments', function ($query3) {
+                                        ->whereHas('instalments', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });

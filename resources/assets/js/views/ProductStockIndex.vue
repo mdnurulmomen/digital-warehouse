@@ -495,7 +495,7 @@
 					                              			class="form-control p-0" 
 					                                  		:class="!errors.stock.warehouse  ? 'is-valid' : 'is-invalid'"  
 					                                  		@close="validateFormInput('warehouse')" 
-					                                  		@input="singleStockData.addresses = [ {} ]" 
+					                                  		@input="resetWarehouseSpaces(); singleStockData.addresses = [ {} ]" 
 					                              		>
 					                                	</multiselect>
 					                                	<div class="invalid-feedback">
@@ -3861,7 +3861,7 @@
 						this.step+=1;
 
 						this.submitForm = true;
-						this.resetWarehouseSpaces();
+						// this.resetWarehouseSpaces();
 						// this.fetchWarehouseAllContainers(this.singleStockData.warehouse.id);
 					
 					}
@@ -4164,6 +4164,7 @@
 						this.emptyShelfContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyShelfContainers ) );
 						this.emptyUnitContainers = JSON.parse( JSON.stringify( this.allDealtEmptyWarehouses[selectedWarehouse].emptyUnitContainers ) );
 
+						/*
 						this.emptyContainers.forEach(
 							(emptyContainer, emptyContainerIndex) => {
 								if (emptyContainer.hasOwnProperty('container_shelf_statuses') && emptyContainer.container_shelf_statuses.length) {
@@ -4195,6 +4196,7 @@
 								}
 							}
 						);	
+						*/
 
 					}
 

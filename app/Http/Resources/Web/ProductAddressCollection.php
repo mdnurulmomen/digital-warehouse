@@ -106,7 +106,7 @@ class ProductAddressCollection extends ResourceCollection
 
         $units = [];       
 
-        foreach ($this->collection->unique('space_type', 'space_id') as $key => $productAddress) {
+        foreach ($this->collection as $key => $productAddress) {
            
             if (strpos($productAddress->space_type, 'ContainerStatus')) {
                 
