@@ -1080,8 +1080,8 @@
 				type: Object,
 				required: true,
 			},
-			categoryName:{
-				type: String,
+			categoryId:{
+				type: Number,
 				required: true,
 			},
 

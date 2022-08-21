@@ -2134,8 +2134,8 @@
 				type: Object,
 				required: true,
 			},
-			merchantName:{
-				type: String,
+			merchantId:{
+				type: Number,
 				required: true,
 			},
 
@@ -3182,7 +3182,7 @@
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: object.product, merchantName: this.merchant.user_name.replace(/ /g,"-"), productMerchant: object }});
+				this.$router.push({ name: 'product-stocks', params: { product: object.product, productMerchant: object }});
 
 			},
 			verifyUserInput() {

@@ -223,7 +223,7 @@
 																				@click="goCategoryProducts(content)" 
 																				v-if="userHasPermissionTo('view-product-index')"
 																		>
-																			<img src="/icons/cms/products.png" width="17px">
+																			<img src="/icons/cms/products.png" width="22px">
 																		</button>
 																	</td>
 																</tr>
@@ -955,7 +955,7 @@
 			},
 			goCategoryProducts(productCategory) {
 				// console.log(object);
-				this.$router.push({ name: 'category-products', params: { category: productCategory, categoryName: productCategory.name.replace(/ /g,"-") }});
+				this.$router.push({ name: 'category-products', params: { category: productCategory, categoryId: productCategory.id }});
 			},
             changeNumberContents(expectedContentsPerPage) {
 				this.pagination.current_page = 1;

@@ -340,16 +340,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/product-manufacturers',
-            name: 'product-manufacturers',
-            component: ProductManufacturerIndex,
-            meta: {
-                // authRequired: true,
-                requiredPermission: 'view-product-asset-index' 
-            }
-        },
-        {
-            path: '/product-categories/:categoryName',
+            path: '/category/:categoryId/products',
             name: 'category-products',
             component: CategoryProductIndex,
             props: true,
@@ -358,12 +349,21 @@ const router = new VueRouter({
                 requiredPermission: 'view-product-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.category && to.params.categoryName) {
+                if (to.params.category && to.params.categoryId) {
                     next(); // <-- everything good, proceed
                 }
                 else {
                     next('/product-categories');
                 }
+            }
+        },
+        {
+            path: '/product-manufacturers',
+            name: 'product-manufacturers',
+            component: ProductManufacturerIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
             }
         },
         {
@@ -414,7 +414,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/product-stocks/:merchantName',
+            path: '/product-stocks',
             name: 'product-stocks',
             component: ProductStockIndex,
             props: true,
@@ -423,7 +423,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-product-stock-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.product && to.params.merchantName && to.params.productMerchant) {
+                if (to.params.product && to.params.productMerchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -441,7 +441,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/product-merchants/:productName',
+            path: '/product/:productId/merchants',
             name: 'product-merchants',
             component: ProductMerchantIndex,
             props: true,
@@ -459,7 +459,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/merchant-products/:merchantName',
+            path: '/merchant/:merchantId/products',
             name: 'merchant-products',
             component: MerchantProductIndex,
             props: true,
@@ -486,7 +486,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/merchant-deals/:merchantId',
+            path: '/merchant/:merchantId/deals',
             name: 'merchant-deals',
             component: MerchantDealIndex,
             props: true,
@@ -504,7 +504,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/deal-instalments/:dealId',
+            path: '/deal/:dealId/instalments',
             name: 'deal-instalments',
             component: DealInstalmentIndex,
             props: true,
@@ -522,7 +522,7 @@ const router = new VueRouter({
             }
         },
         {
-            path: 'instalment-payments/:instalmentId',
+            path: 'instalment/:instalmentId/payments',
             name: 'instalment-payments',
             component: DealPaymentIndex,
             props: true,

@@ -3004,10 +3004,6 @@
 				type: Object,
 				required: true,
 			},
-			merchantName:{
-				type: String,
-				required: true,
-			},
 
 		},
 
