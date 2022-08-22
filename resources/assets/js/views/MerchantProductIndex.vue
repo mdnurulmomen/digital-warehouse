@@ -2134,10 +2134,6 @@
 				type: Object,
 				required: true,
 			},
-			merchantId:{
-				type: Number,
-				required: true,
-			},
 
 		},
 

@@ -1600,10 +1600,6 @@
 				type: Object,
 				required: true,
 			},
-			productId:{
-				type: Number,
-				required: true,
-			},
 
 		},
 

@@ -1865,6 +1865,8 @@
 											<div class="col-sm-6">
 												<label class="col-form-label">
 													{{ singleStockData.stock_code | capitalize }}
+
+													<i class="fa fa-print fa-lg text-danger" aria-hidden="true" @click="printStockCode(singleStockData)" v-tooltip.bottom-end="'Print'"></i>
 												</label>
 												
 												<!-- 
@@ -4855,7 +4857,7 @@
 							// this.submitForm = true;
 							// this.errors.stock.variations = [];
 
-							if (! this.productMerchant.has_variations && this.singleStockData.stock_quantity > 0 && (this.singleStockData.stock_quantity != this.singleStockData.serials.length || singleStockData.serials.some(stockSerial=>! stockSerial.serial_no))) {
+							if (! this.productMerchant.has_variations && this.singleStockData.stock_quantity > 0 && (this.singleStockData.stock_quantity != this.singleStockData.serials.length || this.singleStockData.serials.some(stockSerial=>! stockSerial.serial_no))) {
 
 								this.errors.stock.product_total_serials = 'Serials are more or less than quantity';
 

@@ -2820,10 +2820,6 @@
 
 		props: {
 
-			productId:{
-				type: Number,
-				required: true,
-			},
 			merchantId:{
 				type: Number,
 				required: true,

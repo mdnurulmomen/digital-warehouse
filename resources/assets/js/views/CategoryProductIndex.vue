@@ -1080,10 +1080,6 @@
 				type: Object,
 				required: true,
 			},
-			categoryId:{
-				type: Number,
-				required: true,
-			},
 
 		},
 
@@ -1689,7 +1685,7 @@
 			goProductMerchants(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-merchants', params: { product: object, productName: object.name.replace(/ /g,"-") }});
+				this.$router.push({ name: 'product-merchants', params: { product: object, productId: object.id }});
 
 			},
 			/*

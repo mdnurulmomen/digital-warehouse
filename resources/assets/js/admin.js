@@ -405,7 +405,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-requisition-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchantId && to.params.productId && to.params.merchantProduct) {
+                if (to.params.productId && to.params.merchantId && to.params.merchantProduct) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -450,7 +450,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-product-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.product) {
+                if (to.params.productId && to.params.product) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -468,7 +468,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-product-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchant) {
+                if (to.params.merchantId && to.params.merchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -495,7 +495,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-deal-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchant) {
+                if (to.params.merchantId && to.params.merchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -513,7 +513,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-payment-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchantName && to.params.deal) {
+                if (to.params.merchantName && to.params.dealId && to.params.deal) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -531,7 +531,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-merchant-payment-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchantName && to.params.instalment) {
+                if (to.params.merchantName && to.params.instalmentId && to.params.instalment) {
                     next(); // <-- everything good, proceed
                 }
                 else {
