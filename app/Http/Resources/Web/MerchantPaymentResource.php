@@ -20,8 +20,8 @@ class MerchantPaymentResource extends JsonResource
             'paid_amount' => $this->paid_amount,
             'current_due' => $this->current_due,
             'paid_at' => $this->paid_at->format('Y-m-d H:i:s'),
-            'merchant_deal_instalment_id' => $this->merchant_deal_instalment_id,
-            'instalment' => $this->instalment,
+            'merchant_rent_id' => $this->merchant_rent_id,
+            'rent' => $this->rent,
             'issuer' => $this->issuer,
             'updater' => $this->updater,
         ];

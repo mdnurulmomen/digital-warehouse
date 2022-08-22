@@ -1,5 +1,5 @@
 
-<template v-if="userHasPermissionTo('view-merchant-deal-index')">
+<template v-if="userHasPermissionTo('view-merchant-space-deal-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
 			:icon="'deals'"
@@ -62,7 +62,7 @@
 
 											  			<div class="ml-auto d-sm-none">
 											  				<button 
-											  					v-if="userHasPermissionTo('create-merchant-deal')"
+											  					v-if="userHasPermissionTo('create-merchant-space-deal')"
 													  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 													  			v-tooltip.bottom-end="'Create New'" 
 													  			@click="showContentCreateForm()"
@@ -118,7 +118,7 @@
 
 													<div class="col-md-4 text-right d-none d-md-block">
 														<button 
-										  					v-if="userHasPermissionTo('create-merchant-deal')"
+										  					v-if="userHasPermissionTo('create-merchant-space-deal')"
 												  			class="btn waves-effect waves-dark btn-success btn-outline-success btn-outline-success btn-sm" 
 												  			v-tooltip.bottom-end="'Create New'" 
 												  			@click="showDealCreateForm()"
@@ -131,10 +131,10 @@
 
 											  	<!-- 
 											  	<search-and-addition-option 
-											  		v-if="userHasPermissionTo('view-merchant-deal-index') || userHasPermissionTo('create-merchant-deal')"
+											  		v-if="userHasPermissionTo('view-merchant-space-deal-index') || userHasPermissionTo('create-merchant-space-deal')"
 											  		:query="query" 
 											  		:caller-page="'deals'" 
-											  		:required-permission="'merchant-deal'" 
+											  		:required-permission="'merchant-space-deal'" 
 											  		:disable-add-button="(allWarehouseSpaces.length==0 || formSubmitted) ? true : false" 									  
 											  		@showContentCreateForm="showDealCreateForm" 
 											  		@searchData="searchData($event)" 
@@ -154,7 +154,6 @@
 																	<tr>
 																		<th>Name</th>
 																		<th>Status</th>
-																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
 																		<th>Rent Package</th>
 																		<th>Exp Date</th>
@@ -164,7 +163,7 @@
 																<tbody>
 																	<tr 
 																	v-for="merchantDeal in merchantAllDeals" 
-																	:key="'merchant-deal-' + merchantDeal.id" 
+																	:key="'merchant-space-deal-' + merchantDeal.id" 
 																	:class="merchantDeal.id==singleMerchantDealData.id ? 'highlighted' : ''"
 																	>
 																		<td>{{ merchantDeal.name | capitalize }}</td>
@@ -172,12 +171,6 @@
 																		<td>
 																			<span :class="[merchantDeal.active ? 'badge-primary' : 'badge-secondary', 'badge']">
 																				{{ merchantDeal.active ? 'Active' : 'Inactive' }}
-																			</span>
-																		</td>
-
-																		<td>
-																			<span :class="[merchantDeal.e_commerce_fulfillment ? 'badge-info' : 'badge-secondary', 'badge']">
-																				{{ merchantDeal.e_commerce_fulfillment ? 'Enabled' : 'NA' }}
 																			</span>
 																		</td>
 																		 
@@ -191,13 +184,13 @@
 																			{{ (merchantDeal.rent_period && merchantDeal.rent_period.name) ? merchantDeal.rent_period.name : 'No Package' | capitalize }}
 																		</td>
 
-																		<td v-if="merchantDeal.instalments[merchantDeal.instalments.length-1] && merchantDeal.instalments[merchantDeal.instalments.length-1].date_to">
-																			{{ merchantDeal.instalments[merchantDeal.instalments.length-1].date_to }}
+																		<td v-if="merchantDeal.rents[merchantDeal.rents.length-1] && merchantDeal.rents[merchantDeal.rents.length-1].date_to">
+																			{{ merchantDeal.rents[merchantDeal.rents.length-1].date_to }}
 																			<span 
-																			v-show="checkExpiryDate(merchantDeal.instalments[merchantDeal.instalments.length-1].date_to)"
-																			:class="[checkExpiryDate(merchantDeal.instalments[merchantDeal.instalments.length-1].date_to) ? 'badge-danger' : 'badge-success', 'badge']"
+																			v-show="checkExpiryDate(merchantDeal.rents[merchantDeal.rents.length-1].date_to)"
+																			:class="[checkExpiryDate(merchantDeal.rents[merchantDeal.rents.length-1].date_to) ? 'badge-danger' : 'badge-success', 'badge']"
 																			>
-																				{{ checkExpiryDate(merchantDeal.instalments[merchantDeal.instalments.length-1].date_to) ? 'Expired' : '' }}
+																				{{ checkExpiryDate(merchantDeal.rents[merchantDeal.rents.length-1].date_to) ? 'Expired' : '' }}
 																			</span>
 																		</td>
 
@@ -220,7 +213,7 @@
 																				class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-icon" 
 																				v-tooltip.bottom-end="'Edit'"  
 																				@click="openDealEditForm(merchantDeal)" 
-																				v-if="userHasPermissionTo('update-merchant-deal')" 
+																				v-if="userHasPermissionTo('update-merchant-space-deal')" 
 																				:disabled="formSubmitted"  
 																			>
 																				<i class="fa fa-edit"></i>
@@ -232,7 +225,7 @@
 																				v-tooltip.bottom-end="'Delete'" 
 																				:disabled="formSubmitted || ! removableDeal(merchantDeal)"  
 																				@click="openDealDeleteForm(merchantDeal)" 
-																				v-if="userHasPermissionTo('delete-merchant-deal')" 
+																				v-if="userHasPermissionTo('delete-merchant-space-deal')" 
 																			>
 																				<i class="fa fa-trash"></i>
 																			</button>
@@ -240,12 +233,12 @@
 																			<button 
 																				type="button" 
 																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
-																				v-tooltip.bottom-end="'Instalments'" 
+																				v-tooltip.bottom-end="'Rents'" 
 																				:disabled="formSubmitted"  
 																				@click="goToDealPayments(merchantDeal)" 
 																				v-if="userHasPermissionTo('view-merchant-payment-index')" 
 																			>
-																				<i class="fa fa-money" aria-hidden="true"></i>
+																				<img src="/icons/cms/deal-rents.png" width="22px">
 																			</button>
 																		</td>
 																	</tr>
@@ -327,12 +320,12 @@
 		</div>
 
  		<!--Create, Edit or Approve Modal -->
-		<div class="modal fade" id="merchantDeal-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-deal') || userHasPermissionTo('update-merchant-deal')">
+		<div class="modal fade" id="merchantDeal-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-space-deal') || userHasPermissionTo('update-merchant-space-deal')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create New ' : 'Update ' }} Deal
+							{{ createMode ? 'Create New ' : 'Update ' }} Space Deal
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -351,7 +344,7 @@
 							<transition-group name="fade">		
 								<div 
 									class="row" 
-									v-bind:key="'merchant-deal-modal-step-' + 1" 
+									v-bind:key="'merchant-space-deal-modal-step-' + 1" 
 									v-show="!loading && step==1"
 								>
 									<h2 class="mx-auto mb-4 lead">Deal Profile</h2>
@@ -541,7 +534,7 @@
 										          	v-on:click="nextPage"
 										          	class="btn waves-effect waves-dark btn-secondary btn-outline-secondary float-right btn-sm btn-round" 
 										          	v-tooltip.bottom-end="'Next'" 
-										          	v-show="singleMerchantDealData.instalments.length < 2"
+										          	v-show="singleMerchantDealData.rents.length < 2"
 									          	>
 							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 							                  	</button>
@@ -550,7 +543,7 @@
 													type="submit" 
 													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
-													v-show="! createMode && singleMerchantDealData.instalments.length > 1"
+													v-show="! createMode && singleMerchantDealData.rents.length > 1"
 												>
 													{{ createMode ? 'Make ' : 'Update ' }} Deal
 												</button>
@@ -561,8 +554,8 @@
 						     
 							    <div 
 									class="row" 
-									v-bind:key="'merchant-deal-modal-step-' + 2" 
-									v-show="! loading && step==2 && singleMerchantDealData.instalments.length==1" 
+									v-bind:key="'merchant-space-deal-modal-step-' + 2" 
+									v-show="! loading && step==2 && singleMerchantDealData.rents.length==1" 
 								>
 									<h2 class="mx-auto mb-4 lead">Rent Space</h2>
 
@@ -593,7 +586,7 @@
 															:class="! errors.rent_period ? 'is-valid' : 'is-invalid'"  
 															@close="validateFormInput('rent_period')" 
 															@input="resetRentPackage()" 
-															:disabled="singleMerchantDealData.instalments.length > 1"
+															:disabled="singleMerchantDealData.rents.length > 1"
 														>
 														</multiselect>
 
@@ -618,7 +611,7 @@
 															:class="! errors.warehouses[merchantWarehouseIndex].warehouse ? 'is-valid' : 'is-invalid'"  
 															@close="validateFormInput('warehouse')" 
 															@input="resetWarehouseSpaces(merchantWarehouseIndex)" 
-															:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableWarehouse(merchantWarehouse) || ! singleMerchantDealData.hasOwnProperty('rent_period') || Object.keys(singleMerchantDealData.rent_period).length < 1"
+															:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableWarehouse(merchantWarehouse) || ! singleMerchantDealData.hasOwnProperty('rent_period') || Object.keys(singleMerchantDealData.rent_period).length < 1"
 														>
 														</multiselect>
 
@@ -655,7 +648,7 @@
 																	class="form-control p-0" 
 																	:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_type ? 'is-valid' : 'is-invalid'" 
 																	
-																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || ! removableSpace(warehouseSpace)" 
+																	:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex + 1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || ! removableSpace(warehouseSpace)" 
 
 																	@input="setWarehouseSpaces(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																	@close="validateFormInput('space_type')"
@@ -698,7 +691,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1" 
 																			@input="setContainerRentPeriod(warehouseSpace.containers[warehouseSpace.containers.length-1])" 
 																			@close="validateFormInput('containers')" 
 																		>
@@ -730,7 +723,7 @@
 																				:allow-empty="false" 
 																				class="form-control p-0" 
 																				:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].containers ? 'is-valid' : 'is-invalid'" 
-																				:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.instalments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)" 
+																				:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.rents.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)" 
 																				@input="setContainerRentPeriod(warehouseSpace.containers[warehouseContainerIndex])" 
 																				@close="validateFormInput('containers')" 
 																			>
@@ -757,7 +750,7 @@
 																				:allow-empty="false" 
 																				class="form-control p-0" 
 																				:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period ? 'is-valid' : 'is-invalid'" 
-																				:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.instalments.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
+																				:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || warehouseSpace.containers.length > (warehouseContainerIndex + 1) || singleMerchantDealData.rents.length > 1 || (warehouseContainer.hasOwnProperty('occupied') && warehouseContainer.occupied != 0)"
 																				@close="validateFormInput('space_rent_period')" 
 																			>
 																			</multiselect>
@@ -840,7 +833,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableShelf(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableShelf(warehouseSpace.container)"
 																			@input="setContainerAvailableShelves(merchantWarehouseIndex, warehouseSpaceIndex)"
 																			@close="validateFormInput('parent_container')" 
 																		>
@@ -871,7 +864,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].shelves ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableShelf(warehouseSpace.container)" 
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableShelf(warehouseSpace.container)" 
 																			@close="validateFormInput('shelves')" 
 																		>
 																		</multiselect>
@@ -909,7 +902,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableShelf(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableShelf(warehouseSpace.container)"
 																			@close="validateFormInput('space_rent_period')" 
 																		>
 																		</multiselect>
@@ -937,7 +930,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_container  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableUnit(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@input="setContainerAvailableUnitShelves(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																			@close="validateFormInput('parent_container')" 
 																		>
@@ -964,7 +957,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].parent_shelf  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableUnit(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@input="setContainerShelfAvailableUnits(merchantWarehouseIndex, warehouseSpaceIndex)" 
 																			@close="validateFormInput('parent_shelf')" 
 																		>
@@ -997,7 +990,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableUnit(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@close="validateFormInput('units')" 
 																		>
 																		</multiselect>
@@ -1027,7 +1020,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].units ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableUnit(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@close="validateFormInput('units')" 
 																		>
 																		</multiselect>
@@ -1055,7 +1048,7 @@
 																			:allow-empty="false" 
 																			class="form-control p-0" 
 																			:class="! errors.warehouses[merchantWarehouseIndex].spaces[warehouseSpaceIndex].space_rent_period  ? 'is-valid' : 'is-invalid'" 
-																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.instalments.length > 1 || immutableUnit(warehouseSpace.container)"
+																			:disabled="singleMerchantDealData.warehouses.length > (merchantWarehouseIndex+1) || merchantWarehouse.spaces.length > (warehouseSpaceIndex + 1) || singleMerchantDealData.rents.length > 1 || immutableUnit(warehouseSpace.container)"
 																			@close="validateFormInput('space_rent_period')" 
 																		>
 																		</multiselect>
@@ -1164,7 +1157,7 @@
 													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" 
 													v-tooltip.bottom-end="'Next'" 
 													v-on:click="nextPage" 
-													v-show="singleMerchantDealData.instalments.length == 1"
+													v-show="singleMerchantDealData.rents.length == 1"
 												>
 													<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
 												</button>
@@ -1175,10 +1168,10 @@
 								
 								<div 
 									class="row" 
-									v-bind:key="'merchant-deal-modal-step-' + 3" 
-									v-if="! loading && step==3 && singleMerchantDealData.instalments.length==1" 
+									v-bind:key="'merchant-space-deal-modal-step-' + 3" 
+									v-if="! loading && step==3 && singleMerchantDealData.rents.length==1" 
 								>
-									<h2 class="mx-auto mb-4 lead">{{ createMode ? 'Deal' : 'Last Deal' }}</h2>
+									<h2 class="mx-auto mb-4 lead">{{ createMode ? 'Deal Rent' : 'Deal Last Rent' }}</h2>
 									<!-- last payment -->
 									<div class="col-md-12">
 										<div class="card">
@@ -1191,11 +1184,11 @@
 															<input 
 																type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleMerchantDealData.instalments[0].number_installment" 
+																v-model.number="singleMerchantDealData.rents[0].number_installment" 
 																min:1
 																placeholder="# rent period to pay" 
 																required="true" 
-																:class="! errors.instalment.number_installment ? 'is-valid' : 'is-invalid'" 
+																:class="! errors.rent.number_installment ? 'is-valid' : 'is-invalid'" 
 																@change="resetTotalRent()"
 															>
 
@@ -1209,9 +1202,9 @@
 														<div 
 															class="invalid-feedback" 
 															style="display: block;"
-															v-show="errors.instalment.number_installment" 
+															v-show="errors.rent.number_installment" 
 														>
-													    	{{ errors.instalment.number_installment }}
+													    	{{ errors.rent.number_installment }}
 													    </div>
 													</div>
 												</div>
@@ -1221,11 +1214,11 @@
 														<label for="inputFirstName">Date From</label>
 														<div class="date">
 															<datepicker 
-																v-model="singleMerchantDealData.instalments[0].date_from" 
+																v-model="singleMerchantDealData.rents[0].date_from" 
 																:initialView="'month'"
 																:minimumView="'day'" 
 																:maximumView="'year'" 
-																:disabled="singleMerchantDealData.instalments.length > 1" 
+																:disabled="singleMerchantDealData.rents.length > 1" 
 																:input-class="'form-control'" 
 																placeholder="Start Date" 
 																@input="changeRentExpiryDate"
@@ -1238,7 +1231,7 @@
 														<label for="inputFirstName">Date To</label>
 														<div class="date">
 															<datepicker 
-																v-model="singleMerchantDealData.instalments[0].date_to" 
+																v-model="singleMerchantDealData.rents[0].date_to" 
 																:disabled="true" 
 																:input-class="'form-control'" 
 															>	
@@ -1256,7 +1249,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleMerchantDealData.instalments[0].total_rent" 
+																v-model.number="singleMerchantDealData.rents[0].total_rent" 
 																placeholder="Total Rent" 
 																required="true" 
 																:readonly="true"
@@ -1275,20 +1268,20 @@
 														<div class="input-group mb-1">
 															<input type="number" 
 																class="form-control" 
-																v-model.number="singleMerchantDealData.instalments[0].discount" 
+																v-model.number="singleMerchantDealData.rents[0].discount" 
 																placeholder="Discount" 
-																:class="! errors.instalment.discount ? 'is-valid' : 'is-invalid'" 
+																:class="! errors.rent.discount ? 'is-valid' : 'is-invalid'" 
 																@change="resetTotalRent()"
 																:min="0" 
 																:max="100" 
-																:readonly="! createMode && singleMerchantDealData.instalments.length > 1" 
+																:readonly="! createMode && singleMerchantDealData.rents.length > 1" 
 															>
 															<div class="input-group-append">
 																<span class="input-group-text"> % </span>
 															</div>
 														</div>
-														<div class="invalid-feedback" style="display:block" v-show="errors.instalment.discount">
-													    	{{ errors.instalment.discount }}
+														<div class="invalid-feedback" style="display:block" v-show="errors.rent.discount">
+													    	{{ errors.rent.discount }}
 													    </div>
 													</div>
 												</div>
@@ -1301,7 +1294,7 @@
 									    				<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleMerchantDealData.instalments[0].previous_due" 
+																v-model.number="singleMerchantDealData.rents[0].previous_due" 
 																placeholder="Previous Due" 
 																:disabled="true"
 															>
@@ -1321,7 +1314,7 @@
 									    				<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleMerchantDealData.instalments[0].net_payable" 
+																v-model.number="singleMerchantDealData.rents[0].net_payable" 
 																placeholder="Net Payable" 
 																required="true" 
 																:readonly="true"
@@ -1341,12 +1334,12 @@
 									    				<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control" 
-																v-model.number="singleMerchantDealData.instalments[0].paid_amount" 
+																v-model.number="singleMerchantDealData.rents[0].paid_amount" 
 																placeholder="Paid Amount" 
-																:class="! errors.instalment.paid_amount ? 'is-valid' : 'is-invalid'" 
+																:class="! errors.rent.paid_amount ? 'is-valid' : 'is-invalid'" 
 																@change="validateFormInput('paid_amount')"  
-																:readonly="! createMode && singleMerchantDealData.instalments.length > 1"
-																min="0" 
+																:readonly="! createMode && singleMerchantDealData.rents.length > 1"
+																min="1" 
 															>
 
 									    					<div class="input-group-append">
@@ -1359,9 +1352,9 @@
 														<div 
 															style="display: block;" 
 															class="invalid-feedback" 
-															v-show="errors.instalment.paid_amount"
+															v-show="errors.rent.paid_amount"
 														>
-												        	{{ errors.instalment.paid_amount }}
+												        	{{ errors.rent.paid_amount }}
 												  		</div>
 									    			</div>
 												</div>
@@ -1373,7 +1366,7 @@
 									    				<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																:value="singleMerchantDealData.instalments[0].net_payable - singleMerchantDealData.instalments[0].paid_amount" 
+																:value="singleMerchantDealData.rents[0].net_payable - singleMerchantDealData.rents[0].paid_amount" 
 																placeholder="Dues" 
 																:readonly="true"
 															>
@@ -1406,7 +1399,7 @@
 													type="submit" 
 													class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" 
 													:disabled="!submitForm || formSubmitted"
-													v-show="singleMerchantDealData.instalments.length < 2"
+													v-show="singleMerchantDealData.rents.length < 2"
 												>
 													{{ createMode ? 'Make ' : 'Update ' }} Deal
 												</button>
@@ -1422,7 +1415,7 @@
 		</div>
 
 		<delete-confirmation-modal 
-			v-if="userHasPermissionTo('delete-merchant-deal')" 
+			v-if="userHasPermissionTo('delete-merchant-space-deal')" 
 			:csrf="csrf" 
 			:form-submitted="formSubmitted" 
 			:submit-method-name="'deleteDeal'" 
@@ -1489,7 +1482,7 @@
 		</div>
 
  		<!-- View Modal -->
-		<div class="modal fade" id="merchant-deal-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="merchant-space-deal-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1502,26 +1495,26 @@
 					<div class="modal-body">
 						<ul class="nav nav-tabs tabs justify-content-center" role="tablist">
 							<li class="nav-item">
-								<a class="nav-link active" data-toggle="tab" href="#merchant-deal-profile" role="tab">
+								<a class="nav-link active" data-toggle="tab" href="#merchant-space-deal-profile" role="tab">
 									Deal
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#merchant-deal-spaces" role="tab">
+								<a class="nav-link" data-toggle="tab" href="#merchant-space-deal-spaces" role="tab">
 									Spaces
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#merchant-deal-instalments" role="tab">
+								<a class="nav-link" data-toggle="tab" href="#merchant-space-deal-rents" role="tab">
 									Payments
 								</a>
 							</li>
 						</ul>
 
 						<div class="tab-content tabs card-block">
-							<div class="tab-pane active" id="merchant-deal-profile" role="tabpanel">
+							<div class="tab-pane active" id="merchant-space-deal-profile" role="tabpanel">
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
 										Merchant Name :
@@ -1564,6 +1557,7 @@
 									</label>
 								</div>
 
+								<!-- 
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
 										E-Commerce Fullfillment :
@@ -1576,6 +1570,17 @@
 									</label>
 								</div>
 
+								<div class="form-row" v-show="singleMerchantDealData.e_commerce_fulfillment">
+									<label class="col-sm-6 col-form-label font-weight-bold text-right">
+										Sale :
+									</label>
+
+									<label class="col-sm-6 col-form-label">
+										{{ singleMerchantDealData.sale_percentage }} %
+									</label>
+								</div> 
+								-->
+
 								<div class="form-row">
 									<label class="col-sm-6 col-form-label font-weight-bold text-right">
 										Auto Renewal :
@@ -1585,16 +1590,6 @@
 										<span :class="[singleMerchantDealData.auto_renewal ? 'badge-warning' : 'badge-secondary', 'badge']">
 											{{ singleMerchantDealData.auto_renewal ? 'Enabled' : 'Disabled' }}
 										</span>
-									</label>
-								</div> 
-
-								<div class="form-row" v-show="singleMerchantDealData.e_commerce_fulfillment">
-									<label class="col-sm-6 col-form-label font-weight-bold text-right">
-										Sale :
-									</label>
-
-									<label class="col-sm-6 col-form-label">
-										{{ singleMerchantDealData.sale_percentage }} %
 									</label>
 								</div>
 
@@ -1609,7 +1604,7 @@
 								</div>
 							</div>
 
-							<div class="tab-pane" id="merchant-deal-spaces" role="tabpanel">
+							<div class="tab-pane" id="merchant-space-deal-spaces" role="tabpanel">
 								<div 
 									class="form-row" 
 									v-if="singleMerchantDealData.hasOwnProperty('warehouses') && Array.isArray(singleMerchantDealData.warehouses) && singleMerchantDealData.warehouses.length"
@@ -1809,23 +1804,23 @@
 								</div>
 							</div>
 
-							<div class="tab-pane" id="merchant-deal-instalments" role="tabpanel">
-								<div class="form-row" v-if="singleMerchantDealData.hasOwnProperty('instalments') && singleMerchantDealData.instalments.length">
+							<div class="tab-pane" id="merchant-space-deal-rents" role="tabpanel">
+								<div class="form-row" v-if="singleMerchantDealData.hasOwnProperty('rents') && singleMerchantDealData.rents.length">
 									<div 
 										class="accordion col-sm-12" 
-										id="deal-accordion-instalments"
-										v-for="(dealInstalment, dealInstalmentIndex) in singleMerchantDealData.instalments" :key="'merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id"
+										id="deal-accordion-rents"
+										v-for="(dealRent, dealRentIndex) in singleMerchantDealData.rents" :key="'merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id"
 									>
 										<div class="card">
-											<div class="card-header" :id="'heading-merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id">
+											<div class="card-header" :id="'heading-merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id">
 												<h2 class="mb-0">
-													<button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" :data-target="'#merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id" aria-expanded="true" :aria-controls="'merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id">
-														# Instalment {{ dealInstalmentIndex + 1 }}
+													<button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" :data-target="'#merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id" aria-expanded="true" :aria-controls="'merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id">
+														# Rent {{ dealRentIndex + 1 }}
 													</button>
 												</h2>
 											</div>
 
-											<div :id="'merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id" class="collapse show" :aria-labelledby="'heading-merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id" data-parent="#deal-accordion-instalments">
+											<div :id="'merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id" class="collapse show" :aria-labelledby="'heading-merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id" data-parent="#deal-accordion-rents">
 												<div class="card-body">
 													<div class="form-row">
 														<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1833,7 +1828,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.number_installment }}
+															{{ dealRent.number_installment }}
 														</label>
 													</div>
 
@@ -1843,7 +1838,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.date_from }}
+															{{ dealRent.date_from }}
 														</label>
 													</div>
 
@@ -1853,7 +1848,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.date_to }}
+															{{ dealRent.date_to }}
 														</label>
 													</div>
 
@@ -1863,7 +1858,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.total_rent + ' ' + general_settings.official_currency_name }}
+															{{ dealRent.total_rent + ' ' + general_settings.official_currency_name }}
 														</label>
 													</div>
 
@@ -1873,7 +1868,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.discount }} %
+															{{ dealRent.discount }} %
 														</label>
 													</div>
 
@@ -1884,7 +1879,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.previous_due + ' ' + general_settings.official_currency_name }}
+															{{ dealRent.previous_due + ' ' + general_settings.official_currency_name }}
 														</label>
 													</div> 
 													-->
@@ -1895,7 +1890,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.net_payable + ' ' + general_settings.official_currency_name }}
+															{{ dealRent.net_payable + ' ' + general_settings.official_currency_name }}
 														</label>
 													</div>
 
@@ -1905,7 +1900,7 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.total_paid_amount + ' ' + general_settings.official_currency_name }} 
+															{{ dealRent.total_paid_amount + ' ' + general_settings.official_currency_name }} 
 														</label>
 													</div>
 
@@ -1915,13 +1910,13 @@
 														</label>
 
 														<label class="col-sm-6 col-form-label">
-															{{ dealInstalment.current_due + ' ' + general_settings.official_currency_name }}
+															{{ (dealRent.net_payable - dealRent.total_paid_amount) + ' ' + general_settings.official_currency_name }}
 														</label>
 													</div>
 
 													<div 
 														class="form-row" 
-														v-if="dealInstalment.hasOwnProperty('rents') && dealInstalment.rents.length"
+														v-if="dealRent.hasOwnProperty('rents') && dealRent.rents.length"
 													>
 														<label class="col-sm-6 col-form-label font-weight-bold text-right">
 															Rents :
@@ -1938,8 +1933,8 @@
 
 																<tbody>
 																	<tr
-																		v-for="(rent, rentIndex) in dealInstalment.rents" 
-																		:key="'merchant-instalment-index-' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id + '-rent-index-' + rentIndex + '-rent-' + rent.id"
+																		v-for="(rent, rentIndex) in dealRent.rents" 
+																		:key="'merchant-rent-index-' + dealRentIndex + '-merchant-rent-' + dealRent.id + '-rent-index-' + rentIndex + '-rent-' + rent.id"
 																	>
 																		<td>
 																			{{ rent.dealt_space ? rent.dealt_space.name : 'NA' | capitalize }}
@@ -1956,7 +1951,7 @@
 
 													<div 
 														class="form-row" 
-														v-if="dealInstalment.hasOwnProperty('payments') && dealInstalment.payments.length"
+														v-if="dealRent.hasOwnProperty('payments') && dealRent.payments.length"
 													>
 														<label class="col-sm-6 col-form-label font-weight-bold text-right">
 															Payments :
@@ -1974,7 +1969,7 @@
 
 																<tbody>
 																	<tr
-																		v-for="(dealPayment, dealPaymentIndex) in dealInstalment.payments" :key="'merchant-instalment-index' + dealInstalmentIndex + '-merchant-instalment-' + dealInstalment.id + '-merchant-payment-index-' + dealPaymentIndex + '-merchant-payment-' + dealPayment.id"
+																		v-for="(dealPayment, dealPaymentIndex) in dealRent.payments" :key="'merchant-rent-index' + dealRentIndex + '-merchant-rent-' + dealRent.id + '-merchant-payment-index-' + dealPaymentIndex + '-merchant-payment-' + dealPayment.id"
 																	>
 																		<td>
 																			{{ dealPayment.invoice_no | capitalize }}
@@ -2173,8 +2168,8 @@
 
 	        		active : true,
 	        		auto_renewal : true, // Renting is normally auto-renewal
-	        		e_commerce_fulfillment : false,
-	        		sale_percentage : 0,
+	        		// e_commerce_fulfillment : false,
+	        		// sale_percentage : 0,
 	        		rent_period : {},
 	        		rent_period_id : null,
 					merchant_id : null,
@@ -2343,7 +2338,7 @@
 						},
 					],
 
-					instalments : [
+					rents : [
 						{
 							number_installment : 1,	
 							date_from : null,
@@ -2353,7 +2348,7 @@
 							discount : 0,	// percentage 
 							net_payable : 0,
 							paid_amount : 0,
-							current_due : 0,
+							// current_due : 0,
 							merchant_deal_id : null,
 							paid_at : null,
 							
@@ -2397,7 +2392,7 @@
 						}
 					],
 
-					instalment : {
+					rent : {
 						// discount : 'Discount cant be negative',
 						// paid_amount : 'Paid amount is required'
 					}
@@ -2425,23 +2420,6 @@
 
 					},
 
-					"E-Commerce": {
-						
-						field: "e_commerce_fulfillment",
-						
-						callback: (value) => {
-							
-							if (value) {
-								return 'Enabled';
-							}
-							else {
-								return 'Disabled';
-							}
-
-						},
-
-					},
-
 					"Renewal": {
 						
 						field: "auto_renewal",
@@ -2459,6 +2437,7 @@
 
 					},
 
+					/*
 					"Sale Percentage": {
 						
 						field: "sale_percentage",
@@ -2475,6 +2454,7 @@
 						},
 
 					},
+					*/
 
 					"Rent Package": {
 						
@@ -2585,11 +2565,11 @@
 
 					"Expiring Date" : {
 
-						field: "instalments",
+						field: "rents",
 						
-						callback: (instalments) => {
+						callback: (rents) => {
 
-							return instalments[instalments.length-1].date_to;
+							return rents[rents.length-1].date_to;
 
 						}
 
@@ -2598,15 +2578,15 @@
 					/*
 					Payments: {
 
-						field: "instalments",
+						field: "rents",
 
-						callback: (instalments) => {
+						callback: (rents) => {
 
-							if (instalments) {
+							if (rents) {
 								
 								var infosToReturn = '';
 
-								instalments.forEach(
+								rents.forEach(
 					
 									(dealPayment, dealPaymentIndex) => {
 
@@ -2873,7 +2853,7 @@
 				this.merchantAllDeals = [];
 				
 				axios
-					.get('/api/merchant-deals/' + this.merchant.id + '/' +  + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/merchant-space-deals/' + this.merchant.id + '/' +  + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// console.log(response);
@@ -3014,7 +2994,7 @@
     		showDealDetails(object) {		
 				// this.singleMerchantDealData = { ...object };
 				this.singleMerchantDealData = Object.assign({}, this.singleMerchantDealData, object);
-				$('#merchant-deal-view-modal').modal('show');
+				$('#merchant-space-deal-view-modal').modal('show');
 			},
 			showDealCreateForm() {
 
@@ -3028,8 +3008,8 @@
 
 	        		active : true,
 	        		auto_renewal : true, // Renting is normally auto-renewal
-	        		e_commerce_fulfillment : false,
-	        		sale_percentage : 0,
+	        		// e_commerce_fulfillment : false,
+	        		// sale_percentage : 0,
 	        		rent_period : {},
 	        		rent_period_id : null,
 					merchant_id : this.merchant.id,
@@ -3198,7 +3178,7 @@
 						},
 					],
 
-					instalments : [
+					rents : [
 						{
 							number_installment : 1,
 							date_from : this.today,
@@ -3208,7 +3188,7 @@
 							discount : 0,	// percentage 
 							net_payable : 0,
 							paid_amount : 0,
-							current_due : 0,
+							// current_due : 0,
 							// merchant_deal_id : null,
 							// paid_at : null,
 							rents : [
@@ -3251,7 +3231,7 @@
 						},
 					],
 
-					instalment : {
+					rent : {
 						// discount : 'Discount cant be negative',
 						// paid_amount : 'Paid amount is required'
 					}
@@ -3275,7 +3255,7 @@
 				this.errors = {
 
 					warehouses : [],
-					instalment : {}
+					rent : {}
 
 				};
 
@@ -3288,8 +3268,8 @@
 			openDealDeleteForm(object) {
 				this.singleMerchantDealData = object;
 
-				if (object.instalments.length > 1) {
-					this.$toastr.e("Deal has multiple instalments", "Error");
+				if (object.rents.length > 1) {
+					this.$toastr.e("Deal has multiple rents", "Error");
 					return;
 				}
 
@@ -3298,7 +3278,7 @@
 			goToDealPayments(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'deal-instalments', params: { merchantName:this.merchant.user_name.replace(/ /g,"-"), deal:object, dealId:object.id }});
+				this.$router.push({ name: 'space-deal-rents', params: { merchantName:this.merchant.user_name.replace(/ /g,"-"), deal:object, dealId:object.id }});
 
 			},
 			createMerchantDeal() {
@@ -3311,7 +3291,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.post('/merchant-deals/' + this.perPage, this.singleMerchantDealData)
+					.post('/merchant-space-deals/' + this.perPage, this.singleMerchantDealData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New deal has been stored", "Success");
@@ -3346,7 +3326,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.put('/merchant-deals/' + this.singleMerchantDealData.id + '/' + this.perPage, this.singleMerchantDealData)
+					.put('/merchant-space-deals/' + this.singleMerchantDealData.id + '/' + this.perPage, this.singleMerchantDealData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Deal has been updated", "Success");
@@ -3373,15 +3353,15 @@
 			},
 			deleteDeal(singleAssetData) {
 				
-				if (singleAssetData.instalments.length > 1) {
-					this.$toastr.e("Deal has multiple instalments", "Error");
+				if (singleAssetData.rents.length > 1) {
+					this.$toastr.e("Deal has multiple rents", "Error");
 					return;
 				}
 
 				this.formSubmitted = true;
 
 				axios
-					.delete('/merchant-deals/' + this.singleMerchantDealData.id + '/' + this.perPage, this.singleMerchantDealData)
+					.delete('/merchant-space-deals/' + this.singleMerchantDealData.id + '/' + this.perPage, this.singleMerchantDealData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Deal has been deleted", "Success");
@@ -3414,7 +3394,7 @@
 				this.searchAttributes.merchant_id = this.merchant.id;
 				
 				axios
-				.post('/search-merchant-deals/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post('/search-merchant-space-deals/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.merchantAllDeals = response.data.all.data;
 					this.pagination = response.data.all;
@@ -3430,7 +3410,7 @@
 				this.validateFormInput('paid_amount');
 				this.validateFormInput('number_installment');
 
-				if (this.errors.constructor === Object && Object.keys(this.errors.instalment).length < 1) {
+				if (this.errors.constructor === Object && Object.keys(this.errors.rent).length < 1) {
 
 					return true;
 				
@@ -3473,7 +3453,7 @@
 
 				else if (this.step == 1) {
 
-					this.validateFormInput('sale_percentage');
+					// this.validateFormInput('sale_percentage');
 
 					if (this.errors.constructor === Object && Object.keys(this.errors).length < 3) {
 
@@ -3534,7 +3514,7 @@
 			},
 			addWarehouseContainers(merchantWarehouseIndex, selectedSpaceIndex) {
 				
-				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.instalments.length < 2) {
+				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.rents.length < 2) {
 
 					if(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex) {
 
@@ -3558,7 +3538,7 @@
 			},
 			removeWarehouseContainers(merchantWarehouseIndex, selectedSpaceIndex) {
 				
-				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.instalments.length < 2) {
+				if(this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.errors.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.rents.length < 2) {
 
 					if(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.errors.warehouses[merchantWarehouseIndex].spaces.length > selectedSpaceIndex && this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[selectedSpaceIndex])){
 
@@ -3577,13 +3557,13 @@
 			},
 			addWarehouseSpace(merchantWarehouseIndex) {
 
-				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].hasOwnProperty('spaces') && this.errors.warehouses.length > merchantWarehouseIndex && this.errors.warehouses[merchantWarehouseIndex].hasOwnProperty('spaces') && this.singleMerchantDealData.instalments.length < 2) {
+				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].hasOwnProperty('spaces') && this.errors.warehouses.length > merchantWarehouseIndex && this.errors.warehouses[merchantWarehouseIndex].hasOwnProperty('spaces') && this.singleMerchantDealData.rents.length < 2) {
 
 					// const expectedWarehouse = (warehouse) => warehouse.id == this.singleMerchantDealData.warehouses[merchantWarehouseIndex].id && warehouse.name == this.singleMerchantDealData.warehouses[merchantWarehouseIndex].name;
 
 					// let warehouseIndex = this.allWarehouseSpaces.findIndex(expectedWarehouse);
 
-					// if (warehouseIndex > -1 && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length < (Object.keys(this.allWarehouseSpaces[warehouseIndex]).length - 2) && this.singleMerchantDealData.instalments.length < 2) {
+					// if (warehouseIndex > -1 && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length < (Object.keys(this.allWarehouseSpaces[warehouseIndex]).length - 2) && this.singleMerchantDealData.rents.length < 2) {
 
 						this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.push( {} );
 						this.errors.warehouses[merchantWarehouseIndex].spaces.push( {} );
@@ -3597,7 +3577,7 @@
 			},
 			removeWarehouseSpace(merchantWarehouseIndex) {
 					
-				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > 0 && this.singleMerchantDealData.instalments.length < 2 && this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])) {
+				if (this.singleMerchantDealData.warehouses.length > merchantWarehouseIndex && this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length > 0 && this.singleMerchantDealData.rents.length < 2 && this.removableSpace(this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces[this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.length-1])) {
 					
 					this.singleMerchantDealData.warehouses[merchantWarehouseIndex].spaces.pop();
 
@@ -3645,7 +3625,7 @@
 
 				}
 
-				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && ! this.errorInWarehousesArray(this.errors.warehouses) && this.singleMerchantDealData.warehouses.length < this.availableWarehouseSpaces.length && this.singleMerchantDealData.instalments.length < 2) {
+				if (this.errors.constructor === Object && Object.keys(this.errors).length < 3 && ! this.errorInWarehousesArray(this.errors.warehouses) && this.singleMerchantDealData.warehouses.length < this.availableWarehouseSpaces.length && this.singleMerchantDealData.rents.length < 2) {
 
 					this.singleMerchantDealData.warehouses.push({});
 					this.errors.warehouses.push({ spaces : [ {} ] });
@@ -3655,7 +3635,7 @@
 			},
 			removeWarehouse() {
 					
-				if (this.singleMerchantDealData.warehouses.length > 1 && this.singleMerchantDealData.instalments.length < 2) {
+				if (this.singleMerchantDealData.warehouses.length > 1 && this.singleMerchantDealData.rents.length < 2) {
 
 					this.singleMerchantDealData.warehouses.pop();
 					this.errors.warehouses.pop();
@@ -3682,7 +3662,7 @@
 
 				};
 
-				return merchantDeal.instalments.length < 2 && ! merchantDeal.warehouses.some(warehouseIsEngaged)
+				return merchantDeal.rents.length < 2 && ! merchantDeal.warehouses.some(warehouseIsEngaged)
 
 			},
 			immutableWarehouse(merchantWarehouse) {
@@ -4452,7 +4432,7 @@
 									}
 								);
 
-								totalRent = totalRent * this.singleMerchantDealData.instalments[0].number_installment;
+								totalRent = totalRent * this.singleMerchantDealData.rents[0].number_installment;
 
 							}
 							else {
@@ -4469,12 +4449,12 @@
 
 				this.changeRentExpiryDate();
 				
-				this.singleMerchantDealData.instalments[0].total_rent = totalRent - (totalRent * this.singleMerchantDealData.instalments[0].discount / 100);
+				this.singleMerchantDealData.rents[0].total_rent = totalRent - (totalRent * this.singleMerchantDealData.rents[0].discount / 100);
 
 			},
 			setNetPayable() {
 
-				this.singleMerchantDealData.instalments[0].net_payable = this.singleMerchantDealData.instalments[this.singleMerchantDealData.instalments.length-1].previous_due + this.singleMerchantDealData.instalments[this.singleMerchantDealData.instalments.length-1].total_rent;
+				this.singleMerchantDealData.rents[0].net_payable = this.singleMerchantDealData.rents[this.singleMerchantDealData.rents.length-1].previous_due + this.singleMerchantDealData.rents[this.singleMerchantDealData.rents.length-1].total_rent;
 
 			},
 			resetTotalRent() {
@@ -4482,7 +4462,7 @@
 				this.validateFormInput('discount');
 				this.validateFormInput('number_installment');
 				
-				if (! this.errors.instalment.discount && ! this.errors.instalment.number_installment) {
+				if (! this.errors.rent.discount && ! this.errors.rent.number_installment) {
 
 					this.setTotalRent();
 					this.setNetPayable();	
@@ -4516,11 +4496,11 @@
 
 				var moment = require('moment');
 
-				let daysToIncrease = this.singleMerchantDealData.instalments[0].number_installment * this.singleMerchantDealData.rent_period.number_days;
+				let daysToIncrease = this.singleMerchantDealData.rents[0].number_installment * this.singleMerchantDealData.rent_period.number_days;
 
-				this.singleMerchantDealData.instalments[0].date_from = moment(this.singleMerchantDealData.instalments[0].date_from).format('YYYY-MM-DD');
+				this.singleMerchantDealData.rents[0].date_from = moment(this.singleMerchantDealData.rents[0].date_from).format('YYYY-MM-DD');
 
-				this.singleMerchantDealData.instalments[0].date_to = moment(this.singleMerchantDealData.instalments[0].date_from).add(daysToIncrease, 'days').format('YYYY-MM-DD');
+				this.singleMerchantDealData.rents[0].date_to = moment(this.singleMerchantDealData.rents[0].date_from).add(daysToIncrease, 'days').format('YYYY-MM-DD');
 				
 				
 			},
@@ -4535,6 +4515,7 @@
 
 				switch(formInputName) {
 
+					/*
 					case 'sale_percentage' :
 
 						if(this.singleMerchantDealData.e_commerce_fulfillment && (this.singleMerchantDealData.sale_percentage < 0 || this.singleMerchantDealData.sale_percentage > 100)){
@@ -4549,6 +4530,7 @@
 						}
 
 						break;
+					*/
 
 					case 'rent_period' :
 
@@ -4847,15 +4829,15 @@
 
 					case 'paid_amount' : 
 						
-						if(this.createMode && (! this.singleMerchantDealData.instalments || ! this.singleMerchantDealData.instalments[0].paid_amount || this.singleMerchantDealData.instalments[0].paid_amount < 1)){
+						if(! this.singleMerchantDealData.rents || ! this.singleMerchantDealData.rents[0].paid_amount || this.singleMerchantDealData.rents[0].paid_amount < 1){
 							
-							this.errors.instalment.paid_amount = 'Paid amount is required';
+							this.errors.rent.paid_amount = 'Paid amount is required';
 
 						}
 						else {
 
 							this.submitForm = true;
-							this.$delete(this.errors.instalment, 'paid_amount');
+							this.$delete(this.errors.rent, 'paid_amount');
 
 						}
 
@@ -4863,14 +4845,14 @@
 
 					case 'discount' : 
 						
-						if(this.singleMerchantDealData.instalments && this.singleMerchantDealData.instalments[0].discount && (this.singleMerchantDealData.instalments[0].discount < 0 || this.singleMerchantDealData.instalments[0].discount > 100)){
+						if(this.singleMerchantDealData.rents && this.singleMerchantDealData.rents[0].discount && (this.singleMerchantDealData.rents[0].discount < 0 || this.singleMerchantDealData.rents[0].discount > 100)){
 
-							this.errors.instalment.discount = 'Rate should be between 0 to 100';
+							this.errors.rent.discount = 'Rate should be between 0 to 100';
 						}
 						else {
 
 							this.submitForm = true;
-							this.$delete(this.errors.instalment, 'discount');
+							this.$delete(this.errors.rent, 'discount');
 
 						}
 
@@ -4878,14 +4860,14 @@
 
 					case 'number_installment' : 
 						
-						if(this.singleMerchantDealData.instalments && (! this.singleMerchantDealData.instalments[0].number_installment || this.singleMerchantDealData.instalments[0].number_installment < 1)){
+						if(this.singleMerchantDealData.rents && (! this.singleMerchantDealData.rents[0].number_installment || this.singleMerchantDealData.rents[0].number_installment < 1)){
 
-							this.errors.instalment.number_installment = 'Number should be positive';
+							this.errors.rent.number_installment = 'Number should be positive';
 						}
 						else {
 
 							this.submitForm = true;
-							this.$delete(this.errors.instalment, 'number_installment');
+							this.$delete(this.errors.rent, 'number_installment');
 
 						}
 

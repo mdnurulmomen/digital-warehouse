@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class DealInstalmentCollection extends ResourceCollection
+class MerchantSpaceDealCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -16,7 +16,7 @@ class DealInstalmentCollection extends ResourceCollection
     {
         return [
             'current_page' => $this->currentPage(),
-            'data'=> DealInstalmentResource::collection($this->collection),
+            'data'=> MerchantSpaceDealResource::collection($this->collection),
             'first_page_url'=> $this->url(1),
             'from'=> $this->firstItem(),
             'last_page'=> $this->lastPage(),

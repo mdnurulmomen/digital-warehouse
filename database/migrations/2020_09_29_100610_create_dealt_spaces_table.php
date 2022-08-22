@@ -25,7 +25,7 @@ class CreateDealtSpacesTable extends Migration
             // $table->float('engaged', $precision = 2, $scale = 1)->default(0);  // 1 for full, .5 for partial
             // $table->unsignedSmallInteger('warehouse_id');
             $table->unsignedMediumInteger('warehouse_container_id');
-            $table->unsignedInteger('merchant_deal_id');
+            $table->unsignedInteger('merchant_space_deal_id');
             // $table->unsignedInteger('merchant_payment_id');
         });
     }

@@ -928,7 +928,7 @@
 	                // 'Product-Category',  // Product-Asset
 	            	// 'Product-Manufacturer',  // Product-Asset
 	            	// 'WarehouseDeliveryCompany'
-	                'Merchant-Deal',
+	                'Merchant-Space-Deal',
 	                'Merchant-Product',
 	                'Merchant-Payment',
 	            ],
@@ -1557,7 +1557,7 @@
 
 				}
 
-				else if (permissionRefName === 'create-merchant-deal' || permissionRefName === 'update-merchant-deal') {
+				else if (permissionRefName === 'create-merchant-space-deal' || permissionRefName === 'update-merchant-space-deal') {
 
 					if (! this.$refs['view-merchant-index'][0].checked) {
 

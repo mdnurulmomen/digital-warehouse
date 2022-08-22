@@ -246,26 +246,26 @@ Route::name('admin.')->group(function () {
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches.store');
 		// Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
-		// merchant-deals
-		Route::get('/api/merchant-deals/{merchant}/{perPage?}','DealController@showMerchantAllDeals')->name('merchant-deals.index');
-		Route::post('/merchant-deals/{perPage}','DealController@storeMerchantDeal')->name('merchant-deals.store');	
-		Route::put('/merchant-deals/{deal}/{perPage}','DealController@updateMerchantDeal')->name('merchant-deals.update');	
-		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals.delete');
-		Route::post('/search-merchant-deals/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
+		// merchant-space-deals
+		Route::get('/api/merchant-space-deals/{merchant}/{perPage?}','DealController@showMerchantAllSpaceDeals')->name('merchant-space-deals.index');
+		Route::post('/merchant-space-deals/{perPage}','DealController@storeMerchantSpaceDeal')->name('merchant-space-deals.store');	
+		Route::put('/merchant-space-deals/{deal}/{perPage}','DealController@updateMerchantSpaceDeal')->name('merchant-space-deals.update');	
+		Route::delete('/merchant-space-deals/{deal}/{perPage}','DealController@deleteMerchantSpaceDeal')->name('merchant-space-deals.delete');
+		Route::post('/search-merchant-space-deals/{perPage}','DealController@searchMerchantAllSpaceDeals')->name('search-merchant-space-deals');
 
-		// deal-instalments
-		Route::get('/api/deal-instalments/{deal}/{perPage?}', 'DealController@showDealAllInstalments')->name('deal-instalments.index');
-		Route::post('/deal-instalments/{perPage}', 'DealController@storeDealNewInstalment')->name('deal-instalments.store');	
-		Route::put('/deal-instalments/{instalment}/{perPage}', 'DealController@updateDealInstalment')->name('deal-instalments.update');	
-		Route::delete('/deal-instalments/{instalment}/{perPage}', 'DealController@deleteDealInstalment')->name('deal-instalments.delete');
-		Route::post('/api/search-deal-instalments/{perPage}', 'DealController@searchDealAllInstalments')->name('search-deal-instalments');
+		// deal-rents
+		Route::get('/api/deal-rents/{deal}/{perPage?}', 'DealController@showDealAllRents')->name('deal-rents.index');
+		Route::post('/deal-rents/{perPage}', 'DealController@storeDealNewRent')->name('deal-rents.store');	
+		Route::put('/deal-rents/{rent}/{perPage}', 'DealController@updateDealRent')->name('deal-rents.update');	
+		Route::delete('/deal-rents/{rent}/{perPage}', 'DealController@deleteDealRent')->name('deal-rents.delete');
+		Route::post('/api/search-deal-rents/{perPage}', 'DealController@searchDealAllRents')->name('search-deal-rents');
 
-		// instalment-payments
-		Route::get('/api/instalment-payments/{instalment}/{perPage?}', 'DealController@showInstalmentAllPayments')->name('instalment-payments.index');
-		Route::post('/instalment-payments/{perPage}', 'DealController@storeInstalmentNewPayment')->name('instalment-payments.store');	
-		Route::put('/instalment-payments/{payment}/{perPage}', 'DealController@updateInstalmentPayment')->name('instalment-payments.update');	
-		Route::delete('/instalment-payments/{payment}/{perPage}', 'DealController@deleteInstalmentPayment')->name('instalment-payments.delete');
-		Route::post('/api/search-instalment-payments/{perPage}', 'DealController@searchInstalmentAllPayments')->name('search-instalment-payments');
+		// rental-payments
+		Route::get('/api/rental-payments/{rental}/{perPage?}', 'DealController@showRentalAllPayments')->name('rental-payments.index');
+		Route::post('/rental-payments/{perPage}', 'DealController@storeRentalNewPayment')->name('rental-payments.store');	
+		Route::put('/rental-payments/{payment}/{perPage}', 'DealController@updateRentalPayment')->name('rental-payments.update');	
+		Route::delete('/rental-payments/{payment}/{perPage}', 'DealController@deleteRentalPayment')->name('rental-payments.delete');
+		Route::post('/api/search-rental-payments/{perPage}', 'DealController@searchRentalAllPayments')->name('search-rental-payments');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions.index');

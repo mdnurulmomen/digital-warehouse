@@ -35,9 +35,9 @@ class PermissionSeeder extends Seeder
                 // 'Product-Category',  // Product-Asset
             	// 'Product-Manufacturer',  // Product-Asset
             	// 'WarehouseDeliveryCompany'
-                'Merchant-Deal',
                 'Merchant-Product',
                 'Merchant-Payment',
+                'Merchant-Space-Deal',
             ];
 
             // EveryOne can view logistics

@@ -63,7 +63,7 @@ class Merchant extends Authenticatable
     
     public function deals()
     {
-        return $this->hasMany(MerchantDeal::class, 'merchant_id', 'id');
+        return $this->hasMany(MerchantSpaceDeal::class, 'merchant_id', 'id');
     }
 
     public function products()

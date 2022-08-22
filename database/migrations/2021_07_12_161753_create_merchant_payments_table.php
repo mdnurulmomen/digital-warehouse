@@ -20,9 +20,9 @@ class CreateMerchantPaymentsTable extends Migration
             $table->unsignedMediumInteger('paid_amount')->default(0); // paid rent of total_rent
             $table->mediumInteger('current_due')->default(0); // past due amount
             $table->timestamp('paid_at')->useCurrent();
-            $table->unsignedInteger('merchant_deal_instalment_id');
             $table->morphs('issuer');
             $table->nullableMorphs('updater');
+            $table->unsignedInteger('merchant_rent_id');
         });
     }
 

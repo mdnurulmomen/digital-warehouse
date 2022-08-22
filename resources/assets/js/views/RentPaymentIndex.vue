@@ -4,7 +4,7 @@
 		<breadcrumb 
 			:icon="'payments'"
 			:title="'payment'" 
-			:message="('All payments of ' + merchantName + ' for the instalment ' + (instalment.name ? instalment.name : ''))"
+			:message="('All payments of ' + merchantName + ' for the rent ' + (rent.name ? rent.name : ''))"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -427,7 +427,11 @@
 								    					</div>
 								    				</div>
 
-								    				<div class="invalid-feedback">
+								    				<div 
+								    					class="invalid-feedback" 
+								    					style="display:block;" 
+								    					v-show="errors.paid_amount" 
+								    				>
 												    	{{ errors.paid_amount }}
 												    </div>
 												</div>
@@ -694,28 +698,28 @@
 					<div class="form-row">
 						<!-- 
 						<label class="col-sm-12 col-form-label font-weight-bold">
-							Instalment Summery
+							Rent Summery
 						</label> 
 						-->
 
 						<div class="col-6">
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold">
-									Instalment
+									Rent :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.name | capitalize }}
+									{{ rent.name | capitalize }}
 								</label>
 							</div>
 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold">
-									# Instalment:
+									# Installments :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.number_installment }}
+									{{ rent.number_installment }}
 								</label>
 							</div>
 
@@ -725,7 +729,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.date_from }}
+									{{ rent.date_from }}
 								</label>
 							</div>
 
@@ -735,7 +739,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.date_to }}
+									{{ rent.date_to }}
 								</label>
 							</div>
 
@@ -745,7 +749,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.total_rent }} 
+									{{ rent.total_rent }} 
 									{{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
@@ -758,7 +762,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.discount }}%
+									{{ rent.discount }}%
 								</label>
 							</div>
 
@@ -768,7 +772,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ instalment.net_payable }} 
+									{{ rent.net_payable }} 
 									{{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
@@ -795,7 +799,7 @@
 
 								<label class="col-6 col-form-label">
 									{{ 
-										(instalment.net_payable -  dealAllPayments.reduce((accumulator, object) => {
+										(rent.net_payable -  dealAllPayments.reduce((accumulator, object) => {
 										  	return accumulator + object.paid_amount;
 										}, 0))
 									}} 
@@ -878,7 +882,7 @@
 		paid_amount : 0,
 		current_due : 0,
 		// paid_at : null,
-		// merchant_deal_instalment_id : null,
+		// merchant_rent_id : null,
 
     };
 
@@ -890,7 +894,7 @@
 
 		props: {
 
-			instalment:{
+			rent:{
 				type: Object,
 				required: true,
 			},
@@ -1114,7 +1118,7 @@
 				// this.allFetchedContents = [];
 				
 				axios
-					.get('/api/instalment-payments/' + this.instalment.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/rental-payments/' + this.rent.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// this.allFetchedContents = response.data;
@@ -1153,7 +1157,7 @@
 				this.dealtSpacesAndRents = [];
 				
 				axios
-					.get('/api/instalment-payments/' + this.instalment.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/rental-payments/' + this.rent.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.dealtSpacesAndRents = response.data;
@@ -1190,9 +1194,9 @@
 
 				this.dealTotalCurrentRent = 0;
 				
-				if (this.instalment.warehouses.length > 0) {
+				if (this.rent.warehouses.length > 0) {
 
-					this.instalment.warehouses.forEach(
+					this.rent.warehouses.forEach(
 						(merchantWarehouse, merchantWarehouseIndex) => {
 							merchantWarehouse.spaces.forEach(
 								(warehouseSpace, warehouseSpaceIndex) => {
@@ -1235,10 +1239,10 @@
 				this.dealAllPayments = [];
 				// this.allFetchedContents = [];
 				// this.pagination.current_page = 1;
-				this.searchAttributes.merchant_deal_instalment_id = this.instalment.id;
+				this.searchAttributes.merchant_rent_id = this.rent.id;
 				
 				axios
-				.post("/api/search-instalment-payments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post("/api/search-rental-payments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
 					this.dealAllPayments = response.data.all.data;
@@ -1266,9 +1270,9 @@
 
 					// previous_due : 0,
 					paid_amount : 0,
-					current_due : this.instalment.current_due,
+					current_due : this.rent.current_due,
 					// paid_at : null,
-					merchant_deal_instalment_id : this.instalment.id,
+					merchant_rent_id : this.rent.id,
 
 				};
 
@@ -1306,7 +1310,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.post('/instalment-payments/' + this.perPage, this.singlePaymentData)
+					.post('/rental-payments/' + this.perPage, this.singlePaymentData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New payment has been added", "Success");
@@ -1344,7 +1348,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.put('/instalment-payments/' + this.singlePaymentData.id + '/' + this.perPage, this.singlePaymentData)
+					.put('/rental-payments/' + this.singlePaymentData.id + '/' + this.perPage, this.singlePaymentData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Payment has been updated", "Success");
@@ -1373,7 +1377,7 @@
 			deleteAsset(singlePaymentData) {
 				
 				axios
-					.delete('/instalment-payments/' + singlePaymentData.id + '/' + this.perPage)
+					.delete('/rental-payments/' + singlePaymentData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Payment has been deleted", "Success");
@@ -1411,7 +1415,7 @@
 			},
 			setDealAllPayments() {
 
-				this.dealAllPayments = this.instalment.payments;
+				this.dealAllPayments = this.rent.payments;
 
 			},
             changeNumberContents() {
@@ -1452,7 +1456,7 @@
 
 				var moment = require('moment');
 
-				let daysToIncrease = this.singlePaymentData.number_installment * this.instalment.rent_period.number_days;
+				let daysToIncrease = this.singlePaymentData.number_installment * this.rent.rent_period.number_days;
 
 				this.singlePaymentData.date_from = moment(this.singlePaymentData.date_from).format('YYYY-MM-DD');
 
@@ -1641,7 +1645,7 @@
 
 					case 'paid_amount' : 
 						
-						if(this.singlePaymentData.paid_amount && this.singlePaymentData.paid_amount < 1){
+						if(! this.singlePaymentData.paid_amount || this.singlePaymentData.paid_amount < 1){
 							
 							this.errors.paid_amount = 'Invalid amount';
 

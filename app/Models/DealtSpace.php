@@ -32,7 +32,7 @@ class DealtSpace extends Model
 
     public function deal()
     {
-        return $this->belongsTo(MerchantDeal::class, 'merchant_deal_id', 'id');
+        return $this->belongsTo(MerchantSpaceDeal::class, 'merchant_space_deal_id', 'id');
     }
 
     public function rents()

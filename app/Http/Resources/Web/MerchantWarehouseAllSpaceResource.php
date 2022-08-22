@@ -42,7 +42,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                 $this->containerStatuses()->whereHas('deals', function ($query1) {
                     $query1->whereHas('deal', function ($query2) {
                         $query2->where('merchant_id', self::$merchant)
-                        ->whereHas('instalments', function ($query3) {
+                        ->whereHas('rents', function ($query3) {
                             $query3->whereDate('date_to', '>=', today());
                         });
                     });
@@ -56,7 +56,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                     $query->whereHas('deals', function ($query1) {
                         $query1->whereHas('deal', function ($query2) {
                             $query2->where('merchant_id', self::$merchant)
-                            ->whereHas('instalments', function ($query3) {
+                            ->whereHas('rents', function ($query3) {
                                 $query3->whereDate('date_to', '>=', today());
                             });
                         });
@@ -67,7 +67,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                     $query1->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
                             $query3->where('merchant_id', self::$merchant)
-                            ->whereHas('instalments', function ($query4) {
+                            ->whereHas('rents', function ($query4) {
                                 $query4->whereDate('date_to', '>=', today());
                             });
                         });
@@ -80,7 +80,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 $query->whereHas('parentContainer.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query3) {
+                                        ->whereHas('rents', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -88,7 +88,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 ->orWhereHas('deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
                                         $query3->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query4) {
+                                        ->whereHas('rents', function ($query4) {
                                             $query4->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -102,7 +102,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 $query->whereHas('parentShelf.parentContainer.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query3) {
+                                        ->whereHas('rents', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -110,7 +110,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 ->orWhereHas('parentShelf.deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
                                         $query3->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query4) {
+                                        ->whereHas('rents', function ($query4) {
                                             $query4->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -126,7 +126,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                     $query->whereHas('deals', function ($query1) {
                         $query1->whereHas('deal', function ($query2) {
                             $query2->where('merchant_id', self::$merchant)
-                            ->whereHas('instalments', function ($query3) {
+                            ->whereHas('rents', function ($query3) {
                                 $query3->whereDate('date_to', '>=', today());
                             });
                         });
@@ -136,7 +136,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                     $query1->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
                             $query3->where('merchant_id', self::$merchant)
-                            ->whereHas('instalments', function ($query4) {
+                            ->whereHas('rents', function ($query4) {
                                 $query4->whereDate('date_to', '>=', today());
                             });
                         });
@@ -146,7 +146,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                     $query1->whereHas('deals', function ($query2) {
                         $query2->whereHas('deal', function ($query3) {
                             $query3->where('merchant_id', self::$merchant)
-                            ->whereHas('instalments', function ($query4) {
+                            ->whereHas('rents', function ($query4) {
                                 $query4->whereDate('date_to', '>=', today());
                             });
                         });
@@ -160,7 +160,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                     $query2->whereHas('deals', function ($query3) {
                                         $query3->whereHas('deal', function ($query4) {
                                             $query4->where('merchant_id', self::$merchant)
-                                            ->whereHas('instalments', function ($query5) {
+                                            ->whereHas('rents', function ($query5) {
                                                 $query5->whereDate('date_to', '>=', today());
                                             });
                                         });
@@ -168,7 +168,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                     ->orWhereHas('parentShelf.deals', function ($query1) {
                                         $query1->whereHas('deal', function ($query2) {
                                             $query2->where('merchant_id', self::$merchant)
-                                            ->whereHas('instalments', function ($query3) {
+                                            ->whereHas('rents', function ($query3) {
                                                 $query3->whereDate('date_to', '>=', today());
                                             });
                                         });
@@ -176,7 +176,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                     ->orWhereHas('parentShelf.parentContainer.deals', function ($query1) {
                                         $query1->whereHas('deal', function ($query2) {
                                             $query2->where('merchant_id', self::$merchant)
-                                            ->whereHas('instalments', function ($query3) {
+                                            ->whereHas('rents', function ($query3) {
                                                 $query3->whereDate('date_to', '>=', today());
                                             });
                                         });
@@ -191,7 +191,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 $query->whereHas('deals', function ($query2) {
                                     $query2->whereHas('deal', function ($query3) {
                                         $query3->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query4) {
+                                        ->whereHas('rents', function ($query4) {
                                             $query4->whereDate('date_to', '>=', now());
                                         });
                                     });
@@ -199,7 +199,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 ->orWhereHas('parentShelf.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query3) {
+                                        ->whereHas('rents', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });
@@ -207,7 +207,7 @@ class MerchantWarehouseAllSpaceResource extends JsonResource
                                 ->orWhereHas('parentShelf.parentContainer.deals', function ($query1) {
                                     $query1->whereHas('deal', function ($query2) {
                                         $query2->where('merchant_id', self::$merchant)
-                                        ->whereHas('instalments', function ($query3) {
+                                        ->whereHas('rents', function ($query3) {
                                             $query3->whereDate('date_to', '>=', today());
                                         });
                                     });

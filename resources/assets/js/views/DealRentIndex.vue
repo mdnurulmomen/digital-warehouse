@@ -2,9 +2,9 @@
 <template v-if="userHasPermissionTo('view-merchant-payment-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'payments'"
-			:title="'installment'" 
-			:message="('All installments of ' + merchantName + ' for the deal ' + (deal.name ? deal.name : ''))"
+			:icon="'deal-rents'"
+			:title="'rent'" 
+			:message="('All rents of ' + merchantName + ' for the deal ' + (deal.name ? deal.name : ''))"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -51,10 +51,10 @@
 										  					<div class="dropdown-menu">
 									  							<download-excel 
 													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
-																	:data="dealAllInstalments"
+																	:data="dealAllRents"
 																	:fields="dataToExport" 
 																	worksheet="Payments sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-installments-' : ('installments-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-rents-' : ('rents-list-')) + today + '-page-' + pagination.current_page + '.xls'"
 													  			>
 													  				Excel
 																</download-excel>
@@ -63,7 +63,7 @@
 										  						<download-excel 
 										  							type="csv"
 													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item disabled"
-																	:data="dealAllInstalments"
+																	:data="dealAllRents"
 																	:fields="dataToExport" 
 																	worksheet="Payments sheet"
 																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-payments-' : (currentTab + '-payments-list-')) + today + '-page-' + pagination.current_page + '.xls'"
@@ -120,7 +120,7 @@
 																		href="javascript:void(0)"
 																		class="nav-link p-0" 
 																		data-toggle="modal" 
-																		data-target="#instalment-custom-search"
+																		data-target="#rent-custom-search"
 																		:class="{ 'active': Object.keys(searchAttributes.dates).length > 0 }"
 																	>
 																		<i class="fa fa-ellipsis-v fa-lg p-2"></i>
@@ -155,9 +155,9 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('instalments')"
+																			@click="changeIntegersOrder('rents')"
 																		> 
-																			# Installments
+																			# Rents
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -270,9 +270,9 @@
 
 															<tbody>
 																<tr 
-																	v-for="(content, contentIndex) in dealAllInstalments" 
+																	v-for="(content, contentIndex) in dealAllRents" 
 																	:key="'content-key-' + contentIndex + '-content-' + content.id" 
-																	:class="content.id==singleInstalmentData.id ? 'highlighted' : ''"
+																	:class="content.id==singleRentData.id ? 'highlighted' : ''"
 																>
 																	<td>
 																		{{ content.number_installment || 0 }}
@@ -333,13 +333,13 @@
 																				v-tooltip.bottom-end="'Partial Payments'" 
 																				@click="goToPartialPayments(content)"  
 																		>
-																			<i class="fa fa-history"></i>
+																			<i class="fa fa-money" aria-hidden="true"></i>
 																		</button>
 																	</td>
 																</tr>
 
 																<tr 
-															  		v-show="! dealAllInstalments || ! dealAllInstalments.length"
+															  		v-show="! dealAllRents || ! dealAllRents.length"
 															  	>
 														    		<td colspan="7">
 															      		<div class="alert alert-danger" role="alert">
@@ -519,12 +519,12 @@
 		</div>
 
 	 	<!--Create, Edit or Approve Modal -->
-		<div class="modal fade" id="merchant-instalment-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-payment') || userHasPermissionTo('update-merchant-payment')">
+		<div class="modal fade" id="merchant-rent-createOrEdit-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" v-if="userHasPermissionTo('create-merchant-payment') || userHasPermissionTo('update-merchant-payment')">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">
-							{{ createMode ? 'Create New ' : 'Update ' }} {{ createMode ? '' : singleInstalmentData.name | capitalize }} Instalment
+							{{ createMode ? 'Make New ' : 'Update Rent ' }} {{ createMode ? 'Rent' : singleRentData.name | capitalize }} 
 						</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
@@ -533,7 +533,7 @@
 						
 					<form 	
 						class="form-horizontal" 
-						v-on:submit.prevent="createMode ? createDealInstalment() : updateDealInstalment()" 
+						v-on:submit.prevent="createMode ? createDealRent() : updateDealRent()" 
 						autocomplete="off" 
 						novalidate="true" 
 					>
@@ -636,15 +636,15 @@
 																						<thead>
 																							<tr>
 																								<th>Container</th>
-																								<th>Shelves</th>
+																								<th>Shelf</th>
 																								<th>Rent</th>
 																							</tr>
 																						</thead>
 
 																						<tbody>
 																							<tr
-																								v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
-																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
+																								v-for="(warehouseShelf, warehouseShelfIndex) in warehouseSpace.container.shelves" 
+																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-shelf-index-' + warehouseShelfIndex + '-id-' + warehouseShelf.id"
 																							>
 																								<td>
 																									{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
@@ -653,7 +653,11 @@
 																								</td>
 																								
 																								<td>
-																									<ul 
+																									<!-- {{ warehouseShelf.name | capitalize }} -->
+
+																									{{ warehouseShelf.name ? warehouseShelf.name.substring(warehouseShelf.name.lastIndexOf("-")+1) : 'NA' }}
+
+																									<!-- <ul 
 																										id="shelf-addresses"
 																										v-if="warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length"
 																									>
@@ -665,7 +669,7 @@
 																											{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
 																											
 																										</li>
-																									</ul>
+																									</ul> -->
 																								</td>
 
 																								<td>
@@ -682,7 +686,7 @@
 
 																		<div 
 																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
+																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf')  && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
 																		>
 																			<div class="card-header text-center">Units</div>
 
@@ -693,15 +697,15 @@
 																							<tr>
 																								<th>Container</th>
 																								<th>Shelf</th>
-																								<th>Units</th>
+																								<th>Unit</th>
 																								<th>Rent</th>
 																							</tr>
 																						</thead>
 
 																						<tbody>
 																							<tr
-																								v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
-																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
+																								v-for="(unitAddress, unitAddressIndex) in warehouseSpace.container.shelf.units" 
+																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-unit-index-' + unitAddressIndex + '-id-' + unitAddress.id"
 																							>
 																								<td>
 																									{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
@@ -714,6 +718,7 @@
 																								</td>
 
 																								<td>
+																									<!-- 
 																									<ul 
 																										id="unit-addresses"
 																										v-if="warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length"
@@ -726,7 +731,11 @@
 																											{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
 																											
 																										</li>
-																									</ul>
+																									</ul> 
+																									-->
+
+																									{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
+																									
 																								</td>
 
 																								<td>
@@ -798,13 +807,13 @@
 
 												<div class="form-row">
 													<div class="form-group col-md-6">
-														<label for="inputFirstName">Current Rent / Instalment</label>
+														<label for="inputFirstName">Current Rent / Rent</label>
 														<div class="input-group">
 															<input 
 																type="text" 
 																class="form-control" 
 																required="true" 
-																v-model="dealTotalCurrentRent" 
+																v-model="dealTotalCurspaceRent" 
 																:readonly="true"
 																aria-label="Amount Per Installment" 
 															>
@@ -819,7 +828,7 @@
 														<div class="input-group mb-1">
 															<input type="number" 
 																class="form-control" 
-																v-model.number="singleInstalmentData.number_installment" 
+																v-model.number="singleRentData.number_installment" 
 																placeholder="Number Installment" 
 																required="true" 
 																:min="1" 
@@ -841,7 +850,7 @@
 														<label for="inputFirstName">Issue From</label>
 														<div class="date">
 															<datepicker 
-																v-model="singleInstalmentData.date_from" 
+																v-model="singleRentData.date_from" 
 																:initialView="'month'"
 																:minimumView="'day'" 
 																:maximumView="'year'" 
@@ -857,7 +866,7 @@
 														<label for="inputFirstName">Expired at</label>
 														<div class="date">
 															<datepicker 
-																v-model="singleInstalmentData.date_to" 
+																v-model="singleRentData.date_to" 
 																:disabled="true"
 															>	
 															</datepicker>
@@ -875,7 +884,7 @@
 									    					<input type="number" 
 																class="form-control is-valid" 
 																required="true" 
-																v-model.number="singleInstalmentData.total_rent" 
+																v-model.number="singleRentData.total_rent" 
 																placeholder="Total Rent" 
 																:readonly="true"
 															>
@@ -893,7 +902,7 @@
 														<div class="input-group mb-1">
 															<input type="number" 
 																class="form-control" 
-																v-model.number="singleInstalmentData.discount" 
+																v-model.number="singleRentData.discount" 
 																placeholder="Discount" 
 																:class="! errors.discount ? 'is-valid' : 'is-invalid'" 
 																@change="resetTotalRent()" 
@@ -918,7 +927,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleInstalmentData.previous_due" 
+																v-model.number="singleRentData.previous_due" 
 																placeholder="Previous Due" 
 																:disabled="true"
 															>
@@ -938,7 +947,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleInstalmentData.net_payable" 
+																v-model.number="singleRentData.net_payable" 
 																placeholder="Net Payable" 
 																:readonly="true"
 															>
@@ -957,13 +966,13 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																v-model.number="singleInstalmentData.total_paid_amount" 
+																v-model.number="singleRentData.total_paid_amount" 
 																placeholder="Paid Amount" 
 																:class="! errors.total_paid_amount ? 'is-valid' : 'is-invalid'" 
 																@change="validateFormInput('total_paid_amount')" 
-																:readonly="! createMode && singleInstalmentData.payments && singleInstalmentData.payments.length > 1" 
+																:readonly="! createMode && singleRentData.payments && singleRentData.payments.length > 1" 
 																required="true" 
-																min="0" 
+																min="1" 
 															>
 
 									    					<div class="input-group-append">
@@ -973,7 +982,11 @@
 									    					</div>
 									    				</div>
 
-									    				<div class="invalid-feedback">
+									    				<div 
+									    					class="invalid-feedback" 
+									    					style="display:block;" 
+									    					v-show="errors.total_paid_amount" 
+									    				>
 													    	{{ errors.total_paid_amount }}
 													    </div>
 													</div>
@@ -986,7 +999,7 @@
 														<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																:value="singleInstalmentData.net_payable - singleInstalmentData.total_paid_amount" 
+																:value="singleRentData.net_payable - singleRentData.total_paid_amount" 
 																placeholder="Previous Dues" 
 																:readonly="true"
 															>
@@ -1035,11 +1048,11 @@
 		</div>
 
 		<!-- View Modal -->
-		<div class="modal fade" id="merchant-instalment-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal fade" id="merchant-rent-view-modal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Instalment Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">Rent Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -1048,43 +1061,43 @@
 					<div class="modal-body">
 						<ul class="nav nav-tabs justify-content-center">
 							<li class="nav-item">
-								<a class="nav-link active" data-toggle="tab" href="#instalment-profile" role="tab">
+								<a class="nav-link active" data-toggle="tab" href="#rent-profile" role="tab">
 									Profile
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#instalment-payments" role="tab">
+								<a class="nav-link" data-toggle="tab" href="#rent-payments" role="tab">
 									Payments
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#instalment-rents" role="tab">
-									Rents
+								<a class="nav-link" data-toggle="tab" href="#space-rents" role="tab">
+									Space Rents
 								</a>
 							</li>
 						</ul>
 
 						<div class="tab-content">
-							<div class="tab-pane fade in active show" id="instalment-profile">
+							<div class="tab-pane fade in active show" id="rent-profile">
 								<div class="form-row">
 									<label class="col-6 col-form-label font-weight-bold text-right">
 										Id :
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.name }}
+										{{ singleRentData.name }}
 									</label>
 								</div>
 
 								<div class="form-row">
 									<label class="col-6 col-form-label font-weight-bold text-right">
-										# Installment :
+										# Installments :
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.number_installment }}
+										{{ singleRentData.number_installment }}
 									</label>
 								</div>
 
@@ -1094,7 +1107,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.date_from }}
+										{{ singleRentData.date_from }}
 									</label>
 								</div>
 
@@ -1104,7 +1117,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.date_to }}
+										{{ singleRentData.date_to }}
 									</label>
 								</div>
 
@@ -1114,7 +1127,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.total_rent }} {{ general_settings.official_currency_name }}
+										{{ singleRentData.total_rent }} {{ general_settings.official_currency_name }}
 									</label>
 								</div>
 
@@ -1124,7 +1137,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.discount }} %
+										{{ singleRentData.discount }} %
 									</label>
 								</div>
 
@@ -1135,7 +1148,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.previous_due }} {{ general_settings.official_currency_name }}
+										{{ singleRentData.previous_due }} {{ general_settings.official_currency_name }}
 									</label>
 								</div> 
 								-->
@@ -1146,7 +1159,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.net_payable }} {{ general_settings.official_currency_name }}
+										{{ singleRentData.net_payable }} {{ general_settings.official_currency_name }}
 									</label>
 								</div>
 
@@ -1156,7 +1169,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.total_paid_amount || 0 }} {{ general_settings.official_currency_name }}
+										{{ singleRentData.total_paid_amount || 0 }} {{ general_settings.official_currency_name }}
 									</label>
 								</div>
 
@@ -1166,7 +1179,7 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.current_due }} {{ general_settings.official_currency_name | capitalize }}
+										{{ (singleRentData.net_payable - singleRentData.total_paid_amount) }} {{ general_settings.official_currency_name | capitalize }}
 									</label>
 								</div>
 
@@ -1176,22 +1189,22 @@
 									</label>
 
 									<label class="col-6 col-form-label">
-										{{ singleInstalmentData.created_at }}
+										{{ singleRentData.created_at }}
 									</label>
 								</div>
 							</div>
 
-							<div id="instalment-payments" class="tab-pane fade">
+							<div id="rent-payments" class="tab-pane fade">
 								<div 
 									class="form-row"
-									v-if="singleInstalmentData.hasOwnProperty('payments') && singleInstalmentData.payments.length"
+									v-if="singleRentData.hasOwnProperty('payments') && singleRentData.payments.length"
 								>
 									<div class="card card-body">
 										<div class="form-row">
 											<div 
 												class="col-sm-6"
-												v-for="(instalmentPayment, instalmentPaymentIndex) in singleInstalmentData.payments" 
-												:key="'merchant-payment-index-' + instalmentPaymentIndex + '-merchant-payment-' + instalmentPayment.id"
+												v-for="(rentPayment, rentPaymentIndex) in singleRentData.payments" 
+												:key="'merchant-payment-index-' + rentPaymentIndex + '-merchant-payment-' + rentPayment.id"
 											>
 												<div class="form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -1199,7 +1212,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ instalmentPayment.invoice_no | capitalize }}
+														{{ rentPayment.invoice_no | capitalize }}
 													</label>
 												</div>
 
@@ -1209,7 +1222,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ instalmentPayment.total_paid_amount || 0 }}
+														{{ rentPayment.total_paid_amount || 0 }}
 													</label>
 												</div>
 
@@ -1219,7 +1232,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ instalmentPayment.paid_at }}
+														{{ rentPayment.paid_at }}
 													</label>
 												</div>
 											</div>
@@ -1228,10 +1241,10 @@
 								</div>
 							</div>
 
-							<div id="instalment-rents" class="tab-pane fade">
+							<div id="space-rents" class="tab-pane fade">
 								<div 
 									class="form-row" 
-									v-if="singleInstalmentData.hasOwnProperty('rents') && singleInstalmentData.rents.length"
+									v-if="singleRentData.hasOwnProperty('spaceRents') && singleRentData.spaceRents.length"
 								>
 									<div class="col-sm-12">
 										<table class="table table-striped table-bordered nowrap text-center">
@@ -1245,19 +1258,19 @@
 
 											<tbody>
 												<tr 
-													v-for="(instalmentRent, instalmentRentIndex) in singleInstalmentData.rents" 
-													:key="'instalment-rent-' + instalmentRentIndex + '-id-' + instalmentRent.id"
+													v-for="(spaceRent, spaceRentIndex) in singleRentData.spaceRents" 
+													:key="'rent-rent-' + spaceRentIndex + '-id-' + spaceRent.id"
 												>	
 													<td>
-														{{ (instalmentRent.dealt_space ? (instalmentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (instalmentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
+														{{ (spaceRent.dealt_space ? (spaceRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (spaceRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
 													</td>
 
 													<td>
-														{{ instalmentRent.dealt_space ? instalmentRent.dealt_space.name : 'NA' | capitalize }}
+														{{ spaceRent.dealt_space ? spaceRent.dealt_space.name : 'NA' | capitalize }}
 													</td>
 													
 													<td>
-														{{ instalmentRent.rent }} {{ general_settings.official_currency_name | capitalize }}
+														{{ spaceRent.rent }} {{ general_settings.official_currency_name | capitalize }}
 													</td>
 												</tr>
 											</tbody>
@@ -1470,13 +1483,13 @@
 							>
 							
 							<h5>
-								{{ general_settings.app_name | capitalize }} Instalment Details
+								{{ general_settings.app_name | capitalize }} Rent Details
 							</h5>
 						</div>
 
 						<div class="col-6">
 							<qr-code 
-								:text="singleInstalmentData.name || ''"
+								:text="singleRentData.name || ''"
 								:size="50" 
 								class="ml-auto"
 							></qr-code>
@@ -1493,7 +1506,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.total_rent }} {{ general_settings.official_currency_name }}
+									{{ singleRentData.total_rent }} {{ general_settings.official_currency_name }}
 								</label>
 							</div>
 
@@ -1503,7 +1516,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.discount }} %
+									{{ singleRentData.discount }} %
 								</label>
 							</div>
 
@@ -1514,7 +1527,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.previous_due }} {{ general_settings.official_currency_name }}
+									{{ singleRentData.previous_due }} {{ general_settings.official_currency_name }}
 								</label>
 							</div> 
 							-->
@@ -1525,7 +1538,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.net_payable }} {{ general_settings.official_currency_name | capitalize }}
+									{{ singleRentData.net_payable }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 
@@ -1535,7 +1548,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.total_paid_amount || 0 }} {{ general_settings.official_currency_name | capitalize }}
+									{{ singleRentData.total_paid_amount || 0 }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 
@@ -1545,7 +1558,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.net_payable - singleInstalmentData.total_paid_amount }} {{ general_settings.official_currency_name | capitalize }}
+									{{ singleRentData.net_payable - singleRentData.total_paid_amount }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 						</div>
@@ -1563,11 +1576,11 @@
 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold text-right">
-									# Installment :
+									# Installments :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.number_installment }}
+									{{ singleRentData.number_installment }}
 								</label>
 							</div>
 
@@ -1577,7 +1590,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.date_from }}
+									{{ singleRentData.date_from }}
 								</label>
 							</div>
 
@@ -1587,7 +1600,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.date_to }}
+									{{ singleRentData.date_to }}
 								</label>
 							</div>
 
@@ -1597,7 +1610,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singleInstalmentData.created_at }}
+									{{ singleRentData.created_at }}
 								</label>
 							</div>
 						</div>
@@ -1605,10 +1618,10 @@
 
 					<div 
 						class="form-row"
-						v-if="singleInstalmentData.hasOwnProperty('rents') && singleInstalmentData.rents.length"
+						v-if="singleRentData.hasOwnProperty('spaceRents') && singleRentData.spaceRents.length"
 					>
 						<label class="col-sm-6 col-form-label font-weight-bold">
-							Rents :
+							Space Rents :
 						</label>
 
 						<div class="col-12">
@@ -1623,19 +1636,19 @@
 
 								<tbody>
 									<tr 
-										v-for="(instalmentRent, instalmentRentIndex) in singleInstalmentData.rents" 
-										:key="'instalment-rent-' + instalmentRentIndex + '-id-' + instalmentRent.id"
+										v-for="(spaceRent, spaceRentIndex) in singleRentData.spaceRents" 
+										:key="'rent-rent-' + spaceRentIndex + '-id-' + spaceRent.id"
 									>	
 										<td>
-											{{ (instalmentRent.dealt_space ? (instalmentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (instalmentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
+											{{ (spaceRent.dealt_space ? (spaceRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (spaceRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
 										</td>
 
 										<td>
-											{{ instalmentRent.dealt_space ? instalmentRent.dealt_space.name : 'NA' | capitalize }}
+											{{ spaceRent.dealt_space ? spaceRent.dealt_space.name : 'NA' | capitalize }}
 										</td>
 										
 										<td>
-											{{ instalmentRent.rent }} {{ general_settings.official_currency_name | capitalize }}
+											{{ spaceRent.rent }} {{ general_settings.official_currency_name | capitalize }}
 										</td>
 									</tr>
 								</tbody>
@@ -1645,7 +1658,7 @@
 
 					<div 
 						class="form-row" 
-						v-if="singleInstalmentData.hasOwnProperty('payments') && singleInstalmentData.payments.length"
+						v-if="singleRentData.hasOwnProperty('payments') && singleRentData.payments.length"
 					>
 						<label class="col-sm-6 col-form-label font-weight-bold">
 							Payments :
@@ -1663,19 +1676,19 @@
 
 								<tbody>
 									<tr 
-										v-for="(instalmentPayment, instalmentPaymentIndex) in singleInstalmentData.payments" 
-										:key="'instalment-rent-' + instalmentPaymentIndex + '-id-' + instalmentPayment.id"
+										v-for="(rentPayment, rentPaymentIndex) in singleRentData.payments" 
+										:key="'rent-rent-' + rentPaymentIndex + '-id-' + rentPayment.id"
 									>	
 										<td>
-											{{ instalmentPayment.invoice_no }}
+											{{ rentPayment.invoice_no }}
 										</td>
 
 										<td>
-											{{ instalmentPayment.paid_amount }}
+											{{ rentPayment.paid_amount }}
 										</td>
 
 										<td>
-											{{ instalmentPayment.paid_at }}
+											{{ rentPayment.paid_at }}
 										</td>
 									</tr>
 								</tbody>
@@ -1688,7 +1701,7 @@
 		<!-- Printing Modal Ends -->
 
 		<!-- Filter Modal -->
-		<div class="modal fade" id="instalment-custom-search" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal fade" id="rent-custom-search" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1736,7 +1749,7 @@
 			v-if="userHasPermissionTo('delete-merchant-payment')" 
 			:csrf="csrf" 
 			:submit-method-name="'deleteAsset'" 
-			:content-to-delete="singleInstalmentData"
+			:content-to-delete="singleRentData"
 			:restoration-message="'But once you think, you can restore this item !'" 
 			
 			@deleteAsset="deleteAsset($event)" 
@@ -1750,7 +1763,7 @@
 	import axios from 'axios';
 	import Datepicker from 'vuejs-datepicker';
 
-    let singleInstalmentData = {
+    let singleRentData = {
     	
 		number_installment : 1,
 		date_from : 1,
@@ -1760,8 +1773,8 @@
     	// previous_due : 0,
 		net_payable : 0,
 		total_paid_amount : 0,
-		current_due : 0,
-		// merchant_deal_id : null,
+		// current_due : 0,
+		// merchant_space_deal_id : null,
 		// paid_at : null,
 		rents : [
 			{
@@ -1810,7 +1823,7 @@
 	        	createMode : true,
 
 	        	// allFetchedContents : [],
-	        	dealAllInstalments : [],
+	        	dealAllRents : [],
 	        	// dealtSpacesAndRents : [],
 
 	        	pagination: {
@@ -1821,9 +1834,9 @@
 
 		      	},
 
-	        	dealTotalCurrentRent : 0,
+	        	dealTotalCurspaceRent : 0,
 
-	        	singleInstalmentData : singleInstalmentData, 
+	        	singleRentData : singleRentData, 
 
 	        	searchAttributes : {
 
@@ -1843,7 +1856,7 @@
 
 	        	dataToExport: {
 
-					"# Installment": 'number_installment',
+					"# Installments": 'number_installment',
 
 					"Issued From": 'date_from',
 
@@ -1859,7 +1872,11 @@
 
 					"Total Paid": 'total_paid_amount',
 
-					Due: 'current_due',
+					Due: {
+						callback: (object) => {
+							return (object.net_payable - object.total_paid_amount);
+						}
+					},
 
 					"Payments": {
 						field: "payments",
@@ -1871,9 +1888,9 @@
 
 								payments.forEach(
 					
-									(instalmentPayment, instalmentPaymentIndex) => {
+									(rentPayment, rentPaymentIndex) => {
 
-										infosToReturn += "Invoice No: " + instalmentPayment.invoice_no + "\n Paid Amount: " + instalmentPayment.total_paid_amount + "\n Paid at:" + instalmentPayment.paid_at;
+										infosToReturn += "Invoice No: " + rentPayment.invoice_no + "\n Paid Amount: " + rentPayment.total_paid_amount + "\n Paid at:" + rentPayment.paid_at;
 
 									}
 									
@@ -1889,19 +1906,19 @@
 						},
 					},
 
-					"Rents": {
-						field: "rents",
-						callback: (rents) => {
+					"Space Rents": {
+						field: "spaceRents",
+						callback: (spaceRents) => {
 
-							if (rents && rents.length) {
+							if (spaceRents && spaceRents.length) {
 								
 								var infosToReturn = '';
 
-								rents.forEach(
+								spaceRents.forEach(
 					
-									(instalmentRent, instalmentRentIndex) => {
+									(spaceRent, spaceRentIndex) => {
 
-										infosToReturn += "Space Type: " + (instalmentRent.dealt_space ? (instalmentRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(instalmentRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + "\n Space Name: "  + this.$options.filters.capitalize(instalmentRent.dealt_space.name) + "\n Rent: " + instalmentRent.rent + "\n";
+										infosToReturn += "Space Type: " + (spaceRent.dealt_space ? (spaceRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(spaceRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + "\n Space Name: "  + this.$options.filters.capitalize(spaceRent.dealt_space.name) + "\n Rent: " + spaceRent.rent + "\n";
 
 									}
 									
@@ -2056,12 +2073,12 @@
 				
 				this.error = '';
 				this.loading = true;
-				this.dealAllInstalments = [];
+				this.dealAllRents = [];
 				this.searchAttributes.search = '';
 				// this.allFetchedContents = [];
 				
 				axios
-					.get('/api/deal-instalments/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/deal-rents/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// this.allFetchedContents = response.data;
@@ -2100,7 +2117,7 @@
 				this.dealtSpacesAndRents = [];
 				
 				axios
-					.get('/api/deal-instalments/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/deal-rents/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.dealtSpacesAndRents = response.data;
@@ -2134,7 +2151,7 @@
 			*/
 			getDealTotalRents() {
 
-				this.dealTotalCurrentRent = 0;
+				this.dealTotalCurspaceRent = 0;
 				
 				if (this.deal.warehouses.length > 0) {
 
@@ -2147,7 +2164,7 @@
 										warehouseSpace.containers.forEach(
 											(warehouseContainer, warehouseContainerIndex) => {
 												
-												this.dealTotalCurrentRent += warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 0;
+												this.dealTotalCurspaceRent += warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 0;
 
 											}
 										);
@@ -2156,13 +2173,13 @@
 
 									else if (warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length) {
 
-										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
+										this.dealTotalCurspaceRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
 
 									}
 
 									else if (warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length) {
 
-										this.dealTotalCurrentRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
+										this.dealTotalCurspaceRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
 
 									}
 								}
@@ -2177,16 +2194,16 @@
 
 				this.error = '';
 				this.loading = true;
-				this.dealAllInstalments = [];
+				this.dealAllRents = [];
 				// this.allFetchedContents = [];
 				// this.pagination.current_page = 1;
-				this.searchAttributes.merchant_deal_id = this.deal.id;
+				this.searchAttributes.merchant_space_deal_id = this.deal.id;
 				
 				axios
-				.post("/api/search-deal-instalments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post("/api/search-deal-rents/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
-					this.dealAllInstalments = response.data.all.data;
+					this.dealAllRents = response.data.all.data;
 					this.pagination = response.data.all;
 				})
 				.catch(e => {
@@ -2198,28 +2215,28 @@
 
 			},
 			showContentDetails(object) {	
-				this.singleInstalmentData = object;
-				$('#merchant-instalment-view-modal').modal('show');
+				this.singleRentData = object;
+				$('#merchant-rent-view-modal').modal('show');
 			},
 			showContentCreateForm() {
 
 				this.step = 1;
 				this.createMode = true;
 
-				let dealLastPayment = this.dealAllInstalments.length ? this.dealAllInstalments[this.dealAllInstalments.length-1] : {};
+				let dealLastPayment = this.dealAllRents.length ? this.dealAllRents[this.dealAllRents.length-1] : {};
 
-				this.singleInstalmentData = {
+				this.singleRentData = {
 
 					number_installment : 1,
 					date_from : dealLastPayment.date_to ?? this.today,
 					date_to : null,
-					total_rent : this.dealTotalCurrentRent, // generated from selected spaces
+					total_rent : this.dealTotalCurspaceRent, // generated from selected spaces
 					discount : 0,	// percentage 
 					// previous_due : dealLastPayment.current_due ?? 0,	// as new deal
-					net_payable : this.dealTotalCurrentRent /* + (dealLastPayment.current_due ?? 0) */,
+					net_payable : this.dealTotalCurspaceRent /* + (dealLastPayment.current_due ?? 0) */,
 					total_paid_amount : 0,
-					current_due : 0,
-					merchant_deal_id : this.deal.id,
+					// current_due : 0,
+					merchant_space_deal_id : this.deal.id,
 					// paid_at : null,
 					
 					/*
@@ -2241,7 +2258,7 @@
 
 		      	this.setRentExpiryDate();
 
-				$('#merchant-instalment-createOrEdit-modal').modal('show');
+				$('#merchant-rent-createOrEdit-modal').modal('show');
 
 			},
 			openContentEditForm(object) {
@@ -2249,19 +2266,19 @@
 				this.step = 1;
 				this.createMode = false;
 
-				this.singleInstalmentData = object;
+				this.singleRentData = object;
 
-				$('#merchant-instalment-createOrEdit-modal').modal('show');
+				$('#merchant-rent-createOrEdit-modal').modal('show');
 				
 			},
 			openContentDeleteForm(object) {	
-				this.singleInstalmentData = object;
+				this.singleRentData = object;
 				$('#delete-confirmation-modal').modal('show');
 			},
 			goToPartialPayments(object) {
-				this.$router.push({ name: 'instalment-payments', params: { instalmentId:object.id, merchantName:this.merchantName, instalment:object }});
+				this.$router.push({ name: 'rent-payments', params: { rentId:object.id, merchantName:this.merchantName, rent:object }});
 			},
-			createDealInstalment() {
+			createDealRent() {
 				
 				if (! this.verifyUserInput()) {
 					
@@ -2273,24 +2290,24 @@
 				this.formSubmitted = true;
 
 				axios
-					.post('/deal-instalments/' + this.perPage, this.singleInstalmentData)
+					.post('/deal-rents/' + this.perPage, this.singleRentData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("New instalment has been added", "Success");
+							this.$toastr.s("New rent has been added", "Success");
 							// this.allFetchedContents = response.data;
 							
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 
 							/*
-							if (this.singleInstalmentData.total_paid_amount > 0) {
+							if (this.singleRentData.total_paid_amount > 0) {
 
 								this.print();
 
 							}
 							*/
 							
-							$('#merchant-instalment-createOrEdit-modal').modal('hide');
+							$('#merchant-rent-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -2305,7 +2322,7 @@
 					});
 
 			},
-			updateDealInstalment() {
+			updateDealRent() {
 				
 				if (! this.verifyUserInput()) {
 					
@@ -2317,24 +2334,24 @@
 				this.formSubmitted = true;
 
 				axios
-					.put('/deal-instalments/' + this.singleInstalmentData.id + '/' + this.perPage, this.singleInstalmentData)
+					.put('/deal-rents/' + this.singleRentData.id + '/' + this.perPage, this.singleRentData)
 					.then(response => {
 						if (response.status == 200) {
-							this.$toastr.s("Instalment has been updated", "Success");
+							this.$toastr.s("Rent has been updated", "Success");
 							// this.allFetchedContents = response.data;
 							
 							this.pagination.current_page = 1; 
 							this.searchAttributes.search !== '' ? this.searchData() : this.setContentPagination(response);
 
 							/*
-							if (this.singleInstalmentData.total_paid_amount > 0) {
+							if (this.singleRentData.total_paid_amount > 0) {
 
 								this.print();
 
 							}
 							*/
 
-							$('#merchant-instalment-createOrEdit-modal').modal('hide');
+							$('#merchant-rent-createOrEdit-modal').modal('hide');
 						}
 					})
 					.catch(error => {
@@ -2349,10 +2366,10 @@
 					});
 
 			},
-			deleteAsset(singleInstalmentData) {
+			deleteAsset(singleRentData) {
 				
 				axios
-					.delete('/deal-instalments/' + singleInstalmentData.id + '/' + this.perPage)
+					.delete('/deal-rents/' + singleRentData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Storage type has been deleted", "Success");
@@ -2391,7 +2408,7 @@
 			/*
 			setDealAllPayments() {
 
-				this.dealAllInstalments = this.deal.installments ? this.deal.installments : [];
+				this.dealAllRents = this.deal.rents ? this.deal.rents : [];
 
 			},
 			*/
@@ -2411,7 +2428,7 @@
     		},
     		setContentPagination(response) {
 
-    			this.dealAllInstalments = response.data.data;
+    			this.dealAllRents = response.data.data;
 				this.pagination = response.data;
 
 			},
@@ -2430,11 +2447,11 @@
 
 				var moment = require('moment');
 
-				let daysToIncrease = this.singleInstalmentData.number_installment * this.deal.rent_period.number_days;
+				let daysToIncrease = this.singleRentData.number_installment * this.deal.rent_period.number_days;
 
-				this.singleInstalmentData.date_from = moment(this.singleInstalmentData.date_from).format('YYYY-MM-DD');
+				this.singleRentData.date_from = moment(this.singleRentData.date_from).format('YYYY-MM-DD');
 
-				this.singleInstalmentData.date_to = moment(this.singleInstalmentData.date_from).add(daysToIncrease, 'days').format('YYYY-MM-DD');
+				this.singleRentData.date_to = moment(this.singleRentData.date_from).add(daysToIncrease, 'days').format('YYYY-MM-DD');
 				
 				
 			},
@@ -2445,11 +2462,11 @@
 				
 				if (! this.errors.discount && ! this.errors.number_installment) {
 
-					this.singleInstalmentData.total_rent = this.dealTotalCurrentRent * this.singleInstalmentData.number_installment;
+					this.singleRentData.total_rent = this.dealTotalCurspaceRent * this.singleRentData.number_installment;
 
-					this.singleInstalmentData.net_payable = this.singleInstalmentData.total_rent = this.singleInstalmentData.total_rent - (this.singleInstalmentData.total_rent * this.singleInstalmentData.discount / 100);
+					this.singleRentData.net_payable = this.singleRentData.total_rent = this.singleRentData.total_rent - (this.singleRentData.total_rent * this.singleRentData.discount / 100);
 
-					// this.singleInstalmentData.net_payable = /*this.singleInstalmentData.previous_due + */this.singleInstalmentData.total_rent;
+					// this.singleRentData.net_payable = /*this.singleRentData.previous_due + */this.singleRentData.total_rent;
 
 				}
 				
@@ -2512,7 +2529,7 @@
 			},
 			ascendingAlphabets(columnValue) {
 
-				this.dealAllInstalments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
 						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
@@ -2525,7 +2542,7 @@
 			},
 			descendingAlphabets(columnValue) {
 
-				this.dealAllInstalments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
 						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
@@ -2538,7 +2555,7 @@
 			},
 			ascendingIntegers(columnValue) {
 
-				this.dealAllInstalments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						return a[columnValue] - b[columnValue];
 					}
@@ -2547,7 +2564,7 @@
 			},
 			descendingIntegers(columnValue) {
 
-				this.dealAllInstalments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						return b[columnValue] - a[columnValue];
 					}
@@ -2604,7 +2621,7 @@
 
 				this.$htmlToPaper('sectionToPrint', this.printingStyles);
 
-				$('#merchant-instalment-view-modal').modal('hide');
+				$('#merchant-rent-view-modal').modal('hide');
 
 			},
 			validateFormInput(formInputName) {
@@ -2615,7 +2632,7 @@
 
 					case 'total_paid_amount' : 
 						
-						if(this.singleInstalmentData.total_paid_amount && this.singleInstalmentData.total_paid_amount < 0){
+						if(! this.singleRentData.total_paid_amount || this.singleRentData.total_paid_amount < 1){
 							
 							this.errors.total_paid_amount = 'Invalid amount';
 
@@ -2631,7 +2648,7 @@
 
 					case 'number_installment' : 
 						
-						if(! this.singleInstalmentData.number_installment || this.singleInstalmentData.number_installment < 1){
+						if(! this.singleRentData.number_installment || this.singleRentData.number_installment < 1){
 							
 							this.errors.number_installment = 'Rent installment number is required';
 
@@ -2647,7 +2664,7 @@
 
 					case 'discount' : 
 						
-						if(this.singleInstalmentData.discount && (this.singleInstalmentData.discount < 0 || this.singleInstalmentData.discount > 100)){
+						if(this.singleRentData.discount && (this.singleRentData.discount < 0 || this.singleRentData.discount > 100)){
 
 							this.errors.discount = 'Discount should be between 0 to 100';
 						}
@@ -2673,10 +2690,10 @@
 	@import '~vue-multiselect/dist/vue-multiselect.min.css';
 
 	.fade-enter-active {
-  		transition: all .3s ease;
+  		transition: all .10s ease;
 	}
 	.fade-leave-active {
-  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  		transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 	}
 	.fade-enter, .fade-leave-to {
   		transform: translateX(10px);

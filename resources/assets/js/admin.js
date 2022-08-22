@@ -111,9 +111,9 @@ import MerchantProductIndex from './views/MerchantProductIndex'
 import RoleIndex from './views/RoleIndex'
 import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
-import MerchantDealIndex from './views/MerchantDealIndex'
-import DealInstalmentIndex from './views/DealInstalmentIndex'
-import DealPaymentIndex from './views/DealPaymentIndex'
+import MerchantSpaceDealIndex from './views/MerchantSpaceDealIndex'
+import DealRentIndex from './views/DealRentIndex'
+import RentPaymentIndex from './views/RentPaymentIndex'
 import MailIndex from './views/MailIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
 
@@ -486,16 +486,16 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/merchant/:merchantId/deals',
-            name: 'merchant-deals',
-            component: MerchantDealIndex,
+            path: '/merchant/:merchantId/space-deals',
+            name: 'merchant-space-deals',
+            component: MerchantSpaceDealIndex,
             props: true,
             meta: {
                 // authRequired: true,
-                requiredPermission: 'view-merchant-deal-index' 
+                requiredPermission: 'view-merchant-space-deal-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchantId && to.params.merchant) {
+                if (to.params.merchant && to.params.merchantId) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -504,9 +504,9 @@ const router = new VueRouter({
             }
         },
         {
-            path: '/deal/:dealId/instalments',
-            name: 'deal-instalments',
-            component: DealInstalmentIndex,
+            path: '/space-deal/:dealId/rents',
+            name: 'space-deal-rents',
+            component: DealRentIndex,
             props: true,
             meta: {
                 // authRequired: true,
@@ -522,16 +522,16 @@ const router = new VueRouter({
             }
         },
         {
-            path: 'instalment/:instalmentId/payments',
-            name: 'instalment-payments',
-            component: DealPaymentIndex,
+            path: '/rent/:rentId/payments',
+            name: 'rent-payments',
+            component: RentPaymentIndex,
             props: true,
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-merchant-payment-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.merchantName && to.params.instalmentId && to.params.instalment) {
+                if (to.params.merchantName && to.params.rentId && to.params.rent) {
                     next(); // <-- everything good, proceed
                 }
                 else {

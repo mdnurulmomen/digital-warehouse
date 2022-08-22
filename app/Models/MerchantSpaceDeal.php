@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MerchantDeal extends Model
+class MerchantSpaceDeal extends Model
 {
     public $timestamps = false;
     protected $guarded = ['id'];
@@ -18,7 +18,6 @@ class MerchantDeal extends Model
     protected $casts = [
         'active' => 'boolean',
         'auto_renewal' => 'boolean',
-        'e_commerce_fulfillment' => 'boolean'
     ];
 
     /**
@@ -34,14 +33,14 @@ class MerchantDeal extends Model
         });
     }
 
-    public function instalments() 
+    public function rents()
     {
-        return $this->hasMany(MerchantDealInstalment::class, 'merchant_deal_id', 'id');
+        return $this->morphMany(MerchantRent::class, 'dealable');
     }
     
     public function spaces() 
     {
-    	return $this->hasMany(DealtSpace::class, 'merchant_deal_id', 'id');
+    	return $this->hasMany(DealtSpace::class, 'merchant_space_deal_id', 'id');
     }
 
     public function containers() 

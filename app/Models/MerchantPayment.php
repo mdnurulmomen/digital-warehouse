@@ -10,9 +10,9 @@ class MerchantPayment extends Model
     protected $guarded = ['id'];
     protected $dates = ['paid_at'];
 
-    public function instalment()
+    public function rent()
     {
-        return $this->belongsTo(MerchantDealInstalment::class, 'merchant_deal_instalment_id', 'id');
+        return $this->belongsTo(MerchantRent::class, 'merchant_rent_id', 'id');
     }
 
     public function issuer()

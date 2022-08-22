@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DealInstalmentRentResource extends JsonResource
+class MerchantSpaceRentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,7 +15,6 @@ class DealInstalmentRentResource extends JsonResource
     public function toArray($request)
     {
         return [
-
             'id' => $this->id,
             // 'issued_from' => $this->issued_from,
             // 'expired_at' => $this->expired_at,
@@ -23,7 +22,6 @@ class DealInstalmentRentResource extends JsonResource
             // 'number_installment' => $this->number_installment,
             'dealt_space_id' => $this->dealt_space_id,
             'dealt_space' => new DealtSpaceResource($this->space->space)
-
         ];
     }
 }
