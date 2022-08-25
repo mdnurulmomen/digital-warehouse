@@ -41,13 +41,13 @@
 								</router-link>
 							</li>
 
-							<li :class="currentRouteName=='my-deals' ? 'active' : ''">
-								<router-link :to="{ name: 'my-deals' }" class="waves-effect waves-dark">
+							<li :class="currentRouteName=='my-space-deals' ? 'active' : ''">
+								<router-link :to="{ name: 'my-space-deals' }" class="waves-effect waves-dark">
 									<span class="pcoded-micon">
 										<img width="18px" src="icons/cms/deals.png">
 									</span>
 									<span class="pcoded-mtext">
-										My Deals
+										My Space Deals
 									</span>
 								</router-link>
 							</li>

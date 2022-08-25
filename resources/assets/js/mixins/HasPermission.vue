@@ -8,8 +8,8 @@
 
 			return {
 
-				roles : JSON.parse(window.localStorage.getItem('roles')),
-				permissions : JSON.parse(window.localStorage.getItem('permissions')),
+				roles : JSON.parse(window.localStorage.getItem('roles')) ?? [],
+				permissions : JSON.parse(window.localStorage.getItem('permissions')) ?? [],
 
 			}
 

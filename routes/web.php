@@ -40,12 +40,12 @@ Route::name('merchant.')->group(function () {
 		
 		/* complementary routes for merchants (my-properties) */
 		// my-deals, spaces & payments
-		Route::get('/api/my-deals/{perPage?}', 'MerchantController@showMyAllDeals')->name('my-deals.index');
-		Route::post('/search-my-deals/{perPage}', 'MerchantController@searchMyAllDeals')->name('search-my-deals');
+		Route::get('/api/my-space-deals/{perPage?}', 'MerchantController@showMyAllSpaceDeals')->name('my-space-deals.index');
+		Route::post('/search-my-space-deals/{perPage}', 'MerchantController@searchMyAllSpaceDeals')->name('search-my-space-deals');
 
-		// deal-payments
-		Route::get('/api/my-deal-payments/{deal}/{perPage?}', 'MerchantController@showMyDealAllPayments')->name('my-payments.index');
-		Route::post('/search-my-deal-payments/{perPage}', 'MerchantController@searchMyDealAllPayments')->name('search-my-payments');
+		// deal-rents
+		Route::get('/api/my-space-deal/{deal}/rents/{perPage?}', 'MerchantController@showMySpaceDealAllRents')->name('my-space-rents.index');
+		Route::post('/search-my-space-deal-rents/{perPage}', 'MerchantController@searchMySpaceDealAllRents')->name('search-my-space-rents');
 
 		// my-products
 		Route::get('/api/my-products/{perPage?}', 'MerchantController@showMyAllProducts')->name('my-products.index');

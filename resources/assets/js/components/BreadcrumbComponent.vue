@@ -16,7 +16,7 @@
 
 				<div class="row">
 					<div class="col-12 mt-1">
-						<h6 class="text-nowrap">{{ message | capitalize }}</h6>
+						<h6 class="text-justify">{{ message | capitalize }}</h6>
 					</div>
 				</div>
 			</div>

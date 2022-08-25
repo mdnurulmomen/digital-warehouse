@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\Warehouse;
 use App\Models\Requisition;
-use App\Models\MerchantDeal;
+use App\Models\MerchantRent;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Models\ProductSerial;
@@ -16,22 +16,23 @@ use App\Models\MerchantPayment;
 use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
 use App\Models\RequisitionAgent;
+use App\Models\MerchantSpaceDeal;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File; 
 use App\Jobs\BroadcastNewRequisition;
 use App\Models\ProductVariationSerial;
 use App\Models\WarehouseContainerStatus;
-use App\Http\Resources\Web\DealCollection;
 use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\MyProductResource;
-use App\Http\Resources\Web\MyProductCollection;
-use App\Http\Resources\Web\DealPaymentCollection;
+// use App\Http\Resources\Web\MyProductCollection;
+use App\Http\Resources\Web\MerchantRentCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Jobs\BroadcastProductReceiveConfirmation;
 use App\Http\Resources\Web\ProductStockCollection;
 use App\Http\Resources\Web\MyRequisitionCollection;
 use App\Http\Resources\Web\MerchantProductResource;
 use App\Http\Resources\Web\MerchantProductCollection;
+use App\Http\Resources\Web\MerchantSpaceDealCollection;
 
 class MerchantController extends Controller
 {
@@ -1466,13 +1467,13 @@ class MerchantController extends Controller
     }
 
     // My-Deal
-    public function showMyAllDeals($perPage)
+    public function showMyAllSpaceDeals($perPage)
     {
         $currentMerchant = \Auth::user();
 
-        return new DealCollection(
-            MerchantDeal::where('merchant_id', $currentMerchant->id)
-            ->with(['spaces', 'payments'])
+        return new MerchantSpaceDealCollection(
+            MerchantSpaceDeal::where('merchant_id', $currentMerchant->id)
+            ->with(['spaces', 'rents'])
             ->with(['rentPeriod' => function($query) {
                 $query->withTrashed();
             }])
@@ -1480,7 +1481,7 @@ class MerchantController extends Controller
         );
     }
 
-    public function searchMyAllDeals(Request $request, $perPage)
+    public function searchMyAllSpaceDeals(Request $request, $perPage)
     {
         $request->validate([
             'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
@@ -1494,7 +1495,7 @@ class MerchantController extends Controller
 
         $currentMerchant = \Auth::user();
 
-        $query = MerchantDeal::with(['spaces', 'payments'])->where('merchant_id', $currentMerchant->id);
+        $query = MerchantSpaceDeal::with(['spaces', 'rents'])->where('merchant_id', $currentMerchant->id);
 
         if ($request->search) {
             
@@ -1518,14 +1519,13 @@ class MerchantController extends Controller
                         }
                     );
                 })
-                ->orWhereHas('payments', function ($query4) use ($request) {
+                ->orWhereHas('rents', function ($query4) use ($request) {
                     $query4->where('invoice_no', 'like', "%$request->search%")
                     ->orWhere('number_installment', 'like', "%$request->search%")
                     ->orWhere('date_from', 'like', "%$request->search%")
                     ->orWhere('date_to', 'like', "%$request->search%")
                     ->orWhere('total_rent', 'like', "%$request->search%")
                     ->orWhere('discount', 'like', "%$request->search%")
-                    ->orWhere('previous_due', 'like', "%$request->search%")
                     ->orWhere('net_payable', 'like', "%$request->search%")
                     ->orWhere('paid_amount', 'like', "%$request->search%")
                     ->orWhere('current_due', 'like', "%$request->search%");
@@ -1547,25 +1547,29 @@ class MerchantController extends Controller
         }
 
         return response()->json([
-            'all' => new DealCollection($query->latest()->paginate($perPage)),  
+            'all' => new MerchantSpaceDealCollection($query->latest()->paginate($perPage)),  
         ], 200);
     }
 
-    // My-Deal-Payments
-    public function showMyDealAllPayments($deal, $perPage = false)
+    // My-Deal-Rents
+    public function showMySpaceDealAllRents($deal, $perPage = false)
     {
         if ($perPage) {
             
             $currentMerchant = \Auth::user();
 
-            $merchantExpectedDeal = MerchantDeal::findOrFail($deal);
+            $merchantExpectedDeal = MerchantSpaceDeal::findOrFail($deal);
 
             if ($merchantExpectedDeal->merchant_id == $currentMerchant->id) {
                 
-                return new DealPaymentCollection(
-                    MerchantPayment::with(['rents'])->whereHas('deal', function ($query) use ($deal) {
-                        $query->where('merchant_deal_id', $deal);
-                    })->latest('paid_at')->paginate($perPage)
+                return new MerchantRentCollection(
+                    MerchantRent::with(['spaceRents'])
+                    ->whereHasMorph('dealable', [MerchantSpaceDeal::class],
+                        function ($query) use ($deal) {
+                            $query->where('id', $deal);
+                        }
+                    )
+                    ->latest('created_at')->paginate($perPage)
                 );
 
             }
@@ -1575,10 +1579,10 @@ class MerchantController extends Controller
         }
     }
 
-    public function searchMyDealAllPayments(Request $request, $perPage)
+    public function searchMySpaceDealAllRents(Request $request, $perPage)
     {
         $request->validate([
-            'merchant_deal_id' => 'required|exists:merchant_deals,id',
+            'merchant_space_deal_id' => 'required|exists:merchant_deals,id',
             'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
             'dateTo' => 'nullable|required_without_all:search,dateFrom|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
             'dateFrom' => 'nullable|required_without_all:search,dateTo|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
@@ -1590,7 +1594,7 @@ class MerchantController extends Controller
 
         $currentMerchant = \Auth::user();
 
-        $merchantExpectedDeal = MerchantDeal::findOrFail($request->merchant_deal_id);
+        $merchantExpectedDeal = MerchantSpaceDeal::findOrFail($request->merchant_space_deal_id);
 
         if ($merchantExpectedDeal->merchant_id != $currentMerchant->id) {
             
@@ -1599,7 +1603,7 @@ class MerchantController extends Controller
         }
 
         $query = MerchantPayment::with(['rents'])->whereHas('deal', function ($query1) use ($request) {
-            $query1->where('merchant_deal_id', $request->merchant_deal_id);
+            $query1->where('merchant_space_deal_id', $request->merchant_space_deal_id);
         });
 
         if ($request->search) {
@@ -1635,7 +1639,7 @@ class MerchantController extends Controller
         }
 
         return response()->json([
-            'all' => new DealPaymentCollection($query->latest('paid_at')->paginate($perPage)),  
+            'all' => new MerchantRentCollection($query->latest('paid_at')->paginate($perPage)),  
         ], 200);
     }
 

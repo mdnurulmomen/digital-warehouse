@@ -1,4 +1,4 @@
-<template v-if="userHasPermissionTo('view-' + requiredPermission + '-index') || userHasPermissionTo('create-' + requiredPermission)">
+<template v-if="$route.name=='packaging-packages' || $route.name=='delivery-companies' || (userHasPermissionTo('view-' + requiredPermission + '-index') || userHasPermissionTo('create-' + requiredPermission))">
 	<section>
 		<div class="row d-flex align-items-center">										  	
 	  		<div class="col-md-4 col-sm-6 d-flex align-items-center form-group">	

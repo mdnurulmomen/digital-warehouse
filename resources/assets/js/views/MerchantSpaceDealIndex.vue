@@ -235,7 +235,7 @@
 																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 																				v-tooltip.bottom-end="'Rents'" 
 																				:disabled="formSubmitted"  
-																				@click="goToDealPayments(merchantDeal)" 
+																				@click="goToDealRents(merchantDeal)" 
 																				v-if="userHasPermissionTo('view-merchant-payment-index')" 
 																			>
 																				<img src="/icons/cms/deal-rents.png" width="22px">
@@ -3274,7 +3274,7 @@
 
 				$('#delete-confirmation-modal').modal('show');
 			},
-			goToDealPayments(object) {
+			goToDealRents(object) {
 
 				// console.log(object);
 				this.$router.push({ name: 'space-deal-rents', params: { merchantName:this.merchant.user_name.replace(/ /g,"-"), deal:object, dealId:object.id }});

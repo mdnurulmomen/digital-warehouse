@@ -130,7 +130,6 @@
 																	<tr>
 																		<th>Name</th>
 																		<th>Status</th>
-																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
 																		<th>Rent Package</th>
 																		<th>Exp Date</th>
@@ -150,12 +149,6 @@
 																				{{ merchantDeal.active ? 'Active' : 'Inactive' }}
 																			</span>
 																		</td>
-
-																		<td>
-																			<span :class="[merchantDeal.e_commerce_fulfillment ? 'badge-info' : 'badge-secondary', 'badge']">
-																				{{ merchantDeal.e_commerce_fulfillment ? 'Enabled' : 'NA' }}
-																			</span>
-																		</td>
 																		 
 																		<td>
 																			<span :class="[merchantDeal.auto_renewal ? 'badge-warning' : 'badge-secondary', 'badge']">
@@ -167,13 +160,13 @@
 																			{{ (merchantDeal.rent_period && merchantDeal.rent_period.name) ? merchantDeal.rent_period.name : 'No Package' | capitalize }}
 																		</td>
 
-																		<td v-if="merchantDeal.payments[merchantDeal.payments.length-1] && merchantDeal.payments[merchantDeal.payments.length-1].date_to">
-																			{{ merchantDeal.payments[merchantDeal.payments.length-1].date_to }}
+																		<td v-if="merchantDeal.rents[merchantDeal.rents.length-1] && merchantDeal.rents[merchantDeal.rents.length-1].date_to">
+																			{{ merchantDeal.rents[merchantDeal.rents.length-1].date_to }}
 																			<span 
-																			v-show="checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to)"
-																			:class="[checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to) ? 'badge-danger' : 'badge-success', 'badge']"
+																			v-show="checkExpiryDate(merchantDeal.rents[merchantDeal.rents.length-1].date_to)"
+																			:class="[checkExpiryDate(merchantDeal.rents[merchantDeal.rents.length-1].date_to) ? 'badge-danger' : 'badge-success', 'badge']"
 																			>
-																				{{ checkExpiryDate(merchantDeal.payments[merchantDeal.payments.length-1].date_to) ? 'Expired' : '' }}
+																				{{ checkExpiryDate(merchantDeal.rents[merchantDeal.rents.length-1].date_to) ? 'Expired' : '' }}
 																			</span>
 																		</td>
 
@@ -194,10 +187,10 @@
 																			<button 
 																				type="button" 
 																				class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
-																				v-tooltip.bottom-end="'Payments'" 
-																				@click="goToDealPayments(merchantDeal)" 
+																				v-tooltip.bottom-end="'Rents'" 
+																				@click="goToDealRents(merchantDeal)" 
 																			>
-																				<i class="fa fa-money" aria-hidden="true"></i>
+																				<img src="/icons/cms/deal-rents.png" width="22px">
 																			</button>
 																		</td>
 																	</tr>
@@ -205,7 +198,7 @@
 																	<tr 
 																  		v-show="!merchantAllDeals.length"
 																  	>
-															    		<td colspan="7">
+															    		<td colspan="6">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -216,7 +209,6 @@
 																	<tr>	
 																		<th>Name</th>
 																		<th>Status</th>
-																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
 																		<th>Rent Package</th>
 																		<th>Exp Date</th>
@@ -352,8 +344,8 @@
 									</li>
 
 									<li class="nav-item">
-										<a class="nav-link" data-toggle="tab" href="#merchant-deal-payments" role="tab">
-											Payments
+										<a class="nav-link" data-toggle="tab" href="#merchant-deal-rents" role="tab">
+											Rents
 										</a>
 									</li>
 								</ul>
@@ -404,18 +396,6 @@
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												E-Commerce Fullfillment :
-											</label>
-
-											<label class="col-sm-6 col-form-label">
-												<span :class="[myDealData.e_commerce_fulfillment ? 'badge-info' : 'badge-secondary', 'badge']">
-													{{ myDealData.e_commerce_fulfillment ? 'Enabled' : 'Disabled' }}
-												</span>
-											</label>
-										</div>
-
-										<div class="form-row">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
 												Auto Renewal :
 											</label>
 
@@ -425,16 +405,6 @@
 												</span>
 											</label>
 										</div> 
-
-										<div class="form-row" v-show="myDealData.e_commerce_fulfillment">
-											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Sale :
-											</label>
-
-											<label class="col-sm-6 col-form-label">
-												{{ myDealData.sale_percentage }} %
-											</label>
-										</div>
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -651,19 +621,19 @@
 										</div>
 									</div>
 
-									<div class="tab-pane" id="merchant-deal-payments" role="tabpanel">
-										<div class="form-row" v-if="myDealData.hasOwnProperty('payments') && myDealData.payments.length">
+									<div class="tab-pane" id="merchant-deal-rents" role="tabpanel">
+										<div class="form-row" v-if="myDealData.hasOwnProperty('rents') && myDealData.rents.length">
 											<div 
 												class="col-md-12 card card-body" 
-												v-for="(dealPayment, dealPaymentIndex) in myDealData.payments" :key="'merchant-payment-index-' + dealPaymentIndex + '-merchant-payment-' + dealPayment.id"
+												v-for="(dealRent, dealRentIndex) in myDealData.rents" :key="'merchant-payment-index-' + dealRentIndex + '-merchant-payment-' + dealRent.id"
 											>
 												<div class="form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Invoice No :
+														Id :
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.invoice_no | capitalize }}
+														{{ dealRent.name | capitalize }}
 													</label>
 												</div>
 
@@ -673,7 +643,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.number_installment }}
+														{{ dealRent.number_installment }}
 													</label>
 												</div>
 
@@ -683,7 +653,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.date_from }}
+														{{ dealRent.date_from }}
 													</label>
 												</div>
 
@@ -693,7 +663,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.date_to }}
+														{{ dealRent.date_to }}
 													</label>
 												</div>
 
@@ -703,7 +673,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.total_rent + ' ' + general_settings.official_currency_name }}
+														{{ dealRent.total_rent + ' ' + general_settings.official_currency_name | capitalize }}
 													</label>
 												</div>
 
@@ -713,17 +683,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.discount }} %
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Previous Due :
-													</label>
-
-													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.previous_due + ' ' + general_settings.official_currency_name }}
+														{{ dealRent.discount }} %
 													</label>
 												</div>
 
@@ -733,7 +693,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.net_payable + ' ' + general_settings.official_currency_name }}
+														{{ dealRent.net_payable + ' ' + general_settings.official_currency_name | capitalize }}
 													</label>
 												</div>
 
@@ -743,7 +703,7 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.paid_amount + ' ' + general_settings.official_currency_name }} 
+														{{ dealRent.total_paid_amount + ' ' + general_settings.official_currency_name | capitalize }} 
 													</label>
 												</div>
 
@@ -753,22 +713,26 @@
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.current_due + ' ' + general_settings.official_currency_name }}
+														{{ (dealRent.net_payable - dealRent.total_paid_amount) + ' ' + general_settings.official_currency_name | capitalize }}
 													</label>
 												</div>
 
 												<div class="form-row">
 													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Paid at :
+														Created at :
 													</label>
 
 													<label class="col-sm-6 col-form-label">
-														{{ dealPayment.paid_at }}
+														{{ dealRent.created_at }}
 													</label>
 												</div>
 
-												<div class="form-row" v-if="dealPayment.hasOwnProperty('rents') && dealPayment.rents.length">
-													<div class="col-md-6" v-for="(rent, rentIndex) in dealPayment.rents" :key="'merchant-payment-' + dealPaymentIndex + '-rent-index-' + rentIndex + '-rent-' + rent.id">
+												<div class="form-row" v-if="dealRent.hasOwnProperty('spaceRents') && dealRent.spaceRents.length">
+													<div 
+														class="col-md-6" 
+														v-for="(rent, rentIndex) in dealRent.spaceRents" 
+														:key="'merchant-payment-' + dealRentIndex + '-rent-index-' + rentIndex + '-rent-' + rent.id"
+													>
 														<div class="card card-body">
 															<div class="form-row">
 																<label class="col-sm-6 col-form-label font-weight-bold text-right">
@@ -869,8 +833,6 @@
 
 	        		active : true,
 	        		auto_renewal : true, // Renting is normally auto-renewal
-	        		e_commerce_fulfillment : false,
-	        		sale_percentage : 0,
 	        		rent_period : {},
 	        		rent_period_id : null,
 					merchant_id : null,
@@ -1039,17 +1001,15 @@
 						},
 					],
 
-					payments : [
+					rents : [
 						{
 							number_installment : 1,	
 							date_from : null,
 							date_to : null,
-							previous_due : 0,
 							total_rent : 0, // generated from selected spaces
 							discount : 0,	// percentage 
 							net_payable : 0,
-							paid_amount : 0,
-							current_due : 0,
+							total_paid_amount : 0,
 							merchant_deal_id : null,
 							paid_at : null,
 							
@@ -1085,23 +1045,6 @@
 
 					},
 
-					"E-Commerce": {
-						
-						field: "e_commerce_fulfillment",
-						
-						callback: (value) => {
-							
-							if (value) {
-								return 'Enabled';
-							}
-							else {
-								return 'Disabled';
-							}
-
-						},
-
-					},
-
 					"Renewal": {
 						
 						field: "auto_renewal",
@@ -1110,23 +1053,6 @@
 							
 							if (value) {
 								return 'Auto-Renewal';
-							}
-							else {
-								return 'NA';
-							}
-
-						},
-
-					},
-
-					"Sale Percentage": {
-						
-						field: "sale_percentage",
-						
-						callback: (value) => {
-							
-							if (value) {
-								return sale_percentage;
 							}
 							else {
 								return 'NA';
@@ -1245,11 +1171,11 @@
 
 					"Expiring Date" : {
 
-						field: "payments",
+						field: "rents",
 						
-						callback: (payments) => {
+						callback: (rents) => {
 
-							return payments[payments.length-1].date_to;
+							return rents[rents.length-1].date_to;
 
 						}
 
@@ -1382,7 +1308,7 @@
 				this.merchantAllDeals = [];
 				
 				axios
-					.get('/api/my-deals/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-space-deals/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// console.log(response);
@@ -1418,10 +1344,10 @@
 				this.myDealData = Object.assign({}, this.myDealData, object);
 				$('#merchant-deal-view-modal').modal('show');
 			},
-			goToDealPayments(object) {
+			goToDealRents(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'my-deal-payments', params: { deal:object, dealId:object.id }});
+				this.$router.push({ name: 'my-space-deal-rents', params: { deal:object, dealId:object.id }});
 
 			},
 			searchData() {
@@ -1432,7 +1358,7 @@
 				// this.searchAttributes.merchant_id = this.merchant.id;
 				
 				axios
-				.post('/search-my-deals/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post('/search-my-space-deals/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.merchantAllDeals = response.data.all.data;
 					this.pagination = response.data.all;

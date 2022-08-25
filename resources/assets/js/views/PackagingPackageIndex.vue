@@ -1,5 +1,5 @@
 
-<template v-if="userHasPermissionTo('view-logistic-asset-index')">
+<template>
 	<div class="pcoded-content">
 		<breadcrumb 
 			:icon="'packaging-packages'"
@@ -455,7 +455,6 @@
 						</button>
 					</div>
 					<div class="modal-body">
-
 						<div class="card">
 							<div class="card-body text-center">	
 								<img class="img-fluid" 
@@ -466,28 +465,28 @@
 						</div>
 
 						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
+						    <div class="form-group col-6 text-right">
 								<label class="font-weight-bold">Name:</label>
 							</div>
-							<div class="form-group col-md-6 text-left">
+							<div class="form-group col-6">
 								{{ singleAssetData.name }}
 							</div>
 						</div>
 
 						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
+						    <div class="form-group col-6 text-right">
 								<label class="font-weight-bold">Price:</label>
 							</div>
-							<div class="form-group col-md-6 text-left">
+							<div class="form-group col-6">
 								{{ singleAssetData.price }}
 							</div>
 						</div>
 
 						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
+						    <div class="form-group col-6 text-right">
 								<label class="font-weight-bold">Description:</label>
 							</div>
-							<div class="form-group col-md-6 text-left">
+							<div class="form-group col-6">
 								<span v-html="singleAssetData.description"></span>
 							</div>
 						</div>

@@ -85,8 +85,8 @@ import Profile from './views/ProfileComponent'
 import MyProductIndex from './views/MyProductIndex'
 import MyProductStockIndex from './views/MyProductStockIndex'
 import MyRequisitionIndex from './views/MyRequisitionIndex'
-import MyDealIndex from './views/MyDealIndex'
-import MyDealPaymentIndex from './views/MyDealPaymentIndex'
+import MySpaceDealIndex from './views/MySpaceDealIndex'
+import MySpaceDealRentIndex from './views/MySpaceDealRentIndex'
 import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'     // public
 import PackagingPackageIndex from './views/PackagingPackageIndex'   // public
 import UnAuthorized from './views/403'
@@ -141,14 +141,14 @@ const router = new VueRouter({
             component: MyRequisitionIndex,
         },
         {
-            path: '/my-deals',
-            name: 'my-deals',
-            component: MyDealIndex,
+            path: '/my-space-deals',
+            name: 'my-space-deals',
+            component: MySpaceDealIndex,
         },
         {
-            path: '/my-deal-payments/:dealId',
-            name: 'my-deal-payments',
-            component: MyDealPaymentIndex,
+            path: '/my-space-deal/:dealId/rents',
+            name: 'my-space-deal-rents',
+            component: MySpaceDealRentIndex,
             props: true,
 
             beforeEnter: (to, from, next) => {
@@ -156,12 +156,12 @@ const router = new VueRouter({
                     next(); // <-- everything good, proceed
                 }
                 else {
-                    next('/my-deals');
+                    next('/my-space-deals');
                 }
             }
         },
         
-        // special routes
+        // public routes
         
         
         // view packages is permissible for all

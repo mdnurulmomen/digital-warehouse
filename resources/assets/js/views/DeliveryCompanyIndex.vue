@@ -376,28 +376,28 @@
 					<div class="modal-body">
 
 						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
+						    <div class="form-group col-6 text-right">
 								<label class="font-weight-bold">Name:</label>
 							</div>
-							<div class="form-group col-md-6 text-left">
+							<div class="form-group col-6">
 								{{ singleAssetData.name | capitalize }}
 							</div>
 						</div>
 
 						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
+						    <div class="form-group col-6 text-right">
 								<label class="font-weight-bold">Commission:</label>
 							</div>
-							<div class="form-group col-md-6 text-left">
+							<div class="form-group col-6">
 								{{ singleAssetData.commission }} %
 							</div>
 						</div>
 
 						<div class="form-row"> 
-						    <div class="form-group col-md-6 text-right">
+						    <div class="form-group col-6 text-right">
 								<label class="font-weight-bold">Service Schedule:</label>
 							</div>
-							<div class="form-group col-md-6 text-left">
+							<div class="form-group col-6">
 								
 							</div>
 						</div>

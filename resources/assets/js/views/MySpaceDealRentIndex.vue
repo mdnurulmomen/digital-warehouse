@@ -2,9 +2,9 @@
 <template>
 	<div class="pcoded-content">
 		<breadcrumb 
-			:icon="'payments'"
+			:icon="'rents'"
 			:title="'payment'" 
-			:message="'All payments of ' + merchant.user_name.replace(/ /g,'-') + ' for the deal ' + deal.name"
+			:message="'All rents of ' + merchant.user_name.replace(/ /g,'-') + ' for the deal ' + deal.name"
 		></breadcrumb>			
 
 		<div class="pcoded-inner-content">
@@ -30,7 +30,7 @@
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="searchData($event)" 
-											  		@fetchAllContents="setDealAllPayments()"
+											  		@fetchAllContents="setDealAllRents()"
 											  	></search-and-addition-option> 
 											  	-->
 
@@ -39,21 +39,21 @@
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
-													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Payments List' : 'Payments List'
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Rents List' : 'Rents List'
 													  			}}
 											  				</span>
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Payments'"></i>
+									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Rents'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 
 													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
-																	:data="dealAllPayments"
+																	:data="dealAllRents"
 																	:fields="dataToExport" 
-																	worksheet="Payments sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-payments-' : ('payments-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+																	worksheet="Rents sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-rents-' : ('rents-list-')) + today + '-page-' + pagination.current_page + '.xls'"
 													  			>
 													  				Excel
 																</download-excel>
@@ -62,10 +62,10 @@
 										  						<download-excel 
 										  							type="csv"
 													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item disabled"
-																	:data="dealAllPayments"
+																	:data="dealAllRents"
 																	:fields="dataToExport" 
-																	worksheet="Payments sheet"
-																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-payments-' : (currentTab + '-payments-list-')) + today + '-page-' + pagination.current_page + '.xls'"
+																	worksheet="Rents sheet"
+																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-rents-' : (currentTab + '-rents-list-')) + today + '-page-' + pagination.current_page + '.xls'"
 													  			>
 													  				CSV
 																</download-excel> 
@@ -81,7 +81,7 @@
 														  		class="form-control" 
 														  		pattern="[^'!#$%^()\x22]+" 
 														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Payments"
+														  		placeholder="Search Rents"
 													  		>
 
 													  		<div class="invalid-feedback">
@@ -132,25 +132,7 @@
 																			href="javascript:void(0)" 
 																			@click="changeNamesOrder"
 																		> 
-																			Invoice
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('previous_due')"
-																		> 
-																			Due
+																			ID
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -202,9 +184,9 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('net_payable')"
+																			@click="changeIntegersOrder('paid_amount')"
 																		> 
-																			Payable
+																			Paid
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -220,9 +202,9 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('paid_amount')"
+																			@click="changeIntegersOrder('previous_due')"
 																		> 
-																			Paid
+																			Due
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -243,32 +225,31 @@
 
 															<tbody>
 																<tr 
-																	v-for="(content, contentIndex) in dealAllPayments" 
+																	v-for="(content, contentIndex) in dealAllRents" 
 																	:key="'content-key-' + contentIndex + '-content-' + content.id" 
-																	:class="content.id==singlePaymentData.id ? 'highlighted' : ''"
+																	:class="content.id==singleRentData.id ? 'highlighted' : ''"
 																>
 																	<td>
-																		{{ content.invoice_no | capitalize }}
-																	</td>
-
-																	<td>
-																		{{ content.previous_due }}
+																		{{ content.name | capitalize }}
 																	</td>
 
 																	<td>
 																		{{ content.total_rent }}
+																		{{ general_settings.official_currency_name | capitalize }}
 																	</td>
 
 																	<td>
-																		{{ content.discount }}
+																		{{ content.discount }} %
 																	</td>
 
 																	<td>
-																		{{ content.net_payable }}
+																		{{ content.total_paid_amount }}
+																		{{ general_settings.official_currency_name | capitalize }}
 																	</td>
 
 																	<td>
-																		{{ content.paid_amount }}
+																		{{ (content.net_payable - content.total_paid_amount) }}
+																		{{ general_settings.official_currency_name | capitalize }}
 																	</td>
 																	
 																	<td>
@@ -283,7 +264,7 @@
 																</tr>
 
 																<tr 
-															  		v-show="! dealAllPayments.length"
+															  		v-show="! dealAllRents.length"
 															  	>
 														    		<td colspan="7">
 															      		<div class="alert alert-danger" role="alert">
@@ -300,25 +281,7 @@
 																			href="javascript:void(0)" 
 																			@click="changeNamesOrder"
 																		> 
-																			Name
-																			<span v-show="ascending">
-																				<i class="fa fa-sort-up" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="descending">
-																				<i class="fa fa-sort-down" aria-hidden="true"></i>
-																			</span>
-																			<span v-show="!ascending && !descending">
-																				<i class="fa fa-sort" aria-hidden="true" style="opacity: 0.4;"></i>
-																			</span>
-																		</a>
-																	</th>
-
-																	<th>
-																		<a 
-																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('previous_due')"
-																		> 
-																			Due
+																			ID
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -370,9 +333,9 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('net_payable')"
+																			@click="changeIntegersOrder('paid_amount')"
 																		> 
-																			Payable
+																			Paid
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -388,9 +351,9 @@
 																	<th>
 																		<a 
 																			href="javascript:void(0)" 
-																			@click="changeIntegersOrder('paid_amount')"
+																			@click="changeIntegersOrder('previous_due')"
 																		> 
-																			Paid
+																			Due
 																			<span v-show="ascending">
 																				<i class="fa fa-sort-up" aria-hidden="true"></i>
 																			</span>
@@ -431,7 +394,7 @@
 																type="button" 
 																class="btn waves-effect waves-dark btn-primary btn-outline-primary btn-sm" 
 																v-tooltip.bottom-end="'Reload'" 
-																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllPayments() : searchData()"
+																@click="pagination.current_page = 1; searchAttributes.search === '' ? fetchAllRents() : searchData()"
 															>
 																Reload
 																<i class="fa fa-sync"></i>
@@ -443,7 +406,7 @@
 																v-if="pagination.last_page > 1"
 																:pagination="pagination"
 																:offset="5"
-																@paginate="searchAttributes.search === '' ? fetchAllPayments() : searchData()"
+																@paginate="searchAttributes.search === '' ? fetchAllRents() : searchData()"
 															>
 															</pagination>
 														</div>
@@ -465,7 +428,7 @@
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Payment ({{ singlePaymentData.invoice_no }}) Details</h5>
+						<h5 class="modal-title" id="exampleModalLabel">Rent ({{ singleRentData.name | capitalize }}) Details</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -474,11 +437,11 @@
 					<div class="modal-body">
 						<div class="form-row">
 							<label class="col-6 col-form-label font-weight-bold text-right">
-								Invoice No :
+								ID :
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.invoice_no | capitalize }}
+								{{ singleRentData.name | capitalize }}
 							</label>
 						</div>
 
@@ -488,7 +451,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.number_installment }}
+								{{ singleRentData.number_installment }}
 							</label>
 						</div>
 
@@ -498,7 +461,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.date_from }}
+								{{ singleRentData.date_from }}
 							</label>
 						</div>
 
@@ -508,7 +471,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.date_to }}
+								{{ singleRentData.date_to }}
 							</label>
 						</div>
 
@@ -518,7 +481,7 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.total_rent }} {{ general_settings.official_currency_name }}
+								{{ singleRentData.total_rent }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
 						</div>
 
@@ -528,37 +491,27 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.discount }} %
+								{{ singleRentData.discount }} %
 							</label>
 						</div>
 
 						<div class="form-row">
 							<label class="col-6 col-form-label font-weight-bold text-right">
-								Last Due :
+								Net Payable :
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
+								{{ singleRentData.net_payable }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
 						</div>
 
 						<div class="form-row">
 							<label class="col-6 col-form-label font-weight-bold text-right">
-								Net Payeble :
+								Total Paid :
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
-							</label>
-						</div>
-
-						<div class="form-row">
-							<label class="col-6 col-form-label font-weight-bold text-right">
-								Paid Amount :
-							</label>
-
-							<label class="col-6 col-form-label">
-								{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
+								{{ singleRentData.total_paid_amount }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
 						</div>
 
@@ -568,27 +521,28 @@
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
+								{{ (singleRentData.net_payable - singleRentData.total_paid_amount) }} {{ general_settings.official_currency_name | capitalize }}
 							</label>
 						</div>
 
+
 						<div class="form-row">
 							<label class="col-6 col-form-label font-weight-bold text-right">
-								Paid at :
+								Created at :
 							</label>
 
 							<label class="col-6 col-form-label">
-								{{ singlePaymentData.paid_at }}
+								{{ singleRentData.created_at }}
 							</label>
 						</div>
 
 						<div 
 							class="form-row" 
-							v-if="singlePaymentData.hasOwnProperty('rents') && singlePaymentData.rents.length"
+							v-if="singleRentData.hasOwnProperty('spaceRents') && singleRentData.spaceRents.length"
 						>
 							<div 
 								class="col-sm-6" 
-								v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
+								v-for="(paymentRent, paymentRentIndex) in singleRentData.spaceRents" 
 								:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
 							>
 								<div class="card card-body">
@@ -618,7 +572,7 @@
 										</label>
 
 										<label class="col-6 col-form-label">
-											{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
+											{{ paymentRent.rent }} {{ general_settings.official_currency_name | capitalize }}
 										</label>	
 									</div>
 								</div>
@@ -648,13 +602,13 @@
 							>
 							
 							<h5>
-								{{ general_settings.app_name | capitalize }} Payment Invoice
+								{{ general_settings.app_name | capitalize }} Rent Details
 							</h5>
 						</div>
 
 						<div class="col-6">
 							<qr-code 
-							:text="singlePaymentData.invoice_no || ''"
+							:text="singleRentData.name || ''"
 							:size="50" 
 							class="float-right"
 							></qr-code>
@@ -671,7 +625,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.total_rent }} {{ general_settings.official_currency_name }}
+									{{ singleRentData.total_rent }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 
@@ -681,17 +635,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.discount }} %
-								</label>
-							</div>
-
-							<div class="form-row">
-								<label class="col-6 col-form-label font-weight-bold">
-									Last Due :
-								</label>
-
-								<label class="col-6 col-form-label">
-									{{ singlePaymentData.previous_due }} {{ general_settings.official_currency_name }}
+									{{ singleRentData.discount }} %
 								</label>
 							</div>
 
@@ -701,17 +645,17 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.net_payable }} {{ general_settings.official_currency_name }}
+									{{ singleRentData.net_payable }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold">
-									Paid Amount :
+									Total Paid Amount :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.paid_amount }} {{ general_settings.official_currency_name }}
+									{{ singleRentData.total_paid_amount }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 
@@ -721,7 +665,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.current_due }} {{ general_settings.official_currency_name }}
+									{{ (singleRentData.net_payable - singleRentData.total_paid_amount) }} {{ general_settings.official_currency_name | capitalize }}
 								</label>
 							</div>
 						</div>
@@ -743,7 +687,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.number_installment }}
+									{{ singleRentData.number_installment }}
 								</label>
 							</div>
 
@@ -753,7 +697,7 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.date_from }}
+									{{ singleRentData.date_from }}
 								</label>
 							</div>
 
@@ -763,17 +707,17 @@
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.date_to }}
+									{{ singleRentData.date_to }}
 								</label>
 							</div>
 
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold text-right">
-									Paid at :
+									Created at :
 								</label>
 
 								<label class="col-6 col-form-label">
-									{{ singlePaymentData.paid_at }} 
+									{{ singleRentData.created_at }} 
 								</label>
 							</div>
 						</div>
@@ -792,7 +736,7 @@
 
 								<tbody>
 									<tr 
-										v-for="(paymentRent, paymentRentIndex) in singlePaymentData.rents" 
+										v-for="(paymentRent, paymentRentIndex) in singleRentData.spaceRents" 
 										:key="'payment-rent-' + paymentRentIndex + '-id-' + paymentRent.id"
 									>	
 										<td>
@@ -804,7 +748,7 @@
 										</td>
 										
 										<td>
-											{{ paymentRent.rent }} {{ general_settings.official_currency_name }}
+											{{ paymentRent.rent }} {{ general_settings.official_currency_name | capitalize }}
 										</td>
 									</tr>
 								</tbody>
@@ -868,20 +812,19 @@
 	import axios from 'axios';
 	import Datepicker from 'vuejs-datepicker';
 
-    let singlePaymentData = {
+    let singleRentData = {
     	
 		number_installment : 1,
 		date_from : 1,
 		date_to : 1,
 		total_rent : 0, // generated from selected spaces
 		discount : 0,	// percentage 
-    	previous_due : 0,
+    	// previous_due : 0,
 		net_payable : 0,
-		paid_amount : 0,
-		current_due : 0,
-		// merchant_deal_id : null,
-		// paid_at : null,
-		rents : [
+		total_paid_amount : 0,
+		// merchant_space_deal_id : null,
+		// created_at : null,
+		spaceRents : [
 			{
 				// rent : 0,
 				// dealt_space_id : null,
@@ -921,13 +864,13 @@
 	        	ascending : false,
 	      		descending : false,
 
-	        	dealAllPayments : [],
+	        	dealAllRents : [],
 
 	        	pagination: {
 		        	current_page: 1
 		      	},
 
-	        	singlePaymentData : singlePaymentData, 
+	        	singleRentData : singleRentData, 
 
 	        	searchAttributes : {
 
@@ -947,7 +890,7 @@
 
 	        	dataToExport: {
 
-					Invoice: 'invoice_no',
+					ID: 'name',
 
 					"# Installment": 'number_installment',
 
@@ -959,25 +902,31 @@
 
 					Discount: 'discount',
 
-					"Prev. Due": 'previous_due',
-
 					"Net Payable": 'net_payable',
 
-					"Paid": 'paid_amount',
+					"Total Paid": 'total_paid_amount',
 
-					Due: 'current_due',
+					"Due": {
+						
+						callback: (object) => {
+							
+							return (object.net_payable - object.total_paid_amount);
 
-					"Paid at": 'paid_at',
+						},
+
+					},
+
+					"Created at": 'created_at',
 
 					"Rents": {
-						field: "rents",
-						callback: (rents) => {
+						field: "spaceRents",
+						callback: (spaceRents) => {
 
-							if (rents && rents.length) {
+							if (spaceRents && spaceRents.length) {
 								
 								var infosToReturn = '';
 
-								rents.forEach(
+								spaceRents.forEach(
 					
 									(paymentRent, paymentRentIndex) => {
 
@@ -1015,7 +964,7 @@
 
 				    timeout: 1000, // default timeout before the print window appears
 					autoClose: true, // if false, the window will not close after printing
-					windowTitle: 'Payment Details' 
+					windowTitle: 'Rent Details' 
 
 				},
 
@@ -1031,7 +980,7 @@
 		
 		created(){
 
-			this.fetchAllPayments();
+			this.fetchAllRents();
 
 		},
 
@@ -1054,8 +1003,8 @@
 
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
-					this.fetchAllPayments();
-					// this.setDealAllPayments();
+					this.fetchAllRents();
+					// this.setDealAllRents();
 
 				}
 				else {
@@ -1078,8 +1027,8 @@
 
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
-					this.fetchAllPayments();
-					// this.setDealAllPayments();
+					this.fetchAllRents();
+					// this.setDealAllRents();
 
 				}
 				else {
@@ -1096,8 +1045,8 @@
 
 				if (this.searchAttributes.search==='' && ! this.searchAttributes.dateTo && ! this.searchAttributes.dateFrom) {
 
-					this.fetchAllPayments();
-					// this.setDealAllPayments();
+					this.fetchAllRents();
+					// this.setDealAllRents();
 
 				}
 				else {
@@ -1136,15 +1085,15 @@
 		
 		methods : {
 
-			fetchAllPayments() {
+			fetchAllRents() {
 				
 				this.error = '';
 				this.loading = true;
-				this.dealAllPayments = [];
+				this.dealAllRents = [];
 				this.searchAttributes.search = '';
 				
 				axios
-					.get('/api/my-deal-payments/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/my-space-deal/'  + this.deal.id + '/rents/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.setContentPagination(response);
@@ -1179,16 +1128,16 @@
 
 				this.error = '';
 				this.loading = true;
-				this.dealAllPayments = [];
+				this.dealAllRents = [];
 				// this.allFetchedContents = [];
 				// this.pagination.current_page = 1;
-				this.searchAttributes.merchant_deal_id = this.deal.id;
+				this.searchAttributes.merchant_space_deal_id = this.deal.id;
 				
 				axios
-				.post("/search-my-deal-payments/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post("/search-my-space-deal-rents/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
-					this.dealAllPayments = response.data.all.data;
+					this.dealAllRents = response.data.all.data;
 					this.pagination = response.data.all;
 				})
 				.catch(e => {
@@ -1200,13 +1149,13 @@
 
 			},
 			showContentDetails(object) {	
-				this.singlePaymentData = object;
+				this.singleRentData = object;
 				$('#merchant-payment-view-modal').modal('show');
 			},
 			/*
-			setDealAllPayments() {
+			setDealAllRents() {
 
-				this.dealAllPayments = this.deal.payments;
+				this.dealAllRents = this.deal.rents;
 
 			},
 			*/
@@ -1217,8 +1166,8 @@
 
 				if (this.searchAttributes.search === '') {
 					
-					this.fetchAllPayments();
-					// this.setDealAllPayments();
+					this.fetchAllRents();
+					// this.setDealAllRents();
 				
 				}
 				else {
@@ -1228,7 +1177,7 @@
     		},
     		setContentPagination(response) {
 
-    			this.dealAllPayments = response.data.data;
+    			this.dealAllRents = response.data.data;
 				this.pagination = response.data;
 
 			},
@@ -1290,7 +1239,7 @@
 			},
 			ascendingAlphabets(columnValue) {
 
-				this.dealAllPayments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
 						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
@@ -1303,7 +1252,7 @@
 			},
 			descendingAlphabets(columnValue) {
 
-				this.dealAllPayments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						var x = a[columnValue] ? a[columnValue].toLowerCase() : '';
 						var y = b[columnValue] ? b[columnValue].toLowerCase() : '';
@@ -1316,7 +1265,7 @@
 			},
 			ascendingIntegers(columnValue) {
 
-				this.dealAllPayments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						return a[columnValue] - b[columnValue];
 					}
@@ -1325,7 +1274,7 @@
 			},
 			descendingIntegers(columnValue) {
 
-				this.dealAllPayments.sort(
+				this.dealAllRents.sort(
 			 		function(a, b){
 						return b[columnValue] - a[columnValue];
 					}
@@ -1373,8 +1322,8 @@
             },
             print() {
 
-				// this.printingStyles.name = `${ this.singlePaymentData.invoice_no } Details`;
-				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singlePaymentData.invoice_no } Details`);
+				// this.printingStyles.name = `${ this.singleRentData.name } Details`;
+				this.printingStyles.windowTitle = this.$options.filters.capitalize(`${ this.singleRentData.name } Details`);
 
 				// this.$set(this, 'paymentToPrint', paymentToPrint);
 				// this.paymentToPrint = paymentToPrint;

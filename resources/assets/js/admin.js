@@ -487,7 +487,7 @@ const router = new VueRouter({
         },
         {
             path: '/merchant/:merchantId/space-deals',
-            name: 'merchant-space-deals',
+            name: 'space-deals',
             component: MerchantSpaceDealIndex,
             props: true,
             meta: {

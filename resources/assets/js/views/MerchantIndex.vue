@@ -234,7 +234,7 @@
 			goMerchantDeals(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'merchant-space-deals', params: { merchant: object, merchantId:object.id }});
+				this.$router.push({ name: 'space-deals', params: { merchant: object, merchantId:object.id }});
 
 			},
 			goMerchantProducts(object) {
