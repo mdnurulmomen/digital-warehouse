@@ -40,20 +40,20 @@
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
-													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Payments List' : 'Payments List'
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Rents List' : 'Rents List'
 													  			}}
 											  				</span>
 											  			</div>
 
 											  			<div class="dropdown">
-									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Payments'"></i>
+									  						<i class="fa fa-download fa-lg dropdown-toggle" data-toggle="dropdown" v-tooltip.bottom-end="'Download Rents'"></i>
 										  					
 										  					<div class="dropdown-menu">
 									  							<download-excel 
 													  				class="btn waves-effect waves-dark btn-default btn-outline-default p-1 dropdown-item active"
 																	:data="dealAllRents"
 																	:fields="dataToExport" 
-																	worksheet="Payments sheet"
+																	worksheet="Rents sheet"
 																	:name="((searchAttributes.search != '' || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'searched-rents-' : ('rents-list-')) + today + '-page-' + pagination.current_page + '.xls'"
 													  			>
 													  				Excel
@@ -94,7 +94,7 @@
 														  		class="form-control" 
 														  		pattern="[^'!#$%^()\x22]+" 
 														  		v-model="searchAttributes.search" 
-														  		placeholder="Search Payments"
+														  		placeholder="Search Rents"
 													  		>
 
 													  		<div class="invalid-feedback">

@@ -246,7 +246,7 @@
 																	<tr 
 																  		v-show="!merchantAllDeals.length"
 																  	>
-															    		<td colspan="7">
+															    		<td colspan="6">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -257,7 +257,6 @@
 																	<tr>	
 																		<th>Name</th>
 																		<th>Status</th>
-																		<th>E-cmmrc support</th>
 																		<th>Auto Renewal</th>
 																		<th>Rent Package</th>
 																		<th>Exp Date</th>
@@ -1334,7 +1333,7 @@
 									    				<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control" 
-																v-model.number="singleMerchantDealData.rents[0].paid_amount" 
+																v-model.number="singleMerchantDealData.rents[0].total_paid_amount" 
 																placeholder="Paid Amount" 
 																:class="! errors.rent.paid_amount ? 'is-valid' : 'is-invalid'" 
 																@change="validateFormInput('paid_amount')"  
@@ -1366,7 +1365,7 @@
 									    				<div class="input-group mb-0">
 									    					<input type="number" 
 																class="form-control is-valid" 
-																:value="singleMerchantDealData.rents[0].net_payable - singleMerchantDealData.rents[0].paid_amount" 
+																:value="singleMerchantDealData.rents[0].net_payable - singleMerchantDealData.rents[0].total_paid_amount" 
 																placeholder="Dues" 
 																:readonly="true"
 															>
@@ -2343,11 +2342,11 @@
 							number_installment : 1,	
 							date_from : null,
 							date_to : null,
-							previous_due : 0,
+							// previous_due : 0,
 							total_rent : 0, // generated from selected spaces
 							discount : 0,	// percentage 
 							net_payable : 0,
-							paid_amount : 0,
+							total_paid_amount : 0,
 							// current_due : 0,
 							merchant_deal_id : null,
 							paid_at : null,
@@ -3183,11 +3182,11 @@
 							number_installment : 1,
 							date_from : this.today,
 							date_to : null,
-							previous_due : 0,	// as new deal
+							// previous_due : 0,	// as new deal
 							total_rent : 0, // generated from selected spaces
 							discount : 0,	// percentage 
 							net_payable : 0,
-							paid_amount : 0,
+							total_paid_amount : 0,
 							// current_due : 0,
 							// merchant_deal_id : null,
 							// paid_at : null,
@@ -4454,7 +4453,7 @@
 			},
 			setNetPayable() {
 
-				this.singleMerchantDealData.rents[0].net_payable = this.singleMerchantDealData.rents[this.singleMerchantDealData.rents.length-1].previous_due + this.singleMerchantDealData.rents[this.singleMerchantDealData.rents.length-1].total_rent;
+				this.singleMerchantDealData.rents[0].net_payable = /* this.singleMerchantDealData.rents[this.singleMerchantDealData.rents.length-1].previous_due + */ this.singleMerchantDealData.rents[this.singleMerchantDealData.rents.length-1].total_rent;
 
 			},
 			resetTotalRent() {
@@ -4829,7 +4828,7 @@
 
 					case 'paid_amount' : 
 						
-						if(! this.singleMerchantDealData.rents || ! this.singleMerchantDealData.rents[0].paid_amount || this.singleMerchantDealData.rents[0].paid_amount < 1){
+						if(! this.singleMerchantDealData.rents || ! this.singleMerchantDealData.rents[0].total_paid_amount || this.singleMerchantDealData.rents[0].total_paid_amount < 1){
 							
 							this.errors.rent.paid_amount = 'Paid amount is required';
 

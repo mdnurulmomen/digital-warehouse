@@ -86,7 +86,7 @@ import RoleIndex from './views/RoleIndex'
 import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 import MerchantSpaceDealIndex from './views/MerchantSpaceDealIndex'
-import DealRentIndex from './views/DealRentIndex'
+import SpaceDealRentIndex from './views/SpaceDealRentIndex'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -365,7 +365,7 @@ const router = new VueRouter({
         {
             path: '/deal-payments/:merchantName/:dealDate',
             name: 'deal-payments',
-            component: DealRentIndex,
+            component: SpaceDealRentIndex,
             props: true,
             meta: {
                 // authRequired: true,

@@ -141,11 +141,19 @@ class MerchantController extends Controller
         return $this->showAllMerchants($perPage);
     }
 
-    public function deleteMerchant($owner, $perPage)
+    public function deleteMerchant($merchant, $perPage)
     {
-    	$userToDelete = Merchant::findOrFail($owner);
+    	$userToDelete = Merchant::findOrFail($merchant);
+        
+        if ($userToDelete->deals()->where('active', 1)->count() || $userToDelete->products()->where('available_quantity', '>', 0)->count()) {
+           
+            return response()->json(['errors'=>["hasDealOrProducts" => "Merchant has active deals or products"]], 422);
+
+        }
+
         // $userToDelete->permissions()->detach();
         // $userToDelete->roles()->detach();
+        
         $userToDelete->delete();
 
         return $this->showAllMerchants($perPage);
@@ -690,7 +698,7 @@ class MerchantController extends Controller
     // Merchant-Products for Admin && Merchant 
     public function showMerchantAvailableProducts($merchant, $perPage=false)
     {
-        $expectedMerchant = Merchant::findOrFail($merchant);
+        $expectedMerchant = Merchant::withTrashed()->findOrFail($merchant);
         
         if ($perPage) {
             
@@ -700,7 +708,10 @@ class MerchantController extends Controller
                                                         ->whereHas('product', function ($query) {
                                                             $query->where('product_category_id', '>', 0);
                                                         })
-                                                        ->with(['merchant', 'addresses', 'serials', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.serials'])
+                                                        ->with(['addresses', 'serials', 'nonDispatchedRequests', 'dispatchedRequests', 'variations.serials'])
+                                                        ->with(array('merchant' => function($query) {
+                                                            $query->withTrashed();
+                                                        }))
                                                         ->with(['stocks' => function ($query1) {
                                                             $query1->where('available_quantity', '>', 0);
                                                          
@@ -716,7 +727,10 @@ class MerchantController extends Controller
                                                             $query->whereNull('product_category_id')
                                                                 ->orWhere('product_category_id', 0);
                                                         })
-                                                        ->with(['merchant', 'stocks', 'addresses', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(['stocks', 'addresses', 'nonDispatchedRequests', 'dispatchedRequests'])
+                                                        ->with(array('merchant' => function($query) {
+                                                            $query->withTrashed();
+                                                        }))
                                                        ->paginate($perPage)),
             ];
 
@@ -725,7 +739,10 @@ class MerchantController extends Controller
         return MerchantProductResource::collection(
             MerchantProduct::where('merchant_id', $expectedMerchant->id)
             ->where('available_quantity', '>', 0)
-            ->with(['merchant', 'nonDispatchedRequests', 'dispatchedRequests', 'variations', 'variations.nonDispatchedRequests'])
+            ->with(['nonDispatchedRequests', 'dispatchedRequests', 'variations', 'variations.nonDispatchedRequests'])
+            ->with(array('merchant' => function($query) {
+                $query->withTrashed();
+            }))
             ->with(['serials' => function ($query) {
                 $query->where('has_requisitions', 0)->where('has_dispatched', 0);
             }])

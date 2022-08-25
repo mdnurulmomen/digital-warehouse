@@ -112,7 +112,7 @@ import RoleIndex from './views/RoleIndex'
 import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 import MerchantSpaceDealIndex from './views/MerchantSpaceDealIndex'
-import DealRentIndex from './views/DealRentIndex'
+import SpaceDealRentIndex from './views/SpaceDealRentIndex'
 import RentPaymentIndex from './views/RentPaymentIndex'
 import MailIndex from './views/MailIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
@@ -506,7 +506,7 @@ const router = new VueRouter({
         {
             path: '/space-deal/:dealId/rents',
             name: 'space-deal-rents',
-            component: DealRentIndex,
+            component: SpaceDealRentIndex,
             props: true,
             meta: {
                 // authRequired: true,

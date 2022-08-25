@@ -69,7 +69,7 @@ class DealController extends Controller
             'rents.*.discount' => 'required|numeric|between:0,100',
             // 'rents.*.previous_due' => 'numeric|min:0',
             'rents.*.net_payable' => 'required|numeric',
-            'rents.*.paid_amount' => 'required|numeric|min:0',
+            'rents.*.total_paid_amount' => 'required|numeric|min:1',
             // 'rents.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
@@ -148,7 +148,7 @@ class DealController extends Controller
             'rents.*.date_to' => 'Rent ending date is required',
             'rents.*.discount' => 'Discount rate should be between 0 to 100',
             'rents.*.net_payable' => 'Net payable is invalid',
-            'rents.*.paid_amount' => 'Paid amount is invalid',
+            'rents.*.total_paid_amount' => 'Paid amount is invalid',
             // 'rents.*.previous_due' => 'Previous due is invalid',
             'rents.*.total_rent' => 'Total rent is invalid',
 
@@ -202,17 +202,17 @@ class DealController extends Controller
             'total_rent' => $request->rents[0]->total_rent,
             'discount' => $request->rents[0]->discount,
             'net_payable' => $request->rents[0]->net_payable,
-            'total_paid_amount' => $request->rents[0]->paid_amount
+            'total_paid_amount' => $request->rents[0]->total_paid_amount
         ]);
 
-        if ($request->rents[0]->paid_amount > 0) {
+        if ($request->rents[0]->total_paid_amount > 0) {
             
             $user = $request->user();
 
             $merchantPayment = $dealNewRent->payments()->create([
                 'invoice_no' => ($dealNewRent->name.'P'.($dealNewRent->payments->count() + 1)),
-                'paid_amount' => $request->rents[0]->paid_amount,
-                'current_due' => ($request->rents[0]->net_payable - $request->rents[0]->paid_amount),
+                'paid_amount' => $request->rents[0]->total_paid_amount,
+                'current_due' => ($request->rents[0]->net_payable - $request->rents[0]->total_paid_amount),
                 'issuer_type' => get_class($user),
                 'issuer_id' => $user->id,
             ]);
@@ -271,7 +271,7 @@ class DealController extends Controller
             'rents.*.discount' => 'required|numeric|between:0,100',
             // 'rents.*.previous_due' => 'required|numeric',
             'rents.*.net_payable' => 'required|numeric',
-            'rents.*.paid_amount' => 'required|numeric|min:0',
+            'rents.*.total_paid_amount' => 'required|numeric|min:1',
             // 'rents.*.current_due' => 'required|numeric',
 
             'warehouses' => 'required|array|min:1',
@@ -350,7 +350,7 @@ class DealController extends Controller
             'rents.*.date_to' => 'Rent ending date is required',
             'rents.*.discount' => 'Discount rate should be between 0 to 100',
             'rents.*.net_payable' => 'Net payable is invalid',
-            'rents.*.paid_amount' => 'Paid amount is invalid',
+            'rents.*.total_paid_amount' => 'Paid amount is invalid',
             // 'rents.*.previous_due' => 'Previous due is invalid',
             'rents.*.total_rent' => 'Total rent is invalid',
 
@@ -395,9 +395,9 @@ class DealController extends Controller
             'merchant_id' => $request->merchant_id,
         ]);
 
-        if ($dealToUpdate->rents->count() == 1 && $dealToUpdate->active) {
+        $dealRecentRent = $dealToUpdate->rents()->firstOrFail();
             
-            $dealRecentRent = $dealToUpdate->rents()->firstOrFail();
+        if ($dealToUpdate->rents->count() == 1 && $dealToUpdate->active) {
 
             $request['rents'] = json_decode(json_encode($request->rents)); 
 
@@ -408,7 +408,7 @@ class DealController extends Controller
                 'total_rent' => $request->rents[0]->total_rent,
                 'discount' => $request->rents[0]->discount,
                 'net_payable' => $request->rents[0]->net_payable,
-                'total_paid_amount' => $dealRecentRent->payments->count() > 1 ? $dealRecentRent->total_paid_amount : $request->rents[0]->paid_amount,
+                'total_paid_amount' => $dealRecentRent->payments->count() > 1 ? $dealRecentRent->total_paid_amount : $request->rents[0]->total_paid_amount,
             ]);
 
             if ($dealRecentRent->payments->count() == 1) {
@@ -416,8 +416,8 @@ class DealController extends Controller
                 $user = $request->user();
 
                 $dealRecentRent->payments()->first()->update([
-                    'paid_amount' => $request->rents[0]->paid_amount,
-                    'current_due' => ($request->rents[0]->net_payable - $request->rents[0]->paid_amount),
+                    'paid_amount' => $request->rents[0]->total_paid_amount,
+                    'current_due' => ($request->rents[0]->net_payable - $request->rents[0]->total_paid_amount),
                     'updater_type' => get_class($user),
                     'updater_id' => $user->id,
                 ]);
@@ -861,7 +861,7 @@ class DealController extends Controller
         $dealNewPayment = $dealRent->payments()->create([
             'invoice_no' => ($dealRent->name.'P'.($dealRent->payments->count() + 1)),
             'paid_amount' => $request->paid_amount,
-            'current_due' => ($dealRent->current_due - $request->paid_amount),
+            'current_due' => (($dealRent->net_payable - $dealRent->total_paid_amount) - $request->paid_amount),
             'issuer_type' => get_class($user),
             'issuer_id' => $user->id,
         ]);
