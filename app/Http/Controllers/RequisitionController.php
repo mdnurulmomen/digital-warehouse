@@ -284,13 +284,13 @@ class RequisitionController extends Controller
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->whereDate('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->whereDate('created_at', '<=', $request->dateTo);
 
         }
 
@@ -442,13 +442,13 @@ class RequisitionController extends Controller
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->whereDate('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->whereDate('created_at', '<=', $request->dateTo);
 
         }
 

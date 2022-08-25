@@ -21,13 +21,13 @@ Route::name('manager.')->group(function () {
 	       return view('auth.login', ['url' => 'manager']); 
 	    })->name('login');
 
-	    Route::post('/', 'Auth\LoginController@managerLogin')->name('login');
+	    Route::post('/', 'Auth\LoginController@adminLogin')->name('login');
 
 	});
 
 	Route::middleware(['auth:manager'])->group(function () {
 		
-		Route::get('/{any}', 'HomeController@managerHome')->name('home');
+		Route::get('/{any}', 'HomeController@adminHome')->name('home');
 		
 		Route::get('/api/mails/{perPage?}', 'MailController@showAllMails')->name('mails.index');
 		Route::post('/mails/{perPage}', 'MailController@sendDynamicMail')->name('mails.store');
@@ -35,9 +35,9 @@ Route::name('manager.')->group(function () {
 		Route::get('api/search-mails/{query}/{perPage}', 'MailController@searchAllMails')->name('search-mails');
 
 		// profile
-		Route::get('/api/profile', 'ProfileController@showManagerProfile')->name('profile.show');	
-		Route::put('/profile', 'ProfileController@updateManagerProfile')->name('profile.update');	
-		Route::post('/password', 'ProfileController@updateManagerPassword')->name('password.update');
+		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile.show');	
+		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile.update');	
+		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password.update');
 
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings.show');
@@ -145,7 +145,7 @@ Route::name('manager.')->group(function () {
 		Route::patch('/variations/{asset}/{perPage}', 'AssetController@restoreVariation')->name('variations.restore');
 		Route::get('/api/search-variations/{search}/{perPage}', 'AssetController@searchAllVariations')->name('search-variations');
 
-		// product-category
+		// product-manufacturers
 		Route::get('/api/manufacturers/{perPage?}', 'ProductController@showAllManufacturers')->name('manufacturers.index');
 		Route::post('/manufacturers/{perPage}', 'ProductController@storeNewManufacturer')->name('manufacturers.store');	
 		Route::put('/manufacturers/{asset}/{perPage}', 'ProductController@updateManufacturer')->name('manufacturers.update');	
@@ -168,7 +168,7 @@ Route::name('manager.')->group(function () {
 		Route::get('/api/search-category-products/{category}/{search}/{perPage?}', 'ProductController@searchCategoryAllProducts')->name('search-category-products');
 
 		// product
-		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products.show');
+		Route::get('/api/products/{perPage?}', 'ProductController@showAllProducts')->name('products.index');
 		Route::post('/products/{perPage}', 'ProductController@storeNewProduct')->name('products.store');	
 		Route::put('/products/{product}/{perPage}', 'ProductController@updateProduct')->name('products.update');
 		Route::delete('/products/{product}/{perPage}', 'ProductController@deleteProduct')->name('products.delete');
@@ -180,7 +180,6 @@ Route::name('manager.')->group(function () {
 		Route::post('/product-stocks/{perPage}', 'ProductController@storeProductStock')->name('product-stocks.store');
 		Route::put('/product-stocks/{stock}/{perPage}', 'ProductController@updateProductStock')->name('product-stocks.update');
 		Route::delete('/product-stocks/{stock}/{perPage}', 'ProductController@deleteProductStock')->name('product-stocks.delete');
-		// Route::patch('/product-stocks/{stock}/{perPage}', 'ProductController@restoreProductStock')->name('product-stocks');
 		Route::post('/api/search-product-stocks/{productMerchant}/{perPage}', 'ProductController@searchProductAllStocks')->name('search-product-stocks');
 
 		// stock
@@ -222,7 +221,7 @@ Route::name('manager.')->group(function () {
 
 		// merchant-products
 		Route::get('/api/merchant-all-products/{merchant}', 'MerchantController@showMerchantAllProducts')->name('merchant-all-products.index');
-		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.show');
+		Route::get('/api/merchant-products/{merchant}/{perPage?}', 'MerchantController@showMerchantAvailableProducts')->name('merchant-products.index');
 		Route::post('/merchant-products/{perPage}', 'MerchantController@storeMerchantNewProduct')->name('merchant-products.store');	
 		Route::post('/merchant-multiple-products/{perPage}', 'MerchantController@storeMerchantMultipleProducts')->name('merchant-products.multiple-store');	
 		Route::put('/merchant-products/{productMerchant}/{perPage}', 'MerchantController@updateMerchantProduct')->name('merchant-products.update');
@@ -247,26 +246,26 @@ Route::name('manager.')->group(function () {
 		Route::post('/dispatches/{perPage}', 'DispatchController@makeDispatch')->name('dispatches.store');
 		// Route::get('/api/search-dispatches/{search}/{perPage?}', 'DispatchController@searchAllDispatches')->name('search-dispatches');
 
-		// merchant-deals
-		Route::get('/api/merchant-deals/{merchant}/{perPage?}','DealController@showMerchantAllDeals')->name('merchant-deals.index');
-		Route::post('/merchant-deals/{perPage}','DealController@storeMerchantDeal')->name('merchant-deals.store');	
-		Route::put('/merchant-deals/{deal}/{perPage}','DealController@updateMerchantDeal')->name('merchant-deals.update');	
-		Route::delete('/merchant-deals/{deal}/{perPage}','DealController@deleteMerchantDeal')->name('merchant-deals.delete');
-		Route::post('/search-merchant-deals/{perPage}','DealController@searchMerchantAllDeals')->name('search-merchant-deals');
+		// merchant-space-deals
+		Route::get('/api/merchant-space-deals/{merchant}/{perPage?}','DealController@showMerchantAllSpaceDeals')->name('merchant-space-deals.index');
+		Route::post('/merchant-space-deals/{perPage}','DealController@storeMerchantSpaceDeal')->name('merchant-space-deals.store');	
+		Route::put('/merchant-space-deals/{deal}/{perPage}','DealController@updateMerchantSpaceDeal')->name('merchant-space-deals.update');	
+		Route::delete('/merchant-space-deals/{deal}/{perPage}','DealController@deleteMerchantSpaceDeal')->name('merchant-space-deals.delete');
+		Route::post('/search-merchant-space-deals/{perPage}','DealController@searchMerchantAllSpaceDeals')->name('search-merchant-space-deals');
 
-		// deal-instalments
-		Route::get('/api/deal-instalments/{deal}/{perPage?}', 'DealController@showDealAllInstalments')->name('deal-instalments.index');
-		Route::post('/deal-instalments/{perPage}', 'DealController@storeDealNewInstalment')->name('deal-instalments.store');	
-		Route::put('/deal-instalments/{instalment}/{perPage}', 'DealController@updateDealInstalment')->name('deal-instalments.update');	
-		Route::delete('/deal-instalments/{instalment}/{perPage}', 'DealController@deleteDealInstalment')->name('deal-instalments.delete');
-		Route::post('/api/search-deal-instalments/{perPage}', 'DealController@searchDealAllInstalments')->name('search-deal-instalments');
+		// deal-rents
+		Route::get('/api/deal-rents/{deal}/{perPage?}', 'DealController@showDealAllRents')->name('deal-rents.index');
+		Route::post('/deal-rents/{perPage}', 'DealController@storeDealNewRent')->name('deal-rents.store');	
+		Route::put('/deal-rents/{rent}/{perPage}', 'DealController@updateDealRent')->name('deal-rents.update');	
+		Route::delete('/deal-rents/{rent}/{perPage}', 'DealController@deleteDealRent')->name('deal-rents.delete');
+		Route::post('/api/search-deal-rents/{perPage}', 'DealController@searchDealAllRents')->name('search-deal-rents');
 
-		// instalment-payments
-		Route::get('/api/instalment-payments/{instalment}/{perPage?}', 'DealController@showInstalmentAllPayments')->name('instalment-payments.index');
-		Route::post('/instalment-payments/{perPage}', 'DealController@storeInstalmentNewPayment')->name('instalment-payments.store');	
-		Route::put('/instalment-payments/{payment}/{perPage}', 'DealController@updateInstalmentPayment')->name('instalment-payments.update');	
-		Route::delete('/instalment-payments/{payment}/{perPage}', 'DealController@deleteInstalmentPayment')->name('instalment-payments.delete');
-		Route::post('/api/search-instalment-payments/{perPage}', 'DealController@searchInstalmentAllPayments')->name('search-instalment-payments');
+		// rental-payments
+		Route::get('/api/rental-payments/{rental}/{perPage?}', 'DealController@showRentalAllPayments')->name('rental-payments.index');
+		Route::post('/rental-payments/{perPage}', 'DealController@storeRentalNewPayment')->name('rental-payments.store');	
+		Route::put('/rental-payments/{payment}/{perPage}', 'DealController@updateRentalPayment')->name('rental-payments.update');	
+		Route::delete('/rental-payments/{payment}/{perPage}', 'DealController@deleteRentalPayment')->name('rental-payments.delete');
+		Route::post('/api/search-rental-payments/{perPage}', 'DealController@searchRentalAllPayments')->name('search-rental-payments');
 
 		// permission
 		Route::get('/api/permissions/','RoleController@showAllPermissions')->name('permissions.index');
@@ -275,7 +274,7 @@ Route::name('manager.')->group(function () {
 		Route::get('/api/general-dashboard-one','AnalyticsController@getGeneralDashboardOneData')->name('dashboard-one.show');
 		// second dashboard
 		Route::get('/api/general-dashboard-two/{merchant}/{date?}','AnalyticsController@getGeneralDashboardTwoData')->name('dashboard-two.show');
-		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.show');
+		Route::get('/api/merchant-limited-products/{merchant}/{perPage}','AnalyticsController@showMerchantLimitedProducts')->name('merchant-limited-products.index');
 
 		// imports
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');

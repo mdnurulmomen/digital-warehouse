@@ -1447,7 +1447,7 @@ class MerchantController extends Controller
         if ($request->dateFrom) {
             
             $query->whereHas('stock', function ($q) use ($request) {
-                $q->where('created_at', '>=', $request->dateFrom);
+                $q->whereDate('created_at', '>=', $request->dateFrom);
             });
 
         }
@@ -1455,7 +1455,7 @@ class MerchantController extends Controller
         if ($request->dateTo) {
             
             $query->whereHas('stock', function ($q) use ($request) {
-                $q->where('created_at', '<=', $request->dateTo);
+                $q->whereDate('created_at', '<=', $request->dateTo);
             });
 
         }

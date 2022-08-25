@@ -2427,6 +2427,7 @@
 						<div class="col-6">
 							<img 
 								class="img-fluid" 
+								width="60px" 
 								:src="'/' + general_settings.logo" 
 								:alt="general_settings.app_name + ' Logo'"
 							>

@@ -1055,7 +1055,7 @@ class ProductController extends Controller
         if ($request->dateFrom) {
             
             $query->whereHas('stock', function ($q) use ($request) {
-                $q->where('created_at', '>=', $request->dateFrom);
+                $q->whereDate('created_at', '>=', $request->dateFrom);
             });
 
         }
@@ -1063,7 +1063,7 @@ class ProductController extends Controller
         if ($request->dateTo) {
             
             $query->whereHas('stock', function ($q) use ($request) {
-                $q->where('created_at', '<=', $request->dateTo);
+                $q->whereDate('created_at', '<=', $request->dateTo);
             });
 
         }
@@ -1452,13 +1452,13 @@ class ProductController extends Controller
 
         if ($request->dateFrom) {
             
-            $query->where('created_at', '>=', $request->dateFrom);
+            $query->whereDate('created_at', '>=', $request->dateFrom);
 
         }
 
         if ($request->dateTo) {
             
-            $query->where('created_at', '<=', $request->dateTo);
+            $query->whereDate('created_at', '<=', $request->dateTo);
 
         }
 
