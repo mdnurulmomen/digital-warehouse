@@ -24,7 +24,7 @@ use App\Models\ProductVariationSerial;
 use App\Models\WarehouseContainerStatus;
 use App\Models\WarehouseContainerShelfStatus;
 use App\Http\Resources\Web\MyProductResource;
-// use App\Http\Resources\Web\MyProductCollection;
+use App\Http\Resources\Web\MerchantCollection;
 use App\Http\Resources\Web\MerchantRentCollection;
 use App\Models\WarehouseContainerShelfUnitStatus;
 use App\Jobs\BroadcastProductReceiveConfirmation;
@@ -60,11 +60,11 @@ class MerchantController extends Controller
             
             return response()->json([
 
-        		'approved' => Merchant::withCount('deals')->withCount('products')->where('active', 1)->latest()->paginate($perPage),
+        		'approved' => new MerchantCollection(Merchant::withCount('spaceDeals')->withCount('products')->where('active', 1)->latest()->paginate($perPage)),
 
-                'pending' => Merchant::withCount('deals')->withCount('products')->where('active', 0)->latest()->paginate($perPage),
+                'pending' => new MerchantCollection(Merchant::withCount('spaceDeals')->withCount('products')->where('active', 0)->latest()->paginate($perPage)),
 
-        		'trashed' => Merchant::withCount('deals')->withCount('products')->onlyTrashed()->latest()->paginate($perPage),
+        		'trashed' => new MerchantCollection(Merchant::withCount('spaceDeals')->withCount('products')->onlyTrashed()->latest()->paginate($perPage)),
 
         	], 200);
 
@@ -83,6 +83,15 @@ class MerchantController extends Controller
             'mobile' => 'required|string|max:50|unique:merchants,mobile',
             'password' => 'required|string|max:255|confirmed',
             'active' => 'required|boolean',
+            'support_deal.e_commerce_fulfillment_support' => 'nullable|boolean',
+            'support_deal.e_commerce_fulfillment_charge' => 'nullable|numeric',
+            'support_deal.pos_support' => 'nullable|boolean',
+            'support_deal.pos_support_charge' => 'nullable|numeric',
+            'support_deal.purchase_support' => 'nullable|boolean',
+            'support_deal.purchase_support_charge' => 'nullable|numeric',
+            'support_deal.sale_percentage' => 'nullable|numeric|min:0|max:100',
+            'support_deal.rent_period_id' => 'required|numeric|exists:rent_periods,id',
+            'support_deal.number_outlets' => 'required_if:pos_support,1|nullable|numeric'
         ]);
 
         $newUser = new Merchant();
@@ -97,6 +106,20 @@ class MerchantController extends Controller
 
         $newUser->save();
 
+        // support deal
+        $newUser->supportDeal()->create([
+            'sale_percentage' => $request->support_deal['sale_percentage'] ?? 0,
+            'e_commerce_fulfillment_support' => $request->support_deal['e_commerce_fulfillment_support'],
+            'e_commerce_fulfillment_charge' => $request->support_deal['e_commerce_fulfillment_support'] ? $request->support_deal['e_commerce_fulfillment_charge'] : 0,
+            'purchase_support' => $request->support_deal['purchase_support'],
+            'purchase_support_charge' => $request->support_deal['purchase_support'] ? $request->support_deal['purchase_support_charge'] : 0,
+            'pos_support' => $request->support_deal['pos_support'],
+            'pos_support_charge' => $request->support_deal['pos_support'] ? $request->support_deal['pos_support_charge'] : 0,
+            'number_outlets' => $request->support_deal['pos_support'] ? $request->support_deal['number_outlets'] : 0,
+            'rent_period_id' => $request->support_deal['rent_period_id']
+        ]);
+
+        // profile preview
         if (array_key_exists('preview', $request->profile_preview)) {
             $newUser->profile_preview = $request->profile_preview['preview'];
             $newUser->save();
@@ -120,6 +143,15 @@ class MerchantController extends Controller
             'mobile' => 'required|string|max:50|unique:merchants,mobile,'.$userToUpdate->id,
             'password' => 'nullable|string|max:255|confirmed',
             'active' => 'required|boolean',
+            'support_deal.e_commerce_fulfillment_support' => 'nullable|boolean',
+            'support_deal.e_commerce_fulfillment_charge' => 'nullable|numeric',
+            'support_deal.pos_support' => 'nullable|boolean',
+            'support_deal.pos_support_charge' => 'nullable|numeric',
+            'support_deal.purchase_support' => 'nullable|boolean',
+            'support_deal.purchase_support_charge' => 'nullable|numeric',
+            'support_deal.sale_percentage' => 'nullable|numeric|min:0|max:100',
+            'support_deal.rent_period_id' => 'required|numeric|exists:rent_periods,id',
+            'support_deal.number_outlets' => 'required_if:pos_support,1|nullable|numeric'
         ]);
 
         $userToUpdate->first_name = strtolower($request->first_name);
@@ -134,10 +166,41 @@ class MerchantController extends Controller
             $userToUpdate->password = Hash::make($request->password);
         }
 
-        // $userToUpdate->user_permissions = json_decode(json_encode($request->permissions));
-        // $userToUpdate->user_roles = json_decode(json_encode($request->roles));
-
         $userToUpdate->save();
+
+        // support deal
+        $merchantSupportDeal = $userToUpdate->supportDeal;
+        $supportDealLastRent = $merchantSupportDeal->rents()->latest()->first();
+        $currentDate = date('Y-m-d');
+
+        if ($supportDealLastRent && $supportDealLastRent->date_to > $currentDate) {
+            
+            $merchantSupportDeal->update([
+                'sale_percentage' => $request->support_deal['sale_percentage'] ?? 0,
+                'e_commerce_fulfillment_charge' => $merchantSupportDeal->e_commerce_fulfillment_support ? $request->support_deal['e_commerce_fulfillment_charge'] : 0,
+                'purchase_support_charge' => $merchantSupportDeal->purchase_support ? $request->support_deal['purchase_support_charge'] : 0,
+                'pos_support_charge' => $merchantSupportDeal->pos_support ? $request->support_deal['pos_support_charge'] : 0,
+                'number_outlets' => $merchantSupportDeal->pos_support ? $request->support_deal['number_outlets'] : 0,
+                'rent_period_id' => $request->support_deal['rent_period_id']
+            ]);
+
+        }
+        else {
+
+            // support deal
+            $merchantSupportDeal->update([
+                'sale_percentage' => $request->support_deal['sale_percentage'] ?? 0,
+                'e_commerce_fulfillment_support' => $request->support_deal['e_commerce_fulfillment_support'],
+                'e_commerce_fulfillment_charge' => $request->support_deal['e_commerce_fulfillment_support'] ? $request->support_deal['e_commerce_fulfillment_charge'] : 0,
+                'purchase_support' => $request->support_deal['purchase_support'],
+                'purchase_support_charge' => $request->support_deal['purchase_support'] ? $request->support_deal['purchase_support_charge'] : 0,
+                'pos_support' => $request->support_deal['pos_support'],
+                'pos_support_charge' => $request->support_deal['pos_support'] ? $request->support_deal['pos_support_charge'] : 0,
+                'number_outlets' => $request->support_deal['pos_support'] ? $request->support_deal['number_outlets'] : 0,
+                'rent_period_id' => $request->support_deal['rent_period_id']
+            ]);
+
+        }
 
         return $this->showAllMerchants($perPage);
     }
@@ -146,7 +209,7 @@ class MerchantController extends Controller
     {
     	$userToDelete = Merchant::findOrFail($merchant);
         
-        if ($userToDelete->deals()->where('active', 1)->count() || $userToDelete->products()->where('available_quantity', '>', 0)->count()) {
+        if ($userToDelete->spaceDeals()->where('active', 1)->count() || $userToDelete->products()->where('available_quantity', '>', 0)->count()) {
            
             return response()->json(['errors'=>["hasDealOrProducts" => "Merchant has active deals or products"]], 422);
 

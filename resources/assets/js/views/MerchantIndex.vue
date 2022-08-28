@@ -51,7 +51,7 @@
 										  			:loading="loading" 
 										  			:per-page="perPage" 
 										  			:column-names="['username', 'mobile', '# deals', '# products']" 
-										  			:column-values-to-show="['user_name', 'mobile', 'number_deals', 'number_products']" 
+										  			:column-values-to-show="['user_name', 'mobile', 'number_space_deals', 'number_products']" 
 										  			:contents-to-show = "contentsToShow" 
 										  			:pagination = "pagination" 
 										  			:required-permission = "'merchant'" 
@@ -126,6 +126,7 @@
     let singleUserDetails = {
     	active : false,
     	profile_preview : {},
+    	support_deal : {}
   		// roles : [],
 		// permissions : [],
     };
@@ -253,6 +254,7 @@
 				this.singleUserDetails = {
 					active : false,
 					profile_preview : {},
+					support_deal : {}
 					// roles : [],
 					// permissions : [],
 				};

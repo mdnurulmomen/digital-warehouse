@@ -27,7 +27,7 @@
 							<div 
 								class="row" 
 								v-bind:key="'user-modal-step-' + 1" 
-								v-show="!loading && step==1"
+								v-show="step==1"
 							>
 								<h2 class="mx-auto mb-4 lead">User Profile</h2>
 
@@ -45,13 +45,13 @@
 													<div class="custom-file">
 													    <input type="file" 
 													    	class="form-control custom-file-input" 
-															:class="!errors.user.profile_preview  ? 'is-valid' : 'is-invalid'" 
+															:class="!errors.profile_preview  ? 'is-valid' : 'is-invalid'" 
 												    	 	@change="onImageChange" 
 												    	 	accept="image/*"
 													    >
 													    <label class="custom-file-label" for="validatedCustomFile">Choose Picture...</label>
 													    <div class="invalid-feedback">
-													    	{{ errors.user.profile_preview }}
+													    	{{ errors.profile_preview }}
 													    </div>
 												  	</div>
 												</div>
@@ -77,12 +77,12 @@
 												class="form-control" 
 												v-model="singleUserDetails.first_name" 
 												placeholder="First Name" 
-												:class="!errors.user.first_name  ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.first_name  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('first_name')"
 											>
 
 											<div class="invalid-feedback">
-									        	{{ errors.user.first_name }}
+									        	{{ errors.first_name }}
 									  		</div>
 										</div>
 										<div class="form-group col-md-6">
@@ -91,12 +91,12 @@
 												class="form-control" 
 												v-model="singleUserDetails.last_name" 
 												placeholder="Last Name" 
-												:class="!errors.user.last_name  ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.last_name  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('last_name')"
 											>
 
 											<div class="invalid-feedback">
-									        	{{ errors.user.last_name }}
+									        	{{ errors.last_name }}
 									  		</div>
 										</div>
 									</div>
@@ -109,12 +109,12 @@
 												v-model="singleUserDetails.email" 
 												placeholder="First Name" 
 												required="true" 
-												:class="!errors.user.email  ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.email  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('email')"
 											>
 
 											<div class="invalid-feedback">
-									        	{{ errors.user.email }}
+									        	{{ errors.email }}
 									  		</div>
 										</div>
 										<div class="form-group col-md-6">
@@ -124,12 +124,12 @@
 												v-model="singleUserDetails.mobile" 
 												placeholder="Mobile Number" 
 												required="true" 
-												:class="!errors.user.mobile  ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.mobile  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('mobile')"
 											>
 
 											<div class="invalid-feedback">
-									        	{{ errors.user.mobile }}
+									        	{{ errors.mobile }}
 									  		</div>
 										</div>
 									</div>
@@ -142,12 +142,12 @@
 												v-model="singleUserDetails.user_name" 
 												placeholder="Username" 
 												required="true" 
-												:class="!errors.user.user_name  ? 'is-valid' : 'is-invalid'" 
+												:class="!errors.user_name  ? 'is-valid' : 'is-invalid'" 
 												@change="validateFormInput('user_name')"
 											>
 
 											<div class="invalid-feedback">
-									        	{{ errors.user.user_name }}
+									        	{{ errors.user_name }}
 									  		</div>
 										</div>
 									</div>
@@ -170,13 +170,13 @@
 													minlength="8" 
 													placeholder="Password" 
 													:required="createMode ? true : false" 
-													:class="!errors.user.password  ? 'is-valid' : 'is-invalid'" 
+													:class="!errors.password  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('password')" 
 													autocomplete="new-password"
 												>
 
 												<div class="invalid-feedback">
-										        	{{ errors.user.password }}
+										        	{{ errors.password }}
 										  		</div>
 											</div>
 											<div class="form-group col-md-6">
@@ -186,12 +186,12 @@
 													v-model="singleUserDetails.password_confirmation" 
 													placeholder="Confirm Password" 
 													:required="createMode ? true : false" 
-													:class="!errors.user.password_confirmation  ? 'is-valid' : 'is-invalid'" 
+													:class="!errors.password_confirmation  ? 'is-valid' : 'is-invalid'" 
 													@change="validateFormInput('password_confirmation')"
 												>
 
 												<div class="invalid-feedback">
-										        	{{ errors.user.password_confirmation }}
+										        	{{ errors.password_confirmation }}
 										  		</div>
 											</div>
 										</div>
@@ -210,7 +210,7 @@
 					          	</div> 
 					          	-->
 
-					          	<div class="col-sm-12 form-group mb-0 card-footer">
+					          	<div class="col-sm-12 form-group mb-0 card-footer" v-if="$route.name != 'merchants'">
 									<div class="flex-column">
 										<div class="col-sm-12 text-right" v-show="!submitForm">
 											<span class="text-danger small">
@@ -226,17 +226,241 @@
 										</div>
 									</div>
 					          	</div>
+
+					          	<div class="col-sm-12 form-group mb-0 card-footer" v-else>
+									<div class="row">
+										<div class="col-sm-12 text-right" v-show="!submitForm">
+											<span class="text-danger small">
+										  		Please input required fields
+										  	</span>
+										</div>
+										<div class="col-sm-12">
+						                  	<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Close Modal" data-dismiss="modal">Close</button>
+
+											<button type="button" class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-right" data-toggle="tooltip" data-placement="top" title="Next" v-on:click="nextPage">
+						                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+						                  	</button>
+										</div>
+									</div>
+					          	</div>
 							</div>
 
-							<!-- 
+							 
 							<div 
 								class="row" 
+								v-if="$route.name == 'merchants' && singleUserDetails.hasOwnProperty('support_deal')"
 								v-bind:key="'user-modal-step-' + 2" 
-								v-show="!loading && step==2"
+								v-show="step==2"
 							>
-								<h2 class="mx-auto mb-4 lead">Roles & Permissions</h2>
+								<h2 class="mx-auto mb-4 lead">Support Deals</h2>
 
 								<div class="col-md-12">
+									<div class="form-row">
+										<div class="form-group col-md-12">
+											<label for="inputUsername">Sale Percentage</label>
+											<div class="input-group mb-1">
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleUserDetails.support_deal.sale_percentage" 
+													placeholder="Sale Percentage" 
+													:class="! errors.sale_percentage ? 'is-valid' : 'is-invalid'" 
+													@change="validateFormInput('sale_percentage')" 
+													:min="0" 
+													:max="100" 
+												>
+												<div class="input-group-append">
+													<span class="input-group-text"> % </span>
+												</div>
+											</div>
+											<div 
+												class="invalid-feedback" 
+												style="display:block" 
+												v-show="errors.sale_percentage"
+											>
+										    	{{ errors.sale_percentage }}
+										    </div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-12">
+											<label for="inputUsername">Rent Period</label>
+											<multiselect 
+												v-model="singleUserDetails.support_deal.rent_period" 
+												class="form-control p-0" 
+												:class="errors.rent_period ? 'is-invalid' : 'is-valid'"
+												placeholder="Rent Period" 
+												:custom-label="objectNameWithCapitalized" 
+												:options="allRentPeriods" 
+												:required="true" 
+												:allow-empty="false" 
+												@input="setRentPeriod()" 
+											>
+											</multiselect>
+											<div 
+												class="invalid-feedback" 
+												style="display:block" 
+												v-show="errors.rent_period"
+											>
+										    	{{ errors.rent_period }}
+										    </div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold">
+											E-Commerce Fullfillment :
+										</label>
+										<div class="col-6 col-form-label">
+											<toggle-button 
+												v-model="singleUserDetails.support_deal.e_commerce_fulfillment_support" 
+												:width=150 
+												:sync="true"
+												:color="{checked: '#229bbf', unchecked: '#6c757d'}"
+												:labels="{checked: 'Enabled', unchecked: 'Disabled'}"  
+											/>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-12">
+											<label for="inputUsername">Fulfilment Charge</label>
+											<div class="input-group mb-1">
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleUserDetails.support_deal.e_commerce_fulfillment_charge" 
+													placeholder="Fulfilment Charge" 
+													:min="0" 
+													:max="100" 
+													:class="! errors.fulfillment_charge ? 'is-valid' : 'is-invalid'" 
+													:disabled="! singleUserDetails.support_deal.e_commerce_fulfillment_support"
+													@change="validateFormInput('fulfillment_charge')" 
+												>
+												<div class="input-group-append">
+													<span class="input-group-text"> 
+														{{ general_settings.official_currency_name | capitalize }}
+													</span>
+												</div>
+											</div>
+											<div 
+												class="invalid-feedback" 
+												style="display:block" 
+												v-show="errors.fulfillment_charge"
+											>
+										    	{{ errors.fulfillment_charge }}
+										    </div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold">
+											Purchase Support :
+										</label>
+										<div class="col-6 col-form-label">
+											<toggle-button 
+												v-model="singleUserDetails.support_deal.purchase_support" 
+												:width=150 
+												:sync="true"
+												:color="{checked: '#229bbf', unchecked: '#6c757d'}"
+												:labels="{checked: 'Enabled', unchecked: 'Disabled'}"  
+											/>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-12">
+											<label for="inputUsername">Purchase Support Charge</label>
+											<div class="input-group mb-1">
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleUserDetails.support_deal.purchase_support_charge" 
+													placeholder="Purchase Suppoprt Charge" 
+													:class="! errors.purchase_support_charge ? 'is-valid' : 'is-invalid'" 
+													:disabled="! singleUserDetails.support_deal.purchase_support"
+													@change="validateFormInput('purchase_support_charge')" 
+													:min="0" 
+													:max="100" 
+												>
+												<div class="input-group-append">
+													<span class="input-group-text"> 
+														{{ general_settings.official_currency_name | capitalize }}
+													</span>
+												</div>
+											</div>
+											<div 
+												class="invalid-feedback" 
+												style="display:block" 
+												v-show="errors.purchase_support_charge"
+											>
+										    	{{ errors.purchase_support_charge }}
+										    </div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold">
+											POS Support :
+										</label>
+										<div class="col-6 col-form-label">
+											<toggle-button 
+												v-model="singleUserDetails.support_deal.pos_support" 
+												:width=150 
+												:sync="true"
+												:color="{checked: '#229bbf', unchecked: '#6c757d'}"
+												:labels="{checked: 'Enabled', unchecked: 'Disabled'}"  
+											/>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-12">
+											<label for="inputUsername">POS Support Charge</label>
+											<div class="input-group mb-1">
+												<input type="number" 
+													class="form-control" 
+													v-model.number="singleUserDetails.support_deal.pos_support_charge" 
+													placeholder="POS Suppoprt Charge" 
+													:class="! errors.pos_support_charge ? 'is-valid' : 'is-invalid'" 
+													:disabled="! singleUserDetails.support_deal.pos_support"
+													@change="validateFormInput('pos_support_charge')" 
+													:min="0" 
+													:max="100" 
+												>
+												<div class="input-group-append">
+													<span class="input-group-text"> 
+														{{ general_settings.official_currency_name | capitalize }}
+													</span>
+												</div>
+											</div>
+											<div 
+												class="invalid-feedback" 
+												style="display:block" 
+												v-show="errors.pos_support_charge"
+											>
+										    	{{ errors.pos_support_charge }}
+										    </div>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<div class="form-group col-md-12">
+											<label for="inputUsername"># Outlets</label>
+											<input 
+												type="number" 
+												class="form-control" 
+												v-model="singleUserDetails.support_deal.number_outlets" 
+												placeholder="Number Outlets" 
+												:class="! errors.number_outlets  ? 'is-valid' : 'is-invalid'" 
+												@change="validateFormInput('number_outlets')"
+												min="0" 
+											>
+											<div class="invalid-feedback">
+									        	{{ errors.number_outlets }}
+									  		</div>
+										</div>
+									</div>
+
+									<!-- 
 									<div class="form-row" v-show="allRoles.length">
 										<div class="form-group col-md-12">
 											<label for="inputUsername">Role</label>
@@ -500,7 +724,8 @@
 										<div class="form-group col-md-12" v-show="! allPermissions.length">
 											<p class="text-center">You may not have permissions to select permissions</p>
 										</div>
-									</div>
+									</div> 
+									-->
 								</div>
 
 								<div class="col-sm-12 form-group mb-0 card-footer">
@@ -521,7 +746,6 @@
 									</div>
 					          	</div>
 							</div> 
-							-->
 						</transition-group>
 					</div>
 				</form>
@@ -572,13 +796,15 @@
 
 				step : 1,
 
-				loading : false,
-
 				submitForm : true,
+
+				allRentPeriods : [],
 				
 				errors : {
-					user : {},
+				
 				},
+
+				general_settings : JSON.parse(window.localStorage.getItem('general_settings')),
 
 				// modelCRUDableAndApproveable : [
 	                // 'Product-Stock',
@@ -654,6 +880,7 @@
 			}
 		
 		},
+		*/
 		
 		watch: {
 
@@ -661,13 +888,13 @@
 				
 				this.step = 1;
 				
-				this.resetAllPermissions();
-				this.disableExistingRolePermissions();
+				// this.resetAllPermissions();
+				// this.disableExistingRolePermissions();
 
 			}
 
 		},
-		*/
+		
 
 		filters: {
 
@@ -772,6 +999,41 @@
 
 			},
 			*/
+			fetchAllRentPeriods() {
+				
+				this.allRentPeriods = [];
+				
+				axios
+					.get('/api/rent-periods/')
+					.then(response => {
+						if (response.status == 200) {
+							this.allRentPeriods = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						
+					});
+
+			},
 			nextPage() {
 				
 				if (this.step==1) {
@@ -779,17 +1041,15 @@
 					this.validateFormInput('user_name');
 					this.validateFormInput('mobile');
 					this.validateFormInput('email');
-
-					if (this.createMode || this.singleUserDetails.password || this.singleUserDetails.password_confirmation) {
-						this.validateFormInput('password');
-						this.validateFormInput('password_confirmation');
-					}
+					this.validateFormInput('password');
+					this.validateFormInput('password_confirmation');
 	            	
-	            	if (Object.keys(this.errors.user).length !== 0 && this.errors.user.constructor === Object) {
+	            	if (Object.keys(this.errors).length !== 0 && this.errors.constructor === Object) {
 						this.submitForm = false;
 						return;
 					}
 					else {
+						this.fetchAllRentPeriods();
 						this.step++;
 					}
 
@@ -998,10 +1258,10 @@
                 // Only process image files.
 		      	if (files.length && files[0].type.match('image.*')) {
                 	this.createImage(files[0]);
-                	this.$delete(this.errors.user, 'profile_preview');
+                	this.$delete(this.errors, 'profile_preview');
 		      	}
 		      	else{
-		      		this.errors.user.profile_preview = 'File should be image';
+		      		this.errors.profile_preview = 'File should be image';
 		      	}
 
 		      	evnt.target.value = '';
@@ -1019,16 +1279,28 @@
             },
             submitUserForm() {
 
-				this.validateFormInput('user_name');
-				this.validateFormInput('mobile');
-				this.validateFormInput('email');
+				if (this.$route.name=='merchants') {
 
-				if (this.createMode || this.singleUserDetails.password || this.singleUserDetails.password_confirmation) {
+					this.validateFormInput('sale_percentage');
+					this.validateFormInput('fulfillment_charge');
+					this.validateFormInput('purchase_support_charge');
+					this.validateFormInput('pos_support_charge');
+					this.validateFormInput('number_outlets');
+					this.validateFormInput('rent_period');
+
+				}
+				else {
+
+					this.validateFormInput('user_name');
+					this.validateFormInput('mobile');
+					this.validateFormInput('email');
 					this.validateFormInput('password');
 					this.validateFormInput('password_confirmation');
+
 				}
+
             	
-            	if (Object.keys(this.errors.user).length !== 0 && this.errors.user.constructor === Object) {
+            	if (Object.keys(this.errors).length !== 0 && this.errors.constructor === Object) {
 					this.submitForm = false;
 					return;
 				}
@@ -1055,6 +1327,16 @@
 		      	else 
 		      		return ''
 		    },
+		    setRentPeriod() {
+		    	
+		    	if (this.singleUserDetails.support_deal.rent_period) {
+
+		    		this.singleUserDetails.support_deal.rent_period_id = this.singleUserDetails.support_deal.rent_period.id;
+
+		    	}
+
+		    },
+		    /*
 		    setRelatedPermissions(permissionName) {
 
 				let permissionRefName = permissionName.toLowerCase();
@@ -1158,6 +1440,7 @@
 				}
 
 			},
+			*/
 			validateFormInput (formInputName) {
 				
 				this.submitForm = false;
@@ -1167,11 +1450,11 @@
 					case 'first_name' :
 
 						if (!this.singleUserDetails.first_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.user.first_name = 'No special character';
+							this.errors.first_name = 'No special character';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'first_name');
+							this.$delete(this.errors, 'first_name');
 						}
 
 						break;
@@ -1179,11 +1462,11 @@
 					case 'last_name' :
 
 						if (!this.singleUserDetails.last_name.match(/^[_A-z0-9]*((-|&|\s)*[_A-z0-9])*$/g)) {
-							this.errors.user.last_name = 'No special character';
+							this.errors.last_name = 'No special character';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'last_name');
+							this.$delete(this.errors, 'last_name');
 						}
 
 						break;
@@ -1191,14 +1474,14 @@
 					case 'user_name' :
 
 						if (!this.singleUserDetails.user_name) {
-							this.errors.user.user_name = 'Username is required';
+							this.errors.user_name = 'Username is required';
 						}
 						else if (!this.singleUserDetails.user_name.match(/^[-\w\.\$@\*\!]{3,30}$/g)) {
-							this.errors.user.user_name = 'No special character';
+							this.errors.user_name = 'No special character';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'user_name');
+							this.$delete(this.errors, 'user_name');
 						}
 
 						break;
@@ -1206,14 +1489,14 @@
 					case 'mobile' :
 
 						if (!this.singleUserDetails.mobile) {
-							this.errors.user.mobile = 'Mobile is required';
+							this.errors.mobile = 'Mobile is required';
 						}
 						else if (!this.singleUserDetails.mobile.match(/\+?(88)?0?1[123456789][0-9]{8}\b/g)) {
-							this.errors.user.mobile = 'Invalid mobile number';
+							this.errors.mobile = 'Invalid mobile number';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'mobile');
+							this.$delete(this.errors, 'mobile');
 						}
 
 						break;
@@ -1221,44 +1504,130 @@
 					case 'email' :
 
 						if (!this.singleUserDetails.email) {
-							this.errors.user.email = 'Email is required';
+							this.errors.email = 'Email is required';
 						}
 						else if (!this.singleUserDetails.email.match(/[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/g)) {
-							this.errors.user.email = 'Invalid email address';
+							this.errors.email = 'Invalid email address';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'email');
+							this.$delete(this.errors, 'email');
 						}
 
 						break;
 
 					case 'password' :
 
-						if (this.createMode && !this.singleUserDetails.password) {
-							this.errors.user.password = 'Password is required';
+						if (this.createMode && ! this.singleUserDetails.password) {
+							this.errors.password = 'Password is required';
 						}
-						else if (this.singleUserDetails.password.length < 8) {
-							this.errors.user.password = 'Minimum length should be 8';
+						else if (this.singleUserDetails.password && this.singleUserDetails.password.length < 8) {
+							this.errors.password = 'Minimum length should be 8';
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'password');
+							this.$delete(this.errors, 'password');
 						}
 
 						break;
 
 					case 'password_confirmation' :
 
-						if (this.singleUserDetails.password && !this.singleUserDetails.password_confirmation) {
-							this.errors.user.password_confirmation = 'Password is required';
+						if (this.singleUserDetails.password && ! this.singleUserDetails.password_confirmation) {
+							this.errors.password_confirmation = 'Password is required';
 						}
 						else if (this.singleUserDetails.password && this.singleUserDetails.password !== this.singleUserDetails.password_confirmation) {
-							this.errors.user.password_confirmation = "Password doesn't match";
+							this.errors.password_confirmation = "Password doesn't match";
 						}
 						else{
 							this.submitForm = true;
-							this.$delete(this.errors.user, 'password_confirmation');
+							this.$delete(this.errors, 'password_confirmation');
+						}
+
+						break;
+
+					case 'sale_percentage' :
+
+						if (this.$route.name=='merchants' && this.singleUserDetails.support_deal.sale_percentage && (this.singleUserDetails.support_deal.sale_percentage < 0 || this.singleUserDetails.support_deal.sale_percentage > 100)) {
+
+							this.errors.sale_percentage = "Percantage value is invalid";
+
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors, 'sale_percentage');
+						}
+
+						break;
+
+					case 'rent_period' : 
+
+						if (this.$route.name=='merchants' && (this.singleUserDetails.support_deal.e_commerce_fulfillment_charge > 0 || this.singleUserDetails.support_deal.purchase_support_charge > 0 || this.singleUserDetails.support_deal.pos_support_charge > 0) && ! this.singleUserDetails.support_deal.rent_period_id) {
+
+							this.errors.rent_period = "Rent period is required";
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors, 'rent_period');
+
+						}
+
+						break;
+
+					case 'fulfillment_charge' :
+
+						if (this.$route.name=='merchants' && this.singleUserDetails.support_deal.e_commerce_fulfillment_support && this.singleUserDetails.support_deal.e_commerce_fulfillment_charge < 0) {
+
+							this.errors.fulfillment_charge = "Fulfilment charge is invalid";
+
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors, 'fulfillment_charge');
+						}
+
+						break;
+
+					case 'purchase_support_charge' :
+
+						if (this.$route.name=='merchants' && this.singleUserDetails.support_deal.purchase_support && this.singleUserDetails.support_deal.purchase_support_charge < 0) {
+
+							this.errors.purchase_support_charge = "Purchase support charge is invalid";
+
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors, 'purchase_support_charge');
+						}
+
+						break;
+
+					case 'pos_support_charge' :
+
+						if (this.$route.name=='merchants' && this.singleUserDetails.support_deal.pos_support && this.singleUserDetails.support_deal.pos_support_charge < 0) {
+
+							this.errors.pos_support_charge = "POS charge is invalid";
+
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors, 'pos_support_charge');
+						}
+
+						break;
+
+					case 'number_outlets' :
+
+						if (this.$route.name=='merchants' && this.singleUserDetails.support_deal.pos_support && (! this.singleUserDetails.support_deal.number_outlets || this.singleUserDetails.support_deal.number_outlets < 1)) {
+
+							this.errors.number_outlets = "Outlet number is required";
+
+						}
+						else {
+							this.submitForm = true;
+							this.$delete(this.errors, 'number_outlets');
 						}
 
 						break;

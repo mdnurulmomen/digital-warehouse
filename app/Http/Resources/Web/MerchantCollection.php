@@ -4,7 +4,7 @@ namespace App\Http\Resources\Web;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ProductCollection extends ResourceCollection
+class MerchantCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -16,13 +16,13 @@ class ProductCollection extends ResourceCollection
     {
         return [
             'current_page' => $this->currentPage(),
-            'data'=> ProductResource::collection($this->collection),
-            'first_page_url'=> url('api/products').'/'.$this->perPage().'?page=1',
+            'data'=> MerchantResource::collection($this->collection),
+            'first_page_url'=> url('api/merchants').'/'.$this->perPage().'?page=1',
             'from'=> $this->firstItem(),
             'last_page'=> $this->lastPage(),
-            'last_page_url'=> url('api/products').'/'.$this->perPage().'?page='.$this->lastPage(),
+            'last_page_url'=> url('api/merchants').'/'.$this->perPage().'?page='.$this->lastPage(),
             'next_page_url'=> $this->nextPageUrl(),
-            'path'=> url('api/products').'/'.$this->perPage(),
+            'path'=> url('api/merchants').'/'.$this->perPage(),
             'per_page'=> $this->perPage(),
             'prev_page_url'=> $this->previousPageUrl(),
             'to'=> $this->lastItem(),

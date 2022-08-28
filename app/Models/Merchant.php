@@ -61,9 +61,14 @@ class Merchant extends Authenticatable
         return $this->morphOne(ProfilePreview::class, 'user')->withDefault();
     }
     
-    public function deals()
+    public function spaceDeals()
     {
         return $this->hasMany(MerchantSpaceDeal::class, 'merchant_id', 'id');
+    }
+
+    public function supportDeal()
+    {
+        return $this->hasOne(MerchantSupportDeal::class, 'merchant_id', 'id');
     }
 
     public function products()

@@ -325,8 +325,8 @@
 				else if (columnValue.match(/variation_parent_name/gi)) {
 					return object.variation_parent ? this.$options.filters.capitalize(object.variation_parent.name) : '';
 				}
-				else if (columnValue.match(/number_deals/gi)) {
-					return object.deals_count ?? 0;
+				else if (columnValue.match(/number_space_deals/gi)) {
+					return object.space_deals_count ?? 0;
 				}
 				else if (columnValue.match(/number_products/gi)) {
 					return object.products_count ?? 0;
