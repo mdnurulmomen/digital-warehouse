@@ -48,9 +48,10 @@
 						>
 							<button type="button" 
 									class="btn waves-effect waves-light btn-info btn-outline-info btn-icon" 
-									v-tooltip.bottom-end="'View Details'"  
+									v-tooltip.bottom-end="'View Details'" 
+									:disabled="formSubmitted"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-show="$route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types'"
+								 	v-show="$route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types'" 
 							>
 								<i class="fa fa-eye"></i>
 							</button>
@@ -91,6 +92,7 @@
 							<button type="button" 
 									class="btn waves-effect waves-dark btn-success btn-outline-success btn-icon" 
 									v-tooltip.bottom-end="'Space-Deals'" 
+									:disabled="formSubmitted" 
 									@click="$emit('goMerchantDeals', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-space-deal-index')"
 							>
@@ -100,15 +102,28 @@
 							<button type="button" 
 									class="btn waves-effect waves-dark btn-warning btn-outline-warning btn-icon" 
 									v-tooltip.bottom-end="'Products'" 
+									:disabled="formSubmitted" 
 									@click="$emit('goMerchantProducts', content)" 
 									v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-product-index')"
 							>
 								<img src="icons/cms/products.png">
 							</button>
 
+							<button 
+								type="button" 
+								class="btn waves-effect waves-dark btn-default btn-outline-default btn-icon" 
+								v-tooltip.bottom-end="'Support-Rents'" 
+								:disabled="formSubmitted"  
+								@click="$emit('goToSupportDealRents', content)" 
+								v-if="$route.name=='merchants' && userHasPermissionTo('view-merchant-payment-index')" 
+							>
+								<img src="/icons/cms/deal-rents.png" width="22px">
+							</button>
+
 							<button type="button" 
 									class="btn waves-effect waves-dark btn-inverse btn-outline-inverse btn-icon"  
-									v-tooltip.bottom-end="'View Containers'"
+									v-tooltip.bottom-end="'View Containers'" 
+									:disabled="formSubmitted" 
 									v-if="$route.name=='warehouses'" 
 									@click="$emit('showContainerShelfDetails', content)"
 							>

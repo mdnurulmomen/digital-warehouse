@@ -40,7 +40,7 @@
 											  			<div class="mr-2">
 											  				<span>
 													  			{{ 
-													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Rents List' : 'Rents List'
+													  				( /* searchAttributes.showPendingRequisitions || searchAttributes.showCancelledRequisitions || searchAttributes.showDispatchedRequisitions || searchAttributes.showProduct || */ searchAttributes.search || searchAttributes.dateFrom || searchAttributes.dateTo) ? 'Searched Rent List' : 'Rent List'
 													  			}}
 											  				</span>
 											  			</div>
@@ -549,225 +549,109 @@
 									v-bind:key="'merchant-deal-modal-step-' + 1" 
 									v-show="! loading && step==1" 
 								>
-									<h2 class="mx-auto mb-4 lead">Dealt Spaces</h2>
+									<h2 class="mx-auto mb-4 lead">Dealt Supports</h2>
 
 									<div class="col-md-12">
-										<div 
-											class="form-row" 
-											v-if="deal.hasOwnProperty('warehouses') && Array.isArray(deal.warehouses) && deal.warehouses.length"
-										>
-											<div class="col-sm-12">
-												<div 
-													class="form-row" 
-													v-for="(merchantWarehouse, merchantWarehouseIndex) in deal.warehouses" 
-													:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-create-or-edit'"
-												>
-													<div class="col-md-12">
-														<div class="card">
-															<div class="card-title">
-																<div class="form-row">
-																	<label class="col-sm-6 col-form-label font-weight-bold text-right">
-																		Warehouse :
-																	</label>
-																	<label class="col-sm-6 col-form-label">
-																		{{ merchantWarehouse.name ? $options.filters.capitalize(merchantWarehouse.name) : 'NA' }}
-																	</label>
-																</div>
-															</div>
-																
-															<div class="card-body pt-0">
-																<div class="form-row" v-if="merchantWarehouse.hasOwnProperty('spaces') && Array.isArray(merchantWarehouse.spaces) && merchantWarehouse.spaces.length">
-																	<div 
-																		class="col-md-6 ml-auto" 
-																		v-for="(warehouseSpace, warehouseSpaceIndex) in merchantWarehouse.spaces" 
-																		:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-view'"
-																	>
-																		<div 
-																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length"
-																		>
-																			<div class="card-header text-center">Containers</div>
+										<div class="card">
+											<div class="card-block">
+												<div class="form-row"> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														Support Deal ID :
+													</label>
+													<label class="col-6 col-form-label">
+														{{ deal.name | capitalize }}
+													</label>
+												</div>
 
-																			<div class="card-body">
-																				<div class="table-responsive">
-																					<table class="table table-bordered">
-																						<thead>
-																							<tr>
-																								<th>Name</th>
-																								<th>Type</th>
-																								<th>#</th>
-																								<th>Rent</th>
-																							</tr>
-																						</thead>
-
-																						<tbody>
-																							<tr
-																								v-for="(warehouseContainer, warehouseContainerIndex) in warehouseSpace.containers" 
-																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-container-' + warehouseContainerIndex + '-id-' + warehouseContainer.id"
-																							>
-																								<td>{{ warehouseContainer.name | capitalize }}</td>
-																								
-																								<td>
-																									{{ warehouseContainer.hasOwnProperty('warehouse_container') && warehouseContainer.warehouse_container.hasOwnProperty('container') ? $options.filters.capitalize(warehouseContainer.warehouse_container.container.name) : 'NA' }}
-																								</td>
-
-																								<td>
-																									{{ warehouseContainer.name ? warehouseContainer.name.substring(warehouseContainer.name.lastIndexOf("-")+1) : 'NA' }}
-																								</td>
-
-																								<td>
-																									{{ warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 'NA' }}
-
-																									{{ general_settings.official_currency_name | capitalize }}
-																								</td>
-																							</tr>
-																						</tbody>
-																					</table>
-																				</div>
-																			</div>
-																		</div>
-
-																		<div 
-																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') &&  warehouseSpace.container.hasOwnProperty('warehouse_container')"
-																		>
-																			<div class="card-header text-center">Shelves</div>
-
-																			<div class="card-body">
-																				<div class="table-responsive">
-																					<table class="table table-bordered">
-																						<thead>
-																							<tr>
-																								<th>Container</th>
-																								<th>Shelf</th>
-																								<th>Rent</th>
-																							</tr>
-																						</thead>
-
-																						<tbody>
-																							<tr
-																								v-for="(warehouseShelf, warehouseShelfIndex) in warehouseSpace.container.shelves" 
-																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-shelf-index-' + warehouseShelfIndex + '-id-' + warehouseShelf.id"
-																							>
-																								<td>
-																									{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
-
-																									{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
-																								</td>
-																								
-																								<td>
-																									<!-- {{ warehouseShelf.name | capitalize }} -->
-
-																									{{ warehouseShelf.name ? warehouseShelf.name.substring(warehouseShelf.name.lastIndexOf("-")+1) : 'NA' }}
-
-																									<!-- <ul 
-																										id="shelf-addresses"
-																										v-if="warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length"
-																									>
-																										<li 
-																											v-for="shelfAddress in warehouseSpace.container.shelves" 
-																											:key="'shelf-address-' + shelfAddress.id"
-																										>
-
-																											{{ shelfAddress.name ? shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																											
-																										</li>
-																									</ul> -->
-																								</td>
-
-																								<td>
-																									{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
-
-																									{{ general_settings.official_currency_name | capitalize }}
-																								</td>
-																							</tr>
-																						</tbody>
-																					</table>
-																				</div>
-																			</div>
-																		</div>
-
-																		<div 
-																			class="card" 
-																			v-if="warehouseSpace.hasOwnProperty('type') && warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf')  && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.hasOwnProperty('warehouse_container')"
-																		>
-																			<div class="card-header text-center">Units</div>
-
-																			<div class="card-body">
-																				<div class="table-responsive">
-																					<table class="table table-bordered">
-																						<thead>
-																							<tr>
-																								<th>Container</th>
-																								<th>Shelf</th>
-																								<th>Unit</th>
-																								<th>Rent</th>
-																							</tr>
-																						</thead>
-
-																						<tbody>
-																							<tr
-																								v-for="(unitAddress, unitAddressIndex) in warehouseSpace.container.shelf.units" 
-																								:key="'rent-warehouse-' + merchantWarehouseIndex + '-warehouse-id-' + merchantWarehouse.id + '-space-' + warehouseSpaceIndex + '-unit-index-' + unitAddressIndex + '-id-' + unitAddress.id"
-																							>
-																								<td>
-																									{{ warehouseSpace.container.warehouse_container.container.name | capitalize }}
-
-																									{{ warehouseSpace.container.name ? warehouseSpace.container.name.substring(warehouseSpace.container.name.lastIndexOf("-")+1) : 'NA' }}
-																								</td>
-																								
-																								<td>
-																									{{ warehouseSpace.container.shelf.name ? warehouseSpace.container.shelf.name.substring(warehouseSpace.container.shelf.name.lastIndexOf("-")+1) : 'NA' }}
-																								</td>
-
-																								<td>
-																									<!-- 
-																									<ul 
-																										id="unit-addresses"
-																										v-if="warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length"
-																									>
-																										<li 
-																											v-for="unitAddress in warehouseSpace.container.shelf.units" 
-																											:key="'unit-address-' + unitAddress.id"
-																										>
-
-																											{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																											
-																										</li>
-																									</ul> 
-																									-->
-
-																									{{ unitAddress.name ? unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) : 'NA' }}
-																									
-																								</td>
-
-																								<td>
-																									{{ warehouseSpace.container.selected_rent ? warehouseSpace.container.selected_rent.rent : 'NA' }}
-
-																									{{ general_settings.official_currency_name | capitalize }}
-																								</td>
-																							</tr>
-																						</tbody>
-																					</table>
-																				</div>
-																			</div>
-																		</div>
-																	</div>
-																</div>		
-															</div>
-														</div>
+												<div class="form-row"> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														<label class="font-weight-bold">E Commerce Fulfillment Support :</label>
+													</label>
+													<div class="col-6 col-form-label">
+														<span :class="[deal.e_commerce_fulfillment_support ? 'badge-success' : 'badge-danger', 'badge']">
+															
+															{{ deal.e_commerce_fulfillment_support ? 'Enabled' : 'Disabled' }}
+															
+														</span>
 													</div>
 												</div>
-											</div>
-										</div>
 
-										<div class="form-row" v-else>
-											<div 
-												class="col-md-12 text-center" 
-											>
-												<p class="text-danger">
-													No Space Found.
-												</p>
+												<div 
+													class="form-row" 
+													v-show="deal.e_commerce_fulfillment_support"
+												> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														Fulfillment Support Charge :
+													</label>
+													<label class="col-6 col-form-label">
+														{{ deal.e_commerce_fulfillment_charge }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row"> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														Purchase Support :
+													</label>
+													<div class="col-6 col-form-label">
+														<span :class="[deal.purchase_support ? 'badge-success' : 'badge-danger', 'badge']">
+															
+															{{ deal.purchase_support ? 'Enabled' : 'Disabled' }}
+															
+														</span>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-show="deal.purchase_support"
+												> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														Purchase Support Charge :
+													</label>
+													<label class="col-6 col-form-label">
+														{{ deal.purchase_support_charge }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row"> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														POS Support :
+													</label>
+													<div class="col-6 col-form-label">
+														<span :class="[deal.pos_support ? 'badge-success' : 'badge-danger', 'badge']">
+															
+															{{ deal.pos_support ? 'Enabled' : 'Disabled' }}
+															
+														</span>
+													</div>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-show="deal.pos_support"
+												> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														POS Charge :
+													</label>
+													<label class="col-6 col-form-label">
+														{{ deal.pos_support_charge }}
+														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+													</label>
+												</div>
+
+												<div 
+													class="form-row" 
+													v-show="deal.pos_support"
+												> 
+												    <label class="col-6 col-form-label font-weight-bold text-right">
+														# Outlets :
+													</label>
+													<label class="col-6 col-form-label">
+														{{ deal.number_outlets }}
+													</label>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -816,7 +700,7 @@
 																type="text" 
 																class="form-control" 
 																required="true" 
-																v-model="dealTotalCurspaceRent" 
+																v-model="dealCurrentRent" 
 																:readonly="true"
 																aria-label="Amount Per Installment" 
 															>
@@ -894,7 +778,7 @@
 
 									    					<div class="input-group-append">
 									    						<span class="input-group-text">
-									    							{{ general_settings.official_currency_name }}
+									    							{{ general_settings.official_currency_name | capitalize }}
 									    						</span>
 									    					</div>
 									    				</div>
@@ -1062,222 +946,263 @@
 					</div>
 
 					<div class="modal-body">
-						<ul class="nav nav-tabs justify-content-center">
-							<li class="nav-item">
-								<a class="nav-link active" data-toggle="tab" href="#rent-profile" role="tab">
-									Profile
-								</a>
-							</li>
+						<div class="card">
+							<ul class="nav nav-tabs justify-content-center">
+								<li class="nav-item">
+									<a class="nav-link active" data-toggle="tab" href="#rent-profile" role="tab">
+										Profile
+									</a>
+								</li>
 
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#rent-payments" role="tab">
-									Payments
-								</a>
-							</li>
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#rent-payments" role="tab">
+										Payments
+									</a>
+								</li>
 
-							<li class="nav-item">
-								<a class="nav-link" data-toggle="tab" href="#space-rents" role="tab">
-									Space Rents
-								</a>
-							</li>
-						</ul>
+								<li class="nav-item">
+									<a class="nav-link" data-toggle="tab" href="#support-rents" role="tab">
+										Support Rents
+									</a>
+								</li>
+							</ul>
+							
+							<div class="tab-content card-block">
+								<div class="tab-pane fade in active show" id="rent-profile">
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Id :
+										</label>
 
-						<div class="tab-content">
-							<div class="tab-pane fade in active show" id="rent-profile">
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Id :
-									</label>
+										<label class="col-6 col-form-label">
+											{{ singleRentData.name }}
+										</label>
+									</div>
 
-									<label class="col-6 col-form-label">
-										{{ singleRentData.name }}
-									</label>
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											# Installments :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.number_installment }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Date From :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.date_from }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Date To :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.date_to }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Total Rent :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.total_rent }} {{ general_settings.official_currency_name }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Discount :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.discount }} %
+										</label>
+									</div>
+
+									<!-- 
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Last Due :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.previous_due }} {{ general_settings.official_currency_name }}
+										</label>
+									</div> 
+									-->
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Net Payeble :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.net_payable }} {{ general_settings.official_currency_name | capitalize }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Total Paid Amount :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.total_paid_amount || 0 }} {{ general_settings.official_currency_name | capitalize }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Due :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ (singleRentData.net_payable - singleRentData.total_paid_amount) }} {{ general_settings.official_currency_name | capitalize }}
+										</label>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Created at :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.created_at }}
+										</label>
+									</div>
 								</div>
 
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										# Installments :
-									</label>
+								<div id="rent-payments" class="tab-pane fade">
+									<div 
+										class="form-row"
+										v-if="singleRentData.hasOwnProperty('payments') && singleRentData.payments.length"
+									>
+										<div class="card card-body">
+											<div class="form-row">
+												<div 
+													class="col-sm-6"
+													v-for="(rentPayment, rentPaymentIndex) in singleRentData.payments" 
+													:key="'merchant-payment-index-' + rentPaymentIndex + '-merchant-payment-' + rentPayment.id"
+												>
+													<div class="form-row">
+														<label class="col-sm-6 col-form-label font-weight-bold text-right">
+															Invoice No :
+														</label>
 
-									<label class="col-6 col-form-label">
-										{{ singleRentData.number_installment }}
-									</label>
-								</div>
+														<label class="col-sm-6 col-form-label">
+															{{ rentPayment.invoice_no | capitalize }}
+														</label>
+													</div>
 
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Date From :
-									</label>
+													<div class="form-row">
+														<label class="col-sm-6 col-form-label font-weight-bold text-right">
+															Paid Amount :
+														</label>
 
-									<label class="col-6 col-form-label">
-										{{ singleRentData.date_from }}
-									</label>
-								</div>
+														<label class="col-sm-6 col-form-label">
+															{{ rentPayment.total_paid_amount || 0 }}
+														</label>
+													</div>
 
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Date To :
-									</label>
+													<div class="form-row">
+														<label class="col-sm-6 col-form-label font-weight-bold text-right">
+															Paid at :
+														</label>
 
-									<label class="col-6 col-form-label">
-										{{ singleRentData.date_to }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Total Rent :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ singleRentData.total_rent }} {{ general_settings.official_currency_name }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Discount :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ singleRentData.discount }} %
-									</label>
-								</div>
-
-								<!-- 
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Last Due :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ singleRentData.previous_due }} {{ general_settings.official_currency_name }}
-									</label>
-								</div> 
-								-->
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Net Payeble :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ singleRentData.net_payable }} {{ general_settings.official_currency_name }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Total Paid Amount :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ singleRentData.total_paid_amount || 0 }} {{ general_settings.official_currency_name }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Due :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ (singleRentData.net_payable - singleRentData.total_paid_amount) }} {{ general_settings.official_currency_name | capitalize }}
-									</label>
-								</div>
-
-								<div class="form-row">
-									<label class="col-6 col-form-label font-weight-bold text-right">
-										Created at :
-									</label>
-
-									<label class="col-6 col-form-label">
-										{{ singleRentData.created_at }}
-									</label>
-								</div>
-							</div>
-
-							<div id="rent-payments" class="tab-pane fade">
-								<div 
-									class="form-row"
-									v-if="singleRentData.hasOwnProperty('payments') && singleRentData.payments.length"
-								>
-									<div class="card card-body">
-										<div class="form-row">
-											<div 
-												class="col-sm-6"
-												v-for="(rentPayment, rentPaymentIndex) in singleRentData.payments" 
-												:key="'merchant-payment-index-' + rentPaymentIndex + '-merchant-payment-' + rentPayment.id"
-											>
-												<div class="form-row">
-													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Invoice No :
-													</label>
-
-													<label class="col-sm-6 col-form-label">
-														{{ rentPayment.invoice_no | capitalize }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Paid Amount :
-													</label>
-
-													<label class="col-sm-6 col-form-label">
-														{{ rentPayment.total_paid_amount || 0 }}
-													</label>
-												</div>
-
-												<div class="form-row">
-													<label class="col-sm-6 col-form-label font-weight-bold text-right">
-														Paid at :
-													</label>
-
-													<label class="col-sm-6 col-form-label">
-														{{ rentPayment.paid_at }}
-													</label>
+														<label class="col-sm-6 col-form-label">
+															{{ rentPayment.paid_at }}
+														</label>
+													</div>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
 
-							<div id="space-rents" class="tab-pane fade">
-								<div 
-									class="form-row" 
-									v-if="singleRentData.hasOwnProperty('spaceRents') && singleRentData.spaceRents.length"
-								>
-									<div class="col-sm-12">
-										<table class="table table-striped table-bordered nowrap text-center">
-											<thead>
-												<tr>
-													<th>Space Type</th>
-													<th>Space Name</th>
-													<th>Rent</th>
-												</tr>
-											</thead>
+								<div id="support-rents" class="tab-pane fade">
+									<div class="form-row"> 
+									    <label class="col-6 col-form-label font-weight-bold text-right">
+											E-Commerce Fulfillment Support :
+										</label>
+										<div class="col-6 col-form-label">
+											<span :class="[singleRentData.deal && singleRentData.deal.e_commerce_fulfillment_support ? 'badge-success' : 'badge-danger', 'badge']">
+												
+												{{ singleRentData.deal && singleRentData.deal.e_commerce_fulfillment_support ? 'Enabled' : 'Disabled' }}
+												
+											</span>
+										</div>
+									</div>
 
-											<tbody>
-												<tr 
-													v-for="(spaceRent, spaceRentIndex) in singleRentData.spaceRents" 
-													:key="'rent-rent-' + spaceRentIndex + '-id-' + spaceRent.id"
-												>	
-													<td>
-														{{ (spaceRent.dealt_space ? (spaceRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (spaceRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
-													</td>
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											E-Commerce Support Charge :
+										</label>
 
-													<td>
-														{{ spaceRent.dealt_space ? spaceRent.dealt_space.name : 'NA' | capitalize }}
-													</td>
-													
-													<td>
-														{{ spaceRent.rent }} {{ general_settings.official_currency_name | capitalize }}
-													</td>
-												</tr>
-											</tbody>
-										</table>							
+										<label class="col-6 col-form-label">
+											{{ singleRentData.deal ? singleRentData.deal.e_commerce_fulfillment_charge : 0 }}
+
+											{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+										</label>
+									</div>
+
+									<div class="form-row"> 
+									    <label class="col-6 col-form-label font-weight-bold text-right">
+											Purchase Support :
+										</label>
+										<div class="col-6 col-form-label">
+											<span :class="[singleRentData.deal && singleRentData.deal.purchase_support ? 'badge-success' : 'badge-danger', 'badge']">
+												
+												{{ singleRentData.deal && singleRentData.deal.purchase_support ? 'Enabled' : 'Disabled' }}
+												
+											</span>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											Purchase Support Charge :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.deal ? singleRentData.deal.purchase_support_charge : 0 }}
+
+											{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+										</label>
+									</div>
+
+									<div class="form-row"> 
+									    <label class="col-6 col-form-label font-weight-bold text-right">
+											POS Support :
+										</label>
+										<div class="col-6 col-form-label">
+											<span :class="[singleRentData.deal && singleRentData.deal.pos_support ? 'badge-success' : 'badge-danger', 'badge']">
+												
+												{{ singleRentData.deal && singleRentData.deal.pos_support ? 'Enabled' : 'Disabled' }}
+												
+											</span>
+										</div>
+									</div>
+
+									<div class="form-row">
+										<label class="col-6 col-form-label font-weight-bold text-right">
+											POS Support Charge :
+										</label>
+
+										<label class="col-6 col-form-label">
+											{{ singleRentData.deal ? singleRentData.deal.pos_support_charge : 0 }}
+
+											{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+										</label>
 									</div>
 								</div>
 							</div>
@@ -1494,7 +1419,7 @@
 							<qr-code 
 								:text="singleRentData.name || ''"
 								:size="50" 
-								class="ml-auto"
+								class="float-right"
 							></qr-code>
 						</div> 
 					</div>
@@ -1619,39 +1544,36 @@
 						</div>
 					</div>
 
-					<div 
-						class="form-row"
-						v-if="singleRentData.hasOwnProperty('spaceRents') && singleRentData.spaceRents.length"
-					>
+					<div class="form-row">
 						<label class="col-sm-6 col-form-label font-weight-bold">
-							Space Rents :
+							Support Rents :
 						</label>
 
 						<div class="col-12">
 							<table class="table table-striped table-bordered nowrap text-center">
 								<thead>
 									<tr>
-										<th>Space Type</th>
-										<th>Space Name</th>
-										<th>Rent</th>
+										<th>E-Commerce Support</th>
+										<th>Purchase Support</th>
+										<th>POS Support</th>
 									</tr>
 								</thead>
 
 								<tbody>
-									<tr 
-										v-for="(spaceRent, spaceRentIndex) in singleRentData.spaceRents" 
-										:key="'rent-rent-' + spaceRentIndex + '-id-' + spaceRent.id"
-									>	
+									<tr>	
 										<td>
-											{{ (spaceRent.dealt_space ? (spaceRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' : (spaceRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') }}
+											{{ singleRentData.deal ? singleRentData.deal.e_commerce_fulfillment_charge : 0 }}
+											{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 										</td>
 
 										<td>
-											{{ spaceRent.dealt_space ? spaceRent.dealt_space.name : 'NA' | capitalize }}
+											{{ singleRentData.deal ? singleRentData.deal.purchase_support_charge : 0 }}
+											{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 										</td>
 										
 										<td>
-											{{ spaceRent.rent }} {{ general_settings.official_currency_name | capitalize }}
+											{{ singleRentData.deal ? singleRentData.deal.pos_support_charge : 0 }}
+											{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 										</td>
 									</tr>
 								</tbody>
@@ -1777,7 +1699,7 @@
 		net_payable : 0,
 		total_paid_amount : 0,
 		// current_due : 0,
-		// merchant_space_deal_id : null,
+		// merchant_support_deal_id : null,
 		// paid_at : null,
 		rents : [
 			{
@@ -1837,7 +1759,7 @@
 
 		      	},
 
-	        	dealTotalCurspaceRent : 0,
+	        	dealCurrentRent : 0,
 
 	        	singleRentData : singleRentData, 
 
@@ -1909,30 +1831,15 @@
 						},
 					},
 
-					"Space Rents": {
-						field: "spaceRents",
-						callback: (spaceRents) => {
+					"Support Rent": {
+						field: "supportRent",
+						callback: (supportRent) => {
+	
+							var infosToReturn = '';
 
-							if (spaceRents && spaceRents.length) {
-								
-								var infosToReturn = '';
+							infosToReturn += "E-Commerce Support: " + supportRent.e_commerce_fulfillment_charge + "\n Purchase Support: "  + supportRent.purchase_support_charge + "\n POS Support: " + supportRent.pos_support_charge + "\n";
 
-								spaceRents.forEach(
-					
-									(spaceRent, spaceRentIndex) => {
-
-										infosToReturn += "Space Type: " + (spaceRent.dealt_space ? (spaceRent.dealt_space.type.includes('WarehouseContainerStatus') ? 'Container' :(spaceRent.dealt_space.type.includes('WarehouseContainerShelfStatus') ? 'Shelf' : 'Unit')) : 'NA') + "\n Space Name: "  + this.$options.filters.capitalize(spaceRent.dealt_space.name) + "\n Rent: " + spaceRent.rent + "\n";
-
-									}
-									
-								);
-
-								return infosToReturn;
-
-							}
-							else {
-								return 'No Rents Found.'
-							}
+							return infosToReturn;
 
 						},
 					},
@@ -2081,7 +1988,7 @@
 				// this.allFetchedContents = [];
 				
 				axios
-					.get('/api/space-deal-rents/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/support-deal-rents/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							// this.allFetchedContents = response.data;
@@ -2120,7 +2027,7 @@
 				this.dealtSpacesAndRents = [];
 				
 				axios
-					.get('/api/space-deal-rents/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
+					.get('/api/support-deal-rents/' + this.deal.id + '/' + this.perPage + "?page=" + this.pagination.current_page)
 					.then(response => {
 						if (response.status == 200) {
 							this.dealtSpacesAndRents = response.data;
@@ -2154,43 +2061,11 @@
 			*/
 			getDealTotalRents() {
 
-				this.dealTotalCurspaceRent = 0;
+				this.dealCurrentRent = 0;
 				
-				if (this.deal.warehouses.length > 0) {
-
-					this.deal.warehouses.forEach(
-						(merchantWarehouse, merchantWarehouseIndex) => {
-							merchantWarehouse.spaces.forEach(
-								(warehouseSpace, warehouseSpaceIndex) => {
-									if (warehouseSpace.type.includes('containers') && warehouseSpace.hasOwnProperty('containers') && warehouseSpace.containers.length) {
-
-										warehouseSpace.containers.forEach(
-											(warehouseContainer, warehouseContainerIndex) => {
-												
-												this.dealTotalCurspaceRent += warehouseContainer.selected_rent ? warehouseContainer.selected_rent.rent : 0;
-
-											}
-										);
-
-									}
-
-									else if (warehouseSpace.type.includes('shelves') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelves') && warehouseSpace.container.shelves.length) {
-
-										this.dealTotalCurspaceRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
-
-									}
-
-									else if (warehouseSpace.type.includes('units') && warehouseSpace.hasOwnProperty('container') && warehouseSpace.container.hasOwnProperty('shelf') && warehouseSpace.container.shelf.hasOwnProperty('units') && warehouseSpace.container.shelf.units.length) {
-
-										this.dealTotalCurspaceRent += warehouseSpace.container.hasOwnProperty('selected_rent') ? warehouseSpace.container.selected_rent.rent : 0;
-
-									}
-								}
-							);
-						}
-					);	
-
-				}
+				this.dealCurrentRent += this.deal.e_commerce_fulfillment_charge;
+				this.dealCurrentRent += this.deal.purchase_support_charge;
+				this.dealCurrentRent += this.deal.pos_support_charge;
 
 			},
 			searchData() {
@@ -2200,10 +2075,10 @@
 				this.dealAllRents = [];
 				// this.allFetchedContents = [];
 				// this.pagination.current_page = 1;
-				this.searchAttributes.merchant_space_deal_id = this.deal.id;
+				this.searchAttributes.merchant_support_deal_id = this.deal.id;
 				
 				axios
-				.post("/api/search-space-deal-rents/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
+				.post("/api/search-support-deal-rents/" + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					// this.allFetchedContents = response.data;
 					this.dealAllRents = response.data.all.data;
@@ -2233,13 +2108,13 @@
 					number_installment : 1,
 					date_from : dealLastPayment.date_to ?? this.today,
 					date_to : null,
-					total_rent : this.dealTotalCurspaceRent, // generated from selected spaces
+					total_rent : this.dealCurrentRent, // generated from selected spaces
 					discount : 0,	// percentage 
 					// previous_due : dealLastPayment.current_due ?? 0,	// as new deal
-					net_payable : this.dealTotalCurspaceRent /* + (dealLastPayment.current_due ?? 0) */,
+					net_payable : this.dealCurrentRent /* + (dealLastPayment.current_due ?? 0) */,
 					total_paid_amount : 0,
 					// current_due : 0,
-					merchant_space_deal_id : this.deal.id,
+					merchant_support_deal_id : this.deal.id,
 					// paid_at : null,
 					
 					/*
@@ -2293,7 +2168,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.post('/space-deal-rents/' + this.perPage, this.singleRentData)
+					.post('/support-deal-rents/' + this.perPage, this.singleRentData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("New rent has been added", "Success");
@@ -2337,7 +2212,7 @@
 				this.formSubmitted = true;
 
 				axios
-					.put('/space-deal-rents/' + this.singleRentData.id + '/' + this.perPage, this.singleRentData)
+					.put('/support-deal-rents/' + this.singleRentData.id + '/' + this.perPage, this.singleRentData)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Rent has been updated", "Success");
@@ -2372,7 +2247,7 @@
 			deleteAsset(singleRentData) {
 				
 				axios
-					.delete('/space-deal-rents/' + singleRentData.id + '/' + this.perPage)
+					.delete('/support-deal-rents/' + singleRentData.id + '/' + this.perPage)
 					.then(response => {
 						if (response.status == 200) {
 							this.$toastr.s("Storage type has been deleted", "Success");
@@ -2465,7 +2340,7 @@
 				
 				if (! this.errors.discount && ! this.errors.number_installment) {
 
-					this.singleRentData.total_rent = this.dealTotalCurspaceRent * this.singleRentData.number_installment;
+					this.singleRentData.total_rent = this.dealCurrentRent * this.singleRentData.number_installment;
 
 					this.singleRentData.net_payable = this.singleRentData.total_rent = this.singleRentData.total_rent - (this.singleRentData.total_rent * this.singleRentData.discount / 100);
 

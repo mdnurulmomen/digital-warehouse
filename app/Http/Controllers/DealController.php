@@ -11,6 +11,7 @@ use App\Models\MerchantRent;
 use App\Models\MerchantPayment;
 use Illuminate\Validation\Rule;
 use App\Models\MerchantSpaceDeal;
+use App\Models\MerchantSupportDeal;
 use App\Models\WarehouseContainerStatus;
 use App\Models\WarehouseContainerShelfStatus;
 use App\Models\WarehouseContainerShelfUnitStatus;
@@ -29,10 +30,10 @@ class DealController extends Controller
         $this->middleware("permission:delete-merchant-space-deal")->only('deleteMerchantSpaceDeal');
 
         // Deal-Payment
-        $this->middleware("permission:view-merchant-payment-index")->only(['showDealAllRents', 'searchDealAllRents', 'showRentalAllPayments', 'searchRentalAllPayments']);
-        $this->middleware("permission:create-merchant-payment")->only(['storeDealNewRent', 'storeRentalNewPayment']);
-        $this->middleware("permission:update-merchant-payment")->only(['updateDealRent', 'updateRentalPayment']);
-        $this->middleware("permission:delete-merchant-payment")->only(['deleteDealRent', 'deleteRentalPayment']);
+        $this->middleware("permission:view-merchant-payment-index")->only(['showSpaceDealAllRents', 'searchSpaceDealAllRents', 'showSupportDealAllRents', 'searchSupportDealAllRents', 'showRentalAllPayments', 'searchRentalAllPayments']);
+        $this->middleware("permission:create-merchant-payment")->only(['storeSpaceDealNewRent', 'storeSupportDealNewRent', 'storeRentalNewPayment']);
+        $this->middleware("permission:update-merchant-payment")->only(['updateSpaceDealRent', 'updateSupportDealRent', 'updateRentalPayment']);
+        $this->middleware("permission:delete-merchant-payment")->only(['deleteSpaceDealRent', 'deleteSupportDealRent', 'deleteRentalPayment']);
     }
 
     // Merchant-Deal
@@ -572,8 +573,8 @@ class DealController extends Controller
         ], 200);
     }
 
-    // Deal-Rents
-    public function showDealAllRents($deal, $perPage = false)
+    // Space-Deal-Rents
+    public function showSpaceDealAllRents($deal, $perPage = false)
     {
         if ($perPage) {
             
@@ -588,7 +589,7 @@ class DealController extends Controller
         }
     }
 
-    public function storeDealNewRent(Request $request, $perPage)
+    public function storeSpaceDealNewRent(Request $request, $perPage)
     {
         $request->validate([
             'merchant_space_deal_id' => 'required|exists:merchant_space_deals,id',
@@ -678,10 +679,10 @@ class DealController extends Controller
 
         }
 
-        return $this->showDealAllRents($request->merchant_space_deal_id, $perPage);
+        return $this->showSpaceDealAllRents($request->merchant_space_deal_id, $perPage);
     }
 
-    public function updateDealRent(Request $request, $rent, $perPage)
+    public function updateSpaceDealRent(Request $request, $rent, $perPage)
     {
         $request->validate([
             // 'merchant_space_deal_id' => 'required|exists:merchant_space_deals,id',
@@ -746,23 +747,23 @@ class DealController extends Controller
 
         }
 
-        return $this->showDealAllRents($request->deal['id'], $perPage);
+        return $this->showSpaceDealAllRents($request->deal['id'], $perPage);
     }
 
-    public function deleteDealRent($rent, $perPage)
+    public function deleteSpaceDealRent($rent, $perPage)
     {
         $dealRentToDelete = MerchantRent::findOrFail($rent);
 
-        $deal = $dealRentToDelete->deal;
+        $deal = $dealRentToDelete->dealable;
 
         $dealRentToDelete->spaceRents()->delete();
         $dealRentToDelete->payments()->delete();
         $dealRentToDelete->delete();
 
-        return $this->showDealAllRents($deal->id, $perPage);
+        return $this->showSpaceDealAllRents($deal->id, $perPage);
     }
 
-    public function searchDealAllRents(Request $request, $perPage)
+    public function searchSpaceDealAllRents(Request $request, $perPage)
     {
         $request->validate([
             'merchant_space_deal_id' => 'required|exists:merchant_space_deals,id',
@@ -776,8 +777,8 @@ class DealController extends Controller
         ]);
 
         $query = MerchantRent::with(['spaceRents', 'payments'])
-        ->whereHas('deal', function ($query1) use ($request) {
-            $query1->where('merchant_space_deal_id', $request->merchant_space_deal_id);
+        ->whereHasMorph('dealable', [MerchantSpaceDeal::class], function($query) use ($request) {
+            $query->where('id', $request->merchant_space_deal_id);
         });
 
         if ($request->search) {
@@ -795,6 +796,230 @@ class DealController extends Controller
                 // ->orWhere('current_due', 'like', "%$request->search%")
                 ->orWhereHas('spaceRents', function ($query3) use ($request) {
                     $query3->where('rent', 'like', "%$request->search%");
+                })
+                ->orWhereHas('payments', function ($query4) use ($request) {
+                    $query4->where('invoice_no', 'like', "%$request->search%")
+                    ->orWhere('paid_amount', 'like', "%$request->search%")
+                    ->orWhere('current_due', 'like', "%$request->search%");
+                });
+            });
+
+        }
+
+        if ($request->dateFrom) {
+            
+            $query->whereDate('created_at', '>=', $request->dateFrom);
+
+        }
+
+        if ($request->dateTo) {
+            
+            $query->whereDate('created_at', '<=', $request->dateTo);
+
+        }
+
+        return response()->json([
+            'all' => new MerchantRentCollection($query->paginate($perPage)),  
+        ], 200);
+    }
+
+    // Support-Deal-Rents
+    public function showSupportDealAllRents($deal, $perPage = false)
+    {
+        if ($perPage) {
+            
+            return new MerchantRentCollection(
+                MerchantRent::with(['payments', 'supportRent'])
+                ->whereHasMorph('dealable', [MerchantSupportDeal::class], function($query) use ($deal) {
+                    $query->where('id', $deal);
+                })
+                ->paginate($perPage)
+            );
+
+        }
+    }
+
+    public function storeSupportDealNewRent(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_support_deal_id' => 'required|exists:merchant_support_deals,id',
+            'number_installment' => 'required|numeric|min:1',
+            'date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'total_rent' => 'required|numeric',
+            'discount' => 'nullable|numeric|between:0,100',
+            // 'previous_due' => 'numeric',
+            'net_payable' => 'numeric',
+            'total_paid_amount' => 'required|numeric|min:1',
+            // 'current_due' => 'required|numeric',
+        ],
+
+        [
+            // 'current_due' => 'Stock quantity is required !',
+            'merchant_support_deal_id.*' => 'Merchant deal is required',
+            'number_installment' => 'Rent rent number is required',
+            'date_from' => 'Rent issueing date is required',
+            'date_to' => 'Rent expiring date is required',
+            'total_rent' => 'Total rent is invalid',
+            'discount' => 'Discount rate should be between 0 to 100',
+            // 'previous_due' => 'Previous due is invalid',
+            'net_payable' => 'Net payable is invalid',
+            'total_paid_amount' => 'Paid amount is invalid',
+        ]);
+
+        $merchantDeal = MerchantSupportDeal::find($request->merchant_support_deal_id);
+
+        $dealNewRent = $merchantDeal->rents()->create([
+            'name' => ($merchantDeal->name.'R'.($merchantDeal->rents->count() + 1)),
+            'number_installment' => $request->number_installment,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'total_rent' => $request->total_rent,
+            'discount' => $request->discount ?? 0,
+            'net_payable' => $request->net_payable ?? 0,
+            'total_paid_amount' => $request->total_paid_amount ?? 0,
+        ]);
+
+        $dealNewRent->supportRent()->create([
+            'e_commerce_fulfillment_charge' => $merchantDeal->e_commerce_fulfillment_charge ?? 0,
+            'purchase_support_charge' => $merchantDeal->purchase_support_charge,
+            'pos_support_charge' => $merchantDeal->pos_support_charge
+        ]);
+
+        if ($dealNewRent->total_paid_amount > 0) {
+            
+            $user = $request->user();
+
+            $rentNewPayment = $dealNewRent->payments()->create([
+                'invoice_no' => ($dealNewRent->name.'P'.($dealNewRent->payments->count() + 1)),
+                // 'previous_due' => 0,    // first payment
+                'paid_amount' => $request->total_paid_amount ?? 0,
+                'current_due' => ($request->net_payable - $request->total_paid_amount),
+                'issuer_type' => get_class($user),
+                'issuer_id' => $user->id,
+            ]);
+
+        }
+
+        return $this->showSupportDealAllRents($request->merchant_support_deal_id, $perPage);
+    }
+
+    public function updateSupportDealRent(Request $request, $rent, $perPage)
+    {
+        $request->validate([
+            // 'merchant_support_deal_id' => 'required|exists:merchant_support_deals,id',
+            'number_installment' => 'required|numeric|min:1',
+            'date_from' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'date_to' => 'required|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'total_rent' => 'required|numeric',
+            'discount' => 'nullable|numeric|between:0,100',
+            // 'previous_due' => 'numeric',
+            'net_payable' => 'numeric',
+            'total_paid_amount' => 'required|numeric|min:1',
+            // 'current_due' => 'required|numeric',
+        ],
+
+        [
+            // 'current_due' => 'Stock quantity is required !',
+            // 'merchant_support_deal_id.*' => 'Merchant deal is required',
+            'number_installment' => 'Rent rent number is required',
+            'date_from' => 'Rent issueing date is required',
+            'date_to' => 'Rent expiring date is required',
+            'total_rent' => 'Total rent is invalid',
+            'discount' => 'Discount rate should be between 0 to 100',
+            // 'previous_due' => 'Previous due is invalid',
+            'net_payable' => 'Net payable is invalid',
+            'total_paid_amount' => 'Paid amount is invalid',
+        ]);
+
+        $rentToUpdate = MerchantRent::where('id', $rent)
+        ->whereHasMorph('dealable', [MerchantSupportDeal::class], function($query) use ($request) {
+            $query->where('id', $request->deal['id']);
+        })->firstOrFail();
+
+        $rentToUpdate->update([
+            'number_installment' => $request->number_installment,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'total_rent' => $request->total_rent,
+            'discount' => $request->discount ?? 0,
+            'net_payable' => $request->net_payable ?? 0,
+            'total_paid_amount' => $rentToUpdate->payments->count() > 1 ? $rentToUpdate->total_paid_amount : $request->total_paid_amount ?? 0,
+        ]);
+
+        // single payment
+        if ($rentToUpdate->payments->count() <= 1 && $rentToUpdate->total_paid_amount > 0) {     // payments : 0 / 1
+            
+            $user = $request->user();
+
+            $rentToUpdate->payments()->updateOrCreate(
+                [
+                    'merchant_rent_id' => $rentToUpdate->id
+                ],
+                [
+                    'invoice_no' => $rentToUpdate->payments->count() ? $rentToUpdate->payments->first()->invoice_no : ($rentToUpdate->name.'P'.($rentToUpdate->payments->count() + 1)),
+                    'paid_amount' => $request->total_paid_amount ?? 0,
+                    'current_due' => ($request->net_payable - $request->total_paid_amount),
+                    'issuer_type' => $rentToUpdate->payments->count() ? $rentToUpdate->payments->first()->issuer_type : get_class($user),
+                    'issuer_id' => $rentToUpdate->payments->count() ? $rentToUpdate->payments->first()->issuer_id : $user->id,
+                    'updater_type' => get_class($user),
+                    'updater_id' => $user->id,
+                ]
+            );
+
+        }
+
+        return $this->showSupportDealAllRents($request->deal['id'], $perPage);
+    }
+
+    public function deleteSupportDealRent($rent, $perPage)
+    {
+        $dealRentToDelete = MerchantRent::findOrFail($rent);
+
+        $deal = $dealRentToDelete->dealable;
+
+        $dealRentToDelete->supportRent()->delete();
+        $dealRentToDelete->payments()->delete();
+        $dealRentToDelete->delete();
+
+        return $this->showSupportDealAllRents($deal->id, $perPage);
+    }
+
+    public function searchSupportDealAllRents(Request $request, $perPage)
+    {
+        $request->validate([
+            'merchant_support_deal_id' => 'required|exists:merchant_support_deals,id',
+            'search' => 'nullable|required_without_all:dateTo,dateFrom|string', 
+            'dateTo' => 'nullable|required_without_all:search,dateFrom|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            'dateFrom' => 'nullable|required_without_all:search,dateTo|date|after_or_equal:1970-01-01 00:00:01|before_or_equal:2038-01-19 03:14:07',
+            // 'showPendingRequisitions' => 'nullable|boolean',
+            // 'showCancelledRequisitions' => 'nullable|boolean',
+            // 'showDispatchedRequisitions' => 'nullable|boolean',
+            // 'showProduct' => 'nullable|string', 
+        ]);
+
+        $query = MerchantRent::with(['supportRent', 'payments'])
+        ->whereHasMorph('dealable', [MerchantSupportDeal::class], function($query) use ($request) {
+            $query->where('id', $request->merchant_support_deal_id);
+        });
+
+        if ($request->search) {
+            
+            $query->where(function($query2) use ($request) {
+                $query2->where('name', 'like', "%$request->search%")
+                ->orWhere('number_installment', 'like', "%$request->search%")
+                ->orWhereDate('date_from', '=', "$request->search")
+                ->orWhereDate('date_to', '=', "$request->search")
+                ->orWhere('total_rent', 'like', "%$request->search%")
+                ->orWhere('discount', 'like', "%$request->search%")
+                // ->orWhere('previous_due', 'like', "%$request->search%")
+                ->orWhere('net_payable', 'like', "%$request->search%")
+                ->orWhere('total_paid_amount', 'like', "%$request->search%")
+                // ->orWhere('current_due', 'like', "%$request->search%")
+                ->orWhereHas('supportRent', function ($query3) use ($request) {
+                    $query3->where('e_commerce_fulfillment_charge', 'like', "%$request->search%")
+                    ->orWhere('purchase_support_charge', 'like', "%$request->search%")
+                    ->orWhere('pos_support_charge', 'like', "%$request->search%");
                 })
                 ->orWhereHas('payments', function ($query4) use ($request) {
                     $query4->where('invoice_no', 'like', "%$request->search%")

@@ -64,6 +64,7 @@
 										  			@openContentRestoreForm="openContentRestoreForm($event)" 
 										  			@goMerchantDeals="goMerchantDeals($event)" 
 										  			@goMerchantProducts="goMerchantProducts($event)" 
+										  			@goToSupportDealRents="goToSupportDealRents($event)" 
 										  			@changeNumberContents="changeNumberContents($event)" 
 										  			@fetchAllContents="fetchAllContents" 
 										  			@searchData="searchData" 
@@ -242,6 +243,12 @@
 
 				// console.log(object);
 				this.$router.push({ name: 'merchant-products', params: { merchant: object, merchantId:object.id }});
+
+			},
+			goToSupportDealRents(object) {
+
+				// console.log(object);
+				this.$router.push({ name: 'support-deal-rents', params: { merchantName:object.user_name.replace(/ /g,"-"), deal:object.support_deal, dealId:object.support_deal.id }});
 
 			},
 			showContentDetails(object) {	

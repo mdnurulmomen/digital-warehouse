@@ -26,6 +26,7 @@ class MerchantRentResource extends JsonResource
             'total_paid_amount' => $this->total_paid_amount,
             'payments' => MerchantPaymentResource::collection($this->payments),
             'spaceRents' => $this->when($this->spaceRents->count(), MerchantSpaceRentResource::collection($this->spaceRents)),
+            'supportRent' => $this->when($this->supportRent()->exists(), new MerchantSupportRentResource($this->supportRent)),
             'deal' => $this->dealable,
             'created_at' => $this->created_at->format('Y-m-d H:i:s')
         ];

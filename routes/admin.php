@@ -253,12 +253,19 @@ Route::name('admin.')->group(function () {
 		Route::delete('/merchant-space-deals/{deal}/{perPage}','DealController@deleteMerchantSpaceDeal')->name('merchant-space-deals.delete');
 		Route::post('/search-merchant-space-deals/{perPage}','DealController@searchMerchantAllSpaceDeals')->name('search-merchant-space-deals');
 
-		// deal-rents
-		Route::get('/api/deal-rents/{deal}/{perPage?}', 'DealController@showDealAllRents')->name('deal-rents.index');
-		Route::post('/deal-rents/{perPage}', 'DealController@storeDealNewRent')->name('deal-rents.store');	
-		Route::put('/deal-rents/{rent}/{perPage}', 'DealController@updateDealRent')->name('deal-rents.update');	
-		Route::delete('/deal-rents/{rent}/{perPage}', 'DealController@deleteDealRent')->name('deal-rents.delete');
-		Route::post('/api/search-deal-rents/{perPage}', 'DealController@searchDealAllRents')->name('search-deal-rents');
+		// space-deal-rents
+		Route::get('/api/space-deal-rents/{deal}/{perPage?}', 'DealController@showSpaceDealAllRents')->name('space-deal-rents.index');
+		Route::post('/space-deal-rents/{perPage}', 'DealController@storeSpaceDealNewRent')->name('space-deal-rents.store');	
+		Route::put('/space-deal-rents/{rent}/{perPage}', 'DealController@updateSpaceDealRent')->name('space-deal-rents.update');	
+		Route::delete('/space-deal-rents/{rent}/{perPage}', 'DealController@deleteSpaceDealRent')->name('space-deal-rents.delete');
+		Route::post('/api/search-space-deal-rents/{perPage}', 'DealController@searchSpaceDealAllRents')->name('search-space-deal-rents');
+
+		// support-deal-rents
+		Route::get('/api/support-deal-rents/{deal}/{perPage?}', 'DealController@showSupportDealAllRents')->name('support-deal-rents.index');
+		Route::post('/support-deal-rents/{perPage}', 'DealController@storeSupportDealNewRent')->name('support-deal-rents.store');	
+		Route::put('/support-deal-rents/{rent}/{perPage}', 'DealController@updateSupportDealRent')->name('support-deal-rents.update');	
+		Route::delete('/support-deal-rents/{rent}/{perPage}', 'DealController@deleteSupportDealRent')->name('support-deal-rents.delete');
+		Route::post('/api/search-support-deal-rents/{perPage}', 'DealController@searchSupportDealAllRents')->name('search-support-deal-rents');
 
 		// rental-payments
 		Route::get('/api/rental-payments/{rental}/{perPage?}', 'DealController@showRentalAllPayments')->name('rental-payments.index');
