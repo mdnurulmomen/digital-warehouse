@@ -173,7 +173,7 @@ class MerchantController extends Controller
         $supportDealLastRent = $merchantSupportDeal->rents()->latest()->first();
         $currentDate = date('Y-m-d');
 
-        if ($supportDealLastRent && $supportDealLastRent->date_to > $currentDate) {
+        if ($supportDealLastRent && $supportDealLastRent->date_to >= $currentDate) {
             
             $merchantSupportDeal->update([
                 'sale_percentage' => $request->support_deal['sale_percentage'] ?? 0,
@@ -187,7 +187,6 @@ class MerchantController extends Controller
         }
         else {
 
-            // support deal
             $merchantSupportDeal->update([
                 'sale_percentage' => $request->support_deal['sale_percentage'] ?? 0,
                 'e_commerce_fulfillment_support' => $request->support_deal['e_commerce_fulfillment_support'],

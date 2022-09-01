@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Web;
 
 use App\Models\Stock;
+use App\Models\Merchant;
 use App\Models\ProductStock;
 use App\Models\MerchantProduct;
 use Illuminate\Validation\Rule;
@@ -41,10 +42,11 @@ class StockRequest extends FormRequest
                 })
             ],
             'products.*.stock_quantity' => 'required|integer|min:1',
-            'products.*.unit_buying_price' => 'nullable|numeric',
             'products.*.addresses' => 'required|array|min:1'
             // 'product_id' => 'required|numeric|exists:products,id',
         ];
+
+        $merchant = Merchant::find($this->input('merchant.id'));
 
         foreach ($storingProducts as $stockingProductKey => $stockingProduct) {
 
@@ -61,6 +63,20 @@ class StockRequest extends FormRequest
             
             $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
             $product = $merchantProduct->product;
+
+            if ($merchant->supportDeal->purchase_support) {
+            
+                $rules['products.'.$stockingProductKey.'.vendor_id'] = 'required|exists:vendors,id';
+                $rules['products.'.$stockingProductKey.'.location_id'] = 'required|exists:locations,id';
+
+                if (! $product->has_variations) {
+                    
+                    $rules['products.'.$stockingProductKey.'.unit_buying_price'] = 'required|numeric|min:0';
+
+                }
+
+
+            }
 
             // $rules['products.'.$stockingProductKey.'.addresses'] = 'required|array|min:1';
 
@@ -129,8 +145,6 @@ class StockRequest extends FormRequest
                 // $rules['products.'.$stockingProductKey.'.variations.*.merchant_product_variation_id'] = 'required_without:products.*.variations.*.id|integer|exists:merchant_product_variations,id';
 
                 $rules['products.'.$stockingProductKey.'.variations.*.stock_quantity'] = 'sometimes|integer|min:0';
-                
-                $rules['products.'.$stockingProductKey.'.variations.*.unit_buying_price'] = 'sometimes|numeric|min:0';
 
                 if (array_sum(array_column($stockingProduct->variations, 'stock_quantity')) != $stockingProduct->stock_quantity) {
                     
@@ -160,6 +174,12 @@ class StockRequest extends FormRequest
 
                         $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code';
 
+                    }
+
+                    if ($merchant->supportDeal->purchase_support && $stockingProductVariation->stock_quantity > 0) {
+                
+                        $rules['products.'.$stockingProductKey.'.variations.*.unit_buying_price'] = 'required|numeric|min:0';
+                        
                     }
 
                 }
@@ -224,6 +244,7 @@ class StockRequest extends FormRequest
     {
         return [
             'products.*.stock_quantity.*' => 'Stock quantity is required !',
+            'products.*.unit_buying_price.required' => 'Buying price is required !',
             'products.*.unit_buying_price.*' => 'Buying price should be numeric !',
             'warehouse.id' => [
                 'exists' => 'Warehouse is invalid !',
@@ -237,6 +258,12 @@ class StockRequest extends FormRequest
                 'unique' => 'Product serial exists',
                 '*' => 'Product serial is required',
             ],
+
+            'products.*.vendor_id.required' => 'Vendor is required',
+            'products.*.vendor_id.*' => 'Vendor is invalid',
+
+            'products.*.location_id.required' => 'Location is required',
+            'products.*.location_id.*' => 'Location is invalid',
             
             // 'product_id.*' => 'Product id is missing !',
             // 'serials.*.unique' => ':attribute serial must be unique !',
@@ -248,6 +275,7 @@ class StockRequest extends FormRequest
                 '*' => 'Variation quantity is required !',
             ],
 
+            'products.*.variations.*.unit_buying_price.required' => 'Buying price is required',
             'products.*.variations.*.unit_buying_price.*' => 'Buying price should be numeric',
             'products.*.variations.*.total_stock_quantity.*' => 'Stock qty does not match',
 

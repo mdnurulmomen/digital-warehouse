@@ -28,7 +28,7 @@
 											  		:required-permission = "'merchant-product'" 
 											  		:disable-add-button="allProducts.length==0 ? true : false" 
 											  		:data-to-export="dataToExport" 
-											  		:contents-to-download="productsToShow" 
+											  		:contents-to-download="merchantProductsToShow" 
 											  		:pagination="pagination" 
 											  		:current-tab="currentTab"
 											  		
@@ -70,7 +70,7 @@
 																</thead>
 
 																<tbody>
-																	<tr v-for="(merchantProduct, merchantProductIndex) in productsToShow" 
+																	<tr v-for="(merchantProduct, merchantProductIndex) in merchantProductsToShow" 
 																		:key="'merchant-product-index-' + merchantProductIndex + '-merchant-product-id' + merchantProduct.id + '-product-id-' + merchantProduct.product.id + '-merchant-id-' + merchantProduct.merchant.id" 
 																		:class="merchantProduct.id==singleMerchantProductData.id ? 'highlighted' : ''"
 																	>
@@ -145,7 +145,7 @@
 																	</tr>
 
 																	<tr 
-																  		v-show="! productsToShow.length"
+																  		v-show="! merchantProductsToShow.length"
 																  	>
 															    		<td colspan="5">
 																      		<div class="alert alert-danger text-center" role="alert">
@@ -738,7 +738,7 @@
 							<div class="form-row">
 								<div class="form-group col-sm-12">
 									<div class="form-row form-group">
-					        			<label class="col-6">Selected Merchant</label>
+					        			<label class="col-6 align-self-end">Selected Merchant</label>
 										
 						        		<div class="col-6 text-right">
 							        		<button 
@@ -754,7 +754,7 @@
 						        		</div>
 									</div>
 
-									<div class="form-row">
+									<div class="form-row form-group">
 										<div class="col-sm-12">
 								        	<multiselect 
 		                              			v-model="merchant" 
@@ -767,7 +767,25 @@
 		                              		>
 		                                	</multiselect>
 										</div>
-									</div>	
+									</div>
+
+									<div class="form-row form-group">
+										<div class="col-3"></div>
+
+										<div class="col-6 was-validated">
+								  			<input 	type="text" 
+											  		v-model="searchProduct" 
+											  		pattern="[^'!#$%^()\x22]+" 
+											  		class="form-control" 
+											  		placeholder="Search Product"
+										  	>
+										  	<div class="invalid-feedback">
+										  		Please search with releavant input
+										  	</div>
+								  		</div>
+
+										<div class="col-3"></div>
+									</div>
 					        	</div>
 							</div>
 
@@ -787,7 +805,7 @@
 
 											<tbody>
 												<tr 
-													v-for="(product, productIndex) in allProducts" 
+													v-for="(product, productIndex) in productsToShow" 
 													:key="'multiple-product-index-' + productIndex + '-product-' + product.id" 
 													:class="singleMerchantProductData.hasOwnProperty('merchantMultipleProducts') && singleMerchantProductData.merchantMultipleProducts.includes(product.id) ? 'highlighted' : ''"
 												>
@@ -816,7 +834,7 @@
 												</tr>
 
 												<tr 
-											  		v-show="! allProducts.length"
+											  		v-show="! productsToShow.length"
 											  	>
 										    		<td colspan="5">
 											      		<div class="alert alert-danger" role="alert">
@@ -2160,10 +2178,11 @@
 	        	
 	        	allProducts : [],
 	        	allVariations : [],
+	        	productsToShow : [],
 	        	allManufacturers : [],
 
-	        	productsToShow : [],
 	        	merchantAllProducts : [],
+	        	merchantProductsToShow : [],
 
 	        	// allContainers : [],
 	        	
@@ -2194,6 +2213,8 @@
 					*/
 					
 				},
+
+				searchProduct : '',
 
 				searchAttributes : {
 
@@ -2485,6 +2506,31 @@
 
 		},
 
+		watch : {
+
+			searchProduct : function(val){
+
+				if (val=='') {
+
+					this.setShowableProducts(this.allProducts);
+
+				}
+				else {
+
+					let regexValue = new RegExp(val, 'i');
+
+					let matchedProducts = this.allProducts.filter(
+						product => product.name.search(regexValue) > -1
+					)
+
+					this.setShowableProducts(matchedProducts);
+						
+				}
+
+			}
+
+		},
+
 		filters: {
 
 			capitalize: function (value) {
@@ -2571,6 +2617,7 @@
 					.then(response => {
 						if (response.status == 200) {
 							this.allProducts = response.data.data;
+							this.setShowableProducts(this.allProducts);
 						}
 					})
 					.catch(error => {
@@ -3129,7 +3176,7 @@
 				.post('/search-merchant-products/' + this.perPage + "?page=" + this.pagination.current_page, this.searchAttributes)
 				.then(response => {
 					this.merchantAllProducts = response.data;
-					this.productsToShow = this.merchantAllProducts.all.data;
+					this.merchantProductsToShow = this.merchantAllProducts.all.data;
 					this.pagination = this.merchantAllProducts.all;
 				})
 				.catch(e => {
@@ -3160,11 +3207,11 @@
     		showSelectedTabProducts() {
 				
 				if (this.currentTab=='retail') {
-					this.productsToShow = this.merchantAllProducts.retail ? this.merchantAllProducts.retail.data : [];
+					this.merchantProductsToShow = this.merchantAllProducts.retail ? this.merchantAllProducts.retail.data : [];
 					this.pagination = this.merchantAllProducts.retail;
 				}
 				else {
-					this.productsToShow = this.merchantAllProducts.bulk ? this.merchantAllProducts.bulk.data : [];
+					this.merchantProductsToShow = this.merchantAllProducts.bulk ? this.merchantAllProducts.bulk.data : [];
 					this.pagination = this.merchantAllProducts.bulk;
 				}
 
@@ -3178,7 +3225,7 @@
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: object.product, productMerchant: object }});
+				this.$router.push({ name: 'product-stocks', params: { product: object.product, merchant: object.merchant, productMerchant: object }});
 
 			},
 			verifyUserInput() {
@@ -3613,6 +3660,11 @@
 						this.formSubmitted = false;
 						// this.fetchAllContainers();
 					});
+
+			},
+			setShowableProducts(products = []) {
+
+				this.productsToShow = products;
 
 			},
 			validateFormInput (formInputName) {

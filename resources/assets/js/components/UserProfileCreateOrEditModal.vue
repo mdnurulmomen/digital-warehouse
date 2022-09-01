@@ -451,7 +451,8 @@
 												v-model="singleUserDetails.support_deal.number_outlets" 
 												placeholder="Number Outlets" 
 												:class="! errors.number_outlets  ? 'is-valid' : 'is-invalid'" 
-												@change="validateFormInput('number_outlets')"
+												@change="validateFormInput('number_outlets')" 
+												:disabled="! singleUserDetails.support_deal.pos_support" 
 												min="0" 
 											>
 											<div class="invalid-feedback">

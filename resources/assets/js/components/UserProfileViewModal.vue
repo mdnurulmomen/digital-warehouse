@@ -49,10 +49,10 @@
 												v-for="property in propertiesToShow" 
 												:key="property"
 											> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">{{ property + ': ' | capitalize }}</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ getPropertyValue(property) }}
 												</div>
 											</div>
@@ -60,37 +60,37 @@
 
 										<div id="support-deal" class="tab-pane fade in">
 											<div class="form-row"> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Support Deal ID:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.name | capitalize }}
 												</div>
 											</div>
 
 											<div class="form-row"> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Rent Period:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.rent_period ? profileToView.support_deal.rent_period.name : '' | capitalize }}
 												</div>
 											</div>
 
 											<div class="form-row"> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Sale Percentage:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.sale_percentage }}%
 												</div>
 											</div>
 
 											<div class="form-row"> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">E Commerce Fulfillment Support:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													<span :class="[profileToView.support_deal.e_commerce_fulfillment_support ? 'badge-success' : 'badge-danger', 'badge']">
 														
 														{{ profileToView.support_deal.e_commerce_fulfillment_support ? 'Enabled' : 'Disabled' }}
@@ -102,20 +102,20 @@
 											<div class="form-row" 
 												v-show="profileToView.support_deal.e_commerce_fulfillment_support"
 											> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Charge:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.e_commerce_fulfillment_charge }}
 													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 												</div>
 											</div>
 
 											<div class="form-row"> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Purchase Support:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													<span :class="[profileToView.support_deal.purchase_support ? 'badge-success' : 'badge-danger', 'badge']">
 														
 														{{ profileToView.support_deal.purchase_support ? 'Enabled' : 'Disabled' }}
@@ -127,20 +127,20 @@
 											<div class="form-row" 
 												v-show="profileToView.support_deal.purchase_support"
 											> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Charge:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.purchase_support_charge }}
 													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 												</div>
 											</div>
 
 											<div class="form-row"> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">POS Support:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													<span :class="[profileToView.support_deal.pos_support ? 'badge-success' : 'badge-danger', 'badge']">
 														
 														{{ profileToView.support_deal.pos_support ? 'Enabled' : 'Disabled' }}
@@ -152,10 +152,10 @@
 											<div class="form-row" 
 												v-show="profileToView.support_deal.pos_support"
 											> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold">Charge:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.pos_support_charge }}
 													{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 												</div>
@@ -164,10 +164,10 @@
 											<div class="form-row" 
 												v-show="profileToView.support_deal.pos_support"
 											> 
-											    <div class="col-md-6 text-right">
+											    <div class="col-6 col-form-label font-weight-bold text-right">
 													<label class="font-weight-bold"># Outlets:</label>
 												</div>
-												<div class="col-md-6">
+												<div class="col-6 col-form-label">
 													{{ profileToView.support_deal.number_outlets }}
 												</div>
 											</div>
@@ -185,10 +185,10 @@
 								v-for="property in propertiesToShow" 
 								:key="property"
 							> 
-							    <div class="col-md-6 text-right">
+							    <div class="col-6 col-form-label font-weight-bold text-right">
 									<label class="font-weight-bold">{{ property + ': ' | capitalize }}</label>
 								</div>
-								<div class="col-md-6 text-left">
+								<div class="col-6 col-form-label">
 									{{ getPropertyValue(property) }}
 								</div>
 							</div>

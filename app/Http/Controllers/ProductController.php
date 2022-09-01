@@ -690,6 +690,8 @@ class ProductController extends Controller
             'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
             'manufactured_at' => $request->manufactured_at ?? NULL,
             'expired_at' => $request->expired_at ?? NULL,
+            'vendor_id' => $request->vendor_id,
+            'location_id' => $request->location_id,
             'merchant_product_id' => $merchantProduct->id
         ]);
 
@@ -881,6 +883,8 @@ class ProductController extends Controller
                 'stock_quantity' => $request->stock_quantity, 
                 'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
                 'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                'vendor_id' => $request->vendor_id,
+                'location_id' => $request->location_id,
             ]);
 
             // $this->increaseStockAvailableQuantity($productStockToUpdate, $difference);
@@ -897,6 +901,8 @@ class ProductController extends Controller
                 'stock_quantity' => $request->stock_quantity, 
                 'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
                 'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                'vendor_id' => $request->vendor_id,
+                'location_id' => $request->location_id,
             ]);
 
             // $this->decreaseStockAvailableQuantity($productStockToUpdate, $difference);
@@ -930,6 +936,8 @@ class ProductController extends Controller
 
             $productStockToUpdate->update([
                 'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                'vendor_id' => $request->vendor_id,
+                'location_id' => $request->location_id,
             ]);
 
             if (! $stockToUpdate->has_approval) { // approving with requested quantity
@@ -1123,6 +1131,8 @@ class ProductController extends Controller
                 'unit_buying_price' => ! $product->has_variations ? ($storingProduct->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,
                 'manufactured_at' => $storingProduct->manufactured_at ?? NULL,
                 'expired_at' => $storingProduct->expired_at ?? NULL,
+                'vendor_id' => $request->vendor_id,
+                'location_id' => $request->location_id,
                 'merchant_product_id' => $merchantProduct->id
             ]);
 
@@ -1181,6 +1191,8 @@ class ProductController extends Controller
                     'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
+                    'vendor_id' => $request->vendor_id,
+                    'location_id' => $request->location_id,
                     'merchant_product_id' => $merchantExpectedProduct->id
                 ]);
                     
@@ -1204,6 +1216,8 @@ class ProductController extends Controller
                             'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                            'vendor_id' => $request->vendor_id,
+                            'location_id' => $request->location_id,
                             'deleted_at' => NULL
                         ]);
 
@@ -1222,6 +1236,8 @@ class ProductController extends Controller
                             'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                            'vendor_id' => $request->vendor_id,
+                            'location_id' => $request->location_id,
                             'deleted_at' => NULL
                         ]);
 
@@ -1236,6 +1252,8 @@ class ProductController extends Controller
                             'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                            'vendor_id' => $request->vendor_id,
+                            'location_id' => $request->location_id,
                             'deleted_at' => NULL
                         ]);
 
@@ -1266,7 +1284,9 @@ class ProductController extends Controller
                         'available_quantity' => $stockingProduct->stock_quantity,
                         'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
                         'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
-                        'expired_at' => $stockingProduct->expired_at ?? NULL,
+                        'expired_at' => $stockingProduct->expired_at ?? NULL, 
+                        'vendor_id' => $request->vendor_id,
+                        'location_id' => $request->location_id,
                         'merchant_product_id' => $merchantExpectedProduct->id,
                         'stock_id' => $stock
                     ]);

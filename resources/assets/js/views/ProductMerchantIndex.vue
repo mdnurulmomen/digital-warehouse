@@ -2095,7 +2095,7 @@
 			goProductStore(object) {
 
 				// console.log(object);
-				this.$router.push({ name: 'product-stocks', params: { product: this.product, productMerchant: object }});
+				this.$router.push({ name: 'product-stocks', params: { product: this.product, merchant: object.merchant, productMerchant: object }});
 
 			},
 			verifyUserInput() {

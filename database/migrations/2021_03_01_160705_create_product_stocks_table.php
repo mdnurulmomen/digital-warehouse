@@ -21,9 +21,11 @@ class CreateProductStocksTable extends Migration
             $table->unsignedDecimal('unit_buying_price', $precision = 8, $scale = 2)->default(0);
             // $table->boolean('has_variations')->default(false);
             // $table->boolean('has_serials')->default(false);
-            $table->unsignedInteger('merchant_product_id');
             $table->date('manufactured_at')->nullable();
             $table->date('expired_at')->nullable();
+            $table->unsignedMediumInteger('vendor_id')->nullable();
+            $table->unsignedMediumInteger('location_id')->nullable();
+            $table->unsignedInteger('merchant_product_id');
             $table->unsignedInteger('stock_id');
             $table->softDeletes();
         });

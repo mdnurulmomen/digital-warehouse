@@ -613,29 +613,6 @@
 													</div>
 												</div>
 
-												<div class="form-row form-group" v-show="! productMerchant.has_variations">
-													<label class="col-sm-4 col-form-label font-weight-bold text-md-right">
-														Buying Price (unit) :
-													</label>
-													<div class="col-sm-8">
-														<div class="input-group mb-0">
-															<input type="number" 
-																class="form-control is-valid" 
-																v-model.number="singleStockData.unit_buying_price" 
-																placeholder="Unit Buying Price" 
-																min="0" 
-																:disabled="singleStockData.has_variations"
-																@keydown.enter.prevent="nextPage" 
-															>
-															<div class="input-group-append">
-																<span class="input-group-text">
-																	{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-																</span>
-															</div>
-														</div>
-													</div>
-												</div>
-
 												<!-- 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold text-right">
@@ -673,7 +650,7 @@
 															v-for="(stockVariation, variationIndex) in singleStockData.variations" 
 															:key="'product-variation-index-' + variationIndex + 'A'"
 														>	
-															<div class="form-group col-md-3">
+															<div class="form-group col-md-4">
 																<label for="inputFirstName">Variaiton</label>
 																<multiselect 
 							                              			v-model="stockVariation.variation"
@@ -688,9 +665,7 @@
 							                                	</multiselect>
 															</div>
 
-															<div 
-																class="form-group col-md-3"
-															>
+															<div class="form-group col-md-4">
 																<label for="inputFirstName">Variation Qty</label>
 																
 																<input type="number" 
@@ -708,7 +683,7 @@
 														  		</div>
 															</div>
 
-															<div class="form-group col-md-3">
+															<div class="form-group col-md-4">
 																<label for="inputFirstName">Stock Code</label>
 																
 																<input type="text" 
@@ -719,28 +694,6 @@
 																	@blur="stockVariation.stock_code=removeWhiteSpace(stockVariation.stock_code)" 
 																	maxlength="10" 
 																>
-															</div>
-
-															<div 
-																class="form-group col-md-3"
-															>
-																<label for="inputFirstName">Buying Price (unit)</label>
-
-																<div class="input-group mb-0">
-																	<input 
-																		type="number" 
-																		class="form-control is-valid" 
-																		v-model.number="stockVariation.unit_buying_price" 
-																		placeholder="Variation Buying Price" 
-																		min="1" 
-																		@keydown.enter.prevent="nextPage" 
-																	>
-																	<div class="input-group-append">
-																		<span class="input-group-text">
-																			{{ general_settings.official_currency_name || 'BDT' | capitalize }}
-																		</span>
-																	</div>
-																</div>
 															</div>
 															
 															<!-- 
@@ -1114,7 +1067,7 @@
 														<span 
 															class="input-group-text waves-effect waves-light btn-grd-primary"
 															v-tooltip.bottom-end="'Insert Serial'" 
-															@click="addVariationSerial(stockedVariationIndex)"
+															@click="addProductSerial()"
 														>
 															Enlist
 														</span>
@@ -1200,11 +1153,186 @@
 										</div>
 									</div>
 							    </div>
-						     
+
 							    <div 
 									class="row" 
 									v-bind:key="'product-modal-step-' + 4" 
-									v-show="!loading && step==4" 
+									v-show="!loading && step==4"
+								>
+									<h2 class="mx-auto mb-4 lead">Purchase Details</h2>
+
+									<div class="col-md-12">
+										<div class="form-row">
+											<div class="col-sm-6 form-group">
+												<label class="col-form-label font-weight-bold">
+													Select Vendor :
+												</label>
+												
+												<multiselect 
+			                              			v-model="singleStockData.vendor"
+			                                  		:options="allVendors" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false"
+			                              			placeholder="Select Vendor" 
+			                              			class="form-control p-0" 
+			                                  		:class="!errors.stock.vendor ? 'is-valid' : 'is-invalid'" 
+			                                  		@input="setPurchaseVendor()" 
+			                                  		@close="validateFormInput('vendor')"
+			                              		>
+			                                	</multiselect>
+
+			                                	<div class="invalid-feedback">
+											    	{{ errors.stock.vendor }}
+											    </div>
+											</div>
+
+											<div class="col-sm-6 form-group">
+												<label class="col-form-label font-weight-bold">
+													Select Location :
+												</label>
+												
+												<multiselect 
+			                              			v-model="singleStockData.location"
+			                                  		:options="allLocations" 
+			                                  		:custom-label="objectNameWithCapitalized" 
+			                                  		:required="true" 
+			                                  		:allow-empty="false"
+			                              			placeholder="Select Location" 
+			                              			class="form-control p-0" 
+			                                  		:class="!errors.stock.location ? 'is-valid' : 'is-invalid'" 
+			                                  		@input="setPurchaseLocation()" 
+			                                  		@close="validateFormInput('location')"
+			                              		>
+			                                	</multiselect>
+
+			                                	<div class="invalid-feedback">
+											    	{{ errors.stock.location }}
+											    </div>
+											</div>
+										</div>
+
+										<div class="row" v-show="! productMerchant.has_variations">
+											<div class="col-sm-12">
+												<div class="form-row form-group">
+													<label class="col-form-label font-weight-bold text-md-right">
+														Buying Price :
+													</label>
+													<div class="col-sm-12">
+														<div class="input-group mb-0">
+															<input 
+																type="number" 
+																class="form-control" 
+																:class="!errors.stock.unit_buying_price ? 'is-valid' : 'is-invalid'" 
+																v-model.number="singleStockData.unit_buying_price" 
+																placeholder="Unit Buying Price" 
+																:disabled="singleStockData.has_variations" 
+																@change="validateFormInput('unit_buying_price')" 
+																@keydown.enter.prevent="nextPage" 
+																min="1" 
+															>
+															<div class="input-group-append">
+																<span class="input-group-text">
+																	{{ general_settings.official_currency_name || 'BDT' | capitalize }} 
+																	/ 
+																	{{ product.quantity_type | capitalize }}
+																</span>
+															</div>
+														</div>
+
+														<div 
+															class="invalid-feedback" 
+															style="display: block;" 
+															v-show="errors.stock.unit_buying_price" 
+														>
+													    	{{ errors.stock.unit_buying_price }}
+													    </div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="row" v-if="productMerchant.has_variations">
+											<div 
+												class="form-group col-md-12" 
+												v-if="singleStockData.hasOwnProperty('variations') && singleStockData.variations.length"
+											>
+												<div 
+													class="form-row" 
+													v-for="(stockVariation, variationIndex) in singleStockData.variations" 
+													:key="'product-variation-index-' + variationIndex + '-vendor-segment'"
+												>
+													<div 
+														class="form-group col-md-12" 
+														v-show="stockVariation.stock_quantity > 0"
+													>
+														<label for="inputFirstName">{{ stockVariation.variation ? stockVariation.variation.name : '' | capitalize }} Buying Price</label>
+
+														<div class="input-group mb-0">
+															<input 
+																type="number" 
+																class="form-control" 
+																:class="!errors.stock.variations[variationIndex].unit_buying_price ? 'is-valid' : 'is-invalid'" 
+																v-model.number="stockVariation.unit_buying_price" 
+																placeholder="Variation Buying Price" 
+																@change="validateFormInput('unit_buying_price')" 
+																@keydown.enter.prevent="nextPage" 
+																min="1" 
+															>
+															<div class="input-group-append">
+																<span class="input-group-text">
+																	{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																	/ 
+																	{{ product.quantity_type | capitalize }}
+																</span>
+															</div>
+														</div>
+
+														<div 
+															class="invalid-feedback" 
+															style="display: block;" 
+															v-show="errors.stock.variations[variationIndex].unit_buying_price"
+														>
+													    	{{ errors.stock.variations[variationIndex].unit_buying_price }}
+													    </div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="row card-footer">
+											<div class="col-sm-12 text-right" v-show="!submitForm">
+												<span class="text-danger small mb-1">
+											  		Please input required fields
+											  	</span>
+											</div>
+											<div class="col-sm-12 d-flex justify-content-between">
+												<button 
+													type="button" 
+													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
+													v-tooltip.bottom-end="'Previous'" 
+													v-on:click="productMerchant.has_serials ? step-=1 : step-=2" 
+												>
+							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
+							                  	</button>
+
+												<button 
+													type="button" 
+													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round" 
+													v-tooltip.bottom-end="'Next'" 
+													v-on:click="nextPage"
+												>
+							                    	<i class="fa fa-2x fa-angle-double-right" aria-hidden="true"></i>
+							                  	</button>
+											</div>
+										</div>
+									</div>
+							    </div>
+						     
+							    <div 
+									class="row" 
+									v-bind:key="'product-modal-step-' + 5" 
+									v-show="!loading && step==5" 
 								>
 									<h2 class="mx-auto mb-4 lead">Store Stock</h2>
 
@@ -1602,7 +1730,7 @@
 													data-placement="top" 
 													data-toggle="tooltip" 
 													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" 
-													v-on:click="productMerchant.has_serials ? step-=1 : step-=2"
+													v-on:click="(merchant.support_deal && merchant.support_deal.purchase_support) ? step-=1 : productMerchant.has_serials ? step-=2 : step-=3" 
 												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -1618,11 +1746,8 @@
 										</div>
 									</div>
 								</div> 
-
 							</transition-group>
-
 						</div>
-
 					</form>
 				</div>
 			</div>
@@ -3002,6 +3127,10 @@
 				type: Object,
 				required: true,
 			},
+			merchant:{
+				type: Object,
+				required: true,
+			},
 			productMerchant:{
 				type: Object,
 				required: true,
@@ -3039,6 +3168,9 @@
 	        	emptyUnitShelves : [],
 
 	        	emptyUnits : [],
+
+	        	allVendors : [],
+	        	allLocations : [],
 
 	        	pagination: {
 		        	current_page: 1
@@ -3104,7 +3236,7 @@
 						field: "stock_quantity",
 						callback: (stock_quantity) => {
 							
-							return this.productMerchant.hasOwnProperty('product') ? this.$options.filters.capitalize(`${this.productMerchant.product.name}`) : 'NA';
+							return this.$options.filters.capitalize(`${this.product.name}`);
 							
 						},
 					},
@@ -3895,7 +4027,17 @@
 						}
 						else {
 
-							this.step += 2;
+							if (this.merchant.support_deal && this.merchant.support_deal.purchase_support) {
+
+								this.step += 2;
+
+							}
+							else {
+
+								this.step += 3;
+								
+							}
+
 
 						}
 
@@ -3920,6 +4062,35 @@
 						}
 
 					}
+
+					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
+
+						if (this.merchant.support_deal && this.merchant.support_deal.purchase_support) {
+
+							this.step += 1;
+
+						}
+						else {
+
+							this.step += 2;
+
+						}
+
+						this.submitForm = true;
+
+					}
+					else {
+
+						this.submitForm = false;
+						
+					}
+
+				}
+				else if (this.step == 4) {
+
+					this.validateFormInput('vendor');
+					this.validateFormInput('location');
+					this.validateFormInput('unit_buying_price');
 
 					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
@@ -4724,6 +4895,24 @@
 				// return '';
 
 			},
+			setPurchaseVendor() {
+
+				if (this.singleStockData.vendor) {
+
+					this.singleStockData.vendor_id = this.singleStockData.vendor.id;
+
+				}
+
+			},
+			setPurchaseLocation() {
+
+				if (this.singleStockData.location) {
+
+					this.singleStockData.location_id = this.singleStockData.location.id;
+
+				}
+
+			},
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -5263,7 +5452,78 @@
 							
 						}
 
-						break;			
+						break;
+
+					case 'vendor': 
+
+						if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! this.singleStockData.vendor_id) {
+
+							this.errors.stock.vendor = 'Vendor is required';
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'vendor');
+
+						}
+
+						break;
+
+					case 'location': 
+
+						if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! this.singleStockData.location_id) {
+
+							this.errors.stock.location = 'Location is required';
+
+						}
+						else {
+
+							this.submitForm = true;
+							this.$delete(this.errors.stock, 'location');
+
+						}
+
+						break;	
+
+					case 'unit_buying_price':
+
+						if (this.productMerchant.has_variations && this.singleStockData.has_variations) {
+
+							this.singleStockData.variations.forEach(
+								(stockedVariation, stockedVariationIndex) => {
+
+									if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! stockedVariation.unit_buying_price) {
+
+										this.errors.variations[stockedVariationIndex].unit_buying_price = 'Buying price is required';
+
+									}
+									else {
+
+										this.$delete(this.errors.variations[stockedVariationIndex], 'unit_buying_price');
+
+									}
+
+								}
+							);
+
+						}
+						else {
+
+							if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! this.singleStockData.unit_buying_price) {
+
+								this.errors.stock.unit_buying_price = 'Buying price is required';
+
+							}
+							else {
+
+								this.$delete(this.errors.stock, 'unit_buying_price');
+
+							}
+
+						}
+
+						break;
 
 				}
 	 

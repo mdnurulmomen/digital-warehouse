@@ -51,7 +51,7 @@ class Merchant extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['profilePreview'];
+    protected $with = ['profilePreview', 'supportDeal'];
 
     /**
      * Get the user's image.

@@ -13,16 +13,6 @@ class ProductStock extends Model
 
     protected $guarded = ['id'];
 
-    public function stock()
-    {
-    	return $this->belongsTo(Stock::class, 'stock_id', 'id');
-    }
-
-    public function merchantProduct()
-    {
-        return $this->belongsTo(MerchantProduct::class, 'merchant_product_id', 'id');
-    }
-
     public function variations()
     {
         return $this->hasMany(ProductVariationStock::class, 'product_stock_id', 'id');
@@ -36,6 +26,26 @@ class ProductStock extends Model
     public function serials()
     {
         return $this->hasMany(ProductSerial::class, 'product_stock_id', 'id');
+    }
+
+    public function stock()
+    {
+        return $this->belongsTo(Stock::class, 'stock_id', 'id');
+    }
+
+    public function merchantProduct()
+    {
+        return $this->belongsTo(MerchantProduct::class, 'merchant_product_id', 'id');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
     public function deleteStockVariations()

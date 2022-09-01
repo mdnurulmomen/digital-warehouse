@@ -40,7 +40,7 @@ class MerchantProductResource extends JsonResource
             'product_id' => $this->product_id,
             'merchant_id' => $this->merchant_id,
             'created_at' => $this->created_at,
-            'merchant' => $this->whenLoaded('merchant'),
+            'merchant' => $this->when($this->relationLoaded('merchant'), new MerchantResource($this->merchant)),
             'product' => new ProductResource($product),
             'has_serials' => $product->has_serials,
             'has_variations' => $product->has_variations,

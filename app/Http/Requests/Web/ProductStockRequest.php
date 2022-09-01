@@ -42,7 +42,6 @@ class ProductStockRequest extends FormRequest
                 */
             ],
             'stock_quantity' => 'required|integer|min:1',
-            'unit_buying_price' => 'nullable|numeric',
             // 'product_id' => 'required|numeric|exists:products,id',
             'addresses' => 'required|array|min:1'
         ];
@@ -60,6 +59,21 @@ class ProductStockRequest extends FormRequest
             
         $merchantProduct = MerchantProduct::findOrFail($this->input('merchant_product_id'));
         $product = $merchantProduct->product;
+        $merchant = $merchantProduct->merchant;
+
+        if ($merchant->supportDeal->purchase_support) {
+            
+            $rules['vendor_id'] = 'required|exists:vendors,id';
+            $rules['location_id'] = 'required|exists:locations,id';
+
+            if (! $product->has_variations) {
+                
+                $rules['unit_buying_price'] = 'required|numeric|min:0';
+
+            }
+
+
+        }
 
         foreach (json_decode(json_encode($this->input('addresses'))) as $addressKey => $address) {
             
@@ -128,8 +142,6 @@ class ProductStockRequest extends FormRequest
 
             $rules['variations.*.stock_quantity'] = 'sometimes|integer|min:0';
 
-            $rules['variations.*.unit_buying_price'] = 'sometimes|numeric|min:0';
-
             if (array_sum(array_column($this->input('variations'), 'stock_quantity')) != $this->input('stock_quantity')) {
 
                 $rules['total_stock_quantity'] = 'required|integer|min:'.array_sum(array_column($this->input('variations'), 'stock_quantity'));
@@ -158,6 +170,12 @@ class ProductStockRequest extends FormRequest
 
                     $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code';
 
+                }
+
+                if ($merchant->supportDeal->purchase_support && $stockingProductVariation->stock_quantity > 0) {
+                
+                    $rules['variations.*.unit_buying_price'] = 'required|numeric|min:0';
+                    
                 }
 
             }
@@ -227,6 +245,7 @@ class ProductStockRequest extends FormRequest
             'merchant_product_id.*' => 'Merchant-Product id is invalid !',
             'stock_quantity.*' => 'Stock quantity is required !',
             'total_stock_quantity.*' => 'Variation total Stock qty is more or less than product qty !',
+            'unit_buying_price.required' => 'Buying price is required !',
             'unit_buying_price.*' => 'Buying price should be numeric !',
             
             // 'addresses.*.container.shelf.units'] => 'Unit address is invalid',
@@ -240,6 +259,12 @@ class ProductStockRequest extends FormRequest
                 'unique' => 'Product serial exists',
                 '*' => 'Product serial is required',
             ],
+
+            'vendor_id.required' => 'Vendor is required',
+            'vendor_id.*' => 'Vendor is invalid',
+
+            'location_id.required' => 'Location is required',
+            'location_id.*' => 'Location is invalid',
             
             // 'product_id.*' => 'Product id is missing !',
             // 'serials.*.unique' => ':attribute serial must be unique !',
@@ -249,6 +274,8 @@ class ProductStockRequest extends FormRequest
             'variations.*.stock_quantity' => [
                 '*' => 'Variation quantity is invalid !',
             ],
+
+            'variations.*.unit_buying_price.required' => 'Buying price is required !',
             'variations.*.unit_buying_price.*' => 'Buying price should be numeric !',
 
             // 'variations.*.serials.*' => 'Variation serial is required',

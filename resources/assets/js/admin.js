@@ -424,7 +424,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-product-stock-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.product && to.params.productMerchant) {
+                if (to.params.product && to.params.merchant && to.params.productMerchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {
