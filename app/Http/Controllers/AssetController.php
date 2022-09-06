@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Vendor;
 use App\Models\Variation;
 use App\Models\Container;
 use App\Models\RentPeriod;
@@ -20,30 +21,62 @@ class AssetController extends Controller
 {
     public function __construct()
     {
-        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes', 'showAllContainerTypes', 'searchAllContainerTypes', 'showAllContainers', 'searchAllContainers', 'showAllRentPeriods', 'searchAllRentPeriods']);
+        // Storage-Types
+        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllStorageTypes', 'searchAllStorageTypes']);
+        $this->middleware("permission:create-warehouse-asset")->only('storeNewStorageType');
+        $this->middleware("permission:update-warehouse-asset")->only('updateStorageType');
+        $this->middleware("permission:delete-warehouse-asset")->only(['deleteStorageType', 'restoreStorageType']); 
 
-        $this->middleware("permission:view-product-asset-index")->only(['showAllVariationTypes', 'searchVariationTypes', 'showAllVariations', 'searchAllVariations']);
+        // Container-Types
+        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllContainerTypes', 'searchAllContainerTypes']);
+        $this->middleware("permission:create-warehouse-asset")->only('storeNewContainerType');
+        $this->middleware("permission:update-warehouse-asset")->only('updateContainerType');
+        $this->middleware("permission:delete-warehouse-asset")->only(['deleteContainerType', 'restoreContainerType']); 
 
-        $this->middleware("permission:create-warehouse-asset")->only(['storeNewStorageType', 'storeNewContainerType', 'storeNewContainer', 'storeNewRentPeriod']);
+        // Containers
+        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllContainers', 'searchAllContainers']);
+        $this->middleware("permission:create-warehouse-asset")->only('storeNewContainer');
+        $this->middleware("permission:update-warehouse-asset")->only('updateContainer');
+        $this->middleware("permission:delete-warehouse-asset")->only(['deleteContainer', 'restoreContainer']);
 
-        $this->middleware("permission:create-product-asset")->only(['storeVariationType', 'storeNewVariation']);
+        // Rent-Periods
+        $this->middleware("permission:view-warehouse-asset-index")->only(['showAllRentPeriods', 'searchAllRentPeriods']);
+        $this->middleware("permission:create-warehouse-asset")->only('storeNewRentPeriod');
+        $this->middleware("permission:update-warehouse-asset")->only('updateRentPeriod');
+        $this->middleware("permission:delete-warehouse-asset")->only(['deleteRentPeriod', 'restoreRentPeriod']);
 
-        $this->middleware("permission:create-logistic-asset")->only(['storeNewPackagingPackage', 'storeDeliveryNewCompany']);
+        // Variation-Types
+        $this->middleware("permission:view-product-asset-index")->only(['showAllVariationTypes', 'searchVariationTypes']);
+        $this->middleware("permission:create-product-asset")->only('storeVariationType');
+        $this->middleware("permission:update-product-asset")->only('updateVariationType');
+        $this->middleware("permission:delete-product-asset")->only(['deleteVariationType', 'restoreVariationType']);
 
-        $this->middleware("permission:update-warehouse-asset")->only(['updateStorageType', 'updateContainerType', 'updateContainer', 'updateRentPeriod']);
+        // Variations
+        $this->middleware("permission:view-product-asset-index")->only(['showAllVariations', 'searchAllVariations']);
+        $this->middleware("permission:create-product-asset")->only('storeNewVariation');
+        $this->middleware("permission:update-product-asset")->only('updateVariation');
+        $this->middleware("permission:delete-product-asset")->only(['deleteVariation', 'restoreVariation']);
 
-        $this->middleware("permission:update-product-asset")->only(['updateVariationType', 'updateVariation']);
+        // Packaging-Packages
+        $this->middleware("permission:view-logistic-index")->only(['showAllPackagingPackages', 'searchAllPackagingPackages']);
+        $this->middleware("permission:create-logistic-asset")->only('storeNewPackagingPackage');
+        $this->middleware("permission:update-logistic-asset")->only('updatePackagingPackage');
+        $this->middleware("permission:delete-logistic-asset")->only(['deletePackagingPackage', 'restorePackagingPackage']);
 
-        $this->middleware("permission:update-logistic-asset")->only(['updatePackagingPackage', 'updateDeliveryCompany']);
-        
-        $this->middleware("permission:delete-warehouse-asset")->only(['deleteStorageType', 'deleteContainerType', 'restoreStorageType', 'deleteContainer', 'restoreContainer', 'deleteRentPeriod', 'restoreRentPeriod']);
+        // Delivery-Companies
+        $this->middleware("permission:view-logistic-asset-index")->only(['showDeliveryAllCompanies', 'searchDeliveryAllCompanies']);
+        $this->middleware("permission:create-logistic-asset")->only('storeDeliveryNewCompany');
+        $this->middleware("permission:update-logistic-asset")->only('updateDeliveryCompany');
+        $this->middleware("permission:delete-logistic-asset")->only(['deleteDeliveryCompany', 'restoreDeliveryCompany']);
 
-        $this->middleware("permission:delete-product-asset")->only(['deleteVariationType', 'restoreVariationType', 'deleteVariation', 'restoreVariation']);
-
-        $this->middleware("permission:delete-logistic-asset")->only(['deletePackagingPackage', 'restorePackagingPackage', 'deleteDeliveryCompany', 'restoreDeliveryCompany']);
+        // Vendors
+        $this->middleware("permission:view-product-asset-index")->only(['showAllVendors', 'searchAllVendors']);
+        $this->middleware("permission:create-product-asset")->only('storeNewVendor');
+        $this->middleware("permission:update-product-asset")->only('updateVendor');
+        $this->middleware("permission:delete-product-asset")->only(['deleteVendor', 'restoreVendor']); 
     }
 
-    // storage types
+    // Storage-Types
     public function showAllStorageTypes($perPage=false)
     {
     	if ($perPage) {
@@ -139,7 +172,7 @@ class AssetController extends Controller
         ], 200);
     }
 
-    // container types
+    // Container-Types
     public function showAllContainerTypes($perPage=false)
     {
         if ($perPage) {
@@ -415,7 +448,7 @@ class AssetController extends Controller
     }
 
     
-    // Rent Periods
+    // Rent-Periods
     public function showAllRentPeriods($perPage=false)
     {
         if ($perPage) {
@@ -727,7 +760,7 @@ class AssetController extends Controller
         ], 200);
     }
 
-    // packaging packages
+    // Packaging-Packages
     public function showAllPackagingPackages($perPage=false)
     {
         if ($perPage) {
@@ -819,7 +852,7 @@ class AssetController extends Controller
         ], 200);
     }
 
-    // delivery-companies
+    // Delivery-Companies
     public function showDeliveryAllCompanies($perPage=false)
     {
         if ($perPage) {
@@ -901,6 +934,86 @@ class AssetController extends Controller
         foreach($columnsToSearch as $column){
             $query->orWhere($column, 'like', "%$search%");
         }
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
+    // Vendors
+    public function showAllVendors($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => Vendor::paginate($perPage),
+                'trashed' => Vendor::onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return Vendor::all();
+    }
+
+    public function storeNewVendor(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:vendors,name',
+        ]);
+
+        $newAsset = new Vendor();
+
+        $newAsset->name = strtolower($request->name);
+
+        $newAsset->save();
+
+        return $this->showAllVendors($perPage);
+    }
+
+    public function updateVendor(Request $request, $asset, $perPage)
+    {
+        $assetToUpdate = Vendor::findOrFail($asset);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:vendors,name,'.$assetToUpdate->id,
+        ]);
+
+        $assetToUpdate->name = strtolower($request->name);
+
+        $assetToUpdate->save();
+
+        return $this->showAllVendors($perPage);
+    }
+
+    public function deleteVendor($asset, $perPage)
+    {
+        $assetToDelete = Vendor::findOrFail($asset);
+
+        if ($assetToDelete->stocks->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->merchantProducts->count()." products"]], 422);
+
+        }
+
+        $assetToDelete->delete();
+
+        return $this->showAllVendors($perPage);
+    }
+
+    public function restoreVendor($asset, $perPage)
+    {
+        $assetToRestore = Vendor::withTrashed()->findOrFail($asset);
+        
+        $assetToRestore->restore();
+
+        return $this->showAllVendors($perPage);
+    }
+
+    public function searchAllVendors($search, $perPage)
+    {
+        $query = Vendor::withTrashed()->where('name', 'like', "%$search%");
 
         return response()->json([
             'all' => $query->paginate($perPage),    

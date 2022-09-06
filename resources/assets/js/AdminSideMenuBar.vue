@@ -196,6 +196,12 @@
 													<span class="pcoded-mtext">Variation-Names</span>
 												</router-link>
 											</li>
+
+											<li :class="['vendors'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'vendors' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Vendors</span>
+												</router-link>
+											</li>
 										</ul>
 									</li>
 

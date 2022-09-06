@@ -153,6 +153,14 @@ Route::name('admin.')->group(function () {
 		Route::patch('/manufacturers/{asset}/{perPage}', 'ProductController@restoreManufacturer')->name('manufacturers.restore');
 		Route::get('/api/search-manufacturers/{search}/{perPage}', 'ProductController@searchAllManufacturers')->name('search-manufacturers');
 
+		// vendors
+		Route::get('/api/vendors/{perPage?}', 'AssetController@showAllVendors')->name('vendors.index');
+		Route::post('/vendors/{perPage}', 'AssetController@storeNewVendor')->name('vendors.store');	
+		Route::put('/vendors/{asset}/{perPage}', 'AssetController@updateVendor')->name('vendors.update');	
+		Route::delete('/vendors/{asset}/{perPage}', 'AssetController@deleteVendor')->name('vendors.delete');	
+		Route::patch('/vendors/{asset}/{perPage}', 'AssetController@restoreVendor')->name('vendors.restore');
+		Route::get('/api/search-vendors/{search}/{perPage}', 'AssetController@searchAllVendors')->name('search-vendors');
+
 		// product-category
 		Route::get('/api/product-categories/{perPage?}', 'ProductController@showProductAllCategories')->name('product-categories.index');
 		Route::post('/product-categories/{perPage}', 'ProductController@storeProductNewCategory')->name('product-categories.store');	
