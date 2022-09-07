@@ -51,7 +51,7 @@
 									v-tooltip.bottom-end="'View Details'" 
 									:disabled="formSubmitted"  
 									@click="$emit('showContentDetails', content)" 
-								 	v-show="$route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types' && $route.name!='vendors'" 
+								 	v-show="$route.name!='variation-types' && $route.name!='variations' && $route.name!='product-manufacturers' && $route.name!='rent-periods' && $route.name!='storage-types' && $route.name!='container-types' && $route.name!='vendors' && $route.name!='locations'" 
 							>
 								<i class="fa fa-eye"></i>
 							</button>

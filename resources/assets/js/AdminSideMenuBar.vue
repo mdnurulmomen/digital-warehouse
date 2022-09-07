@@ -171,6 +171,18 @@
 											<span class="pcoded-mtext">Assets</span>
 										</a>
 										<ul class="pcoded-submenu">
+											<li :class="['vendors'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'vendors' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Vendors</span>
+												</router-link>
+											</li>
+
+											<li :class="['locations'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'locations' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Locations</span>
+												</router-link>
+											</li>
+											
 											<li :class="['product-categories', 'category-products'].includes(currentRouteName) ? 'active' : ''">
 												<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
 													<span class="pcoded-mtext">Categories</span>
@@ -194,12 +206,6 @@
 											<li :class="['variations'].includes(currentRouteName) ? 'active' : ''">
 												<router-link :to="{ name: 'variations' }" class="waves-effect waves-dark">
 													<span class="pcoded-mtext">Variation-Names</span>
-												</router-link>
-											</li>
-
-											<li :class="['vendors'].includes(currentRouteName) ? 'active' : ''">
-												<router-link :to="{ name: 'vendors' }" class="waves-effect waves-dark">
-													<span class="pcoded-mtext">Vendors</span>
 												</router-link>
 											</li>
 										</ul>

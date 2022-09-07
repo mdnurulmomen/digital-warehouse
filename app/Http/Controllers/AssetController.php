@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vendor;
+use App\Models\Location;
 use App\Models\Variation;
 use App\Models\Container;
 use App\Models\RentPeriod;
@@ -74,6 +75,12 @@ class AssetController extends Controller
         $this->middleware("permission:create-product-asset")->only('storeNewVendor');
         $this->middleware("permission:update-product-asset")->only('updateVendor');
         $this->middleware("permission:delete-product-asset")->only(['deleteVendor', 'restoreVendor']); 
+
+        // Locations
+        $this->middleware("permission:view-product-asset-index")->only(['showAllLocations', 'searchAllLocations']);
+        $this->middleware("permission:create-product-asset")->only('storeNewLocation');
+        $this->middleware("permission:update-product-asset")->only('updateLocation');
+        $this->middleware("permission:delete-product-asset")->only(['deleteLocation', 'restoreLocation']); 
     }
 
     // Storage-Types
@@ -993,7 +1000,7 @@ class AssetController extends Controller
 
         if ($assetToDelete->stocks->count()) {
             
-            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->merchantProducts->count()." products"]], 422);
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->stocks->count()." products"]], 422);
 
         }
 
@@ -1014,6 +1021,86 @@ class AssetController extends Controller
     public function searchAllVendors($search, $perPage)
     {
         $query = Vendor::withTrashed()->where('name', 'like', "%$search%");
+
+        return response()->json([
+            'all' => $query->paginate($perPage),    
+        ], 200);
+    }
+
+    // Locations
+    public function showAllLocations($perPage=false)
+    {
+        if ($perPage) {
+            
+            return response()->json([
+
+                'current' => Location::paginate($perPage),
+                'trashed' => Location::onlyTrashed()->paginate($perPage),
+
+            ], 200);
+
+        }
+
+        return Location::all();
+    }
+
+    public function storeNewLocation(Request $request, $perPage)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:locations,name',
+        ]);
+
+        $newAsset = new Location();
+
+        $newAsset->name = strtolower($request->name);
+
+        $newAsset->save();
+
+        return $this->showAllLocations($perPage);
+    }
+
+    public function updateLocation(Request $request, $asset, $perPage)
+    {
+        $assetToUpdate = Location::findOrFail($asset);
+
+        $request->validate([
+            'name' => 'required|string|max:100|unique:locations,name,'.$assetToUpdate->id,
+        ]);
+
+        $assetToUpdate->name = strtolower($request->name);
+
+        $assetToUpdate->save();
+
+        return $this->showAllLocations($perPage);
+    }
+
+    public function deleteLocation($asset, $perPage)
+    {
+        $assetToDelete = Location::findOrFail($asset);
+
+        if ($assetToDelete->stocks->count()) {
+            
+            return response()->json(['errors'=>["engaged" => ucfirst($assetToDelete->name)." is in use at ".$assetToDelete->stocks->count()." products"]], 422);
+
+        }
+
+        $assetToDelete->delete();
+
+        return $this->showAllLocations($perPage);
+    }
+
+    public function restoreLocation($asset, $perPage)
+    {
+        $assetToRestore = Location::withTrashed()->findOrFail($asset);
+        
+        $assetToRestore->restore();
+
+        return $this->showAllLocations($perPage);
+    }
+
+    public function searchAllLocations($search, $perPage)
+    {
+        $query = Location::withTrashed()->where('name', 'like', "%$search%");
 
         return response()->json([
             'all' => $query->paginate($perPage),    

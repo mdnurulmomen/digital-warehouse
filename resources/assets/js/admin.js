@@ -100,6 +100,7 @@ import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
 import ProductManufacturerIndex from './views/ProductManufacturerIndex'
 import VendorIndex from './views/VendorIndex'
+import LocationIndex from './views/LocationIndex'
 import ProductIndex from './views/ProductIndex'
 import CategoryProductIndex from './views/CategoryProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
@@ -372,6 +373,15 @@ const router = new VueRouter({
             path: '/vendors',
             name: 'vendors',
             component: VendorIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        {
+            path: '/locations',
+            name: 'locations',
+            component: LocationIndex,
             meta: {
                 // authRequired: true,
                 requiredPermission: 'view-product-asset-index' 
