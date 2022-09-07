@@ -705,7 +705,7 @@
 						<div class="col-6">
 							<div class="form-row">
 								<label class="col-6 col-form-label font-weight-bold">
-									Rent :
+									Rent Id :
 								</label>
 
 								<label class="col-6 col-form-label">
