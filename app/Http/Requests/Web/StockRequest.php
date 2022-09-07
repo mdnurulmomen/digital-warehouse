@@ -29,8 +29,6 @@ class StockRequest extends FormRequest
      */
     public function rules()
     {
-        $storingProducts = json_decode(json_encode($this->products));
-
         $rules = [
             // 'merchant_id' => 'required|exists:merchants,id',
             'merchant.id' => 'required|exists:merchants,id',
@@ -48,16 +46,16 @@ class StockRequest extends FormRequest
 
         $merchant = Merchant::find($this->input('merchant.id'));
 
-        foreach ($storingProducts as $stockingProductKey => $stockingProduct) {
+        foreach (json_decode(json_encode($this->products)) as $stockingProductKey => $stockingProduct) {
 
             if (! empty($stockingProduct->id) && $this->route('stock')) {
             
-                $rules['products.'.$stockingProductKey.'.stock_code'] = 'nullable|string|max:10|unique:product_stocks,stock_code,'.$stockingProduct->id;
+                $rules['products.'.$stockingProductKey.'.stock_code'] = 'nullable|string|max:12|unique:product_stocks,stock_code,'.$stockingProduct->id;
 
             }
             else {
 
-                $rules['products.'.$stockingProductKey.'.stock_code'] = 'nullable|string|max:10|unique:product_stocks,stock_code';
+                $rules['products.'.$stockingProductKey.'.stock_code'] = 'nullable|string|max:12|unique:product_stocks,stock_code';
 
             }
             
@@ -152,7 +150,7 @@ class StockRequest extends FormRequest
 
                 }
 
-                foreach ($stockingProduct->variations as $stockingProductVariationKey => $stockingProductVariation) {
+                foreach (json_decode(json_encode($stockingProduct->variations)) as $stockingProductVariationKey => $stockingProductVariation) {
                     
                     if (empty($stockingProductVariation->merchant_product_variation_id)) {  // updating
                     
@@ -167,18 +165,18 @@ class StockRequest extends FormRequest
 
                     if (! empty($stockingProductVariation->id) && $this->route('stock')) {
             
-                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code,'.$stockingProductVariation->id;
+                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:12|unique:product_variation_stocks,stock_code,'.$stockingProductVariation->id;
 
                     }
                     else {
 
-                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code';
+                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:12|unique:product_variation_stocks,stock_code';
 
                     }
 
-                    if ($merchant->supportDeal->purchase_support && $stockingProductVariation->stock_quantity > 0) {
+                    if ($merchant->supportDeal->purchase_support && ! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
                 
-                        $rules['products.'.$stockingProductKey.'.variations.*.unit_buying_price'] = 'required|numeric|min:0';
+                        $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.unit_buying_price'] = 'required|numeric|min:0';
                         
                     }
 

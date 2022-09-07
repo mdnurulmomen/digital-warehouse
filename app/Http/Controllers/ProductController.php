@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Merchant;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
+use App\Models\Vendor;
 // use App\Models\ProductSerial;
 use App\Models\MerchantProduct;
 use App\Models\ProductCategory;
@@ -70,7 +71,7 @@ class ProductController extends Controller
         $this->middleware("permission:view-merchant-product-index")->only(['showProductAllMerchants', 'searchProductAllMerchants']);
         $this->middleware("permission:create-merchant-product")->only('storeProductNewMerchant');
         $this->middleware("permission:update-merchant-product")->only('updateProductMerchant');
-        $this->middleware("permission:delete-merchant-product")->only('deleteProductMerchant');        
+        $this->middleware("permission:delete-merchant-product")->only('deleteProductMerchant');     
     }
 
     // Manufacturers
@@ -1047,13 +1048,19 @@ class ProductController extends Controller
                 ->orWhereHas('serials', function ($query2) use ($request) {
                     $query2->where('serial_no', 'like', "%$request->search%");
                 })
-                ->orWhereHas('variations', function ($query3) use ($request) {
-                    $query3->where('stock_code', 'like', "%$request->search%")
+                ->orWhereHas('vendor', function ($query3) use ($request) {
+                    $query3->where('name', 'like', "%$request->search%");
+                })
+                ->orWhereHas('location', function ($query4) use ($request) {
+                    $query4->where('name', 'like', "%$request->search%");
+                })
+                ->orWhereHas('variations', function ($query5) use ($request) {
+                    $query5->where('stock_code', 'like', "%$request->search%")
                         ->orWhere('stock_quantity', 'like', "%$request->search%")
                         ->orWhere('available_quantity', 'like', "%$request->search%")
                         ->orWhere('unit_buying_price', 'like', "%$request->search%")
-                        ->orWhereHas('serials', function ($query4) use ($request) {
-                            $query4->where('serial_no', 'like', "%$request->search%");
+                        ->orWhereHas('serials', function ($query6) use ($request) {
+                            $query6->where('serial_no', 'like', "%$request->search%");
                         });
                 });
             });
@@ -1131,8 +1138,8 @@ class ProductController extends Controller
                 'unit_buying_price' => ! $product->has_variations ? ($storingProduct->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,
                 'manufactured_at' => $storingProduct->manufactured_at ?? NULL,
                 'expired_at' => $storingProduct->expired_at ?? NULL,
-                'vendor_id' => $request->vendor_id,
-                'location_id' => $request->location_id,
+                'vendor_id' => $storingProduct->vendor_id,
+                'location_id' => $storingProduct->location_id,
                 'merchant_product_id' => $merchantProduct->id
             ]);
 
@@ -1191,8 +1198,8 @@ class ProductController extends Controller
                     'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
-                    'vendor_id' => $request->vendor_id,
-                    'location_id' => $request->location_id,
+                    'vendor_id' => $stockingProduct->vendor_id,
+                    'location_id' => $stockingProduct->location_id,
                     'merchant_product_id' => $merchantExpectedProduct->id
                 ]);
                     
@@ -1216,8 +1223,8 @@ class ProductController extends Controller
                             'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
-                            'vendor_id' => $request->vendor_id,
-                            'location_id' => $request->location_id,
+                            'vendor_id' => $stockingProduct->vendor_id,
+                            'location_id' => $stockingProduct->location_id,
                             'deleted_at' => NULL
                         ]);
 
@@ -1236,8 +1243,8 @@ class ProductController extends Controller
                             'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
-                            'vendor_id' => $request->vendor_id,
-                            'location_id' => $request->location_id,
+                            'vendor_id' => $stockingProduct->vendor_id,
+                            'location_id' => $stockingProduct->location_id,
                             'deleted_at' => NULL
                         ]);
 
@@ -1252,8 +1259,8 @@ class ProductController extends Controller
                             'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
-                            'vendor_id' => $request->vendor_id,
-                            'location_id' => $request->location_id,
+                            'vendor_id' => $stockingProduct->vendor_id,
+                            'location_id' => $stockingProduct->location_id,
                             'deleted_at' => NULL
                         ]);
 
@@ -1285,8 +1292,8 @@ class ProductController extends Controller
                         'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
                         'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                         'expired_at' => $stockingProduct->expired_at ?? NULL, 
-                        'vendor_id' => $request->vendor_id,
-                        'location_id' => $request->location_id,
+                        'vendor_id' => $stockingProduct->vendor_id,
+                        'location_id' => $stockingProduct->location_id,
                         'merchant_product_id' => $merchantExpectedProduct->id,
                         'stock_id' => $stock
                     ]);
@@ -1415,30 +1422,36 @@ class ProductController extends Controller
                     ->orWhere('stock_quantity', 'like', "%$request->search%")
                     ->orWhere('available_quantity', 'like', "%$request->search%")
                     ->orWhere('unit_buying_price', 'like', "%$request->search%")
-                    ->orWhereHas('merchantProduct', function ($q3) use ($request) {
-                        $q3->whereHas('product', function ($q4) use ($request) {
-                            $q4->where('name', 'like', "%$request->search%");
+                    ->orWhereHas('vendor', function ($q3) use ($request) {  
+                        $q3->where('name', 'like', "%$request->search%");
+                    })
+                    ->orWhereHas('location', function ($q4) use ($request) {
+                        $q4->where('name', 'like', "%$request->search%");
+                    })
+                    ->orWhereHas('merchantProduct', function ($q5) use ($request) {
+                        $q5->whereHas('product', function ($q6) use ($request) {
+                            $q6->where('name', 'like', "%$request->search%");
                         });
                     });
                 })
-                ->orWhereHas('stocks.serials', function ($q3) use ($request) {
-                    $q3->where('serial_no', 'like', "%$request->search%");
+                ->orWhereHas('stocks.serials', function ($q7) use ($request) {
+                    $q7->where('serial_no', 'like', "%$request->search%");
                 })
-                ->orWhereHas('stocks.variations', function ($q4) use ($request) {
-                    $q4->where('stock_quantity', 'like', "%$request->search%")
+                ->orWhereHas('stocks.variations', function ($q8) use ($request) {
+                    $q8->where('stock_quantity', 'like', "%$request->search%")
                     ->orWhere('available_quantity', 'like', "%$request->search%");
                 })
-                ->orWhereHas('stocks.variations.serials', function ($q5) use ($request) {
-                    $q5->where('serial_no', 'like', "%$request->search%");
+                ->orWhereHas('stocks.variations.serials', function ($q9) use ($request) {
+                    $q9->where('serial_no', 'like', "%$request->search%");
                 })
-                ->orWhereHas('warehouse', function ($q6) use ($request) {
-                    $q6->where('name', 'like', "%$request->search%")
+                ->orWhereHas('warehouse', function ($q10) use ($request) {
+                    $q10->where('name', 'like', "%$request->search%")
                     ->orWhere('user_name', 'like', "%$request->search%")
                     ->orWhere('email', 'like', "%$request->search%")
                     ->orWhere('mobile', 'like', "%$request->search%");
                 })
-                ->orWhereHas('merchant', function ($q6) use ($request) {
-                    $q6->where('first_name', 'like', "%$request->search%")
+                ->orWhereHas('merchant', function ($q11) use ($request) {
+                    $q11->where('first_name', 'like', "%$request->search%")
                     ->orWhere('last_name', 'like', "%$request->search%")
                     ->orWhere('user_name', 'like', "%$request->search%")
                     ->orWhere('email', 'like', "%$request->search%")
@@ -1447,8 +1460,8 @@ class ProductController extends Controller
                 ->orWhereHasMorph(
                     'keeper',
                     [Admin::class, Manager::class],
-                    function ($q7) use ($request) {
-                        $q7->where('first_name', 'like', "%$request->search%")
+                    function ($q12) use ($request) {
+                        $q12->where('first_name', 'like', "%$request->search%")
                         ->orWhere('last_name', 'like', "%$request->search%")
                         ->orWhere('user_name', 'like', "%$request->search%")
                         ->orWhere('email', 'like', "%$request->search%")
@@ -1458,8 +1471,8 @@ class ProductController extends Controller
                 ->orWhereHasMorph(
                     'approver',
                     [Admin::class, Manager::class],
-                    function ($q8) use ($request) {
-                        $q8->where('first_name', 'like', "%$request->search%")
+                    function ($q13) use ($request) {
+                        $q13->where('first_name', 'like', "%$request->search%")
                         ->orWhere('last_name', 'like', "%$request->search%")
                         ->orWhere('user_name', 'like', "%$request->search%")
                         ->orWhere('email', 'like', "%$request->search%")

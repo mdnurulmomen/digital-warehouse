@@ -48,12 +48,12 @@ class ProductStockRequest extends FormRequest
 
         if (! empty($this->input('id')) && $this->route('stock')) {
             
-            $rules['stock_code'] = 'nullable|string|max:10|unique:product_stocks,stock_code,'.$this->input('id');
+            $rules['stock_code'] = 'nullable|string|max:12|unique:product_stocks,stock_code,'.$this->input('id');
 
         }
         else {
 
-            $rules['stock_code'] = 'nullable|string|max:10|unique:product_stocks,stock_code';
+            $rules['stock_code'] = 'nullable|string|max:12|unique:product_stocks,stock_code';
 
         }
             
@@ -163,18 +163,18 @@ class ProductStockRequest extends FormRequest
 
                 if (! empty($stockingProductVariation->id) && $this->route('stock')) {
             
-                    $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code,'.$stockingProductVariation->id;
+                    $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:12|unique:product_variation_stocks,stock_code,'.$stockingProductVariation->id;
 
                 }
                 else {
 
-                    $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:10|unique:product_variation_stocks,stock_code';
+                    $rules['variations.'.$stockingProductVariationKey.'.stock_code'] = 'nullable|string|max:12|unique:product_variation_stocks,stock_code';
 
                 }
 
-                if ($merchant->supportDeal->purchase_support && $stockingProductVariation->stock_quantity > 0) {
+                if ($merchant->supportDeal->purchase_support && ! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
                 
-                    $rules['variations.*.unit_buying_price'] = 'required|numeric|min:0';
+                    $rules['variations.'.$stockingProductVariationKey.'.unit_buying_price'] = 'required|numeric|min:0';
                     
                 }
 

@@ -608,7 +608,7 @@
 															placeholder="Unique Code" 
 															@keydown.enter.prevent="nextPage" 
 															@blur="singleStockData.stock_code=removeWhiteSpace(singleStockData.stock_code)" 
-															maxlength="10" 
+															maxlength="12" 
 														>
 													</div>
 												</div>
@@ -692,7 +692,7 @@
 																	placeholder="Unique Code" 
 																	@keydown.enter.prevent="nextPage" 
 																	@blur="stockVariation.stock_code=removeWhiteSpace(stockVariation.stock_code)" 
-																	maxlength="10" 
+																	maxlength="12" 
 																>
 															</div>
 															
@@ -1730,7 +1730,7 @@
 													data-placement="top" 
 													data-toggle="tooltip" 
 													class="btn waves-effect waves-dark btn-secondary btn-outline-secondary btn-sm btn-round float-left" 
-													v-on:click="(merchant.support_deal && merchant.support_deal.purchase_support) ? step-=1 : productMerchant.has_serials ? step-=2 : step-=3" 
+													v-on:click="merchantHasPurchaseSupport() ? step-=1 : productMerchant.has_serials ? step-=2 : step-=3" 
 												>
 							                    	<i class="fa fa-2x fa-angle-double-left" aria-hidden="true"></i>
 							                  	</button>
@@ -2144,6 +2144,24 @@
 											
 											<label class="col-sm-6 col-form-label">
 												{{ singleStockData.available_quantity + ' ' + product.quantity_type }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleStockData.vendor_id">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
+												Vendor :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.vendor ? singleStockData.vendor.name : '--' | capitalize }}
+											</label>
+										</div>
+
+										<div class="form-row" v-show="singleStockData.location_id">
+											<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
+												Location :
+											</label>
+											<label class="col-sm-6 col-form-label">
+												{{ singleStockData.location ? singleStockData.location.name : '--' | capitalize }}
 											</label>
 										</div>
 
@@ -3634,6 +3652,84 @@
 					});
 
 			},
+			fetchAllVendors() {
+
+				this.error = '';
+				this.loading = true;
+				this.allVendors = [];
+				this.searchAttributes.search = '';
+				
+				axios
+					.get('/api/vendors/')
+					.then(response => {
+						if (response.status == 200) {
+							// console.log(response);
+							this.allVendors = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllLocations() {
+
+				this.error = '';
+				this.loading = true;
+				this.allLocations = [];
+				this.searchAttributes.search = '';
+				
+				axios
+					.get('/api/locations/')
+					.then(response => {
+						if (response.status == 200) {
+							// console.log(response);
+							this.allLocations = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
 		/*
 			configureProductErrorsWithPropData() {
 
@@ -4022,22 +4118,29 @@
 								
 							}							
 
-							this.step += 1;
+							this.step += 1;		// 3
 
 						}
 						else {
 
-							if (this.merchant.support_deal && this.merchant.support_deal.purchase_support) {
+							if (this.merchantHasPurchaseSupport()) {
 
-								this.step += 2;
+								this.step += 2;		// 4
 
 							}
 							else {
 
-								this.step += 3;
+								this.step += 3;		// 5
 								
 							}
 
+
+						}
+
+						if (this.merchantHasPurchaseSupport() && this.userHasPermissionTo('view-product-asset-index') && (this.allVendors.length == 0 || this.allLocations.length == 0)) {
+
+							this.fetchAllVendors();
+							this.fetchAllLocations();
 
 						}
 
@@ -4065,7 +4168,7 @@
 
 					if (this.errors.stock.constructor === Object && Object.keys(this.errors.stock).length < 3 && ! this.errorInVariationsArray(this.errors.stock.variations)) {
 
-						if (this.merchant.support_deal && this.merchant.support_deal.purchase_support) {
+						if (this.merchantHasPurchaseSupport()) {
 
 							this.step += 1;
 
@@ -4370,6 +4473,11 @@
 					}
 
 				}
+
+			},
+			merchantHasPurchaseSupport() {
+
+				return this.merchant.support_deal && this.merchant.support_deal.purchase_support;
 
 			},
 			/*
@@ -5456,7 +5564,7 @@
 
 					case 'vendor': 
 
-						if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! this.singleStockData.vendor_id) {
+						if (this.merchantHasPurchaseSupport() && ! this.singleStockData.vendor_id) {
 
 							this.errors.stock.vendor = 'Vendor is required';
 
@@ -5472,7 +5580,7 @@
 
 					case 'location': 
 
-						if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! this.singleStockData.location_id) {
+						if (this.merchantHasPurchaseSupport() && ! this.singleStockData.location_id) {
 
 							this.errors.stock.location = 'Location is required';
 
@@ -5493,7 +5601,7 @@
 							this.singleStockData.variations.forEach(
 								(stockedVariation, stockedVariationIndex) => {
 
-									if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! stockedVariation.unit_buying_price) {
+									if (this.merchantHasPurchaseSupport() && stockedVariation.stock_quantity > 0 && ! stockedVariation.unit_buying_price) {
 
 										this.errors.variations[stockedVariationIndex].unit_buying_price = 'Buying price is required';
 
@@ -5510,7 +5618,7 @@
 						}
 						else {
 
-							if (this.merchant.support_deal && this.merchant.support_deal.purchase_support && ! this.singleStockData.unit_buying_price) {
+							if (this.merchantHasPurchaseSupport() && ! this.singleStockData.unit_buying_price) {
 
 								this.errors.stock.unit_buying_price = 'Buying price is required';
 

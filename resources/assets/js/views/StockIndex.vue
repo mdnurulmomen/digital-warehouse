@@ -525,7 +525,7 @@
 									                              			class="form-control p-0" 
 									                                  		:class="! errors.products[stockedProductIndex].product ? 'is-valid' : 'is-invalid'" 
 									                                  		:disabled="Boolean(! createMode && stockedProduct.stock_quantity && stockedProduct.hasOwnProperty('available_quantity') && stockedProduct.stock_quantity != stockedProduct.available_quantity)" 
-									                                  		@input="resetProductProperties(stockedProductIndex)" 
+									                                  		@input="validateFormInput('product'); resetProductProperties(stockedProductIndex)" 
 									                              		>
 									                                	</multiselect>
 
@@ -571,13 +571,14 @@
 																			Stock Code :
 																		</label>
 
-																		<input type="text" 
+																		<input 
+																			type="text" 
 																			class="form-control is-valid" 
 																			v-model.number="stockedProduct.stock_code" 
 																			placeholder="Unique Code" 
 																			@keydown.enter.prevent="nextPage" 
 																			@change="stockedProduct.stock_code=removeWhiteSpace(stockedProduct.stock_code)" 
-																			maxlength="10" 
+																			maxlength="12" 
 																		>
 																	</div>
 																</div>
@@ -670,7 +671,7 @@
 																					placeholder="Unique Code" 
 																					@keydown.enter.prevent="nextPage" 
 																					@change="stockedVariation.stock_code=removeWhiteSpace(stockedVariation.stock_code)" 
-																					maxlength="10" 
+																					maxlength="12" 
 																				>
 																			</div>
 																			
@@ -1349,7 +1350,7 @@
 																	</div>
 																</div>
 
-																<div class="row" v-if="stockedProduct.has_variations">
+																<div class="row" v-if="stockedProduct.has_variations && stockedProduct.variations && errors.products[stockedProductIndex].variations && stockedProduct.variations.length==errors.products[stockedProductIndex].variations.length">
 																	<div 
 																		class="form-group col-md-12" 
 																		v-if="stockedProduct.hasOwnProperty('variations') && stockedProduct.variations.length"
@@ -1515,7 +1516,8 @@
 											                                  		:option-height="104" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_containers ? 'is-valid' : 'is-invalid'" 
-											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
+											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)" 
+											                                  		@input="validateFormInput('product_containers')" 
 											                              		>
 											                              			<template slot="option" slot-scope="props">
 																						<div class="option__desc">
@@ -1588,7 +1590,8 @@
 											                                  		:option-height="104" 
 											                                  		class="form-control p-0" 
 											                                  		:class="! errors.products[stockedProductIndex].addresses[spaceIndex].product_shelves ? 'is-valid' : 'is-invalid'" 
-											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)"
+											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)" 
+											                                  		@input="validateFormInput('product_shelves')" 
 											                              		>
 											                              			<template slot="option" slot-scope="props">
 																						<div class="option__desc">
@@ -1742,6 +1745,7 @@
 											                                  		class="form-control p-0" 
 											                                  		:class="!errors.products[stockedProductIndex].addresses[spaceIndex].product_units ? 'is-valid' : 'is-invalid'" 
 											                                  		:disabled="stockedProduct.addresses.length > (spaceIndex+1)" 
+											                                  		@input="validateFormInput('product_units')" 
 											                              		>
 											                              			<template slot="option" slot-scope="props">
 																						<div class="option__desc">
@@ -2309,6 +2313,24 @@
 													
 													<label class="col-sm-6 col-form-label">
 														{{ stockedProduct.available_quantity }} {{ (stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.quantity_type : 'Unit' }}
+													</label>
+												</div>
+
+												<div class="form-row" v-show="stockedProduct.vendor_id">
+													<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
+														Vendor :
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ stockedProduct.vendor ? stockedProduct.vendor.name : '--' | capitalize }}
+													</label>
+												</div>
+
+												<div class="form-row" v-show="stockedProduct.location_id">
+													<label class="col-sm-6 col-form-label font-weight-bold text-md-right">
+														Location :
+													</label>
+													<label class="col-sm-6 col-form-label">
+														{{ stockedProduct.location ? stockedProduct.location.name : '--' | capitalize }}
 													</label>
 												</div>
 
@@ -3554,7 +3576,7 @@
 
 					},
 
-					"Stock Details": {
+					"Stock": {
 						callback: (object) => {
 							var stockInfosToReturn = '';
 
@@ -3809,6 +3831,84 @@
 						if (response.status == 200) {
 							// console.log(response);
 							this.allMerchants = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllVendors() {
+
+				this.error = '';
+				this.loading = true;
+				this.allVendors = [];
+				this.searchAttributes.search = '';
+				
+				axios
+					.get('/api/vendors/')
+					.then(response => {
+						if (response.status == 200) {
+							// console.log(response);
+							this.allVendors = response.data;
+						}
+					})
+					.catch(error => {
+						this.error = error.toString();
+						// Request made and server responded
+						if (error.response) {
+							console.log(error.response.data);
+							console.log(error.response.status);
+							console.log(error.response.headers);
+							console.log(error.response.data.errors[x]);
+						} 
+						// The request was made but no response was received
+						else if (error.request) {
+							console.log(error.request);
+						} 
+						// Something happened in setting up the request that triggered an Error
+						else {
+							console.log('Error', error.message);
+						}
+
+					})
+					.finally(response => {
+						this.loading = false;
+					});
+
+			},
+			fetchAllLocations() {
+
+				this.error = '';
+				this.loading = true;
+				this.allLocations = [];
+				this.searchAttributes.search = '';
+				
+				axios
+					.get('/api/locations/')
+					.then(response => {
+						if (response.status == 200) {
+							// console.log(response);
+							this.allLocations = response.data;
 						}
 					})
 					.catch(error => {
@@ -4348,7 +4448,6 @@
 							this.fetchMerchantWarehouseAllSpaces();
 
 						}
-
 						
 						this.submitForm = true;
 						this.step++;
@@ -4429,9 +4528,15 @@
 
 								}
 
-
 							}
 						
+						}
+
+						if (this.merchantHasPurchaseSupport() && this.userHasPermissionTo('view-product-asset-index') && (this.allVendors.length == 0 || this.allLocations.length == 0)) {
+
+							this.fetchAllVendors();
+							this.fetchAllLocations();
+
 						}
 						
 						// this.resetWarehouseSpaces();
@@ -4955,6 +5060,7 @@
 				}
 			},
 			setProductSpaceType(stockedProductIndex, spaceIndex) {
+				
 				if (this.singleStockData.products.length > stockedProductIndex && this.singleStockData.products[stockedProductIndex].addresses.length > spaceIndex && this.errors.products.length > stockedProductIndex && this.errors.products[stockedProductIndex].addresses.length > spaceIndex) {
 
 					// resetting
@@ -5650,7 +5756,7 @@
 						this.singleStockData.products.forEach(
 							(stockedProduct, stockedProductIndex) => {
 
-								if (! stockedProduct || Object.keys(stockedProduct).length == 0) {
+								if (! stockedProduct.merchant_product || Object.keys(stockedProduct.merchant_product).length == 0) {
 									this.errors.products[stockedProductIndex].product = 'Product is required';
 								}
 								else if (this.singleStockData.products.some((productTostock, productIndexTostock)=>productTostock.merchant_product_id==stockedProduct.merchant_product_id && productIndexTostock != stockedProductIndex )) {
@@ -6473,7 +6579,7 @@
 									stockedProduct.variations.forEach(
 										(stockedVariation, stockedVariationIndex) => {
 
-											if (this.singleStockData.merchant && this.singleStockData.merchant.support_deal && this.singleStockData.merchant.support_deal.purchase_support && ! stockedVariation.unit_buying_price) {
+											if (this.singleStockData.merchant && this.singleStockData.merchant.support_deal && this.singleStockData.merchant.support_deal.purchase_support && stockedVariation.stock_quantity > 0 && ! stockedVariation.unit_buying_price) {
 
 												this.errors.products[stockedProductIndex].variations[stockedVariationIndex].unit_buying_price = 'Buying price is required';
 
@@ -6507,6 +6613,11 @@
 
 						);
 
+						if (! this.errorInProductsArray(this.errors.products)) {
+
+							this.submitForm = true;
+
+						}
 
 						break;
 
