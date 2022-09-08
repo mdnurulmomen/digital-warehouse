@@ -338,7 +338,7 @@ class MerchantProduct extends Model
                 
                 $warehouseExpectedContainer = WarehouseContainerStatus::find($container->id);
 
-                $warehouseExpectedContainer->product()->delete();
+                $warehouseExpectedContainer->products()->delete();
 
                 $warehouseExpectedContainer->update([
                     'occupied' => 0
@@ -358,7 +358,7 @@ class MerchantProduct extends Model
                 
                 $warehouseExpectedShelf = WarehouseContainerShelfStatus::find($containerShelf->id);
 
-                $warehouseExpectedShelf->product()->delete();
+                $warehouseExpectedShelf->products()->delete();
 
                 $warehouseExpectedShelf->update([
                     'occupied' => 0
@@ -381,7 +381,7 @@ class MerchantProduct extends Model
                 
                 $warehouseExpectedShelfUnit = WarehouseContainerShelfUnitStatus::find($containerShelfUnit->id);
 
-                $warehouseExpectedShelfUnit->product()->delete();
+                $warehouseExpectedShelfUnit->products()->delete();
 
                 $warehouseExpectedShelfUnit->update([
                     'occupied' => 0

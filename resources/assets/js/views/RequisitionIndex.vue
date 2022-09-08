@@ -1116,7 +1116,7 @@
 												>
 													<div 
 														class="form-row"
-														v-if="requiredProduct.selected_stocks.length==errors.products[requiredProductIndex].stock_codes.length"
+														v-if="requiredProduct.selected_stocks && errors.products[requiredProductIndex].stock_codes && requiredProduct.selected_stocks.length==errors.products[requiredProductIndex].stock_codes.length"
 													>
 														<div class="form-group col-md-3">
 															<label for="inputFirstName">
@@ -1356,7 +1356,7 @@
 															>
 																<div 
 																	class="col-sm-12"
-																	v-if="requiredProductVariation.selected_stocks.length==errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_codes.length" 
+																	v-if="requiredProductVariation.selected_stocks && errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_codes && requiredProductVariation.selected_stocks.length==errors.products[requiredProductIndex].variations[requiredProductVariationIndex].stock_codes.length" 
 																>
 																	<div class="form-row">
 																		<div class="form-group col-md-3">
@@ -2152,19 +2152,19 @@
 									<div class="tab-pane active" id="requisition-profile" role="tabpanel">	
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Subject :
+												Merchant :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.subject | capitalize }}
+												{{ singleRequisitionData.merchant_name | capitalize }}
 											</label>
 										</div>
 
 										<div class="form-row">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Merchant :
+												Subject :
 											</label>
 											<label class="col-sm-6 col-form-label">
-												{{ singleRequisitionData.merchant_name | capitalize }}
+												{{ singleRequisitionData.subject | capitalize }}
 											</label>
 										</div>
 
@@ -2394,7 +2394,7 @@
 
 										<div class="form-row" v-if="singleRequisitionData.description">
 											<label class="col-sm-6 col-form-label font-weight-bold text-right">
-												Product Note :
+												Note :
 											</label>
 											<label class="col-sm-6 col-form-label">
 												<span v-html="singleRequisitionData.description"></span>
@@ -3847,7 +3847,7 @@
 				      	}
 					})
 					.finally(response => {
-						this.formSubmitted = false;
+						// this.formSubmitted = false;
 						this.fetchMerchantAllProducts();
 					});
 
@@ -3885,7 +3885,7 @@
 				      	}
 					})
 					.finally(response => {
-						this.formSubmitted = false;
+						// this.formSubmitted = false;
 						// this.fetchAllRequisitions();
 					});
 
@@ -3927,7 +3927,7 @@
 				      	}
 					})
 					.finally(response => {
-						this.formSubmitted = false;
+						// this.formSubmitted = false;
 						// this.fetchAllRequisitions();
 					});
 

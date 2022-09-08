@@ -136,7 +136,7 @@
 								</router-link>
 							</li>
 
-							<li :class="['merchants', 'merchant-deals', 'deal-instalments', 'instalment-payments', 'merchant-products'].includes(currentRouteName) ? 'active' : ''" 
+							<li :class="['merchants', 'space-deals', 'space-deal-rents', 'support-deal-rents', 'rent-payments', 'merchant-products'].includes(currentRouteName) ? 'active' : ''" 
 								v-if="userHasPermissionTo('view-merchant-index')"
 							>
 								<router-link :to="{ name: 'merchants' }" class="waves-effect waves-dark">
@@ -151,7 +151,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations', 'products', 'product-merchants', 'product-stocks', 'stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['vendors', 'locations', 'product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations', 'products', 'product-merchants', 'product-stocks', 'stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('view-product-asset-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -164,13 +164,25 @@
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['vendors', 'locations', 'product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-product-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
 											<span class="pcoded-mtext">Assets</span>
 										</a>
 										<ul class="pcoded-submenu">
+											<li :class="['vendors'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'vendors' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Vendors</span>
+												</router-link>
+											</li>
+
+											<li :class="['locations'].includes(currentRouteName) ? 'active' : ''">
+												<router-link :to="{ name: 'locations' }" class="waves-effect waves-dark">
+													<span class="pcoded-mtext">Locations</span>
+												</router-link>
+											</li>
+											
 											<li :class="['product-categories', 'category-products'].includes(currentRouteName) ? 'active' : ''">
 												<router-link :to="{ name: 'product-categories' }" class="waves-effect waves-dark">
 													<span class="pcoded-mtext">Categories</span>

@@ -81,6 +81,7 @@
 																		<th>Name</th>
 																		<th>Category</th>
 																		<th># Merchants</th>
+																		<th># Total</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -107,6 +108,11 @@
 																			<span v-show="! content.merchants_count">
 																				{{ content.merchants_count || 0 }}
 																			</span>
+																		</td>
+
+																		<td>
+																			{{ content.total_available || 0 }} 
+																			{{ content.quantity_type | capitalize }}
 																		</td>
 																		
 																		<td>
@@ -169,7 +175,7 @@
 																	<tr 
 																  		v-show="!productsToShow.length"
 																  	>
-															    		<td colspan="4">
+															    		<td colspan="5">
 																      		<div class="alert alert-danger" role="alert">
 																      			Sorry, No data found.
 																      		</div>
@@ -182,6 +188,7 @@
 																		<th>Name</th>
 																		<th>Category</th>
 																		<th># Merchants</th>
+																		<th># Total</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -330,6 +337,25 @@
 										Quantity Type :
 									</label>
 									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.quantity_type | capitalize }}
+									</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										# Merchants :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.merchants_count || 0 }}
+									</label>
+								</div>
+
+								<div class="form-row">
+									<label class="col-sm-4 col-form-label font-weight-bold text-right">
+										Total Available :
+									</label>
+									<label class="col-sm-8 col-form-label">
+										{{ singleProductData.total_available || 0 }}
 										{{ singleProductData.quantity_type | capitalize }}
 									</label>
 								</div>

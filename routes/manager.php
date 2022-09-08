@@ -21,13 +21,13 @@ Route::name('manager.')->group(function () {
 	       return view('auth.login', ['url' => 'manager']); 
 	    })->name('login');
 
-	    Route::post('/', 'Auth\LoginController@adminLogin')->name('login');
+	    Route::post('/', 'Auth\LoginController@managerLogin')->name('login');
 
 	});
 
 	Route::middleware(['auth:manager'])->group(function () {
 		
-		Route::get('/{any}', 'HomeController@adminHome')->name('home');
+		Route::get('/{any}', 'HomeController@managerHome')->name('home');
 		
 		Route::get('/api/mails/{perPage?}', 'MailController@showAllMails')->name('mails.index');
 		Route::post('/mails/{perPage}', 'MailController@sendDynamicMail')->name('mails.store');
@@ -35,9 +35,9 @@ Route::name('manager.')->group(function () {
 		Route::get('api/search-mails/{query}/{perPage}', 'MailController@searchAllMails')->name('search-mails');
 
 		// profile
-		Route::get('/api/profile', 'ProfileController@showAdminProfile')->name('profile.show');	
-		Route::put('/profile', 'ProfileController@updateAdminProfile')->name('profile.update');	
-		Route::post('/password', 'ProfileController@updateAdminPassword')->name('password.update');
+		Route::get('/api/profile', 'ProfileController@showManagerProfile')->name('profile.show');	
+		Route::put('/profile', 'ProfileController@updateManagerProfile')->name('profile.update');	
+		Route::post('/password', 'ProfileController@updateManagerPassword')->name('password.update');
 
 		// application setting
 		Route::get('/api/application-settings', 'SettingController@showApplicationSetting')->name('application-settings.show');
@@ -153,6 +153,22 @@ Route::name('manager.')->group(function () {
 		Route::patch('/manufacturers/{asset}/{perPage}', 'ProductController@restoreManufacturer')->name('manufacturers.restore');
 		Route::get('/api/search-manufacturers/{search}/{perPage}', 'ProductController@searchAllManufacturers')->name('search-manufacturers');
 
+		// vendors
+		Route::get('/api/vendors/{perPage?}', 'AssetController@showAllVendors')->name('vendors.index');
+		Route::post('/vendors/{perPage}', 'AssetController@storeNewVendor')->name('vendors.store');	
+		Route::put('/vendors/{asset}/{perPage}', 'AssetController@updateVendor')->name('vendors.update');	
+		Route::delete('/vendors/{asset}/{perPage}', 'AssetController@deleteVendor')->name('vendors.delete');	
+		Route::patch('/vendors/{asset}/{perPage}', 'AssetController@restoreVendor')->name('vendors.restore');
+		Route::get('/api/search-vendors/{search}/{perPage}', 'AssetController@searchAllVendors')->name('search-vendors');
+
+		// locations
+		Route::get('/api/locations/{perPage?}', 'AssetController@showAllLocations')->name('locations.index');
+		Route::post('/locations/{perPage}', 'AssetController@storeNewLocation')->name('locations.store');	
+		Route::put('/locations/{asset}/{perPage}', 'AssetController@updateLocation')->name('locations.update');	
+		Route::delete('/locations/{asset}/{perPage}', 'AssetController@deleteLocation')->name('locations.delete');	
+		Route::patch('/locations/{asset}/{perPage}', 'AssetController@restoreLocation')->name('locations.restore');
+		Route::get('/api/search-locations/{search}/{perPage}', 'AssetController@searchAllLocations')->name('search-locations');
+
 		// product-category
 		Route::get('/api/product-categories/{perPage?}', 'ProductController@showProductAllCategories')->name('product-categories.index');
 		Route::post('/product-categories/{perPage}', 'ProductController@storeProductNewCategory')->name('product-categories.store');	
@@ -253,12 +269,19 @@ Route::name('manager.')->group(function () {
 		Route::delete('/merchant-space-deals/{deal}/{perPage}','DealController@deleteMerchantSpaceDeal')->name('merchant-space-deals.delete');
 		Route::post('/search-merchant-space-deals/{perPage}','DealController@searchMerchantAllSpaceDeals')->name('search-merchant-space-deals');
 
-		// deal-rents
-		Route::get('/api/deal-rents/{deal}/{perPage?}', 'DealController@showDealAllRents')->name('deal-rents.index');
-		Route::post('/deal-rents/{perPage}', 'DealController@storeDealNewRent')->name('deal-rents.store');	
-		Route::put('/deal-rents/{rent}/{perPage}', 'DealController@updateDealRent')->name('deal-rents.update');	
-		Route::delete('/deal-rents/{rent}/{perPage}', 'DealController@deleteDealRent')->name('deal-rents.delete');
-		Route::post('/api/search-deal-rents/{perPage}', 'DealController@searchDealAllRents')->name('search-deal-rents');
+		// space-deal-rents
+		Route::get('/api/space-deal-rents/{deal}/{perPage?}', 'DealController@showSpaceDealAllRents')->name('space-deal-rents.index');
+		Route::post('/space-deal-rents/{perPage}', 'DealController@storeSpaceDealNewRent')->name('space-deal-rents.store');	
+		Route::put('/space-deal-rents/{rent}/{perPage}', 'DealController@updateSpaceDealRent')->name('space-deal-rents.update');	
+		Route::delete('/space-deal-rents/{rent}/{perPage}', 'DealController@deleteSpaceDealRent')->name('space-deal-rents.delete');
+		Route::post('/api/search-space-deal-rents/{perPage}', 'DealController@searchSpaceDealAllRents')->name('search-space-deal-rents');
+
+		// support-deal-rents
+		Route::get('/api/support-deal-rents/{deal}/{perPage?}', 'DealController@showSupportDealAllRents')->name('support-deal-rents.index');
+		Route::post('/support-deal-rents/{perPage}', 'DealController@storeSupportDealNewRent')->name('support-deal-rents.store');	
+		Route::put('/support-deal-rents/{rent}/{perPage}', 'DealController@updateSupportDealRent')->name('support-deal-rents.update');	
+		Route::delete('/support-deal-rents/{rent}/{perPage}', 'DealController@deleteSupportDealRent')->name('support-deal-rents.delete');
+		Route::post('/api/search-support-deal-rents/{perPage}', 'DealController@searchSupportDealAllRents')->name('search-support-deal-rents');
 
 		// rental-payments
 		Route::get('/api/rental-payments/{rental}/{perPage?}', 'DealController@showRentalAllPayments')->name('rental-payments.index');
@@ -280,6 +303,8 @@ Route::name('manager.')->group(function () {
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
 		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
 		Route::post('import-product-categories', 'ImportController@importProductCategories')->name('import-product-categories');
+		Route::post('import-vendors', 'ImportController@importVendors')->name('import-vendors');
+		Route::post('import-locations', 'ImportController@importLocations')->name('import-locations');
 
 		// manager logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');

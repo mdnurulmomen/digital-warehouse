@@ -387,7 +387,7 @@ class Warehouse extends Authenticatable
                 else if(is_null($warehouseExistingContainer)) {
                     
                     // add currently working container to warehouse
-                    $warehouseContainer = $this->createNewContainerToWarehouse($inputedContainer);
+                    $warehouseContainer = $this->createWarehouseNewContainers($inputedContainer);
 
                     // add new containers and properties to warehouse
                     $this->createNewContainerProperties($warehouseContainer, $inputedContainer);
@@ -453,7 +453,7 @@ class Warehouse extends Authenticatable
     }
 */
 
-    protected function createContainerUpdatedRents($warehouseContainer, $inputedContainer)
+    protected function createContainerUpdatedRents(WarehouseContainer $warehouseContainer, $inputedContainer)
     {          
         // primary deletion
         if ($inputedContainer->container->has_shelve) {
@@ -546,7 +546,7 @@ class Warehouse extends Authenticatable
         ]);
     }
 
-    protected function createNewContainerToWarehouse($inputedContainer)
+    protected function createWarehouseNewContainers($inputedContainer)
     {
         $warehouseContainer = $this->containers()->create([
             'quantity' => $inputedContainer->quantity,
@@ -573,7 +573,7 @@ class Warehouse extends Authenticatable
     // increase quantity of required container
     protected function createNewContainerProperties($warehouseContainer, $inputedContainer)
     {
-        for($i=0; $i<$inputedContainer->quantity; $i++) {
+        for($i = 0; $i < $inputedContainer->quantity; $i++) {
 
             // $containerToAdd = Container::findOrFail($inputedContainer->container->id);
 
@@ -585,20 +585,20 @@ class Warehouse extends Authenticatable
             if ($inputedContainer->container->has_shelve) {
                 
                 // shelves per container
-                for($j=0; $j<$inputedContainer->container->shelf->quantity; $j++) {
+                for($j = 0; $j < $inputedContainer->container->shelf->quantity; $j++) {
 
                     $warehouseContainerShelfStatus = $warehouseContainerStatus->containerShelfStatuses()->create([
-                        'name' => $warehouseContainerStatus->name.'-shl-'.($j+1),
+                        'name' => /*$warehouseContainerStatus->name.'-shl-'.*/($j+1),
                         'warehouse_container_id' => $warehouseContainer->id,
                     ]);
 
                     if ($inputedContainer->container->shelf->has_units) {
                         
                         // units per shelf
-                        for($k=0; $k<$inputedContainer->container->shelf->unit->quantity; $k++){
+                        for($k = 0; $k < $inputedContainer->container->shelf->unit->quantity; $k++){
 
                             $warehouseContainerShelfStatus->containerShelfUnitStatuses()->create([
-                                'name' => $warehouseContainerShelfStatus->name.'-unt-'.($k+1),
+                                'name' => /*$warehouseContainerShelfStatus->name.'-unt-'.*/($k+1),
                                 'warehouse_container_id' => $warehouseContainer->id,
                             ]);    
 

@@ -59,13 +59,13 @@ class AssetController extends Controller
         $this->middleware("permission:delete-product-asset")->only(['deleteVariation', 'restoreVariation']);
 
         // Packaging-Packages
-        $this->middleware("permission:view-logistic-index")->only(['showAllPackagingPackages', 'searchAllPackagingPackages']);
+        // $this->middleware("permission:view-logistic-asset-index")->only(['showAllPackagingPackages', 'searchAllPackagingPackages']);
         $this->middleware("permission:create-logistic-asset")->only('storeNewPackagingPackage');
         $this->middleware("permission:update-logistic-asset")->only('updatePackagingPackage');
         $this->middleware("permission:delete-logistic-asset")->only(['deletePackagingPackage', 'restorePackagingPackage']);
 
         // Delivery-Companies
-        $this->middleware("permission:view-logistic-asset-index")->only(['showDeliveryAllCompanies', 'searchDeliveryAllCompanies']);
+        // $this->middleware("permission:view-logistic-asset-index")->only(['showDeliveryAllCompanies', 'searchDeliveryAllCompanies']);
         $this->middleware("permission:create-logistic-asset")->only('storeDeliveryNewCompany');
         $this->middleware("permission:update-logistic-asset")->only('updateDeliveryCompany');
         $this->middleware("permission:delete-logistic-asset")->only(['deleteDeliveryCompany', 'restoreDeliveryCompany']);

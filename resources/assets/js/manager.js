@@ -99,6 +99,8 @@ import VariationTypeIndex from './views/VariationTypeIndex'
 import VariationIndex from './views/VariationIndex'
 import ProductCategoryIndex from './views/ProductCategoryIndex'
 import ProductManufacturerIndex from './views/ProductManufacturerIndex'
+import VendorIndex from './views/VendorIndex'
+import LocationIndex from './views/LocationIndex'
 import ProductIndex from './views/ProductIndex'
 import CategoryProductIndex from './views/CategoryProductIndex'
 import RequisitionIndex from './views/RequisitionIndex'
@@ -113,6 +115,7 @@ import DeliveryCompanyIndex from './views/DeliveryCompanyIndex'
 import PackagingPackageIndex from './views/PackagingPackageIndex'
 import MerchantSpaceDealIndex from './views/MerchantSpaceDealIndex'
 import SpaceDealRentIndex from './views/SpaceDealRentIndex'
+import SupportDealRentIndex from './views/SupportDealRentIndex'
 import RentPaymentIndex from './views/RentPaymentIndex'
 import MailIndex from './views/MailIndex'
 // import WarehouseManagerIndex from './views/WarehouseManagerIndex'
@@ -367,6 +370,24 @@ const router = new VueRouter({
             }
         },
         {
+            path: '/vendors',
+            name: 'vendors',
+            component: VendorIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        {
+            path: '/locations',
+            name: 'locations',
+            component: LocationIndex,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-product-asset-index' 
+            }
+        },
+        {
             path: '/products',
             name: 'products',
             component: ProductIndex,
@@ -423,7 +444,7 @@ const router = new VueRouter({
                 requiredPermission: 'view-product-stock-index' 
             },
             beforeEnter: (to, from, next) => {
-                if (to.params.product && to.params.productMerchant) {
+                if (to.params.product && to.params.merchant && to.params.productMerchant) {
                     next(); // <-- everything good, proceed
                 }
                 else {
@@ -487,7 +508,7 @@ const router = new VueRouter({
         },
         {
             path: '/merchant/:merchantId/space-deals',
-            name: 'merchant-space-deals',
+            name: 'space-deals',
             component: MerchantSpaceDealIndex,
             props: true,
             meta: {
@@ -507,6 +528,24 @@ const router = new VueRouter({
             path: '/space-deal/:dealId/rents',
             name: 'space-deal-rents',
             component: SpaceDealRentIndex,
+            props: true,
+            meta: {
+                // authRequired: true,
+                requiredPermission: 'view-merchant-payment-index' 
+            },
+            beforeEnter: (to, from, next) => {
+                if (to.params.merchantName && to.params.dealId && to.params.deal) {
+                    next(); // <-- everything good, proceed
+                }
+                else {
+                    next('/merchants');
+                }
+            }
+        },
+        {
+            path: '/support-deal/:dealId/rents',
+            name: 'support-deal-rents',
+            component: SupportDealRentIndex,
             props: true,
             meta: {
                 // authRequired: true,
