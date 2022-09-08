@@ -22,13 +22,14 @@
 											  	<search-and-addition-option 
 											  		v-if="userHasPermissionTo('view-product-asset-index') || userHasPermissionTo('create-product-asset')" 
 											  		:query="query" 
-											  		:caller-page="'product location'" 
+											  		:caller-page="'locations'" 
 											  		:disable-add-button="formSubmitted" 
 											  		:required-permission = "'product-asset'" 
 											  		
 											  		@showContentCreateForm="showContentCreateForm" 
 											  		@searchData="pagination.current_page = 1; searchData($event)" 
-											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()"
+											  		@fetchAllContents="pagination.current_page = 1; fetchAllContents()" 
+											  		@importExcelFile="importExcelFile($event)" 
 											  	></search-and-addition-option>
 											</div>
 											
@@ -500,6 +501,41 @@
 					});
 
 			},
+			importExcelFile(fileToExport) {
+
+				// console.log(fileToExport);
+
+				this.formSubmitted = true;
+
+				fileToExport.set('perPage', this.perPage);
+
+				axios
+					.post('/import-locations', fileToExport)
+					.then(response => {
+						if (response.status == 200) {
+							this.$toastr.s("New locations has been stored", "Success");
+
+							this.pagination.current_page = 1; 
+							this.allFetchedContents = response.data;
+							this.query !== '' ? this.searchData() : this.showSelectedTabContents();
+							
+							$('#locations-importing-modal').modal('hide');
+						}
+					})
+					.catch(error => {
+						if (error.response.status == 422) {
+							for (var x in error.response.data.errors) {
+								this.$toastr.w(error.response.data.errors[x], "Warning");
+							}
+				      	}
+					})
+					.finally(response => {
+						this.formSubmitted = false;
+						// this.fetchAllContainers();
+					});
+
+			},
+
 			/*
 			goCategoryProducts(productCategory) {
 				

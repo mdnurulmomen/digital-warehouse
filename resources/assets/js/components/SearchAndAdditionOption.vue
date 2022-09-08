@@ -42,7 +42,7 @@
 
   					<i 
   						class="fa fa-upload fa-lg" 
-  						v-show="($route.name=='products' || $route.name=='product-categories') && userHasPermissionTo('create-' + requiredPermission)" 
+  						v-show="($route.name=='products' || $route.name=='product-categories' || $route.name=='vendors' || $route.name=='locations') && userHasPermissionTo('create-' + requiredPermission)" 
   						v-tooltip.bottom-end="'Upload ' + callerPage" 
   						data-toggle="modal" 
 						:data-target="'#'+ callerPage +'-importing-modal'" 

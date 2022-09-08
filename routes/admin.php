@@ -303,6 +303,8 @@ Route::name('admin.')->group(function () {
 		Route::post('import-products', 'ImportController@importProducts')->name('import-products');
 		Route::post('import-merchant-products', 'ImportController@importMerchantProducts')->name('import-merchant-products');
 		Route::post('import-product-categories', 'ImportController@importProductCategories')->name('import-product-categories');
+		Route::post('import-vendors', 'ImportController@importVendors')->name('import-vendors');
+		Route::post('import-locations', 'ImportController@importLocations')->name('import-locations');
 
 		// admin logout
 		Route::post('/logout', 'Auth\LoginController@logout')->name('logout');

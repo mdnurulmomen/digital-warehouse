@@ -151,7 +151,7 @@
 
 							<li 
 								class="pcoded-hasmenu" 
-								:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations', 'products', 'product-merchants', 'product-stocks', 'stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+								:class="['vendors', 'locations', 'product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations', 'products', 'product-merchants', 'product-stocks', 'stocks'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 								v-if="userHasPermissionTo('view-product-index') || userHasPermissionTo('view-product-asset-index')"
 							>
 								<a href="javascript:void(0)" class="waves-effect waves-dark">
@@ -164,7 +164,7 @@
 								<ul class="pcoded-submenu">
 									<li 
 										class="pcoded-hasmenu" 
-										:class="['product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
+										:class="['vendors', 'locations', 'product-categories', 'category-products', 'product-manufacturers', 'variation-types', 'variations'].includes(currentRouteName) ? 'active pcoded-trigger' : ''" 
 										v-if="userHasPermissionTo('view-product-asset-index')"
 									>
 										<a href="javascript:void(0)" class="waves-effect waves-dark">
