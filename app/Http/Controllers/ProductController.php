@@ -280,11 +280,11 @@ class ProductController extends Controller
 
             return response()->json([
 
-                'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)->with(['variations.variation.type.variations', 'category'])->withCount('merchants')->with(['merchantProducts'])->paginate($perPage)),
+                'retail' => new ProductCollection(Product::where('product_category_id', '!=', 0)->with(['variations.variation.type.variations', 'category', 'merchantProducts'])->withCount('merchants')->paginate($perPage)),
 
                 'bulk' => new ProductCollection(Product::whereNull('product_category_id')->orWhere('product_category_id', 0)->withCount('merchants')->with(['merchantProducts'])->paginate($perPage)),
 
-                'trashed' => new ProductCollection(Product::onlyTrashed()->with(['variations.variation.type.variations', 'category'])->withCount('merchants')->with(['merchantProducts'])->paginate($perPage)),
+                'trashed' => new ProductCollection(Product::onlyTrashed()->with(['variations.variation.type.variations', 'category', 'merchantProducts'])->withCount('merchants')->paginate($perPage)),
 
             ], 200);
 
@@ -412,18 +412,19 @@ class ProductController extends Controller
 
     public function searchAllProducts($search, $perPage)
     {
-        $query = Product::where('name', 'like', "%$search%")
-                        // ->orWhere('sku', 'like', "%$search%")
-                        // ->orWhere('price', 'like', "%$search%")
-                        ->orWhere('quantity_type', 'like', "%$search%")
-                        ->orWhereHas('merchants', function ($q) use ($search) {
-                            $q->where('merchants.first_name', 'like', "%$search%")
-                            ->orWhere('merchants.last_name', 'like', "%$search%")
-                            ->orWhere('merchants.user_name', 'like', "%$search%");
-                        })
-                        ->orWhereHas('category', function ($q) use ($search) {
-                            $q->where('name', 'like', "%$search%");
-                        });
+        $query = Product::with(['variations.variation.type.variations', 'category', 'merchantProducts'])->withCount('merchants')
+        ->where('name', 'like', "%$search%")
+        // ->orWhere('sku', 'like', "%$search%")
+        // ->orWhere('price', 'like', "%$search%")
+        ->orWhere('quantity_type', 'like', "%$search%")
+        ->orWhereHas('merchants', function ($q) use ($search) {
+            $q->where('merchants.first_name', 'like', "%$search%")
+            ->orWhere('merchants.last_name', 'like', "%$search%")
+            ->orWhere('merchants.user_name', 'like', "%$search%");
+        })
+        ->orWhereHas('category', function ($q) use ($search) {
+            $q->where('name', 'like', "%$search%");
+        });
 
         return response()->json([
             'all' => new ProductCollection($query->paginate($perPage)),  
@@ -963,7 +964,11 @@ class ProductController extends Controller
 
         }
 
-        $productStockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $productStockToUpdate->merchant_product_id);
+        if ($productStockToUpdate->available_quantity > 0) {
+            
+            $productStockToUpdate->setStockAddresses(json_decode(json_encode($request->addresses)), $productStockToUpdate->merchant_product_id);
+
+        }
 
         return $this->showProductAllStocks($productStockToUpdate->merchant_product_id, $perPage);
     }
@@ -1316,7 +1321,11 @@ class ProductController extends Controller
 
             }
 
-            $productStockToUpdate->setStockAddresses(json_decode(json_encode($stockingProduct->addresses)), $productStockToUpdate->merchant_product_id);
+            if ($productStockToUpdate->available_quantity > 0) {
+                
+                $productStockToUpdate->setStockAddresses(json_decode(json_encode($stockingProduct->addresses)), $productStockToUpdate->merchant_product_id);
+            
+            }
 
         }
 
@@ -1438,8 +1447,13 @@ class ProductController extends Controller
                     $q7->where('serial_no', 'like', "%$request->search%");
                 })
                 ->orWhereHas('stocks.variations', function ($q8) use ($request) {
-                    $q8->where('stock_quantity', 'like', "%$request->search%")
-                    ->orWhere('available_quantity', 'like', "%$request->search%");
+                    $q8->where('stock_code', 'like', "%$request->search%")
+                        ->orWhere('stock_quantity', 'like', "%$request->search%")
+                        ->orWhere('available_quantity', 'like', "%$request->search%")
+                        ->orWhere('unit_buying_price', 'like', "%$request->search%")
+                        ->orWhereHas('serials', function ($query9) use ($request) {
+                            $query9->where('serial_no', 'like', "%$request->search%");
+                        });
                 })
                 ->orWhereHas('stocks.variations.serials', function ($q9) use ($request) {
                     $q9->where('serial_no', 'like', "%$request->search%");

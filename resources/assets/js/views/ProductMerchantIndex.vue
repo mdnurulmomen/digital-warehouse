@@ -35,7 +35,10 @@
 											<div class="col-sm-12 col-lg-12">
 												<loading v-show="loading"></loading>
 
- 												<div class="tab-content card-block pl-0 pr-0" v-show="!loading">
+ 												<div 
+ 													class="tab-content card-block pl-0 pr-0" 
+ 													v-show="!loading"
+ 												>
 													<div class="card">
 														<div class="table-responsive">
 															<table class="table table-striped table-bordered nowrap text-center">
@@ -44,7 +47,7 @@
 																		<th>Merchant</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
-																		<th>Available Stock</th>
+																		<th>Available</th>
 																		<th>Actions</th>
 																	</tr>
 																</thead>
@@ -136,7 +139,7 @@
 																		<th>Merchant</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
-																		<th>Stock</th>
+																		<th>Available</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -330,7 +333,11 @@
 												</div>
 											</div>
 
-											<div class="invalid-feedback" style="display: block;" v-show="errors.product_price">
+											<div 
+												class="invalid-feedback" 
+												style="display: block;" 
+												v-show="errors.product_price"
+											>
 									        	{{ errors.product_price }}
 									  		</div>
 										</div>
@@ -1044,7 +1051,7 @@
 											<div class="col-md-8">
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Merchant Name :
+														Merchant :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.merchant ? singleMerchantProductData.merchant.user_name : 'None' | capitalize }}
@@ -1053,7 +1060,7 @@
 
 												<div class="form-row">
 													<label class="col-sm-4 col-form-label font-weight-bold">
-														Manufacturer/Brand Name :
+														Manufacturer/Brand :
 													</label>
 													<label class="col-sm-8 col-form-label">
 														{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
@@ -1237,8 +1244,17 @@
 																				Selling Price (unit) :
 																			</label>
 																			<label class="col-sm-8 col-form-label">
-																				{{ merchantProductVariation.selling_price }}
+																				{{ merchantProductVariation.selling_price || 0 }}
 																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+																			</label>
+																		</div>
+
+																		<div class="form-row">
+																			<label class="col-4 col-form-label font-weight-bold">
+																				Available Qty :
+																			</label>
+																			<label class="col-8 col-form-label">
+																				{{ (merchantProductVariation.available_quantity + merchantProductVariation.previous_quantity) }} {{ singleMerchantProductData.product ? singleMerchantProductData.product.quantity_type : 'unit' }}
 																			</label>
 																		</div>
 																	</div>

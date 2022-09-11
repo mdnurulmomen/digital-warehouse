@@ -62,7 +62,7 @@ class StockRequest extends FormRequest
             $merchantProduct = MerchantProduct::findOrFail($stockingProduct->merchant_product_id);
             $product = $merchantProduct->product;
 
-            if ($merchant->supportDeal->purchase_support) {
+            if ($merchant->supportDeal->purchase_support && $merchant->supportDeal->rents()->whereDate('date_to', '>=', now())->count()) {
             
                 $rules['products.'.$stockingProductKey.'.vendor_id'] = 'required|exists:vendors,id';
                 $rules['products.'.$stockingProductKey.'.location_id'] = 'required|exists:locations,id';
@@ -78,6 +78,7 @@ class StockRequest extends FormRequest
 
             // $rules['products.'.$stockingProductKey.'.addresses'] = 'required|array|min:1';
 
+            // Address
             foreach (json_decode(json_encode($stockingProduct->addresses)) as $addressKey => $address) {
             
                 if ($address->type=='containers') {
@@ -104,6 +105,7 @@ class StockRequest extends FormRequest
 
             }
 
+            // Serials
             if ($product->has_serials && ! $product->has_variations) {
                 $rules['products.'.$stockingProductKey.'.serials'] = 'required|array|min:'.$stockingProduct->stock_quantity;
                 
@@ -135,6 +137,7 @@ class StockRequest extends FormRequest
                 }
             }
             
+            // Variations
             if ($product->has_variations) {
                 $rules['products.'.$stockingProductKey.'.variations'] = 'required|array|min:1';
 
@@ -174,7 +177,7 @@ class StockRequest extends FormRequest
 
                     }
 
-                    if ($merchant->supportDeal->purchase_support && ! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
+                    if ($merchant->supportDeal->purchase_support && $merchant->supportDeal->rents()->whereDate('date_to', '>=', now())->count() && ! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
                 
                         $rules['products.'.$stockingProductKey.'.variations.'.$stockingProductVariationKey.'.unit_buying_price'] = 'required|numeric|min:0';
                         

@@ -160,7 +160,7 @@
 																		<th>Product</th>
 																		<th>Manufacturer/Brand</th>
 																		<th>SKU</th>
-																		<th>Stock</th>
+																		<th>Available</th>
 																		<th>Actions</th>
 																	</tr>
 																</tfoot>
@@ -394,11 +394,19 @@
 
 								<div class="form-group col-md-6">
 									<label for="inputFirstName">Warning Qty</label>
-									<input type="number" 
-										class="form-control is-valid" 
-										v-model.number="singleMerchantProductData.warning_quantity" 
-										placeholder="Product Warning Qty" 
-									>
+
+									<div class="input-group mb-0">
+										<input type="number" 
+											class="form-control is-valid" 
+											v-model.number="singleMerchantProductData.warning_quantity" 
+											placeholder="Product Warning Qty" 
+										>
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">
+												{{ general_settings.official_currency_name || 'BDT' | capitalize }}
+											</span>
+										</div>
+									</div>
 								</div>
 							</div>
 
@@ -947,7 +955,7 @@
 
 												<div class="form-row">
 													<label class="col-4 col-form-label font-weight-bold">
-														Manufacturer/Brand Name :
+														Manufacturer/Brand :
 													</label>
 													<label class="col-8 col-form-label">
 														{{ singleMerchantProductData.manufacturer ? singleMerchantProductData.manufacturer.name : 'own product' | capitalize }}
@@ -1049,7 +1057,7 @@
 														Unit Max Price :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.unit_max_price }}
+														{{ singleMerchantProductData.unit_max_price || 0 }}
 														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 													</label>
 												</div>
@@ -1059,7 +1067,7 @@
 														Unit Min Price :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.unit_min_price }}
+														{{ singleMerchantProductData.unit_min_price || 0 }}
 														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 													</label>
 												</div>
@@ -1069,7 +1077,7 @@
 														Unit Avg Price :
 													</label>
 													<label class="col-8 col-form-label">
-														{{ singleMerchantProductData.unit_avg_price }}
+														{{ singleMerchantProductData.unit_avg_price || 0 }}
 														{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 													</label>
 												</div>
@@ -1217,7 +1225,7 @@
 																				Unit Max Price :
 																			</label>
 																			<label class="col-8 col-form-label">
-																				{{ merchantProductVariation.unit_max_price }}
+																				{{ merchantProductVariation.unit_max_price || 0 }}
 																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
@@ -1227,7 +1235,7 @@
 																				Unit Min Price :
 																			</label>
 																			<label class="col-8 col-form-label">
-																				{{ merchantProductVariation.unit_min_price }}
+																				{{ merchantProductVariation.unit_min_price || 0 }}
 																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
@@ -1237,7 +1245,7 @@
 																				Unit Avg Price :
 																			</label>
 																			<label class="col-8 col-form-label">
-																				{{ merchantProductVariation.unit_avg_price }}
+																				{{ merchantProductVariation.unit_avg_price || 0 }}
 																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>
@@ -1247,7 +1255,7 @@
 																				Variation-Stock Total Cost :
 																			</label>
 																			<label class="col-8 col-form-label">
-																				{{ merchantProductVariation.stock_total_cost }}
+																				{{ merchantProductVariation.stock_total_cost || 0 }}
 																				{{ general_settings.official_currency_name || 'BDT' | capitalize }}
 																			</label>
 																		</div>

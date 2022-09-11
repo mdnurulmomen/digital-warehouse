@@ -61,7 +61,7 @@ class ProductStockRequest extends FormRequest
         $product = $merchantProduct->product;
         $merchant = $merchantProduct->merchant;
 
-        if ($merchant->supportDeal->purchase_support) {
+        if ($merchant->supportDeal->purchase_support && $merchant->supportDeal->rents()->whereDate('date_to', '>=', now())->count()) {
             
             $rules['vendor_id'] = 'required|exists:vendors,id';
             $rules['location_id'] = 'required|exists:locations,id';
@@ -75,6 +75,7 @@ class ProductStockRequest extends FormRequest
 
         }
 
+        // address
         foreach (json_decode(json_encode($this->input('addresses'))) as $addressKey => $address) {
             
             if ($address->type=='containers') {
@@ -101,6 +102,7 @@ class ProductStockRequest extends FormRequest
 
         }
 
+        // serials
         if ($product->has_serials && ! $product->has_variations) {
             $rules['serials'] = 'required|array|min:'.$this->input('stock_quantity');
             
@@ -132,6 +134,7 @@ class ProductStockRequest extends FormRequest
             }
         }
 
+        // variations
         if ($product->has_variations) {
 
             $rules['variations'] = 'required|array|min:1';
@@ -172,7 +175,7 @@ class ProductStockRequest extends FormRequest
 
                 }
 
-                if ($merchant->supportDeal->purchase_support && ! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
+                if ($merchant->supportDeal->purchase_support && $merchant->supportDeal->rents()->whereDate('date_to', '>=', now())->count() && ! empty($stockingProductVariation->stock_quantity) && $stockingProductVariation->stock_quantity > 0) {
                 
                     $rules['variations.'.$stockingProductVariationKey.'.unit_buying_price'] = 'required|numeric|min:0';
                     
