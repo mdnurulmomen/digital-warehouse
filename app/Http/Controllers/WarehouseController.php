@@ -32,10 +32,10 @@ class WarehouseController extends Controller
         $this->middleware("permission:delete-warehouse")->only(['deleteWarehouse', 'restoreWarehouse']);
 
         // Warehouse Managers
-        $this->middleware("permission:view-warehouse-manager-index")->only(['showAllWarehouseManagers', 'searchAllWarehouseManagers']);
-        // $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
-        $this->middleware("permission:update-warehouse-manager")->only('updateWarehouseManager');
-        $this->middleware("permission:delete-warehouse-manager")->only(['deleteWarehouseManager']);
+        // $this->middleware("permission:view-warehouse-manager-index")->only(['showAllWarehouseManagers', 'searchAllWarehouseManagers']);
+        // // $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
+        // $this->middleware("permission:update-warehouse-manager")->only('updateWarehouseManager');
+        // $this->middleware("permission:delete-warehouse-manager")->only(['deleteWarehouseManager']);
     }
 
     // Warehouse Owner
@@ -347,7 +347,7 @@ class WarehouseController extends Controller
 
         }
 
-        $invalidity = $this->checkWarehouseRentedContainers($warehouseToUpdate, json_decode(json_encode($request->containers)));
+        $invalidity = $this->checkRentedContainerExists($warehouseToUpdate, json_decode(json_encode($request->containers)));
 
         if ($invalidity) {
             
@@ -1011,7 +1011,7 @@ class WarehouseController extends Controller
 
     }
 
-    protected function checkWarehouseRentedContainers(Warehouse $warehouse, $warehouseNewContainers = [])
+    protected function checkRentedContainerExists(Warehouse $warehouse, $warehouseNewContainers = [])
     {
         $warehouseNewContainers = collect($warehouseNewContainers);        
 
@@ -1019,14 +1019,13 @@ class WarehouseController extends Controller
             
             $existingInputedContainer = $warehouseNewContainers->firstWhere('container_id', $warehouseContainer->container_id);
 
-            if (empty($existingInputedContainer)) {
+            if (empty($existingInputedContainer)) {         // new-one
                 continue;
             }
             else {
 
-                if ($warehouseContainer->containerStatuses()->where(function ($query) {
-                    $query->where('engaged', 0.5)->orWhere('engaged', 1);
-                })->count() > $existingInputedContainer->quantity) {
+                // quantity-check
+                if ($warehouseContainer->containerStatuses()->where('engaged', '>', 0.0)->count() > $existingInputedContainer->quantity) {
                     
                     return response()->json([
                         'errors'=>[
@@ -1037,6 +1036,7 @@ class WarehouseController extends Controller
                 }
                 else {
 
+                    // warehouse-container rent
                     foreach ($warehouseContainer->rents()->where('active', 1)->get() as $containerActiveRentIndex => $containerActiveRent) {
                         
                         if ($existingInputedContainer->rents->{'container_rent_'.$containerActiveRent->rentPeriod->name}->rent_period_id != $containerActiveRent->rent_period_id) {
@@ -1054,6 +1054,7 @@ class WarehouseController extends Controller
 
                     if ($warehouseContainer->shelf) {
                         
+                        // warehouse-container-shelf rent
                         foreach ($warehouseContainer->shelf->rents()->where('active', 1)->get() as $shelfActiveRentIndex => $shelfActiveRent) {
                         
                             if ($existingInputedContainer->rents->{'shelf_rent_'.$shelfActiveRent->rentPeriod->name}->rent_period_id != $shelfActiveRent->rent_period_id) {
@@ -1069,6 +1070,7 @@ class WarehouseController extends Controller
 
                         }
 
+                        // warehouse-container-shelf-unit rent
                         if ($warehouseContainer->shelf->unit) {
                         
                             foreach ($warehouseContainer->shelf->unit->rents()->where('active', 1)->get() as $unitActiveRentIndex => $unitActiveRent) {

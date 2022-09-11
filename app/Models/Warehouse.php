@@ -629,7 +629,7 @@ class Warehouse extends Authenticatable
                 for($j=0; $j<$inputedContainer->container->shelf->quantity; $j++) {
 
                     $warehouseContainerShelfStatus = $warehouseContainerStatus->containerShelfStatuses()->create([
-                        'name' => $warehouseContainerStatus->name.'-shl-'.($j+1),
+                        'name' => /*$warehouseContainerStatus->name.'-shl-'.*/($j+1),
                         'warehouse_container_id' => $warehouseContainer->id,
                     ]);
 
@@ -639,7 +639,7 @@ class Warehouse extends Authenticatable
                         for($k=0; $k<$inputedContainer->container->shelf->unit->quantity; $k++){
 
                             $warehouseContainerShelfStatus->containerShelfUnitStatuses()->create([
-                                'name' => $warehouseContainerShelfStatus->name.'-unt-'.($k+1),
+                                'name' => /*$warehouseContainerShelfStatus->name.'-unt-'.*/($k+1),
                                 'warehouse_container_id' => $warehouseContainer->id,
                             ]);    
 

@@ -4249,28 +4249,35 @@
 
 			},
 			changeContainerRents(index) {
-				this.singleWarehouseData.containers[index].rents = {};
-				this.errors.warehouse.containers[index] = {};
 
-				this.allRentPeriods.forEach(
-					rentPeriod => {
-						
-						this.$set(this.singleWarehouseData.containers[index].rents, `container_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+				if (this.singleWarehouseData.containers[index].container && Object.keys(this.singleWarehouseData.containers[index].container).length) {
 
-						if (this.singleWarehouseData.containers[index].container.has_shelve && this.singleWarehouseData.containers[index].container.shelf) {
+					this.singleWarehouseData.containers[index].container_id = this.singleWarehouseData.containers[index].container.id;
+
+					this.singleWarehouseData.containers[index].rents = {};
+					this.errors.warehouse.containers[index] = {};
+
+					this.allRentPeriods.forEach(
+						rentPeriod => {
 							
-							this.$set(this.singleWarehouseData.containers[index].rents, `shelf_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+							this.$set(this.singleWarehouseData.containers[index].rents, `container_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
 
-							if (this.singleWarehouseData.containers[index].container.shelf.has_units && this.singleWarehouseData.containers[index].container.shelf.unit) {
+							if (this.singleWarehouseData.containers[index].container.has_shelve && this.singleWarehouseData.containers[index].container.shelf) {
+								
+								this.$set(this.singleWarehouseData.containers[index].rents, `shelf_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
 
-								this.$set(this.singleWarehouseData.containers[index].rents, `unit_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+								if (this.singleWarehouseData.containers[index].container.shelf.has_units && this.singleWarehouseData.containers[index].container.shelf.unit) {
+
+									this.$set(this.singleWarehouseData.containers[index].rents, `unit_rent_${rentPeriod.name}`, { rent: null, rent_period_id: null, active: false });
+
+								}
 
 							}
 
 						}
+					);
 
-					}
-				);
+				}
 
 			}
             
