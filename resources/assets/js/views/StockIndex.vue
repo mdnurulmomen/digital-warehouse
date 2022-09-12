@@ -5925,7 +5925,7 @@
 
 							(stockedProduct, stockedProductIndex) => {
 
-								if (this.createMode && stockedProduct.addresses.length < 1) {
+								if ((this.createMode && stockedProduct.addresses.length < 1) || (! this.createMode && stockedProduct.stock_quantity > stockedProduct.primary_quantity && stockedProduct.addresses.length < 1)) {
 									// this.submitForm = false;
 									this.errors.products[stockedProductIndex].product_address = 'Address is required';
 								}

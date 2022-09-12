@@ -587,6 +587,7 @@
 																</span>
 															</div>
 														</div>
+
 														<div class="invalid-feedback" 
 															style="display: block;" 
 															v-show="errors.stock.product_stock_quantity"
@@ -5038,7 +5039,7 @@
 
 				}
 
-			},
+			}, 
 			validateFormInput (formInputName) {
 
 				this.submitForm = false;
@@ -5190,7 +5191,7 @@
 				
 					case 'product_address' : 
 
-						if (/*this.createMode && */this.singleStockData.addresses.length < 1) {
+						if ((this.createMode && this.singleStockData.addresses.length < 1) || (! this.createMode && this.singleStockData.stock_quantity > this.singleStockData.primary_quantity && this.singleStockData.addresses.length < 1)) {
 							this.submitForm = false;
 							this.errors.stock.product_address = 'Address is required';
 						}

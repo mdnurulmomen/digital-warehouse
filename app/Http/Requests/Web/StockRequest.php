@@ -40,13 +40,20 @@ class StockRequest extends FormRequest
                 })
             ],
             'products.*.stock_quantity' => 'required|integer|min:1',
-            'products.*.addresses' => 'required|array|min:1'
+            // 'products.*.addresses' => 'required|array|min:1'
             // 'product_id' => 'required|numeric|exists:products,id',
         ];
 
         $merchant = Merchant::find($this->input('merchant.id'));
 
         foreach (json_decode(json_encode($this->products)) as $stockingProductKey => $stockingProduct) {
+
+            if (! $this->route('stock') || ($this->route('stock') && isset($stockingProduct->available_quantity) && $stockingProduct->available_quantity > 0) || ($this->route('stock') && $stockingProduct->stock_quantity > ProductStock::findOrFail($this->route('stock'))->stock_quantity)) {        // when creating or product is available or stock_quantity is increased when updating
+            
+                $rules['products.'.$stockingProductKey.'.addresses'] = 'required|array|min:1';
+
+            }
+
 
             if (! empty($stockingProduct->id) && $this->route('stock')) {
             

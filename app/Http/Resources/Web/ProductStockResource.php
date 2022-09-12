@@ -20,6 +20,7 @@ class ProductStockResource extends JsonResource
         return [
             'id' => $this->id,
             'stock_code' => $this->stock_code,
+            'primary_quantity' => $this->stock_quantity ?? 0,
             'stock_quantity' => $this->stock_quantity ?? 0,
             'available_quantity' => /* $this->when(! $product->has_variations, $this->available_quantity ?? 0) */ $this->available_quantity ?? 0,
             'unit_buying_price' => $this->when(! $product->has_variations, $this->unit_buying_price ?? 0.0),

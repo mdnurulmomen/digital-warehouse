@@ -43,8 +43,14 @@ class ProductStockRequest extends FormRequest
             ],
             'stock_quantity' => 'required|integer|min:1',
             // 'product_id' => 'required|numeric|exists:products,id',
-            'addresses' => 'required|array|min:1'
+            // 'addresses' => 'required|array|min:1'
         ];
+
+        if (! $this->route('stock') || ($this->route('stock') && $this->has('available_quantity') && $this->input('available_quantity') > 0) || ($this->route('stock') && $this->input('stock_quantity') > ProductStock::findOrFail($this->route('stock'))->stock_quantity)) {        // when creating or product is available or stock_quantity is increased when updating
+            
+            $rules['addresses'] = 'required|array|min:1';
+
+        }
 
         if (! empty($this->input('id')) && $this->route('stock')) {
             
