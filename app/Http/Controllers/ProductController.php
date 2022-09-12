@@ -689,7 +689,7 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $request->stock_quantity : $lastAvailableQuantity,
             'available_quantity' => $request->stock_quantity,
-            'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
+            'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? 0.0) : 0.0,  // No Costing Price if variation exists
             'manufactured_at' => $request->manufactured_at ?? NULL,
             'expired_at' => $request->expired_at ?? NULL,
             'vendor_id' => $request->vendor_id,
@@ -884,7 +884,7 @@ class ProductController extends Controller
             $productStockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity, 
                 'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
-                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? 0.0) : 0.0,
                 'vendor_id' => $request->vendor_id,
                 'location_id' => $request->location_id,
             ]);
@@ -902,7 +902,7 @@ class ProductController extends Controller
             $productStockToUpdate->update([
                 'stock_quantity' => $request->stock_quantity, 
                 'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
-                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? 0.0) : 0.0,
                 'vendor_id' => $request->vendor_id,
                 'location_id' => $request->location_id,
             ]);
@@ -937,7 +937,7 @@ class ProductController extends Controller
         else {  // approving stock / updating only price
 
             $productStockToUpdate->update([
-                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                'unit_buying_price' => ! $product->has_variations ? ($request->unit_buying_price ?? 0.0) : 0.0,
                 'vendor_id' => $request->vendor_id,
                 'location_id' => $request->location_id,
             ]);
@@ -1140,7 +1140,7 @@ class ProductController extends Controller
                 'stock_quantity' => $storingProduct->stock_quantity,
                 // 'available_quantity' => $userHasUpdatingPermission ? $lastAvailableQuantity + $storingProduct->stock_quantity : $lastAvailableQuantity,
                 'available_quantity' => $storingProduct->stock_quantity,
-                'unit_buying_price' => ! $product->has_variations ? ($storingProduct->unit_buying_price ?? $merchantProduct->selling_price ?? 0) : 0.0,
+                'unit_buying_price' => ! $product->has_variations ? ($storingProduct->unit_buying_price ?? 0.0) : 0.0,
                 'manufactured_at' => $storingProduct->manufactured_at ?? NULL,
                 'expired_at' => $storingProduct->expired_at ?? NULL,
                 'vendor_id' => $storingProduct->vendor_id,
@@ -1200,7 +1200,7 @@ class ProductController extends Controller
                     'stock_code' => ($merchantExpectedProduct->sku.'S'.($merchantExpectedProduct->stocks->count()+1)),
                     'stock_quantity' => $stockingProduct->stock_quantity,
                     'available_quantity' => $stockingProduct->stock_quantity,
-                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,  // No Costing Price if variation exists
+                    'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? 0.0) : 0.0,  // No Costing Price if variation exists
                     'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                     'expired_at' => $stockingProduct->expired_at ?? NULL,
                     'vendor_id' => $stockingProduct->vendor_id,
@@ -1225,7 +1225,7 @@ class ProductController extends Controller
                         $productStockToUpdate->update([
                             'stock_quantity' => $stockingProduct->stock_quantity,
                             'available_quantity' => ($productStockToUpdate->available_quantity + $difference),
-                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? 0.0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
                             'vendor_id' => $stockingProduct->vendor_id,
@@ -1245,7 +1245,7 @@ class ProductController extends Controller
                         $productStockToUpdate->update([
                             'stock_quantity' => $stockingProduct->stock_quantity,
                             'available_quantity' => ($productStockToUpdate->available_quantity - $difference), 
-                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? 0.0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
                             'vendor_id' => $stockingProduct->vendor_id,
@@ -1261,7 +1261,7 @@ class ProductController extends Controller
                     else {  // approving stock / updating only price
 
                         $productStockToUpdate->update([
-                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $productStockToUpdate->merchantProduct->selling_price ?? 0) : 0.0,
+                            'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? 0.0) : 0.0,
                             'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                             'expired_at' => $stockingProduct->expired_at ?? NULL, 
                             'vendor_id' => $stockingProduct->vendor_id,
@@ -1294,7 +1294,7 @@ class ProductController extends Controller
                         'stock_code' => ($merchantExpectedProduct->sku.'S'.($merchantExpectedProduct->stocks->count()+1)),
                         'stock_quantity' => $stockingProduct->stock_quantity,
                         'available_quantity' => $stockingProduct->stock_quantity,
-                        'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? $merchantExpectedProduct->selling_price ?? 0) : 0.0,
+                        'unit_buying_price' => ! $product->has_variations ? ($stockingProduct->unit_buying_price ?? 0.0) : 0.0,
                         'manufactured_at' => $stockingProduct->manufactured_at ?? NULL,
                         'expired_at' => $stockingProduct->expired_at ?? NULL, 
                         'vendor_id' => $stockingProduct->vendor_id,

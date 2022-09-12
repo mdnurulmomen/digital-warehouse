@@ -26,10 +26,12 @@ class WarehouseController extends Controller
         $this->middleware("permission:delete-warehouse-owner")->only(['deleteOwner', 'restoreOwner']);
 
         // Warehouse
-        $this->middleware("permission:view-warehouse-index")->only(['showAllWarehouses', 'searchAllWarehouses', 'showWarehouseAllContainers', 'searchWarehouseAllContainers', 'showContainerAllShelves', 'searchContainerAllShelves', 'showShelfAllUnits', 'searchShelfAllUnits']);
+        $this->middleware("permission:view-warehouse-index")->only(['showAllWarehouses', 'searchAllWarehouses']);
         $this->middleware("permission:create-warehouse")->only('storeNewWarehouse');
         $this->middleware("permission:update-warehouse")->only('updateWarehouse');
         $this->middleware("permission:delete-warehouse")->only(['deleteWarehouse', 'restoreWarehouse']);
+
+        $this->middleware("permission:view-warehouse-index")->only(['showWarehouseAllContainers', 'searchWarehouseAllContainers', 'showContainerAllShelves', 'searchContainerAllShelves', 'showShelfAllUnits', 'searchShelfAllUnits']);
 
         // Warehouse Managers
         // $this->middleware("permission:view-warehouse-manager-index")->only(['showAllWarehouseManagers', 'searchAllWarehouseManagers']);
