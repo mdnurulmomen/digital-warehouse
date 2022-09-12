@@ -2497,7 +2497,7 @@
 																				Container # :
 																			</label>
 																			<label class="col-6 col-form-label">
-																				{{ containerAddress.name.substring(containerAddress.name.lastIndexOf("-")+1) }}
+																				{{ containerAddress.name.substring(containerAddress.name.lastIndexOf("-") + 1) }}
 																			</label>
 																		</div>
 																	</div>
@@ -2542,7 +2542,9 @@
 																						:key="'stocked-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-shelf-address-' + shelfAddress.id"
 																					>
 
-																						{{ shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) }}
+																						{{ /* shelfAddress.name.substring(shelfAddress.name.lastIndexOf("-")+1) */ 
+																							shelfAddress.name
+																						}}
 																						
 																					</li>
 																				</ul>
@@ -2572,7 +2574,7 @@
 																				Container # :
 																			</label>
 																			<label class="col-6 col-form-label">
-																				{{ stockAddress.container.name.substring(stockAddress.container.name.lastIndexOf("-")+1) }}
+																				{{ stockAddress.container.name.substring(stockAddress.container.name.lastIndexOf("-") + 1) }}
 																			</label>
 																		</div>
 
@@ -2581,7 +2583,9 @@
 																				Shelf # :
 																			</label>
 																			<label class="col-6 col-form-label">
-																				{{ stockAddress.container.shelf.name.substring(stockAddress.container.shelf.name.lastIndexOf("-")+1) }}
+																				{{ /*stockAddress.container.shelf.name.substring(stockAddress.container.shelf.name.lastIndexOf("-")+1)*/
+																					stockAddress.container.shelf.name
+																				}}
 																			</label>
 																		</div>
 
@@ -2597,7 +2601,9 @@
 																						:key="'stocked-product-index-' + stockedProductIndex + '-stocked-product-' + stockedProduct.id + '-unit-address-' + unitAddress.id"
 																					>
 
-																						{{ unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1) }}
+																						{{ /*unitAddress.name.substring(unitAddress.name.lastIndexOf("-")+1)*/
+																							unitAddress.name 
+																						}}
 																						
 																					</li>
 																				</ul>

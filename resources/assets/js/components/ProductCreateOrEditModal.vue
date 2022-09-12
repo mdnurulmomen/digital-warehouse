@@ -12,53 +12,53 @@
 				</div>
 
 				<form 	
-					class="form-horizontal" 
-					v-on:submit.prevent="verifyUserInput()" 
-					autocomplete="off" 
-					novalidate="true" 
+				class="form-horizontal" 
+				v-on:submit.prevent="verifyUserInput()" 
+				autocomplete="off" 
+				novalidate="true" 
 				>
-					<input type="hidden" name="_token" :value="csrf">
+				<input type="hidden" name="_token" :value="csrf">
 
 				<div class="modal-body">
 					<div class="form-row">
 						<div class="form-group col-md-6">
 							<label for="inputUsername">Product Type</label>
 							<multiselect 
-								v-model="productMode" 
-								class="form-control p-0 is-valid" 
-								placeholder="Product Mode" 
-								:custom-label="nameWithCapitalized" 
-								:options="['bulk product', 'retail product']" 
-								:required="true" 
-								:allow-empty="false" 
-								@input="setProductMode()" 
-								:disabled="singleProductData.product_immutability" 
-								>
-							</multiselect>
-						</div>
-
-						<div class="form-group col-md-6">
-							<label for="inputUsername">Product Category</label>
-
-							<treeselect
-							v-model="singleProductData.category"
-							class="form-control p-0" 
-							placeholder="Select Variation" 
-							:class="! errors.product_category ? 'is-valid' : 'is-invalid'"
-							:options="allProductCategories" 
-							:show-count="true" 
-							:normalizer="treeSelectCustomFunction" 
-							:valueFormat="'object'" 
+							v-model="productMode" 
+							class="form-control p-0 is-valid" 
+							placeholder="Product Mode" 
+							:custom-label="nameWithCapitalized" 
+							:options="['bulk product', 'retail product']" 
 							:required="true" 
-							:disabled="productMode=='bulk product'" 
-							@input="setProductCategory()"
-							/>
+							:allow-empty="false" 
+							@input="setProductMode()" 
+							:disabled="singleProductData.product_immutability" 
+							>
+						</multiselect>
+					</div>
 
-							<div class="invalid-feedback">
-								{{ errors.product_category }}
-							</div>
+					<div class="form-group col-md-6">
+						<label for="inputUsername">Product Category</label>
+
+						<treeselect
+						v-model="singleProductData.category"
+						class="form-control p-0" 
+						placeholder="Select Variation" 
+						:class="! errors.product_category ? 'is-valid' : 'is-invalid'"
+						:options="allProductCategories" 
+						:show-count="true" 
+						:normalizer="treeSelectCustomFunction" 
+						:valueFormat="'object'" 
+						:required="true" 
+						:disabled="productMode=='bulk product'" 
+						@input="setProductCategory()"
+						/>
+
+						<div class="invalid-feedback">
+							{{ errors.product_category }}
 						</div>
 					</div>
+				</div>
 
 				<div class="form-row">
 					<div class="form-group col-md-6">
@@ -162,22 +162,22 @@
 						<div class="form-group col-md-3">
 							<label for="inputFirstName">Variation Type</label>
 							<multiselect 
-								v-model="singleProductData.variation_type"
-								placeholder="Choose Type" 
-								label="name" 
-								track-by="id" 
-								:custom-label="objectNameWithCapitalized" 
-								:options="allVariationTypes" 
-								:required="true" 
-								:allow-empty="false"
-								selectLabel = "Press/Click"
-								deselect-label="Can't remove single value" 
-								class="form-control p-0" 
-								:class="!errors.product_variation_type  ? 'is-valid' : 'is-invalid'" 
-								:disabled="singleProductData.product_immutability"
-								@close="validateFormInput('product_variation_type')" 
-								>
-							</multiselect>
+							v-model="singleProductData.variation_type"
+							placeholder="Choose Type" 
+							label="name" 
+							track-by="id" 
+							:custom-label="objectNameWithCapitalized" 
+							:options="allVariationTypes" 
+							:required="true" 
+							:allow-empty="false"
+							selectLabel = "Press/Click"
+							deselect-label="Can't remove single value" 
+							class="form-control p-0" 
+							:class="!errors.product_variation_type  ? 'is-valid' : 'is-invalid'" 
+							:disabled="singleProductData.product_immutability"
+							@close="validateFormInput('product_variation_type')" 
+							>
+						</multiselect>
 						<div class="invalid-feedback">
 							{{ errors.product_variation_type }}
 						</div>
@@ -203,17 +203,17 @@
 									<label for="inputFirstName">Variation</label>
 
 									<treeselect
-										v-model="productVariation.variation"
-										:options="singleProductData.variation_type.variations" 
-										:show-count="true" 
-										:normalizer="treeSelectCustomFunction" 
-										:valueFormat="'object'" 
-										:required="true" 
-										:disabled="productVariation.variation_immutability" 
-										@input="validateFormInput('product_variation_id')"  
-										class="form-control p-0" 
-										:class="! errors.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
-										placeholder="Select Variation" 
+									v-model="productVariation.variation"
+									:options="singleProductData.variation_type.variations" 
+									:show-count="true" 
+									:normalizer="treeSelectCustomFunction" 
+									:valueFormat="'object'" 
+									:required="true" 
+									:disabled="productVariation.variation_immutability" 
+									@input="validateFormInput('product_variation_id')"  
+									class="form-control p-0" 
+									:class="! errors.variations[index].product_variation_id ? 'is-valid' : 'is-invalid'"
+									placeholder="Select Variation" 
 									/>
 
 									<div class="invalid-feedback">
@@ -258,16 +258,14 @@
 									<label for="inputFirstName">Variation</label>
 
 									<treeselect
-										v-model="productVariation.variation"
-										:options="[]" 
-										:show-count="true" 
-										:normalizer="treeSelectCustomFunction" 
-										:valueFormat="'object'" 
-										:required="true" 
-										:disabled="productVariation.variation_immutability" 
-										@input="validateFormInput('product_variation_id')"  
-										class="form-control p-0 is-valid" 
-										placeholder="Select Variation" 
+									v-model="productVariation.variation"
+									:options="[]" 
+									:show-count="true" 
+									:valueFormat="'object'" 
+									:required="true" 
+									:disabled="productVariation.variation_immutability" 
+									class="form-control p-0 is-valid" 
+									placeholder="Select Variation" 
 									/>
 								</div>
 							</div>
@@ -356,26 +354,26 @@
 	import Treeselect from '@riophae/vue-treeselect';
   	import '@riophae/vue-treeselect/dist/vue-treeselect.css';			// import the styles
 
-	export default {
+  	export default {
 
-		components : {
-			Treeselect, 
-			multiselect : Multiselect,
-		},
+  		components : {
+  			Treeselect, 
+  			multiselect : Multiselect,
+  		},
 
-		props : {
-			csrf: {
-				type: String,
-				required: true
-			},
-			errors: {
-				type: Object,
-				default() {
+  		props : {
+  			csrf: {
+  				type: String,
+  				required: true
+  			},
+  			errors: {
+  				type: Object,
+  				default() {
 
-					return {
+  					return {
 
-						variations : [],
-						
+  						variations : [],
+
 						/*
 						addresses : [
 							{}
@@ -544,11 +542,11 @@
 				if (this.singleProductData.has_variations) {
 
 					this.singleProductData.variations = [
-						{}, {}
+					{}, {}
 					];
 
 					this.errors.variations = [
-						{}, {}
+					{}, {}
 					];
 
 				}
@@ -713,5 +711,5 @@
 </script>
 
 <style>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
+@import '~vue-multiselect/dist/vue-multiselect.min.css';
 </style>
