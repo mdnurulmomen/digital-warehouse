@@ -215,18 +215,11 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-	import Multiselect from 'vue-multiselect';
-
     let singleAssetData = {
     	// manufacturer : {},
     };
 
 	export default {
-
-	    components: { 
-			multiselect : Multiselect,
-		},
 
 	    data() {
 
@@ -582,7 +575,3 @@
   	}
 
 </script>
-
-<style scoped>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
-</style>

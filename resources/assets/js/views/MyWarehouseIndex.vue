@@ -648,8 +648,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-
     let singleWarehouseData = {
     	owner : {},
     	previews : [],
@@ -1118,7 +1116,6 @@
 </script>
 
 <style scoped>
-	
 	/*@import '~vue-multiselect/dist/vue-multiselect.min.css';*/
 
 	.modal { 
@@ -1127,5 +1124,4 @@
 	.modal-body {
 		word-break: break-all;
 	}
-
 </style>

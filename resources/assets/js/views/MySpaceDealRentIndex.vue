@@ -809,7 +809,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
 	import Datepicker from 'vuejs-datepicker';
 
     let singleRentData = {
@@ -1340,7 +1339,3 @@
   	}
 
 </script>
-
-<style scoped>
-	
-</style>

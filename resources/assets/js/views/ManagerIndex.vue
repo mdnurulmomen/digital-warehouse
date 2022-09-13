@@ -121,8 +121,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-
     let singleUserDetails = {
     	active : false,
     	profile_preview : {},

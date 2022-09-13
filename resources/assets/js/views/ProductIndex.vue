@@ -423,7 +423,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
   	import ProductCreateOrEditModal from '../components/ProductCreateOrEditModal';
 
     let singleProductData = {

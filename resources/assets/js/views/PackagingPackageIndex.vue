@@ -523,7 +523,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 

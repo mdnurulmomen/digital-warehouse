@@ -107,7 +107,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
 	import MailViewModal from '../components/MailViewModal.vue';
 	import MailCreateModal from '../components/MailCreateModal.vue';
 

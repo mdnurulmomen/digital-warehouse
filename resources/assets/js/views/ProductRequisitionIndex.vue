@@ -2778,9 +2778,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-	// import JsonExcel from "vue-json-excel";
-	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 	// import DatePicker from 'v-calendar/lib/components/date-picker.umd';
@@ -2815,7 +2812,6 @@
 	    components: { 
 	    	// vDatePicker : DatePicker,
 	    	// downloadExcel : JsonExcel, 
-			multiselect : Multiselect,
 			ckeditor: CKEditor.component,
 		},
 
@@ -4945,18 +4941,3 @@
   	}
 
 </script>
-
-<style scoped>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
-
-	.fade-enter-active {
-  		transition: all .3s ease;
-	}
-	.fade-leave-active {
-  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-	}
-	.fade-enter, .fade-leave-to {
-  		transform: translateX(10px);
-  		opacity: 0;
-	}
-</style>

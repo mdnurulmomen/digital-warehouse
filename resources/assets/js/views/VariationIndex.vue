@@ -470,8 +470,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-	import Multiselect from 'vue-multiselect';
 	import Treeselect from '@riophae/vue-treeselect'
 	// import the styles
   	import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -501,7 +499,6 @@
 
 	    components: { 
 	    	Treeselect,
-			multiselect : Multiselect,
 		},
 
 	    data() {
@@ -1045,7 +1042,3 @@
   	}
 
 </script>
-
-<style scoped>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
-</style>

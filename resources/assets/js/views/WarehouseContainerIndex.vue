@@ -337,12 +337,9 @@
 			</div>
 		</div>
 	</div>
-
 </template>
 
 <script type="text/javascript">
-
-	import axios from 'axios';
 
 	export default {
 
@@ -545,16 +542,3 @@
   	}
 
 </script>
-
-<style scoped>
-	.branches-enter-active {
-  		transition: all 1s ease;
-	}
-	.branches-leave-active {
-  		transition: all 1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-	}
-	.branches-enter, .branches-leave-to {
-  		transform: translateX(10px);
-  		opacity: 0;
-	}
-</style>

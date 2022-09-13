@@ -949,17 +949,10 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-	import Multiselect from 'vue-multiselect';
 	import CKEditor from '@ckeditor/ckeditor5-vue';
 	import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 	export default {
-
-		components: { 
-			multiselect : Multiselect,
-			ckeditor: CKEditor.component,
-		},
 
 	    data() {
 	        return {
@@ -1984,7 +1977,3 @@
   	}
 
 </script>
-
-<style scoped>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
-</style>

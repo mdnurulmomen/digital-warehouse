@@ -3331,14 +3331,7 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-	import Multiselect from 'vue-multiselect';
-
 	export default {
-
-	    components: { 
-			multiselect : Multiselect,
-		},
 
 	    data() {
 
@@ -6635,18 +6628,3 @@
   	}
 
 </script>
-
-<style scoped>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
-
-	.fade-enter-active {
-  		transition: all .3s ease;
-	}
-	.fade-leave-active {
-  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-	}
-	.fade-enter, .fade-leave-to {
-  		transform: translateX(10px);
-  		opacity: 0;
-	}
-</style>

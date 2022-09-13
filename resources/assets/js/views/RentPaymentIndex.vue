@@ -873,7 +873,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
 	import Datepicker from 'vuejs-datepicker';
 
     let singlePaymentData = {
@@ -1667,23 +1666,3 @@
   	}
 
 </script>
-
-<style scoped>
-	@import '~vue-multiselect/dist/vue-multiselect.min.css';
-
-	.fade-enter-active {
-  		transition: all .3s ease;
-	}
-	.fade-leave-active {
-  		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-	}
-	.fade-enter, .fade-leave-to {
-  		transform: translateX(10px);
-  		opacity: 0;
-	}
-	.date {
-		background: #f2f2f2;
-		border: 1px solid #ddd;
-		padding: 1em 1em 1em;
-	}
-</style>

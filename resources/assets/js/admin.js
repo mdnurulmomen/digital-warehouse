@@ -16,6 +16,9 @@ Vue.use(VueRouter)
 import VTooltip from 'v-tooltip'
 Vue.use(VTooltip)
 
+import axios from 'axios';
+Vue.use(axios)
+
 // import mixin
 import HasPermission from './mixins/HasPermission';
 Vue.mixin(HasPermission);
@@ -49,6 +52,7 @@ Vue.component('qr-code', VueQRCodeComponent)
 
 // Registering component globally
 // Vue.component('barcode', require('vue-barcode'));
+Vue.component('multiselect', require('vue-multiselect').default);
 Vue.component('download-excel', require('vue-json-excel').default);
 Vue.component('tab', require('./components/TabComponent.vue').default);
 Vue.component('alert', require('./components/AlertComponent.vue').default);

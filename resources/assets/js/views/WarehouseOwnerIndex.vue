@@ -122,8 +122,6 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-
     let singleOwnerDetails = {
     	active : false,
     	profile_preview : {},

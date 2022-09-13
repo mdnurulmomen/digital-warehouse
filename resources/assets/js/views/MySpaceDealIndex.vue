@@ -787,15 +787,12 @@
 
 <script type="text/javascript">
 
-	import axios from 'axios';
-	// import Multiselect from 'vue-multiselect';
 	import Datepicker from 'vuejs-datepicker';
 
 	export default {
 
 	    components: { 
 	    	Datepicker,
-			// multiselect : Multiselect,
 		},
 
 	    data() {
@@ -1447,11 +1444,3 @@
   	}
 
 </script>
-
-<style scoped>
-	.date {
-		background: #f2f2f2;
-		border: 1px solid #ddd;
-		padding: 1em 1em 1em;
-	}
-</style>
