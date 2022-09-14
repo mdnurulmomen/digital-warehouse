@@ -28,14 +28,27 @@
 						<div class="form-row">
 							<div class="form-group col-md-12">
 								<label for="inputFirstName">Email Address</label>
-								<input type="text" 
-									class="form-control" 
-									v-model="newEmail" 
-									placeholder="New Email Address" 
-									:class="!errors.email ? 'is-valid' : 'is-invalid'" 
-									@change="validateFormInput('email')" 
-									@keydown.enter.prevent="validateFormInput('email');addRecipientMail()"
-								>
+
+								<div class="input-group mb-0">
+									<input type="text" 
+										class="form-control" 
+										v-model="newEmail" 
+										placeholder="New Email Address" 
+										:class="!errors.email ? 'is-valid' : 'is-invalid'" 
+										@change="validateFormInput('email')" 
+										@keydown.enter.prevent="validateFormInput('email');addRecipientMail()"
+									>
+
+									<div class="input-group-append">
+										<span 
+											class="input-group-text waves-effect waves-light btn-grd-primary"
+											v-tooltip.bottom-end="'Add Address'" 
+											@click="addRecipientMail()"
+										>
+											Enlist
+										</span>
+									</div>
+								</div>
 
 								<div class="invalid-feedback">
 						        	{{ errors.email }}
@@ -113,7 +126,7 @@
 								Close
 							</button>
 							<button type="submit" class="btn waves-effect waves-dark btn-primary btn-outline-primary float-right" :disabled="! submitForm || formSubmitted">
-								{{ createMode ? 'Save' : 'Update' }}
+								Sent Mail
 							</button>
 						</div>
 					</div>

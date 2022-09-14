@@ -6,7 +6,7 @@
   <meta name="x-apple-disable-message-reformatting">
 </head>
 
-<title>{{ $generalSettings->app_name }} Mail</title>
+<title>{{ ucfirst($generalSettings->app_name) }} Mail</title>
 
 <style type="text/css"></style>
 
@@ -52,7 +52,7 @@
                                                                               <tr>
                                                                                 <td align="center">
                                                                                   <a href="{{ config('app.url') }}" title="{{ ucfirst($generalSettings->app_name) }}" target="_blank">
-                                                                                    <img src="{{ asset('uploads/application/application_logo.png') }}" alt="{{ ucfirst($generalSettings->app_name) }} Logo" height="40" width="150" style="display:block;height:40px;width:150px;text-align:center;padding:30px 20px" class="CToWUd">
+                                                                                    <img src="{{asset('system/logo.png')}}" alt="{{ ucfirst($generalSettings->app_name) }} Logo" height="40" width="150" style="display:block;height:40px;width:150px;text-align:center;padding:30px 20px" class="CToWUd">
                                                                                   </a>
                                                                                 </td>
                                                                               </tr>

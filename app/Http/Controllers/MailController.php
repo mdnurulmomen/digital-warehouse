@@ -72,7 +72,7 @@ class MailController extends Controller
             'id' => 1
         ]);
 
-        $sender = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user() ?? \Auth::guard('warehouse')->user() ?? \Auth::guard('owner')->user() ?? \Auth::user();
+        $sender = \Auth::guard('admin')->user() ?? \Auth::guard('manager')->user();
 
 		$newMail = new AppMail();
 		$newMail->subject = $request->subject;
