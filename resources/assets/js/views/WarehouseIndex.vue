@@ -4282,12 +4282,3 @@
   	}
 
 </script>
-
-<style scoped>
-	.modal { 
-		overflow: auto !important; 
-	}
-	.modal-body {
-		word-break: break-all;
-	}
-</style>
