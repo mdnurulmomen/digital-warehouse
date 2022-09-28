@@ -1,4 +1,3 @@
-
 <template v-if="userHasPermissionTo('view-requisition-index')">
 	<div class="pcoded-content">
 		<breadcrumb 
