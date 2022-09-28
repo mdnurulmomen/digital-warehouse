@@ -163,7 +163,7 @@ class ProductController extends Controller
 
                 'current' => new ProductCategoryCollection(ProductCategory::withCount('products')->with('parent')->latest('id')->paginate($perPage)),
 
-                'trashed' => new ProductCategoryCollection(ProductCategory::withCount('products')->onlyTrashed()->with('parent')->latest('id')->paginate($perPage)),
+                'trashed' => new ProductCategoryCollection(ProductCategory::onlyTrashed()->withCount('products')->with('parent')->latest('id')->paginate($perPage)),
 
             ], 200);
 

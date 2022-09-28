@@ -16,7 +16,7 @@ class ProductCategoriesImport implements ToModel, WithValidation, WithHeadingRow
         return [
             'name' => 'required|string|max:255',   
             'is_perishable' => 'required|boolean',          
-            'parent_category_name' => 'nullable|string|max:100',   
+            'parent_category_name' => 'nullable|string|max:100|different:name',   
         ];
     }
 
@@ -47,7 +47,7 @@ class ProductCategoriesImport implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {   
         // parent category
-        if (! empty($row['parent_category_name']) && preg_match("/[a-z]/i", $row['parent_category_name']) && strlen($row['parent_category_name']) > 2) {
+        if (! empty($row['parent_category_name']) && preg_match("/[a-z]/i", $row['parent_category_name']) && strlen($row['parent_category_name']) > 2 && strtolower($row['name']) != strtolower($row['parent_category_name'])) {
             
             $parentCategory = ProductCategory::withTrashed()->updateOrCreate(
                 [

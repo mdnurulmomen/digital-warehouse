@@ -22,7 +22,7 @@ class ProductCategoryResource extends JsonResource
             'products_count' => $this->products_count,
             'parent_category_id' => $this->when($this->parent_category_id, $this->parent_category_id),
             
-            'parent' => $this->when($this->relationLoaded('parent') && $this->parent, new ProductCategoryResource($this->parent ? $this->parent->loadMissing('parent') : NULL)),
+            'parent' => new ProductCategoryResource($this->whenLoaded('parent')),
 
             'childs' => $this->when($this->relationLoaded('childs'), $this->childs ? ProductCategoryResource::collection($this->childs->loadMissing('childs')) : []),
             
