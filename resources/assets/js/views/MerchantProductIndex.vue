@@ -1360,6 +1360,7 @@
 															>
 																<h6>Container Address</h6>
 
+																<!-- 
 																<div class="form-row">
 																	<label class="col-4 col-form-label font-weight-bold">
 																		Warehouse :
@@ -1367,7 +1368,8 @@
 																	<label class="col-8 col-form-label">
 																		{{ containerAddress.warehouse_container ? $options.filters.capitalize(containerAddress.warehouse_container.warehouse.name) : 'NA' }}
 																	</label>
-																</div>
+																</div> 
+																-->
 
 																<div class="form-row">
 																	<label class="col-4 col-form-label font-weight-bold">
