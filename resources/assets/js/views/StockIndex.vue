@@ -318,7 +318,6 @@
 						<input type="hidden" name="_token" :value="csrf">
 
 						<div class="modal-body">
-
 							<transition-group name="fade">  		
 								<div 
 									class="row" 
@@ -3185,7 +3184,7 @@
 							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 								<!-- {{ productVariationQuantityIndex }} -->
 
-								{{ (productVariationQuantityIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+								{{ (productVariationQuantityIndex + '.' + ((stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : '') + ' ' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 							</h6>
 
 							<svg  
@@ -3286,7 +3285,7 @@
 								<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 									<!-- {{ productVariationSerialIndex }} -->
 
-									{{ (productVariationSerialIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+									{{ (productVariationSerialIndex + '.' + ((stockedProduct.merchant_product && stockedProduct.merchant_product.product) ? stockedProduct.merchant_product.product.name : '') + ' ' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 								</h6>
 
 								<svg  

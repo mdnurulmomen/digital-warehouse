@@ -2618,7 +2618,7 @@
 					:key="'printing-product-quantity-index-' + productQuantity + '-product-' + productToPrint.id"
 				>
 					<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
-						Stock-Code :
+						{{ product.name | capitalize }} Stock-Code :
 					</h6>
 
 					<svg  
@@ -2650,7 +2650,7 @@
 						<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 							<!-- {{ productVariationQuantityIndex }} -->
 
-							{{ (productVariationQuantityIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+							{{ (productVariationQuantityIndex + '.' + product.name + ' ' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 						</h6>
 
 						<svg  
@@ -2678,7 +2678,7 @@
 				>
 					<div style="text-align:center;">
 						<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
-							Stock-Code :
+							{{ product.name | capitalize }} Stock-Code :
 						</h6>
 
 						<svg  
@@ -2751,7 +2751,7 @@
 							<h6 style="margin-bottom:0px; margin-top:0px;font-size: 80%;">
 								<!-- {{ productVariationSerialIndex }} -->
 
-								{{ (productVariationSerialIndex + '.' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
+								{{ (productVariationSerialIndex + '.' + product.name + ' ' + productVariation.variation ? productVariation.variation.name : '') | capitalize }} Stock-Code :
 							</h6>
 
 							<svg  
@@ -3131,7 +3131,6 @@
 													--
 												</span>
 											</td>
-
 											<!-- <td></td> -->
 										</tr>
 									</div>

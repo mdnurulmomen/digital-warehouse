@@ -22,7 +22,7 @@ import { ToggleButton } from 'vue-js-toggle-button'
 Vue.component('ToggleButton', ToggleButton)
 
 // importing custom components
-import { routeNeedsPermission, userHasPermissionTo } from './public.js'
+import { routeNeedsPermission, userHasPermissionTo } from './mixins/public.js'
 
 /**
  * The following block of code may be used to automatically register your
