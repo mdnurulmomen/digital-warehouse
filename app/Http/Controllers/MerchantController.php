@@ -109,13 +109,13 @@ class MerchantController extends Controller
         // support deal
         $newUser->supportDeal()->create([
             'sale_percentage' => $request->support_deal['sale_percentage'] ?? 0,
-            'e_commerce_fulfillment_support' => $request->support_deal['e_commerce_fulfillment_support'],
-            'e_commerce_fulfillment_charge' => $request->support_deal['e_commerce_fulfillment_support'] ? $request->support_deal['e_commerce_fulfillment_charge'] : 0,
-            'purchase_support' => $request->support_deal['purchase_support'],
-            'purchase_support_charge' => $request->support_deal['purchase_support'] ? $request->support_deal['purchase_support_charge'] : 0,
-            'pos_support' => $request->support_deal['pos_support'],
-            'pos_support_charge' => $request->support_deal['pos_support'] ? $request->support_deal['pos_support_charge'] : 0,
-            'number_outlets' => $request->support_deal['pos_support'] ? $request->support_deal['number_outlets'] : 0,
+            'e_commerce_fulfillment_support' => $request->support_deal['e_commerce_fulfillment_support'] ?? 0,
+            'e_commerce_fulfillment_charge' => $request->support_deal['e_commerce_fulfillment_charge'] ?? 0,
+            'purchase_support' => $request->support_deal['purchase_support'] ?? 0,
+            'purchase_support_charge' => $request->support_deal['purchase_support_charge'] ?? 0,
+            'pos_support' => $request->support_deal['pos_support'] ?? 0,
+            'pos_support_charge' => $request->support_deal['pos_support_charge'] ?? 0,
+            'number_outlets' => $request->support_deal['number_outlets'] ?? 0,
             'rent_period_id' => $request->support_deal['rent_period_id']
         ]);
 
